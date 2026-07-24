@@ -1,3 +1,5 @@
+import { readFileSync } from "node:fs";
+import { join } from "node:path";
 import { describe, expect, it } from "vitest";
 import {
   buildProductPathHref,
@@ -8,6 +10,21 @@ import {
 import { buildSoftwareCategoryHref } from "@/lib/software-category-navigation";
 
 describe("homepage demand product paths", () => {
+  it("renders database-backed product paths at request time", () => {
+    const routeFiles = [
+      "src/app/(zh-public)/product-paths/[slug]/page.tsx",
+      "src/app/en/product-paths/[slug]/page.tsx",
+    ];
+
+    for (const routeFile of routeFiles) {
+      const source = readFileSync(join(process.cwd(), routeFile), "utf8");
+
+      expect(source).toContain('export const dynamic = "force-dynamic";');
+      expect(source).not.toContain("generateStaticParams");
+      expect(source).not.toContain("export const revalidate");
+    }
+  });
+
   it("defines the three product display pages with the requested Chinese titles and categories", () => {
     expect(productPathSlugs).toEqual([
       "work-efficiency",

@@ -1,15 +1,10 @@
 import {
   generateProductPathMetadata,
-  generateProductPathStaticParams,
   ProductPathPageShell,
 } from "@/app/product-paths/[slug]/page-shell";
 import { PublicSiteChrome } from "@/components/public-site-chrome";
 
-export const revalidate = 300;
-
-export function generateStaticParams() {
-  return generateProductPathStaticParams();
-}
+export const dynamic = "force-dynamic";
 
 export async function generateMetadata({
   params,
