@@ -98,11 +98,6 @@ export async function SiteFooter({ forceLocale }: { forceLocale?: Locale }) {
               />
               <p className="site-footer-brand-name">{siteName}</p>
             </div>
-            <p className="site-footer-summary">
-              {locale === "en"
-                ? "AI news, trend analysis, software apps, account guidance, skill learning, and tutorials in one ENHE AI hub."
-                : "汇集AI前沿资讯、AI趋势分析、AI软件应用、AI账号服务、AI技能学习与使用教程，让用户从信息判断走向可执行成果。"}
-            </p>
           </div>
 
           <div className="site-footer-newsletter" aria-label={locale === "en" ? "ENHE AI contact channels" : "ENHE AI 联系渠道"}>

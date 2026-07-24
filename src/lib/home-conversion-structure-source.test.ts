@@ -17,14 +17,15 @@ describe("homepage conversion structure contract", () => {
     ).replace(/\r\n/g, "\n");
 
     expect(dictionaries).toContain(
-      "从工具选择、内容创作到技能学习与隐私更可控的工作流，按真实任务找到可执行的 AI 路径。",
+      "让每一个普通人，都能轻松驾驭AI，把想法变成现实，把效率变成价值。",
     );
     expect(dictionaries).toContain(
-      "Find practical AI paths for tool selection, content creation, skill learning, and privacy-conscious workflows.",
+      "Helping everyone use AI with confidence—turn ideas into creations and productivity into value.",
     );
 
     expect(page).toContain("const homeTrustSignals: Record<Locale, HomeTrustSignal[]> = {");
-    expect(page).toContain('className="home-trust-shell"');
+    expect(page).toContain('className="home-decision-card-shell"');
+    expect(page).toContain('className="home-seo-disclosure home-decision-disclosure"');
     expect(page).toContain('href: "/llms.txt"');
     expect(page).toContain('href: "/about"');
     expect(page).toContain('href: "/legal/privacy-policy"');
@@ -40,17 +41,15 @@ describe("homepage conversion structure contract", () => {
     expect(page).not.toContain('className="home-flowing-menu-shell"');
 
     expect(page).toContain("const homeWorkflowSteps = {");
-    expect(page).toContain('className="home-workflow-shell"');
     expect(page).toContain('className="home-workflow-list"');
-    expect(page).toContain('className="home-final-cta-shell"');
+    expect(page).toContain('className="home-final-cta-band"');
     expect(page).toContain('data-analytics-meta-placement="home-final-cta"');
 
-    expect(css).toContain(".home-trust-shell,");
+    expect(css).toContain(".home-decision-card-shell {");
     expect(css).toContain(".home-task-outcomes-shell,");
-    expect(css).toContain(".home-final-cta-shell {");
-    expect(css).toMatch(
-      /\.home-hero-cta-primary\s*{[\s\S]*?background:\s*#41c5db\s*!important;[\s\S]*?color:\s*#07131a\s*!important;/,
-    );
+    expect(css).toContain(".home-final-cta-band {");
+    expect(css).not.toContain(".home-hero-cta-primary {");
+    expect(css).toContain("background-color: rgba(255, 255, 255, 0.045) !important;");
     expect(css).toContain("outline: 1px solid rgba(255, 255, 255, 0.1);");
     expect(css).toContain(".home-task-outcome-link:active {");
     expect(css).toContain("transform: scale(0.96);");

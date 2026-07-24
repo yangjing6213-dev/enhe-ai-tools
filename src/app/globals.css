@@ -2363,7 +2363,7 @@ select option:disabled {
 
 .home-hero-actions {
   display: grid;
-  width: min(100%, 1120px);
+  width: min(100%, 1040px);
   grid-template-columns: repeat(4, minmax(0, 1fr));
   align-items: stretch;
   gap: 12px;
@@ -2387,20 +2387,18 @@ select option:disabled {
   width: 100%;
   min-width: 0;
   min-height: 48px;
-  border: 1px solid rgba(255, 255, 255, 0.18) !important;
+  border: 1px solid rgba(255, 255, 255, 0.16) !important;
   border-radius: 9px !important;
-  background-color: transparent !important;
+  background-color: rgba(255, 255, 255, 0.045) !important;
   background-image: none !important;
-  padding: 0 24px !important;
-  color: #ffffff !important;
-  font-size: 17px !important;
-  font-weight: 850 !important;
-  line-height: 1 !important;
-  letter-spacing: 0.03em;
+  padding: 8px 16px !important;
+  color: rgba(231, 248, 250, 0.86) !important;
+  font-size: 15px !important;
+  font-weight: 700 !important;
+  line-height: 1.35 !important;
+  letter-spacing: 0;
   white-space: nowrap;
-  box-shadow:
-    inset 0 0 0 1px rgba(255, 255, 255, 0.06),
-    0 14px 34px rgba(0, 0, 0, 0.14) !important;
+  box-shadow: none !important;
   backdrop-filter: var(--home-hero-cta-filter) !important;
   -webkit-backdrop-filter: var(--home-hero-cta-filter) !important;
   transition:
@@ -2414,20 +2412,10 @@ select option:disabled {
   display: none !important;
 }
 
-.home-hero-cta-primary {
-  border-color: #41c5db !important;
-  background: #41c5db !important;
-  background-image: none !important;
-  color: #07131a !important;
-  box-shadow:
-    0 0 0 1px rgba(255, 255, 255, 0.08),
-    0 14px 32px rgba(0, 0, 0, 0.24),
-    0 0 28px rgba(65, 197, 219, 0.2) !important;
-}
-
 .home-hero-cta:hover {
-  border-color: #78dbe8 !important;
-  background-color: #78dbe8 !important;
+  border-color: rgba(65, 197, 219, 0.5) !important;
+  background-color: rgba(65, 197, 219, 0.1) !important;
+  color: #ffffff !important;
   transform: translateY(-1px);
 }
 
@@ -2513,6 +2501,10 @@ select option:disabled {
     0 24px 64px rgba(0, 0, 0, 0.14);
   backdrop-filter: blur(18px) saturate(125%);
   -webkit-backdrop-filter: blur(18px) saturate(125%);
+}
+
+.home-decision-disclosure .home-decision-card {
+  margin-top: 1rem;
 }
 
 .home-decision-card-section {
@@ -2809,19 +2801,9 @@ select option:disabled {
   gap: 2rem;
 }
 
-.home-final-cta-band h2 {
-  margin: 0;
-  color: var(--marketing-text);
-  font-size: 2rem;
-  font-weight: 900;
-  line-height: 1.2;
-  letter-spacing: 0;
-  text-wrap: balance;
-}
-
 .home-final-cta-band p {
   max-width: 680px;
-  margin: 0.75rem 0 0;
+  margin: 0;
   color: var(--marketing-muted);
   font-size: 0.95rem;
   font-weight: 550;
@@ -3780,15 +3762,6 @@ select option:disabled {
   font-weight: 850;
   line-height: 1;
   overflow-wrap: anywhere;
-}
-
-.site-footer-summary {
-  max-width: 540px;
-  margin: 18px 0 0;
-  color: var(--marketing-soft-text);
-  font-size: 15px;
-  font-weight: 600;
-  line-height: 1.75;
 }
 
 .site-footer-socials {

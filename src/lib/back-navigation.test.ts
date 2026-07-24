@@ -1,6 +1,10 @@
 import { describe, expect, it } from "vitest";
 import { readFileSync } from "node:fs";
-import { getBackNavigationParentHref, shouldShowBackNavigation } from "@/lib/back-navigation";
+import {
+  getBackNavigationParentHref,
+  shouldShowBackNavigation,
+  shouldUseBrowserHistory,
+} from "@/lib/back-navigation";
 
 describe("back navigation", () => {
   it("hides only on localized home pages", () => {
@@ -39,6 +43,52 @@ describe("back navigation", () => {
     expect(getBackNavigationParentHref("/admin/orders/cm123")).toBe("/admin/orders");
     expect(getBackNavigationParentHref("/orders/cm123/pay")).toBe("/orders/cm123");
     expect(getBackNavigationParentHref("/orders/cm123")).toBe("/user");
+  });
+
+  it("uses browser history only when it is an internal, non-empty history", () => {
+    const currentOrigin = "https://www.enhe-tech.com.cn";
+
+    expect(
+      shouldUseBrowserHistory({
+        currentOrigin,
+        hasClientHistory: false,
+        historyLength: 2,
+        referrer: "https://www.enhe-tech.com.cn/software",
+      }),
+    ).toBe(true);
+    expect(
+      shouldUseBrowserHistory({
+        currentOrigin,
+        hasClientHistory: false,
+        historyLength: 1,
+        referrer: "https://www.enhe-tech.com.cn/software",
+      }),
+    ).toBe(false);
+    expect(
+      shouldUseBrowserHistory({
+        currentOrigin,
+        hasClientHistory: false,
+        historyLength: 2,
+        referrer: "https://example.com/",
+      }),
+    ).toBe(false);
+    expect(
+      shouldUseBrowserHistory({
+        currentOrigin,
+        hasClientHistory: true,
+        historyLength: 2,
+        referrer: "",
+      }),
+    ).toBe(true);
+  });
+
+  it("uses router history instead of a cached path", () => {
+    const backNavigationBar = readFileSync("src/components/back-navigation-bar.tsx", "utf8");
+
+    expect(backNavigationBar).toContain("router.back()");
+    expect(backNavigationBar).toContain("router.replace(parentHref)");
+    expect(backNavigationBar).not.toContain("sessionStorage");
+    expect(backNavigationBar).not.toContain("previousInternalPath");
   });
 
   it("keeps the public back button aligned to the content container", () => {

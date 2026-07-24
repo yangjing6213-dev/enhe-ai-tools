@@ -22,8 +22,8 @@ describe("homepage SaaS redesign source", () => {
     expect(page).not.toContain("ENHE AI recommended content preview");
     expect(page).toContain("const heroTitle =");
     expect(page).toContain("ENHE AI");
-    expect(dictionaries).toContain("从工具选择、内容创作到技能学习与隐私更可控的工作流，按真实任务找到可执行的 AI 路径。");
-    expect(dictionaries).toContain("Find practical AI paths for tool selection, content creation, skill learning, and privacy-conscious workflows.");
+    expect(dictionaries).toContain("让每一个普通人，都能轻松驾驭AI，把想法变成现实，把效率变成价值。");
+    expect(dictionaries).toContain("Helping everyone use AI with confidence—turn ideas into creations and productivity into value.");
     expect(page).toContain("const heroIntro = t.home.intro;");
     expect(page).not.toContain("home-hero-metrics");
     expect(page).not.toContain("t.home.metricsExploreTitle");
@@ -33,12 +33,13 @@ describe("homepage SaaS redesign source", () => {
     expect(page).not.toContain("HomeGooeyNav");
     expect(page).not.toContain("const heroCtaItems = [");
     expect(page).toContain('className="home-hero-actions"');
-    expect(page).toContain('className="home-hero-cta home-hero-cta-primary"');
+    expect(page).toContain('className="home-hero-cta"');
+    expect(page).not.toContain("home-hero-cta-primary");
     expect(page).toContain('className="home-hero-secondary-link"');
     expect(page).not.toContain('className="home-hero-cta home-hero-cta-accent"');
     expect(page).toContain('href={buildLocalePath("/software", forceLocale)}');
     expect(page).toContain('href={buildLocalePath("/skill-learning", forceLocale)}');
-    expect(page).toContain('forceLocale === "en" ? "Find the right AI tool" : "选择适合我的 AI 工具"');
+    expect(page).toContain('forceLocale === "en" ? "Find the right AI tool" : "选择适合AI的工具"');
     expect(page).toContain('forceLocale === "en" ? "Explore practical AI learning" : "查看 AI 实战学习路径"');
     expect(page).toContain("const homeTaskOutcomes: Record<Locale, HomeTaskOutcome[]> = {");
     expect(page).toContain("const homeTrustSignals: Record<Locale, HomeTrustSignal[]> = {");
@@ -48,13 +49,13 @@ describe("homepage SaaS redesign source", () => {
     expect(page).not.toContain("const buildYourOwnXSpotlight = {");
     expect(page).toContain('href: "/build-your-own-x"');
     expect(page).toContain('className="home-task-outcomes-shell"');
-    expect(page).toContain('className="home-trust-shell"');
+    expect(page).toContain('className="home-trust-list"');
     expect(page).not.toContain("<FlowingMenu");
     expect(page).not.toContain("先从软件、课程或账号服务进入，再对比价格、交付方式和购买说明。");
     expect(page).not.toContain("Start with software, courses, or account services, then compare pricing and delivery details before purchase.");
     expect(page).toContain('className="home-support-shell"');
     expect(page).toContain('className="home-seo-disclosure"');
-    expect(page).toContain('className="home-workflow-shell"');
+    expect(page).toContain('className="home-workflow-list"');
     expect(page).not.toContain('className="home-byox-spotlight"');
     expect(page).not.toContain("t.home.featuredContentIntro");
     expect(page).not.toContain("take: 40");
@@ -74,11 +75,12 @@ describe("homepage SaaS redesign source", () => {
       page.indexOf('{homeProductDemos.length ?'),
     );
     expect(page.indexOf('<section className="home-product-demo-shell"')).toBeLessThan(
+      page.indexOf('className="home-decision-card-shell"'),
+    );
+    expect(page.indexOf('className="home-decision-card-shell"')).toBeLessThan(
       page.indexOf('<section className="home-support-shell"'),
     );
-    expect(page.indexOf('<section className="home-support-shell"')).toBeLessThan(
-      page.indexOf('<section className="home-final-cta-shell"'),
-    );
+    expect(page).not.toContain('className="home-final-cta-shell"');
     expect(page).not.toContain("HeroLogoMark");
     expect(page).not.toContain("enhe-orbital-system");
     expect(page).not.toContain("enhe-circuit-line");
@@ -114,7 +116,7 @@ describe("homepage SaaS redesign source", () => {
     expect(css).not.toContain(".home-hero-metrics");
     expect(css).not.toContain(".home-featured-shell");
     expect(css).toContain(".home-task-outcomes-shell");
-    expect(css).toContain(".home-trust-shell");
+    expect(css).toContain(".home-decision-card");
     expect(css).not.toContain(".home-outcome-grid");
     expect(css).not.toContain(".home-product-path-grid");
     expect(css).toContain(".home-support-shell");
@@ -126,9 +128,9 @@ describe("homepage SaaS redesign source", () => {
     expect(css).toContain("border-radius: 18px;\n  background: rgba(255, 255, 255, 0.045);");
     expect(css).toContain("overflow-x: clip");
     expect(css).toContain("scroll-margin-top: 96px");
-    expect(css).toContain(".home-hero-actions {\n  display: flex;");
-    expect(css).toContain(".home-hero-actions {\n    width: 100%;\n    flex-direction: column;");
-    expect(css).toContain(".home-hero-cta {\n    width: min(100%, 320px);");
+    expect(css).toContain(".home-hero-actions {\n  display: grid;");
+    expect(css).toContain(".home-hero-actions {\n    width: 100%;\n    grid-template-columns: repeat(2, minmax(0, 1fr));");
+    expect(css).toContain(".home-hero-cta {\n    width: 100%;");
     expect(css).not.toContain(".home-gooey-nav-list");
     expect(css).toContain("white-space: pre-line");
     expect(css).toContain(".home-product-preview {\n  width: min(100%, 1280px);\n  margin: 0 auto;");
@@ -320,15 +322,15 @@ describe("homepage SaaS redesign source", () => {
     expect(css).toContain("background-image: none");
     expect(css).toContain("--home-hero-eyebrow-filter: blur(18px) saturate(150%)");
     expect(css).toContain("backdrop-filter: var(--home-hero-eyebrow-filter)");
-    expect(css).toContain("min-width: 292px;");
+    expect(css).toContain("width: min(100%, 1040px);");
     expect(css).toContain("min-height: 48px;");
     expect(css).toContain("border-radius: 9px !important");
     expect(css).toContain("--home-hero-cta-filter: blur(20px) saturate(165%) contrast(1.04)");
     expect(css).toContain("backdrop-filter: var(--home-hero-cta-filter) !important");
-    expect(css).toContain("border: 1px solid rgba(255, 255, 255, 0.18) !important");
-    expect(css).toContain("background: #41c5db !important");
+    expect(css).toContain("border: 1px solid rgba(255, 255, 255, 0.16) !important");
+    expect(css).toContain("background-color: rgba(255, 255, 255, 0.045) !important");
     expect(css).toContain("background-image: none !important");
-    expect(css).toContain(".home-hero-cta-primary {\n  border-color: #41c5db !important;");
+    expect(css).not.toContain(".home-hero-cta-primary {");
     expect(css).toContain(".home-hero-secondary-link {");
     expect(css).toContain("color: #ffffff");
     expect(css).toContain(".home-task-outcomes-shell,");

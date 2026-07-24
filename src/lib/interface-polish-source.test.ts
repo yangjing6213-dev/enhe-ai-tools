@@ -45,13 +45,14 @@ describe("public interface polish contract", () => {
     expect(css).toMatch(/\.home-seo-disclosure summary\s*{[\s\S]*?min-height:\s*44px;/);
   });
 
-  it("collapses mobile footer groups by default while preserving desktop content", () => {
+  it("keeps footer groups collapsed by default and expandable on every viewport", () => {
     const footer = readFileSync(new URL("../components/site-footer.tsx", import.meta.url), "utf8");
     const css = readFileSync(new URL("../app/globals.css", import.meta.url), "utf8");
 
     expect(footer).not.toContain('className="site-footer-disclosure" open');
-    expect(css).toContain(".site-footer-disclosure:not([open]) > :not(summary)");
-    expect(css).toContain("@media (min-width: 1024px)");
+    expect(footer).toContain('<details className="site-footer-disclosure">');
+    expect(css).toContain(".site-footer-disclosure > summary");
+    expect(css).not.toContain(".site-footer-disclosure {\n    display: contents;");
   });
 
   it("uses tabular numbers and targeted neutral outlines for public dynamic metrics and thumbnails", () => {

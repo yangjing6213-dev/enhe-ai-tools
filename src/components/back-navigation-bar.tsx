@@ -2,42 +2,54 @@
 
 import { ArrowLeft } from "lucide-react";
 import { usePathname, useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
-import { getBackNavigationParentHref, shouldShowBackNavigation } from "@/lib/back-navigation";
+import { useEffect } from "react";
+import { getBackNavigationParentHref, shouldShowBackNavigation, shouldUseBrowserHistory } from "@/lib/back-navigation";
 import { cn } from "@/lib/utils";
 
 type BackNavigationBarProps = {
   locale: "zh" | "en";
 };
 
-const currentPathStorageKey = "enhe:last-current-path";
-
-function getSameOriginReferrerPath() {
-  if (typeof document === "undefined" || !document.referrer) return false;
-
-  try {
-    const referrer = new URL(document.referrer);
-    if (referrer.origin !== window.location.origin) return null;
-    return `${referrer.pathname}${referrer.search}${referrer.hash}`;
-  } catch {
-    return null;
-  }
-}
+let clientPathStack: string[] = [];
+let pendingHistoryTraversal = false;
+let pendingParentFallback = false;
 
 export function BackNavigationBar({ locale }: BackNavigationBarProps) {
   const pathname = usePathname() ?? "/";
   const router = useRouter();
   const parentHref = getBackNavigationParentHref(pathname);
   const visible = shouldShowBackNavigation(pathname);
-  const [previousInternalPath, setPreviousInternalPath] = useState<string | null>(null);
 
   useEffect(() => {
-    const referrerPath = getSameOriginReferrerPath();
-    const storedPath = window.sessionStorage.getItem(currentPathStorageKey);
-    const nextPreviousPath = referrerPath && referrerPath !== pathname ? referrerPath : storedPath && storedPath !== pathname ? storedPath : null;
+    const handlePopState = () => {
+      pendingHistoryTraversal = true;
+    };
 
-    setPreviousInternalPath(nextPreviousPath);
-    window.sessionStorage.setItem(currentPathStorageKey, pathname);
+    window.addEventListener("popstate", handlePopState);
+    return () => window.removeEventListener("popstate", handlePopState);
+  }, []);
+
+  useEffect(() => {
+    const currentPath = clientPathStack.at(-1);
+    if (!currentPath) {
+      clientPathStack = [pathname];
+      return;
+    }
+    if (currentPath === pathname) return;
+
+    if (pendingParentFallback) {
+      clientPathStack = [pathname];
+      pendingParentFallback = false;
+      pendingHistoryTraversal = false;
+      return;
+    }
+
+    if (pendingHistoryTraversal && clientPathStack.at(-2) === pathname) {
+      clientPathStack.pop();
+    } else {
+      clientPathStack.push(pathname);
+    }
+    pendingHistoryTraversal = false;
   }, [pathname]);
 
   if (!visible) return null;
@@ -50,11 +62,19 @@ export function BackNavigationBar({ locale }: BackNavigationBarProps) {
         type="button"
         className={cn("site-back-nav-button cursor-target")}
         onClick={() => {
-          if (previousInternalPath) {
-            router.push(previousInternalPath);
+          if (
+            shouldUseBrowserHistory({
+              currentOrigin: window.location.origin,
+              hasClientHistory: clientPathStack.length > 1,
+              historyLength: window.history.length,
+              referrer: document.referrer,
+            })
+          ) {
+            router.back();
             return;
           }
-          router.push(parentHref);
+          pendingParentFallback = true;
+          router.replace(parentHref);
         }}
       >
         <ArrowLeft size={16} strokeWidth={1.8} aria-hidden="true" />

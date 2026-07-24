@@ -208,10 +208,10 @@ describe("AI GEO foundations", () => {
     expect(pageShell).toContain('forceLocale === "en"');
     expect(pageShell).toContain("ENHE AI");
     expect(dictionaries).toContain(
-      'intro: "从工具选择、内容创作到技能学习与隐私更可控的工作流，按真实任务找到可执行的 AI 路径。"',
+      'intro: "让每一个普通人，都能轻松驾驭AI，把想法变成现实，把效率变成价值。"',
     );
     expect(dictionaries).toContain(
-      'intro: "Find practical AI paths for tool selection, content creation, skill learning, and privacy-conscious workflows."',
+      'intro: "Helping everyone use AI with confidence—turn ideas into creations and productivity into value."',
     );
     expect(dictionaries).toContain('titleSecondLine: "把 AI 用到真实任务里，让工作、创作和学习更可控"');
     expect(dictionaries).toContain('titleSecondLineEn: "Use AI for real work, creation, learning, and safer workflows"');

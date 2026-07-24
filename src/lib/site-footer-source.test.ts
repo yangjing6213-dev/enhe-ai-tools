@@ -39,4 +39,13 @@ describe("site footer source", () => {
     );
     expect(css).not.toContain(".site-footer-disclosure {\n    display: contents;");
   });
+
+  it("keeps the footer brand area concise", () => {
+    const footer = readFileSync(new URL("../components/site-footer.tsx", import.meta.url), "utf8");
+    const css = readFileSync(new URL("../app/globals.css", import.meta.url), "utf8");
+
+    expect(footer).not.toContain("site-footer-summary");
+    expect(footer).not.toContain("汇集AI前沿资讯");
+    expect(css).not.toContain(".site-footer-summary");
+  });
 });

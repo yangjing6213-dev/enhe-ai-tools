@@ -19,7 +19,7 @@ describe("homepage hero conversion contract", () => {
       'href={buildLocalePath("/software", forceLocale)}',
     );
     expect(hero).toContain(
-      'forceLocale === "en" ? "Find the right AI tool" : "选择适合我的 AI 工具"',
+      'forceLocale === "en" ? "Find the right AI tool" : "选择适合AI的工具"',
     );
     expect(hero).toContain('className="home-hero-actions"');
     expect(hero).toContain('className="home-hero-primary-glow"');
@@ -68,13 +68,15 @@ describe("homepage hero conversion contract", () => {
 
     expect(decisionStart).toBeGreaterThan(-1);
     expect(supportStart).toBeGreaterThan(decisionStart);
+    expect(decisionCard).toContain('className="home-seo-disclosure home-decision-disclosure"');
+    expect(decisionCard).toContain('<summary id="home-decision-summary">{conversionCopy.finalTitle}</summary>');
     expect(decisionCard).toContain('className="home-decision-card"');
     expect(decisionCard).toContain('className="home-trust-list"');
     expect(decisionCard).toContain('className="home-workflow-list"');
     expect(decisionCard).toContain('className="home-final-cta-band"');
     expect(source.match(/id="home-trust-title"/g)).toHaveLength(1);
     expect(source.match(/id="home-workflow-title"/g)).toHaveLength(1);
-    expect(source.match(/id="home-final-cta-title"/g)).toHaveLength(1);
+    expect(source).not.toContain('id="home-final-cta-title"');
   });
 
   it("leaves a visible preview of the next homepage section", () => {
@@ -102,7 +104,7 @@ describe("homepage hero conversion contract", () => {
       "min-height: calc(100dvh - 64px - 1rem - var(--home-next-section-peek));",
     );
     expect(css).toContain(
-      ".home-hero-actions {\n  display: grid;\n  width: min(100%, 1120px);\n  grid-template-columns: repeat(4, minmax(0, 1fr));",
+      ".home-hero-actions {\n  display: grid;\n  width: min(100%, 1040px);\n  grid-template-columns: repeat(4, minmax(0, 1fr));",
     );
     expect(css).toContain(
       ".home-hero-primary-glow {\n  width: 100% !important;\n  min-width: 0 !important;",

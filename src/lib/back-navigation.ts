@@ -20,6 +20,25 @@ const adminParentMap: Record<string, string> = {
   "/admin/ai-news/keywords": "/admin/ai-news"
 };
 
+type BrowserHistoryContext = {
+  currentOrigin: string;
+  hasClientHistory: boolean;
+  historyLength: number;
+  referrer: string;
+};
+
+export function shouldUseBrowserHistory({ currentOrigin, hasClientHistory, historyLength, referrer }: BrowserHistoryContext) {
+  if (historyLength <= 1) return false;
+  if (hasClientHistory) return true;
+  if (!referrer) return false;
+
+  try {
+    return new URL(referrer).origin === currentOrigin;
+  } catch {
+    return false;
+  }
+}
+
 function normalizePathname(pathname: string) {
   const withoutQuery = pathname.split(/[?#]/)[0] ?? "/";
   const normalized = withoutQuery.startsWith("/") ? withoutQuery : `/${withoutQuery}`;

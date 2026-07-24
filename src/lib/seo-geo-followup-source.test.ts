@@ -7,17 +7,17 @@ function read(path: string) {
 }
 
 describe("SEO and GEO follow-up source contracts", () => {
-  it("keeps one readable glass CTA and a lower-emphasis learning link", () => {
+  it("keeps matching glass CTAs and a readable learning link", () => {
     const css = read("src/app/globals.css");
     const baseCta = css.match(/\.home-hero-cta\s*\{[\s\S]*?\}/)?.[0] ?? "";
     const secondaryLink = css.match(/\.home-hero-secondary-link\s*\{[\s\S]*?\}/)?.[0] ?? "";
 
-    expect(baseCta).toContain("background-color: transparent !important");
+    expect(baseCta).toContain("background-color: rgba(255, 255, 255, 0.045) !important");
     expect(baseCta).toContain("background-image: none !important");
     expect(baseCta).toContain("backdrop-filter: var(--home-hero-cta-filter) !important");
-    expect(secondaryLink).toContain("min-height: 44px");
-    expect(secondaryLink).toContain("color: rgba(231, 248, 250, 0.78)");
-    expect(secondaryLink).not.toContain("background");
+    expect(secondaryLink).toContain("min-height: 48px");
+    expect(secondaryLink).toContain("color: rgba(231, 248, 250, 0.86)");
+    expect(secondaryLink).toContain("background: rgba(255, 255, 255, 0.045)");
   });
 
   it("adds public cache headers for AI Trends canonical listing pages", () => {
