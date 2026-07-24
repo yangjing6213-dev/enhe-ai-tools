@@ -28,45 +28,24 @@ export type ProductPathConfig = {
 export const productPathConfigs: Record<ProductPathSlug, ProductPathConfig> = {
   "work-efficiency": {
     slug: "work-efficiency",
-    categoryNames: [
-      "办公效率工具",
-      "文件处理工具",
-      "系统实用工具",
-      "数据分析工具",
-      "提升效率",
-      "AI电脑软件",
-    ],
+    categoryNames: ["AI办公与效率", "AI 智能体"],
     zh: {
       title: "提升工作效率",
       intro:
-        "展示办公效率工具、文件处理工具、系统实用工具、数据分析工具、提升效率和AI电脑软件，帮助你快速找到适合日常工作的产品。",
+        "展示分类为AI办公与效率、AI智能体的产品，帮助你找到适合日常办公、自动化流程与任务协作的AI工具。",
       metaDescription:
-        "按办公效率、文件处理、系统实用、数据分析、效率提升和AI电脑软件筛选产品，比较适用任务、价格、教程、交付方式和使用边界，帮助普通用户更快找到能提升工作效率的AI工具。",
-      categories: [
-        "办公效率工具",
-        "文件处理工具",
-        "系统实用工具",
-        "数据分析工具",
-        "提升效率",
-        "AI电脑软件",
-      ],
+        "浏览AI办公与效率、AI智能体分类下的产品，比较适用任务、价格、教程、交付方式和使用边界，帮助普通用户更快找到适合办公提效、流程自动化、智能协作与实际工作的AI工具。",
+      categories: ["AI办公与效率", "AI智能体"],
       emptyTitle: "暂无提升工作效率产品",
       emptyText: "后台发布对应分类产品后，这里会自动展示。",
     },
     en: {
       title: "Improve work efficiency",
       intro:
-        "Browse office productivity tools, file processing tools, system utilities, data analysis tools, productivity tools, and AI desktop software.",
+        "Browse AI office productivity and AI agent products for daily work, workflow automation, and task collaboration.",
       metaDescription:
-        "Browse AI tools for productivity, file processing, data analysis, utilities, and desktop workflows. Compare fit, pricing, tutorials, and delivery.",
-      categories: [
-        "Office productivity tools",
-        "File processing tools",
-        "System utilities",
-        "Data analysis tools",
-        "Productivity",
-        "AI desktop software",
-      ],
+        "Browse AI office productivity and AI agent products for work and automation. Compare task fit, pricing, tutorials, delivery, and usage boundaries.",
+      categories: ["AI office and productivity", "AI agents"],
       emptyTitle: "No work-efficiency products yet",
       emptyText:
         "Products published under the matching categories will appear here automatically.",
@@ -75,26 +54,24 @@ export const productPathConfigs: Record<ProductPathSlug, ProductPathConfig> = {
   "media-generation": {
     slug: "media-generation",
     categoryNames: [
-      "AI视频工具",
-      "AI图片工具",
-      "AI音频工具",
-      "视频生成",
-      "语音生成",
-      "视频/图片处理",
+      "AI视频生成",
+      "AI图片生成",
+      "AI语音生成",
+      "视频处理",
+      "图片处理",
     ],
     zh: {
       title: "生成图片/视频/音频",
       intro:
-        "展示AI视频工具、AI图片工具、AI音频工具、视频生成、语音生成和视频/图片处理产品，优先找到适合内容创作的工具。",
+        "展示分类为AI视频生成、AI图片生成、AI语音生成、视频处理和图片处理的产品，优先找到适合内容创作的工具。",
       metaDescription:
-        "按AI视频工具、AI图片工具、AI音频工具、视频生成、语音生成和视频/图片处理筛选产品，比较输出质量、素材流程、导出格式、价格边界和教程，找到更适合创作任务的AI工具。",
+        "浏览AI视频生成、AI图片生成、AI语音生成、视频处理和图片处理分类下的产品，比较输出质量、素材流程、导出格式、价格边界和教程，找到更适合内容创作任务的AI工具。",
       categories: [
-        "AI视频工具",
-        "AI图片工具",
-        "AI音频工具",
-        "视频生成",
-        "语音生成",
-        "视频/图片处理",
+        "AI视频生成",
+        "AI图片生成",
+        "AI语音生成",
+        "视频处理",
+        "图片处理",
       ],
       emptyTitle: "暂无生成图片/视频/音频产品",
       emptyText: "后台发布对应分类产品后，这里会自动展示。",
@@ -102,16 +79,15 @@ export const productPathConfigs: Record<ProductPathSlug, ProductPathConfig> = {
     en: {
       title: "Generate image/video/audio",
       intro:
-        "Browse AI video tools, AI image tools, AI audio tools, video generation, voice generation, and video/image processing products.",
+        "Browse AI video, image, and voice generation products plus video and image processing tools for content creation.",
       metaDescription:
-        "Browse AI video, image, audio, and voice generation tools for content creation. Compare output quality, exports, pricing, tutorials, and fit.",
+        "Browse AI video, image, and voice generation products plus video and image processing tools. Compare output quality, exports, pricing, and tutorials.",
       categories: [
-        "AI video tools",
-        "AI image tools",
-        "AI audio tools",
-        "Video generation",
-        "Voice generation",
-        "Video/image processing",
+        "AI video generation",
+        "AI image generation",
+        "AI voice generation",
+        "Video processing",
+        "Image processing",
       ],
       emptyTitle: "No media-generation products yet",
       emptyText:

@@ -68,6 +68,10 @@ function normalizeCategoryValue(value: string | null | undefined) {
 }
 
 export function buildSoftwareCategoryHref(categoryName: string, locale: Locale) {
+  if (categoryName === "提升效率") {
+    return buildLocalePath("/product-paths/work-efficiency", locale);
+  }
+
   return buildLocalePath(
     `/software?categoryName=${encodeURIComponent(categoryName)}`,
     locale,

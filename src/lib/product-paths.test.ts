@@ -5,6 +5,7 @@ import {
   productPathConfigs,
   productPathSlugs,
 } from "@/lib/product-paths";
+import { buildSoftwareCategoryHref } from "@/lib/software-category-navigation";
 
 describe("homepage demand product paths", () => {
   it("defines the three product display pages with the requested Chinese titles and categories", () => {
@@ -16,27 +17,30 @@ describe("homepage demand product paths", () => {
 
     expect(getProductPathConfig("work-efficiency")?.zh).toMatchObject({
       title: "提升工作效率",
-      categories: [
-        "办公效率工具",
-        "文件处理工具",
-        "系统实用工具",
-        "数据分析工具",
-        "提升效率",
-        "AI电脑软件",
-      ],
+      categories: ["AI办公与效率", "AI智能体"],
     });
+    expect(getProductPathConfig("work-efficiency")?.categoryNames).toEqual([
+      "AI办公与效率",
+      "AI 智能体",
+    ]);
 
     expect(getProductPathConfig("media-generation")?.zh).toMatchObject({
       title: "生成图片/视频/音频",
       categories: [
-        "AI视频工具",
-        "AI图片工具",
-        "AI音频工具",
-        "视频生成",
-        "语音生成",
-        "视频/图片处理",
+        "AI视频生成",
+        "AI图片生成",
+        "AI语音生成",
+        "视频处理",
+        "图片处理",
       ],
     });
+    expect(getProductPathConfig("media-generation")?.categoryNames).toEqual([
+      "AI视频生成",
+      "AI图片生成",
+      "AI语音生成",
+      "视频处理",
+      "图片处理",
+    ]);
 
     expect(getProductPathConfig("future-ai")?.zh).toMatchObject({
       title: "改变你未来的AI",
@@ -61,6 +65,18 @@ describe("homepage demand product paths", () => {
     );
     expect(buildProductPathHref("future-ai", "zh")).toBe(
       "/product-paths/future-ai",
+    );
+  });
+
+  it("routes the productivity dropdown to the shared work-efficiency path", () => {
+    expect(buildSoftwareCategoryHref("提升效率", "zh")).toBe(
+      "/product-paths/work-efficiency",
+    );
+    expect(buildSoftwareCategoryHref("提升效率", "en")).toBe(
+      "/en/product-paths/work-efficiency",
+    );
+    expect(buildSoftwareCategoryHref("视频生成", "zh")).toBe(
+      "/software?categoryName=%E8%A7%86%E9%A2%91%E7%94%9F%E6%88%90",
     );
   });
 
