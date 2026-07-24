@@ -17,7 +17,6 @@ import {
 } from "lucide-react";
 import { StructuredData } from "@/components/structured-data";
 import { ASCIIHeroTitle } from "@/components/home/ascii-hero-title";
-import BorderGlow from "@/components/home/border-glow";
 import { HeroGradientSubtitle } from "@/components/home/hero-gradient-subtitle";
 import { HomeParticlesBackground } from "@/components/home/home-particles-background";
 import { ProductDemoCard } from "@/components/product-demo-card";
@@ -445,64 +444,6 @@ export async function HomePageShell({ forceLocale }: { forceLocale: Locale }) {
               <p className="home-hero-positioning">
                 <HeroGradientSubtitle>{heroIntro}</HeroGradientSubtitle>
               </p>
-
-              <div className="home-hero-actions">
-                <BorderGlow
-                  variant="button"
-                  className="home-hero-primary-glow"
-                  edgeSensitivity={34}
-                  glowColor="190 80 72"
-                  borderRadius={9}
-                  glowRadius={24}
-                  glowIntensity={0.55}
-                  coneSpread={18}
-                  colors={["#56bfd0", "#41c5db", "#20bbd6"]}
-                  fillOpacity={0.18}
-                >
-                  <ButtonLink
-                    href={buildLocalePath("/software", forceLocale)}
-                    variant="ghost"
-                    className="home-hero-cta"
-                    data-analytics-event="home_tool_finder_cta_click"
-                    data-analytics-meta-target="software"
-                    data-analytics-meta-placement="home-hero"
-                  >
-                    {forceLocale === "en" ? "Find the right AI tool" : "选择适合AI的工具"}
-                  </ButtonLink>
-                </BorderGlow>
-                <>
-                  <Link
-                    href={buildLocalePath("/product-paths/work-efficiency", forceLocale)}
-                    className="home-hero-route-cta"
-                    data-analytics-event="home_productivity_path_click"
-                    data-analytics-meta-target="work-efficiency"
-                    data-analytics-meta-placement="home-hero"
-                  >
-                    {forceLocale === "en" ? "Boost work efficiency" : "提升工作效率"}
-                    <ArrowUpRight size={16} aria-hidden="true" />
-                  </Link>
-                  <Link
-                    href={buildLocalePath("/product-paths/media-generation", forceLocale)}
-                    className="home-hero-route-cta"
-                    data-analytics-event="home_content_creation_path_click"
-                    data-analytics-meta-target="media-generation"
-                    data-analytics-meta-placement="home-hero"
-                  >
-                    {forceLocale === "en" ? "Create content with AI" : "内容生成创作"}
-                    <ArrowUpRight size={16} aria-hidden="true" />
-                  </Link>
-                </>
-                <Link
-                  href={buildLocalePath("/skill-learning", forceLocale)}
-                  className="home-hero-secondary-link"
-                  data-analytics-event="home_practical_ai_learning_click"
-                  data-analytics-meta-target="skill-learning"
-                  data-analytics-meta-placement="home-hero"
-                >
-                  {forceLocale === "en" ? "Explore practical AI learning" : "查看 AI 实战学习路径"}
-                  <ArrowUpRight size={16} aria-hidden="true" />
-                </Link>
-              </div>
             </div>
           </div>
         </Container>

@@ -7,17 +7,16 @@ function read(path: string) {
 }
 
 describe("SEO and GEO follow-up source contracts", () => {
-  it("keeps matching glass CTAs and a readable learning link", () => {
+  it("keeps semantic hero and task schema after removing duplicate CTAs", () => {
+    const page = read("src/app/page-shell.tsx");
     const css = read("src/app/globals.css");
-    const baseCta = css.match(/\.home-hero-cta\s*\{[\s\S]*?\}/)?.[0] ?? "";
-    const secondaryLink = css.match(/\.home-hero-secondary-link\s*\{[\s\S]*?\}/)?.[0] ?? "";
 
-    expect(baseCta).toContain("background-color: rgba(255, 255, 255, 0.045) !important");
-    expect(baseCta).toContain("background-image: none !important");
-    expect(baseCta).toContain("backdrop-filter: var(--home-hero-cta-filter) !important");
-    expect(secondaryLink).toContain("min-height: 48px");
-    expect(secondaryLink).toContain("color: rgba(231, 248, 250, 0.86)");
-    expect(secondaryLink).toContain("background: rgba(255, 255, 255, 0.045)");
+    expect(page).toContain('<h1 className="sr-only">{heroTitle}</h1>');
+    expect(page).toContain("taskCollectionSchema, taskItemListSchema");
+    expect(page).toContain('className="home-task-outcomes-shell"');
+    expect(page).not.toContain('className="home-hero-actions"');
+    expect(css).not.toContain(".home-hero-actions {");
+    expect(css).toContain("padding: clamp(2.2rem, 5.8vh, 4.8rem) 0;");
   });
 
   it("adds public cache headers for AI Trends canonical listing pages", () => {

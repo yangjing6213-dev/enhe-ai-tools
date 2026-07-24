@@ -7,6 +7,11 @@ describe("homepage SaaS redesign source", () => {
     const header = readFileSync(new URL("../components/site-header.tsx", import.meta.url), "utf8");
     const dictionaries = readFileSync(new URL("../lib/dictionaries.ts", import.meta.url), "utf8");
     const css = readFileSync(new URL("../app/globals.css", import.meta.url), "utf8").replace(/\r\n/g, "\n");
+    const heroStart = page.indexOf('<section className="home-hero-shell">');
+    const hero = page.slice(
+      heroStart,
+      page.indexOf("</section>", heroStart) + "</section>".length,
+    );
 
     expect(page).toContain('className="home-page-shell"');
     expect(page).toContain("home-hero-shell");
@@ -32,11 +37,10 @@ describe("homepage SaaS redesign source", () => {
     expect(page).not.toContain("t.home.featuredContentTitle");
     expect(page).not.toContain("HomeGooeyNav");
     expect(page).not.toContain("const heroCtaItems = [");
-    expect(page).toContain('className="home-hero-actions"');
-    expect(page).toContain('className="home-hero-cta"');
-    expect(page).not.toContain("home-hero-cta-primary");
-    expect(page).toContain('className="home-hero-secondary-link"');
-    expect(page).not.toContain('className="home-hero-cta home-hero-cta-accent"');
+    expect(hero).not.toContain('className="home-hero-actions"');
+    expect(hero).not.toContain('className="home-hero-cta"');
+    expect(hero).not.toContain('className="home-hero-secondary-link"');
+    expect(hero).not.toContain("<BorderGlow");
     expect(page).toContain('href={buildLocalePath("/software", forceLocale)}');
     expect(page).toContain('href={buildLocalePath("/skill-learning", forceLocale)}');
     expect(page).toContain('forceLocale === "en" ? "Find the right AI tool" : "选择适合AI的工具"');
@@ -128,9 +132,9 @@ describe("homepage SaaS redesign source", () => {
     expect(css).toContain("border-radius: 18px;\n  background: rgba(255, 255, 255, 0.045);");
     expect(css).toContain("overflow-x: clip");
     expect(css).toContain("scroll-margin-top: 96px");
-    expect(css).toContain(".home-hero-actions {\n  display: grid;");
-    expect(css).toContain(".home-hero-actions {\n    width: 100%;\n    grid-template-columns: repeat(2, minmax(0, 1fr));");
-    expect(css).toContain(".home-hero-cta {\n    width: 100%;");
+    expect(css).not.toContain(".home-hero-actions {");
+    expect(css).not.toContain(".home-hero-cta {");
+    expect(css).toContain("padding: clamp(2.2rem, 5.8vh, 4.8rem) 0;");
     expect(css).not.toContain(".home-gooey-nav-list");
     expect(css).toContain("white-space: pre-line");
     expect(css).toContain(".home-product-preview {\n  width: min(100%, 1280px);\n  margin: 0 auto;");
@@ -285,7 +289,7 @@ describe("homepage SaaS redesign source", () => {
     expect(css).toContain(".home-hero-velocity-copy");
     expect(css).not.toContain(".home-hero-metrics strong");
     expect(css).not.toContain(".home-hero-metrics span");
-    expect(css).toContain(".home-hero-cta");
+    expect(css).toContain(".home-hero-positioning");
     expect(css).toContain("font-family: var(--font-heading-zh)");
     expect(css).toContain(".site-nav-link,\n.site-login-link,\n.site-admin-link {\n  min-height: 44px;\n  align-items: center;\n  border-radius: 999px;\n  color: var(--marketing-text);");
     expect(css).toContain(".site-user-center-cta {\n  align-items: center;");
@@ -309,7 +313,7 @@ describe("homepage SaaS redesign source", () => {
     expect(css).toContain("gap: 0.58em;");
   });
 
-  it("polishes the hero label, CTA contrast, and footer while preserving SEO and GEO source contracts", () => {
+  it("centers the simplified hero and preserves SEO and GEO source contracts", () => {
     const footer = readFileSync(new URL("../components/site-footer.tsx", import.meta.url), "utf8");
     const css = readFileSync(new URL("../app/globals.css", import.meta.url), "utf8").replace(/\r\n/g, "\n");
     const page = readFileSync(new URL("../app/page-shell.tsx", import.meta.url), "utf8");
@@ -322,17 +326,13 @@ describe("homepage SaaS redesign source", () => {
     expect(css).toContain("background-image: none");
     expect(css).toContain("--home-hero-eyebrow-filter: blur(18px) saturate(150%)");
     expect(css).toContain("backdrop-filter: var(--home-hero-eyebrow-filter)");
-    expect(css).toContain("width: min(100%, 1040px);");
-    expect(css).toContain("min-height: 48px;");
-    expect(css).toContain("border-radius: 9px !important");
-    expect(css).toContain("--home-hero-cta-filter: blur(20px) saturate(165%) contrast(1.04)");
-    expect(css).toContain("backdrop-filter: var(--home-hero-cta-filter) !important");
-    expect(css).toContain("border: 1px solid rgba(255, 255, 255, 0.16) !important");
-    expect(css).toContain("background-color: rgba(255, 255, 255, 0.045) !important");
-    expect(css).toContain("background-image: none !important");
-    expect(css).not.toContain(".home-hero-cta-primary {");
-    expect(css).toContain(".home-hero-secondary-link {");
-    expect(css).toContain("color: #ffffff");
+    expect(css).toContain("padding: clamp(2.2rem, 5.8vh, 4.8rem) 0;");
+    expect(css).toContain("padding: 1rem 0;");
+    expect(css).toContain("padding: 1.5rem 0;");
+    expect(css).not.toContain(".home-hero-actions {");
+    expect(css).not.toContain(".home-hero-cta {");
+    expect(page).toContain('<h1 className="sr-only">{heroTitle}</h1>');
+    expect(page).toContain("taskCollectionSchema, taskItemListSchema");
     expect(css).toContain(".home-task-outcomes-shell,");
     expect(css).toContain("linear-gradient(180deg, rgba(16, 24, 33, 0) 0%, rgba(16, 24, 33, 0) 54%, rgba(16, 24, 33, 0.32) 72%, rgba(16, 24, 33, 0.82) 91%, #101821 100%)");
     expect(css).not.toContain("radial-gradient(ellipse at 50% 78%, rgba(65, 197, 219, 0.09), transparent 34%)");

@@ -2,7 +2,7 @@ import { readFileSync } from "node:fs";
 import { describe, expect, it } from "vitest";
 
 describe("homepage hero conversion contract", () => {
-  it("uses one row of four task entry actions", () => {
+  it("keeps semantic hero copy while removing duplicate task actions", () => {
     const source = readFileSync(
       new URL("../app/page-shell.tsx", import.meta.url),
       "utf8",
@@ -13,45 +13,22 @@ describe("homepage hero conversion contract", () => {
       source.indexOf("</section>", heroStart) + "</section>".length,
     );
 
-    expect(hero.match(/<ButtonLink/g)).toHaveLength(1);
-    expect(hero.match(/<BorderGlow/g)).toHaveLength(1);
+    expect(hero).toContain('<h1 className="sr-only">{heroTitle}</h1>');
+    expect(hero).toContain('<ASCIIHeroTitle text={heroTitle} />');
+    expect(hero).toContain('<p className="home-hero-positioning">');
     expect(hero).toContain(
-      'href={buildLocalePath("/software", forceLocale)}',
+      "<HeroGradientSubtitle>{heroIntro}</HeroGradientSubtitle>",
     );
-    expect(hero).toContain(
-      'forceLocale === "en" ? "Find the right AI tool" : "选择适合AI的工具"',
-    );
-    expect(hero).toContain('className="home-hero-actions"');
-    expect(hero).toContain('className="home-hero-primary-glow"');
-    expect(hero.match(/className="home-hero-route-cta"/g)).toHaveLength(2);
-    expect(hero).toContain(
-      'href={buildLocalePath("/product-paths/work-efficiency", forceLocale)}',
-    );
-    expect(hero).toContain(
-      'forceLocale === "en" ? "Boost work efficiency" : "提升工作效率"',
-    );
-    expect(hero).toContain(
-      'href={buildLocalePath("/product-paths/media-generation", forceLocale)}',
-    );
-    expect(hero).toContain(
-      'forceLocale === "en" ? "Create content with AI" : "内容生成创作"',
-    );
-    expect(hero).toContain('className="home-hero-secondary-link"');
-    expect(hero).toContain(
-      'href={buildLocalePath("/skill-learning", forceLocale)}',
-    );
-    expect(hero).toContain(
-      'forceLocale === "en" ? "Explore practical AI learning" : "查看 AI 实战学习路径"',
-    );
-    expect(hero.indexOf('href={buildLocalePath("/software", forceLocale)}')).toBeLessThan(
-      hero.indexOf('href={buildLocalePath("/product-paths/work-efficiency", forceLocale)}'),
-    );
-    expect(hero.indexOf('href={buildLocalePath("/product-paths/work-efficiency", forceLocale)}')).toBeLessThan(
-      hero.indexOf('href={buildLocalePath("/product-paths/media-generation", forceLocale)}'),
-    );
-    expect(hero.indexOf('href={buildLocalePath("/product-paths/media-generation", forceLocale)}')).toBeLessThan(
-      hero.indexOf('href={buildLocalePath("/skill-learning", forceLocale)}'),
-    );
+    expect(hero).not.toContain("<ButtonLink");
+    expect(hero).not.toContain("<BorderGlow");
+    expect(hero).not.toContain('className="home-hero-actions"');
+    expect(hero).not.toContain('data-analytics-meta-placement="home-hero"');
+
+    expect(source).toContain('className="home-task-outcomes-shell"');
+    expect(source).toContain('href: "/product-paths/work-efficiency"');
+    expect(source).toContain('href: "/product-paths/media-generation"');
+    expect(source).toContain('href: "/skill-learning"');
+    expect(source).toContain('href: "/ai-news"');
     expect(source).toContain("taskCollectionSchema, taskItemListSchema");
     expect(source).not.toContain("taskEyebrow");
     expect(source).not.toContain("home-flowing-menu-shell");
@@ -68,8 +45,12 @@ describe("homepage hero conversion contract", () => {
 
     expect(decisionStart).toBeGreaterThan(-1);
     expect(supportStart).toBeGreaterThan(decisionStart);
-    expect(decisionCard).toContain('className="home-seo-disclosure home-decision-disclosure"');
-    expect(decisionCard).toContain('<summary id="home-decision-summary">{conversionCopy.finalTitle}</summary>');
+    expect(decisionCard).toContain(
+      'className="home-seo-disclosure home-decision-disclosure"',
+    );
+    expect(decisionCard).toContain(
+      '<summary id="home-decision-summary">{conversionCopy.finalTitle}</summary>',
+    );
     expect(decisionCard).toContain('className="home-decision-card"');
     expect(decisionCard).toContain('className="home-trust-list"');
     expect(decisionCard).toContain('className="home-workflow-list"');
@@ -79,7 +60,7 @@ describe("homepage hero conversion contract", () => {
     expect(source).not.toContain('id="home-final-cta-title"');
   });
 
-  it("leaves a visible preview of the next homepage section", () => {
+  it("keeps the next-section preview while centering hero content", () => {
     const css = readFileSync(
       new URL("../app/globals.css", import.meta.url),
       "utf8",
@@ -103,14 +84,9 @@ describe("homepage hero conversion contract", () => {
     expect(css).toContain(
       "min-height: calc(100dvh - 64px - 1rem - var(--home-next-section-peek));",
     );
-    expect(css).toContain(
-      ".home-hero-actions {\n  display: grid;\n  width: min(100%, 1040px);\n  grid-template-columns: repeat(4, minmax(0, 1fr));",
-    );
-    expect(css).toContain(
-      ".home-hero-primary-glow {\n  width: 100% !important;\n  min-width: 0 !important;",
-    );
-    expect(css).toContain(
-      ".home-hero-actions {\n    width: 100%;\n    grid-template-columns: repeat(2, minmax(0, 1fr));",
-    );
+    expect(css).toContain("padding: clamp(2.2rem, 5.8vh, 4.8rem) 0;");
+    expect(css).toContain("padding: 1rem 0;");
+    expect(css).toContain("padding: 1.5rem 0;");
+    expect(css).not.toContain(".home-hero-actions {");
   });
 });

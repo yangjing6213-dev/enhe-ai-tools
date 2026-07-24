@@ -118,16 +118,6 @@
   transform: translate3d(0, -1px, 0.01px);
 }
 
-.button .inner > :global(.home-hero-cta) {
-  width: 100%;
-  min-width: 0;
-  transform: none;
-}
-
-.button .inner > :global(.home-hero-cta:hover) {
-  transform: none;
-}
-
 .demandCard {
   height: 100%;
 }

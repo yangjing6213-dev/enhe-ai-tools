@@ -49,7 +49,8 @@ describe("homepage conversion structure contract", () => {
     expect(css).toContain(".home-task-outcomes-shell,");
     expect(css).toContain(".home-final-cta-band {");
     expect(css).not.toContain(".home-hero-cta-primary {");
-    expect(css).toContain("background-color: rgba(255, 255, 255, 0.045) !important;");
+    expect(css).not.toContain(".home-hero-actions {");
+    expect(css).toContain("padding: clamp(2.2rem, 5.8vh, 4.8rem) 0;");
     expect(css).toContain("outline: 1px solid rgba(255, 255, 255, 0.1);");
     expect(css).toContain(".home-task-outcome-link:active {");
     expect(css).toContain("transform: scale(0.96);");
