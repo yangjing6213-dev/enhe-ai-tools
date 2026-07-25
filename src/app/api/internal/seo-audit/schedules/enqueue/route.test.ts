@@ -1,9 +1,13 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 const enqueueDueSeoAuditSchedules = vi.hoisted(() => vi.fn());
+const reapSeoAuditArtifactUploads = vi.hoisted(() => vi.fn());
 
 vi.mock("@/lib/seo-audit/entitlements", () => ({
   enqueueDueSeoAuditSchedules,
+}));
+vi.mock("@/lib/seo-audit/jobs", () => ({
+  reapSeoAuditArtifactUploads,
 }));
 
 import { POST, runtime } from "./route";
@@ -53,11 +57,18 @@ describe("POST /api/internal/seo-audit/schedules/enqueue", () => {
     expect(invalid.status).toBe(400);
     expect(enqueueDueSeoAuditSchedules).not.toHaveBeenCalled();
 
+    reapSeoAuditArtifactUploads.mockResolvedValueOnce({ cleaned: 1, failed: 0 });
     enqueueDueSeoAuditSchedules.mockResolvedValueOnce({ enqueued: 2 });
     const response = await POST(request({ limit: 10 }));
     expect(response.status).toBe(200);
-    expect(await response.json()).toEqual({ ok: true, enqueued: 2 });
+    expect(await response.json()).toEqual({
+      ok: true,
+      enqueued: 2,
+      artifactUploadsCleaned: 1,
+      artifactUploadCleanupFailed: 0,
+    });
     expect(response.headers.get("cache-control")).toBe("no-store");
+    expect(reapSeoAuditArtifactUploads).toHaveBeenCalledWith();
     expect(enqueueDueSeoAuditSchedules).toHaveBeenCalledWith({ limit: 10 });
   });
 });

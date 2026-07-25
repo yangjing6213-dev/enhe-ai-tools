@@ -6,6 +6,7 @@ import {
 import { Prisma } from "@prisma/client";
 import { prisma } from "@/lib/db";
 import {
+  assertPrivateSeoAuditArtifactKeys,
   assertSeoAuditReportMatchesRun,
   assertSeoAuditSummaryMatches,
   buildPrivateArtifactKeys,
@@ -65,6 +66,8 @@ type CompleteOptions = JobOptions & {
   storeArtifacts?: (input: {
     runId: string;
     parsed: ParsedSeoAuditReport;
+    reportJsonKey: string;
+    reportMarkdownKey: string;
   }) => Promise<StoredSeoAuditArtifacts>;
   removeArtifacts?: (input: StoredSeoAuditArtifacts) => Promise<void>;
   randomBytes?: (size: number) => Buffer;
@@ -430,6 +433,10 @@ type CompletionRun = Prisma.SeoAuditRunGetPayload<{
 
 const completionReservationPrefix = "seo-audit-pending-upload:";
 const completionReservationTimeoutMs = 65_000;
+const artifactUploadCleanupDelayMs = 5 * 60_000;
+const artifactUploadClaimTimeoutMs = 5 * 60_000;
+const artifactUploadRetryDelayMs = 5 * 60_000;
+const artifactUploadCleanupRequestTimeoutMs = 5_000;
 
 function buildCompletionReservation(
   now: Date,
@@ -446,6 +453,21 @@ function readCompletionReservationStartedAt(value: string | null) {
     .split(":", 2);
   const startedAt = Number(timestamp);
   return Number.isSafeInteger(startedAt) && nonce ? startedAt : null;
+}
+
+function buildReservedArtifactKeys(
+  runId: string,
+  reportSha256: string,
+  reservation: string,
+) {
+  const reservationHash = createHash("sha256")
+    .update(reservation, "utf8")
+    .digest("hex");
+  const keys = buildPrivateArtifactKeys(runId, reportSha256, reservationHash);
+  return {
+    reportJsonKey: keys.jsonKey,
+    reportMarkdownKey: keys.markdownKey,
+  };
 }
 
 async function lockCompletionRun(
@@ -496,14 +518,21 @@ function assertCompletedPayloadMatches(
   assertSeoAuditReportMatchesRun(parsed, run);
   assertSeoAuditSummaryMatches(summary, parsed.summary);
   const storedSummary = storedCompletionSummary(run);
-  const expectedKeys = buildPrivateArtifactKeys(run.id, parsed.reportSha256);
-  if (
-    run.reportSha256 !== parsed.reportSha256 ||
-    run.reportJsonKey !== expectedKeys.jsonKey ||
-    run.reportMarkdownKey !== expectedKeys.markdownKey ||
-    !storedSummary ||
-    JSON.stringify(storedSummary) !== JSON.stringify(summary)
-  ) {
+  if (run.reportSha256 !== parsed.reportSha256 || !storedSummary) {
+    throw new SeoAuditJobError("JOB_STATE_CONFLICT");
+  }
+  try {
+    assertPrivateSeoAuditArtifactKeys(
+      {
+        reportJsonKey: run.reportJsonKey ?? "",
+        reportMarkdownKey: run.reportMarkdownKey ?? "",
+      },
+      { runId: run.id, reportSha256: parsed.reportSha256 },
+    );
+  } catch {
+    throw new SeoAuditJobError("JOB_STATE_CONFLICT");
+  }
+  if (JSON.stringify(storedSummary) !== JSON.stringify(summary)) {
     throw new SeoAuditJobError("JOB_STATE_CONFLICT");
   }
 }
@@ -548,6 +577,33 @@ async function settleCompletionCancellation(
   });
 }
 
+async function createArtifactUploadReservation(
+  tx: Prisma.TransactionClient,
+  input: {
+    runId: string;
+    reportSha256: string;
+    reservation: string;
+    now: Date;
+  },
+) {
+  const keys = buildReservedArtifactKeys(
+    input.runId,
+    input.reportSha256,
+    input.reservation,
+  );
+  await tx.seoAuditArtifactUpload.create({
+    data: {
+      runId: input.runId,
+      reservation: input.reservation,
+      reportSha256: input.reportSha256,
+      reportJsonKey: keys.reportJsonKey,
+      reportMarkdownKey: keys.reportMarkdownKey,
+      cleanupAfter: new Date(input.now.getTime() + artifactUploadCleanupDelayMs),
+    },
+  });
+  return keys;
+}
+
 async function prepareSeoAuditCompletion(input: {
   db: JobDatabase;
   runId: string;
@@ -580,6 +636,12 @@ async function prepareSeoAuditCompletion(input: {
     assertSeoAuditReportMatchesRun(input.parsed, run);
 
     if (!run.reportSha256 && !run.reportJsonKey && !run.reportMarkdownKey) {
+      const keys = await createArtifactUploadReservation(tx, {
+        runId: input.runId,
+        reportSha256: input.parsed.reportSha256,
+        reservation: input.reservation,
+        now: input.now,
+      });
       await tx.seoAuditRun.update({
         where: { id: input.runId },
         data: {
@@ -588,7 +650,7 @@ async function prepareSeoAuditCompletion(input: {
           reportMarkdownKey: null,
         },
       });
-      return { state: "upload" as const };
+      return { state: "upload" as const, keys };
     }
 
     const activeReservation = run.reportJsonKey;
@@ -605,11 +667,17 @@ async function prepareSeoAuditCompletion(input: {
         input.now.getTime() - reservationStartedAt >=
         completionReservationTimeoutMs
       ) {
+        const keys = await createArtifactUploadReservation(tx, {
+          runId: input.runId,
+          reportSha256: input.parsed.reportSha256,
+          reservation: input.reservation,
+          now: input.now,
+        });
         await tx.seoAuditRun.update({
           where: { id: input.runId },
           data: { reportJsonKey: input.reservation },
         });
-        return { state: "upload" as const };
+        return { state: "upload" as const, keys };
       }
       return { state: "wait" as const, reservation: activeReservation };
     }
@@ -714,6 +782,18 @@ async function finalizeSeoAuditCompletion(input: {
       throw new SeoAuditJobError("JOB_STATE_CONFLICT");
     }
 
+    const removedUpload = await tx.seoAuditArtifactUpload.deleteMany({
+      where: {
+        runId: input.runId,
+        reservation: input.reservation,
+        reportJsonKey: input.stored.reportJsonKey,
+        reportMarkdownKey: input.stored.reportMarkdownKey,
+      },
+    });
+    if (removedUpload.count !== 1) {
+      throw new SeoAuditJobError("JOB_STATE_CONFLICT");
+    }
+
     await tx.seoAuditRun.update({
       where: { id: input.runId },
       data: {
@@ -751,6 +831,129 @@ async function cleanupUploadedArtifacts(
   } catch {
     console.error("SEO audit artifact cleanup failed.");
   }
+}
+
+async function lockArtifactUpload(
+  tx: Prisma.TransactionClient,
+  uploadId: string,
+) {
+  const locked = await tx.$queryRaw<Array<{ id: string }>>(Prisma.sql`
+    SELECT "id"
+    FROM "seo_audit_artifact_uploads"
+    WHERE "id" = ${uploadId}
+    FOR UPDATE
+  `);
+  if (!locked[0]) return null;
+  return tx.seoAuditArtifactUpload.findUnique({ where: { id: uploadId } });
+}
+
+export async function reapSeoAuditArtifactUploads(
+  options: {
+    db?: JobDatabase;
+    now?: Date;
+    removeArtifacts?: (input: StoredSeoAuditArtifacts) => Promise<void>;
+    randomBytes?: (size: number) => Buffer;
+    limit?: number;
+  } = {},
+) {
+  const db = options.db ?? prisma;
+  const now = resolveNow(options.now);
+  const removeArtifacts =
+    options.removeArtifacts ??
+    ((input: StoredSeoAuditArtifacts) =>
+      removePrivateSeoAuditArtifacts(input, {
+        requestTimeoutMs: artifactUploadCleanupRequestTimeoutMs,
+      }));
+  const randomBytes = options.randomBytes ?? createRandomBytes;
+  const limit = Number.isSafeInteger(options.limit)
+    ? Math.min(Math.max(Number(options.limit), 1), 100)
+    : 2;
+  const staleClaimedBefore = new Date(
+    now.getTime() - artifactUploadClaimTimeoutMs,
+  );
+  const candidates = await db.seoAuditArtifactUpload.findMany({
+    where: {
+      cleanupAfter: { lte: now },
+      OR: [
+        { cleanupClaimedAt: null },
+        { cleanupClaimedAt: { lte: staleClaimedBefore } },
+      ],
+    },
+    orderBy: [{ cleanupAfter: "asc" }, { createdAt: "asc" }],
+    take: limit,
+    select: { id: true, runId: true },
+  });
+
+  let cleaned = 0;
+  let failed = 0;
+  for (const candidate of candidates) {
+    const claimToken = `seo-audit-upload-gc:${randomBytes(24).toString("base64url")}`;
+    const claimed = await db.$transaction(async (tx) => {
+      const run = await lockCompletionRun(tx, candidate.runId);
+      const upload = await lockArtifactUpload(tx, candidate.id);
+      if (
+        !upload ||
+        upload.cleanupAfter.getTime() > now.getTime() ||
+        (upload.cleanupClaimedAt !== null &&
+          upload.cleanupClaimedAt.getTime() > staleClaimedBefore.getTime())
+      ) {
+        return null;
+      }
+
+      const isCompletedArtifact =
+        run.status === "completed" &&
+        run.reportSha256 === upload.reportSha256 &&
+        run.reportJsonKey === upload.reportJsonKey &&
+        run.reportMarkdownKey === upload.reportMarkdownKey;
+      const isLiveCurrentReservation =
+        (run.status === "running" || run.status === "cancel_requested") &&
+        run.reportJsonKey === upload.reservation &&
+        run.leaseExpiresAt !== null &&
+        run.leaseExpiresAt.getTime() > now.getTime();
+      if (isCompletedArtifact || isLiveCurrentReservation) return null;
+
+      await tx.seoAuditArtifactUpload.update({
+        where: { id: upload.id },
+        data: {
+          cleanupClaimToken: claimToken,
+          cleanupClaimedAt: now,
+          cleanupAttemptCount: { increment: 1 },
+        },
+      });
+      return {
+        id: upload.id,
+        claimToken,
+        reportJsonKey: upload.reportJsonKey,
+        reportMarkdownKey: upload.reportMarkdownKey,
+      };
+    });
+    if (!claimed) continue;
+
+    try {
+      await removeArtifacts({
+        reportJsonKey: claimed.reportJsonKey,
+        reportMarkdownKey: claimed.reportMarkdownKey,
+      });
+    } catch {
+      failed += 1;
+      await db.seoAuditArtifactUpload.updateMany({
+        where: { id: claimed.id, cleanupClaimToken: claimed.claimToken },
+        data: {
+          cleanupClaimToken: null,
+          cleanupClaimedAt: null,
+          cleanupAfter: new Date(now.getTime() + artifactUploadRetryDelayMs),
+        },
+      });
+      continue;
+    }
+
+    const deleted = await db.seoAuditArtifactUpload.deleteMany({
+      where: { id: claimed.id, cleanupClaimToken: claimed.claimToken },
+    });
+    cleaned += deleted.count;
+  }
+
+  return { cleaned, failed };
 }
 
 export async function completeSeoAuditJob(
@@ -848,7 +1051,12 @@ export async function completeSeoAuditJob(
 
     let stored: StoredSeoAuditArtifacts;
     try {
-      stored = await storeArtifacts({ runId: input.runId, parsed });
+      stored = await storeArtifacts({
+        runId: input.runId,
+        parsed,
+        reportJsonKey: prepared.keys.reportJsonKey,
+        reportMarkdownKey: prepared.keys.reportMarkdownKey,
+      });
     } catch (error) {
       const rollbackStatus = await rollbackSeoAuditCompletion({
         db,
@@ -864,13 +1072,9 @@ export async function completeSeoAuditJob(
       throw error;
     }
 
-    const expectedKeys = buildPrivateArtifactKeys(
-      input.runId,
-      parsed.reportSha256,
-    );
     if (
-      stored.reportJsonKey !== expectedKeys.jsonKey ||
-      stored.reportMarkdownKey !== expectedKeys.markdownKey
+      stored.reportJsonKey !== prepared.keys.reportJsonKey ||
+      stored.reportMarkdownKey !== prepared.keys.reportMarkdownKey
     ) {
       await rollbackSeoAuditCompletion({
         db,
@@ -897,7 +1101,9 @@ export async function completeSeoAuditJob(
         now: resolveNow(options.now),
       });
     } catch (error) {
-      await cleanupUploadedArtifacts(stored, removeArtifacts);
+      if (error instanceof SeoAuditJobError) {
+        await cleanupUploadedArtifacts(stored, removeArtifacts);
+      }
       throw error;
     }
     if (result.status !== "completed") {

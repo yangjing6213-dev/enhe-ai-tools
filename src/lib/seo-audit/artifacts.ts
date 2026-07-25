@@ -237,6 +237,7 @@ type CosPutObjectInput = {
   Body: Buffer;
   ContentLength: number;
   ContentType: string;
+  onTaskReady?: (taskId: string) => void;
 };
 
 type CosDeleteObjectInput = {
@@ -254,6 +255,7 @@ type CosClient = {
     input: CosDeleteObjectInput,
     callback: (error: unknown) => void,
   ) => void;
+  cancelTask?: (taskId: string) => void;
 };
 
 type ArtifactStorageOptions = {
@@ -553,18 +555,64 @@ export async function parseSeoAuditReportBundle(
   };
 }
 
-export function buildPrivateArtifactKeys(runId: string, reportSha256: string) {
+export function buildPrivateArtifactKeys(
+  runId: string,
+  reportSha256: string,
+  uploadReservationHash?: string,
+) {
   if (
     !/^[A-Za-z0-9_-]{1,128}$/.test(runId) ||
-    !/^[a-f0-9]{64}$/.test(reportSha256)
+    !/^[a-f0-9]{64}$/.test(reportSha256) ||
+    (uploadReservationHash !== undefined &&
+      !/^[a-f0-9]{64}$/.test(uploadReservationHash))
   ) {
     throw new SeoAuditArtifactError("INVALID_REPORT_BUNDLE");
   }
-  const prefix = `seo-audit/runs/${runId}/${reportSha256}`;
+  const reportPrefix = `seo-audit/runs/${runId}/${reportSha256}`;
+  const prefix = uploadReservationHash
+    ? `${reportPrefix}/uploads/${uploadReservationHash}`
+    : reportPrefix;
   return {
     jsonKey: `${prefix}/report.json`,
     markdownKey: `${prefix}/report.md`,
   };
+}
+
+function parsePrivateArtifactKey(value: string, extension: "json" | "md") {
+  const match = value.match(
+    new RegExp(
+      `^seo-audit/runs/([A-Za-z0-9_-]{1,128})/([a-f0-9]{64})(?:/uploads/([a-f0-9]{64}))?/report\\.${extension}$`,
+    ),
+  );
+  return match
+    ? { runId: match[1], reportSha256: match[2], uploadHash: match[3] ?? null }
+    : null;
+}
+
+export function assertPrivateSeoAuditArtifactKeys(
+  input: StoredSeoAuditArtifacts,
+  expected?: {
+    runId?: string;
+    reportSha256?: string;
+    requireUploadPrefix?: boolean;
+  },
+) {
+  const json = parsePrivateArtifactKey(input.reportJsonKey, "json");
+  const markdown = parsePrivateArtifactKey(input.reportMarkdownKey, "md");
+  if (
+    !json ||
+    !markdown ||
+    json.runId !== markdown.runId ||
+    json.reportSha256 !== markdown.reportSha256 ||
+    json.uploadHash !== markdown.uploadHash ||
+    (expected?.runId !== undefined && json.runId !== expected.runId) ||
+    (expected?.reportSha256 !== undefined &&
+      json.reportSha256 !== expected.reportSha256) ||
+    (expected?.requireUploadPrefix && json.uploadHash === null)
+  ) {
+    throw new SeoAuditArtifactError("INVALID_REPORT_BUNDLE");
+  }
+  return input;
 }
 
 async function createDefaultCosClient(
@@ -595,6 +643,16 @@ function putPrivateObject(
 ) {
   return new Promise<void>((resolve, reject) => {
     let settled = false;
+    let timedOut = false;
+    let taskId: string | null = null;
+    const cancelUpload = () => {
+      if (!taskId) return;
+      try {
+        client.cancelTask?.(taskId);
+      } catch {
+        // Persistent upload cleanup remains the source of truth after timeout.
+      }
+    };
     const finish = (error?: unknown) => {
       if (settled) return;
       settled = true;
@@ -602,13 +660,27 @@ function putPrivateObject(
       if (error) reject(error);
       else resolve();
     };
-    const timer = setTimeout(
-      () => finish(new Error("COS request timed out")),
-      requestTimeoutMs,
-    );
-    client.putObject(input, (error) => {
-      finish(error || undefined);
-    });
+    const timer = setTimeout(() => {
+      timedOut = true;
+      finish(new Error("COS request timed out"));
+      cancelUpload();
+    }, requestTimeoutMs);
+    try {
+      client.putObject(
+        {
+          ...input,
+          onTaskReady: (readyTaskId) => {
+            taskId = readyTaskId;
+            if (timedOut) cancelUpload();
+          },
+        },
+        (error) => {
+          finish(error || undefined);
+        },
+      );
+    } catch (error) {
+      finish(error);
+    }
   });
 }
 
@@ -626,13 +698,16 @@ function deletePrivateObject(
       if (error) reject(error);
       else resolve();
     };
-    const timer = setTimeout(
-      () => finish(new Error("COS request timed out")),
-      requestTimeoutMs,
-    );
-    client.deleteObject(input, (error) => {
-      finish(error || undefined);
-    });
+    const timer = setTimeout(() => {
+      finish(new Error("COS request timed out"));
+    }, requestTimeoutMs);
+    try {
+      client.deleteObject(input, (error) => {
+        finish(error || undefined);
+      });
+    } catch (error) {
+      finish(error);
+    }
   });
 }
 
@@ -668,13 +743,25 @@ async function resolveCosClient(
 }
 
 export async function storePrivateSeoAuditArtifacts(
-  input: { runId: string; parsed: ParsedSeoAuditReport },
+  input: {
+    runId: string;
+    parsed: ParsedSeoAuditReport;
+    reportJsonKey: string;
+    reportMarkdownKey: string;
+  },
   options: ArtifactStorageOptions = {},
 ): Promise<StoredSeoAuditArtifacts> {
   const config = readStorageConfig(options);
-  const keys = buildPrivateArtifactKeys(
-    input.runId,
-    input.parsed.reportSha256,
+  const keys = assertPrivateSeoAuditArtifactKeys(
+    {
+      reportJsonKey: input.reportJsonKey,
+      reportMarkdownKey: input.reportMarkdownKey,
+    },
+    {
+      runId: input.runId,
+      reportSha256: input.parsed.reportSha256,
+      requireUploadPrefix: true,
+    },
   );
   const jsonBody = Buffer.from(
     JSON.stringify(input.parsed.fullReport),
@@ -690,22 +777,22 @@ export async function storePrivateSeoAuditArtifacts(
       ACL: "private",
       Bucket: config.bucket,
       Region: config.region,
-      Key: keys.jsonKey,
+      Key: keys.reportJsonKey,
       Body: jsonBody,
       ContentLength: jsonBody.length,
       ContentType: "application/json; charset=utf-8",
     }, config.requestTimeoutMs);
-    uploadedKeys.push(keys.jsonKey);
+    uploadedKeys.push(keys.reportJsonKey);
     await putPrivateObject(client, {
       ACL: "private",
       Bucket: config.bucket,
       Region: config.region,
-      Key: keys.markdownKey,
+      Key: keys.reportMarkdownKey,
       Body: markdownBody,
       ContentLength: markdownBody.length,
       ContentType: "text/markdown; charset=utf-8",
     }, config.requestTimeoutMs);
-    uploadedKeys.push(keys.markdownKey);
+    uploadedKeys.push(keys.reportMarkdownKey);
   } catch {
     if (client) {
       await Promise.allSettled(
@@ -722,8 +809,8 @@ export async function storePrivateSeoAuditArtifacts(
   }
 
   return {
-    reportJsonKey: keys.jsonKey,
-    reportMarkdownKey: keys.markdownKey,
+    reportJsonKey: keys.reportJsonKey,
+    reportMarkdownKey: keys.reportMarkdownKey,
   };
 }
 
@@ -732,14 +819,7 @@ export async function removePrivateSeoAuditArtifacts(
   options: ArtifactStorageOptions = {},
 ) {
   const config = readStorageConfig(options);
-  const expectedKey =
-    /^seo-audit\/runs\/[A-Za-z0-9_-]{1,128}\/[a-f0-9]{64}\/report\.(?:json|md)$/;
-  if (
-    !expectedKey.test(input.reportJsonKey) ||
-    !expectedKey.test(input.reportMarkdownKey)
-  ) {
-    throw new SeoAuditArtifactError("INVALID_REPORT_BUNDLE");
-  }
+  assertPrivateSeoAuditArtifactKeys(input);
 
   try {
     const client = await resolveCosClient(config, options);

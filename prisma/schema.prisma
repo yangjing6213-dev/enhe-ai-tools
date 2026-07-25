@@ -455,7 +455,7 @@ model ToolPriceSpec {
   status    ContentStatus @default(active)
   createdAt DateTime      @default(now()) @map("created_at")
   updatedAt DateTime      @updatedAt @map("updated_at")
-  tool      Tool          @relation(fields: [toolId], references: [id], onDelete: Cascade)
+  tool      Tool          @relation(fields: [toolId], references: [id], onDelete: Restrict)
   orders    Order[]
   purchases ToolPurchase[]
 
@@ -524,7 +524,7 @@ model Order {
   user          User            @relation(fields: [userId], references: [id])
   plan          VipPlan?        @relation(fields: [planId], references: [id])
   tool          Tool?           @relation(fields: [toolId], references: [id], onDelete: Restrict)
-  toolPriceSpec ToolPriceSpec?  @relation(fields: [toolPriceSpecId], references: [id], onDelete: SetNull)
+  toolPriceSpec ToolPriceSpec?  @relation(fields: [toolPriceSpecId], references: [id], onDelete: Restrict)
   seoAuditOffer SeoAuditOffer?  @relation(fields: [seoAuditOfferId], references: [id], onDelete: SetNull)
   seoAuditSourceRun SeoAuditRun? @relation("SeoAuditUpgradeSourceRun", fields: [seoAuditSourceRunId], references: [id], onDelete: SetNull)
   paymentProof  PaymentProof?
@@ -605,7 +605,7 @@ model ToolPurchase {
   updatedAt DateTime @updatedAt @map("updated_at")
   user      User     @relation(fields: [userId], references: [id])
   tool      Tool     @relation(fields: [toolId], references: [id])
-  toolPriceSpec ToolPriceSpec? @relation(fields: [toolPriceSpecId], references: [id], onDelete: SetNull)
+  toolPriceSpec ToolPriceSpec? @relation(fields: [toolPriceSpecId], references: [id], onDelete: Restrict)
   order     Order    @relation(fields: [orderId], references: [id])
 
   @@unique([userId, toolId])
@@ -705,6 +705,7 @@ model SeoAuditRun {
   upgradeOrders           Order[]                @relation("SeoAuditUpgradeSourceRun")
   credit                  SeoAuditCredit?        @relation(fields: [creditId], references: [id], onDelete: SetNull)
   subscription            SeoAuditSubscription?  @relation(fields: [subscriptionId], references: [id], onDelete: SetNull)
+  artifactUploads         SeoAuditArtifactUpload[]
 
   @@index([status, availableAt])
   @@index([leaseExpiresAt])
@@ -715,6 +716,26 @@ model SeoAuditRun {
   @@index([creditId, createdAt])
   @@index([subscriptionId, createdAt])
   @@map("seo_audit_runs")
+}
+
+model SeoAuditArtifactUpload {
+  id                    String      @id @default(cuid())
+  runId                 String      @map("run_id")
+  reservation           String      @unique
+  reportSha256          String      @db.Char(64) @map("report_sha256")
+  reportJsonKey         String      @unique @map("report_json_key")
+  reportMarkdownKey     String      @unique @map("report_markdown_key")
+  cleanupAfter          DateTime    @map("cleanup_after")
+  cleanupClaimToken     String?     @unique @map("cleanup_claim_token")
+  cleanupClaimedAt      DateTime?   @map("cleanup_claimed_at")
+  cleanupAttemptCount   Int         @default(0) @map("cleanup_attempt_count")
+  createdAt             DateTime    @default(now()) @map("created_at")
+  updatedAt             DateTime    @updatedAt @map("updated_at")
+  run                   SeoAuditRun @relation(fields: [runId], references: [id], onDelete: Restrict)
+
+  @@index([cleanupAfter, cleanupClaimedAt])
+  @@index([runId, createdAt])
+  @@map("seo_audit_artifact_uploads")
 }
 
 model SeoAuditCredit {

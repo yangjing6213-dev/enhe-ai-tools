@@ -1,4 +1,4 @@
-import { readFileSync } from "node:fs";
+import { existsSync, readFileSync } from "node:fs";
 import { join } from "node:path";
 import { describe, expect, it } from "vitest";
 
@@ -24,6 +24,19 @@ const migrationNames = [
 const migrationPaths = migrationNames.map((migrationName) =>
   join(root, "prisma", "migrations", migrationName, "migration.sql"),
 );
+const priceSpecMigrationNames = [
+  "20260725234500_protect_tool_price_spec_evidence",
+  "20260725234600_validate_tool_price_spec_evidence",
+  "20260725234700_finalize_tool_price_spec_evidence",
+] as const;
+const priceSpecMigrationPaths = priceSpecMigrationNames.map((migrationName) =>
+  join(root, "prisma", "migrations", migrationName, "migration.sql"),
+);
+const priceSpecForeignKeys = [
+  "tool_price_specs_tool_id_fkey",
+  "orders_tool_price_spec_id_fkey",
+  "tool_purchases_tool_price_spec_id_fkey",
+] as const;
 const protectedForeignKeys = [
   "payment_transactions_order_id_fkey",
   "order_refund_records_order_id_fkey",
@@ -66,6 +79,76 @@ describe("financial audit hard-delete protection schema", () => {
     expect(model("Order")).toMatch(
       /tool\s+Tool\?\s+@relation\(fields: \[toolId\], references: \[id\], onDelete: Restrict\)/,
     );
+    expect(model("ToolPriceSpec")).toMatch(
+      /tool\s+Tool\s+@relation\(fields: \[toolId\], references: \[id\], onDelete: Restrict\)/,
+    );
+    expect(model("Order")).toMatch(
+      /toolPriceSpec\s+ToolPriceSpec\?\s+@relation\(fields: \[toolPriceSpecId\], references: \[id\], onDelete: Restrict\)/,
+    );
+    expect(model("ToolPurchase")).toMatch(
+      /toolPriceSpec\s+ToolPriceSpec\?\s+@relation\(fields: \[toolPriceSpecId\], references: \[id\], onDelete: Restrict\)/,
+    );
+  });
+
+  it("protects price-spec evidence with phased low-lock Restrict migrations", () => {
+    expect(priceSpecMigrationPaths.every(existsSync)).toBe(true);
+    const [installMigration, validationMigration, finalizationMigration] =
+      priceSpecMigrationPaths.map((migrationPath) =>
+        readFileSync(migrationPath, "utf8"),
+      );
+
+    for (const migration of [
+      installMigration,
+      validationMigration,
+      finalizationMigration,
+    ]) {
+      expect(migration.match(/\bBEGIN;/g)).toHaveLength(1);
+      expect(migration.match(/\bCOMMIT;/g)).toHaveLength(1);
+      expect(transactionBodies(migration)).toHaveLength(1);
+      expect(migration).toContain("SET LOCAL lock_timeout = '5s'");
+    }
+
+    expect(installMigration).toContain("SET LOCAL statement_timeout = '30s'");
+    expect(
+      installMigration.match(
+        /ON DELETE RESTRICT ON UPDATE CASCADE NOT VALID/g,
+      ),
+    ).toHaveLength(3);
+    expect(installMigration).not.toMatch(
+      /VALIDATE CONSTRAINT|DROP CONSTRAINT|RENAME CONSTRAINT/,
+    );
+
+    expect(validationMigration).toContain(
+      "SET LOCAL statement_timeout = '10min'",
+    );
+    expect(validationMigration.match(/VALIDATE CONSTRAINT/g)).toHaveLength(3);
+    expect(validationMigration).not.toMatch(
+      /ADD CONSTRAINT|DROP CONSTRAINT|RENAME CONSTRAINT/,
+    );
+
+    expect(finalizationMigration).toContain(
+      "SET LOCAL statement_timeout = '30s'",
+    );
+    expect(finalizationMigration).not.toContain("VALIDATE CONSTRAINT");
+    for (const constraint of priceSpecForeignKeys) {
+      const temporaryConstraint = temporaryConstraintName(constraint);
+      expect(installMigration).toContain(
+        `ADD CONSTRAINT "${temporaryConstraint}"`,
+      );
+      expect(validationMigration).toContain(
+        `VALIDATE CONSTRAINT "${temporaryConstraint}"`,
+      );
+      expect(finalizationMigration).toContain(`DROP CONSTRAINT "${constraint}"`);
+      expect(finalizationMigration).toMatch(
+        new RegExp(
+          `RENAME CONSTRAINT "${temporaryConstraint}"\\s+TO "${constraint}"`,
+        ),
+      );
+    }
+
+    expect(
+      [installMigration, validationMigration, finalizationMigration].join("\n"),
+    ).not.toMatch(/DROP TABLE|DROP COLUMN|TRUNCATE|DELETE FROM|UPDATE\s+"/i);
   });
 
   it("uses one atomic Prisma migration per install, validation, and finalization phase", () => {

@@ -44,12 +44,15 @@ const parsedReport = {
 };
 const leaseToken = "lease-token-12345678901234567890";
 const leaseTokenHash = createHash("sha256").update(leaseToken).digest("hex");
-const reportJsonKey = `seo-audit/runs/run-1/${"a".repeat(64)}/report.json`;
-const reportMarkdownKey = `seo-audit/runs/run-1/${"a".repeat(64)}/report.md`;
 const reservation = `seo-audit-pending-upload:${now.getTime()}:${Buffer.alloc(
   24,
   1,
 ).toString("base64url")}`;
+const reservationKeyHash = createHash("sha256")
+  .update(reservation)
+  .digest("hex");
+const reportJsonKey = `seo-audit/runs/run-1/${"a".repeat(64)}/uploads/${reservationKeyHash}/report.json`;
+const reportMarkdownKey = `seo-audit/runs/run-1/${"a".repeat(64)}/uploads/${reservationKeyHash}/report.md`;
 
 function completionRun(overrides: Record<string, unknown> = {}) {
   return {
@@ -99,6 +102,10 @@ function createJobDb() {
       findUnique: vi.fn(),
       update: vi.fn(),
       updateMany: vi.fn(),
+    },
+    seoAuditArtifactUpload: {
+      create: vi.fn(),
+      deleteMany: vi.fn().mockResolvedValue({ count: 1 }),
     },
     seoAuditWorkerHeartbeat: {
       upsert: vi.fn(),
@@ -382,10 +389,15 @@ describe("SEO audit job state machine", () => {
         }
       },
     );
-    const storeArtifacts = vi.fn().mockImplementation(async () => {
-      expect(transactionOpen).toBe(false);
-      return { reportJsonKey, reportMarkdownKey };
-    });
+    const storeArtifacts = vi
+      .fn()
+      .mockImplementation(async (input: Record<string, unknown>) => {
+        expect(transactionOpen).toBe(false);
+        return {
+          reportJsonKey: input.reportJsonKey as string,
+          reportMarkdownKey: input.reportMarkdownKey as string,
+        };
+      });
 
     const first = await completeSeoAuditJob(
       {
@@ -416,6 +428,29 @@ describe("SEO audit job state machine", () => {
     expect(repeated).toEqual({ status: "completed", alreadyCompleted: true });
     expect(parseReport).toHaveBeenCalledTimes(2);
     expect(storeArtifacts).toHaveBeenCalledTimes(1);
+    expect(storeArtifacts).toHaveBeenCalledWith({
+      runId: "run-1",
+      parsed: parsedReport,
+      reportJsonKey,
+      reportMarkdownKey,
+    });
+    expect(tx.seoAuditArtifactUpload.create).toHaveBeenCalledWith({
+      data: expect.objectContaining({
+        runId: "run-1",
+        reservation,
+        reportSha256: parsedReport.reportSha256,
+        reportJsonKey,
+        reportMarkdownKey,
+      }),
+    });
+    expect(tx.seoAuditArtifactUpload.deleteMany).toHaveBeenCalledWith({
+      where: {
+        runId: "run-1",
+        reservation,
+        reportJsonKey,
+        reportMarkdownKey,
+      },
+    });
     const completionLockSql = rawSql(tx.$queryRaw.mock.calls[0][0]);
     expect(completionLockSql.sql).toMatch(/FOR UPDATE/i);
     expect(tx.seoAuditRun.update.mock.invocationCallOrder[0]).toBeLessThan(
@@ -445,6 +480,54 @@ describe("SEO audit job state machine", () => {
         reportSha256: "a".repeat(64),
       }),
     });
+  });
+
+  it("keeps uploaded artifacts when the finalize transaction result is ambiguous", async () => {
+    const { db, tx } = createJobDb();
+    db.seoAuditRun.findUnique.mockResolvedValueOnce(completionRun());
+    tx.$queryRaw.mockResolvedValue([{ id: "run-1" }]);
+    tx.seoAuditRun.findUnique
+      .mockResolvedValueOnce(completionRun())
+      .mockResolvedValueOnce(
+        completionRun({
+          reportJsonKey: reservation,
+          reportSha256: parsedReport.reportSha256,
+        }),
+      );
+    tx.seoAuditRun.update.mockResolvedValue({ id: "run-1" });
+    const finalizeError = new Error("connection lost after commit");
+    let transactionCall = 0;
+    db.$transaction.mockImplementation(
+      async (callback: (client: typeof tx) => Promise<unknown>) => {
+        transactionCall += 1;
+        const result = await callback(tx);
+        if (transactionCall === 2) throw finalizeError;
+        return result;
+      },
+    );
+    const removeArtifacts = vi.fn().mockResolvedValue(undefined);
+
+    await expect(
+      completeSeoAuditJob(
+        {
+          runId: "run-1",
+          leaseToken,
+          reportGzipBase64: "bundle",
+          summary: completionSummary,
+        },
+        {
+          db: db as never,
+          now,
+          parseReport: async () => parsedReport,
+          storeArtifacts: async () => ({ reportJsonKey, reportMarkdownKey }),
+          removeArtifacts,
+          randomBytes: () => Buffer.alloc(24, 1),
+        },
+      ),
+    ).rejects.toBe(finalizeError);
+    expect(tx.seoAuditArtifactUpload.deleteMany).toHaveBeenCalledTimes(1);
+    expect(tx.seoAuditRun.update).toHaveBeenCalledTimes(2);
+    expect(removeArtifacts).not.toHaveBeenCalled();
   });
 
   it("rejects contradictory summaries and mismatched targets before reserving or uploading", async () => {
@@ -491,8 +574,8 @@ describe("SEO audit job state machine", () => {
     const { db } = createJobDb();
     db.seoAuditRun.findUnique.mockResolvedValueOnce(
       completedRun({
-        reportJsonKey: `seo-audit/runs/other-run/${parsedReport.reportSha256}/report.json`,
-        reportMarkdownKey: `seo-audit/runs/other-run/${parsedReport.reportSha256}/report.md`,
+        reportJsonKey: `seo-audit/runs/other-run/${parsedReport.reportSha256}/uploads/${reservationKeyHash}/report.json`,
+        reportMarkdownKey: `seo-audit/runs/other-run/${parsedReport.reportSha256}/uploads/${reservationKeyHash}/report.md`,
       }),
     );
 
@@ -577,9 +660,16 @@ describe("SEO audit job state machine", () => {
           {
             db: db as never,
             parseReport: async () => parsedReport,
-            storeArtifacts: async () => {
+            storeArtifacts: async (input) => {
               vi.setSystemTime(new Date("2026-07-25T08:01:00.000Z"));
-              return { reportJsonKey, reportMarkdownKey };
+              const reserved = input as typeof input & {
+                reportJsonKey: string;
+                reportMarkdownKey: string;
+              };
+              return {
+                reportJsonKey: reserved.reportJsonKey,
+                reportMarkdownKey: reserved.reportMarkdownKey,
+              };
             },
             removeArtifacts,
             randomBytes: () => Buffer.alloc(24, 1),
@@ -631,6 +721,12 @@ describe("SEO audit job state machine", () => {
         },
       ),
     ).rejects.toMatchObject({ code: "ARTIFACT_UPLOAD_FAILED" });
+    expect(storeArtifacts).toHaveBeenCalledWith({
+      runId: "run-1",
+      parsed: parsedReport,
+      reportJsonKey,
+      reportMarkdownKey,
+    });
     expect(tx.seoAuditRun.updateMany).toHaveBeenCalledWith({
       where: {
         id: "run-1",

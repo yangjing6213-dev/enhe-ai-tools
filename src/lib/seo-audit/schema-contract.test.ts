@@ -17,10 +17,18 @@ const commercialMigrationPath = resolve(
   "20260725090000_add_seo_audit_commercialization",
   "migration.sql"
 );
+const artifactUploadMigrationPath = resolve(
+  process.cwd(),
+  "prisma",
+  "migrations",
+  "20260725233000_add_seo_audit_artifact_upload_gc",
+  "migration.sql"
+);
 
 const schema = readFileSync(schemaPath, "utf8");
 const orderTypeMigration = readFileSync(orderTypeMigrationPath, "utf8");
 const commercialMigration = readFileSync(commercialMigrationPath, "utf8");
+const artifactUploadMigration = readFileSync(artifactUploadMigrationPath, "utf8");
 
 function normalizeWhitespace(value: string) {
   return value.trim().replace(/\s+/g, " ");
@@ -48,8 +56,8 @@ function getSqlStatements(sql: string) {
     .filter(Boolean);
 }
 
-function getSqlTableLines(tableName: string) {
-  const match = commercialMigration.match(
+function getSqlTableLines(tableName: string, migration = commercialMigration) {
+  const match = migration.match(
     new RegExp(`CREATE TABLE "${tableName}" \\(([\\s\\S]*?)\\n\\);`, "m")
   );
   expect(match, `table ${tableName} must exist`).not.toBeNull();
@@ -158,7 +166,7 @@ function getMigrationIndexes() {
 }
 
 describe("SEO audit commercial schema contract", () => {
-  it("locks the four OrderType values and exactly eight SEO audit models", () => {
+  it("locks the four OrderType values and exactly nine SEO audit models", () => {
     expect(getPrismaBlock("enum", "OrderType")).toEqual([
       "vip",
       "software_download",
@@ -173,6 +181,7 @@ describe("SEO audit commercial schema contract", () => {
       "SeoAuditOffer",
       "SeoAuditProject",
       "SeoAuditRun",
+      "SeoAuditArtifactUpload",
       "SeoAuditCredit",
       "SeoAuditSubscription",
       "SeoAuditSubscriptionOrder",
@@ -321,6 +330,40 @@ describe("SEO audit commercial schema contract", () => {
         '"report_sha256" CHAR(64)'
       ])
     );
+  });
+
+  it("persists reservation-owned artifact uploads for idempotent cleanup", () => {
+    expectExactPrismaLines("SeoAuditRun", [
+      "artifactUploads SeoAuditArtifactUpload[]",
+    ]);
+    expectExactPrismaLines("SeoAuditArtifactUpload", [
+      'runId String @map("run_id")',
+      "reservation String @unique",
+      'reportSha256 String @db.Char(64) @map("report_sha256")',
+      'reportJsonKey String @unique @map("report_json_key")',
+      'reportMarkdownKey String @unique @map("report_markdown_key")',
+      'cleanupAfter DateTime @map("cleanup_after")',
+      'cleanupClaimToken String? @unique @map("cleanup_claim_token")',
+      'cleanupClaimedAt DateTime? @map("cleanup_claimed_at")',
+      'cleanupAttemptCount Int @default(0) @map("cleanup_attempt_count")',
+      "run SeoAuditRun @relation(fields: [runId], references: [id], onDelete: Restrict)",
+      "@@index([cleanupAfter, cleanupClaimedAt])",
+      "@@index([runId, createdAt])",
+    ]);
+    expect(getSqlTableLines("seo_audit_artifact_uploads", artifactUploadMigration)).toEqual(
+      expect.arrayContaining([
+        '"run_id" TEXT NOT NULL',
+        '"reservation" TEXT NOT NULL',
+        '"report_sha256" CHAR(64) NOT NULL',
+        '"report_json_key" TEXT NOT NULL',
+        '"report_markdown_key" TEXT NOT NULL',
+        '"cleanup_after" TIMESTAMP(3) NOT NULL',
+        '"cleanup_claim_token" TEXT',
+        '"cleanup_claimed_at" TIMESTAMP(3)',
+        '"cleanup_attempt_count" INTEGER NOT NULL DEFAULT 0',
+      ]),
+    );
+    expect(artifactUploadMigration).toContain("ON DELETE RESTRICT ON UPDATE CASCADE");
   });
 
   it("creates exactly the eight audit tables and the required unique and lookup indexes", () => {

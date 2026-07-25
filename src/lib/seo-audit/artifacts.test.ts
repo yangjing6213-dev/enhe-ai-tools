@@ -6,6 +6,7 @@ import {
   assertSeoAuditSummaryMatches,
   buildPrivateArtifactKeys,
   parseSeoAuditReportBundle,
+  removePrivateSeoAuditArtifacts,
   SEO_AUDIT_COS_REQUEST_TIMEOUT_MS,
   storePrivateSeoAuditArtifacts,
 } from "@/lib/seo-audit/artifacts";
@@ -357,8 +358,22 @@ describe("private SEO audit artifact storage", () => {
     });
   });
 
+  it("isolates each upload reservation under its own private object prefix", () => {
+    expect(
+      buildPrivateArtifactKeys("run-123", "a".repeat(64), "b".repeat(64)),
+    ).toEqual({
+      jsonKey: `seo-audit/runs/run-123/${"a".repeat(64)}/uploads/${"b".repeat(64)}/report.json`,
+      markdownKey: `seo-audit/runs/run-123/${"a".repeat(64)}/uploads/${"b".repeat(64)}/report.md`,
+    });
+  });
+
   it("uploads private JSON and Markdown objects without returning a public URL", async () => {
     const parsed = await parseSeoAuditReportBundle(bundleBase64());
+    const reserved = buildPrivateArtifactKeys(
+      "run-123",
+      parsed.reportSha256,
+      "d".repeat(64),
+    );
     const uploads: Array<Record<string, unknown>> = [];
     const putObject = vi.fn(
       (
@@ -372,13 +387,18 @@ describe("private SEO audit artifact storage", () => {
     const deleteObject = vi.fn(
       (
         _input: Record<string, unknown>,
-        callback: (error: unknown) => void,
-      ) => callback(null),
+        callback: (error: unknown, data: { Location?: string }) => void,
+      ) => callback(null, {}),
     );
     const createClient = vi.fn(() => ({ putObject, deleteObject }));
 
     const stored = await storePrivateSeoAuditArtifacts(
-      { runId: "run-123", parsed },
+      {
+        runId: "run-123",
+        parsed,
+        reportJsonKey: reserved.jsonKey,
+        reportMarkdownKey: reserved.markdownKey,
+      },
       {
         env: {
           TENCENT_COS_SECRET_ID: "secret-id",
@@ -420,25 +440,52 @@ describe("private SEO audit artifact storage", () => {
 
   it("fails closed when private COS configuration is incomplete", async () => {
     const parsed = await parseSeoAuditReportBundle(bundleBase64());
+    const reserved = buildPrivateArtifactKeys(
+      "run-123",
+      parsed.reportSha256,
+      "d".repeat(64),
+    );
 
     await expect(
       storePrivateSeoAuditArtifacts(
-        { runId: "run-123", parsed },
+        {
+          runId: "run-123",
+          parsed,
+          reportJsonKey: reserved.jsonKey,
+          reportMarkdownKey: reserved.markdownKey,
+        },
         { env: {}, createClient: vi.fn() },
       ),
     ).rejects.toMatchObject({ code: "ARTIFACT_STORAGE_UNAVAILABLE" });
   });
 
-  it("applies an explicit request timeout when the COS callback never settles", async () => {
+  it("cancels a timed-out COS upload through its task id", async () => {
     const parsed = await parseSeoAuditReportBundle(bundleBase64());
+    const reserved = buildPrivateArtifactKeys(
+      "run-123",
+      parsed.reportSha256,
+      "d".repeat(64),
+    );
+    const cancelTask = vi.fn();
     const createClient = vi.fn(() => ({
-      putObject: vi.fn(),
+      putObject: vi.fn((input: Record<string, unknown>) => {
+        const onTaskReady = input.onTaskReady as
+          | ((taskId: string) => void)
+          | undefined;
+        onTaskReady?.("upload-task-1");
+      }),
       deleteObject: vi.fn(),
+      cancelTask,
     }));
 
     await expect(
       storePrivateSeoAuditArtifacts(
-        { runId: "run-123", parsed },
+        {
+          runId: "run-123",
+          parsed,
+          reportJsonKey: reserved.jsonKey,
+          reportMarkdownKey: reserved.markdownKey,
+        },
         {
           env: {
             TENCENT_COS_SECRET_ID: "secret-id",
@@ -452,10 +499,236 @@ describe("private SEO audit artifact storage", () => {
       ),
     ).rejects.toMatchObject({ code: "ARTIFACT_UPLOAD_FAILED" });
     expect(createClient).toHaveBeenCalledWith({ requestTimeoutMs: 5 });
+    expect(cancelTask).toHaveBeenCalledWith("upload-task-1");
+  });
+
+  it("keeps the timeout failure when cancelTask synchronously invokes the COS callback", async () => {
+    const parsed = await parseSeoAuditReportBundle(bundleBase64());
+    const reserved = buildPrivateArtifactKeys(
+      "run-123",
+      parsed.reportSha256,
+      "e".repeat(64),
+    );
+    const cancelTask = vi.fn();
+    const createClient = vi.fn(() => ({
+      putObject: vi.fn(
+        (
+          input: Record<string, unknown>,
+          callback: (error: unknown, data: { Location?: string }) => void,
+        ) => {
+          cancelTask.mockImplementation(() => callback(null, {}));
+          const onTaskReady = input.onTaskReady as
+            | ((taskId: string) => void)
+            | undefined;
+          onTaskReady?.("upload-task-2");
+        },
+      ),
+      deleteObject: vi.fn(),
+      cancelTask,
+    }));
+
+    await expect(
+      storePrivateSeoAuditArtifacts(
+        {
+          runId: "run-123",
+          parsed,
+          reportJsonKey: reserved.jsonKey,
+          reportMarkdownKey: reserved.markdownKey,
+        },
+        {
+          env: {
+            TENCENT_COS_SECRET_ID: "secret-id",
+            TENCENT_COS_SECRET_KEY: "secret-key",
+            TENCENT_COS_BUCKET: "private-bucket-123",
+            TENCENT_COS_REGION: "ap-guangzhou",
+          },
+          requestTimeoutMs: 5,
+          createClient,
+        },
+      ),
+    ).rejects.toMatchObject({ code: "ARTIFACT_UPLOAD_FAILED" });
+    expect(cancelTask).toHaveBeenCalledWith("upload-task-2");
+  });
+
+  it("keeps timed-out void COS deletions failed after late success callbacks", async () => {
+    vi.useFakeTimers();
+    try {
+      const keys = buildPrivateArtifactKeys(
+        "run-123",
+        "a".repeat(64),
+        "f".repeat(64),
+      );
+      const callbacks: Array<(error: unknown) => void> = [];
+      const deleteObject = vi.fn(
+        (
+          _input: Record<string, unknown>,
+          callback: (error: unknown) => void,
+        ) => {
+          callbacks.push(callback);
+        },
+      );
+      const removal = removePrivateSeoAuditArtifacts(
+        {
+          reportJsonKey: keys.jsonKey,
+          reportMarkdownKey: keys.markdownKey,
+        },
+        {
+          env: {
+            TENCENT_COS_SECRET_ID: "secret-id",
+            TENCENT_COS_SECRET_KEY: "secret-key",
+            TENCENT_COS_BUCKET: "private-bucket-123",
+            TENCENT_COS_REGION: "ap-guangzhou",
+          },
+          requestTimeoutMs: 5,
+          createClient: () => ({ putObject: vi.fn(), deleteObject }),
+        },
+      );
+      const rejection = expect(removal).rejects.toMatchObject({
+        code: "ARTIFACT_UPLOAD_FAILED",
+      });
+
+      await Promise.resolve();
+      await vi.advanceTimersByTimeAsync(5);
+      callbacks.forEach((callback) => callback(null));
+      await rejection;
+      expect(deleteObject).toHaveBeenCalledTimes(2);
+    } finally {
+      vi.useRealTimers();
+    }
+  });
+
+  it("passes the request timeout to the default COS SDK client", async () => {
+    const parsed = await parseSeoAuditReportBundle(bundleBase64());
+    const reserved = buildPrivateArtifactKeys(
+      "run-123",
+      parsed.reportSha256,
+      "f".repeat(64),
+    );
+    const constructorOptions = vi.fn();
+
+    class MockCosClient {
+      cancelTask = vi.fn();
+
+      constructor(options: Record<string, unknown>) {
+        constructorOptions(options);
+      }
+
+      putObject(
+        _input: Record<string, unknown>,
+        callback: (error: unknown, data: { Location?: string }) => void,
+      ) {
+        callback(null, {});
+      }
+
+      deleteObject(
+        _input: Record<string, unknown>,
+        callback: (error: unknown) => void,
+      ) {
+        callback(null);
+      }
+    }
+
+    vi.doMock("cos-nodejs-sdk-v5", () => ({ default: MockCosClient }));
+    try {
+      await expect(
+        storePrivateSeoAuditArtifacts(
+          {
+            runId: "run-123",
+            parsed,
+            reportJsonKey: reserved.jsonKey,
+            reportMarkdownKey: reserved.markdownKey,
+          },
+          {
+            env: {
+              TENCENT_COS_SECRET_ID: "secret-id",
+              TENCENT_COS_SECRET_KEY: "secret-key",
+              TENCENT_COS_BUCKET: "private-bucket-123",
+              TENCENT_COS_REGION: "ap-guangzhou",
+            },
+            requestTimeoutMs: 17,
+          },
+        ),
+      ).resolves.toEqual({
+        reportJsonKey: reserved.jsonKey,
+        reportMarkdownKey: reserved.markdownKey,
+      });
+      expect(constructorOptions).toHaveBeenCalledWith({
+        SecretId: "secret-id",
+        SecretKey: "secret-key",
+        Timeout: 17,
+      });
+    } finally {
+      vi.doUnmock("cos-nodejs-sdk-v5");
+      vi.resetModules();
+    }
+  });
+
+  it("uploads to caller-reserved keys only when both keys match the run and report", async () => {
+    const parsed = await parseSeoAuditReportBundle(bundleBase64());
+    const reserved = buildPrivateArtifactKeys(
+      "run-123",
+      parsed.reportSha256,
+      "c".repeat(64),
+    );
+    const putObject = vi.fn(
+      (
+        _input: Record<string, unknown>,
+        callback: (error: unknown, data: { Location?: string }) => void,
+      ) => callback(null, {}),
+    );
+    const createClient = vi.fn(() => ({
+      putObject,
+      deleteObject: vi.fn(),
+    }));
+    const options = {
+      env: {
+        TENCENT_COS_SECRET_ID: "secret-id",
+        TENCENT_COS_SECRET_KEY: "secret-key",
+        TENCENT_COS_BUCKET: "private-bucket-123",
+        TENCENT_COS_REGION: "ap-guangzhou",
+      },
+      createClient,
+    };
+
+    await expect(
+      storePrivateSeoAuditArtifacts(
+        {
+          runId: "run-123",
+          parsed,
+          reportJsonKey: reserved.jsonKey,
+          reportMarkdownKey: reserved.markdownKey,
+        },
+        options,
+      ),
+    ).resolves.toEqual({
+      reportJsonKey: reserved.jsonKey,
+      reportMarkdownKey: reserved.markdownKey,
+    });
+    expect(putObject.mock.calls.map(([input]) => input.Key)).toEqual([
+      reserved.jsonKey,
+      reserved.markdownKey,
+    ]);
+
+    await expect(
+      storePrivateSeoAuditArtifacts(
+        {
+          runId: "run-123",
+          parsed,
+          reportJsonKey: reserved.jsonKey,
+          reportMarkdownKey: reserved.markdownKey.replace("run-123", "other-run"),
+        },
+        options,
+      ),
+    ).rejects.toMatchObject({ code: "INVALID_REPORT_BUNDLE" });
   });
 
   it("rolls back an already uploaded object when the second COS upload fails", async () => {
     const parsed = await parseSeoAuditReportBundle(bundleBase64());
+    const reserved = buildPrivateArtifactKeys(
+      "run-123",
+      parsed.reportSha256,
+      "d".repeat(64),
+    );
     const putObject = vi
       .fn()
       .mockImplementationOnce(
@@ -479,7 +752,12 @@ describe("private SEO audit artifact storage", () => {
 
     await expect(
       storePrivateSeoAuditArtifacts(
-        { runId: "run-123", parsed },
+        {
+          runId: "run-123",
+          parsed,
+          reportJsonKey: reserved.jsonKey,
+          reportMarkdownKey: reserved.markdownKey,
+        },
         {
           env: {
             TENCENT_COS_SECRET_ID: "secret-id",

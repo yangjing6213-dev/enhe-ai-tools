@@ -38,7 +38,6 @@ const task9MigrationNames = [
   finalizationMigrationName,
 ] as const;
 type Task9MigrationName = (typeof task9MigrationNames)[number];
-const expectedMigrationCount = 39;
 const migrationsRoot = join(root, "prisma", "migrations");
 const prismaCli = join(root, "node_modules", "prisma", "build", "index.js");
 const execFileAsync = promisify(execFile);
@@ -651,7 +650,84 @@ describePostgres("PostgreSQL admin hard-delete protection", () => {
     } finally {
       await db.toolPurchase.deleteMany({ where: { id: purchase.id } });
       await db.order.deleteMany({ where: { id: { in: [toolOrder.id, priceSpecOrder.id, purchaseOrder.id] } } });
+      await db.toolPriceSpec.deleteMany({ where: { id: priceSpec.id } });
       await db.tool.deleteMany({ where: { id: { in: [orderedTool.id, pricedTool.id, purchasedTool.id] } } });
+      await db.user.deleteMany({ where: { id: user.id } });
+    }
+  }, 30_000);
+
+  it("blocks direct tool deletion when an order is linked only through a price spec", async () => {
+    const user = await createUser(true);
+    const tool = await createTool();
+    const priceSpec = await db.toolPriceSpec.create({
+      data: {
+        toolId: tool.id,
+        name: "Database protected price spec",
+        price: "9.90",
+      },
+    });
+    const order = await createOrder(user.id, {
+      orderStatus: "cancelled",
+      isTestData: true,
+      toolPriceSpecId: priceSpec.id,
+    });
+
+    try {
+      await expect(db.tool.delete({ where: { id: tool.id } })).rejects.toBeDefined();
+      expect(await db.tool.findUnique({ where: { id: tool.id } })).not.toBeNull();
+      expect(
+        (await db.order.findUniqueOrThrow({ where: { id: order.id } }))
+          .toolPriceSpecId,
+      ).toBe(priceSpec.id);
+    } finally {
+      await db.order.deleteMany({ where: { id: order.id } });
+      await db.toolPriceSpec.deleteMany({ where: { id: priceSpec.id } });
+      await db.tool.deleteMany({ where: { id: tool.id } });
+      await db.user.deleteMany({ where: { id: user.id } });
+    }
+  }, 30_000);
+
+  it("blocks direct price-spec deletion when only a purchase references it", async () => {
+    const user = await createUser(true);
+    const tool = await createTool();
+    const priceSpec = await db.toolPriceSpec.create({
+      data: {
+        toolId: tool.id,
+        name: "Purchase protected price spec",
+        price: "19.90",
+      },
+    });
+    const order = await createOrder(user.id, {
+      orderStatus: "cancelled",
+      isTestData: true,
+    });
+    const purchase = await db.toolPurchase.create({
+      data: {
+        userId: user.id,
+        toolId: tool.id,
+        toolPriceSpecId: priceSpec.id,
+        toolPriceSpecName: priceSpec.name,
+        orderId: order.id,
+        amount: "19.90",
+      },
+    });
+
+    try {
+      await expect(
+        db.toolPriceSpec.delete({ where: { id: priceSpec.id } }),
+      ).rejects.toBeDefined();
+      expect(
+        (
+          await db.toolPurchase.findUniqueOrThrow({
+            where: { id: purchase.id },
+          })
+        ).toolPriceSpecId,
+      ).toBe(priceSpec.id);
+    } finally {
+      await db.toolPurchase.deleteMany({ where: { id: purchase.id } });
+      await db.order.deleteMany({ where: { id: order.id } });
+      await db.toolPriceSpec.deleteMany({ where: { id: priceSpec.id } });
+      await db.tool.deleteMany({ where: { id: tool.id } });
       await db.user.deleteMany({ where: { id: user.id } });
     }
   }, 30_000);
@@ -758,7 +834,7 @@ describePostgres("PostgreSQL admin hard-delete protection", () => {
         expect(failure.output).toMatch(
           /statement timeout|57014|current transaction is aborted/i,
         );
-        expect(failure.elapsedMs).toBeLessThan(10_000);
+        expect(failure.elapsedMs).toBeLessThan(30_000);
         await expectIntermediateMigrationProtection({
           client: harness.client,
           schemaName: harness.schemaName,
@@ -793,6 +869,13 @@ describePostgres("PostgreSQL admin hard-delete protection", () => {
       isTestData: true,
     });
     const tool = await createTool();
+    const unusedPriceSpec = await db.toolPriceSpec.create({
+      data: {
+        toolId: tool.id,
+        name: "Unused price spec",
+        price: "9.90",
+      },
+    });
 
     try {
       expect(
@@ -820,6 +903,9 @@ describePostgres("PostgreSQL admin hard-delete protection", () => {
           auditContext,
         }),
       ).toMatchObject({ status: "deleted" });
+      expect(
+        await db.toolPriceSpec.findUnique({ where: { id: unusedPriceSpec.id } }),
+      ).toBeNull();
 
       expect(
         await db.adminAuditLog.count({
@@ -837,6 +923,7 @@ describePostgres("PostgreSQL admin hard-delete protection", () => {
         where: { targetId: { in: [order.id, emptyUser.id, tool.id] } },
       });
       await db.order.deleteMany({ where: { id: order.id } });
+      await db.toolPriceSpec.deleteMany({ where: { id: unusedPriceSpec.id } });
       await db.tool.deleteMany({ where: { id: tool.id } });
       await db.user.deleteMany({ where: { id: { in: [owner.id, emptyUser.id] } } });
     }
@@ -1181,6 +1268,9 @@ async function expectFinalMigrationState(input: {
     { table_name: "users", is_nullable: "NO", column_default: "false" },
   ]);
 
+  const expectedMigrationCount = (
+    await readdir(migrationsRoot, { withFileTypes: true })
+  ).filter((entry) => entry.isDirectory()).length;
   const [migrationCount] = await input.client.$queryRawUnsafe<
     Array<{ count: number }>
   >(

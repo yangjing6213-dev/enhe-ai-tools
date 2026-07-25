@@ -316,6 +316,7 @@ export async function deleteToolForAdmin(
           changelogs: number;
           tagLinks: number;
           files: number;
+          priceSpecs: number;
         }
       | undefined;
     try {
@@ -328,6 +329,7 @@ export async function deleteToolForAdmin(
         tx.toolChangelog.deleteMany({ where: { toolId: tool.id } }),
         tx.toolTagLink.deleteMany({ where: { toolId: tool.id } }),
         tx.file.updateMany({ where: { toolId: tool.id }, data: { toolId: null } }),
+        tx.toolPriceSpec.deleteMany({ where: { id: { in: priceSpecIds } } }),
       ]);
       const deleted = await tx.tool.deleteMany({ where: { id: tool.id } });
       if (deleted.count !== 1) {
@@ -343,6 +345,7 @@ export async function deleteToolForAdmin(
         changelogs: results[5].count,
         tagLinks: results[6].count,
         files: results[7].count,
+        priceSpecs: results[8].count,
       };
       await releaseSavepoint(tx, "admin_tool_delete");
     } catch (error) {
