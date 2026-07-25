@@ -46,9 +46,6 @@ const completionSummary = {
   criticalCount: 1,
   highCount: 0,
   mediumCount: 1,
-  findings: [
-    { id: "F001", severity: "critical" as const, issue: "Critical issue" },
-  ],
 };
 
 function jsonRequest(path: string, body: unknown, token = workerToken) {
@@ -97,7 +94,7 @@ describe("internal SEO audit job routes", () => {
     async (token) => {
       const request = jsonRequest(
         "/api/internal/seo-audit/jobs/claim",
-        { workerId: "worker-1", engineVersion: "1.4.4" },
+        { workerId: "worker-1", engineVersion: "1.4.8" },
       );
       if (token === null) request.headers.delete("authorization");
       else if (token === "malformed token") {
@@ -124,7 +121,7 @@ describe("internal SEO audit job routes", () => {
     const invalid = await claimPOST(
       jsonRequest("/api/internal/seo-audit/jobs/claim", {
         workerId: "worker 1",
-        engineVersion: "1.4.4",
+        engineVersion: "1.4.8",
       }),
     );
     expect(invalid.status).toBe(400);
@@ -140,12 +137,12 @@ describe("internal SEO audit job routes", () => {
       pageLimit: 100,
       requestTimeoutSeconds: 8,
       totalTimeoutSeconds: 720,
-      engineVersion: "1.4.4",
+      engineVersion: "1.4.8",
     });
     const response = await claimPOST(
       jsonRequest("/api/internal/seo-audit/jobs/claim", {
         workerId: "worker-1",
-        engineVersion: "1.4.4",
+        engineVersion: "1.4.8",
       }),
     );
 
@@ -156,8 +153,21 @@ describe("internal SEO audit job routes", () => {
     });
     expect(jobMocks.claimSeoAuditJob).toHaveBeenCalledWith({
       workerId: "worker-1",
-      engineVersion: "1.4.4",
+      engineVersion: "1.4.8",
     });
+
+    const unsupported = await claimPOST(
+      jsonRequest("/api/internal/seo-audit/jobs/claim", {
+        workerId: "worker-1",
+        engineVersion: "1.4.7",
+      }),
+    );
+    expect(unsupported.status).toBe(400);
+    expect(await readJson(unsupported)).toEqual({
+      ok: false,
+      code: "INVALID_REQUEST",
+    });
+    expect(jobMocks.claimSeoAuditJob).toHaveBeenCalledTimes(1);
   });
 
   it("validates heartbeat progress and returns cooperative cancellation", async () => {
@@ -165,7 +175,7 @@ describe("internal SEO audit job routes", () => {
       jsonRequest("/api/internal/seo-audit/jobs/run-1/heartbeat", {
         leaseToken: "lease-token-12345678901234567890",
         workerId: "worker-1",
-        engineVersion: "1.4.4",
+          engineVersion: "1.4.8",
         progress: {
           phase: "crawl",
           pagesProcessed: 1,
@@ -185,7 +195,7 @@ describe("internal SEO audit job routes", () => {
       jsonRequest("/api/internal/seo-audit/jobs/run-1/heartbeat", {
         leaseToken: "lease-token-12345678901234567890",
         workerId: "worker-1",
-        engineVersion: "1.4.4",
+        engineVersion: "1.4.8",
         progress: { phase: "cancel", pagesProcessed: 10, pageLimit: 100 },
       }),
       routeContext(),
@@ -236,6 +246,20 @@ describe("internal SEO audit job routes", () => {
       routeContext(),
     );
     expect(invalid.status).toBe(400);
+    expect(jobMocks.completeSeoAuditJob).toHaveBeenCalledTimes(1);
+
+    const findingsInvalid = await completePOST(
+      jsonRequest("/api/internal/seo-audit/jobs/run-1/complete", {
+        leaseToken: "lease-token-12345678901234567890",
+        reportGzipBase64: "H4sIAAAAAAAA",
+        summary: {
+          ...completionSummary,
+          findings: [{ issue: "worker-controlled text" }],
+        },
+      }),
+      routeContext(),
+    );
+    expect(findingsInvalid.status).toBe(400);
     expect(jobMocks.completeSeoAuditJob).toHaveBeenCalledTimes(1);
   });
 
@@ -290,6 +314,23 @@ describe("internal SEO audit job routes", () => {
     expect(await readJson(response)).toEqual({
       ok: false,
       code: "REPORT_TOO_LARGE",
+    });
+
+    jobMocks.completeSeoAuditJob.mockRejectedValueOnce({
+      code: "JOB_CANCELLED",
+    });
+    const cancelled = await completePOST(
+      jsonRequest("/api/internal/seo-audit/jobs/run-1/complete", {
+        leaseToken: "lease-token-12345678901234567890",
+        reportGzipBase64: "H4sIAAAAAAAA",
+        summary: completionSummary,
+      }),
+      routeContext(),
+    );
+    expect(cancelled.status).toBe(409);
+    expect(await readJson(cancelled)).toEqual({
+      ok: false,
+      code: "JOB_CANCELLED",
     });
   });
 });

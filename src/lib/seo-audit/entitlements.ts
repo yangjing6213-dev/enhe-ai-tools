@@ -2,6 +2,7 @@ import { createHash, createHmac } from "node:crypto";
 import { isIP } from "node:net";
 import { Prisma } from "@prisma/client";
 import { prisma } from "@/lib/db";
+import { sanitizeStoredSeoAuditPublicFindings } from "@/lib/seo-audit/artifacts";
 
 export type SeoAuditEntitlementErrorCode =
   | "INVALID_TARGET"
@@ -423,7 +424,9 @@ export async function enqueueAnonymousFreeAudit(
             summaryCriticalCount: cached.summaryCriticalCount,
             summaryHighCount: cached.summaryHighCount,
             summaryMediumCount: cached.summaryMediumCount,
-            summaryFindings: cached.summaryFindings ?? Prisma.JsonNull,
+            summaryFindings: sanitizeStoredSeoAuditPublicFindings(
+              cached.summaryFindings,
+            ),
             reportJsonKey: cached.reportJsonKey,
             reportMarkdownKey: cached.reportMarkdownKey,
             reportSha256: cached.reportSha256,

@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { SEO_AUDIT_ENGINE_VERSION } from "@/lib/seo-audit/artifacts";
 import { claimSeoAuditJob } from "@/lib/seo-audit/jobs";
 import {
   handleWorkerRouteError,
@@ -14,7 +15,7 @@ export const dynamic = "force-dynamic";
 const claimSchema = z
   .object({
     workerId: z.string().min(1).max(80).regex(/^[A-Za-z0-9._:-]+$/),
-    engineVersion: z.string().min(1).max(64).regex(/^[A-Za-z0-9._+-]+$/),
+    engineVersion: z.literal(SEO_AUDIT_ENGINE_VERSION),
   })
   .strict();
 

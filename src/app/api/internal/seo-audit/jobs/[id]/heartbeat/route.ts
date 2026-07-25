@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { SEO_AUDIT_ENGINE_VERSION } from "@/lib/seo-audit/artifacts";
 import { heartbeatSeoAuditJob } from "@/lib/seo-audit/jobs";
 import {
   handleWorkerRouteError,
@@ -16,7 +17,7 @@ const heartbeatSchema = z
   .object({
     leaseToken: z.string().min(24).max(512).regex(/^\S+$/),
     workerId: z.string().min(1).max(80).regex(/^[A-Za-z0-9._:-]+$/),
-    engineVersion: z.string().min(1).max(64).regex(/^[A-Za-z0-9._+-]+$/),
+    engineVersion: z.literal(SEO_AUDIT_ENGINE_VERSION),
     progress: z
       .object({
         phase: z.enum(["prepare", "crawl", "report", "upload", "cancel"]),

@@ -1,0 +1,324 @@
+{
+  "findings": [
+    {
+      "action": "\u53bb\u91cd sitemap \u7684 loc\uff0c\u5e76\u4fdd\u7559\u552f\u4e00\u89c4\u8303 URL\u3002",
+      "category": "technical_seo",
+      "code": "sitemap_duplicate_urls",
+      "evidence": [
+        "https://fixture.example/about"
+      ],
+      "id": "F001",
+      "issue": "Sitemap \u542b\u91cd\u590d URL",
+      "severity": "medium",
+      "status": "verified",
+      "verification": "\u91cd\u65b0\u89e3\u6790 sitemap\uff0c\u786e\u8ba4\u603b loc \u6570\u4e0e\u552f\u4e00 loc \u6570\u76f8\u540c\u3002"
+    },
+    {
+      "action": "\u4f7f\u7528\u6d4f\u89c8\u5668\u8bfb\u53d6\u6e32\u67d3\u540e\u7684 application/ld+json\uff1b\u4ec5\u5728\u4ecd\u4e3a\u7a7a\u65f6\u8bc4\u4f30\u662f\u5426\u7f3a\u5931\u3002",
+      "category": "structured_data",
+      "code": "schema_render_check",
+      "evidence": [
+        "https://fixture.example/about"
+      ],
+      "id": "F002",
+      "issue": "\u90e8\u5206\u9875\u9762\u7684\u9759\u6001 HTML \u672a\u53d1\u73b0 JSON-LD\uff0c\u9700\u6e32\u67d3\u590d\u6838",
+      "severity": "info",
+      "status": "render_required",
+      "verification": "\u4fdd\u5b58\u6e32\u67d3 DOM \u6216 Rich Results Test \u7ed3\u679c\u3002"
+    },
+    {
+      "action": "\u4ec5\u5728\u80fd\u6301\u7eed\u7ef4\u62a4\u51c6\u786e\u5185\u5bb9\u65f6\u8865\u5145\uff1b\u4e0d\u8981\u628a\u8fd9\u4e9b\u6587\u4ef6\u5f53\u4f5c Google \u6392\u540d\u5fc5\u8981\u6761\u4ef6\u3002",
+      "category": "geo",
+      "code": "optional_machine_assets",
+      "evidence": [
+        "/pricing.md",
+        "/okf/index.md"
+      ],
+      "id": "F003",
+      "issue": "\u90e8\u5206\u53ef\u9009\u673a\u5668\u53ef\u8bfb\u8d44\u6e90\u4e0d\u53ef\u7528",
+      "severity": "info",
+      "status": "verified",
+      "verification": "\u8bf7\u6c42\u8d44\u6e90\u5e76\u786e\u8ba4 200\u3001\u5185\u5bb9\u51c6\u786e\u3001\u53ef\u516c\u5f00\u8bbf\u95ee\u3002"
+    },
+    {
+      "action": "\u83b7\u53d6 LCP\u3001INP\u3001CLS \u5b57\u6bb5\u6570\u636e\u5e76\u6309\u9875\u9762\u7c7b\u578b\u548c\u8bbe\u5907\u5206\u6790\u3002",
+      "category": "performance",
+      "code": "core_web_vitals_data",
+      "evidence": "\u9700\u8981 CrUX\u3001PageSpeed \u5b57\u6bb5\u6570\u636e\u6216 GSC Core Web Vitals\u3002",
+      "id": "F004",
+      "issue": "Core Web Vitals \u672a\u7531\u672c\u6b21 HTTP \u6293\u53d6\u9a8c\u8bc1",
+      "severity": "info",
+      "status": "external_data_required",
+      "verification": "\u4fdd\u5b58\u6570\u636e\u6e90\u3001\u65f6\u95f4\u7a97\u3001\u6837\u672c\u91cf\u548c\u901a\u8fc7\u7387\u3002"
+    },
+    {
+      "action": "\u5728\u7528\u6237\u6388\u6743\u540e\uff0c\u5bf9\u4f18\u5148\u67e5\u8be2\u6267\u884c\u5e26\u65f6\u95f4\u3001\u8bed\u8a00\u548c\u5730\u533a\u7684\u771f\u5b9e\u63a2\u6d4b\u3002",
+      "category": "geo",
+      "code": "answer_engine_visibility_data",
+      "evidence": "\u672c\u811a\u672c\u4e0d\u8c03\u7528 ChatGPT\u3001Perplexity\u3001Claude\u3001Gemini \u6216 Copilot\u3002",
+      "id": "F005",
+      "issue": "\u771f\u5b9e\u7b54\u6848\u5f15\u64ce\u54c1\u724c\u63d0\u53ca\u4e0e\u57df\u540d\u5f15\u7528\u672a\u9a8c\u8bc1",
+      "severity": "info",
+      "status": "external_data_required",
+      "verification": "\u4fdd\u5b58\u9010\u67e5\u8be2\u7ed3\u679c\u3001\u5f15\u7528 URL\u3001\u7ade\u4e89\u6765\u6e90\u548c\u590d\u6d4b\u65e5\u671f\u3002"
+    }
+  ],
+  "meta": {
+    "allow_private": false,
+    "engine_version": "1.4.8",
+    "finished_at": "2026-07-25T00:00:01+00:00",
+    "limitations": [
+      "Static HTML only; client-rendered metadata and JSON-LD require browser verification.",
+      "HTTP timing is not Core Web Vitals.",
+      "No Search Console, analytics, backlink, ranking, or answer-engine data is collected."
+    ],
+    "max_pages": 5,
+    "started_at": "2026-07-25T00:00:00+00:00",
+    "target": "https://fixture.example/",
+    "user_agent": "IndependentSiteSeoGeoAudit/1.0 (+read-only)"
+  },
+  "pages": [
+    {
+      "author_signal": false,
+      "canonical": "https://fixture.example/",
+      "content_type": "text/html",
+      "elapsed_ms": 1,
+      "error": null,
+      "external_link_count": 0,
+      "final_url": "https://fixture.example/",
+      "h1": [
+        "\u9996\u9875"
+      ],
+      "h1_count": 1,
+      "h2_count": 0,
+      "hreflang": [],
+      "html_lang": "zh-CN",
+      "images_missing_alt_attribute": 0,
+      "in_sitemap": true,
+      "internal_link_count": 1,
+      "is_html": true,
+      "json_ld_static_count": 1,
+      "json_ld_static_errors": [],
+      "json_ld_static_valid_count": 1,
+      "meta_description": "\u6d4b\u8bd5\u9996\u9875",
+      "meta_description_length": 4,
+      "noindex": false,
+      "parse_error": null,
+      "redirects": [],
+      "robots_directive": "",
+      "status": 200,
+      "title": "\u9996\u9875",
+      "title_length": 2,
+      "truncated": false,
+      "url": "https://fixture.example/",
+      "word_count": 3
+    },
+    {
+      "author_signal": false,
+      "canonical": "https://fixture.example/about",
+      "content_type": "text/html",
+      "elapsed_ms": 1,
+      "error": null,
+      "external_link_count": 0,
+      "final_url": "https://fixture.example/about",
+      "h1": [
+        "\u5173\u4e8e"
+      ],
+      "h1_count": 1,
+      "h2_count": 0,
+      "hreflang": [],
+      "html_lang": "zh-CN",
+      "images_missing_alt_attribute": 0,
+      "in_sitemap": true,
+      "internal_link_count": 0,
+      "is_html": true,
+      "json_ld_static_count": 0,
+      "json_ld_static_errors": [],
+      "json_ld_static_valid_count": 0,
+      "meta_description": "\u5173\u4e8e\u6211\u4eec",
+      "meta_description_length": 4,
+      "noindex": false,
+      "parse_error": null,
+      "redirects": [],
+      "robots_directive": "",
+      "status": 200,
+      "title": "\u5173\u4e8e",
+      "title_length": 2,
+      "truncated": false,
+      "url": "https://fixture.example/about",
+      "word_count": 3
+    }
+  ],
+  "strengths": [
+    {
+      "category": "crawlability",
+      "code": "robots_available",
+      "evidence": {
+        "status": 200,
+        "url": "https://fixture.example/robots.txt"
+      },
+      "id": "S001",
+      "status": "verified",
+      "title": "robots.txt \u53ef\u6b63\u5e38\u8bfb\u53d6",
+      "value": "\u641c\u7d22\u4e0e\u7b54\u6848\u5f15\u64ce\u53ef\u4ee5\u8bfb\u53d6\u7ad9\u70b9\u516c\u5f00\u6293\u53d6\u7b56\u7565\u3002"
+    },
+    {
+      "category": "crawlability",
+      "code": "sitemap_available",
+      "evidence": [
+        {
+          "kind": "urlset",
+          "url": "https://fixture.example/sitemap.xml",
+          "url_count": 3
+        }
+      ],
+      "id": "S002",
+      "status": "verified",
+      "title": "\u5df2\u63d0\u4f9b\u53ef\u89e3\u6790\u7684 XML Sitemap",
+      "value": "\u4e3a\u641c\u7d22\u5f15\u64ce\u53d1\u73b0\u89c4\u8303 URL \u548c\u7406\u89e3\u7ad9\u70b9\u89c4\u6a21\u63d0\u4f9b\u7a33\u5b9a\u5165\u53e3\u3002"
+    },
+    {
+      "category": "indexation",
+      "code": "sample_pages_indexable",
+      "evidence": {
+        "checked_pages": 2
+      },
+      "id": "S003",
+      "status": "verified",
+      "title": "\u5df2\u6293\u53d6 HTML \u6837\u672c\u672a\u53d1\u73b0 noindex",
+      "value": "\u5f53\u524d\u6837\u672c\u6ca1\u6709\u901a\u8fc7\u9875\u9762\u7ea7\u6307\u4ee4\u4e3b\u52a8\u6392\u9664\u641c\u7d22\u6536\u5f55\u3002"
+    },
+    {
+      "category": "on_page",
+      "code": "titles_present",
+      "evidence": {
+        "covered_pages": 2
+      },
+      "id": "S004",
+      "status": "verified",
+      "title": "\u5df2\u6293\u53d6\u9875\u9762\u5747\u5177\u5907 title",
+      "value": "\u4e3a\u641c\u7d22\u7ed3\u679c\u7406\u89e3\u9875\u9762\u4e3b\u9898\u63d0\u4f9b\u57fa\u7840\u4fe1\u53f7\u3002"
+    },
+    {
+      "category": "on_page",
+      "code": "descriptions_present",
+      "evidence": {
+        "covered_pages": 2
+      },
+      "id": "S005",
+      "status": "verified",
+      "title": "\u5df2\u6293\u53d6\u9875\u9762\u5747\u5177\u5907 meta description",
+      "value": "\u4e3a\u641c\u7d22\u6458\u8981\u548c\u9875\u9762\u4ef7\u503c\u8868\u8fbe\u63d0\u4f9b\u53ef\u590d\u7528\u6587\u672c\u3002"
+    },
+    {
+      "category": "canonicalization",
+      "code": "self_canonical_complete",
+      "evidence": {
+        "covered_pages": 2
+      },
+      "id": "S006",
+      "status": "verified",
+      "title": "\u5df2\u6293\u53d6\u9875\u9762\u5747\u8bbe\u7f6e\u81ea\u5f15\u7528 canonical",
+      "value": "\u5e2e\u52a9\u641c\u7d22\u5f15\u64ce\u805a\u5408\u91cd\u590d URL \u4fe1\u53f7\u5e76\u8bc6\u522b\u89c4\u8303\u7248\u672c\u3002"
+    },
+    {
+      "category": "on_page",
+      "code": "h1_structure_complete",
+      "evidence": {
+        "covered_pages": 2
+      },
+      "id": "S007",
+      "status": "verified",
+      "title": "\u5df2\u6293\u53d6\u9875\u9762\u5747\u5177\u5907\u5355\u4e00 H1",
+      "value": "\u9875\u9762\u4e3b\u4e3b\u9898\u5c42\u7ea7\u6e05\u6670\uff0c\u4fbf\u4e8e\u7528\u6237\u548c\u673a\u5668\u7406\u89e3\u3002"
+    },
+    {
+      "category": "international_seo",
+      "code": "html_lang_present",
+      "evidence": {
+        "covered_pages": 2,
+        "languages": [
+          "zh-CN"
+        ]
+      },
+      "id": "S008",
+      "status": "verified",
+      "title": "\u5df2\u6293\u53d6\u9875\u9762\u5747\u58f0\u660e\u4e3b\u8981\u8bed\u8a00",
+      "value": "\u5e2e\u52a9\u641c\u7d22\u3001\u8f85\u52a9\u6280\u672f\u548c\u7b54\u6848\u5f15\u64ce\u6b63\u786e\u8bc6\u522b\u5185\u5bb9\u8bed\u8a00\u3002"
+    },
+    {
+      "category": "structured_data",
+      "code": "valid_static_json_ld",
+      "evidence": {
+        "pages_with_json_ld": 1,
+        "valid_blocks": 1
+      },
+      "id": "S009",
+      "status": "verified",
+      "title": "\u9759\u6001 HTML \u4e2d\u53d1\u73b0\u53ef\u89e3\u6790\u7684 JSON-LD",
+      "value": "\u4e3a\u673a\u5668\u7406\u89e3\u5b9e\u4f53\u3001\u9875\u9762\u7c7b\u578b\u548c\u5185\u5bb9\u5173\u7cfb\u63d0\u4f9b\u7ed3\u6784\u5316\u57fa\u7840\u3002"
+    },
+    {
+      "category": "geo",
+      "code": "ai_bot_access_available",
+      "evidence": [
+        {
+          "bot": "OAI-SearchBot",
+          "category": "search"
+        },
+        {
+          "bot": "PerplexityBot",
+          "category": "search"
+        },
+        {
+          "bot": "GPTBot",
+          "category": "training"
+        },
+        {
+          "bot": "Google-Extended",
+          "category": "training"
+        },
+        {
+          "bot": "ClaudeBot",
+          "category": "training"
+        },
+        {
+          "bot": "ChatGPT-User",
+          "category": "user_fetch"
+        },
+        {
+          "bot": "Claude-User",
+          "category": "user_fetch"
+        }
+      ],
+      "id": "S010",
+      "status": "verified",
+      "title": "7 \u4e2a\u5df2\u68c0\u67e5\u7684\u641c\u7d22/AI \u722c\u866b\u5141\u8bb8\u8bbf\u95ee\u9996\u9875",
+      "value": "\u5728 robots \u7b56\u7565\u5c42\u9762\u4e3a\u76f8\u5e94\u641c\u7d22\u6216\u7b54\u6848\u5f15\u64ce\u53d1\u73b0\u516c\u5f00\u5185\u5bb9\u4fdd\u7559\u5165\u53e3\u3002"
+    },
+    {
+      "category": "geo",
+      "code": "machine_assets_available",
+      "evidence": [
+        "/llms.txt"
+      ],
+      "id": "S011",
+      "status": "verified",
+      "title": "\u5df2\u63d0\u4f9b\u90e8\u5206\u673a\u5668\u53ef\u8bfb\u8d44\u6e90",
+      "value": "\u53ef\u589e\u5f3a\u975e Google \u7b54\u6848\u5f15\u64ce\u548c\u4ee3\u7406\u5bf9\u516c\u5f00\u4fe1\u606f\u7684\u8bfb\u53d6\u6548\u7387\u3002"
+    }
+  ],
+  "summary": {
+    "crawl_limit_reached": false,
+    "failed_pages": 0,
+    "finding_counts": {
+      "info": 4,
+      "medium": 1
+    },
+    "html_pages": 2,
+    "pages_crawled": 2,
+    "recommendation_count": 4,
+    "robots_blocked_pages": 0,
+    "strength_count": 11
+  }
+}

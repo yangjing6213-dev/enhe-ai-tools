@@ -233,7 +233,7 @@ describe("anonymous free audit limits and cache", () => {
         ipAddress: "203.0.113.10",
         targetUrl: "https://example.com/path",
         publicToken: "public-token-12345678901234567890",
-        engineVersion: "1.4.4",
+        engineVersion: "1.4.8",
       },
       { db: db as never, now, hmacSecret },
     );
@@ -328,14 +328,33 @@ describe("anonymous free audit limits and cache", () => {
       .mockResolvedValueOnce({
         id: "cached-run",
         completedAt: new Date("2026-07-25T07:00:00.000Z"),
-        engineVersion: "1.4.4",
+        engineVersion: "1.4.8",
         summaryScore: 90,
         summaryEvidenceCoverage: 80,
         summaryPageCount: 10,
         summaryCriticalCount: 0,
         summaryHighCount: 1,
         summaryMediumCount: 2,
-        summaryFindings: [{ id: "f-1" }],
+        summaryFindings: [
+          {
+            id: "F001",
+            code: "missing_canonical",
+            severity: "high",
+            issue: "Some pages are missing canonical tags.",
+          },
+          {
+            id: "F002",
+            code: "missing_title",
+            severity: "high",
+            issue: "https://private.example/report?token=must-not-leak",
+          },
+          {
+            id: "https://private.example/report?token=must-not-leak",
+            code: "missing_title",
+            severity: "high",
+            issue: "Some pages are missing titles.",
+          },
+        ],
         reportJsonKey: "private/report.json",
         reportMarkdownKey: "private/report.md",
         reportSha256: "a".repeat(64),
@@ -352,7 +371,7 @@ describe("anonymous free audit limits and cache", () => {
           ipAddress: "203.0.113.10",
           targetUrl: "https://example.com/new-path",
           publicToken: "public-token-12345678901234567890",
-          engineVersion: "1.4.4",
+          engineVersion: "1.4.8",
         },
         { db: db as never, now, hmacSecret },
       ),
@@ -360,7 +379,15 @@ describe("anonymous free audit limits and cache", () => {
     expect(tx.seoAuditRun.create).toHaveBeenCalledWith({
       data: expect.objectContaining({
         status: "completed",
-        engineVersion: "1.4.4",
+        engineVersion: "1.4.8",
+        summaryFindings: [
+          {
+            id: "F001",
+            code: "missing_canonical",
+            severity: "high",
+            issue: "Some pages are missing canonical tags.",
+          },
+        ],
         reportJsonKey: "private/report.json",
         reportMarkdownKey: "private/report.md",
         reportSha256: "a".repeat(64),

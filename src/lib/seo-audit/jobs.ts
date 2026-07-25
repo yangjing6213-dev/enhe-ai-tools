@@ -6,8 +6,12 @@ import {
 import { Prisma } from "@prisma/client";
 import { prisma } from "@/lib/db";
 import {
+  assertSeoAuditReportMatchesRun,
   assertSeoAuditSummaryMatches,
+  buildPrivateArtifactKeys,
   parseSeoAuditReportBundle,
+  removePrivateSeoAuditArtifacts,
+  SEO_AUDIT_ENGINE_VERSION,
   storePrivateSeoAuditArtifacts,
   type ParsedSeoAuditReport,
   type SeoAuditCompletionSummary,
@@ -31,7 +35,8 @@ export type SeoAuditJobErrorCode =
   | "JOB_CANCELLED"
   | "JOB_STATE_CONFLICT"
   | "LEASE_INVALID"
-  | "LEASE_EXPIRED";
+  | "LEASE_EXPIRED"
+  | "ENGINE_VERSION_UNSUPPORTED";
 
 export class SeoAuditJobError extends Error {
   readonly code: SeoAuditJobErrorCode;
@@ -61,6 +66,10 @@ type CompleteOptions = JobOptions & {
     runId: string;
     parsed: ParsedSeoAuditReport;
   }) => Promise<StoredSeoAuditArtifacts>;
+  removeArtifacts?: (input: StoredSeoAuditArtifacts) => Promise<void>;
+  randomBytes?: (size: number) => Buffer;
+  completionPollIntervalMs?: number;
+  completionWaitTimeoutMs?: number;
 };
 
 export type SeoAuditWorkerProgress = {
@@ -162,6 +171,9 @@ function staleLeaseRecoverySql(now: Date) {
         END,
         "lease_token_hash" = NULL,
         "lease_expires_at" = NULL,
+        "report_json_key" = NULL,
+        "report_markdown_key" = NULL,
+        "report_sha256" = NULL,
         "updated_at" = ${now}
       WHERE "status" IN ('running', 'cancel_requested')
         AND "lease_expires_at" <= ${now}
@@ -237,6 +249,9 @@ export async function claimSeoAuditJob(
   input: { workerId: string; engineVersion: string },
   options: ClaimOptions = {},
 ) {
+  if (input.engineVersion !== SEO_AUDIT_ENGINE_VERSION) {
+    throw new SeoAuditJobError("ENGINE_VERSION_UNSUPPORTED");
+  }
   const db = options.db ?? prisma;
   const now = resolveNow(options.now);
   const leaseToken = (options.randomBytes ?? createRandomBytes)(32).toString(
@@ -297,9 +312,16 @@ export async function heartbeatSeoAuditJob(
         status: true,
         leaseTokenHash: true,
         leaseExpiresAt: true,
+        engineVersion: true,
       },
     });
     if (!run) throw new SeoAuditJobError("JOB_NOT_FOUND");
+    if (
+      input.engineVersion !== SEO_AUDIT_ENGINE_VERSION ||
+      run.engineVersion !== input.engineVersion
+    ) {
+      throw new SeoAuditJobError("ENGINE_VERSION_UNSUPPORTED");
+    }
     assertLiveLease(run, input.leaseToken, now);
 
     if (run.status === "cancel_requested") {
@@ -314,6 +336,9 @@ export async function heartbeatSeoAuditJob(
           status: "cancelled",
           leaseTokenHash: null,
           leaseExpiresAt: null,
+          reportJsonKey: null,
+          reportMarkdownKey: null,
+          reportSha256: null,
         },
       });
       if (cancelled.count !== 1) {
@@ -380,29 +405,352 @@ export async function heartbeatSeoAuditJob(
   });
 }
 
-function assertCompletableRun(
-  run: {
-    status: string;
-    leaseTokenHash: string | null;
-    leaseExpiresAt: Date | null;
-  },
-  leaseToken: string,
+const completionRunSelect = {
+  id: true,
+  status: true,
+  targetUrl: true,
+  pageLimit: true,
+  engineVersion: true,
+  leaseTokenHash: true,
+  leaseExpiresAt: true,
+  reportJsonKey: true,
+  reportMarkdownKey: true,
+  reportSha256: true,
+  summaryScore: true,
+  summaryEvidenceCoverage: true,
+  summaryPageCount: true,
+  summaryCriticalCount: true,
+  summaryHighCount: true,
+  summaryMediumCount: true,
+} satisfies Prisma.SeoAuditRunSelect;
+
+type CompletionRun = Prisma.SeoAuditRunGetPayload<{
+  select: typeof completionRunSelect;
+}>;
+
+const completionReservationPrefix = "seo-audit-pending-upload:";
+const completionReservationTimeoutMs = 65_000;
+
+function buildCompletionReservation(
   now: Date,
+  randomBytes: (size: number) => Buffer,
 ) {
-  if (run.status === "completed") {
-    if (!leaseMatches(run.leaseTokenHash, leaseToken)) {
-      throw new SeoAuditJobError("LEASE_INVALID");
-    }
-    return "completed" as const;
+  const nonce = randomBytes(24).toString("base64url");
+  return `${completionReservationPrefix}${now.getTime()}:${nonce}`;
+}
+
+function readCompletionReservationStartedAt(value: string | null) {
+  if (!value?.startsWith(completionReservationPrefix)) return null;
+  const [timestamp, nonce] = value
+    .slice(completionReservationPrefix.length)
+    .split(":", 2);
+  const startedAt = Number(timestamp);
+  return Number.isSafeInteger(startedAt) && nonce ? startedAt : null;
+}
+
+async function lockCompletionRun(
+  tx: Prisma.TransactionClient,
+  runId: string,
+) {
+  const locked = await tx.$queryRaw<Array<{ id: string }>>(Prisma.sql`
+    SELECT "id"
+    FROM "seo_audit_runs"
+    WHERE "id" = ${runId}
+    FOR UPDATE
+  `);
+  if (!locked[0]) throw new SeoAuditJobError("JOB_NOT_FOUND");
+  const run = await tx.seoAuditRun.findUnique({
+    where: { id: runId },
+    select: completionRunSelect,
+  });
+  if (!run) throw new SeoAuditJobError("JOB_NOT_FOUND");
+  return run;
+}
+
+function storedCompletionSummary(run: CompletionRun) {
+  if (
+    run.summaryScore === null ||
+    run.summaryEvidenceCoverage === null ||
+    run.summaryPageCount === null ||
+    run.summaryCriticalCount === null ||
+    run.summaryHighCount === null ||
+    run.summaryMediumCount === null
+  ) {
+    return null;
   }
-  if (run.status === "cancel_requested" || run.status === "cancelled") {
-    throw new SeoAuditJobError("JOB_CANCELLED");
-  }
-  if (run.status !== "running") {
+  return {
+    score: run.summaryScore,
+    evidenceCoverage: run.summaryEvidenceCoverage,
+    pageCount: run.summaryPageCount,
+    criticalCount: run.summaryCriticalCount,
+    highCount: run.summaryHighCount,
+    mediumCount: run.summaryMediumCount,
+  };
+}
+
+function assertCompletedPayloadMatches(
+  run: CompletionRun,
+  parsed: ParsedSeoAuditReport,
+  summary: SeoAuditCompletionSummary,
+) {
+  assertSeoAuditReportMatchesRun(parsed, run);
+  assertSeoAuditSummaryMatches(summary, parsed.summary);
+  const storedSummary = storedCompletionSummary(run);
+  const expectedKeys = buildPrivateArtifactKeys(run.id, parsed.reportSha256);
+  if (
+    run.reportSha256 !== parsed.reportSha256 ||
+    run.reportJsonKey !== expectedKeys.jsonKey ||
+    run.reportMarkdownKey !== expectedKeys.markdownKey ||
+    !storedSummary ||
+    JSON.stringify(storedSummary) !== JSON.stringify(summary)
+  ) {
     throw new SeoAuditJobError("JOB_STATE_CONFLICT");
   }
-  assertLiveLease(run, leaseToken, now);
-  return "running" as const;
+}
+
+async function settleCancelledRun(
+  tx: Prisma.TransactionClient,
+  runId: string,
+  now: Date,
+) {
+  await tx.seoAuditRun.update({
+    where: { id: runId },
+    data: {
+      status: "cancelled",
+      cancelRequestedAt: now,
+      leaseTokenHash: null,
+      leaseExpiresAt: null,
+      reportJsonKey: null,
+      reportMarkdownKey: null,
+      reportSha256: null,
+    },
+  });
+}
+
+async function settleCompletionCancellation(
+  db: JobDatabase,
+  runId: string,
+  now: Date,
+) {
+  return db.$transaction(async (tx) => {
+    const run = await lockCompletionRun(tx, runId);
+    if (run.status === "cancel_requested") {
+      await settleCancelledRun(tx, runId, now);
+      return { status: "cancelled" as const, alreadyCompleted: false };
+    }
+    if (run.status === "cancelled") {
+      if (run.leaseTokenHash || run.leaseExpiresAt || run.reportSha256) {
+        await settleCancelledRun(tx, runId, now);
+      }
+      return { status: "cancelled" as const, alreadyCompleted: false };
+    }
+    return null;
+  });
+}
+
+async function prepareSeoAuditCompletion(input: {
+  db: JobDatabase;
+  runId: string;
+  leaseToken: string;
+  parsed: ParsedSeoAuditReport;
+  summary: SeoAuditCompletionSummary;
+  reservation: string;
+  now: Date;
+}) {
+  return input.db.$transaction(async (tx) => {
+    const run = await lockCompletionRun(tx, input.runId);
+    if (run.status === "completed") {
+      assertCompletedPayloadMatches(run, input.parsed, input.summary);
+      return { state: "completed" as const };
+    }
+    if (run.status === "cancel_requested") {
+      await settleCancelledRun(tx, input.runId, input.now);
+      return { state: "cancelled" as const };
+    }
+    if (run.status === "cancelled") {
+      if (run.leaseTokenHash || run.leaseExpiresAt || run.reportSha256) {
+        await settleCancelledRun(tx, input.runId, input.now);
+      }
+      return { state: "cancelled" as const };
+    }
+    if (run.status !== "running") {
+      throw new SeoAuditJobError("JOB_STATE_CONFLICT");
+    }
+    assertLiveLease(run, input.leaseToken, input.now);
+    assertSeoAuditReportMatchesRun(input.parsed, run);
+
+    if (!run.reportSha256 && !run.reportJsonKey && !run.reportMarkdownKey) {
+      await tx.seoAuditRun.update({
+        where: { id: input.runId },
+        data: {
+          reportSha256: input.parsed.reportSha256,
+          reportJsonKey: input.reservation,
+          reportMarkdownKey: null,
+        },
+      });
+      return { state: "upload" as const };
+    }
+
+    const activeReservation = run.reportJsonKey;
+    const reservationStartedAt = readCompletionReservationStartedAt(
+      activeReservation,
+    );
+    if (
+      run.reportSha256 === input.parsed.reportSha256 &&
+      activeReservation !== null &&
+      reservationStartedAt !== null &&
+      !run.reportMarkdownKey
+    ) {
+      if (
+        input.now.getTime() - reservationStartedAt >=
+        completionReservationTimeoutMs
+      ) {
+        await tx.seoAuditRun.update({
+          where: { id: input.runId },
+          data: { reportJsonKey: input.reservation },
+        });
+        return { state: "upload" as const };
+      }
+      return { state: "wait" as const, reservation: activeReservation };
+    }
+
+    throw new SeoAuditJobError("JOB_STATE_CONFLICT");
+  });
+}
+
+async function waitForCompletionReservation(
+  db: JobDatabase,
+  runId: string,
+  reservation: string,
+  options: CompleteOptions,
+) {
+  const interval = Math.max(5, options.completionPollIntervalMs ?? 50);
+  const timeout = Math.max(
+    interval,
+    options.completionWaitTimeoutMs ?? completionReservationTimeoutMs,
+  );
+  const deadline = Date.now() + timeout;
+  while (Date.now() < deadline) {
+    const run = await db.seoAuditRun.findUnique({
+      where: { id: runId },
+      select: { status: true, reportJsonKey: true },
+    });
+    if (!run) throw new SeoAuditJobError("JOB_NOT_FOUND");
+    if (run.status !== "running" || run.reportJsonKey !== reservation) return;
+    await new Promise((resolve) => setTimeout(resolve, interval));
+  }
+}
+
+async function rollbackSeoAuditCompletion(input: {
+  db: JobDatabase;
+  runId: string;
+  leaseTokenHash: string;
+  reportSha256: string;
+  reservation: string;
+  now: Date;
+}) {
+  return input.db.$transaction(async (tx) => {
+    const run = await lockCompletionRun(tx, input.runId);
+    if (run.status === "cancel_requested") {
+      await settleCancelledRun(tx, input.runId, input.now);
+      return "cancelled" as const;
+    }
+    if (run.status === "running") {
+      await tx.seoAuditRun.updateMany({
+        where: {
+          id: input.runId,
+          status: "running",
+          leaseTokenHash: input.leaseTokenHash,
+          reportSha256: input.reportSha256,
+          reportJsonKey: input.reservation,
+        },
+        data: {
+          reportJsonKey: null,
+          reportMarkdownKey: null,
+          reportSha256: null,
+        },
+      });
+    }
+    return run.status;
+  });
+}
+
+async function finalizeSeoAuditCompletion(input: {
+  db: JobDatabase;
+  runId: string;
+  leaseToken: string;
+  parsed: ParsedSeoAuditReport;
+  summary: SeoAuditCompletionSummary;
+  reservation: string;
+  stored: StoredSeoAuditArtifacts;
+  now: Date;
+}) {
+  return input.db.$transaction(async (tx) => {
+    const run = await lockCompletionRun(tx, input.runId);
+    if (run.status === "completed") {
+      assertCompletedPayloadMatches(run, input.parsed, input.summary);
+      return { status: "completed" as const, alreadyCompleted: true };
+    }
+    if (run.status === "cancel_requested") {
+      await settleCancelledRun(tx, input.runId, input.now);
+      return { status: "cancelled" as const, alreadyCompleted: false };
+    }
+    if (run.status === "cancelled") {
+      if (run.leaseTokenHash || run.leaseExpiresAt || run.reportSha256) {
+        await settleCancelledRun(tx, input.runId, input.now);
+      }
+      return { status: "cancelled" as const, alreadyCompleted: false };
+    }
+    if (run.status !== "running") {
+      throw new SeoAuditJobError("JOB_STATE_CONFLICT");
+    }
+    assertLiveLease(run, input.leaseToken, input.now);
+    assertSeoAuditReportMatchesRun(input.parsed, run);
+    if (
+      run.reportSha256 !== input.parsed.reportSha256 ||
+      run.reportJsonKey !== input.reservation ||
+      run.reportMarkdownKey !== null
+    ) {
+      throw new SeoAuditJobError("JOB_STATE_CONFLICT");
+    }
+
+    await tx.seoAuditRun.update({
+      where: { id: input.runId },
+      data: {
+        status: "completed",
+        completedAt: input.now,
+        failedAt: null,
+        failureCode: null,
+        failureMessage: null,
+        cancelRequestedAt: null,
+        leaseTokenHash: null,
+        leaseExpiresAt: null,
+        engineVersion: input.parsed.engineVersion,
+        summaryScore: input.summary.score,
+        summaryEvidenceCoverage: input.summary.evidenceCoverage,
+        summaryPageCount: input.summary.pageCount,
+        summaryCriticalCount: input.summary.criticalCount,
+        summaryHighCount: input.summary.highCount,
+        summaryMediumCount: input.summary.mediumCount,
+        summaryFindings: input.parsed.publicFindings,
+        reportJsonKey: input.stored.reportJsonKey,
+        reportMarkdownKey: input.stored.reportMarkdownKey,
+        reportSha256: input.parsed.reportSha256,
+      },
+    });
+    return { status: "completed" as const, alreadyCompleted: false };
+  });
+}
+
+async function cleanupUploadedArtifacts(
+  stored: StoredSeoAuditArtifacts,
+  removeArtifacts: (input: StoredSeoAuditArtifacts) => Promise<void>,
+) {
+  try {
+    await removeArtifacts(stored);
+  } catch {
+    console.error("SEO audit artifact cleanup failed.");
+  }
 }
 
 export async function completeSeoAuditJob(
@@ -416,92 +764,150 @@ export async function completeSeoAuditJob(
 ) {
   const db = options.db ?? prisma;
   const now = resolveNow(options.now);
-  const run = await db.seoAuditRun.findUnique({
+  const initialRun = await db.seoAuditRun.findUnique({
     where: { id: input.runId },
-    select: {
-      id: true,
-      status: true,
-      leaseTokenHash: true,
-      leaseExpiresAt: true,
-      reportSha256: true,
-    },
+    select: completionRunSelect,
   });
-  if (!run) throw new SeoAuditJobError("JOB_NOT_FOUND");
-  if (assertCompletableRun(run, input.leaseToken, now) === "completed") {
-    return { status: "completed" as const, alreadyCompleted: true };
+  if (!initialRun) throw new SeoAuditJobError("JOB_NOT_FOUND");
+  if (
+    initialRun.status === "cancel_requested" ||
+    initialRun.status === "cancelled"
+  ) {
+    const cancelled = await settleCompletionCancellation(db, input.runId, now);
+    if (cancelled) throw new SeoAuditJobError("JOB_CANCELLED");
   }
+  if (initialRun.status === "running") {
+    assertLiveLease(initialRun, input.leaseToken, now);
+  } else if (initialRun.status !== "completed") {
+    throw new SeoAuditJobError("JOB_STATE_CONFLICT");
+  }
+
   const parsed = await (options.parseReport ?? parseSeoAuditReportBundle)(
     input.reportGzipBase64,
   );
   assertSeoAuditSummaryMatches(input.summary, parsed.summary);
+  assertSeoAuditReportMatchesRun(parsed, initialRun);
+  if (initialRun.status === "completed") {
+    assertCompletedPayloadMatches(initialRun, parsed, input.summary);
+    if (initialRun.leaseTokenHash || initialRun.leaseExpiresAt) {
+      await db.$transaction(async (tx) => {
+        const run = await lockCompletionRun(tx, input.runId);
+        if (run.status !== "completed") {
+          throw new SeoAuditJobError("JOB_STATE_CONFLICT");
+        }
+        assertCompletedPayloadMatches(run, parsed, input.summary);
+        if (run.leaseTokenHash || run.leaseExpiresAt) {
+          await tx.seoAuditRun.update({
+            where: { id: input.runId },
+            data: { leaseTokenHash: null, leaseExpiresAt: null },
+          });
+        }
+      });
+    }
+    return { status: "completed" as const, alreadyCompleted: true };
+  }
+
   const leaseTokenHash = hashLeaseToken(input.leaseToken);
   const storeArtifacts =
     options.storeArtifacts ?? storePrivateSeoAuditArtifacts;
+  const removeArtifacts =
+    options.removeArtifacts ?? removePrivateSeoAuditArtifacts;
+  const randomBytes = options.randomBytes ?? createRandomBytes;
+  let reservation = buildCompletionReservation(now, randomBytes);
 
-  return db.$transaction(
-    async (tx) => {
-      const locked = await tx.$queryRaw<Array<{ id: string }>>(Prisma.sql`
-        SELECT "id"
-        FROM "seo_audit_runs"
-        WHERE "id" = ${input.runId}
-        FOR UPDATE
-      `);
-      if (!locked[0]) throw new SeoAuditJobError("JOB_NOT_FOUND");
+  for (let attempt = 0; attempt < 3; attempt += 1) {
+    const attemptNow = resolveNow(options.now);
+    const prepared = await prepareSeoAuditCompletion({
+      db,
+      runId: input.runId,
+      leaseToken: input.leaseToken,
+      parsed,
+      summary: input.summary,
+      reservation,
+      now: attemptNow,
+    });
+    if (prepared.state === "completed") {
+      return { status: "completed" as const, alreadyCompleted: true };
+    }
+    if (prepared.state === "cancelled") {
+      throw new SeoAuditJobError("JOB_CANCELLED");
+    }
+    if (prepared.state === "wait") {
+      await waitForCompletionReservation(
+        db,
+        input.runId,
+        prepared.reservation,
+        options,
+      );
+      reservation = buildCompletionReservation(
+        resolveNow(options.now),
+        randomBytes,
+      );
+      continue;
+    }
 
-      const current = await tx.seoAuditRun.findUnique({
-        where: { id: input.runId },
-        select: {
-          id: true,
-          status: true,
-          leaseTokenHash: true,
-          leaseExpiresAt: true,
-          reportSha256: true,
-        },
+    let stored: StoredSeoAuditArtifacts;
+    try {
+      stored = await storeArtifacts({ runId: input.runId, parsed });
+    } catch (error) {
+      const rollbackStatus = await rollbackSeoAuditCompletion({
+        db,
+        runId: input.runId,
+        leaseTokenHash,
+        reportSha256: parsed.reportSha256,
+        reservation,
+        now: resolveNow(options.now),
       });
-      if (!current) throw new SeoAuditJobError("JOB_NOT_FOUND");
-      if (
-        assertCompletableRun(current, input.leaseToken, now) === "completed"
-      ) {
-        return { status: "completed" as const, alreadyCompleted: true };
+      if (rollbackStatus === "cancelled") {
+        throw new SeoAuditJobError("JOB_CANCELLED");
       }
+      throw error;
+    }
 
-      const stored = await storeArtifacts({ runId: input.runId, parsed });
-      const updated = await tx.seoAuditRun.updateMany({
-        where: {
-          id: input.runId,
-          status: "running",
-          leaseTokenHash,
-          leaseExpiresAt: { gt: now },
-          cancelRequestedAt: null,
-        },
-        data: {
-          status: "completed",
-          completedAt: now,
-          failedAt: null,
-          failureCode: null,
-          failureMessage: null,
-          leaseTokenHash,
-          leaseExpiresAt: null,
-          engineVersion: stored.engineVersion,
-          summaryScore: stored.summary.score,
-          summaryEvidenceCoverage: stored.summary.evidenceCoverage,
-          summaryPageCount: stored.summary.pageCount,
-          summaryCriticalCount: stored.summary.criticalCount,
-          summaryHighCount: stored.summary.highCount,
-          summaryMediumCount: stored.summary.mediumCount,
-          summaryFindings: stored.summary.findings,
-          reportJsonKey: stored.reportJsonKey,
-          reportMarkdownKey: stored.reportMarkdownKey,
-          reportSha256: stored.reportSha256,
-        },
+    const expectedKeys = buildPrivateArtifactKeys(
+      input.runId,
+      parsed.reportSha256,
+    );
+    if (
+      stored.reportJsonKey !== expectedKeys.jsonKey ||
+      stored.reportMarkdownKey !== expectedKeys.markdownKey
+    ) {
+      await rollbackSeoAuditCompletion({
+        db,
+        runId: input.runId,
+        leaseTokenHash,
+        reportSha256: parsed.reportSha256,
+        reservation,
+        now: resolveNow(options.now),
       });
-      if (updated.count !== 1) {
-        throw new SeoAuditJobError("JOB_STATE_CONFLICT");
-      }
-      return { status: "completed" as const, alreadyCompleted: false };
-    },
-    { maxWait: 10_000, timeout: 120_000 },
-  );
+      await cleanupUploadedArtifacts(stored, removeArtifacts);
+      throw new SeoAuditJobError("JOB_STATE_CONFLICT");
+    }
+
+    let result: Awaited<ReturnType<typeof finalizeSeoAuditCompletion>>;
+    try {
+      result = await finalizeSeoAuditCompletion({
+        db,
+        runId: input.runId,
+        leaseToken: input.leaseToken,
+        parsed,
+        summary: input.summary,
+        reservation,
+        stored,
+        now: resolveNow(options.now),
+      });
+    } catch (error) {
+      await cleanupUploadedArtifacts(stored, removeArtifacts);
+      throw error;
+    }
+    if (result.status !== "completed") {
+      await cleanupUploadedArtifacts(stored, removeArtifacts);
+      throw new SeoAuditJobError("JOB_CANCELLED");
+    }
+    return result;
+  }
+
+  throw new SeoAuditJobError("JOB_STATE_CONFLICT");
 }
 
 export async function failSeoAuditJob(
@@ -517,6 +923,13 @@ export async function failSeoAuditJob(
   const leaseTokenHash = hashLeaseToken(input.leaseToken);
 
   return db.$transaction(async (tx) => {
+    const locked = await tx.$queryRaw<Array<{ id: string }>>(Prisma.sql`
+      SELECT "id"
+      FROM "seo_audit_runs"
+      WHERE "id" = ${input.runId}
+      FOR UPDATE
+    `);
+    if (!locked[0]) throw new SeoAuditJobError("JOB_NOT_FOUND");
     const run = await tx.seoAuditRun.findUnique({
       where: { id: input.runId },
       select: {
@@ -525,13 +938,32 @@ export async function failSeoAuditJob(
         leaseTokenHash: true,
         leaseExpiresAt: true,
         creditId: true,
+        failureCode: true,
       },
     });
     if (!run) throw new SeoAuditJobError("JOB_NOT_FOUND");
     if (run.status === "failed") {
+      if (run.failureCode !== input.failureCode) {
+        throw new SeoAuditJobError("JOB_STATE_CONFLICT");
+      }
+      await tx.seoAuditRun.update({
+        where: { id: input.runId },
+        data: {
+          leaseTokenHash: null,
+          leaseExpiresAt: null,
+          reportJsonKey: null,
+          reportMarkdownKey: null,
+          reportSha256: null,
+        },
+      });
       return { status: "failed" as const, alreadyFailed: true };
     }
-    if (run.status === "cancel_requested" || run.status === "cancelled") {
+    if (run.status === "cancel_requested") {
+      await settleCancelledRun(tx, input.runId, now);
+      return { status: "cancelled" as const, alreadyFailed: false };
+    }
+    if (run.status === "cancelled") {
+      await settleCancelledRun(tx, input.runId, now);
       return { status: "cancelled" as const, alreadyFailed: false };
     }
     if (run.status !== "running") {
@@ -553,6 +985,9 @@ export async function failSeoAuditJob(
         failureMessage: failureMessages[input.failureCode],
         leaseTokenHash: null,
         leaseExpiresAt: null,
+        reportJsonKey: null,
+        reportMarkdownKey: null,
+        reportSha256: null,
       },
     });
     if (failed.count !== 1) {
@@ -582,38 +1017,51 @@ export async function requestSeoAuditJobCancellation(
   const now = resolveNow(options.now);
 
   return db.$transaction(async (tx) => {
+    const locked = await tx.$queryRaw<Array<{ id: string }>>(Prisma.sql`
+      SELECT "id"
+      FROM "seo_audit_runs"
+      WHERE "id" = ${runId}
+      FOR UPDATE
+    `);
+    if (!locked[0]) throw new SeoAuditJobError("JOB_NOT_FOUND");
     const run = await tx.seoAuditRun.findUnique({
       where: { id: runId },
-      select: { id: true, status: true },
+      select: {
+        id: true,
+        status: true,
+        leaseTokenHash: true,
+        leaseExpiresAt: true,
+        reportSha256: true,
+      },
     });
     if (!run) throw new SeoAuditJobError("JOB_NOT_FOUND");
 
     if (run.status === "queued") {
-      const cancelled = await tx.seoAuditRun.updateMany({
-        where: { id: runId, status: "queued" },
-        data: {
-          status: "cancelled",
-          cancelRequestedAt: now,
-          leaseTokenHash: null,
-          leaseExpiresAt: null,
-        },
-      });
-      if (cancelled.count === 1) return { status: "cancelled" as const };
+      await settleCancelledRun(tx, runId, now);
+      return { status: "cancelled" as const };
     }
     if (run.status === "running") {
-      const requested = await tx.seoAuditRun.updateMany({
-        where: { id: runId, status: "running" },
+      await tx.seoAuditRun.update({
+        where: { id: runId },
         data: { status: "cancel_requested", cancelRequestedAt: now },
       });
-      if (requested.count === 1) {
-        return { status: "cancel_requested" as const };
-      }
+      return { status: "cancel_requested" as const };
     }
-    const current = await tx.seoAuditRun.findUnique({
-      where: { id: runId },
-      select: { status: true },
-    });
-    if (!current) throw new SeoAuditJobError("JOB_NOT_FOUND");
-    return { status: current.status };
+    if (run.status === "cancelled") {
+      if (run.leaseTokenHash || run.leaseExpiresAt || run.reportSha256) {
+        await settleCancelledRun(tx, runId, now);
+      }
+      return { status: "cancelled" as const };
+    }
+    if (run.status === "completed" || run.status === "failed") {
+      if (run.leaseTokenHash || run.leaseExpiresAt) {
+        await tx.seoAuditRun.update({
+          where: { id: runId },
+          data: { leaseTokenHash: null, leaseExpiresAt: null },
+        });
+      }
+      return { status: run.status };
+    }
+    return { status: "cancel_requested" as const };
   });
 }

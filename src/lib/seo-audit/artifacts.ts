@@ -7,6 +7,8 @@ export const SEO_AUDIT_REPORT_LIMITS = {
   maxCompressedBytes: 6 * 1024 * 1024,
   maxUncompressedBytes: 32 * 1024 * 1024,
 } as const;
+export const SEO_AUDIT_ENGINE_VERSION = "1.4.8";
+export const SEO_AUDIT_COS_REQUEST_TIMEOUT_MS = 30_000;
 
 type ReportLimits = Partial<typeof SEO_AUDIT_REPORT_LIMITS>;
 
@@ -153,9 +155,16 @@ const findingSchema = z
 const fullReportSchema = z
   .object({
     meta: z
-      .object({ engine_version: z.literal("1.4.8") })
+      .object({
+        target: httpUrlSchema,
+        engine_version: z.literal(SEO_AUDIT_ENGINE_VERSION),
+        max_pages: z.number().int().min(1).max(5000),
+      })
       .passthrough(),
     pages: z.array(pageSchema).max(5000),
+    summary: z
+      .object({ pages_crawled: z.number().int().min(0).max(5000) })
+      .passthrough(),
     strengths: z.array(strengthSchema).max(5000),
     findings: z.array(findingSchema).max(10_000),
   })
@@ -163,7 +172,8 @@ const fullReportSchema = z
 
 const publicFindingSchema = z
   .object({
-    id: z.string().min(1).max(128),
+    id: z.string().regex(/^F\d{3,}$/).max(128),
+    code: z.string().regex(/^[a-z0-9_]+$/).max(128),
     severity: severitySchema,
     issue: z.string().min(1).max(240),
   })
@@ -177,40 +187,30 @@ export const seoAuditCompletionSummarySchema = z
     criticalCount: z.number().int().min(0).max(10_000),
     highCount: z.number().int().min(0).max(10_000),
     mediumCount: z.number().int().min(0).max(10_000),
-    findings: z.array(publicFindingSchema).max(3),
   })
   .strict();
 
-type PublicFinding = z.infer<typeof publicFindingSchema>;
-
-export type SeoAuditDerivedSummary = {
-  score: number;
-  evidenceCoverage: number;
-  pageCount: number;
-  criticalCount: number;
-  highCount: number;
-  mediumCount: number;
-  findings: PublicFinding[];
-};
+export type SeoAuditPublicFinding = z.infer<typeof publicFindingSchema>;
 
 export type SeoAuditCompletionSummary = z.infer<
   typeof seoAuditCompletionSummarySchema
 >;
+export type SeoAuditDerivedSummary = SeoAuditCompletionSummary;
 
 export type ParsedSeoAuditReport = {
   fullReport: Record<string, unknown>;
   markdown: string;
   reportSha256: string;
   engineVersion: string;
+  targetUrl: string;
+  pageLimit: number;
   summary: SeoAuditDerivedSummary;
+  publicFindings: SeoAuditPublicFinding[];
 };
 
 export type StoredSeoAuditArtifacts = {
   reportJsonKey: string;
   reportMarkdownKey: string;
-  reportSha256: string;
-  engineVersion: string;
-  summary: SeoAuditDerivedSummary;
 };
 
 export type SeoAuditArtifactErrorCode =
@@ -239,16 +239,29 @@ type CosPutObjectInput = {
   ContentType: string;
 };
 
+type CosDeleteObjectInput = {
+  Bucket: string;
+  Region: string;
+  Key: string;
+};
+
 type CosClient = {
   putObject: (
     input: CosPutObjectInput,
     callback: (error: unknown, data: { Location?: string }) => void,
   ) => void;
+  deleteObject: (
+    input: CosDeleteObjectInput,
+    callback: (error: unknown) => void,
+  ) => void;
 };
 
 type ArtifactStorageOptions = {
   env?: Record<string, string | undefined>;
-  createClient?: () => CosClient | Promise<CosClient>;
+  requestTimeoutMs?: number;
+  createClient?: (input: {
+    requestTimeoutMs: number;
+  }) => CosClient | Promise<CosClient>;
 };
 
 const severityOrder = {
@@ -265,6 +278,35 @@ const severityPenalty = {
   medium: 7,
   low: 3,
   info: 0,
+} as const;
+
+const publicFindingCopy = {
+  ai_bot_policy: "Some AI crawler access policies need review.",
+  answer_engine_visibility_data:
+    "Real answer-engine visibility data is still required.",
+  core_web_vitals_data: "Real Core Web Vitals data is still required.",
+  external_canonical: "Some canonical tags point to external origins.",
+  failed_pages: "Some checked pages could not be fetched successfully.",
+  h1_structure: "Some pages need H1 structure adjustments.",
+  hreflang_consistency: "Some hreflang relationships are incomplete.",
+  images_missing_alt: "Some images are missing alt attributes.",
+  invalid_static_json_ld:
+    "Some static JSON-LD blocks could not be parsed.",
+  missing_canonical: "Some pages are missing canonical tags.",
+  missing_html_lang: "Some pages are missing a language declaration.",
+  missing_meta_description:
+    "Some pages are missing meta descriptions.",
+  missing_title: "Some pages are missing titles.",
+  noindex_pages_review: "Some noindex pages need intent review.",
+  optional_machine_assets:
+    "Some optional machine-readable resources are unavailable.",
+  robots_unavailable: "robots.txt could not be fetched successfully.",
+  schema_render_check:
+    "Structured data needs verification after browser rendering.",
+  sitemap_duplicate_urls: "The sitemap contains duplicate URLs.",
+  sitemap_noindex_conflict:
+    "Some sitemap URLs conflict with noindex directives.",
+  sitemap_unavailable: "The sitemap could not be fetched successfully.",
 } as const;
 
 function isRecord(value: unknown): value is Record<string, unknown> {
@@ -324,20 +366,25 @@ function deriveSummary(fullReport: z.infer<typeof fullReportSchema>) {
   const evidenceCoverage = evidenceTotal
     ? Math.round((evidenceItems * 100) / evidenceTotal)
     : 0;
-  const countSeverity = (severity: PublicFinding["severity"]) =>
+  const countSeverity = (severity: SeoAuditPublicFinding["severity"]) =>
     verifiedFindings.filter((finding) => finding.severity === severity).length;
   const publicFindings = verifiedFindings
     .map((finding, index) => ({ ...finding, index }))
+    .filter(
+      (finding) =>
+        Object.prototype.hasOwnProperty.call(publicFindingCopy, finding.code),
+    )
     .sort(
       (left, right) =>
         severityOrder[left.severity] - severityOrder[right.severity] ||
         left.index - right.index,
     )
     .slice(0, 3)
-    .map(({ id, issue, severity }) => ({
+    .map(({ id, code, severity }) => ({
       id,
+      code,
       severity,
-      issue: issue.replace(/\s+/g, " ").slice(0, 240),
+      issue: publicFindingCopy[code as keyof typeof publicFindingCopy],
     }));
 
   return {
@@ -349,9 +396,59 @@ function deriveSummary(fullReport: z.infer<typeof fullReportSchema>) {
       criticalCount: countSeverity("critical"),
       highCount: countSeverity("high"),
       mediumCount: countSeverity("medium"),
-      findings: publicFindings,
     } satisfies SeoAuditDerivedSummary,
+    publicFindings,
   };
+}
+
+function normalizeComparableTarget(value: string) {
+  try {
+    const target = new URL(value);
+    if (
+      (target.protocol !== "http:" && target.protocol !== "https:") ||
+      target.username ||
+      target.password
+    ) {
+      throw new Error("invalid target");
+    }
+    target.hash = "";
+    return target.toString();
+  } catch {
+    throw new SeoAuditArtifactError("INVALID_REPORT_BUNDLE");
+  }
+}
+
+export function assertSeoAuditReportMatchesRun(
+  parsed: ParsedSeoAuditReport,
+  run: { targetUrl: string; pageLimit: number; engineVersion: string | null },
+) {
+  if (
+    parsed.engineVersion !== SEO_AUDIT_ENGINE_VERSION ||
+    run.engineVersion !== SEO_AUDIT_ENGINE_VERSION ||
+    normalizeComparableTarget(parsed.targetUrl) !==
+      normalizeComparableTarget(run.targetUrl) ||
+    parsed.pageLimit !== run.pageLimit ||
+    parsed.summary.pageCount > run.pageLimit
+  ) {
+    throw new SeoAuditArtifactError("INVALID_REPORT_BUNDLE");
+  }
+}
+
+export function sanitizeStoredSeoAuditPublicFindings(value: unknown) {
+  if (!Array.isArray(value)) return [];
+  const findings: SeoAuditPublicFinding[] = [];
+  for (const candidate of value.slice(0, 20)) {
+    const parsed = publicFindingSchema.safeParse(candidate);
+    if (!parsed.success) continue;
+    const expected =
+      publicFindingCopy[
+        parsed.data.code as keyof typeof publicFindingCopy
+      ];
+    if (!expected || parsed.data.issue !== expected) continue;
+    findings.push(parsed.data);
+    if (findings.length === 3) break;
+  }
+  return findings;
 }
 
 export function assertSeoAuditSummaryMatches(
@@ -437,13 +534,22 @@ export async function parseSeoAuditReportBundle(
   if (!reportResult.success) {
     throw new SeoAuditArtifactError("INVALID_REPORT_BUNDLE");
   }
+  if (
+    reportResult.data.summary.pages_crawled !== reportResult.data.pages.length ||
+    reportResult.data.pages.length > reportResult.data.meta.max_pages
+  ) {
+    throw new SeoAuditArtifactError("INVALID_REPORT_BUNDLE");
+  }
   const derived = deriveSummary(reportResult.data);
   return {
     fullReport: reportResult.data,
     markdown: bundle.markdown,
     reportSha256: createHash("sha256").update(decompressed).digest("hex"),
     engineVersion: derived.engineVersion,
+    targetUrl: reportResult.data.meta.target,
+    pageLimit: reportResult.data.meta.max_pages,
     summary: derived.summary,
+    publicFindings: derived.publicFindings,
   };
 }
 
@@ -464,25 +570,73 @@ export function buildPrivateArtifactKeys(runId: string, reportSha256: string) {
 async function createDefaultCosClient(
   secretId: string,
   secretKey: string,
+  requestTimeoutMs: number,
 ): Promise<CosClient> {
   const COSModule = await import("cos-nodejs-sdk-v5");
   const COS = COSModule.default ?? COSModule;
-  return new COS({ SecretId: secretId, SecretKey: secretKey });
+  return new COS({
+    SecretId: secretId,
+    SecretKey: secretKey,
+    Timeout: requestTimeoutMs,
+  });
 }
 
-function putPrivateObject(client: CosClient, input: CosPutObjectInput) {
+function resolveRequestTimeout(value: number | undefined) {
+  if (!Number.isSafeInteger(value) || Number(value) < 1) {
+    return SEO_AUDIT_COS_REQUEST_TIMEOUT_MS;
+  }
+  return Math.min(Number(value), 120_000);
+}
+
+function putPrivateObject(
+  client: CosClient,
+  input: CosPutObjectInput,
+  requestTimeoutMs: number,
+) {
   return new Promise<void>((resolve, reject) => {
-    client.putObject(input, (error) => {
+    let settled = false;
+    const finish = (error?: unknown) => {
+      if (settled) return;
+      settled = true;
+      clearTimeout(timer);
       if (error) reject(error);
       else resolve();
+    };
+    const timer = setTimeout(
+      () => finish(new Error("COS request timed out")),
+      requestTimeoutMs,
+    );
+    client.putObject(input, (error) => {
+      finish(error || undefined);
     });
   });
 }
 
-export async function storePrivateSeoAuditArtifacts(
-  input: { runId: string; parsed: ParsedSeoAuditReport },
-  options: ArtifactStorageOptions = {},
-): Promise<StoredSeoAuditArtifacts> {
+function deletePrivateObject(
+  client: CosClient,
+  input: CosDeleteObjectInput,
+  requestTimeoutMs: number,
+) {
+  return new Promise<void>((resolve, reject) => {
+    let settled = false;
+    const finish = (error?: unknown) => {
+      if (settled) return;
+      settled = true;
+      clearTimeout(timer);
+      if (error) reject(error);
+      else resolve();
+    };
+    const timer = setTimeout(
+      () => finish(new Error("COS request timed out")),
+      requestTimeoutMs,
+    );
+    client.deleteObject(input, (error) => {
+      finish(error || undefined);
+    });
+  });
+}
+
+function readStorageConfig(options: ArtifactStorageOptions) {
   const env = options.env ?? process.env;
   const secretId = env.TENCENT_COS_SECRET_ID?.trim();
   const secretKey = env.TENCENT_COS_SECRET_KEY?.trim();
@@ -491,7 +645,33 @@ export async function storePrivateSeoAuditArtifacts(
   if (!secretId || !secretKey || !bucket || !region) {
     throw new SeoAuditArtifactError("ARTIFACT_STORAGE_UNAVAILABLE");
   }
+  return {
+    secretId,
+    secretKey,
+    bucket,
+    region,
+    requestTimeoutMs: resolveRequestTimeout(options.requestTimeoutMs),
+  };
+}
 
+async function resolveCosClient(
+  config: ReturnType<typeof readStorageConfig>,
+  options: ArtifactStorageOptions,
+) {
+  return options.createClient
+    ? options.createClient({ requestTimeoutMs: config.requestTimeoutMs })
+    : createDefaultCosClient(
+        config.secretId,
+        config.secretKey,
+        config.requestTimeoutMs,
+      );
+}
+
+export async function storePrivateSeoAuditArtifacts(
+  input: { runId: string; parsed: ParsedSeoAuditReport },
+  options: ArtifactStorageOptions = {},
+): Promise<StoredSeoAuditArtifacts> {
+  const config = readStorageConfig(options);
   const keys = buildPrivateArtifactKeys(
     input.runId,
     input.parsed.reportSha256,
@@ -502,37 +682,88 @@ export async function storePrivateSeoAuditArtifacts(
   );
   const markdownBody = Buffer.from(input.parsed.markdown, "utf8");
 
+  let client: CosClient | null = null;
+  const uploadedKeys: string[] = [];
   try {
-    const client = options.createClient
-      ? await options.createClient()
-      : await createDefaultCosClient(secretId, secretKey);
+    client = await resolveCosClient(config, options);
     await putPrivateObject(client, {
       ACL: "private",
-      Bucket: bucket,
-      Region: region,
+      Bucket: config.bucket,
+      Region: config.region,
       Key: keys.jsonKey,
       Body: jsonBody,
       ContentLength: jsonBody.length,
       ContentType: "application/json; charset=utf-8",
-    });
+    }, config.requestTimeoutMs);
+    uploadedKeys.push(keys.jsonKey);
     await putPrivateObject(client, {
       ACL: "private",
-      Bucket: bucket,
-      Region: region,
+      Bucket: config.bucket,
+      Region: config.region,
       Key: keys.markdownKey,
       Body: markdownBody,
       ContentLength: markdownBody.length,
       ContentType: "text/markdown; charset=utf-8",
-    });
+    }, config.requestTimeoutMs);
+    uploadedKeys.push(keys.markdownKey);
   } catch {
+    if (client) {
+      await Promise.allSettled(
+        uploadedKeys.map((key) =>
+          deletePrivateObject(
+            client as CosClient,
+            { Bucket: config.bucket, Region: config.region, Key: key },
+            config.requestTimeoutMs,
+          ),
+        ),
+      );
+    }
     throw new SeoAuditArtifactError("ARTIFACT_UPLOAD_FAILED");
   }
 
   return {
     reportJsonKey: keys.jsonKey,
     reportMarkdownKey: keys.markdownKey,
-    reportSha256: input.parsed.reportSha256,
-    engineVersion: input.parsed.engineVersion,
-    summary: input.parsed.summary,
   };
+}
+
+export async function removePrivateSeoAuditArtifacts(
+  input: { reportJsonKey: string; reportMarkdownKey: string },
+  options: ArtifactStorageOptions = {},
+) {
+  const config = readStorageConfig(options);
+  const expectedKey =
+    /^seo-audit\/runs\/[A-Za-z0-9_-]{1,128}\/[a-f0-9]{64}\/report\.(?:json|md)$/;
+  if (
+    !expectedKey.test(input.reportJsonKey) ||
+    !expectedKey.test(input.reportMarkdownKey)
+  ) {
+    throw new SeoAuditArtifactError("INVALID_REPORT_BUNDLE");
+  }
+
+  try {
+    const client = await resolveCosClient(config, options);
+    await Promise.all([
+      deletePrivateObject(
+        client,
+        {
+          Bucket: config.bucket,
+          Region: config.region,
+          Key: input.reportJsonKey,
+        },
+        config.requestTimeoutMs,
+      ),
+      deletePrivateObject(
+        client,
+        {
+          Bucket: config.bucket,
+          Region: config.region,
+          Key: input.reportMarkdownKey,
+        },
+        config.requestTimeoutMs,
+      ),
+    ]);
+  } catch {
+    throw new SeoAuditArtifactError("ARTIFACT_UPLOAD_FAILED");
+  }
 }
