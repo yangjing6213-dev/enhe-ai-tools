@@ -1,4 +1,18 @@
+import { execFile } from "node:child_process";
 import { randomUUID } from "node:crypto";
+import {
+  copyFile,
+  cp,
+  mkdir,
+  mkdtemp,
+  readFile,
+  readdir,
+  rm,
+  writeFile,
+} from "node:fs/promises";
+import { tmpdir } from "node:os";
+import { join } from "node:path";
+import { promisify } from "node:util";
 import { PrismaClient } from "@prisma/client";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
 import {
@@ -11,6 +25,23 @@ const databaseUrl = process.env.SEO_AUDIT_TEST_DATABASE_URL;
 const describePostgres = databaseUrl ? describe : describe.skip;
 const auditContext = { ip: "127.0.0.1", userAgent: "vitest" };
 const guardTable = "admin_delete_user_guards";
+const root = process.cwd();
+const migrationName = "20260725182500_protect_financial_audit_records";
+const migrationsRoot = join(root, "prisma", "migrations");
+const prismaCli = join(root, "node_modules", "prisma", "build", "index.js");
+const execFileAsync = promisify(execFile);
+const protectedForeignKeys = [
+  "payment_transactions_order_id_fkey",
+  "order_refund_records_order_id_fkey",
+  "seo_audit_runs_source_order_id_fkey",
+  "seo_audit_runs_user_id_fkey",
+  "orders_tool_id_fkey",
+] as const;
+const temporaryGuardTriggers = [
+  "task9_guard_order_evidence_delete",
+  "task9_guard_user_report_delete",
+  "task9_guard_tool_order_delete",
+] as const;
 
 describePostgres("PostgreSQL admin hard-delete protection", () => {
   let db: PrismaClient;
@@ -127,6 +158,132 @@ describePostgres("PostgreSQL admin hard-delete protection", () => {
         where: { id: { in: [paidOrder.id, reportOrder.id, purchaseOrder.id] } },
       });
       await db.tool.deleteMany({ where: { id: tool.id } });
+      await db.user.deleteMany({ where: { id: user.id } });
+    }
+  }, 30_000);
+
+  it("retains payment proof, refund, credit, and monitoring subscription evidence", async () => {
+    const user = await createUser(true);
+    const offer = await db.seoAuditOffer.create({
+      data: {
+        code: `${prefix}-${randomUUID()}`,
+        name: "Task 9 protected evidence",
+        orderType: "seo_audit_credit",
+        regularPrice: "99.00",
+        pageLimit: 10,
+        validityDays: 30,
+      },
+    });
+    const project = await db.seoAuditProject.create({
+      data: {
+        userId: user.id,
+        normalizedOrigin: `https://${randomUUID()}.example`,
+      },
+    });
+    const subscription = await db.seoAuditSubscription.create({
+      data: {
+        userId: user.id,
+        projectId: project.id,
+        offerId: offer.id,
+        startsAt: new Date("2026-07-01T00:00:00.000Z"),
+        expiresAt: new Date("2026-08-01T00:00:00.000Z"),
+        maxScheduledRuns: 4,
+        manualRunsRemaining: 1,
+      },
+    });
+    const proofOrder = await createOrder(user.id, {
+      orderStatus: "cancelled",
+      isTestData: true,
+    });
+    const refundOrder = await createOrder(user.id, {
+      orderStatus: "cancelled",
+      isTestData: true,
+    });
+    const creditOrder = await createOrder(user.id, {
+      orderStatus: "cancelled",
+      isTestData: true,
+    });
+    const subscriptionOrder = await createOrder(user.id, {
+      orderStatus: "cancelled",
+      isTestData: true,
+    });
+    const proof = await db.paymentProof.create({
+      data: {
+        orderId: proofOrder.id,
+        userId: user.id,
+        paymentMethod: "alipay",
+        proofImage: "/task9/proof.png",
+      },
+    });
+    const refund = await db.orderRefundRecord.create({
+      data: {
+        orderId: refundOrder.id,
+        adminId,
+        requesterId: user.id,
+        amount: "9.90",
+        reason: "Task 9 protected refund",
+      },
+    });
+    const credit = await db.seoAuditCredit.create({
+      data: {
+        userId: user.id,
+        offerId: offer.id,
+        orderId: creditOrder.id,
+        runKind: "professional",
+        pageLimit: 10,
+        totalRuns: 1,
+        remainingRuns: 1,
+        expiresAt: new Date("2026-08-01T00:00:00.000Z"),
+      },
+    });
+    const monitoringOrder = await db.seoAuditSubscriptionOrder.create({
+      data: {
+        subscriptionId: subscription.id,
+        orderId: subscriptionOrder.id,
+        serviceStartsAt: new Date("2026-07-01T00:00:00.000Z"),
+        serviceEndsAt: new Date("2026-08-01T00:00:00.000Z"),
+      },
+    });
+    const orderIds = [
+      proofOrder.id,
+      refundOrder.id,
+      creditOrder.id,
+      subscriptionOrder.id,
+    ];
+
+    try {
+      for (const orderId of orderIds) {
+        expect(
+          await deleteOrderForAdmin({
+            db,
+            orderId,
+            adminId,
+            auditContext,
+          }),
+        ).toEqual({
+          status: "blocked",
+          code: "ADMIN_ORDER_DELETE_PROTECTED_RECORDS",
+        });
+      }
+
+      expect(await db.order.count({ where: { id: { in: orderIds } } })).toBe(4);
+      expect(await db.paymentProof.findUnique({ where: { id: proof.id } })).not.toBeNull();
+      expect(await db.orderRefundRecord.findUnique({ where: { id: refund.id } })).not.toBeNull();
+      expect(await db.seoAuditCredit.findUnique({ where: { id: credit.id } })).not.toBeNull();
+      expect(
+        await db.seoAuditSubscriptionOrder.findUnique({
+          where: { id: monitoringOrder.id },
+        }),
+      ).not.toBeNull();
+    } finally {
+      await db.seoAuditSubscriptionOrder.deleteMany({ where: { id: monitoringOrder.id } });
+      await db.seoAuditCredit.deleteMany({ where: { id: credit.id } });
+      await db.orderRefundRecord.deleteMany({ where: { id: refund.id } });
+      await db.paymentProof.deleteMany({ where: { id: proof.id } });
+      await db.seoAuditSubscription.deleteMany({ where: { id: subscription.id } });
+      await db.seoAuditProject.deleteMany({ where: { id: project.id } });
+      await db.order.deleteMany({ where: { id: { in: orderIds } } });
+      await db.seoAuditOffer.deleteMany({ where: { id: offer.id } });
       await db.user.deleteMany({ where: { id: user.id } });
     }
   }, 30_000);
@@ -267,6 +424,54 @@ describePostgres("PostgreSQL admin hard-delete protection", () => {
       await db.seoAuditRun.deleteMany({ where: { id: report.id } });
       await db.adminAuditLog.deleteMany({ where: { targetId: user.id } });
       await db.user.deleteMany({ where: { id: user.id } });
+    }
+  }, 30_000);
+
+  it("disables a cross-user audit operator without nulling audit or VIP ownership", async () => {
+    const operator = await createUser(true);
+    const beneficiary = await createUser(true);
+    const audit = await db.adminAuditLog.create({
+      data: {
+        adminId: operator.id,
+        action: "user.cross-account-review",
+        targetType: "user",
+        targetId: beneficiary.id,
+        summary: "Task 9 cross-user audit evidence",
+      },
+    });
+    const adjustment = await db.vipAdjustmentLog.create({
+      data: {
+        userId: beneficiary.id,
+        adminId: operator.id,
+        actionType: "extend",
+        reason: "Task 9 cross-user VIP evidence",
+      },
+    });
+
+    try {
+      expect(
+        await deleteUserForAdmin({
+          db,
+          userId: operator.id,
+          adminId,
+          auditContext,
+        }),
+      ).toEqual({
+        status: "blocked",
+        code: "ADMIN_USER_DELETE_PROTECTED_RECORDS",
+        disabled: true,
+      });
+      expect((await db.user.findUniqueOrThrow({ where: { id: operator.id } })).status).toBe("disabled");
+      expect((await db.adminAuditLog.findUniqueOrThrow({ where: { id: audit.id } })).adminId).toBe(operator.id);
+      expect((await db.vipAdjustmentLog.findUniqueOrThrow({ where: { id: adjustment.id } })).adminId).toBe(operator.id);
+    } finally {
+      await db.vipAdjustmentLog.deleteMany({ where: { id: adjustment.id } });
+      await db.adminAuditLog.deleteMany({
+        where: { OR: [{ id: audit.id }, { targetId: operator.id }] },
+      });
+      await db.user.deleteMany({
+        where: { id: { in: [operator.id, beneficiary.id] } },
+      });
     }
   }, 30_000);
 
@@ -434,6 +639,92 @@ describePostgres("PostgreSQL admin hard-delete protection", () => {
     }
   }, 30_000);
 
+  it(
+    "keeps validated temporary protection when the final FK swap hits lock_timeout",
+    async () => {
+      const harness = await createMigrationHarness(db, databaseUrl!);
+      const releaseLock = deferred<void>();
+      const lockAcquired = deferred<void>();
+      let blocker: Promise<unknown> | undefined;
+
+      try {
+        const evidence = await seedMigrationPaymentEvidence(harness.client, 1);
+        await harness.installCurrentMigration();
+        blocker = harness.client.$transaction(async (tx) => {
+          await tx.$queryRawUnsafe(
+            'SELECT "id" FROM "payment_transactions" WHERE "id" = $1',
+            evidence.paymentId,
+          );
+          lockAcquired.resolve();
+          await releaseLock.promise;
+        });
+        await lockAcquired.promise;
+
+        const failure = await runMigrateDeployExpectingFailure(
+          harness.schemaPath,
+          harness.databaseUrl,
+        );
+        expect(failure.output).toMatch(
+          /lock timeout|55P03|current transaction is aborted/i,
+        );
+        expect(failure.elapsedMs).toBeGreaterThanOrEqual(4_000);
+        expect(failure.elapsedMs).toBeLessThan(20_000);
+
+        releaseLock.resolve();
+        await blocker;
+        await expectFailedMigrationProtection({
+          client: harness.client,
+          schemaName: harness.schemaName,
+          orderId: evidence.orderId,
+          expectAllValidated: true,
+        });
+      } finally {
+        releaseLock.resolve();
+        await blocker?.catch(() => undefined);
+        await harness.cleanup();
+      }
+    },
+    120_000,
+  );
+
+  it(
+    "keeps old and temporary protection when FK validation hits statement_timeout",
+    async () => {
+      const harness = await createMigrationHarness(db, databaseUrl!);
+
+      try {
+        const evidence = await seedMigrationPaymentEvidence(
+          harness.client,
+          25_000,
+        );
+        await harness.installCurrentMigration((migration) =>
+          migration.replaceAll(
+            "SET LOCAL statement_timeout = '10min';",
+            "SET LOCAL statement_timeout = '1ms';",
+          ),
+        );
+
+        const failure = await runMigrateDeployExpectingFailure(
+          harness.schemaPath,
+          harness.databaseUrl,
+        );
+        expect(failure.output).toMatch(
+          /statement timeout|57014|current transaction is aborted/i,
+        );
+        expect(failure.elapsedMs).toBeLessThan(10_000);
+        await expectFailedMigrationProtection({
+          client: harness.client,
+          schemaName: harness.schemaName,
+          orderId: evidence.orderId,
+          expectAllValidated: false,
+        });
+      } finally {
+        await harness.cleanup();
+      }
+    },
+    120_000,
+  );
+
   it("writes successful user, order, and tool deletion audits in their transactions", async () => {
     const owner = await createUser(true);
     const emptyUser = await createUser(true);
@@ -536,6 +827,251 @@ describePostgres("PostgreSQL admin hard-delete protection", () => {
     });
   }
 });
+
+async function createMigrationHarness(
+  controlDb: PrismaClient,
+  sourceDatabaseUrl: string,
+) {
+  const schemaName = `task9_migration_${randomUUID().replaceAll("-", "")}`;
+  const tempRoot = await mkdtemp(join(tmpdir(), "task9-prisma-"));
+  const prismaRoot = join(tempRoot, "prisma");
+  const tempMigrationsRoot = join(prismaRoot, "migrations");
+  const schemaPath = join(prismaRoot, "schema.prisma");
+  const scopedDatabaseUrl = databaseUrlForSchema(sourceDatabaseUrl, schemaName);
+  let client: PrismaClient | undefined;
+
+  try {
+    await mkdir(tempMigrationsRoot, { recursive: true });
+    await copyFile(join(root, "prisma", "schema.prisma"), schemaPath);
+    await copyFile(
+      join(migrationsRoot, "migration_lock.toml"),
+      join(tempMigrationsRoot, "migration_lock.toml"),
+    );
+    for (const entry of await readdir(migrationsRoot, {
+      withFileTypes: true,
+    })) {
+      if (!entry.isDirectory() || entry.name === migrationName) continue;
+      await cp(
+        join(migrationsRoot, entry.name),
+        join(tempMigrationsRoot, entry.name),
+        { recursive: true },
+      );
+    }
+
+    await controlDb.$executeRawUnsafe(`CREATE SCHEMA "${schemaName}"`);
+    await runMigrateDeploy(schemaPath, scopedDatabaseUrl);
+    client = new PrismaClient({
+      datasourceUrl: scopedDatabaseUrl,
+      transactionOptions: { maxWait: 10_000, timeout: 60_000 },
+    });
+
+    return {
+      client,
+      databaseUrl: scopedDatabaseUrl,
+      schemaName,
+      schemaPath,
+      async installCurrentMigration(
+        transform: (migration: string) => string = (migration) => migration,
+      ) {
+        const target = join(tempMigrationsRoot, migrationName);
+        await mkdir(target, { recursive: true });
+        const migration = await readFile(
+          join(migrationsRoot, migrationName, "migration.sql"),
+          "utf8",
+        );
+        await writeFile(join(target, "migration.sql"), transform(migration));
+      },
+      async cleanup() {
+        await client?.$disconnect();
+        await controlDb.$executeRawUnsafe(
+          `DROP SCHEMA IF EXISTS "${schemaName}" CASCADE`,
+        );
+        await rm(tempRoot, { recursive: true, force: true });
+      },
+    };
+  } catch (error) {
+    await client?.$disconnect();
+    await controlDb
+      .$executeRawUnsafe(`DROP SCHEMA IF EXISTS "${schemaName}" CASCADE`)
+      .catch(() => undefined);
+    await rm(tempRoot, { recursive: true, force: true });
+    throw error;
+  }
+}
+
+async function runMigrateDeploy(schemaPath: string, scopedDatabaseUrl: string) {
+  return execFileAsync(
+    process.execPath,
+    [prismaCli, "migrate", "deploy", "--schema", schemaPath],
+    {
+      cwd: root,
+      env: { ...process.env, DATABASE_URL: scopedDatabaseUrl },
+      encoding: "utf8",
+      maxBuffer: 10 * 1024 * 1024,
+      timeout: 120_000,
+    },
+  );
+}
+
+async function runMigrateDeployExpectingFailure(
+  schemaPath: string,
+  scopedDatabaseUrl: string,
+) {
+  const startedAt = Date.now();
+  try {
+    await runMigrateDeploy(schemaPath, scopedDatabaseUrl);
+  } catch (error) {
+    const commandError = error as Error & {
+      stdout?: string | Buffer;
+      stderr?: string | Buffer;
+    };
+    return {
+      elapsedMs: Date.now() - startedAt,
+      output: `${String(commandError.stdout ?? "")}\n${String(commandError.stderr ?? "")}\n${commandError.message}`,
+    };
+  }
+  throw new Error("Expected prisma migrate deploy to fail");
+}
+
+async function seedMigrationPaymentEvidence(
+  client: PrismaClient,
+  count: number,
+) {
+  const suffix = randomUUID().replaceAll("-", "");
+  const userId = `migration-user-${suffix}`;
+  const orderIdPrefix = `migration-order-${suffix}-`;
+  const orderNoPrefix = `MIG-${suffix}-`;
+  const paymentIdPrefix = `migration-payment-${suffix}-`;
+
+  await client.$executeRawUnsafe(
+    `INSERT INTO "users" ("id", "password_hash", "created_at", "updated_at") VALUES ($1, $2, NOW(), NOW())`,
+    userId,
+    "integration-test",
+  );
+  await client.$executeRawUnsafe(
+    `
+      INSERT INTO "orders" (
+        "id", "order_no", "user_id", "amount", "order_status", "created_at", "updated_at"
+      )
+      SELECT $1 || value, $2 || value, $3, 9.90, 'cancelled', NOW(), NOW()
+      FROM generate_series(1, $4::integer) AS series(value)
+    `,
+    orderIdPrefix,
+    orderNoPrefix,
+    userId,
+    count,
+  );
+  await client.$executeRawUnsafe(
+    `
+      INSERT INTO "payment_transactions" (
+        "id", "order_id", "payment_type", "amount", "created_at", "updated_at"
+      )
+      SELECT $1 || value, $2 || value, 'alipay', 9.90, NOW(), NOW()
+      FROM generate_series(1, $3::integer) AS series(value)
+    `,
+    paymentIdPrefix,
+    orderIdPrefix,
+    count,
+  );
+
+  return {
+    orderId: `${orderIdPrefix}1`,
+    paymentId: `${paymentIdPrefix}1`,
+  };
+}
+
+async function expectFailedMigrationProtection(input: {
+  client: PrismaClient;
+  schemaName: string;
+  orderId: string;
+  expectAllValidated: boolean;
+}) {
+  const constraints = await input.client.$queryRawUnsafe<
+    Array<{ conname: string; convalidated: boolean; confdeltype: string }>
+  >(
+    `
+      SELECT constraint_row.conname, constraint_row.convalidated, constraint_row.confdeltype::text
+      FROM pg_constraint AS constraint_row
+      JOIN pg_namespace AS namespace_row
+        ON namespace_row.oid = constraint_row.connamespace
+      WHERE namespace_row.nspname = $1
+        AND constraint_row.conname = ANY($2::text[])
+      ORDER BY constraint_row.conname
+    `,
+    input.schemaName,
+    [
+      ...protectedForeignKeys,
+      ...protectedForeignKeys.map(temporaryConstraintName),
+    ],
+  );
+  const constraintsByName = new Map(
+    constraints.map((constraint) => [constraint.conname, constraint]),
+  );
+
+  for (const constraint of protectedForeignKeys) {
+    expect(constraintsByName.has(constraint)).toBe(true);
+    const temporary = constraintsByName.get(temporaryConstraintName(constraint));
+    expect(temporary).toMatchObject({ confdeltype: "r" });
+    if (input.expectAllValidated) {
+      expect(temporary?.convalidated).toBe(true);
+    }
+  }
+  if (!input.expectAllValidated) {
+    expect(
+      protectedForeignKeys.some(
+        (constraint) =>
+          constraintsByName.get(temporaryConstraintName(constraint))
+            ?.convalidated === false,
+      ),
+    ).toBe(true);
+  }
+
+  const triggers = await input.client.$queryRawUnsafe<Array<{ tgname: string }>>(
+    `
+      SELECT trigger_row.tgname
+      FROM pg_trigger AS trigger_row
+      JOIN pg_class AS table_row ON table_row.oid = trigger_row.tgrelid
+      JOIN pg_namespace AS namespace_row ON namespace_row.oid = table_row.relnamespace
+      WHERE namespace_row.nspname = $1
+        AND trigger_row.tgname = ANY($2::text[])
+      ORDER BY trigger_row.tgname
+    `,
+    input.schemaName,
+    [...temporaryGuardTriggers],
+  );
+  expect(triggers.map((trigger) => trigger.tgname)).toEqual(
+    [...temporaryGuardTriggers].sort(),
+  );
+
+  await expect(
+    input.client.$executeRawUnsafe(
+      'DELETE FROM "orders" WHERE "id" = $1',
+      input.orderId,
+    ),
+  ).rejects.toBeDefined();
+  const [orderCount] = await input.client.$queryRawUnsafe<Array<{ count: number }>>(
+    'SELECT COUNT(*)::integer AS count FROM "orders" WHERE "id" = $1',
+    input.orderId,
+  );
+  const [paymentCount] = await input.client.$queryRawUnsafe<
+    Array<{ count: number }>
+  >(
+    'SELECT COUNT(*)::integer AS count FROM "payment_transactions" WHERE "order_id" = $1',
+    input.orderId,
+  );
+  expect(orderCount?.count).toBe(1);
+  expect(paymentCount?.count).toBe(1);
+}
+
+function databaseUrlForSchema(sourceDatabaseUrl: string, schemaName: string) {
+  const url = new URL(sourceDatabaseUrl);
+  url.searchParams.set("schema", schemaName);
+  return url.toString();
+}
+
+function temporaryConstraintName(constraint: string) {
+  return constraint.replace(/_fkey$/, "_restrict_fkey");
+}
 
 function deferred<T>() {
   let resolve!: (value: T | PromiseLike<T>) => void;
