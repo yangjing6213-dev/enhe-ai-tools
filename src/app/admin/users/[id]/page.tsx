@@ -3,6 +3,7 @@ import { notFound } from "next/navigation";
 import { deleteUserAdminAction, resetUserPasswordAction, updateUserAdminAction } from "@/app/admin/actions";
 import { AdminSection, DangerButton, Field, inputClass, selectClass, SubmitButton } from "@/app/admin/admin-ui";
 import { PasswordInput } from "@/components/password-input";
+import { decideAdminUserHardDelete } from "@/lib/admin-delete-protection";
 import { prisma } from "@/lib/db";
 import { getCurrentLocale, type Locale } from "@/lib/i18n";
 
@@ -33,8 +34,8 @@ const copy = {
     resetPassword: "重置密码",
     passwordPlaceholder: "至少 8 位临时密码",
     deleteTitle: "删除用户",
-    deleteIntro: "删除用户会清理该用户的订单、支付凭证、评论、下载记录、AI账号服务使用记录和登录会话。当前登录管理员不能删除自己，系统也会阻止删除最后一个管理员。",
-    confirmDelete: "我已确认该用户可以删除，并理解相关业务记录会同步清理。",
+    deleteIntro: "仅无订单、支付、退款、权益、巡检或管理员审计关系的空测试账号允许硬删除。受保护账号只能停用，业务证据会永久保留。",
+    confirmDelete: "我确认这是无任何受保护业务关系的空测试账号。",
     deleteUser: "删除用户"
   },
   en: {
@@ -58,8 +59,8 @@ const copy = {
     resetPassword: "Reset password",
     passwordPlaceholder: "At least 8 temporary characters",
     deleteTitle: "Delete user",
-    deleteIntro: "Deleting a user clears orders, payment proofs, comments, download logs, AI account service usage logs, and sessions. The current admin cannot delete themselves, and the system blocks deleting the last admin.",
-    confirmDelete: "I confirm this user can be deleted and understand related business records will be cleaned up.",
+    deleteIntro: "Only an empty test account without orders, payments, refunds, entitlements, audits, or admin history can be hard-deleted. Protected accounts can only be disabled.",
+    confirmDelete: "I confirm this is an empty test account without protected business records.",
     deleteUser: "Delete user"
   }
 } as const;
@@ -70,10 +71,64 @@ export default async function AdminUserDetailPage({ params, searchParams }: Admi
   const user = await prisma.user.findUnique({
     where: { id },
     include: {
-      _count: { select: { orders: true, comments: true, downloadLogs: true, toolUsageLogs: true } }
+      _count: {
+        select: {
+          orders: true,
+          comments: true,
+          downloadLogs: true,
+          toolUsageLogs: true,
+          memberships: true,
+          paymentProofs: true,
+          reviewedProofs: true,
+          analyticsEvents: true,
+          toolPurchases: true,
+          vipAdjustments: true,
+          vipOperations: true,
+          refundRecords: true,
+          refundRequests: true,
+          adminAuditLogs: true,
+          sessions: true,
+          notifications: true,
+          newsFavorites: true,
+          newsLikes: true,
+          seoAuditProjects: true,
+          seoAuditRuns: true,
+          seoAuditCredits: true,
+          seoAuditSubscriptions: true
+        }
+      }
     }
   });
   if (!user) notFound();
+
+  const protectedCounts = {
+    orders: user._count.orders,
+    memberships: user._count.memberships,
+    paymentProofs: user._count.paymentProofs,
+    reviewedProofs: user._count.reviewedProofs,
+    comments: user._count.comments,
+    downloadLogs: user._count.downloadLogs,
+    toolUsageLogs: user._count.toolUsageLogs,
+    analyticsEvents: user._count.analyticsEvents,
+    toolPurchases: user._count.toolPurchases,
+    vipAdjustments: user._count.vipAdjustments,
+    vipOperations: user._count.vipOperations,
+    refundRecords: user._count.refundRecords,
+    refundRequests: user._count.refundRequests,
+    adminAuditLogs: user._count.adminAuditLogs,
+    sessions: user._count.sessions,
+    notifications: user._count.notifications,
+    newsFavorites: user._count.newsFavorites,
+    newsLikes: user._count.newsLikes,
+    seoAuditProjects: user._count.seoAuditProjects,
+    seoAuditRuns: user._count.seoAuditRuns,
+    seoAuditCredits: user._count.seoAuditCredits,
+    seoAuditSubscriptions: user._count.seoAuditSubscriptions
+  };
+  const deleteDecision = decideAdminUserHardDelete({
+    isTestData: user.isTestData,
+    protectedCounts,
+  });
 
   return (
     <AdminSection title={t.title} intro={t.intro}>
@@ -101,6 +156,8 @@ export default async function AdminUserDetailPage({ params, searchParams }: Admi
             <span>{roleLabel(user.role, locale)} · {statusLabel(user.status, locale)}</span>
             <span>{formatCounts(t.counts, user._count.orders, user._count.comments)}</span>
             <span>{formatUsageCounts(t.usageCounts, user._count.downloadLogs, user._count.toolUsageLogs)}</span>
+            <span>{user.isTestData ? (locale === "en" ? "Test data" : "测试数据") : (locale === "en" ? "Production data" : "生产数据")}</span>
+            <span>{formatProtectedCounts(protectedCounts, locale)}</span>
             <span>{t.registeredAt.replace("{date}", formatDate(user.createdAt, locale))}</span>
           </div>
         </div>
@@ -148,14 +205,22 @@ export default async function AdminUserDetailPage({ params, searchParams }: Admi
         <div className="mt-5 rounded-2xl border border-red-400/30 bg-red-400/10 p-4">
           <h3 className="font-semibold text-red-100">{t.deleteTitle}</h3>
           <p className="mt-2 text-sm leading-6 text-red-100/80">{t.deleteIntro}</p>
-          <form action={deleteUserAdminAction} className="mt-4">
-            <input type="hidden" name="id" value={user.id} />
-            <label className="mb-4 flex gap-3 text-sm text-red-100">
-              <input name="confirmDelete" type="checkbox" required value="DELETE_USER" className="mt-1" />
-              <span>{t.confirmDelete}</span>
-            </label>
-            <DangerButton>{t.deleteUser}</DangerButton>
-          </form>
+          {deleteDecision.allowed ? (
+            <form action={deleteUserAdminAction} className="mt-4">
+              <input type="hidden" name="id" value={user.id} />
+              <label className="mb-4 flex gap-3 text-sm text-red-100">
+                <input name="confirmDelete" type="checkbox" required value="DELETE_USER" className="mt-1" />
+                <span>{t.confirmDelete}</span>
+              </label>
+              <DangerButton>{t.deleteUser}</DangerButton>
+            </form>
+          ) : (
+            <p className="mt-4 text-sm leading-6 text-red-100">
+              {locale === "en"
+                ? `Hard deletion blocked (${deleteDecision.code}). Set the account status to Disabled instead.`
+                : `硬删除已阻止（${deleteDecision.code}）。请将账号状态改为“禁用”。`}
+            </p>
+          )}
         </div>
       </div>
     </AdminSection>
@@ -186,4 +251,9 @@ function formatUsageCounts(template: string, downloads: number, usages: number) 
   return template
     .replace("{downloads}", String(downloads))
     .replace("{usages}", String(usages));
+}
+
+function formatProtectedCounts(counts: Record<string, number>, locale: Locale) {
+  const total = Object.values(counts).reduce((sum, count) => sum + count, 0);
+  return locale === "en" ? `${total} protected business records` : `${total} 条受保护业务记录`;
 }

@@ -11,7 +11,7 @@ export type AdminAuditInput = {
   metadata?: Prisma.InputJsonValue | null;
 };
 
-type AuditRequestContext = {
+export type AuditRequestContext = {
   ip?: string | null;
   userAgent?: string | null;
 };
@@ -29,18 +29,33 @@ export function createAdminAuditData(input: AdminAuditInput, context: AuditReque
   };
 }
 
-export async function writeAdminAuditLog(input: AdminAuditInput) {
+export function createAdminAuditCreateData(
+  input: AdminAuditInput,
+  context: AuditRequestContext = {},
+): Prisma.AdminAuditLogUncheckedCreateInput {
+  const data = createAdminAuditData(input, context);
+  return {
+    ...data,
+    metadata: data.metadata ?? Prisma.JsonNull,
+  };
+}
+
+export async function getAdminAuditRequestContext(): Promise<AuditRequestContext> {
   const headerStore = await headers();
   const forwardedFor = headerStore.get("x-forwarded-for");
-  const data = createAdminAuditData(input, {
+  return {
     ip: forwardedFor?.split(",")[0]?.trim() || headerStore.get("x-real-ip"),
-    userAgent: headerStore.get("user-agent")
-  });
+    userAgent: headerStore.get("user-agent"),
+  };
+}
+
+export async function writeAdminAuditLog(input: AdminAuditInput) {
+  const data = createAdminAuditCreateData(
+    input,
+    await getAdminAuditRequestContext(),
+  );
 
   await prisma.adminAuditLog.create({
-    data: {
-      ...data,
-      metadata: data.metadata ?? Prisma.JsonNull
-    }
+    data,
   });
 }

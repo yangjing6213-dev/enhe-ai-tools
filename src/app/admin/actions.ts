@@ -6,7 +6,12 @@ import { revalidatePath, revalidateTag } from "next/cache";
 import { redirect } from "next/navigation";
 import { z } from "zod";
 import type { Prisma, Order, PaymentTransaction } from "@prisma/client";
-import { writeAdminAuditLog } from "@/lib/admin-audit";
+import { getAdminAuditRequestContext, writeAdminAuditLog } from "@/lib/admin-audit";
+import {
+  deleteOrderForAdmin,
+  deleteToolForAdmin,
+  deleteUserForAdmin,
+} from "@/lib/admin-delete";
 import { prisma } from "@/lib/db";
 import {
   buildSeoFriendlySlug,
@@ -20,7 +25,6 @@ import { parseNewsRelationIds, resolveAiNewsCanonicalSlug, resolveNewsSlug } fro
 import { hashPassword, requireAdmin } from "@/lib/auth";
 import { getOrderTimestampPatch } from "@/lib/admin-order";
 import { sendRefundProcessedAdminEmail } from "@/lib/admin-email-notifications";
-import { getAdminUserDeleteBlockReason } from "@/lib/admin-user-rules";
 import { getAdminToolBasePath, getAdminToolEditPath } from "@/lib/admin-tool-routes";
 import { buildAiNewsImportPayloadFromHtml } from "@/lib/ai-news-html-import";
 import { importAiNewsArticle } from "@/lib/ai-news-import";
@@ -34,10 +38,8 @@ import { buildRefundProcessedNotification } from "@/lib/notification-messages";
 import { createUserNotification } from "@/lib/notifications";
 import {
   assertAdminOrderStatusUpdateAllowed,
-  canAdminDeleteOrderSafely,
   canRecordRefundForOrder,
   getRefundStatusPatch,
-  isAdminDeleteRiskConfirmed,
   normalizeRefundRecordAmount
 } from "@/lib/order-rules";
 import {
@@ -415,89 +417,27 @@ export async function deleteUserAdminAction(formData: FormData) {
   const admin = await requireAdmin();
   const id = idSchema.parse(formData.get("id"));
   const confirmDelete = parseOptionalString(formData.get("confirmDelete"));
-  const user = await prisma.user.findUnique({
-    where: { id },
-    select: { id: true, email: true, phone: true, nickname: true, role: true }
-  });
-  if (!user) {
-    redirect(`/admin/users?error=${encodeURIComponent("用户不存在，可能已经被删除。")}`);
-  }
   if (confirmDelete !== deleteUserConfirmationToken) {
     redirect(`/admin/users/${id}?error=${encodeURIComponent("请先勾选删除确认。")}`);
   }
 
-  const remainingAdminCount = await prisma.user.count({
-    where: {
-      role: "admin",
-      id: { not: id }
-    }
-  });
-  const blockReason = getAdminUserDeleteBlockReason({
-    currentAdminId: admin.id,
-    targetUserId: id,
-    targetRole: user.role,
-    remainingAdminCount
-  });
-  if (blockReason) {
-    redirect(`/admin/users/${id}?error=${encodeURIComponent(blockReason)}`);
-  }
-
-  const cleanup = await prisma.$transaction(async (tx) => {
-    const orders = await tx.order.findMany({ where: { userId: id }, select: { id: true } });
-    const orderIds = orders.map((order) => order.id);
-
-    const adminAuditLogs = await tx.adminAuditLog.updateMany({ where: { adminId: id }, data: { adminId: null } });
-    const reviewedProofs = await tx.paymentProof.updateMany({ where: { reviewerId: id }, data: { reviewerId: null } });
-    const vipAdjustmentLogs = await tx.vipAdjustmentLog.deleteMany({
-      where: { OR: [{ userId: id }, { adminId: id }] }
-    });
-    const refundRecords = await tx.orderRefundRecord.deleteMany({
-      where: { OR: [{ adminId: id }, { requesterId: id }, { orderId: { in: orderIds } }] }
-    });
-    const paymentProofs = await tx.paymentProof.deleteMany({
-      where: { OR: [{ userId: id }, { orderId: { in: orderIds } }] }
-    });
-    const toolPurchases = await tx.toolPurchase.deleteMany({
-      where: { OR: [{ userId: id }, { orderId: { in: orderIds } }] }
-    });
-    const downloadLogs = await tx.downloadLog.deleteMany({ where: { userId: id } });
-    const usageLogs = await tx.toolUsageLog.deleteMany({ where: { userId: id } });
-    const comments = await tx.comment.deleteMany({ where: { userId: id } });
-    const memberships = await tx.membership.deleteMany({ where: { userId: id } });
-    const sessions = await tx.session.deleteMany({ where: { userId: id } });
-    const deletedOrders = await tx.order.deleteMany({ where: { userId: id } });
-    await tx.user.delete({ where: { id } });
-
-    return {
-      orders: deletedOrders.count,
-      paymentProofs: paymentProofs.count,
-      toolPurchases: toolPurchases.count,
-      comments: comments.count,
-      memberships: memberships.count,
-      downloadLogs: downloadLogs.count,
-      usageLogs: usageLogs.count,
-      sessions: sessions.count,
-      vipAdjustmentLogs: vipAdjustmentLogs.count,
-      refundRecords: refundRecords.count,
-      reviewedProofsUnlinked: reviewedProofs.count,
-      adminAuditLogsUnlinked: adminAuditLogs.count
-    };
-  });
-
-  await writeAdminAuditLog({
+  const result = await deleteUserForAdmin({
+    db: prisma,
+    userId: id,
     adminId: admin.id,
-    action: "user.delete",
-    targetType: "user",
-    targetId: id,
-    summary: "Deleted user and cleaned related user-owned records.",
-    metadata: {
-      email: user.email,
-      phone: user.phone,
-      nickname: user.nickname,
-      role: user.role,
-      cleanup
-    }
+    auditContext: await getAdminAuditRequestContext(),
   });
+  if (result.status === "not_found") {
+    redirect(`/admin/users?error=${encodeURIComponent("用户不存在，可能已经被删除。")}`);
+  }
+  if (result.status === "rule_blocked") {
+    redirect(`/admin/users/${id}?error=${encodeURIComponent(result.message)}`);
+  }
+  if (result.status === "blocked") {
+    revalidatePath("/admin/users");
+    revalidatePath(`/admin/users/${id}`);
+    redirect(`/admin/users/${id}?error=${result.code}&disabled=1`);
+  }
 
   revalidatePath("/admin/users");
   redirect("/admin/users?deleted=1");
@@ -546,29 +486,18 @@ export async function updateOrderAdminAction(formData: FormData) {
 export async function deleteOrderAdminAction(formData: FormData) {
   const admin = await requireAdmin();
   const id = idSchema.parse(formData.get("id"));
-  const confirmRisk = parseOptionalString(formData.get("confirmRisk"));
-  const order = await prisma.order.findUnique({ where: { id } });
-  if (!order) {
+  const result = await deleteOrderForAdmin({
+    db: prisma,
+    orderId: id,
+    adminId: admin.id,
+    auditContext: await getAdminAuditRequestContext(),
+  });
+  if (result.status === "not_found") {
     redirect(`/admin/orders?error=${encodeURIComponent("订单不存在，可能已经被删除。")}`);
   }
-  if (!canAdminDeleteOrderSafely(order.orderStatus) && !isAdminDeleteRiskConfirmed(confirmRisk)) {
-    redirect(`/admin/orders?error=${encodeURIComponent("该订单已支付或已开通权益，请先勾选风险确认后再删除。")}`);
+  if (result.status === "blocked") {
+    redirect(`/admin/orders/${id}?error=${result.code}`);
   }
-
-  await prisma.$transaction([
-    prisma.paymentProof.deleteMany({ where: { orderId: id } }),
-    prisma.toolPurchase.deleteMany({ where: { orderId: id } }),
-    prisma.orderRefundRecord.deleteMany({ where: { orderId: id } }),
-    prisma.order.delete({ where: { id } })
-  ]);
-  await writeAdminAuditLog({
-    adminId: admin.id,
-    action: "order.delete",
-    targetType: "order",
-    targetId: id,
-    summary: "Deleted order after admin confirmation.",
-    metadata: { orderNo: order.orderNo, orderStatus: order.orderStatus, confirmedRisk: !canAdminDeleteOrderSafely(order.orderStatus) }
-  });
 
   revalidatePath("/admin/orders");
   revalidatePath("/admin/payments");
@@ -1263,48 +1192,19 @@ export async function deleteToolAction(formData: FormData) {
   const id = idSchema.parse(formData.get("id"));
   const type = z.enum(["software", "online", "skill_learning"]).parse(formData.get("type"));
   const adminPath = getAdminToolBasePath(type);
-  const existingTool = await prisma.tool.findUnique({ where: { id } });
-  if (!existingTool) {
+  const result = await deleteToolForAdmin({
+    db: prisma,
+    toolId: id,
+    toolType: type,
+    adminId: admin.id,
+    auditContext: await getAdminAuditRequestContext(),
+  });
+  if (result.status === "not_found") {
     redirect(`${adminPath}?error=${encodeURIComponent("工具不存在，可能已经被删除。")}`);
   }
-  const cleanup = await prisma.$transaction(async (tx) => {
-    const [orders, purchases, downloadLogs, usageLogs, comments, tutorials, faqs, changelogs, tagLinks, files] = await Promise.all([
-      tx.order.updateMany({ where: { toolId: id }, data: { toolId: null } }),
-      tx.toolPurchase.deleteMany({ where: { toolId: id } }),
-      tx.downloadLog.deleteMany({ where: { toolId: id } }),
-      tx.toolUsageLog.deleteMany({ where: { toolId: id } }),
-      tx.comment.deleteMany({ where: { toolId: id } }),
-      tx.tutorial.deleteMany({ where: { toolId: id } }),
-      tx.toolFaq.deleteMany({ where: { toolId: id } }),
-      tx.toolChangelog.deleteMany({ where: { toolId: id } }),
-      tx.toolTagLink.deleteMany({ where: { toolId: id } }),
-      tx.file.updateMany({ where: { toolId: id }, data: { toolId: null } })
-    ]);
-    const tool = await tx.tool.delete({ where: { id } });
-    return { tool, orders, purchases, downloadLogs, usageLogs, comments, tutorials, faqs, changelogs, tagLinks, files };
-  });
-  await writeAdminAuditLog({
-    adminId: admin.id,
-    action: "tool.delete",
-    targetType: "tool",
-    targetId: id,
-    summary: "Deleted tool and cleaned dependent records.",
-    metadata: {
-      type,
-      name: cleanup.tool.name,
-      slug: cleanup.tool.slug,
-      ordersDetached: cleanup.orders.count,
-      purchasesDeleted: cleanup.purchases.count,
-      downloadLogsDeleted: cleanup.downloadLogs.count,
-      usageLogsDeleted: cleanup.usageLogs.count,
-      commentsDeleted: cleanup.comments.count,
-      tutorialsDeleted: cleanup.tutorials.count,
-      faqsDeleted: cleanup.faqs.count,
-      changelogsDeleted: cleanup.changelogs.count,
-      tagLinksDeleted: cleanup.tagLinks.count,
-      filesDetached: cleanup.files.count
-    }
-  });
+  if (result.status === "blocked") {
+    redirect(`${getAdminToolEditPath(type, id)}?error=${result.code}`);
+  }
   revalidatePath(adminPath);
   revalidatePath("/");
   redirect(`${adminPath}?deleted=1`);

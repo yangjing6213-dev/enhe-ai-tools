@@ -1,13 +1,11 @@
 import { describe, expect, it } from "vitest";
 import {
   assertAdminOrderStatusUpdateAllowed,
-  canAdminDeleteOrderSafely,
   canRecordRefundForOrder,
   canUserCancelOrder,
   canUserRequestRefundForOrder,
   getRefundRecordActorLabel,
   getRefundStatusPatch,
-  isAdminDeleteRiskConfirmed,
   normalizeRefundRecordAmount
 } from "@/lib/order-rules";
 
@@ -29,19 +27,6 @@ describe("order business rules", () => {
   it("allows saving an already activated order without changing its status", () => {
     expect(() => assertAdminOrderStatusUpdateAllowed("activated", "activated")).not.toThrow();
     expect(() => assertAdminOrderStatusUpdateAllowed("activated", "paid")).toThrow();
-  });
-
-  it("marks activated, paid, and refunded orders as risky to delete", () => {
-    expect(canAdminDeleteOrderSafely("activated")).toBe(false);
-    expect(canAdminDeleteOrderSafely("paid")).toBe(false);
-    expect(canAdminDeleteOrderSafely("refunded")).toBe(false);
-    expect(canAdminDeleteOrderSafely("cancelled")).toBe(true);
-  });
-
-  it("requires an explicit confirmation token before deleting risky orders", () => {
-    expect(isAdminDeleteRiskConfirmed(null)).toBe(false);
-    expect(isAdminDeleteRiskConfirmed("wrong")).toBe(false);
-    expect(isAdminDeleteRiskConfirmed("DELETE_ACTIVATED_ORDER")).toBe(true);
   });
 
   it("allows refund records only for paid, activated, or already refunded orders", () => {

@@ -6,6 +6,7 @@ import { ToolMediaUploadGuard } from "@/app/admin/tool-media-upload-guard";
 import { ToolProductImageManager } from "@/app/admin/tool-product-image-manager";
 import { ToolVideoUploadField } from "@/app/admin/tool-video-upload-field";
 import { getAdminToolBasePath, getAdminToolEditPath, getAdminToolNewPath } from "@/lib/admin-tool-routes";
+import { decideAdminToolHardDelete } from "@/lib/admin-delete-protection";
 import type { Locale } from "@/lib/i18n";
 import { normalizeImageSrc } from "@/lib/media";
 import { getPrimaryToolPrice, type ToolPriceSpecStatus } from "@/lib/tool-price-specs";
@@ -47,10 +48,11 @@ type ToolItem = {
   priceSpecs?: ToolPriceSpecItem[];
   categoryId: string | null;
   category?: { name: string } | null;
+  _count?: { orders: number; purchases: number };
 };
 
 type ToolCategoryItem = { id: string; name: string; type: string };
-type ToolPriceSpecItem = { id: string; name: string; price: unknown; sortOrder: number; status: ToolPriceSpecStatus };
+type ToolPriceSpecItem = { id: string; name: string; price: unknown; sortOrder: number; status: ToolPriceSpecStatus; _count?: { orders: number; purchases: number } };
 type Notice = Record<string, string | undefined>;
 type ToolListFilters = { q: string; status?: string; categoryId?: string; page: number };
 
@@ -317,6 +319,19 @@ export function ToolEditor({
   const isAccountService = type === "online";
   const isSkillLearning = type === "skill_learning";
   const priceSpecRows = buildEditorPriceSpecRows(tool);
+  const priceSpecProtectedCounts = (tool?.priceSpecs ?? []).reduce(
+    (counts, priceSpec) => ({
+      orders: counts.orders + (priceSpec._count?.orders ?? 0),
+      purchases: counts.purchases + (priceSpec._count?.purchases ?? 0),
+    }),
+    { orders: 0, purchases: 0 },
+  );
+  const deleteDecision = tool
+    ? decideAdminToolHardDelete({
+        orders: (tool._count?.orders ?? 0) + priceSpecProtectedCounts.orders,
+        purchases: (tool._count?.purchases ?? 0) + priceSpecProtectedCounts.purchases,
+      })
+    : null;
 
   return (
     <div>
@@ -574,12 +589,18 @@ export function ToolEditor({
         </div>
       </form>
 
-      {tool ? (
+      {tool && deleteDecision?.allowed ? (
         <form action={deleteToolAction} className="mt-4">
           <input type="hidden" name="id" value={tool.id} />
           <input type="hidden" name="type" value={type} />
           <DangerButton>{isSkillLearning ? copy.deleteCourse : isAccountService ? copy.deleteService : copy.deleteTool}</DangerButton>
         </form>
+      ) : tool ? (
+        <p className="mt-4 rounded-xl border border-red-400/30 bg-red-400/10 px-4 py-3 text-sm text-red-100">
+          {locale === "en"
+            ? `Hard deletion blocked (${deleteDecision?.code}). Orders and purchase entitlements are retained.`
+            : `硬删除已阻止（${deleteDecision?.code}）。订单和购买权益会保留。`}
+        </p>
       ) : null}
     </div>
   );

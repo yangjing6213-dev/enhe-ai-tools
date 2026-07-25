@@ -1,16 +1,11 @@
 import type { OrderStatus, RefundStatus } from "@prisma/client";
 
 export const userCancellableOrderStatuses = ["pending_payment", "pending_review", "rejected"] as const;
-export const adminDeleteRiskConfirmationToken = "DELETE_ACTIVATED_ORDER";
 export const refundableOrderStatuses = ["paid", "activated", "refunded"] as const;
 export const userRefundRequestableOrderStatuses = ["paid", "activated"] as const;
 
 export function canUserCancelOrder(status: OrderStatus) {
   return userCancellableOrderStatuses.includes(status as (typeof userCancellableOrderStatuses)[number]);
-}
-
-export function canAdminDeleteOrderSafely(status: OrderStatus) {
-  return status !== "activated" && status !== "paid" && status !== "refunded";
 }
 
 export function canRecordRefundForOrder(status: OrderStatus) {
@@ -40,10 +35,6 @@ export function getRefundStatusPatch(status: RefundStatus, currentCompletedAt?: 
   return {
     completedAt: status === "completed" ? currentCompletedAt ?? now : null
   };
-}
-
-export function isAdminDeleteRiskConfirmed(value: string | null | undefined) {
-  return value === adminDeleteRiskConfirmationToken;
 }
 
 export function assertAdminOrderStatusUpdateAllowed(status: OrderStatus, currentStatus?: OrderStatus | null) {

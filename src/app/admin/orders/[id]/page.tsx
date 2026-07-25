@@ -2,8 +2,9 @@
 import { notFound } from "next/navigation";
 import { createRefundRecordAdminAction, deleteOrderAdminAction, processRefundRecordAdminAction, updateOrderAdminAction } from "@/app/admin/actions";
 import { AdminSection, Field, inputClass, selectClass, SubmitButton, textareaClass } from "@/app/admin/admin-ui";
+import { decideAdminOrderHardDelete } from "@/lib/admin-delete-protection";
 import { prisma } from "@/lib/db";
-import { adminDeleteRiskConfirmationToken, canAdminDeleteOrderSafely, canRecordRefundForOrder, getRefundRecordActorLabel } from "@/lib/order-rules";
+import { canRecordRefundForOrder, getRefundRecordActorLabel } from "@/lib/order-rules";
 import { getStatusLabel, orderStatusLabels, proofStatusLabels, refundStatusLabels } from "@/lib/status-labels";
 import { formatCurrency } from "@/lib/utils";
 
@@ -30,13 +31,31 @@ export default async function AdminOrderDetailPage({ params, searchParams }: Adm
       plan: true,
       tool: true,
       paymentProof: true,
+      paymentTransaction: true,
       toolPurchase: true,
+      seoAuditCredit: true,
+      seoAuditSubscriptionOrder: true,
+      seoAuditOffer: true,
+      _count: { select: { refundRecords: true, seoAuditRuns: true } },
       refundRecords: { include: { admin: true, requester: true }, orderBy: { createdAt: "desc" } }
     }
   });
   if (!order) notFound();
 
-  const deleteIsSafe = canAdminDeleteOrderSafely(order.orderStatus);
+  const protectedCounts = {
+    paymentTransaction: order.paymentTransaction ? 1 : 0,
+    paymentProof: order.paymentProof ? 1 : 0,
+    refundRecords: order._count.refundRecords,
+    toolPurchase: order.toolPurchase ? 1 : 0,
+    seoAuditCredit: order.seoAuditCredit ? 1 : 0,
+    seoAuditSubscriptionOrder: order.seoAuditSubscriptionOrder ? 1 : 0,
+    seoAuditRuns: order._count.seoAuditRuns
+  };
+  const deleteDecision = decideAdminOrderHardDelete({
+    orderStatus: order.orderStatus,
+    isTestData: order.isTestData,
+    protectedCounts
+  });
 
   return (
     <AdminSection title="订单详情" intro="在单独详情页处理订单状态、付款记录、售后退款和删除风险确认。">
@@ -59,21 +78,30 @@ export default async function AdminOrderDetailPage({ params, searchParams }: Adm
         <p className="mb-5 rounded-xl border border-[#48F5D3]/30 bg-[#48F5D3]/10 px-4 py-3 text-sm font-semibold text-[#48F5D3]">订单已保存。</p>
       ) : null}
 
+      {query.error ? (
+        <p className="mb-5 rounded-xl border border-red-400/30 bg-red-400/10 px-4 py-3 text-sm text-red-100">
+          操作失败：{query.error}
+        </p>
+      ) : null}
+
       <div className="glass rounded-2xl p-6">
         <div className="grid gap-4 md:grid-cols-3">
           <Info label="订单号" value={order.orderNo} />
           <Info label="用户" value={order.user.email ?? order.user.phone ?? order.user.id} />
-          <Info label="项目" value={order.plan?.name ?? order.tool?.name ?? "订单项目"} />
+          <Info label="项目" value={order.seoAuditOffer?.name ?? order.plan?.name ?? order.tool?.name ?? "订单项目"} />
           {order.toolPriceSpecName ? <Info label="规格" value={order.toolPriceSpecName} /> : null}
           <Info label="金额" value={formatCurrency(order.amount.toString())} />
           <Info label="订单状态" value={getStatusLabel(orderStatusLabels, order.orderStatus)} />
+          <Info label="数据标识" value={order.isTestData ? "测试数据" : "生产数据（不可硬删除）"} />
           <Info label="凭证状态" value={getStatusLabel(proofStatusLabels, order.paymentProof?.reviewStatus)} />
           <Info label="创建时间" value={order.createdAt.toLocaleString("zh-CN")} />
           <Info label="支付时间" value={order.paidAt?.toLocaleString("zh-CN") ?? "-"} />
           <Info label="开通时间" value={order.activatedAt?.toLocaleString("zh-CN") ?? "-"} />
           <Info label="退款日期" value={order.refundRecords[0]?.completedAt?.toLocaleString("zh-CN") ?? "-"} />
-          <Info label="订单类型" value={order.orderType === "software_download" ? "软件下载订单" : "历史会员订单"} />
-          <Info label="权益记录" value={order.toolPurchase ? "已生成软件购买授权" : order.activatedAt ? "已开通权益" : "未开通"} />
+          <Info label="订单类型" value={orderTypeLabel(order.orderType)} />
+          {order.seoAuditTargetOrigin ? <Info label="巡检站点" value={order.seoAuditTargetOrigin} /> : null}
+          <Info label="权益记录" value={entitlementLabel(order)} />
+          <Info label="受保护记录" value={formatProtectedCounts(protectedCounts)} />
         </div>
 
         <form action={updateOrderAdminAction} className="mt-6 grid gap-4 border-t border-white/10 pt-6 md:grid-cols-[180px_160px_160px_1fr]">
@@ -175,16 +203,19 @@ export default async function AdminOrderDetailPage({ params, searchParams }: Adm
         )}
       </div>
 
-      <form action={deleteOrderAdminAction} className="mt-6 rounded-2xl border border-red-400/30 bg-red-400/5 p-5">
-        <input type="hidden" name="id" value={order.id} />
-        {!deleteIsSafe ? (
-          <label className="mb-3 flex gap-3 rounded-xl border border-[#FFB86B]/30 bg-[#FFB86B]/10 px-4 py-3 text-xs leading-6 text-[#FFB86B]">
-            <input name="confirmRisk" type="checkbox" required value={adminDeleteRiskConfirmationToken} className="mt-1" />
-            <span>该订单已支付、已开通或已退款。删除订单不会自动恢复资金流水，请确认已完成售后处理并承担删除风险。</span>
-          </label>
-        ) : null}
-        <SubmitButton variant="danger" pendingLabel="删除中...">删除订单</SubmitButton>
-      </form>
+      <div className="mt-6 rounded-2xl border border-red-400/30 bg-red-400/5 p-5">
+        {deleteDecision.allowed ? (
+          <form action={deleteOrderAdminAction}>
+            <input type="hidden" name="id" value={order.id} />
+            <p className="mb-3 text-xs leading-6 text-red-100/80">仅无任何业务关系的已取消测试订单允许硬删除。</p>
+            <SubmitButton variant="danger" pendingLabel="删除中...">删除订单</SubmitButton>
+          </form>
+        ) : (
+          <p className="text-sm leading-6 text-red-100">
+            该订单不可硬删除（{deleteDecision.code}）。支付、退款、权益和巡检报告证据会永久保留。
+          </p>
+        )}
+      </div>
     </AdminSection>
   );
 }
@@ -196,4 +227,39 @@ function Info({ label, value }: { label: string; value: string }) {
       <p className="mt-2 break-all font-semibold text-[#E8EEF8]">{value}</p>
     </div>
   );
+}
+
+function orderTypeLabel(orderType: string) {
+  if (orderType === "software_download") return "软件/服务订单";
+  if (orderType === "seo_audit_credit") return "SEO/GEO 巡检次数包";
+  if (orderType === "seo_audit_monitoring") return "SEO/GEO 持续监控";
+  return "会员订单";
+}
+
+function entitlementLabel(order: {
+  toolPurchase: unknown;
+  seoAuditCredit: unknown;
+  seoAuditSubscriptionOrder: unknown;
+  activatedAt: Date | null;
+}) {
+  if (order.seoAuditCredit) return "已生成巡检次数权益";
+  if (order.seoAuditSubscriptionOrder) return "已绑定监控服务期";
+  if (order.toolPurchase) return "已生成软件购买授权";
+  return order.activatedAt ? "已开通权益" : "未开通";
+}
+
+function formatProtectedCounts(counts: Record<string, number>) {
+  const labels: Record<string, string> = {
+    paymentTransaction: "支付流水",
+    paymentProof: "支付凭证",
+    refundRecords: "退款记录",
+    toolPurchase: "购买权益",
+    seoAuditCredit: "巡检次数",
+    seoAuditSubscriptionOrder: "监控续费",
+    seoAuditRuns: "巡检任务/报告"
+  };
+  const values = Object.entries(counts)
+    .filter(([, count]) => count > 0)
+    .map(([key, count]) => `${labels[key] ?? key} ${count}`);
+  return values.length ? values.join(" · ") : "无";
 }
