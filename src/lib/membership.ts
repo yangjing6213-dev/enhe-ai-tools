@@ -1,3 +1,4 @@
+import type { OrderType } from "@prisma/client";
 import { prisma } from "@/lib/db";
 import { applyVipCancellation, applyVipGrant, type MembershipSnapshot } from "@/lib/membership-rules";
 
@@ -6,6 +7,10 @@ type MembershipDelegate = {
 };
 type RefundEntitlementDelegate = MembershipDelegate & {
   toolPurchase: Pick<typeof prisma.toolPurchase, "deleteMany">;
+  seoAuditCredit: Pick<typeof prisma.seoAuditCredit, "updateMany">;
+  seoAuditSubscriptionOrder: Pick<typeof prisma.seoAuditSubscriptionOrder, "findUnique">;
+  seoAuditSubscription: Pick<typeof prisma.seoAuditSubscription, "update">;
+  seoAuditSchedule: Pick<typeof prisma.seoAuditSchedule, "updateMany">;
 };
 
 export async function getActiveMembership(userId: string) {
@@ -115,22 +120,53 @@ export async function cancelVipMembership(tx: MembershipDelegate, userId: string
 
 export async function revokeEntitlementsForRefundedOrder(
   tx: RefundEntitlementDelegate,
-  order: { id: string; userId: string; orderType: "vip" | "software_download"; toolId?: string | null },
+  order: { id: string; userId: string; orderType: OrderType; toolId?: string | null },
   now = new Date()
 ) {
-  if (order.orderType === "software_download") {
-    await tx.toolPurchase.deleteMany({
-      where: {
-        OR: [
-          { orderId: order.id },
-          ...(order.toolId ? [{ userId: order.userId, toolId: order.toolId }] : [])
-        ]
+  switch (order.orderType) {
+    case "vip":
+      await cancelVipMembership(tx, order.userId, now);
+      return;
+    case "software_download":
+      await tx.toolPurchase.deleteMany({
+        where: {
+          OR: [
+            { orderId: order.id },
+            ...(order.toolId ? [{ userId: order.userId, toolId: order.toolId }] : [])
+          ]
+        }
+      });
+      return;
+    case "seo_audit_credit":
+      await tx.seoAuditCredit.updateMany({
+        where: { orderId: order.id },
+        data: { remainingRuns: 0, refundedAt: now }
+      });
+      return;
+    case "seo_audit_monitoring": {
+      const subscriptionOrder = await tx.seoAuditSubscriptionOrder.findUnique({
+        where: { orderId: order.id },
+        select: { subscriptionId: true }
+      });
+      if (!subscriptionOrder) {
+        throw new Error("SEO audit monitoring order is missing subscription binding.");
       }
-    });
-    return;
-  }
 
-  await cancelVipMembership(tx, order.userId, now);
+      await tx.seoAuditSubscription.update({
+        where: { id: subscriptionOrder.subscriptionId },
+        data: { status: "refunded" }
+      });
+      await tx.seoAuditSchedule.updateMany({
+        where: { subscriptionId: subscriptionOrder.subscriptionId },
+        data: { enabled: false, nextRunAt: null }
+      });
+      return;
+    }
+    default: {
+      const unsupportedOrderType: never = order.orderType;
+      throw new Error(`Unsupported order type: ${unsupportedOrderType}`);
+    }
+  }
 }
 
 export async function manuallyAdjustVip(input: {
@@ -176,6 +212,20 @@ export async function activateVipForOrder(orderId: string, reviewerId?: string, 
       include: { plan: true, paymentProof: true }
     });
     if (!order) throw new Error("Order not found.");
+
+    switch (order.orderType) {
+      case "seo_audit_credit":
+      case "seo_audit_monitoring":
+        throw new Error("SEO audit orders require the dedicated payment dispatcher.");
+      case "vip":
+      case "software_download":
+        break;
+      default: {
+        const unsupportedOrderType: never = order.orderType;
+        throw new Error(`Unsupported order type: ${unsupportedOrderType}`);
+      }
+    }
+
     const start = new Date();
 
     if (order.orderStatus === "activated") {

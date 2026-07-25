@@ -65,6 +65,38 @@ enum PaymentTransactionStatus {
 enum OrderType {
   vip
   software_download
+  seo_audit_credit
+  seo_audit_monitoring
+}
+
+enum SeoAuditRunStatus {
+  queued
+  running
+  completed
+  failed
+  cancel_requested
+  cancelled
+}
+
+enum SeoAuditRunKind {
+  free
+  professional
+  deep
+  recheck
+  scheduled
+}
+
+enum SeoAuditSubscriptionStatus {
+  active
+  paused
+  expired
+  refunded
+}
+
+enum SeoAuditCadence {
+  weekly
+  biweekly
+  monthly
 }
 
 enum RefundStatus {
@@ -204,6 +236,10 @@ model User {
     acceptEmailUpdates  Boolean   @default(true) @map("accept_email_updates")
     newsFavorites    NewsArticleFavorite[]
     newsLikes        NewsArticleLike[]
+    seoAuditProjects      SeoAuditProject[]
+    seoAuditRuns          SeoAuditRun[]
+    seoAuditCredits       SeoAuditCredit[]
+    seoAuditSubscriptions SeoAuditSubscription[]
 
   @@map("users")
 }
@@ -472,6 +508,9 @@ model Order {
   toolId        String?         @map("tool_id")
   toolPriceSpecId   String?     @map("tool_price_spec_id")
   toolPriceSpecName String?     @map("tool_price_spec_name")
+  seoAuditOfferId String?       @map("seo_audit_offer_id")
+  seoAuditTargetOrigin String?  @map("seo_audit_target_origin")
+  seoAuditSourceRunId String?   @map("seo_audit_source_run_id")
   orderType     OrderType       @default(vip) @map("order_type")
   amount        Decimal         @db.Decimal(10, 2)
   paymentMethod PaymentMethod?  @map("payment_method")
@@ -484,13 +523,20 @@ model Order {
   plan          VipPlan?        @relation(fields: [planId], references: [id])
   tool          Tool?           @relation(fields: [toolId], references: [id])
   toolPriceSpec ToolPriceSpec?  @relation(fields: [toolPriceSpecId], references: [id], onDelete: SetNull)
+  seoAuditOffer SeoAuditOffer?  @relation(fields: [seoAuditOfferId], references: [id], onDelete: SetNull)
+  seoAuditSourceRun SeoAuditRun? @relation("SeoAuditUpgradeSourceRun", fields: [seoAuditSourceRunId], references: [id], onDelete: SetNull)
   paymentProof  PaymentProof?
   paymentTransaction PaymentTransaction?
   toolPurchase  ToolPurchase?
+  seoAuditCredit SeoAuditCredit?
+  seoAuditSubscriptionOrder SeoAuditSubscriptionOrder?
+  seoAuditRuns SeoAuditRun[] @relation("SeoAuditFundedRuns")
   refundRecords OrderRefundRecord[]
 
   @@index([userId, orderStatus])
   @@index([toolId, orderStatus])
+  @@index([seoAuditOfferId, orderStatus])
+  @@index([seoAuditSourceRunId])
   @@map("orders")
 }
 
@@ -562,6 +608,208 @@ model ToolPurchase {
 
   @@unique([userId, toolId])
   @@map("tool_purchases")
+}
+
+model SeoAuditOffer {
+  id                  String        @id @default(cuid())
+  code                String        @unique
+  name                String
+  nameEn              String?       @map("name_en")
+  orderType           OrderType?    @map("order_type")
+  regularPrice        Decimal       @map("regular_price") @db.Decimal(10, 2)
+  launchPrice         Decimal?      @map("launch_price") @db.Decimal(10, 2)
+  launchEndsAt        DateTime?     @map("launch_ends_at")
+  launchQuantityLimit Int?          @map("launch_quantity_limit")
+  pageLimit           Int           @map("page_limit")
+  includedRuns        Int?          @map("included_runs")
+  validityDays        Int           @map("validity_days")
+  publicFindingLimit  Int?          @map("public_finding_limit")
+  maxScheduledRuns    Int?          @map("max_scheduled_runs")
+  manualRuns          Int?          @map("manual_runs")
+  status              PlanStatus    @default(active)
+  createdAt           DateTime      @default(now()) @map("created_at")
+  updatedAt           DateTime      @updatedAt @map("updated_at")
+  orders              Order[]
+  runs                SeoAuditRun[]
+  credits             SeoAuditCredit[]
+  subscriptions       SeoAuditSubscription[]
+
+  @@index([status])
+  @@map("seo_audit_offers")
+}
+
+model SeoAuditProject {
+  id               String                 @id @default(cuid())
+  userId           String                 @map("user_id")
+  normalizedOrigin String                 @map("normalized_origin")
+  displayUrl       String?                @map("display_url")
+  createdAt        DateTime               @default(now()) @map("created_at")
+  updatedAt        DateTime               @updatedAt @map("updated_at")
+  user             User                   @relation(fields: [userId], references: [id])
+  runs             SeoAuditRun[]
+  subscriptions    SeoAuditSubscription[]
+
+  @@unique([userId, normalizedOrigin])
+  @@index([normalizedOrigin])
+  @@map("seo_audit_projects")
+}
+
+model SeoAuditRun {
+  id                      String                @id @default(cuid())
+  userId                  String?               @map("user_id")
+  projectId               String?               @map("project_id")
+  offerId                 String?               @map("offer_id")
+  sourceOrderId           String?               @map("source_order_id")
+  creditId                String?               @map("credit_id")
+  subscriptionId          String?               @map("subscription_id")
+  status                  SeoAuditRunStatus     @default(queued)
+  kind                    SeoAuditRunKind
+  targetUrl               String                @map("target_url")
+  normalizedOrigin        String                @map("normalized_origin")
+  requestIpHash           String?               @map("request_ip_hash")
+  requestOriginHash       String?               @map("request_origin_hash")
+  pageLimit               Int                   @map("page_limit")
+  totalTimeoutSeconds     Int                   @map("total_timeout_seconds")
+  publicTokenHash         String?               @unique @map("public_token_hash")
+  publicTokenExpiresAt    DateTime?              @map("public_token_expires_at")
+  leaseTokenHash          String?               @map("lease_token_hash")
+  leaseExpiresAt          DateTime?              @map("lease_expires_at")
+  availableAt             DateTime               @default(now()) @map("available_at")
+  attemptCount            Int                    @default(0) @map("attempt_count")
+  maxAttempts             Int                    @default(3) @map("max_attempts")
+  cancelRequestedAt       DateTime?              @map("cancel_requested_at")
+  startedAt               DateTime?              @map("started_at")
+  completedAt             DateTime?              @map("completed_at")
+  failedAt                DateTime?              @map("failed_at")
+  failureCode             String?                @map("failure_code")
+  failureMessage          String?                @map("failure_message")
+  engineVersion           String?                @map("engine_version")
+  summaryScore            Int?                   @map("summary_score")
+  summaryEvidenceCoverage Float?                 @map("summary_evidence_coverage")
+  summaryPageCount        Int?                   @map("summary_page_count")
+  summaryCriticalCount    Int?                   @map("summary_critical_count")
+  summaryHighCount        Int?                   @map("summary_high_count")
+  summaryMediumCount      Int?                   @map("summary_medium_count")
+  summaryFindings         Json?                  @map("summary_findings")
+  reportJsonKey           String?                @map("report_json_key")
+  reportMarkdownKey       String?                @map("report_markdown_key")
+  reportSha256            String?                @map("report_sha256")
+  createdAt               DateTime               @default(now()) @map("created_at")
+  updatedAt               DateTime               @updatedAt @map("updated_at")
+  user                    User?                  @relation(fields: [userId], references: [id], onDelete: SetNull)
+  project                 SeoAuditProject?       @relation(fields: [projectId], references: [id], onDelete: SetNull)
+  offer                   SeoAuditOffer?         @relation(fields: [offerId], references: [id], onDelete: SetNull)
+  sourceOrder             Order?                 @relation("SeoAuditFundedRuns", fields: [sourceOrderId], references: [id], onDelete: SetNull)
+  upgradeOrders           Order[]                @relation("SeoAuditUpgradeSourceRun")
+  credit                  SeoAuditCredit?        @relation(fields: [creditId], references: [id], onDelete: SetNull)
+  subscription            SeoAuditSubscription?  @relation(fields: [subscriptionId], references: [id], onDelete: SetNull)
+
+  @@index([status, availableAt])
+  @@index([leaseExpiresAt])
+  @@index([userId, createdAt])
+  @@index([projectId, createdAt])
+  @@index([requestIpHash, createdAt])
+  @@index([requestOriginHash, createdAt])
+  @@index([creditId, createdAt])
+  @@index([subscriptionId, createdAt])
+  @@map("seo_audit_runs")
+}
+
+model SeoAuditCredit {
+  id            String          @id @default(cuid())
+  userId        String          @map("user_id")
+  offerId       String          @map("offer_id")
+  orderId       String          @unique @map("order_id")
+  runKind       SeoAuditRunKind @map("run_kind")
+  pageLimit     Int             @map("page_limit")
+  totalRuns     Int             @map("total_runs")
+  remainingRuns Int             @map("remaining_runs")
+  expiresAt     DateTime        @map("expires_at")
+  refundedAt    DateTime?       @map("refunded_at")
+  createdAt     DateTime        @default(now()) @map("created_at")
+  updatedAt     DateTime        @updatedAt @map("updated_at")
+  user          User            @relation(fields: [userId], references: [id])
+  offer         SeoAuditOffer   @relation(fields: [offerId], references: [id])
+  order         Order           @relation(fields: [orderId], references: [id])
+  runs          SeoAuditRun[]
+
+  @@index([userId, expiresAt])
+  @@index([offerId])
+  @@map("seo_audit_credits")
+}
+
+model SeoAuditSubscription {
+  id                  String                     @id @default(cuid())
+  userId              String                     @map("user_id")
+  projectId           String                     @map("project_id")
+  offerId             String                     @map("offer_id")
+  status              SeoAuditSubscriptionStatus @default(active)
+  startsAt            DateTime                   @map("starts_at")
+  expiresAt           DateTime                   @map("expires_at")
+  maxScheduledRuns    Int                        @map("max_scheduled_runs")
+  scheduledRunsUsed   Int                        @default(0) @map("scheduled_runs_used")
+  manualRunsRemaining Int                        @map("manual_runs_remaining")
+  createdAt           DateTime                   @default(now()) @map("created_at")
+  updatedAt           DateTime                   @updatedAt @map("updated_at")
+  user                User                       @relation(fields: [userId], references: [id])
+  project             SeoAuditProject            @relation(fields: [projectId], references: [id])
+  offer               SeoAuditOffer              @relation(fields: [offerId], references: [id])
+  orders              SeoAuditSubscriptionOrder[]
+  schedule            SeoAuditSchedule?
+  runs                SeoAuditRun[]
+
+  @@index([userId, status])
+  @@index([projectId, status])
+  @@index([status, expiresAt])
+  @@map("seo_audit_subscriptions")
+}
+
+model SeoAuditSubscriptionOrder {
+  id              String               @id @default(cuid())
+  subscriptionId  String               @map("subscription_id")
+  orderId         String               @unique @map("order_id")
+  serviceStartsAt DateTime             @map("service_starts_at")
+  serviceEndsAt   DateTime             @map("service_ends_at")
+  createdAt       DateTime             @default(now()) @map("created_at")
+  subscription    SeoAuditSubscription @relation(fields: [subscriptionId], references: [id])
+  order           Order                @relation(fields: [orderId], references: [id])
+
+  @@index([subscriptionId, createdAt])
+  @@map("seo_audit_subscription_orders")
+}
+
+model SeoAuditSchedule {
+  id             String               @id @default(cuid())
+  subscriptionId String               @unique @map("subscription_id")
+  cadence        SeoAuditCadence      @default(weekly)
+  weekday        Int                  @default(1)
+  hour           Int                  @default(9)
+  minute         Int                  @default(0)
+  timeZone       String               @default("Asia/Shanghai") @map("time_zone")
+  enabled        Boolean              @default(true)
+  nextRunAt      DateTime?            @map("next_run_at")
+  lastRunAt      DateTime?            @map("last_run_at")
+  createdAt      DateTime             @default(now()) @map("created_at")
+  updatedAt      DateTime             @updatedAt @map("updated_at")
+  subscription   SeoAuditSubscription @relation(fields: [subscriptionId], references: [id], onDelete: Cascade)
+
+  @@index([enabled, nextRunAt])
+  @@map("seo_audit_schedules")
+}
+
+model SeoAuditWorkerHeartbeat {
+  id            String   @id @default(cuid())
+  workerId      String   @unique @map("worker_id")
+  engineVersion String   @map("engine_version")
+  status        String
+  currentRunId  String?  @map("current_run_id")
+  lastSeenAt    DateTime @default(now()) @map("last_seen_at")
+  metadata      Json?
+  createdAt     DateTime @default(now()) @map("created_at")
+  updatedAt     DateTime @updatedAt @map("updated_at")
+
+  @@index([lastSeenAt])
+  @@map("seo_audit_worker_heartbeats")
 }
 
 model PaymentProof {
