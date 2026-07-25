@@ -294,6 +294,12 @@ export function truncateDescription(value: string, maxLength = 160) {
   return truncateText(value, maxLength);
 }
 
+function trimTrailingTitlePunctuation(value: string) {
+  return value
+    .replace(/[\s|,;:\u2013\u2014\uFF0C\uFF1B\uFF1A-]+$/u, "")
+    .trimEnd();
+}
+
 export function buildMetaDescription(
   value: string | null | undefined,
   fallback = defaultSiteDescription,
@@ -341,7 +347,13 @@ export function buildMetadataTitle({
   if (fullTitle.length <= maxLength) return fullTitle;
 
   const reservedLength = ` | ${normalizedBrand}`.length;
-  return `${truncateText(normalizedPageTitle, Math.max(12, maxLength - reservedLength))} | ${normalizedBrand}`;
+  const truncatedPageTitle = trimTrailingTitlePunctuation(
+    truncateText(
+      normalizedPageTitle,
+      Math.max(12, maxLength - reservedLength),
+    ),
+  );
+  return `${truncatedPageTitle} | ${normalizedBrand}`;
 }
 
 export function buildListingMetadataTitle(
@@ -681,19 +693,22 @@ export function buildToolMetadataTitle({
       : { toolName: primaryName, typeName: "" };
 
   if (locale === "en" && splitTitle.typeName) {
-    const titleWithType = buildMetadataTitle({
-      pageTitle: `${splitTitle.toolName} | ${splitTitle.typeName}`,
-      brand,
-      maxLength: targetMaxLength,
-    });
-    if (titleWithType.length <= targetMaxLength) return titleWithType;
+    const pageTitleWithType = `${splitTitle.toolName} | ${splitTitle.typeName}`;
+    if (`${pageTitleWithType} | ${brand}`.length <= targetMaxLength) {
+      return buildMetadataTitle({
+        pageTitle: pageTitleWithType,
+        brand,
+        maxLength: targetMaxLength,
+      });
+    }
   }
 
+  const primaryTitle = splitTitle.toolName || primaryName;
   const preferredTitle = secondaryName
-    ? `${primaryName} (${secondaryName})`
-    : primaryName;
+    ? `${primaryTitle} (${secondaryName})`
+    : primaryTitle;
   const compactTitle = buildMetadataTitle({
-    pageTitle: primaryName,
+    pageTitle: primaryTitle,
     brand,
     maxLength: targetMaxLength,
   });
@@ -715,7 +730,9 @@ export function buildToolMetadataTitle({
   if (compactTitle.length <= targetMaxLength) return compactTitle;
 
   const reservedLength = ` | ${brand}`.length;
-  return `${truncateText(primaryName, Math.max(12, targetMaxLength - reservedLength))} | ${brand}`;
+  return `${trimTrailingTitlePunctuation(
+    truncateText(primaryTitle, Math.max(12, targetMaxLength - reservedLength)),
+  )} | ${brand}`;
 }
 
 export function buildToolMetaDescription({

@@ -497,6 +497,23 @@ function stripGenericEnglishNewsTitlePrefix(value: string) {
     .trim();
 }
 
+function truncateAiNewsTitleSource(
+  value: string,
+  maxLength: number,
+  locale: "zh" | "en",
+) {
+  if (value.length <= maxLength) return value;
+
+  const candidate = value.slice(0, maxLength).trimEnd();
+  if (locale !== "en") return candidate;
+  if (/\s/.test(value.charAt(candidate.length))) return candidate;
+
+  const lastWordBoundary = candidate.lastIndexOf(" ");
+  return lastWordBoundary > 0
+    ? candidate.slice(0, lastWordBoundary).trimEnd()
+    : candidate;
+}
+
 export function buildAiNewsSerpTitle({
   title,
   categoryName,
@@ -520,8 +537,11 @@ export function buildAiNewsSerpTitle({
   const compactSource =
     source.length + reservedLength <= maxLength
       ? source
-      : source.slice(0, Math.max(12, maxLength - reservedLength - 3)).trimEnd() +
-        "...";
+      : truncateAiNewsTitleSource(
+          source,
+          Math.max(12, maxLength - reservedLength),
+          locale,
+        );
 
   return `${compactSource} ${suffix}`;
 }
