@@ -36,9 +36,11 @@ import { publicPageCacheSeconds } from "@/lib/public-routes";
 import {
   absoluteUrl,
   buildBreadcrumbSchema,
+  buildAvailableLanguageAlternates,
   buildListingMetadataTitle,
   buildListingMetaDescription,
   buildLocalePath,
+  buildMetadataTitle,
   buildPageMetadata,
 } from "@/lib/seo";
 
@@ -129,12 +131,27 @@ export async function generateAiNewsPageMetadata(
   const isFiltered = hasAiNewsFilters(searchParams);
   const canonicalPath =
     page > 1 && !isFiltered ? `/ai-news?page=${page}` : "/ai-news";
+  const pageLabel = forceLocale === "en" ? `Page ${page}` : `第${page}页`;
+  const baseDescription = buildListingMetaDescription("ai-news", forceLocale);
   const metadata = buildPageMetadata({
-    title: buildListingMetadataTitle("ai-news", forceLocale, t.brand),
-    description: buildListingMetaDescription("ai-news", forceLocale),
+    title:
+      page > 1 && !isFiltered
+        ? buildMetadataTitle({
+            pageTitle: `${t.aiNews.title} - ${pageLabel}`,
+            brand: t.brand,
+          })
+        : buildListingMetadataTitle("ai-news", forceLocale, t.brand),
+    description:
+      page > 1 && !isFiltered
+        ? `${pageLabel}: ${baseDescription}`
+        : baseDescription,
     path: canonicalPath,
     locale: forceLocale === "en" ? "en_US" : "zh_CN",
     localeKey: forceLocale,
+    languageAlternates: buildAvailableLanguageAlternates(canonicalPath, [
+      "zh",
+      "en",
+    ]),
   });
 
   return isFiltered

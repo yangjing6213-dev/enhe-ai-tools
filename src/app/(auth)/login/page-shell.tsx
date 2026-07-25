@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import Link from "next/link";
 import { loginAction } from "@/app/actions";
 import { FormSubmitButton } from "@/components/form-submit-button";
@@ -5,7 +6,25 @@ import { PasswordInput } from "@/components/password-input";
 import { Container } from "@/components/ui";
 import { getOrCreateCsrfToken } from "@/lib/csrf";
 import { getCurrentLocale, getDictionary, type Locale } from "@/lib/i18n";
-import { buildLocalePath } from "@/lib/seo";
+import {
+  buildLocalePath,
+  buildMetadataTitle,
+  buildPageMetadata,
+} from "@/lib/seo";
+
+export function generateLoginPageMetadata(forceLocale: Locale): Metadata {
+  const t = getDictionary(forceLocale);
+  const metadata = buildPageMetadata({
+    title: buildMetadataTitle({ pageTitle: t.auth.loginTitle, brand: t.brand }),
+    description: t.auth.loginIntro,
+    path: "/login",
+    locale: forceLocale === "en" ? "en_US" : "zh_CN",
+    localeKey: forceLocale,
+  });
+
+  metadata.robots = { index: false, follow: true };
+  return metadata;
+}
 
 export async function LoginPageShell({
   searchParams,

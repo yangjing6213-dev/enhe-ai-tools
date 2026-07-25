@@ -78,6 +78,16 @@ const englishToolContentOverrides: Record<
   },
 };
 
+const reviewedEnglishIndexableToolSlugs = new Set([
+  "gmail-google",
+  "chatgpt-codex-dalle",
+  "chatgpt-plus-100",
+  "ai-ai-ilo5a5",
+  "ai-monetization-side-hustle-course",
+  "ai-at8nui",
+  "high-frequency-ai-prompts-for-work-learning-and-teaching",
+]);
+
 const cjkPattern = /[\u3400-\u9fff]/;
 const latinWordPattern = /[A-Za-z][A-Za-z0-9'+-]*/g;
 const sentenceBreakPattern = /[。！？!?；;\n]+/;
@@ -722,15 +732,25 @@ export function shouldIndexEnglishToolPage(
     localizedIdentity.primaryName !== defaultLabel ||
     isEnglishLike(englishName, 1);
 
+  const hasReadableLocalizedCopy =
+    isLocalizedEnglishCopy(localizedSummary, 6) &&
+    isLocalizedEnglishCopy(localizedContent, 12);
+
+  if (
+    !hasReadableEnglishName ||
+    !Boolean(englishName) ||
+    !hasReadableLocalizedCopy
+  ) {
+    return false;
+  }
+
+  if (reviewedEnglishIndexableToolSlugs.has(tool.slug)) return true;
+
   return (
-    hasReadableEnglishName &&
-    Boolean(englishName) &&
     (isLocalizedEnglishCopy(sourceSummary, 6) ||
       Boolean(englishOverride) ||
       Boolean(buildEnglishSummaryFromContent(tool.content))) &&
-    isLocalizedEnglishCopy(sourceContent, 12) &&
-    isLocalizedEnglishCopy(localizedSummary, 6) &&
-    isLocalizedEnglishCopy(localizedContent, 12)
+    isLocalizedEnglishCopy(sourceContent, 12)
   );
 }
 

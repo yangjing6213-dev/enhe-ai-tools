@@ -490,6 +490,13 @@ function truncateAiNewsMetaDescription(value: string, maxLength: number) {
   return `${normalized.slice(0, maxLength - 3).trimEnd()}...`;
 }
 
+function stripGenericEnglishNewsTitlePrefix(value: string) {
+  return value
+    .replace(/^how\s+enhe\s+ai\s+helps\s+users\s+understand\s+/i, "")
+    .replace(/^enhe\s+ai\s+helps\s+users\s+understand\s+/i, "")
+    .trim();
+}
+
 export function buildAiNewsSerpTitle({
   title,
   categoryName,
@@ -505,7 +512,11 @@ export function buildAiNewsSerpTitle({
   const normalizedCategory = normalizeAiNewsMetaCandidate(categoryName);
   const suffix = locale === "en" ? "Impact Analysis" : "影响解读";
   const reservedLength = ` ${suffix}`.length;
-  const source = normalizedTitle || normalizedCategory || "AI";
+  const englishTitle =
+    locale === "en"
+      ? stripGenericEnglishNewsTitlePrefix(normalizedTitle)
+      : normalizedTitle;
+  const source = englishTitle || normalizedCategory || "AI";
   const compactSource =
     source.length + reservedLength <= maxLength
       ? source

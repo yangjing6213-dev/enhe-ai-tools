@@ -1,6 +1,13 @@
-import { LoginPageShell } from "@/app/(auth)/login/page-shell";
+import {
+  generateLoginPageMetadata,
+  LoginPageShell,
+} from "@/app/(auth)/login/page-shell";
 
 export const dynamic = "force-dynamic";
+
+export function generateMetadata() {
+  return generateLoginPageMetadata("zh");
+}
 
 export default async function LoginPage({
   searchParams
