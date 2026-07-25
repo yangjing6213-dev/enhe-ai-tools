@@ -16,12 +16,13 @@ const userPage = readFileSync(
   join(root, "src", "app", "admin", "users", "[id]", "page.tsx"),
   "utf8",
 );
-const migrationPath = join(
-  root,
-  "prisma",
-  "migrations",
+const migrationNames = [
   "20260725182500_protect_financial_audit_records",
-  "migration.sql",
+  "20260725182600_validate_financial_audit_restrict_fks",
+  "20260725182700_finalize_financial_audit_restrict_fks",
+] as const;
+const migrationPaths = migrationNames.map((migrationName) =>
+  join(root, "prisma", "migrations", migrationName, "migration.sql"),
 );
 const protectedForeignKeys = [
   "payment_transactions_order_id_fkey",
@@ -67,90 +68,80 @@ describe("financial audit hard-delete protection schema", () => {
     );
   });
 
-  it("validates replacement constraints before the short strong-lock swap transaction", () => {
-    const migration = readFileSync(migrationPath, "utf8");
-    const transactions = transactionBodies(migration);
-    const addConstraintTransaction = transactions.find((transaction) =>
-      transaction.includes("ADD CONSTRAINT"),
-    );
-    const validationTransactions = transactions.filter((transaction) =>
-      transaction.includes("VALIDATE CONSTRAINT"),
-    );
-    const replacementTransaction = transactions.find((transaction) =>
-      transaction.includes("DROP CONSTRAINT"),
-    );
+  it("uses one atomic Prisma migration per install, validation, and finalization phase", () => {
+    const [installMigration, validationMigration, finalizationMigration] =
+      migrationPaths.map((migrationPath) => readFileSync(migrationPath, "utf8"));
 
-    expect(transactions).toHaveLength(9);
-    expect(addConstraintTransaction).toBeDefined();
-    expect(validationTransactions).toHaveLength(5);
-    expect(replacementTransaction).toBeDefined();
+    expect([...migrationNames].sort()).toEqual([...migrationNames]);
+    for (const migration of [
+      installMigration,
+      validationMigration,
+      finalizationMigration,
+    ]) {
+      expect(migration.match(/\bBEGIN;/g)).toHaveLength(1);
+      expect(migration.match(/\bCOMMIT;/g)).toHaveLength(1);
+      expect(transactionBodies(migration)).toHaveLength(1);
+      expect(migration).toContain("SET LOCAL lock_timeout = '5s'");
+    }
 
-    for (const transaction of transactions) {
-      expect(transaction).toContain("SET LOCAL lock_timeout = '5s'");
-      expect(transaction).toMatch(/SET LOCAL statement_timeout = '(?:30s|10min)'/);
-    }
-    for (const transaction of validationTransactions) {
-      expect(transaction).toContain("SET LOCAL statement_timeout = '10min'");
-      expect(transaction.match(/VALIDATE CONSTRAINT/g)).toHaveLength(1);
-      expect(transaction).not.toMatch(/DROP CONSTRAINT|RENAME CONSTRAINT/);
-    }
-    expect(replacementTransaction).toContain("SET LOCAL statement_timeout = '30s'");
-    expect(replacementTransaction).not.toContain("VALIDATE CONSTRAINT");
-    expect(addConstraintTransaction).toContain(
+    expect(installMigration).toContain("SET LOCAL statement_timeout = '30s'");
+    expect(installMigration.match(/SET search_path FROM CURRENT/g)).toHaveLength(3);
+    expect(installMigration).toContain(
       'CREATE TRIGGER "task9_guard_order_evidence_delete"',
     );
-    expect(addConstraintTransaction).toContain(
+    expect(installMigration).toContain(
       'CREATE TRIGGER "task9_guard_user_report_delete"',
     );
-    expect(addConstraintTransaction).toContain(
+    expect(installMigration).toContain(
       'CREATE TRIGGER "task9_guard_tool_order_delete"',
     );
-    expect(replacementTransaction).toContain(
-      'DROP TRIGGER "task9_guard_order_evidence_delete"',
-    );
-    expect(replacementTransaction).toContain(
-      'DROP TRIGGER "task9_guard_user_report_delete"',
-    );
-    expect(replacementTransaction).toContain(
-      'DROP TRIGGER "task9_guard_tool_order_delete"',
-    );
-
-    expect(migration).toMatch(
+    expect(installMigration).toMatch(
       /ALTER TABLE "users"\s+ADD COLUMN "is_test_data" BOOLEAN NOT NULL DEFAULT false/,
     );
-    expect(migration).toMatch(
+    expect(installMigration).toMatch(
       /ALTER TABLE "orders"\s+ADD COLUMN "is_test_data" BOOLEAN NOT NULL DEFAULT false/,
     );
+    expect(installMigration.match(/ON DELETE RESTRICT ON UPDATE CASCADE NOT VALID/g)).toHaveLength(5);
+    expect(installMigration).not.toMatch(
+      /VALIDATE CONSTRAINT|DROP CONSTRAINT|RENAME CONSTRAINT/,
+    );
 
-    const lastValidationIndex = Math.max(
-      ...protectedForeignKeys.map((constraint) =>
-        migration.indexOf(
-          `VALIDATE CONSTRAINT "${temporaryConstraintName(constraint)}"`,
-        ),
-      ),
+    expect(validationMigration).toContain("SET LOCAL statement_timeout = '10min'");
+    expect(validationMigration.match(/VALIDATE CONSTRAINT/g)).toHaveLength(5);
+    expect(validationMigration).not.toMatch(
+      /ADD CONSTRAINT|DROP CONSTRAINT|RENAME CONSTRAINT|CREATE TRIGGER/,
+    );
+
+    expect(finalizationMigration).toContain("SET LOCAL statement_timeout = '30s'");
+    expect(finalizationMigration).not.toContain("VALIDATE CONSTRAINT");
+    expect(finalizationMigration).toContain(
+      'DROP TRIGGER "task9_guard_order_evidence_delete"',
+    );
+    expect(finalizationMigration).toContain(
+      'DROP TRIGGER "task9_guard_user_report_delete"',
+    );
+    expect(finalizationMigration).toContain(
+      'DROP TRIGGER "task9_guard_tool_order_delete"',
     );
     for (const constraint of protectedForeignKeys) {
       const temporaryConstraint = temporaryConstraintName(constraint);
-      const addIndex = migration.indexOf(`ADD CONSTRAINT "${temporaryConstraint}"`);
-      const validateIndex = migration.indexOf(
+      expect(installMigration).toContain(
+        `ADD CONSTRAINT "${temporaryConstraint}"`,
+      );
+      expect(validationMigration).toContain(
         `VALIDATE CONSTRAINT "${temporaryConstraint}"`,
       );
-      const dropIndex = migration.indexOf(`DROP CONSTRAINT "${constraint}"`);
-      const renameIndex = migration.match(
+      expect(finalizationMigration).toContain(`DROP CONSTRAINT "${constraint}"`);
+      expect(finalizationMigration).toMatch(
         new RegExp(
           `RENAME CONSTRAINT "${temporaryConstraint}"\\s+TO "${constraint}"`,
         ),
-      )?.index ?? -1;
-
-      expect(addIndex).toBeGreaterThanOrEqual(0);
-      expect(validateIndex).toBeGreaterThan(addIndex);
-      expect(dropIndex).toBeGreaterThan(lastValidationIndex);
-      expect(renameIndex).toBeGreaterThan(dropIndex);
+      );
     }
 
-    expect(migration.match(/ON DELETE RESTRICT ON UPDATE CASCADE NOT VALID/g)).toHaveLength(5);
-    expect(migration.match(/VALIDATE CONSTRAINT/g)).toHaveLength(5);
-    expect(migration).not.toMatch(/DROP TABLE|DROP COLUMN|TRUNCATE|DELETE FROM|UPDATE\s+"/i);
+    expect(
+      [installMigration, validationMigration, finalizationMigration].join("\n"),
+    ).not.toMatch(/DROP TABLE|DROP COLUMN|TRUNCATE|DELETE FROM|UPDATE\s+"/i);
   });
 
   it("keeps admin hard-delete entrypoints away from protected evidence cleanup", () => {

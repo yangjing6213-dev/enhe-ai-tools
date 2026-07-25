@@ -26,7 +26,19 @@ const describePostgres = databaseUrl ? describe : describe.skip;
 const auditContext = { ip: "127.0.0.1", userAgent: "vitest" };
 const guardTable = "admin_delete_user_guards";
 const root = process.cwd();
-const migrationName = "20260725182500_protect_financial_audit_records";
+const installMigrationName =
+  "20260725182500_protect_financial_audit_records";
+const validationMigrationName =
+  "20260725182600_validate_financial_audit_restrict_fks";
+const finalizationMigrationName =
+  "20260725182700_finalize_financial_audit_restrict_fks";
+const task9MigrationNames = [
+  installMigrationName,
+  validationMigrationName,
+  finalizationMigrationName,
+] as const;
+type Task9MigrationName = (typeof task9MigrationNames)[number];
+const expectedMigrationCount = 39;
 const migrationsRoot = join(root, "prisma", "migrations");
 const prismaCli = join(root, "node_modules", "prisma", "build", "index.js");
 const execFileAsync = promisify(execFile);
@@ -41,6 +53,11 @@ const temporaryGuardTriggers = [
   "task9_guard_order_evidence_delete",
   "task9_guard_user_report_delete",
   "task9_guard_tool_order_delete",
+] as const;
+const temporaryGuardFunctions = [
+  "task9_guard_order_evidence_delete_fn",
+  "task9_guard_user_report_delete_fn",
+  "task9_guard_tool_order_delete_fn",
 ] as const;
 
 describePostgres("PostgreSQL admin hard-delete protection", () => {
@@ -639,8 +656,25 @@ describePostgres("PostgreSQL admin hard-delete protection", () => {
     }
   }, 30_000);
 
+  it("applies all three Task 9 migration phases to the final protected state", async () => {
+    const harness = await createMigrationHarness(db, databaseUrl!);
+
+    try {
+      const evidence = await seedMigrationPaymentEvidence(harness.client, 1);
+      await harness.installTask9Migrations();
+      await runMigrateDeploy(harness.schemaPath, harness.databaseUrl);
+      await expectFinalMigrationState({
+        client: harness.client,
+        schemaName: harness.schemaName,
+        orderId: evidence.orderId,
+      });
+    } finally {
+      await harness.cleanup();
+    }
+  }, 120_000);
+
   it(
-    "keeps validated temporary protection when the final FK swap hits lock_timeout",
+    "resolves and reruns the final phase after its FK swap hits lock_timeout",
     async () => {
       const harness = await createMigrationHarness(db, databaseUrl!);
       const releaseLock = deferred<void>();
@@ -649,7 +683,7 @@ describePostgres("PostgreSQL admin hard-delete protection", () => {
 
       try {
         const evidence = await seedMigrationPaymentEvidence(harness.client, 1);
-        await harness.installCurrentMigration();
+        await harness.installTask9Migrations();
         blocker = harness.client.$transaction(async (tx) => {
           await tx.$queryRawUnsafe(
             'SELECT "id" FROM "payment_transactions" WHERE "id" = $1',
@@ -672,11 +706,23 @@ describePostgres("PostgreSQL admin hard-delete protection", () => {
 
         releaseLock.resolve();
         await blocker;
-        await expectFailedMigrationProtection({
+        await expectIntermediateMigrationProtection({
           client: harness.client,
           schemaName: harness.schemaName,
           orderId: evidence.orderId,
           expectAllValidated: true,
+        });
+
+        await runMigrateResolve(
+          harness.schemaPath,
+          harness.databaseUrl,
+          finalizationMigrationName,
+        );
+        await runMigrateDeploy(harness.schemaPath, harness.databaseUrl);
+        await expectFinalMigrationState({
+          client: harness.client,
+          schemaName: harness.schemaName,
+          orderId: evidence.orderId,
         });
       } finally {
         releaseLock.resolve();
@@ -688,7 +734,7 @@ describePostgres("PostgreSQL admin hard-delete protection", () => {
   );
 
   it(
-    "keeps old and temporary protection when FK validation hits statement_timeout",
+    "resolves and reruns validation after its transaction hits statement_timeout",
     async () => {
       const harness = await createMigrationHarness(db, databaseUrl!);
 
@@ -697,12 +743,13 @@ describePostgres("PostgreSQL admin hard-delete protection", () => {
           harness.client,
           25_000,
         );
-        await harness.installCurrentMigration((migration) =>
-          migration.replaceAll(
-            "SET LOCAL statement_timeout = '10min';",
-            "SET LOCAL statement_timeout = '1ms';",
-          ),
-        );
+        await harness.installTask9Migrations({
+          [validationMigrationName]: (migration) =>
+            migration.replace(
+              "SET LOCAL statement_timeout = '10min';",
+              "SET LOCAL statement_timeout = '1ms';",
+            ),
+        });
 
         const failure = await runMigrateDeployExpectingFailure(
           harness.schemaPath,
@@ -712,11 +759,24 @@ describePostgres("PostgreSQL admin hard-delete protection", () => {
           /statement timeout|57014|current transaction is aborted/i,
         );
         expect(failure.elapsedMs).toBeLessThan(10_000);
-        await expectFailedMigrationProtection({
+        await expectIntermediateMigrationProtection({
           client: harness.client,
           schemaName: harness.schemaName,
           orderId: evidence.orderId,
           expectAllValidated: false,
+        });
+
+        await runMigrateResolve(
+          harness.schemaPath,
+          harness.databaseUrl,
+          validationMigrationName,
+        );
+        await harness.installTask9Migrations();
+        await runMigrateDeploy(harness.schemaPath, harness.databaseUrl);
+        await expectFinalMigrationState({
+          client: harness.client,
+          schemaName: harness.schemaName,
+          orderId: evidence.orderId,
         });
       } finally {
         await harness.cleanup();
@@ -850,7 +910,12 @@ async function createMigrationHarness(
     for (const entry of await readdir(migrationsRoot, {
       withFileTypes: true,
     })) {
-      if (!entry.isDirectory() || entry.name === migrationName) continue;
+      if (
+        !entry.isDirectory() ||
+        task9MigrationNames.includes(entry.name as Task9MigrationName)
+      ) {
+        continue;
+      }
       await cp(
         join(migrationsRoot, entry.name),
         join(tempMigrationsRoot, entry.name),
@@ -870,16 +935,23 @@ async function createMigrationHarness(
       databaseUrl: scopedDatabaseUrl,
       schemaName,
       schemaPath,
-      async installCurrentMigration(
-        transform: (migration: string) => string = (migration) => migration,
+      async installTask9Migrations(
+        transforms: Partial<
+          Record<Task9MigrationName, (migration: string) => string>
+        > = {},
       ) {
-        const target = join(tempMigrationsRoot, migrationName);
-        await mkdir(target, { recursive: true });
-        const migration = await readFile(
-          join(migrationsRoot, migrationName, "migration.sql"),
-          "utf8",
-        );
-        await writeFile(join(target, "migration.sql"), transform(migration));
+        for (const migrationName of task9MigrationNames) {
+          const target = join(tempMigrationsRoot, migrationName);
+          await mkdir(target, { recursive: true });
+          const migration = await readFile(
+            join(migrationsRoot, migrationName, "migration.sql"),
+            "utf8",
+          );
+          await writeFile(
+            join(target, "migration.sql"),
+            transforms[migrationName]?.(migration) ?? migration,
+          );
+        }
       },
       async cleanup() {
         await client?.$disconnect();
@@ -903,6 +975,32 @@ async function runMigrateDeploy(schemaPath: string, scopedDatabaseUrl: string) {
   return execFileAsync(
     process.execPath,
     [prismaCli, "migrate", "deploy", "--schema", schemaPath],
+    {
+      cwd: root,
+      env: { ...process.env, DATABASE_URL: scopedDatabaseUrl },
+      encoding: "utf8",
+      maxBuffer: 10 * 1024 * 1024,
+      timeout: 120_000,
+    },
+  );
+}
+
+async function runMigrateResolve(
+  schemaPath: string,
+  scopedDatabaseUrl: string,
+  migrationName: Task9MigrationName,
+) {
+  return execFileAsync(
+    process.execPath,
+    [
+      prismaCli,
+      "migrate",
+      "resolve",
+      "--rolled-back",
+      migrationName,
+      "--schema",
+      schemaPath,
+    ],
     {
       cwd: root,
       env: { ...process.env, DATABASE_URL: scopedDatabaseUrl },
@@ -980,29 +1078,15 @@ async function seedMigrationPaymentEvidence(
   };
 }
 
-async function expectFailedMigrationProtection(input: {
+async function expectIntermediateMigrationProtection(input: {
   client: PrismaClient;
   schemaName: string;
   orderId: string;
   expectAllValidated: boolean;
 }) {
-  const constraints = await input.client.$queryRawUnsafe<
-    Array<{ conname: string; convalidated: boolean; confdeltype: string }>
-  >(
-    `
-      SELECT constraint_row.conname, constraint_row.convalidated, constraint_row.confdeltype::text
-      FROM pg_constraint AS constraint_row
-      JOIN pg_namespace AS namespace_row
-        ON namespace_row.oid = constraint_row.connamespace
-      WHERE namespace_row.nspname = $1
-        AND constraint_row.conname = ANY($2::text[])
-      ORDER BY constraint_row.conname
-    `,
+  const constraints = await readProtectedConstraints(
+    input.client,
     input.schemaName,
-    [
-      ...protectedForeignKeys,
-      ...protectedForeignKeys.map(temporaryConstraintName),
-    ],
   );
   const constraintsByName = new Map(
     constraints.map((constraint) => [constraint.conname, constraint]),
@@ -1014,19 +1098,149 @@ async function expectFailedMigrationProtection(input: {
     expect(temporary).toMatchObject({ confdeltype: "r" });
     if (input.expectAllValidated) {
       expect(temporary?.convalidated).toBe(true);
+    } else {
+      expect(temporary?.convalidated).toBe(false);
     }
   }
-  if (!input.expectAllValidated) {
+
+  const triggers = await readTemporaryGuardTriggers(
+    input.client,
+    input.schemaName,
+  );
+  expect(triggers.map((trigger) => trigger.tgname)).toEqual(
+    [...temporaryGuardTriggers].sort(),
+  );
+
+  const functions = await readTemporaryGuardFunctions(
+    input.client,
+    input.schemaName,
+  );
+  expect(functions.map((guardFunction) => guardFunction.proname)).toEqual(
+    [...temporaryGuardFunctions].sort(),
+  );
+  for (const guardFunction of functions) {
     expect(
-      protectedForeignKeys.some(
-        (constraint) =>
-          constraintsByName.get(temporaryConstraintName(constraint))
-            ?.convalidated === false,
+      guardFunction.proconfig?.some((setting) =>
+        setting.startsWith("search_path="),
       ),
     ).toBe(true);
   }
 
-  const triggers = await input.client.$queryRawUnsafe<Array<{ tgname: string }>>(
+  await expectEvidenceDeleteBlocked(input.client, input.orderId);
+}
+
+async function expectFinalMigrationState(input: {
+  client: PrismaClient;
+  schemaName: string;
+  orderId: string;
+}) {
+  const constraints = await readProtectedConstraints(
+    input.client,
+    input.schemaName,
+  );
+  const constraintsByName = new Map(
+    constraints.map((constraint) => [constraint.conname, constraint]),
+  );
+
+  for (const constraint of protectedForeignKeys) {
+    expect(constraintsByName.get(constraint)).toMatchObject({
+      convalidated: true,
+      confdeltype: "r",
+    });
+    expect(constraintsByName.has(temporaryConstraintName(constraint))).toBe(
+      false,
+    );
+  }
+  expect(
+    await readTemporaryGuardTriggers(input.client, input.schemaName),
+  ).toEqual([]);
+  expect(
+    await readTemporaryGuardFunctions(input.client, input.schemaName),
+  ).toEqual([]);
+
+  const columns = await input.client.$queryRawUnsafe<
+    Array<{
+      table_name: string;
+      is_nullable: string;
+      column_default: string | null;
+    }>
+  >(
+    `
+      SELECT table_name, is_nullable, column_default
+      FROM information_schema.columns
+      WHERE table_schema = $1
+        AND column_name = 'is_test_data'
+        AND table_name = ANY($2::text[])
+      ORDER BY table_name
+    `,
+    input.schemaName,
+    ["orders", "users"],
+  );
+  expect(columns).toEqual([
+    { table_name: "orders", is_nullable: "NO", column_default: "false" },
+    { table_name: "users", is_nullable: "NO", column_default: "false" },
+  ]);
+
+  const [migrationCount] = await input.client.$queryRawUnsafe<
+    Array<{ count: number }>
+  >(
+    `
+      SELECT COUNT(*)::integer AS count
+      FROM "_prisma_migrations"
+      WHERE finished_at IS NOT NULL AND rolled_back_at IS NULL
+    `,
+  );
+  expect(migrationCount?.count).toBe(expectedMigrationCount);
+
+  const appliedTask9Migrations = await input.client.$queryRawUnsafe<
+    Array<{ migration_name: string }>
+  >(
+    `
+      SELECT migration_name
+      FROM "_prisma_migrations"
+      WHERE migration_name = ANY($1::text[])
+        AND finished_at IS NOT NULL
+        AND rolled_back_at IS NULL
+      ORDER BY migration_name
+    `,
+    [...task9MigrationNames],
+  );
+  expect(appliedTask9Migrations.map((migration) => migration.migration_name)).toEqual(
+    [...task9MigrationNames],
+  );
+
+  await expectEvidenceDeleteBlocked(input.client, input.orderId);
+}
+
+async function readProtectedConstraints(
+  client: PrismaClient,
+  schemaName: string,
+) {
+  return client.$queryRawUnsafe<
+    Array<{ conname: string; convalidated: boolean; confdeltype: string }>
+  >(
+    `
+      SELECT constraint_row.conname, constraint_row.convalidated, constraint_row.confdeltype::text
+      FROM pg_constraint AS constraint_row
+      JOIN pg_namespace AS namespace_row
+        ON namespace_row.oid = constraint_row.connamespace
+      WHERE namespace_row.nspname = $1
+        AND constraint_row.conname = ANY($2::text[])
+      ORDER BY constraint_row.conname
+    `,
+    schemaName,
+    [
+      ...protectedForeignKeys,
+      ...protectedForeignKeys.map(temporaryConstraintName),
+    ],
+  );
+}
+
+async function readTemporaryGuardTriggers(
+  client: PrismaClient,
+  schemaName: string,
+) {
+  return client.$queryRawUnsafe<Array<{ tgname: string }>>(
     `
       SELECT trigger_row.tgname
       FROM pg_trigger AS trigger_row
@@ -1036,28 +1250,50 @@ async function expectFailedMigrationProtection(input: {
         AND trigger_row.tgname = ANY($2::text[])
       ORDER BY trigger_row.tgname
     `,
-    input.schemaName,
+    schemaName,
     [...temporaryGuardTriggers],
   );
-  expect(triggers.map((trigger) => trigger.tgname)).toEqual(
-    [...temporaryGuardTriggers].sort(),
+}
+
+async function readTemporaryGuardFunctions(
+  client: PrismaClient,
+  schemaName: string,
+) {
+  return client.$queryRawUnsafe<
+    Array<{ proname: string; proconfig: string[] | null }>
+  >(
+    `
+      SELECT function_row.proname, function_row.proconfig
+      FROM pg_proc AS function_row
+      JOIN pg_namespace AS namespace_row
+        ON namespace_row.oid = function_row.pronamespace
+      WHERE namespace_row.nspname = $1
+        AND function_row.proname = ANY($2::text[])
+      ORDER BY function_row.proname
+    `,
+    schemaName,
+    [...temporaryGuardFunctions],
   );
+}
+
+async function expectEvidenceDeleteBlocked(
+  client: PrismaClient,
+  orderId: string,
+) {
 
   await expect(
-    input.client.$executeRawUnsafe(
+    client.$executeRawUnsafe(
       'DELETE FROM "orders" WHERE "id" = $1',
-      input.orderId,
+      orderId,
     ),
   ).rejects.toBeDefined();
-  const [orderCount] = await input.client.$queryRawUnsafe<Array<{ count: number }>>(
+  const [orderCount] = await client.$queryRawUnsafe<Array<{ count: number }>>(
     'SELECT COUNT(*)::integer AS count FROM "orders" WHERE "id" = $1',
-    input.orderId,
+    orderId,
   );
-  const [paymentCount] = await input.client.$queryRawUnsafe<
-    Array<{ count: number }>
-  >(
+  const [paymentCount] = await client.$queryRawUnsafe<Array<{ count: number }>>(
     'SELECT COUNT(*)::integer AS count FROM "payment_transactions" WHERE "order_id" = $1',
-    input.orderId,
+    orderId,
   );
   expect(orderCount?.count).toBe(1);
   expect(paymentCount?.count).toBe(1);
