@@ -260,8 +260,10 @@ describe("SEO audit commercial schema contract", () => {
 
   it("locks public tokens, worker leases, retries, complete summaries, and private report keys", () => {
     expectExactPrismaLines("SeoAuditRun", [
-      'publicTokenHash String? @unique @map("public_token_hash")',
-      'leaseTokenHash String? @map("lease_token_hash")',
+      'requestIpHash String? @db.Char(64) @map("request_ip_hash")',
+      'requestOriginHash String? @db.Char(64) @map("request_origin_hash")',
+      'publicTokenHash String? @unique @db.Char(64) @map("public_token_hash")',
+      'leaseTokenHash String? @db.Char(64) @map("lease_token_hash")',
       'leaseExpiresAt DateTime? @map("lease_expires_at")',
       'availableAt DateTime @default(now()) @map("available_at")',
       'attemptCount Int @default(0) @map("attempt_count")',
@@ -273,9 +275,11 @@ describe("SEO audit commercial schema contract", () => {
       'summaryHighCount Int? @map("summary_high_count")',
       'summaryMediumCount Int? @map("summary_medium_count")',
       'summaryFindings Json? @map("summary_findings")',
+      'targetUrl String @map("target_url")',
+      'failureMessage String? @map("failure_message")',
       'reportJsonKey String? @map("report_json_key")',
       'reportMarkdownKey String? @map("report_markdown_key")',
-      'reportSha256 String? @map("report_sha256")',
+      'reportSha256 String? @db.Char(64) @map("report_sha256")',
       "user User? @relation(fields: [userId], references: [id], onDelete: SetNull)",
       "project SeoAuditProject? @relation(fields: [projectId], references: [id], onDelete: SetNull)",
       "offer SeoAuditOffer? @relation(fields: [offerId], references: [id], onDelete: SetNull)",
@@ -295,8 +299,10 @@ describe("SEO audit commercial schema contract", () => {
 
     expect(getSqlTableLines("seo_audit_runs")).toEqual(
       expect.arrayContaining([
-        '"public_token_hash" TEXT',
-        '"lease_token_hash" TEXT',
+        '"request_ip_hash" CHAR(64)',
+        '"request_origin_hash" CHAR(64)',
+        '"public_token_hash" CHAR(64)',
+        '"lease_token_hash" CHAR(64)',
         '"lease_expires_at" TIMESTAMP(3)',
         '"available_at" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP',
         '"attempt_count" INTEGER NOT NULL DEFAULT 0',
@@ -308,9 +314,11 @@ describe("SEO audit commercial schema contract", () => {
         '"summary_high_count" INTEGER',
         '"summary_medium_count" INTEGER',
         '"summary_findings" JSONB',
+        '"target_url" TEXT NOT NULL',
+        '"failure_message" TEXT',
         '"report_json_key" TEXT',
         '"report_markdown_key" TEXT',
-        '"report_sha256" TEXT'
+        '"report_sha256" CHAR(64)'
       ])
     );
   });
@@ -477,13 +485,23 @@ describe("SEO audit commercial schema contract", () => {
     ]);
   });
 
+  it("wraps each migration in exactly one explicit transaction", () => {
+    for (const migration of [orderTypeMigration, commercialMigration]) {
+      const statements = getSqlStatements(migration);
+      expect(statements[0]).toBe("BEGIN");
+      expect(statements.at(-1)).toBe("COMMIT");
+      expect(statements.filter((statement) => statement === "BEGIN")).toHaveLength(1);
+      expect(statements.filter((statement) => statement === "COMMIT")).toHaveLength(1);
+    }
+  });
+
   it("commits the two enum values in the earlier migration and never repeats ADD VALUE", () => {
     expect(
       basename(dirname(orderTypeMigrationPath)).localeCompare(
         basename(dirname(commercialMigrationPath))
       )
     ).toBeLessThan(0);
-    expect(getSqlStatements(orderTypeMigration)).toEqual([
+    expect(getSqlStatements(orderTypeMigration).slice(1, -1)).toEqual([
       'ALTER TYPE "OrderType" ADD VALUE \'seo_audit_credit\'',
       'ALTER TYPE "OrderType" ADD VALUE \'seo_audit_monitoring\''
     ]);

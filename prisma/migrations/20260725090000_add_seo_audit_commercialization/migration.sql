@@ -1,3 +1,5 @@
+BEGIN;
+
 CREATE TYPE "SeoAuditRunStatus" AS ENUM (
   'queued',
   'running',
@@ -137,13 +139,13 @@ CREATE TABLE "seo_audit_runs" (
   "kind" "SeoAuditRunKind" NOT NULL,
   "target_url" TEXT NOT NULL,
   "normalized_origin" TEXT NOT NULL,
-  "request_ip_hash" TEXT,
-  "request_origin_hash" TEXT,
+  "request_ip_hash" CHAR(64),
+  "request_origin_hash" CHAR(64),
   "page_limit" INTEGER NOT NULL,
   "total_timeout_seconds" INTEGER NOT NULL,
-  "public_token_hash" TEXT,
+  "public_token_hash" CHAR(64),
   "public_token_expires_at" TIMESTAMP(3),
-  "lease_token_hash" TEXT,
+  "lease_token_hash" CHAR(64),
   "lease_expires_at" TIMESTAMP(3),
   "available_at" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
   "attempt_count" INTEGER NOT NULL DEFAULT 0,
@@ -164,7 +166,7 @@ CREATE TABLE "seo_audit_runs" (
   "summary_findings" JSONB,
   "report_json_key" TEXT,
   "report_markdown_key" TEXT,
-  "report_sha256" TEXT,
+  "report_sha256" CHAR(64),
   "created_at" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
   "updated_at" TIMESTAMP(3) NOT NULL,
 
@@ -413,3 +415,5 @@ ALTER TABLE "seo_audit_runs"
   ADD CONSTRAINT "seo_audit_runs_subscription_id_fkey"
   FOREIGN KEY ("subscription_id") REFERENCES "seo_audit_subscriptions"("id")
   ON DELETE SET NULL ON UPDATE CASCADE;
+
+COMMIT;
