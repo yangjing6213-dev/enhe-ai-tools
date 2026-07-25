@@ -9,6 +9,22 @@ import {
 } from "@/lib/seo-audit/jobs";
 
 const now = new Date("2026-07-25T08:00:00.000Z");
+const completionSummary = {
+  score: 88,
+  evidenceCoverage: 92,
+  pageCount: 10,
+  criticalCount: 0,
+  highCount: 2,
+  mediumCount: 5,
+  findings: [{ id: "F001", severity: "high" as const, issue: "Issue" }],
+};
+const parsedReport = {
+  fullReport: { meta: { engine_version: "1.4.8" } },
+  markdown: "# Report\n",
+  reportSha256: "a".repeat(64),
+  engineVersion: "1.4.8",
+  summary: completionSummary,
+};
 
 function createJobDb() {
   const tx = {
@@ -241,6 +257,7 @@ describe("SEO audit job state machine", () => {
           runId: "run-1",
           leaseToken: "lease-token-12345678901234567890",
           reportGzipBase64: "bundle",
+          summary: completionSummary,
         },
         { db: db as never, now, storeArtifacts },
       ),
@@ -248,7 +265,7 @@ describe("SEO audit job state machine", () => {
     expect(storeArtifacts).not.toHaveBeenCalled();
   });
 
-  it("uploads first, then completes transactionally, and treats repeated completion as idempotent", async () => {
+  it("locks completion, validates summary before upload, and treats same-token retries as idempotent", async () => {
     const { db, tx } = createJobDb();
     const leaseToken = "lease-token-12345678901234567890";
     const leaseTokenHash = createHash("sha256").update(leaseToken).digest("hex");
@@ -263,39 +280,56 @@ describe("SEO audit job state machine", () => {
       .mockResolvedValueOnce({
         id: "run-1",
         status: "completed",
-        leaseTokenHash: null,
+        leaseTokenHash,
         leaseExpiresAt: null,
         reportSha256: "a".repeat(64),
       });
+    tx.$queryRaw.mockResolvedValueOnce([{ id: "run-1" }]);
+    tx.seoAuditRun.findUnique.mockResolvedValueOnce({
+      id: "run-1",
+      status: "running",
+      leaseTokenHash,
+      leaseExpiresAt: new Date("2026-07-25T08:00:30.000Z"),
+      reportSha256: null,
+    });
     tx.seoAuditRun.updateMany.mockResolvedValueOnce({ count: 1 });
+    const parseReport = vi.fn().mockResolvedValue(parsedReport);
     const storeArtifacts = vi.fn().mockResolvedValue({
       reportJsonKey: `seo-audit/runs/run-1/${"a".repeat(64)}/report.json`,
       reportMarkdownKey: `seo-audit/runs/run-1/${"a".repeat(64)}/report.md`,
       reportSha256: "a".repeat(64),
-      engineVersion: "1.4.4",
-      summary: {
-        score: 88,
-        evidenceCoverage: 92,
-        pageCount: 10,
-        criticalCount: 0,
-        highCount: 2,
-        mediumCount: 5,
-        findings: [{ id: "f-1", severity: "high", issue: "Issue" }],
-      },
+      engineVersion: "1.4.8",
+      summary: completionSummary,
     });
 
     const first = await completeSeoAuditJob(
-      { runId: "run-1", leaseToken, reportGzipBase64: "bundle" },
-      { db: db as never, now, storeArtifacts },
+      {
+        runId: "run-1",
+        leaseToken,
+        reportGzipBase64: "bundle",
+        summary: completionSummary,
+      },
+      { db: db as never, now, parseReport, storeArtifacts },
     );
     const repeated = await completeSeoAuditJob(
-      { runId: "run-1", leaseToken, reportGzipBase64: "bundle" },
-      { db: db as never, now, storeArtifacts },
+      {
+        runId: "run-1",
+        leaseToken,
+        reportGzipBase64: "bundle",
+        summary: completionSummary,
+      },
+      { db: db as never, now, parseReport, storeArtifacts },
     );
 
     expect(first).toEqual({ status: "completed", alreadyCompleted: false });
     expect(repeated).toEqual({ status: "completed", alreadyCompleted: true });
+    expect(parseReport).toHaveBeenCalledTimes(1);
     expect(storeArtifacts).toHaveBeenCalledTimes(1);
+    const completionLockSql = rawSql(tx.$queryRaw.mock.calls[0][0]);
+    expect(completionLockSql.sql).toMatch(/FOR UPDATE/i);
+    expect(parseReport.mock.invocationCallOrder[0]).toBeLessThan(
+      storeArtifacts.mock.invocationCallOrder[0],
+    );
     expect(tx.seoAuditRun.updateMany).toHaveBeenCalledWith({
       where: {
         id: "run-1",
@@ -306,17 +340,66 @@ describe("SEO audit job state machine", () => {
       },
       data: expect.objectContaining({
         status: "completed",
-        leaseTokenHash: null,
+        leaseTokenHash,
         leaseExpiresAt: null,
         completedAt: now,
-        engineVersion: "1.4.4",
+        engineVersion: "1.4.8",
         summaryScore: 88,
         summaryFindings: [
-          { id: "f-1", severity: "high", issue: "Issue" },
+          { id: "F001", severity: "high", issue: "Issue" },
         ],
         reportSha256: "a".repeat(64),
       }),
     });
+  });
+
+  it("rejects a contradictory summary before upload and a wrong token after completion", async () => {
+    const { db } = createJobDb();
+    const leaseToken = "lease-token-12345678901234567890";
+    const leaseTokenHash = createHash("sha256").update(leaseToken).digest("hex");
+    db.seoAuditRun.findUnique
+      .mockResolvedValueOnce({
+        id: "run-1",
+        status: "running",
+        leaseTokenHash,
+        leaseExpiresAt: new Date("2026-07-25T08:00:30.000Z"),
+        reportSha256: null,
+      })
+      .mockResolvedValueOnce({
+        id: "run-1",
+        status: "completed",
+        leaseTokenHash,
+        leaseExpiresAt: null,
+        reportSha256: "a".repeat(64),
+      });
+    const parseReport = vi.fn().mockResolvedValue(parsedReport);
+    const storeArtifacts = vi.fn();
+
+    await expect(
+      completeSeoAuditJob(
+        {
+          runId: "run-1",
+          leaseToken,
+          reportGzipBase64: "bundle",
+          summary: { ...completionSummary, score: 99 },
+        },
+        { db: db as never, now, parseReport, storeArtifacts },
+      ),
+    ).rejects.toMatchObject({ code: "INVALID_REPORT_BUNDLE" });
+    expect(storeArtifacts).not.toHaveBeenCalled();
+
+    await expect(
+      completeSeoAuditJob(
+        {
+          runId: "run-1",
+          leaseToken: "wrong-lease-token-1234567890123456",
+          reportGzipBase64: "bundle",
+          summary: completionSummary,
+        },
+        { db: db as never, now, parseReport, storeArtifacts },
+      ),
+    ).rejects.toMatchObject({ code: "LEASE_INVALID" });
+    expect(parseReport).toHaveBeenCalledTimes(1);
   });
 
   it("fails idempotently and refunds a consumed credit exactly once for a system failure", async () => {
@@ -383,7 +466,7 @@ describe("SEO audit job state machine", () => {
     tx.seoAuditRun.findUnique
       .mockResolvedValueOnce({ id: "queued-run", status: "queued" })
       .mockResolvedValueOnce({ id: "running-run", status: "running" });
-    tx.seoAuditRun.update.mockResolvedValue({ id: "updated" });
+    tx.seoAuditRun.updateMany.mockResolvedValue({ count: 1 });
 
     await expect(
       requestSeoAuditJobCancellation("queued-run", { db: db as never, now }),
@@ -391,5 +474,30 @@ describe("SEO audit job state machine", () => {
     await expect(
       requestSeoAuditJobCancellation("running-run", { db: db as never, now }),
     ).resolves.toEqual({ status: "cancel_requested" });
+    expect(tx.seoAuditRun.updateMany).toHaveBeenNthCalledWith(1, {
+      where: { id: "queued-run", status: "queued" },
+      data: {
+        status: "cancelled",
+        cancelRequestedAt: now,
+        leaseTokenHash: null,
+        leaseExpiresAt: null,
+      },
+    });
+    expect(tx.seoAuditRun.updateMany).toHaveBeenNthCalledWith(2, {
+      where: { id: "running-run", status: "running" },
+      data: { status: "cancel_requested", cancelRequestedAt: now },
+    });
+  });
+
+  it("does not overwrite a run that completes while cancellation waits", async () => {
+    const { db, tx } = createJobDb();
+    tx.seoAuditRun.findUnique
+      .mockResolvedValueOnce({ id: "run-1", status: "running" })
+      .mockResolvedValueOnce({ id: "run-1", status: "completed" });
+    tx.seoAuditRun.updateMany.mockResolvedValueOnce({ count: 0 });
+
+    await expect(
+      requestSeoAuditJobCancellation("run-1", { db: db as never, now }),
+    ).resolves.toEqual({ status: "completed" });
   });
 });

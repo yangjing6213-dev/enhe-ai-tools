@@ -39,6 +39,17 @@ import {
 
 const workerToken = "current-worker-token-1234567890";
 const originalWorkerToken = process.env.AUDIT_WORKER_TOKEN_CURRENT;
+const completionSummary = {
+  score: 65,
+  evidenceCoverage: 80,
+  pageCount: 2,
+  criticalCount: 1,
+  highCount: 0,
+  mediumCount: 1,
+  findings: [
+    { id: "F001", severity: "critical" as const, issue: "Critical issue" },
+  ],
+};
 
 function jsonRequest(path: string, body: unknown, token = workerToken) {
   return new Request(`http://localhost${path}`, {
@@ -188,17 +199,7 @@ describe("internal SEO audit job routes", () => {
     });
   });
 
-  it("rejects worker-provided summary fields and completes from the gzip bundle only", async () => {
-    const invalid = await completePOST(
-      jsonRequest("/api/internal/seo-audit/jobs/run-1/complete", {
-        leaseToken: "lease-token-12345678901234567890",
-        reportGzipBase64: "H4sIAAAAAAAA",
-        summary: { score: 100 },
-      }),
-      routeContext(),
-    );
-    expect(invalid.status).toBe(400);
-
+  it("accepts a strict worker summary while rejecting unknown completion fields", async () => {
     jobMocks.completeSeoAuditJob.mockResolvedValueOnce({
       status: "completed",
       alreadyCompleted: false,
@@ -207,6 +208,7 @@ describe("internal SEO audit job routes", () => {
       jsonRequest("/api/internal/seo-audit/jobs/run-1/complete", {
         leaseToken: "lease-token-12345678901234567890",
         reportGzipBase64: "H4sIAAAAAAAA",
+        summary: completionSummary,
       }),
       routeContext(),
     );
@@ -221,7 +223,20 @@ describe("internal SEO audit job routes", () => {
       runId: "run-1",
       leaseToken: "lease-token-12345678901234567890",
       reportGzipBase64: "H4sIAAAAAAAA",
+      summary: completionSummary,
     });
+
+    const invalid = await completePOST(
+      jsonRequest("/api/internal/seo-audit/jobs/run-1/complete", {
+        leaseToken: "lease-token-12345678901234567890",
+        reportGzipBase64: "H4sIAAAAAAAA",
+        summary: completionSummary,
+        unexpected: true,
+      }),
+      routeContext(),
+    );
+    expect(invalid.status).toBe(400);
+    expect(jobMocks.completeSeoAuditJob).toHaveBeenCalledTimes(1);
   });
 
   it("accepts only stable failure codes and never logs sensitive exception text", async () => {
@@ -266,6 +281,7 @@ describe("internal SEO audit job routes", () => {
       jsonRequest("/api/internal/seo-audit/jobs/run-1/complete", {
         leaseToken: "lease-token-12345678901234567890",
         reportGzipBase64: "H4sIAAAAAAAA",
+        summary: completionSummary,
       }),
       routeContext(),
     );

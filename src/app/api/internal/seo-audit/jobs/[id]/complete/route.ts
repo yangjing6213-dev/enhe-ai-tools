@@ -1,5 +1,8 @@
 import { z } from "zod";
-import { SEO_AUDIT_REPORT_LIMITS } from "@/lib/seo-audit/artifacts";
+import {
+  SEO_AUDIT_REPORT_LIMITS,
+  seoAuditCompletionSummarySchema,
+} from "@/lib/seo-audit/artifacts";
 import { completeSeoAuditJob } from "@/lib/seo-audit/jobs";
 import {
   handleWorkerRouteError,
@@ -20,6 +23,7 @@ const completeSchema = z
       .string()
       .min(4)
       .max(SEO_AUDIT_REPORT_LIMITS.maxBase64Chars),
+    summary: seoAuditCompletionSummarySchema,
   })
   .strict();
 

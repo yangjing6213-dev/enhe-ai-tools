@@ -1,5 +1,6 @@
 import { createHash } from "node:crypto";
 import { gunzip } from "node:zlib";
+import { z } from "zod";
 
 export const SEO_AUDIT_REPORT_LIMITS = {
   maxBase64Chars: 8 * 1024 * 1024,
@@ -9,11 +10,178 @@ export const SEO_AUDIT_REPORT_LIMITS = {
 
 type ReportLimits = Partial<typeof SEO_AUDIT_REPORT_LIMITS>;
 
-type PublicFinding = {
-  id: string;
-  severity: "critical" | "high" | "medium" | "low" | "info";
-  issue: string;
+const severitySchema = z.enum(["critical", "high", "medium", "low", "info"]);
+const findingStatusSchema = z.enum([
+  "verified",
+  "render_required",
+  "external_data_required",
+]);
+const httpUrlSchema = z
+  .string()
+  .min(1)
+  .max(2048)
+  .refine((value) => {
+    try {
+      const url = new URL(value);
+      return url.protocol === "http:" || url.protocol === "https:";
+    } catch {
+      return false;
+    }
+  });
+const nonNegativeIntegerSchema = z.number().int().min(0);
+const boundedText = (max: number) =>
+  z.string().max(max).refine((value) => value.trim().length > 0);
+
+type JsonValue =
+  | null
+  | boolean
+  | number
+  | string
+  | JsonValue[]
+  | { [key: string]: JsonValue };
+
+const jsonValueSchema: z.ZodType<JsonValue> = z.lazy(() =>
+  z.union([
+    z.null(),
+    z.boolean(),
+    z.number().finite(),
+    z.string(),
+    z.array(jsonValueSchema),
+    z.record(jsonValueSchema),
+  ]),
+);
+
+const redirectSchema = z
+  .object({
+    status: z.number().int().min(300).max(399),
+    from: httpUrlSchema,
+    to: httpUrlSchema,
+  })
+  .strict();
+
+const fetchedPageShape = {
+  url: httpUrlSchema,
+  final_url: httpUrlSchema.nullable(),
+  status: z.number().int().min(100).max(599).nullable(),
+  content_type: z.string().max(512).nullable(),
+  elapsed_ms: nonNegativeIntegerSchema.nullable(),
+  redirects: z.array(redirectSchema).max(20),
+  error: z.string().max(20_000).nullable(),
+  truncated: z.boolean(),
+  in_sitemap: z.boolean(),
 };
+
+const nonHtmlPageSchema = z
+  .object({ ...fetchedPageShape, is_html: z.literal(false) })
+  .strict();
+const htmlPageSchema = z
+  .object({
+    ...fetchedPageShape,
+    final_url: httpUrlSchema,
+    status: z.literal(200),
+    content_type: z.enum(["text/html", "application/xhtml+xml"]),
+    error: z.null(),
+    is_html: z.literal(true),
+    title: z.string().max(20_000),
+    title_length: nonNegativeIntegerSchema,
+    meta_description: z.string().max(20_000),
+    meta_description_length: nonNegativeIntegerSchema,
+    canonical: z.union([z.literal(""), httpUrlSchema]),
+    html_lang: z.string().max(64),
+    robots_directive: z.string().max(2048),
+    noindex: z.boolean(),
+    h1_count: nonNegativeIntegerSchema,
+    h1: z.array(z.string().max(20_000)).max(1000),
+    h2_count: nonNegativeIntegerSchema,
+    images_missing_alt_attribute: nonNegativeIntegerSchema,
+    internal_link_count: nonNegativeIntegerSchema,
+    external_link_count: nonNegativeIntegerSchema,
+    hreflang: z
+      .array(
+        z
+          .object({ lang: boundedText(64), url: httpUrlSchema })
+          .strict(),
+      )
+      .max(1000),
+    json_ld_static_count: nonNegativeIntegerSchema,
+    json_ld_static_valid_count: nonNegativeIntegerSchema,
+    json_ld_static_errors: z.array(z.string().max(20_000)).max(1000),
+    word_count: nonNegativeIntegerSchema,
+    author_signal: z.boolean(),
+    parse_error: z.string().max(20_000).nullable(),
+  })
+  .strict();
+const robotsBlockedPageSchema = z
+  .object({
+    url: httpUrlSchema,
+    status: z.null(),
+    error: boundedText(20_000),
+    blocked_by_robots: z.literal(true),
+    is_html: z.literal(false),
+  })
+  .strict();
+const pageSchema = z.union([
+  robotsBlockedPageSchema,
+  htmlPageSchema,
+  nonHtmlPageSchema,
+]);
+
+const strengthSchema = z
+  .object({
+    id: z.string().regex(/^S\d{3,}$/),
+    code: z.string().regex(/^[a-z0-9_]+$/).max(128),
+    category: z.string().regex(/^[a-z0-9_]+$/).max(128),
+    status: z.literal("verified"),
+    title: boundedText(20_000),
+    evidence: jsonValueSchema,
+    value: boundedText(20_000),
+  })
+  .strict();
+const findingSchema = z
+  .object({
+    id: z.string().regex(/^F\d{3,}$/),
+    code: z.string().regex(/^[a-z0-9_]+$/).max(128),
+    category: z.string().regex(/^[a-z0-9_]+$/).max(128),
+    severity: severitySchema,
+    status: findingStatusSchema,
+    issue: boundedText(20_000),
+    evidence: jsonValueSchema,
+    action: boundedText(20_000),
+    verification: boundedText(20_000),
+  })
+  .strict();
+const fullReportSchema = z
+  .object({
+    meta: z
+      .object({ engine_version: z.literal("1.4.8") })
+      .passthrough(),
+    pages: z.array(pageSchema).max(5000),
+    strengths: z.array(strengthSchema).max(5000),
+    findings: z.array(findingSchema).max(10_000),
+  })
+  .passthrough();
+
+const publicFindingSchema = z
+  .object({
+    id: z.string().min(1).max(128),
+    severity: severitySchema,
+    issue: z.string().min(1).max(240),
+  })
+  .strict();
+
+export const seoAuditCompletionSummarySchema = z
+  .object({
+    score: z.number().int().min(0).max(100),
+    evidenceCoverage: z.number().int().min(0).max(100),
+    pageCount: z.number().int().min(0).max(5000),
+    criticalCount: z.number().int().min(0).max(10_000),
+    highCount: z.number().int().min(0).max(10_000),
+    mediumCount: z.number().int().min(0).max(10_000),
+    findings: z.array(publicFindingSchema).max(3),
+  })
+  .strict();
+
+type PublicFinding = z.infer<typeof publicFindingSchema>;
 
 export type SeoAuditDerivedSummary = {
   score: number;
@@ -24,6 +192,10 @@ export type SeoAuditDerivedSummary = {
   mediumCount: number;
   findings: PublicFinding[];
 };
+
+export type SeoAuditCompletionSummary = z.infer<
+  typeof seoAuditCompletionSummarySchema
+>;
 
 export type ParsedSeoAuditReport = {
   fullReport: Record<string, unknown>;
@@ -134,56 +306,8 @@ function gunzipBounded(input: Buffer, maxOutputLength: number) {
   });
 }
 
-function readSeverity(value: unknown): keyof typeof severityOrder {
-  if (
-    value === "critical" ||
-    value === "high" ||
-    value === "medium" ||
-    value === "low" ||
-    value === "info"
-  ) {
-    return value;
-  }
-  throw new SeoAuditArtifactError("INVALID_REPORT_BUNDLE");
-}
-
-function readFullReportFinding(value: unknown) {
-  if (!isRecord(value)) {
-    throw new SeoAuditArtifactError("INVALID_REPORT_BUNDLE");
-  }
-  const id = typeof value.id === "string" ? value.id.trim() : "";
-  const issue = typeof value.issue === "string" ? value.issue.trim() : "";
-  const status = typeof value.status === "string" ? value.status : "";
-  if (!id || id.length > 128 || !issue || issue.length > 20_000 || !status) {
-    throw new SeoAuditArtifactError("INVALID_REPORT_BUNDLE");
-  }
-
-  return {
-    id,
-    issue,
-    status,
-    severity: readSeverity(value.severity),
-  };
-}
-
-function deriveSummary(fullReport: Record<string, unknown>) {
-  if (
-    !Array.isArray(fullReport.pages) ||
-    !Array.isArray(fullReport.findings) ||
-    !Array.isArray(fullReport.strengths) ||
-    !isRecord(fullReport.meta)
-  ) {
-    throw new SeoAuditArtifactError("INVALID_REPORT_BUNDLE");
-  }
-  const engineVersion =
-    typeof fullReport.meta.engine_version === "string"
-      ? fullReport.meta.engine_version.trim()
-      : "";
-  if (!engineVersion || engineVersion.length > 64) {
-    throw new SeoAuditArtifactError("INVALID_REPORT_BUNDLE");
-  }
-
-  const findings = fullReport.findings.map(readFullReportFinding);
+function deriveSummary(fullReport: z.infer<typeof fullReportSchema>) {
+  const findings = fullReport.findings;
   const verifiedFindings = findings.filter(
     (finding) => finding.status === "verified",
   );
@@ -201,8 +325,8 @@ function deriveSummary(fullReport: Record<string, unknown>) {
     ? Math.round((evidenceItems * 100) / evidenceTotal)
     : 0;
   const countSeverity = (severity: PublicFinding["severity"]) =>
-    findings.filter((finding) => finding.severity === severity).length;
-  const publicFindings = findings
+    verifiedFindings.filter((finding) => finding.severity === severity).length;
+  const publicFindings = verifiedFindings
     .map((finding, index) => ({ ...finding, index }))
     .sort(
       (left, right) =>
@@ -217,7 +341,7 @@ function deriveSummary(fullReport: Record<string, unknown>) {
     }));
 
   return {
-    engineVersion,
+    engineVersion: fullReport.meta.engine_version,
     summary: {
       score,
       evidenceCoverage,
@@ -228,6 +352,22 @@ function deriveSummary(fullReport: Record<string, unknown>) {
       findings: publicFindings,
     } satisfies SeoAuditDerivedSummary,
   };
+}
+
+export function assertSeoAuditSummaryMatches(
+  candidate: unknown,
+  derived: SeoAuditDerivedSummary,
+) {
+  const candidateResult = seoAuditCompletionSummarySchema.safeParse(candidate);
+  const derivedResult = seoAuditCompletionSummarySchema.safeParse(derived);
+  if (
+    !candidateResult.success ||
+    !derivedResult.success ||
+    JSON.stringify(candidateResult.data) !== JSON.stringify(derivedResult.data)
+  ) {
+    throw new SeoAuditArtifactError("INVALID_REPORT_BUNDLE");
+  }
+  return candidateResult.data;
 }
 
 export async function parseSeoAuditReportBundle(
@@ -293,9 +433,13 @@ export async function parseSeoAuditReportBundle(
     throw new SeoAuditArtifactError("INVALID_REPORT_BUNDLE");
   }
 
-  const derived = deriveSummary(bundle.json);
+  const reportResult = fullReportSchema.safeParse(bundle.json);
+  if (!reportResult.success) {
+    throw new SeoAuditArtifactError("INVALID_REPORT_BUNDLE");
+  }
+  const derived = deriveSummary(reportResult.data);
   return {
-    fullReport: bundle.json,
+    fullReport: reportResult.data,
     markdown: bundle.markdown,
     reportSha256: createHash("sha256").update(decompressed).digest("hex"),
     engineVersion: derived.engineVersion,
