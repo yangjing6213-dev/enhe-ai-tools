@@ -1,6 +1,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { ArrowUpRight, PlayCircle } from "lucide-react";
+import { ProductDemoMotionCard } from "@/components/product-demo-motion-card";
 import type { Locale } from "@/lib/dictionaries";
 import type { PublicProductDemo } from "@/lib/product-demos";
 import {
@@ -34,7 +35,7 @@ export function ProductDemoCard({ demo, locale, variant = "listing" }: ProductDe
   const demoLabel = locale === "en" ? "Watch demo" : "观看演示";
 
   return (
-    <article className="product-demo-card surface-panel">
+    <ProductDemoMotionCard>
       <Link href={demoHref} className="product-demo-card-media" aria-label={`${demoLabel}: ${localizedTitle}`}>
         {coverImage ? (
           <Image
@@ -81,6 +82,6 @@ export function ProductDemoCard({ demo, locale, variant = "listing" }: ProductDe
           </Link>
         </div>
       </div>
-    </article>
+    </ProductDemoMotionCard>
   );
 }

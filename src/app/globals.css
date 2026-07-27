@@ -3138,6 +3138,15 @@ select option:disabled {
   gap: 16px;
 }
 
+.product-demo-list-item {
+  min-width: 0;
+  min-height: 100%;
+}
+
+.product-demo-list-item > .product-demo-card {
+  height: 100%;
+}
+
 .home-product-demo-grid .product-demo-card {
   min-height: 0;
   border: 1px solid rgba(255, 255, 255, 0.1);
@@ -3182,12 +3191,23 @@ select option:disabled {
   height: 100%;
   object-fit: cover;
   opacity: 0.9;
-  transition: opacity 220ms ease, transform 360ms ease;
+  transition: opacity 220ms ease;
 }
 
-.product-demo-card:hover .product-demo-card-media img {
+.product-demo-card:is(:hover, :focus-within) .product-demo-card-media img {
   opacity: 1;
-  transform: scale(1.035);
+}
+
+@media (hover: hover) and (pointer: fine) and (prefers-reduced-motion: no-preference) {
+  .product-demo-card:is(:hover, :focus-within) .product-demo-card-media img,
+  .product-demo-card:is(:hover, :focus-within) .product-demo-card-placeholder,
+  .product-demo-card:is(:hover, :focus-within) .product-demo-card-play,
+  .product-demo-card:is(:hover, :focus-within) .product-demo-card-body > h3,
+  .product-demo-card:is(:hover, :focus-within) .product-demo-card-body > p,
+  .product-demo-card:is(:hover, :focus-within) .product-demo-card-tags,
+  .product-demo-card:is(:hover, :focus-within) .product-demo-card-actions {
+    will-change: transform;
+  }
 }
 
 .product-demo-card-placeholder {

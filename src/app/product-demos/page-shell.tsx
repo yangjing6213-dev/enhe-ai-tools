@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
-import Link from "next/link";
 import { StructuredData } from "@/components/structured-data";
 import { ProductDemoCard } from "@/components/product-demo-card";
+import { ProductDemoFilterGrid } from "@/components/product-demo-filter-grid";
 import { Container, EmptyState, SectionTitle } from "@/components/ui";
 import type { Locale } from "@/lib/dictionaries";
 import {
@@ -88,6 +88,18 @@ export async function ProductDemoListingPageShell({
       })),
     },
   };
+  const filters = [
+    {
+      value: "all" as const,
+      label: copy.all,
+      href: buildProductDemoListingPath(forceLocale),
+    },
+    ...productDemoCategories.map((category) => ({
+      value: category,
+      label: getProductDemoCategoryLabel(category, forceLocale),
+      href: buildProductDemoListingPath(forceLocale, category),
+    })),
+  ];
 
   return (
     <main>
@@ -95,30 +107,17 @@ export async function ProductDemoListingPageShell({
         <StructuredData data={[breadcrumbSchema, collectionSchema]} />
         <div className="product-demo-page-hero">
           <SectionTitle as="h1" title={copy.title} intro={copy.intro} />
-          <nav className="product-demo-filter-bar" aria-label={forceLocale === "en" ? "Product demo filters" : "产品演示筛选"}>
-            <Link href={buildProductDemoListingPath(forceLocale)} className={activeCategory === "all" ? "is-active" : ""}>
-              {copy.all}
-            </Link>
-            {productDemoCategories.map((category) => (
-              <Link
-                key={category}
-                href={buildProductDemoListingPath(forceLocale, category)}
-                className={activeCategory === category ? "is-active" : ""}
-              >
-                {getProductDemoCategoryLabel(category, forceLocale)}
-              </Link>
-            ))}
-          </nav>
         </div>
-        {demos.length ? (
-          <div className="product-demo-list-grid">
-            {demos.map((demo) => (
-              <ProductDemoCard key={demo.id} demo={demo} locale={forceLocale} />
-            ))}
-          </div>
-        ) : (
-          <EmptyState title={copy.emptyTitle} text={copy.emptyText} />
-        )}
+        <ProductDemoFilterGrid
+          activeCategory={activeCategory}
+          filters={filters}
+          filterAriaLabel={forceLocale === "en" ? "Product demo filters" : "产品演示筛选"}
+          items={demos.map((demo) => ({
+            id: demo.id,
+            content: <ProductDemoCard demo={demo} locale={forceLocale} />,
+          }))}
+          emptyState={<EmptyState title={copy.emptyTitle} text={copy.emptyText} />}
+        />
       </Container>
     </main>
   );
