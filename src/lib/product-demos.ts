@@ -1,5 +1,6 @@
 import { unstable_cache } from "next/cache";
 import type { Prisma, ProductDemoCategory } from "@prisma/client";
+import { enheOrganizationReference } from "@/lib/brand-entity";
 import { prisma } from "@/lib/db";
 import type { Locale } from "@/lib/dictionaries";
 import { normalizeImageSrc } from "@/lib/media";
@@ -334,11 +335,7 @@ export function buildProductDemoVideoObjectSchema(demo: PublicProductDemo, local
     uploadDate: getProductDemoSchemaUploadDate(demo),
     ...(demo.videoDuration ? { duration: demo.videoDuration } : {}),
     ...(contentUrl ? { contentUrl: absoluteUrl(contentUrl) } : {}),
-    publisher: {
-      "@type": "Organization",
-      name: "恩禾ENHE AI",
-      url: absoluteUrl("/"),
-    },
+    publisher: enheOrganizationReference,
     url: absoluteUrl(demoPath),
     inLanguage: locale === "en" ? "en-US" : "zh-CN",
   };

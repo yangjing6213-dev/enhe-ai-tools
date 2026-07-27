@@ -76,19 +76,14 @@ describe("sitemap canonical URL contract", () => {
     expect(urls).toContain("https://www.enhe-tech.com.cn/software");
     expect(urls).toContain("https://www.enhe-tech.com.cn/account-services");
     expect(urls).toContain("https://www.enhe-tech.com.cn/skill-learning");
-    expect(urls).toContain("https://www.enhe-tech.com.cn/product-demos");
-    expect(urls).toContain("https://www.enhe-tech.com.cn/product-paths/work-efficiency");
-    expect(urls).toContain("https://www.enhe-tech.com.cn/product-paths/media-generation");
-    expect(urls).toContain("https://www.enhe-tech.com.cn/product-paths/future-ai");
-    expect(urls).toContain("https://www.enhe-tech.com.cn/en/product-paths/work-efficiency");
-    expect(urls).toContain("https://www.enhe-tech.com.cn/en/product-paths/media-generation");
-    expect(urls).toContain("https://www.enhe-tech.com.cn/en/product-paths/future-ai");
+    expect(urls).toContain("https://www.enhe-tech.com.cn/skill-learning/ai-prompt-management");
+    expect(urls).toContain("https://www.enhe-tech.com.cn/en/skill-learning/ai-prompt-management");
     expect(urls).toContain("https://www.enhe-tech.com.cn/software/ai-voice-generator-flexible-edition");
     expect(urls).toContain("https://www.enhe-tech.com.cn/account-services/chatgpt-support");
     expect(urls).toContain("https://www.enhe-tech.com.cn/skill-learning/prompt-course");
     expect(urls).toContain("https://www.enhe-tech.com.cn/ai-news/ai-agents-reshape-daily-workflows");
 
-    for (const forbidden of ["/admin", "/dashboard", "/user-center", "/login", "/register", "/checkout", "/orders", "/payment", "/api", "/online-tools", "/tools/"]) {
+    for (const forbidden of ["/admin", "/dashboard", "/user-center", "/login", "/register", "/checkout", "/orders", "/payment", "/api", "/online-tools", "/tools/", "/product-demos", "/product-paths/"]) {
       expect(urls.some((url) => url.includes(forbidden)), forbidden).toBe(false);
     }
 
@@ -255,24 +250,25 @@ describe("sitemap canonical URL contract", () => {
     expect(byUrl.get("https://www.enhe-tech.com.cn/ai-news/agent-news")?.lastModified).toBe(newsUpdatedAt);
   });
 
-  it("includes only published product demo pages from the product demo query", async () => {
-    const demoUpdatedAt = new Date("2026-07-01T03:04:05.000Z");
+  it("includes stable Chinese and English AI news pagination URLs", async () => {
     prismaMock.tool.findMany.mockResolvedValue([]);
-    prismaMock.newsArticle.findMany.mockResolvedValue([]);
-    prismaMock.productDemo.findMany.mockResolvedValue([
-      {
-        slug: "ai-voice-demo",
-        updatedAt: demoUpdatedAt
-      }
-    ]);
+    prismaMock.newsArticle.findMany.mockResolvedValue(
+      Array.from({ length: 10 }, (_, index) => ({
+        slug: `news-${index + 1}`,
+        title: `AI workflow update ${index + 1}`,
+        englishTitle: `AI workflow update ${index + 1}`,
+        englishSummary: "A useful English summary for AI workflow readers.",
+        englishContent: "This article explains AI workflow changes and practical next steps for users. ".repeat(4),
+        updatedAt: new Date(`2026-06-${String(index + 1).padStart(2, "0")}T01:02:03.000Z`),
+      })),
+    );
 
     const { default: sitemap } = await import("@/app/sitemap");
     const entries = await sitemap();
-    const byUrl = new Map(entries.map((entry) => [entry.url, entry]));
+    const urls = entries.map((entry) => entry.url);
 
-    expect(byUrl.get("https://www.enhe-tech.com.cn/product-demos/ai-voice-demo")?.lastModified).toBe(demoUpdatedAt);
-    expect(byUrl.get("https://www.enhe-tech.com.cn/en/product-demos/ai-voice-demo")?.alternates?.languages?.["zh-CN"]).toBe(
-      "https://www.enhe-tech.com.cn/product-demos/ai-voice-demo",
-    );
+    expect(urls).toContain("https://www.enhe-tech.com.cn/ai-news/page/2");
+    expect(urls).toContain("https://www.enhe-tech.com.cn/en/ai-news/page/2");
+    expect(urls.some((url) => url.includes("/ai-news?page="))).toBe(false);
   });
 });

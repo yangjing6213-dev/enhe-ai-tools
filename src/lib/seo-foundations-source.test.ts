@@ -42,6 +42,7 @@ describe("SEO foundations source contract", () => {
 
   it("adds site-wide and detail-page JSON-LD contracts", () => {
     const publicChrome = read("src/components/public-site-chrome.tsx");
+    const brandEntity = read("src/lib/brand-entity.ts");
     const toolDetail = read("src/app/tools/[slug]/page-shell.tsx");
     const software = read("src/app/software/page-shell.tsx");
     const tutorials = read("src/app/tutorials/page-shell.tsx");
@@ -52,7 +53,7 @@ describe("SEO foundations source contract", () => {
     expect(publicChrome).toContain("Organization");
     expect(publicChrome).toContain("SearchAction");
     expect(publicChrome).toContain("buildLocalePath");
-    expect(publicChrome).toContain("sameAs");
+    expect(brandEntity).toContain("sameAs");
     expect(publicChrome).toContain("contactPoint");
 
     expect(software).toContain("BreadcrumbList");

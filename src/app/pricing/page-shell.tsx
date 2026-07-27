@@ -5,6 +5,7 @@ import { StructuredData } from "@/components/structured-data";
 import { Container, SectionTitle } from "@/components/ui";
 import { getDictionary, type Locale } from "@/lib/dictionaries";
 import { getPricingOfferItems } from "@/lib/pricing-offers";
+import { enheOrganizationReference } from "@/lib/brand-entity";
 import { publicPageCacheSeconds } from "@/lib/public-routes";
 import {
   absoluteUrl,
@@ -37,7 +38,7 @@ function formatPrice(price: number) {
   return price.toFixed(2);
 }
 
-function buildPricingOfferCatalogSchema(forceLocale: Locale) {
+export function buildPricingOfferCatalogSchema(forceLocale: Locale) {
   const isEnglish = forceLocale === "en";
   const pricingUrl = absoluteUrl(forceLocale === "en" ? "/en/pricing" : "/pricing");
   const pricingOfferItemsForLocale = getPricingOfferItems(forceLocale);
@@ -49,11 +50,7 @@ function buildPricingOfferCatalogSchema(forceLocale: Locale) {
     description: buildListingMetaDescription("pricing", forceLocale),
     url: pricingUrl,
     inLanguage: isEnglish ? "en-US" : "zh-CN",
-    provider: {
-      "@type": "Organization",
-      name: "ENHE AI",
-      url: absoluteUrl("/"),
-    },
+    provider: enheOrganizationReference,
     itemListElement: pricingOfferItemsForLocale.map((item, index) => ({
       "@type": "Offer",
       position: index + 1,

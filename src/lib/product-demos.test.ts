@@ -11,6 +11,7 @@ import {
   getProductDemoVideoUrl,
   type PublicProductDemo,
 } from "@/lib/product-demos";
+import { enheOrganizationReference } from "@/lib/brand-entity";
 
 function makeDemo(overrides: Partial<PublicProductDemo> = {}) {
   return {
@@ -71,6 +72,7 @@ describe("product demo localization and schema helpers", () => {
       "@type": "VideoObject",
       uploadDate: "2026-06-01T10:20:00.000Z",
       inLanguage: "en-US",
+      publisher: enheOrganizationReference,
     });
   });
 

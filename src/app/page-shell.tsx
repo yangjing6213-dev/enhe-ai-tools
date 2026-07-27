@@ -23,6 +23,7 @@ import { ProductDemoCard } from "@/components/product-demo-card";
 import { ButtonLink, Container } from "@/components/ui";
 import { getDictionary, type Locale } from "@/lib/dictionaries";
 import { getHomeProductDemos } from "@/lib/product-demos";
+import { enheOrganizationReference } from "@/lib/brand-entity";
 import {
   buildBreadcrumbSchema,
   buildFaqSchema,
@@ -392,11 +393,7 @@ export async function HomePageShell({ forceLocale }: { forceLocale: Locale }) {
       "@type": "WebSite",
       "@id": absoluteUrl("/#website"),
     },
-    mainEntity: {
-      "@type": "Organization",
-      "@id": absoluteUrl("/#organization"),
-      name: "ENHE AI",
-    },
+    mainEntity: enheOrganizationReference,
     breadcrumb: { "@id": breadcrumbId },
     hasPart: { "@id": taskCollectionId },
   };

@@ -4,6 +4,8 @@ import {
   buildHomeMetadataTitle,
   buildListingMetadataTitle,
   buildListingMetaDescription,
+  buildOrganizationSchema,
+  getRevenuePageSeoTitle,
   buildMetaDescription,
   buildMetadataTitle,
   buildPageMetadata,
@@ -146,10 +148,66 @@ describe("seo helpers", () => {
   });
 
   it("builds homepage titles as brand plus business scope", () => {
-    expect(buildHomeMetadataTitle("en", "ENHE AI")).toBe("ENHE AI | Real Tasks, Safer AI Workflows");
-    expect(buildHomeMetadataTitle("zh", "恩禾 ENHE AI")).toBe(
-      "恩禾 ENHE AI | 让 AI 真正为每个人所用，把复杂变简单，把效率变价值。",
+    expect(buildHomeMetadataTitle("en", "ENHE AI")).toBe(
+      "ENHE AI | AI Tools, News, Account Services & Courses",
     );
+    expect(buildHomeMetadataTitle("zh", "恩禾 ENHE AI")).toBe(
+      "恩禾 ENHE AI | AI工具、AI资讯、账号服务与技能课程",
+    );
+
+    const chineseDescription = buildHomeMetaDescription("zh");
+    const englishDescription = buildHomeMetaDescription("en");
+    expect(chineseDescription).toContain("真实任务");
+    expect(chineseDescription).toContain("AI 工具");
+    expect(chineseDescription.length).toBeLessThanOrEqual(150);
+    expect(englishDescription).toContain("real tasks");
+    expect(englishDescription).toContain("AI");
+    expect(englishDescription.length).toBeLessThanOrEqual(155);
+    expect(
+      buildHomeMetaDescription(
+        "en",
+        "Live in symbiosis with artificial intelligence, awaken in this era, and define a more productive future through thoughtful creation and collaboration.",
+      ),
+    ).toContain("real tasks");
+  });
+
+  it("assigns one explicit primary search title to verified revenue pages", () => {
+    expect(
+      getRevenuePageSeoTitle("infinitetalk-ai", "zh"),
+    ).toBe("InfiniteTalk AI数字人口播");
+    expect(
+      getRevenuePageSeoTitle("ai-prompt-management", "zh"),
+    ).toBe("AI提示词管理教程");
+    expect(
+      getRevenuePageSeoTitle(
+        "ai-prompt-management-system-418-bilingual-prompts-for-writing-seo-and-ai-creation",
+        "zh",
+      ),
+    ).toBe("418双语提示词 AI提示词管理工具");
+    const mappedTitle = buildToolMetadataTitle({
+      name: getRevenuePageSeoTitle("infinitetalk-ai", "zh") ?? "",
+      brand: "恩禾 ENHE AI",
+      locale: "zh",
+      maxLength: 38,
+    });
+    expect(mappedTitle.length).toBeLessThanOrEqual(38);
+    expect(mappedTitle).toContain("InfiniteTalk");
+    expect(mappedTitle).toContain("AI数字人口播");
+    expect(getRevenuePageSeoTitle("unknown-product", "zh")).toBeUndefined();
+  });
+
+  it("uses one stable ENHE AI organization entity and rejects internal sameAs URLs", () => {
+    const schema = buildOrganizationSchema({
+      name: "ENHE AI",
+      sameAs: [
+        "https://www.enhe-tech.com.cn/about",
+        "https://example.com/enhe-ai",
+      ],
+    });
+
+    expect(schema["@id"]).toBe("https://www.enhe-tech.com.cn/#organization");
+    expect(schema.name).toBe("ENHE AI");
+    expect(schema.sameAs).toEqual(["https://example.com/enhe-ai"]);
   });
 
   it("builds stronger meta descriptions for core public pages", () => {

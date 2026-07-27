@@ -6,6 +6,7 @@ import { AiNewsInteractions } from "@/components/ai-news-interactions";
 import { StructuredData } from "@/components/structured-data";
 import { Badge, ButtonLink, Container, SectionTitle } from "@/components/ui";
 import { ToolCard } from "@/components/tool-card";
+import { enheOrganizationReference } from "@/lib/brand-entity";
 import {
   buildAiNewsRelatedKeywords,
   buildAiNewsDescriptionFallback,
@@ -50,7 +51,6 @@ import {
   buildAvailableLanguageAlternates,
   buildLocalePath,
   buildMetadataTitle,
-  buildOrganizationSchema,
   buildPageMetadata,
   siteName,
 } from "@/lib/seo";
@@ -90,16 +90,21 @@ export async function generateAiNewsDetailPageMetadata(
 
   const localized = localizeArticle(article, forceLocale);
   const hasIndexableEnglishPage = isEnglishNewsArticleIndexable(article);
+  const metadataTitleMaxLength = forceLocale === "en" ? 58 : 38;
+  const metadataPageTitleMaxLength = Math.max(
+    12,
+    metadataTitleMaxLength - ` | ${t.brand}`.length,
+  );
   const metadata = buildPageMetadata({
     title: buildMetadataTitle({
       pageTitle: buildAiNewsSerpTitle({
         title: localized.title,
         categoryName: article.category?.name,
         locale: forceLocale,
-        maxLength: forceLocale === "en" ? 58 : 60,
+        maxLength: metadataPageTitleMaxLength,
       }),
       brand: t.brand,
-      maxLength: forceLocale === "en" ? 58 : 60,
+      maxLength: metadataTitleMaxLength,
     }),
     description: localized.description,
     path: `/ai-news/${canonicalSlug}`,
@@ -176,18 +181,13 @@ export async function AiNewsDetailPageShell({
     forceLocale,
     coverImage,
   );
-  const organizationSchema = buildOrganizationSchema({
-    name: t.brand,
-    logo: "/images/brand/enhe-icon-gradient-white-bg-cropped.png",
-    url: absoluteUrl(buildLocalePath("/", forceLocale)),
-  });
   const articleFaqItems = buildAiNewsFaqItems(localized, forceLocale);
   const faqSchema = buildFaqSchema({ items: articleFaqItems });
 
   return (
     <Container className="py-14">
       <StructuredData
-        data={[breadcrumbSchema, organizationSchema, newsArticleSchema, faqSchema]}
+        data={[breadcrumbSchema, newsArticleSchema, faqSchema]}
       />
       <main>
         <article>
@@ -306,7 +306,16 @@ export async function AiNewsDetailPageShell({
                 <SectionTitle title={t.aiNews.relatedTools} />
                 <div className="grid gap-5 md:grid-cols-3">
                   {relatedTools.map((tool) => (
-                    <ToolCard key={tool.id} tool={tool} locale={forceLocale} />
+                    <div
+                      key={tool.id}
+                      className="contents"
+                      data-analytics-event="content_to_product_click"
+                      data-analytics-entity-type="tool"
+                      data-analytics-entity-id={tool.id}
+                      data-analytics-meta-source="ai-news"
+                    >
+                      <ToolCard tool={tool} locale={forceLocale} />
+                    </div>
                   ))}
                 </div>
               </section>
@@ -1017,10 +1026,7 @@ function buildNewsArticleSchema(
       "@type": "Person",
       name: article.author || siteName,
     },
-    publisher: {
-      "@type": "Organization",
-      name: siteName,
-    },
+    publisher: enheOrganizationReference,
     ...(coverImage ? { image: [absoluteUrl(coverImage)] } : {}),
     keywords:
       buildLocalizedNewsKeywordList(

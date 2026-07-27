@@ -1,20 +1,82 @@
 import { NextResponse } from "next/server";
 import { z } from "zod";
 import { getCurrentUser } from "@/lib/auth";
-import { isAnalyticsEventName, isMissingAnalyticsStorageError, toPrismaJson } from "@/lib/analytics";
+import { isClientAnalyticsEventName, isMissingAnalyticsStorageError, toPrismaJson } from "@/lib/analytics";
+import {
+  analyticsClientStringLimits,
+  analyticsTrafficMediumValues,
+  normalizeAnalyticsPath,
+  toSafeAnalyticsHostname,
+  toSafeAnalyticsReferrerOrigin
+} from "@/lib/analytics-client-payload";
 import { prisma } from "@/lib/db";
+
+const boundedString = (max: number) => z.string().trim().min(1).max(max);
+const referrerSchema = z.string().trim().transform(toSafeAnalyticsReferrerOrigin).pipe(boundedString(analyticsClientStringLimits.referrer));
+const hostnameSchema = z.string().trim().transform(toSafeAnalyticsHostname).pipe(boundedString(analyticsClientStringLimits.referrerHost));
+const pathSchema = (max: number) => z.string().trim().transform((value) => normalizeAnalyticsPath(value, max)).pipe(boundedString(max));
+const trafficMediumSchema = z.enum(analyticsTrafficMediumValues);
+
+const attributionMetadataSchema = z.object({
+  sessionId: boundedString(analyticsClientStringLimits.sessionId),
+  landingId: boundedString(analyticsClientStringLimits.landingId),
+  firstLandingPath: pathSchema(analyticsClientStringLimits.firstLandingPath),
+  landingPath: pathSchema(analyticsClientStringLimits.landingPath),
+  contentType: boundedString(analyticsClientStringLimits.contentType),
+  source: boundedString(analyticsClientStringLimits.source),
+  trafficMedium: trafficMediumSchema,
+  searchEngine: boundedString(analyticsClientStringLimits.searchEngine).optional(),
+  searchQuery: boundedString(analyticsClientStringLimits.searchQuery).optional(),
+  referrer: referrerSchema.optional(),
+  referrerHost: hostnameSchema.optional(),
+  utmSource: boundedString(analyticsClientStringLimits.utmSource).optional(),
+  utmMedium: boundedString(analyticsClientStringLimits.utmMedium).optional(),
+  utmCampaign: boundedString(analyticsClientStringLimits.utmCampaign).optional(),
+  locale: z.enum(["zh", "en"]),
+  createdAt: z.number().int().nonnegative(),
+  lastSeenAt: z.number().int().nonnegative(),
+  attributionVersion: z.literal(2)
+}).strict().refine((attribution) => attribution.createdAt <= attribution.lastSeenAt, {
+  path: ["lastSeenAt"]
+});
+
+const analyticsMetadataSchema = z.object({
+  sessionId: boundedString(analyticsClientStringLimits.sessionId).optional(),
+  landingId: boundedString(analyticsClientStringLimits.landingId).optional(),
+  firstLandingPath: pathSchema(analyticsClientStringLimits.firstLandingPath).optional(),
+  landingPath: pathSchema(analyticsClientStringLimits.landingPath).optional(),
+  contentType: boundedString(analyticsClientStringLimits.contentType).optional(),
+  source: boundedString(analyticsClientStringLimits.source).optional(),
+  trafficMedium: trafficMediumSchema.optional(),
+  searchEngine: boundedString(analyticsClientStringLimits.searchEngine).optional(),
+  searchQuery: boundedString(analyticsClientStringLimits.searchQuery).optional(),
+  referrer: referrerSchema.optional(),
+  referrerHost: hostnameSchema.optional(),
+  utmSource: boundedString(analyticsClientStringLimits.utmSource).optional(),
+  utmMedium: boundedString(analyticsClientStringLimits.utmMedium).optional(),
+  utmCampaign: boundedString(analyticsClientStringLimits.utmCampaign).optional(),
+  locale: z.enum(["zh", "en"]).optional(),
+  query: boundedString(analyticsClientStringLimits.query).optional(),
+  category: boundedString(analyticsClientStringLimits.category).optional(),
+  tag: boundedString(analyticsClientStringLimits.tag).optional(),
+  sort: boundedString(analyticsClientStringLimits.sort).optional(),
+  target: boundedString(analyticsClientStringLimits.target).optional(),
+  placement: boundedString(analyticsClientStringLimits.placement).optional(),
+  surface: boundedString(analyticsClientStringLimits.surface).optional(),
+  attribution: attributionMetadataSchema.optional()
+}).strict();
 
 const analyticsPayloadSchema = z.object({
   eventName: z.string(),
-  path: z.string().max(300).optional().nullable(),
-  entityType: z.string().max(80).optional().nullable(),
-  entityId: z.string().max(120).optional().nullable(),
-  metadata: z.record(z.unknown()).optional().nullable()
-});
+  path: pathSchema(analyticsClientStringLimits.path).optional().nullable(),
+  entityType: boundedString(analyticsClientStringLimits.entityType).optional().nullable(),
+  entityId: boundedString(analyticsClientStringLimits.entityId).optional().nullable(),
+  metadata: analyticsMetadataSchema.optional().nullable()
+}).strict();
 
 export async function POST(request: Request) {
   const payload = analyticsPayloadSchema.safeParse(await request.json().catch(() => null));
-  if (!payload.success || !isAnalyticsEventName(payload.data.eventName)) {
+  if (!payload.success || !isClientAnalyticsEventName(payload.data.eventName)) {
     return NextResponse.json({ ok: false }, { status: 400 });
   }
 

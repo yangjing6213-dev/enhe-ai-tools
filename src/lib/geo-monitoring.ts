@@ -2,6 +2,11 @@ export type GeoPlatformRegion = "global" | "china";
 export type GeoProviderMode = "api" | "manual_browser" | "search_console" | "bing_webmaster";
 export type GeoQueryIntent = "recommendation" | "deployment" | "compliance" | "tutorial" | "comparison" | "trend";
 export type GeoRecommendationType = "faq" | "comparison_table" | "source_citation" | "answer_block" | "okf_concept";
+export type GeoCollectionStatus = "collected" | "uncollected" | "unavailable";
+export type GeoVisibilityStatus = "cited" | "mentioned" | "absent" | "uncollected" | "unavailable";
+export type GeoEvidenceStatus = "no_records" | "insufficient" | "sufficient";
+
+export const GEO_MINIMUM_VALID_SAMPLE_SIZE = 3;
 
 export type GeoMonitoringQuery = {
   id: string;
@@ -25,9 +30,13 @@ export type GeoMonitoringProvider = {
 export type GeoVisibilityResultInput = {
   query: string;
   providerId: string;
+  collectionStatus?: GeoCollectionStatus;
   isBrandMentioned: boolean;
   isDomainCited: boolean;
   citedUrls: string[];
+  answerSummary?: string | null;
+  screenshotUrl?: string | null;
+  checkedAt?: Date | string | number | null;
   competitors: string[];
 };
 
@@ -47,9 +56,24 @@ export type GeoMonitoringReport = {
     totalProviders: number;
     globalProviders: number;
     chinaProviders: number;
+    eligibleProviders: number;
+    targetSampleCount: number;
+    validSampleCount: number;
+    excludedResults: number;
     reviewedResults: number;
-    brandMentionRate: number;
-    domainCitationRate: number;
+    recordedResults: number;
+    citedResults: number;
+    mentionedResults: number;
+    absentResults: number;
+    uncollectedResults: number;
+    unavailableResults: number;
+    brandMentionRate: number | null;
+    domainCitationRate: number | null;
+    targetCoverageRate: number | null;
+    hasSufficientSample: boolean;
+    evidenceStatus: GeoEvidenceStatus;
+    firstCheckedAt: string | null;
+    lastCheckedAt: string | null;
     openGaps: number;
   };
   queries: GeoMonitoringQuery[];
@@ -336,7 +360,7 @@ export const GEO_MONITORING_PROVIDERS: GeoMonitoringProvider[] = [
     name: "Google AI Overview",
     region: "global",
     mode: "manual_browser",
-    description: "Use manual browser review plus Google Search Console signals for AI Overview visibility.",
+    description: "Record manual AI Overview answer evidence only; keep Search Console performance separate.",
     officialUrl: "https://www.google.com/search"
   },
   {
@@ -360,7 +384,7 @@ export const GEO_MONITORING_PROVIDERS: GeoMonitoringProvider[] = [
     name: "Bing / Copilot",
     region: "global",
     mode: "bing_webmaster",
-    description: "Combine Bing Webmaster data with Copilot answer checks.",
+    description: "Bing Webmaster search performance only; excluded from Copilot AI mention and citation metrics.",
     officialUrl: "https://www.bing.com"
   },
   {
@@ -376,7 +400,7 @@ export const GEO_MONITORING_PROVIDERS: GeoMonitoringProvider[] = [
     name: "Google Search Console",
     region: "global",
     mode: "search_console",
-    description: "Official Google performance data for indexed pages, queries, CTR, and coverage.",
+    description: "Google search performance data only; excluded from AI mention and citation metrics.",
     officialUrl: "https://search.google.com/search-console"
   },
   {
@@ -430,11 +454,36 @@ export const GEO_MONITORING_PROVIDERS: GeoMonitoringProvider[] = [
 ];
 
 export function buildGeoMonitoringReport(input: { queryResults?: GeoVisibilityResultInput[] } = {}): GeoMonitoringReport {
-  const queryResults = input.queryResults ?? [];
-  const reviewedResults = queryResults.length;
-  const brandMentions = queryResults.filter((result) => result.isBrandMentioned).length;
-  const domainCitations = queryResults.filter((result) => result.isDomainCited || result.citedUrls.some((url) => url.includes("enhe-tech.com.cn"))).length;
-  const gaps = queryResults.filter((result) => !result.isBrandMentioned || !result.isDomainCited);
+  const queryResults = selectLatestGeoResults(input.queryResults ?? []);
+  const eligibleProviders = GEO_MONITORING_PROVIDERS.filter(isAiVisibilityProvider);
+  const eligibleResults = queryResults.filter(isAiVisibilityProviderResult);
+  const resultStates = eligibleResults.map((result) => ({
+    result,
+    status: resolveGeoVisibilityStatus(result)
+  }));
+  const collectedResults = resultStates.filter(({ status }) =>
+    status === "cited" || status === "mentioned" || status === "absent"
+  );
+  const citedResults = collectedResults.filter(({ status }) => status === "cited");
+  const mentionedResults = collectedResults.filter(({ status }) => status === "mentioned");
+  const absentResults = collectedResults.filter(({ status }) => status === "absent");
+  const uncollectedResults = resultStates.filter(({ status }) => status === "uncollected");
+  const unavailableResults = resultStates.filter(({ status }) => status === "unavailable");
+  const gaps = collectedResults
+    .filter(({ status }) => status !== "cited")
+    .map(({ result }) => result);
+  const reviewedResults = collectedResults.length;
+  const hasSufficientSample = reviewedResults >= GEO_MINIMUM_VALID_SAMPLE_SIZE;
+  const checkedTimestamps = eligibleResults
+    .map((result) => toTimestamp(result.checkedAt))
+    .filter((timestamp): timestamp is number => timestamp !== null)
+    .sort((left, right) => left - right);
+  const evidenceStatus: GeoEvidenceStatus = eligibleResults.length === 0
+    ? "no_records"
+    : hasSufficientSample
+      ? "sufficient"
+      : "insufficient";
+  const targetSampleCount = GEO_MONITORING_QUERIES.length * eligibleProviders.length;
 
   return {
     summary: {
@@ -442,9 +491,28 @@ export function buildGeoMonitoringReport(input: { queryResults?: GeoVisibilityRe
       totalProviders: GEO_MONITORING_PROVIDERS.length,
       globalProviders: GEO_MONITORING_PROVIDERS.filter((provider) => provider.region === "global").length,
       chinaProviders: GEO_MONITORING_PROVIDERS.filter((provider) => provider.region === "china").length,
+      eligibleProviders: eligibleProviders.length,
+      targetSampleCount,
+      validSampleCount: reviewedResults,
+      excludedResults: queryResults.length - eligibleResults.length,
       reviewedResults,
-      brandMentionRate: percent(brandMentions, reviewedResults),
-      domainCitationRate: percent(domainCitations, reviewedResults),
+      recordedResults: queryResults.length,
+      citedResults: citedResults.length,
+      mentionedResults: mentionedResults.length,
+      absentResults: absentResults.length,
+      uncollectedResults: uncollectedResults.length,
+      unavailableResults: unavailableResults.length,
+      brandMentionRate: hasSufficientSample
+        ? percent(citedResults.length + mentionedResults.length, reviewedResults)
+        : null,
+      domainCitationRate: hasSufficientSample ? percent(citedResults.length, reviewedResults) : null,
+      targetCoverageRate: hasSufficientSample ? percent(reviewedResults, targetSampleCount) : null,
+      hasSufficientSample,
+      evidenceStatus,
+      firstCheckedAt: checkedTimestamps.length ? new Date(checkedTimestamps[0]).toISOString() : null,
+      lastCheckedAt: checkedTimestamps.length
+        ? new Date(checkedTimestamps[checkedTimestamps.length - 1]).toISOString()
+        : null,
       openGaps: gaps.length
     },
     queries: GEO_MONITORING_QUERIES,
@@ -453,11 +521,105 @@ export function buildGeoMonitoringReport(input: { queryResults?: GeoVisibilityRe
   };
 }
 
+export function isConfiguredGeoQuery(value: string) {
+  return GEO_MONITORING_QUERIES.some((query) => query.query === value);
+}
+
+export function isConfiguredGeoProvider(value: string) {
+  return GEO_MONITORING_PROVIDERS.some((provider) => provider.id === value);
+}
+
+function isAiVisibilityProvider(provider: GeoMonitoringProvider) {
+  return provider.mode === "api" || provider.mode === "manual_browser";
+}
+
+function isAiVisibilityProviderResult(result: GeoVisibilityResultInput) {
+  const provider = GEO_MONITORING_PROVIDERS.find((item) => item.id === result.providerId);
+  return Boolean(provider && isAiVisibilityProvider(provider));
+}
+
+export function resolveGeoVisibilityStatus(
+  result: GeoVisibilityResultInput,
+): GeoVisibilityStatus {
+  if (result.collectionStatus === "uncollected") return "uncollected";
+  if (result.collectionStatus === "unavailable") return "unavailable";
+  if (hasVerifiableEnheCitationEvidence(result)) {
+    return "cited";
+  }
+  if (result.isBrandMentioned) return "mentioned";
+  return "absent";
+}
+
+export function isOfficialEnheCitationUrl(value: string) {
+  try {
+    const url = new URL(value);
+    if (url.protocol !== "http:" && url.protocol !== "https:") return false;
+
+    const hostname = url.hostname.toLowerCase().replace(/\.$/, "");
+    return hostname === "enhe-tech.com.cn" || hostname === "www.enhe-tech.com.cn";
+  } catch {
+    return false;
+  }
+}
+
+export function hasVerifiableEnheCitationEvidence(
+  result: Pick<GeoVisibilityResultInput, "citedUrls" | "answerSummary" | "screenshotUrl">,
+) {
+  const hasOfficialUrl = result.citedUrls.some(isOfficialEnheCitationUrl);
+  const hasAnswerOrScreenshot = Boolean(result.answerSummary?.trim() || result.screenshotUrl?.trim());
+  return hasOfficialUrl && hasAnswerOrScreenshot;
+}
+
+function selectLatestGeoResults(results: GeoVisibilityResultInput[]) {
+  const latestResults = new Map<string, GeoVisibilityResultInput>();
+
+  for (const result of results) {
+    const key = `${result.query.trim().toLowerCase()}\u0000${result.providerId.trim().toLowerCase()}`;
+    const current = latestResults.get(key);
+    if (!current || isNewerResult(result, current)) {
+      latestResults.set(key, result);
+    }
+  }
+
+  return Array.from(latestResults.values());
+}
+
+function isNewerResult(candidate: GeoVisibilityResultInput, current: GeoVisibilityResultInput) {
+  const candidateTime = toTimestamp(candidate.checkedAt);
+  const currentTime = toTimestamp(current.checkedAt);
+  if (candidateTime !== null && currentTime === null) return true;
+  if (candidateTime === null && currentTime !== null) return false;
+  if (candidateTime !== null && currentTime !== null && candidateTime !== currentTime) {
+    return candidateTime > currentTime;
+  }
+
+  return stableResultKey(candidate) < stableResultKey(current);
+}
+
+function stableResultKey(result: GeoVisibilityResultInput) {
+  return JSON.stringify({
+    collectionStatus: result.collectionStatus ?? "collected",
+    isBrandMentioned: result.isBrandMentioned,
+    isDomainCited: result.isDomainCited,
+    citedUrls: [...result.citedUrls].map((url) => url.trim()).sort(),
+    answerSummary: result.answerSummary?.trim() ?? null,
+    screenshotUrl: result.screenshotUrl?.trim() ?? null,
+    competitors: [...result.competitors].map((competitor) => competitor.trim()).sort(),
+    query: result.query.trim().toLowerCase(),
+    providerId: result.providerId.trim().toLowerCase()
+  });
+}
+
+function toTimestamp(value: GeoVisibilityResultInput["checkedAt"]) {
+  if (value === undefined || value === null) return null;
+  const timestamp = new Date(value).getTime();
+  return Number.isNaN(timestamp) ? null : timestamp;
+}
+
 function buildGeoRecommendations(gaps: GeoVisibilityResultInput[]): GeoMonitoringRecommendation[] {
   const recommendations = new Map<string, GeoMonitoringRecommendation>();
-  const targetGaps = gaps.length ? gaps : GEO_MONITORING_QUERIES.slice(0, 2).map((query) => toDefaultGap(query.query));
 
-  for (const gap of targetGaps) {
+  for (const gap of gaps) {
     const query = findQuery(gap.query);
     const targetPath = query?.targetPath ?? "/ai-news";
     const competitorReason = gap.competitors.length ? `当前结果中出现 ${gap.competitors.slice(0, 3).join("、")}，但 ENHE AI 露出不足。` : "当前结果没有稳定引用 ENHE AI 官网页面。";
@@ -525,17 +687,6 @@ function addRecommendation(map: Map<string, GeoMonitoringRecommendation>, item: 
 
 function findQuery(query: string) {
   return GEO_MONITORING_QUERIES.find((item) => item.query.toLowerCase() === query.toLowerCase());
-}
-
-function toDefaultGap(query: string): GeoVisibilityResultInput {
-  return {
-    query,
-    providerId: "manual",
-    isBrandMentioned: false,
-    isDomainCited: false,
-    citedUrls: [],
-    competitors: []
-  };
 }
 
 function okfTargetForTopic(topic?: GeoMonitoringQuery["topic"]) {

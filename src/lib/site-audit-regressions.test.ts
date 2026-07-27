@@ -12,9 +12,12 @@ function read(path: string) {
 
 describe("site audit regression coverage", () => {
   it("keeps homepage and listing metadata broad enough for current SEO targets", () => {
-    expect(buildHomeMetadataTitle("zh", dictionaries.zh.brand)).toContain("让 AI 真正为每个人所用");
-    expect(buildHomeMetadataTitle("en", dictionaries.en.brand)).toContain("Real Tasks");
-    expect(buildHomeMetadataTitle("en", dictionaries.en.brand)).toContain("Safer AI");
+    expect(buildHomeMetadataTitle("zh", dictionaries.zh.brand)).toBe(
+      "恩禾 ENHE AI | AI工具、AI资讯、账号服务与技能课程",
+    );
+    expect(buildHomeMetadataTitle("en", dictionaries.en.brand)).toBe(
+      "ENHE AI | AI Tools, News, Account Services & Courses",
+    );
 
     expect(dictionaries.zh.listing.softwareIntro.length).toBeGreaterThanOrEqual(50);
     expect(dictionaries.zh.listing.onlineIntro.length).toBeGreaterThanOrEqual(50);

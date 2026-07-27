@@ -48,6 +48,77 @@ export type AiNewsExternalSeoProvider = {
   getKeywordBoosts(input: { locale: Locale; keywords: string[] }): Promise<AiNewsExternalSeoBoost[]>;
 };
 
+export type AiNewsOpportunityContentKind = "news" | "evergreen";
+
+export type AiNewsOpportunitySourceAuthority =
+  | "first-party"
+  | "government"
+  | "standards-body"
+  | "primary-research";
+
+export type AiNewsOpportunitySourceEvidence = {
+  url: string;
+  authority: AiNewsOpportunitySourceAuthority;
+  supports: string;
+};
+
+export type AiNewsOpportunityQuerySource =
+  | "google-search-console"
+  | "bing-webmaster"
+  | "baidu-resource-platform";
+
+export type AiNewsOpportunityQueryEvidence = {
+  source: AiNewsOpportunityQuerySource;
+  query: string;
+  observedAt: string;
+  impressions: number;
+  clicks?: number;
+  targetPath?: string;
+};
+
+export type AiNewsOpportunityRecord = {
+  id: string;
+  contentKind: AiNewsOpportunityContentKind;
+  eventKey: string;
+  eventName: string;
+  eventDate: string;
+  eventSourceUrl: string;
+  topic: string;
+  userTask: string;
+  sourceUrls: string[];
+};
+
+export type AiNewsOpportunityCandidate = AiNewsOpportunityRecord & {
+  userImpact: string;
+  sourceEvidence: AiNewsOpportunitySourceEvidence[];
+  queryEvidence: AiNewsOpportunityQueryEvidence[];
+  demandScore: number;
+  bilingual: boolean;
+};
+
+export type AiNewsOpportunityDecisionReason =
+  | "accepted"
+  | "missing-query-evidence"
+  | "missing-source-evidence"
+  | "missing-event-key"
+  | "missing-user-impact"
+  | "missing-user-task"
+  | "bilingual-contract-required"
+  | "duplicate-news-event"
+  | "insufficient-distinction";
+
+export type AiNewsOpportunityDecisionStatus =
+  | "evidence_missing"
+  | "rejected"
+  | "accepted";
+
+export type AiNewsOpportunityDecision = {
+  candidate: AiNewsOpportunityCandidate;
+  eventFingerprint: string | null;
+  status: AiNewsOpportunityDecisionStatus;
+  reason: AiNewsOpportunityDecisionReason;
+};
+
 export const minKeywordLength = 2;
 export const maxKeywordLength = 24;
 export const minArticleCount = 2;
@@ -279,4 +350,334 @@ export function buildAiNewsTopicCollections(input: {
   }
 
   return Array.from(topicMap.values()).slice(0, topicCollectionCount);
+}
+
+export function buildAiNewsEventFingerprint(
+  input: Pick<AiNewsOpportunityRecord, "eventKey" | "eventDate" | "eventSourceUrl">,
+) {
+  const eventDate = normalizeOpportunityDate(input.eventDate);
+  const eventKey = normalizeOpportunityEventKey(input.eventKey);
+  if (!eventKey) {
+    throw new Error("Event key must contain a Unicode letter or number.");
+  }
+  const eventSourceUrl = canonicalizeOpportunitySource(input.eventSourceUrl);
+  return [eventDate, eventKey, eventSourceUrl].join("|");
+}
+
+export function scanAiNewsOpportunities(input: {
+  existing?: AiNewsOpportunityRecord[];
+  candidates: AiNewsOpportunityCandidate[];
+}) {
+  const accepted: AiNewsOpportunityCandidate[] = [];
+  const decisions: AiNewsOpportunityDecision[] = [];
+  const knownByEvent = new Map<string, AiNewsOpportunityRecord[]>();
+
+  for (const item of input.existing ?? []) {
+    if (!normalizeOpportunityEventKey(item.eventKey)) continue;
+    const fingerprint = buildAiNewsEventFingerprint(item);
+    knownByEvent.set(fingerprint, [...(knownByEvent.get(fingerprint) ?? []), item]);
+  }
+
+  const candidates = input.candidates
+    .map((candidate, index) => ({ candidate, index }))
+    .sort((left, right) => right.candidate.demandScore - left.candidate.demandScore || left.index - right.index);
+
+  for (const { candidate } of candidates) {
+    const normalizedEventKey = normalizeOpportunityEventKey(candidate.eventKey);
+    if (!normalizedEventKey) {
+      decisions.push({
+        candidate,
+        eventFingerprint: null,
+        status: "evidence_missing",
+        reason: "missing-event-key",
+      });
+      continue;
+    }
+
+    const eventFingerprint = buildAiNewsEventFingerprint(candidate);
+    const sameEventItems = knownByEvent.get(eventFingerprint) ?? [];
+    let reason: AiNewsOpportunityDecisionReason = "accepted";
+
+    if (!hasValidQueryEvidence(candidate.queryEvidence)) {
+      reason = "missing-query-evidence";
+    } else if (!hasAuthoritativeSourceEvidence(candidate)) {
+      reason = "missing-source-evidence";
+    } else if (!isSpecificOpportunityText(candidate.userImpact, 12, 4)) {
+      reason = "missing-user-impact";
+    } else if (!isExecutableOpportunityTask(candidate.userTask)) {
+      reason = "missing-user-task";
+    } else if (!candidate.bilingual) {
+      reason = "bilingual-contract-required";
+    } else if (
+      candidate.contentKind === "news" &&
+      sameEventItems.some((item) => item.contentKind === "news")
+    ) {
+      reason = "duplicate-news-event";
+    } else if (
+      candidate.contentKind === "evergreen" &&
+      sameEventItems.some((item) => !isMateriallyDistinctOpportunity(candidate, item))
+    ) {
+      reason = "insufficient-distinction";
+    }
+
+    decisions.push({
+      candidate,
+      eventFingerprint,
+      status: getOpportunityDecisionStatus(reason),
+      reason,
+    });
+    if (reason !== "accepted") continue;
+
+    accepted.push(candidate);
+    knownByEvent.set(eventFingerprint, [...sameEventItems, candidate]);
+  }
+
+  return { accepted, decisions };
+}
+
+function getOpportunityDecisionStatus(
+  reason: AiNewsOpportunityDecisionReason,
+): AiNewsOpportunityDecisionStatus {
+  if (reason === "accepted") return "accepted";
+  if (
+    reason === "missing-query-evidence" ||
+    reason === "missing-source-evidence" ||
+    reason === "missing-event-key" ||
+    reason === "missing-user-impact" ||
+    reason === "missing-user-task"
+  ) {
+    return "evidence_missing";
+  }
+  return "rejected";
+}
+
+function hasAuthoritativeSourceEvidence(candidate: AiNewsOpportunityCandidate) {
+  const eventSourceUrl = canonicalizeOpportunitySource(candidate.eventSourceUrl);
+  if (!isSpecificHttpsSource(eventSourceUrl)) return false;
+
+  const sourceUrls = new Set(
+    (candidate.sourceUrls ?? []).map(canonicalizeOpportunitySource).filter(Boolean),
+  );
+  if (!sourceUrls.has(eventSourceUrl)) return false;
+
+  const evidence = candidate.sourceEvidence ?? [];
+  if (!evidence.length) return false;
+
+  return (
+    evidence.every(
+      (item) =>
+        isTrustedSourceEvidence(item) &&
+        sourceUrls.has(canonicalizeOpportunitySource(item.url)) &&
+        isSpecificOpportunityText(item.supports, 12, 3),
+    ) &&
+    evidence.some((item) => canonicalizeOpportunitySource(item.url) === eventSourceUrl)
+  );
+}
+
+function hasValidQueryEvidence(value: unknown): value is AiNewsOpportunityQueryEvidence[] {
+  return (
+    Array.isArray(value) &&
+    value.length > 0 &&
+    value.every((item) => {
+      if (!item || typeof item !== "object") return false;
+      const evidence = item as Record<string, unknown>;
+      return (
+        isAiNewsOpportunityQuerySource(evidence.source) &&
+        typeof evidence.query === "string" &&
+        evidence.query.trim().length > 0 &&
+        typeof evidence.observedAt === "string" &&
+        isAbsoluteObservationTime(evidence.observedAt) &&
+        typeof evidence.impressions === "number" &&
+        Number.isInteger(evidence.impressions) &&
+        evidence.impressions > 0 &&
+        (evidence.clicks === undefined ||
+          (typeof evidence.clicks === "number" &&
+            Number.isInteger(evidence.clicks) &&
+            evidence.clicks >= 0)) &&
+        (evidence.targetPath === undefined ||
+          (typeof evidence.targetPath === "string" &&
+            evidence.targetPath.trim().startsWith("/") &&
+            !evidence.targetPath.trim().startsWith("//")))
+      );
+    })
+  );
+}
+
+function isAiNewsOpportunityQuerySource(value: unknown): value is AiNewsOpportunityQuerySource {
+  return (
+    value === "google-search-console" ||
+    value === "bing-webmaster" ||
+    value === "baidu-resource-platform"
+  );
+}
+
+function isAbsoluteObservationTime(value: string) {
+  return (
+    /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(?:\.\d+)?(?:Z|[+-]\d{2}:\d{2})$/.test(value) &&
+    Number.isFinite(Date.parse(value))
+  );
+}
+
+function isTrustedSourceEvidence(value: unknown): value is AiNewsOpportunitySourceEvidence {
+  if (!value || typeof value !== "object") return false;
+  const evidence = value as Record<string, unknown>;
+  if (
+    typeof evidence.url !== "string" ||
+    typeof evidence.authority !== "string" ||
+    typeof evidence.supports !== "string" ||
+    !isSpecificOpportunityText(evidence.supports, 12, 3)
+  ) {
+    return false;
+  }
+
+  let url: URL;
+  try {
+    url = new URL(evidence.url);
+  } catch {
+    return false;
+  }
+
+  if (url.protocol !== "https:" || url.pathname === "/") return false;
+  const host = url.hostname.toLowerCase().replace(/^www\./, "");
+  const path = url.pathname.toLowerCase();
+
+  if (evidence.authority === "first-party") {
+    return host === "github.blog" && path.startsWith("/changelog/");
+  }
+  if (evidence.authority === "government") {
+    return (
+      host === "gov.uk" ||
+      host.endsWith(".gov.uk") ||
+      host === "gov.cn" ||
+      host.endsWith(".gov.cn") ||
+      host.endsWith(".gov") ||
+      host === "europa.eu" ||
+      host.endsWith(".europa.eu")
+    );
+  }
+  if (evidence.authority === "standards-body") {
+    return (
+      (host === "modelcontextprotocol.io" && path.startsWith("/specification/")) ||
+      (host === "rfc-editor.org" && path.startsWith("/rfc/")) ||
+      (host === "w3.org" && path.startsWith("/tr/")) ||
+      (host === "iso.org" && path.startsWith("/standard/")) ||
+      (host === "nist.gov" && path !== "/")
+    );
+  }
+  if (evidence.authority === "primary-research") {
+    return (
+      (host === "arxiv.org" && (path.startsWith("/abs/") || path.startsWith("/pdf/"))) ||
+      (host === "openreview.net" && path.startsWith("/forum")) ||
+      (host === "pubmed.ncbi.nlm.nih.gov" && path !== "/") ||
+      (host === "dl.acm.org" && path.startsWith("/doi/")) ||
+      (host === "nature.com" && path.startsWith("/articles/")) ||
+      (host === "science.org" && path.startsWith("/doi/"))
+    );
+  }
+  return false;
+}
+
+function isSpecificHttpsSource(value: string) {
+  try {
+    const url = new URL(value);
+    return url.protocol === "https:" && Boolean(url.hostname) && url.pathname !== "/";
+  } catch {
+    return false;
+  }
+}
+
+function isExecutableOpportunityTask(value: string) {
+  const normalized = normalizeOpportunityText(value);
+  if (
+    new Set([
+      "read the news",
+      "read news",
+      "understand the announcement",
+      "summarize the announcement",
+      "read the announcement",
+      "\u9605\u8bfb\u65b0\u95fb",
+      "\u4e86\u89e3\u516c\u544a",
+    ]).has(normalized)
+  ) {
+    return false;
+  }
+  return isSpecificOpportunityText(value, 8, 3);
+}
+
+function isSpecificOpportunityText(
+  value: string | null | undefined,
+  minimumCharacters: number,
+  minimumTokens: number,
+) {
+  const normalized = normalizeOpportunityText(value ?? "");
+  const compactLength = normalized.replace(/\s+/g, "").length;
+  return (
+    compactLength >= minimumCharacters &&
+    tokenizeOpportunityText(normalized).length >= minimumTokens
+  );
+}
+
+function isMateriallyDistinctOpportunity(candidate: AiNewsOpportunityRecord, existing: AiNewsOpportunityRecord) {
+  const candidateTopic = normalizeOpportunityText(candidate.topic);
+  const existingTopic = normalizeOpportunityText(existing.topic);
+  const candidateTask = normalizeOpportunityText(candidate.userTask);
+  const existingTask = normalizeOpportunityText(existing.userTask);
+
+  if (!candidateTopic || !candidateTask) return false;
+  if (candidateTopic === existingTopic || candidateTask === existingTask) return false;
+
+  return textSimilarity(candidateTopic, existingTopic) < 0.7 && textSimilarity(candidateTask, existingTask) < 0.7;
+}
+
+function textSimilarity(left: string, right: string) {
+  const leftTokens = new Set(tokenizeOpportunityText(left));
+  const rightTokens = new Set(tokenizeOpportunityText(right));
+  if (!leftTokens.size || !rightTokens.size) return left === right ? 1 : 0;
+
+  const shared = Array.from(leftTokens).filter((token) => rightTokens.has(token)).length;
+  const union = new Set([...leftTokens, ...rightTokens]).size;
+  return union ? shared / union : 0;
+}
+
+function tokenizeOpportunityText(value: string) {
+  const wordTokens = value.match(/[a-z0-9]+|[\p{Script=Han}]/giu);
+  return wordTokens ?? [];
+}
+
+function normalizeOpportunityText(value: string) {
+  return String(value ?? "")
+    .normalize("NFKC")
+    .toLowerCase()
+    .replace(/[\p{P}\p{S}]+/gu, " ")
+    .replace(/\s+/g, " ")
+    .trim();
+}
+
+function normalizeOpportunityDate(value: string) {
+  const datePrefix = String(value ?? "").trim().match(/^\d{4}-\d{2}-\d{2}/)?.[0];
+  return datePrefix ?? String(value ?? "").trim();
+}
+
+function normalizeOpportunityEventKey(value: string) {
+  return String(value ?? "")
+    .normalize("NFKC")
+    .toLowerCase()
+    .replace(/[^\p{Letter}\p{Number}]+/gu, "-")
+    .replace(/^-+|-+$/g, "");
+}
+
+function canonicalizeOpportunitySource(value: string) {
+  try {
+    const url = new URL(value);
+    url.hash = "";
+    for (const key of Array.from(url.searchParams.keys())) {
+      if (/^(?:utm_.+|gclid|fbclid|msclkid)$/i.test(key)) url.searchParams.delete(key);
+    }
+    url.searchParams.sort();
+    url.hostname = url.hostname.toLowerCase();
+    if (url.pathname !== "/") url.pathname = url.pathname.replace(/\/+$/, "");
+    return url.toString().replace(/\?$/, "");
+  } catch {
+    return String(value ?? "").trim().replace(/[?#].*$/, "").replace(/\/+$/, "");
+  }
 }

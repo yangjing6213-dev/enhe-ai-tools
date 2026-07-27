@@ -1,22 +1,21 @@
 import Link from "next/link";
 import { AdminSection } from "@/app/admin/admin-ui";
 import { prisma } from "@/lib/db";
-import { buildSeoInsightReport, type SeoInsightRecommendation } from "@/lib/seo-insights";
+import {
+  buildSeoInsightReport,
+  SEO_ATTRIBUTION_WINDOW_DAYS,
+  SEO_INSIGHTS_EVENT_BATCH_SIZE,
+  seoConversionFunnelSteps,
+  type SeoInsightRecommendation,
+  type SeoConversionFunnelReport,
+  type SeoConversionFunnelRow
+} from "@/lib/seo-insights";
 
 export default async function AdminSeoInsightsPage() {
-  const since = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000);
-  const [events, articles, tools, tutorials] = await Promise.all([
-    prisma.analyticsEvent.findMany({
-      where: {
-        createdAt: { gte: since },
-        eventName: {
-          in: ["seo_landing_view", "search_ai_news", "create_order", "payment_proof_submitted", "payment_review_approved", "click_open_vip"]
-        }
-      },
-      select: { eventName: true, path: true, metadata: true, createdAt: true },
-      orderBy: { createdAt: "desc" },
-      take: 5000
-    }),
+  const until = new Date();
+  const since = new Date(until.getTime() - SEO_ATTRIBUTION_WINDOW_DAYS * 24 * 60 * 60 * 1000);
+  const [eventRows, articles, tools, tutorials] = await Promise.all([
+    loadSeoInsightEvents(since, until),
     prisma.newsArticle.findMany({
       where: { status: "published" },
       select: { title: true, keywords: true, seoKeywords: true, summary: true }
@@ -37,7 +36,7 @@ export default async function AdminSeoInsightsPage() {
     })
   ]);
   const report = buildSeoInsightReport({
-    events,
+    events: eventRows,
     articles,
     tools: tools.map((tool) => ({
       title: tool.name,
@@ -57,14 +56,49 @@ export default async function AdminSeoInsightsPage() {
       title="SEO 数据跟踪与行动建议"
       intro="汇总近 30 天自然搜索、AI 问答引擎、站内搜索和转化信号，自动推导下一步文章、软件、账号服务和课程方向。"
     >
-      <div className="grid gap-4 md:grid-cols-3 xl:grid-cols-6">
+      <div className="grid gap-4 md:grid-cols-3 xl:grid-cols-8">
         <InsightStat label="SEO访问" value={report.summary.totalSeoViews} accent />
         <InsightStat label="自然搜索" value={report.summary.organicLandings} />
         <InsightStat label="AI问答入口" value={report.summary.aiAnswerLandings} />
+        <InsightStat label="活动流量" value={report.summary.campaignLandings} />
+        <InsightStat label="直接访问" value={report.summary.directLandings} />
         <InsightStat label="站内搜索" value={report.summary.searchEvents} />
         <InsightStat label="转化动作" value={report.summary.conversionEvents} />
         <InsightStat label="内部访问" value={report.summary.internalViews} />
       </div>
+
+      <p className="mt-4 text-xs leading-5 text-[var(--marketing-muted)]">
+        数据窗口为近 {SEO_ATTRIBUTION_WINDOW_DAYS} 天，按每批 {SEO_INSIGHTS_EVENT_BATCH_SIZE.toLocaleString("zh-CN")} 条游标读取完整 Analytics 事件，不截断 landing 与后续转化链路。
+      </p>
+
+      <section className="surface-panel mt-8 p-6">
+        <div className="flex flex-wrap items-start justify-between gap-3">
+          <div>
+            <h2 className="text-xl font-semibold text-[var(--marketing-text)]">自然搜索到转化会话归因</h2>
+            <p className="mt-2 text-sm leading-6 text-[var(--marketing-muted)]">
+              近 {SEO_ATTRIBUTION_WINDOW_DAYS} 天仅纳入 trafficMedium=organic_search，并按匿名浏览器会话的首次 landing 归因；后续阶段只统计携带同一 landingId 且完成前序阶段的 landing。
+              清除浏览器数据、跨浏览器或跨设备时无法合并，因此不是用户身份级归因。
+            </p>
+          </div>
+          <div className="text-right text-xs leading-5 text-[var(--marketing-muted)]">
+            <div>可归因 landing：{report.conversionAttribution.attributedLandings}</div>
+            <div>未计入自然搜索的事件：{report.conversionAttribution.unattributedFunnelEvents}</div>
+          </div>
+        </div>
+        <div className="mt-5 grid gap-6 xl:grid-cols-2">
+          <ConversionFunnelTable
+            title="内容落地路径"
+            description="内容页进入产品后，依次查看产品、点击购买、结算和订单状态。"
+            funnel={report.conversionFunnels.content}
+          />
+          <ConversionFunnelTable
+            title="产品页直达路径"
+            description="产品、服务或课程详情页的搜索直达用户从查看产品开始，不要求经过内容页点击。"
+            funnel={report.conversionFunnels.direct}
+          />
+        </div>
+        <p className="mt-5 text-xs leading-5 text-[var(--marketing-muted)]">本页仅展示实际事件和订单状态，不推算或展示收入金额。</p>
+      </section>
 
       <section className="surface-panel mt-8 p-6">
         <div className="flex flex-wrap items-center justify-between gap-3">
@@ -177,11 +211,92 @@ export default async function AdminSeoInsightsPage() {
   );
 }
 
+async function loadSeoInsightEvents(since: Date, until: Date) {
+  const events: Array<{
+    eventName: string;
+    path: string | null;
+    metadata: unknown;
+    createdAt: Date;
+  }> = [];
+  let cursor: string | undefined;
+
+  while (true) {
+    const batch = await prisma.analyticsEvent.findMany({
+      where: {
+        createdAt: { gte: since, lte: until },
+        eventName: {
+          in: [...seoConversionFunnelSteps, "search_ai_news", "click_open_vip"]
+        }
+      },
+      select: { id: true, eventName: true, path: true, metadata: true, createdAt: true },
+      orderBy: [{ createdAt: "desc" }, { id: "desc" }],
+      take: SEO_INSIGHTS_EVENT_BATCH_SIZE,
+      ...(cursor ? { cursor: { id: cursor }, skip: 1 } : {})
+    });
+
+    events.push(...batch.map((row) => ({
+      eventName: row.eventName,
+      path: row.path,
+      metadata: row.metadata,
+      createdAt: row.createdAt
+    })));
+    if (batch.length < SEO_INSIGHTS_EVENT_BATCH_SIZE) return events;
+
+    cursor = batch.at(-1)?.id;
+    if (!cursor) return events;
+  }
+}
+
 function InsightStat({ label, value, accent = false }: { label: string; value: number | string; accent?: boolean }) {
   return (
     <div className="surface-panel p-5">
       <p className="text-sm text-[var(--marketing-muted)]">{label}</p>
       <p className={`mt-3 text-3xl font-semibold ${accent ? "text-[var(--marketing-accent)]" : "text-[#E8EEF8]"}`}>{value}</p>
+    </div>
+  );
+}
+
+function ConversionFunnelRow({ step }: { step: SeoConversionFunnelRow }) {
+  return (
+    <tr>
+      <td className="px-3 py-3 font-semibold text-[#E8EEF8]">{funnelStepLabel(step.eventName)}</td>
+      <td className="px-3 py-3 text-right text-[var(--marketing-accent)]">{step.count}</td>
+      <td className="px-3 py-3 text-right text-[var(--marketing-muted)]">{formatRate(step.stepConversionRate)}</td>
+      <td className="px-3 py-3 text-right text-[var(--marketing-muted)]">{formatRate(step.landingConversionRate)}</td>
+    </tr>
+  );
+}
+
+function ConversionFunnelTable({
+  title,
+  description,
+  funnel
+}: {
+  title: string;
+  description: string;
+  funnel: SeoConversionFunnelReport;
+}) {
+  return (
+    <div className="min-w-0">
+      <h3 className="text-base font-semibold text-[var(--marketing-text)]">{title}</h3>
+      <p className="mt-2 text-xs leading-5 text-[var(--marketing-muted)]">{description} 可归因 landing：{funnel.attributedLandings}</p>
+      <div className="mt-3 overflow-x-auto">
+        <table className="w-full min-w-[620px] text-left text-sm">
+          <thead className="border-b border-white/10 text-xs text-[var(--marketing-muted)]">
+            <tr>
+              <th className="px-3 py-3 font-semibold">阶段</th>
+              <th className="px-3 py-3 text-right font-semibold">可归因 landing</th>
+              <th className="px-3 py-3 text-right font-semibold">相邻阶段转化</th>
+              <th className="px-3 py-3 text-right font-semibold">首次落地转化</th>
+            </tr>
+          </thead>
+          <tbody className="divide-y divide-white/8">
+            {funnel.rows.map((step) => (
+              <ConversionFunnelRow key={step.eventName} step={step} />
+            ))}
+          </tbody>
+        </table>
+      </div>
     </div>
   );
 }
@@ -252,4 +367,22 @@ function contentTypeLabel(type: string) {
     other: "其他"
   };
   return labels[type] ?? type;
+}
+
+function funnelStepLabel(eventName: SeoConversionFunnelRow["eventName"]) {
+  const labels: Record<SeoConversionFunnelRow["eventName"], string> = {
+    seo_landing_view: "搜索落地访问",
+    content_to_product_click: "内容进入产品",
+    view_tool: "查看产品详情",
+    product_purchase_cta_click: "点击购买",
+    begin_checkout: "开始结算",
+    create_order: "创建订单",
+    payment_proof_submitted: "提交付款凭证",
+    payment_review_approved: "付款审核通过"
+  };
+  return labels[eventName];
+}
+
+function formatRate(value: number) {
+  return `${Number.isInteger(value) ? value : value.toFixed(1)}%`;
 }

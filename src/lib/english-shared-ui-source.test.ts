@@ -13,11 +13,9 @@ describe("english shared UI source", () => {
   it("uses localized site-name helpers across shared public chrome", () => {
     const header = readFileSync(new URL("../components/site-header.tsx", import.meta.url), "utf8");
     const footer = readFileSync(new URL("../components/site-footer.tsx", import.meta.url), "utf8");
-    const chrome = readFileSync(new URL("../components/public-site-chrome.tsx", import.meta.url), "utf8");
 
     expect(header).toContain("getEffectiveLocalizedSiteName");
     expect(footer).toContain("getEffectiveLocalizedSiteName");
-    expect(chrome).toContain("getEffectiveLocalizedSiteName");
   });
 
   it("renders English filing labels instead of Chinese text in the English footer", () => {

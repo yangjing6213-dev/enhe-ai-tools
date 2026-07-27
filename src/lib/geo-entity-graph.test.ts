@@ -63,6 +63,10 @@ describe("GEO entity graph", () => {
       new URL("../components/public-site-chrome.tsx", import.meta.url),
       "utf8",
     );
+    const brandEntity = readFileSync(
+      new URL("./brand-entity.ts", import.meta.url),
+      "utf8",
+    );
     const home = readFileSync(
       new URL("../app/page-shell.tsx", import.meta.url),
       "utf8",
@@ -70,14 +74,25 @@ describe("GEO entity graph", () => {
 
     expect(publicChrome).toContain('absoluteUrl("/#organization")');
     expect(publicChrome).toContain('absoluteUrl("/#website")');
-    expect(publicChrome).toContain(
+    expect(brandEntity).toContain(
       '"https://github.com/hqwzhu/enhe-ai-tools"',
     );
     expect(home).toContain('"@id": absoluteUrl("/#website")');
-    expect(home).toContain('"@id": absoluteUrl("/#organization")');
+    expect(home).toContain("mainEntity: enheOrganizationReference");
+    expect(home).not.toContain('"@type": "Organization"');
     expect(home).toContain('"@type": "CollectionPage"');
     expect(home).toContain('"@type": "ItemList"');
     expect(home).toContain("itemListElement: homeTaskOutcomes[forceLocale].map");
+  });
+
+  it("keeps the WebSite URL at the root for every locale", () => {
+    const publicChrome = readFileSync(
+      new URL("../components/public-site-chrome.tsx", import.meta.url),
+      "utf8",
+    );
+
+    expect(publicChrome).toContain('url: absoluteUrl("/")');
+    expect(publicChrome).not.toContain("url: languageAlternates[inLanguage]");
   });
 
   it("builds stable page-level ids for localized canonical urls", () => {

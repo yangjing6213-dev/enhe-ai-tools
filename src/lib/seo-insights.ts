@@ -1,3 +1,5 @@
+import { parseAnalyticsAttribution } from "@/lib/analytics-client-payload";
+
 export type TrafficMedium = "direct" | "internal" | "organic_search" | "ai_answer_engine" | "referral" | "campaign";
 
 export type SeoContentType =
@@ -33,6 +35,39 @@ export type SeoInsightEvent = {
   createdAt?: Date | string | null;
 };
 
+export const seoContentConversionFunnelSteps = [
+  "seo_landing_view",
+  "content_to_product_click",
+  "view_tool",
+  "product_purchase_cta_click",
+  "begin_checkout",
+  "create_order",
+  "payment_proof_submitted",
+  "payment_review_approved"
+] as const;
+
+export const seoDirectConversionFunnelSteps = [
+  "seo_landing_view",
+  "view_tool",
+  "product_purchase_cta_click",
+  "begin_checkout",
+  "create_order",
+  "payment_proof_submitted",
+  "payment_review_approved"
+] as const;
+
+export const seoConversionFunnelSteps = seoContentConversionFunnelSteps;
+
+export const SEO_ATTRIBUTION_WINDOW_DAYS = 30;
+export const SEO_INSIGHTS_EVENT_BATCH_SIZE = 5000;
+
+export type SeoConversionFunnelRow = {
+  eventName: (typeof seoConversionFunnelSteps)[number];
+  count: number;
+  stepConversionRate: number;
+  landingConversionRate: number;
+};
+
 export type SeoInsightContentItem = {
   title: string;
   keywords?: string | null;
@@ -56,6 +91,8 @@ export type SeoInsightReport = {
     totalSeoViews: number;
     organicLandings: number;
     aiAnswerLandings: number;
+    campaignLandings: number;
+    directLandings: number;
     internalViews: number;
     searchEvents: number;
     conversionEvents: number;
@@ -64,20 +101,55 @@ export type SeoInsightReport = {
   topLandingPages: Array<{ path: string; count: number; contentType: SeoContentType; conversionCount: number }>;
   searchQueries: Array<{ query: string; count: number; covered: boolean }>;
   contentTypeMix: Array<{ contentType: SeoContentType; count: number }>;
+  conversionFunnels: {
+    content: SeoConversionFunnelReport;
+    direct: SeoConversionFunnelReport;
+  };
+  conversionAttribution: {
+    attributedLandings: number;
+    attributedStageLandings: number;
+    unattributedFunnelEvents: number;
+  };
   recommendations: SeoInsightRecommendation[];
+};
+
+export type SeoConversionFunnelReport = {
+  rows: SeoConversionFunnelRow[];
+  attributedLandings: number;
 };
 
 const siteHosts = new Set(["www.enhe-tech.com.cn", "enhe-tech.com.cn"]);
 
 const searchEngines = [
-  { source: "google", hosts: ["google."], queryKeys: ["q"] },
+  {
+    source: "google",
+    hosts: [
+      "google.com",
+      "google.com.hk",
+      "google.com.tw",
+      "google.co.jp",
+      "google.co.uk",
+      "google.ca",
+      "google.de",
+      "google.fr",
+      "google.com.au",
+      "google.co.in",
+      "google.sg",
+      "google.co.kr"
+    ],
+    queryKeys: ["q"]
+  },
   { source: "bing", hosts: ["bing.com"], queryKeys: ["q"] },
   { source: "baidu", hosts: ["baidu.com"], queryKeys: ["wd", "word"] },
   { source: "sogou", hosts: ["sogou.com"], queryKeys: ["query", "keyword"] },
   { source: "360", hosts: ["so.com"], queryKeys: ["q"] },
   { source: "duckduckgo", hosts: ["duckduckgo.com"], queryKeys: ["q"] },
   { source: "yahoo", hosts: ["search.yahoo.com"], queryKeys: ["p"] },
-  { source: "yandex", hosts: ["yandex."], queryKeys: ["text"] },
+  {
+    source: "yandex",
+    hosts: ["yandex.com", "yandex.ru", "yandex.kz", "yandex.by", "yandex.uz", "yandex.com.tr"],
+    queryKeys: ["text"]
+  },
   { source: "naver", hosts: ["search.naver.com"], queryKeys: ["query"] }
 ] as const;
 
@@ -85,7 +157,11 @@ const aiAnswerEngines = [
   { source: "perplexity", hosts: ["perplexity.ai"], queryKeys: ["q"] },
   { source: "chatgpt", hosts: ["chatgpt.com"], queryKeys: ["q"] },
   { source: "copilot", hosts: ["copilot.microsoft.com"], queryKeys: ["q"] },
-  { source: "gemini", hosts: ["gemini.google.com"], queryKeys: ["q"] }
+  { source: "gemini", hosts: ["gemini.google.com"], queryKeys: ["q"] },
+  { source: "doubao", hosts: ["doubao.com"], queryKeys: [] },
+  { source: "kimi", hosts: ["kimi.com"], queryKeys: [] },
+  { source: "yuanbao", hosts: ["yuanbao.tencent.com"], queryKeys: [] },
+  { source: "deepseek", hosts: ["chat.deepseek.com"], queryKeys: [] }
 ] as const;
 
 const socialHosts = ["weibo.com", "xiaohongshu.com", "zhihu.com", "bilibili.com", "douyin.com", "x.com", "twitter.com", "linkedin.com", "reddit.com"];
@@ -155,25 +231,32 @@ export function buildSeoInsightReport(input: {
 }): SeoInsightReport {
   const seoEvents = input.events.filter((event) => event.eventName === "seo_landing_view");
   const searchEvents = input.events.filter((event) => event.eventName === "search_ai_news");
-  const conversionEvents = input.events.filter((event) =>
-    ["create_order", "payment_proof_submitted", "payment_review_approved", "click_open_vip"].includes(event.eventName)
-  );
+  const conversionEventNames = new Set<string>(seoConversionFunnelSteps.slice(1));
+  const conversionEvents = input.events.filter((event) => conversionEventNames.has(event.eventName));
+  const conversionAttribution = buildSeoConversionFunnel(input.events);
 
   const trafficSources = new Map<string, { source: string; medium: string; count: number }>();
   const landingPages = new Map<string, { path: string; count: number; contentType: SeoContentType; conversionCount: number }>();
+  const landingPathById = new Map<string, string>();
+  const conversionLandingIdsByPath = new Map<string, Set<string>>();
   const contentTypes = new Map<SeoContentType, { contentType: SeoContentType; count: number }>();
   const queryCounts = new Map<string, number>();
 
   for (const event of seoEvents) {
     const metadata = getMetadataRecord(event.metadata);
-    const source = stringValue(metadata.source) || "direct";
-    const medium = stringValue(metadata.trafficMedium) || "direct";
+    const cohort = getEventTrafficCohort(event.metadata);
+    const source = cohort.source || "direct";
+    const medium = cohort.trafficMedium || "direct";
     const sourceKey = `${source}:${medium}`;
     const landingPath = stringValue(metadata.landingPath) || event.path || "/";
     const contentType = normalizeSeoContentType(stringValue(metadata.contentType)) ?? getSeoContentType(landingPath);
     const searchQuery = normalizeQuery(stringValue(metadata.searchQuery));
+    const attribution = getEventAttribution(event.metadata);
 
     if (searchQuery) queryCounts.set(searchQuery, (queryCounts.get(searchQuery) ?? 0) + 1);
+    if (attribution && !landingPathById.has(attribution.landingId)) {
+      landingPathById.set(attribution.landingId, landingPath);
+    }
     trafficSources.set(sourceKey, {
       source,
       medium,
@@ -192,9 +275,22 @@ export function buildSeoInsightReport(input: {
   }
 
   for (const event of conversionEvents) {
-    const path = event.path || "/";
+    const attribution = getEventAttribution(event.metadata);
+    const attributedPath = attribution
+      ? landingPathById.get(attribution.landingId)
+      : null;
+    const path = attributedPath || event.path || "/";
     const landing = landingPages.get(path);
-    if (landing) landingPages.set(path, { ...landing, conversionCount: landing.conversionCount + 1 });
+    if (!landing) continue;
+
+    if (attribution && attributedPath) {
+      const landingIds = conversionLandingIdsByPath.get(path) ?? new Set<string>();
+      landingIds.add(attribution.landingId);
+      conversionLandingIdsByPath.set(path, landingIds);
+      landingPages.set(path, { ...landing, conversionCount: landingIds.size });
+    } else {
+      landingPages.set(path, { ...landing, conversionCount: landing.conversionCount + 1 });
+    }
   }
 
   for (const event of searchEvents) {
@@ -223,9 +319,11 @@ export function buildSeoInsightReport(input: {
   return {
     summary: {
       totalSeoViews: seoEvents.length,
-      organicLandings: seoEvents.filter((event) => stringValue(getMetadataRecord(event.metadata).trafficMedium) === "organic_search").length,
-      aiAnswerLandings: seoEvents.filter((event) => stringValue(getMetadataRecord(event.metadata).trafficMedium) === "ai_answer_engine").length,
-      internalViews: seoEvents.filter((event) => stringValue(getMetadataRecord(event.metadata).trafficMedium) === "internal").length,
+      organicLandings: seoEvents.filter((event) => getEventTrafficMedium(event.metadata) === "organic_search").length,
+      aiAnswerLandings: seoEvents.filter((event) => getEventTrafficMedium(event.metadata) === "ai_answer_engine").length,
+      campaignLandings: seoEvents.filter((event) => getEventTrafficMedium(event.metadata) === "campaign").length,
+      directLandings: seoEvents.filter((event) => getEventTrafficMedium(event.metadata) === "direct").length,
+      internalViews: seoEvents.filter((event) => getEventTrafficMedium(event.metadata) === "internal").length,
       searchEvents: searchEvents.length,
       conversionEvents: conversionEvents.length
     },
@@ -233,8 +331,126 @@ export function buildSeoInsightReport(input: {
     topLandingPages,
     searchQueries,
     contentTypeMix: Array.from(contentTypes.values()).sort((left, right) => right.count - left.count),
+    conversionFunnels: conversionAttribution.funnels,
+    conversionAttribution: conversionAttribution.summary,
     recommendations
   };
+}
+
+function buildSeoConversionFunnel(events: SeoInsightEvent[]) {
+  const eventLandingIds = new Map<string, Set<string>>(seoConversionFunnelSteps.map((eventName) => [eventName, new Set<string>()]));
+  const organicLandingIds = eventLandingIds.get("seo_landing_view")!;
+  const landingPaths = new Map<string, string>();
+
+  for (const event of events) {
+    if (!(seoConversionFunnelSteps as readonly string[]).includes(event.eventName)) continue;
+    const attribution = getEventAttribution(event.metadata);
+    if (!attribution) continue;
+    if (event.eventName === "seo_landing_view" && getEventTrafficMedium(event.metadata) !== "organic_search") continue;
+    eventLandingIds.get(event.eventName)?.add(attribution.landingId);
+    if (event.eventName === "seo_landing_view") {
+      landingPaths.set(attribution.landingId, attribution.firstLandingPath);
+    }
+  }
+
+  const contentLandingIds = new Set(
+    Array.from(organicLandingIds).filter((landingId) => isContentConversionLandingPath(landingPaths.get(landingId)))
+  );
+  const directLandingIds = new Set(
+    Array.from(organicLandingIds).filter((landingId) => isDirectConversionLandingPath(landingPaths.get(landingId)))
+  );
+  const funnels = {
+    content: {
+      rows: buildConversionFunnelRows(seoContentConversionFunnelSteps, contentLandingIds, eventLandingIds),
+      attributedLandings: contentLandingIds.size
+    },
+    direct: {
+      rows: buildConversionFunnelRows(seoDirectConversionFunnelSteps, directLandingIds, eventLandingIds),
+      attributedLandings: directLandingIds.size
+    }
+  };
+
+  const attributedStageLandings = Array.from(eventLandingIds.values()).reduce(
+    (count, ids) => count + Array.from(ids).filter((landingId) => organicLandingIds.has(landingId)).length,
+    0
+  );
+  const unattributedFunnelEvents = events.filter((event) => {
+    if (!(seoConversionFunnelSteps as readonly string[]).includes(event.eventName)) return false;
+    const attribution = getEventAttribution(event.metadata);
+    return !attribution || !organicLandingIds.has(attribution.landingId);
+  }).length;
+
+  return {
+    funnels,
+    summary: {
+      attributedLandings: organicLandingIds.size,
+      attributedStageLandings,
+      unattributedFunnelEvents
+    }
+  };
+}
+
+function buildConversionFunnelRows(
+  steps: readonly (typeof seoConversionFunnelSteps)[number][],
+  landingIds: Set<string>,
+  eventLandingIds: Map<string, Set<string>>
+) {
+  let previousLandingIds = new Set(landingIds);
+  return steps.map((eventName, index) => {
+    const currentEventLandingIds = eventLandingIds.get(eventName) ?? new Set<string>();
+    const currentLandingIds = index === 0
+      ? new Set(landingIds)
+      : new Set(Array.from(previousLandingIds).filter((landingId) => currentEventLandingIds.has(landingId)));
+    const previousCount = previousLandingIds.size;
+    const count = currentLandingIds.size;
+    previousLandingIds = currentLandingIds;
+    return {
+      eventName,
+      count,
+      stepConversionRate: index === 0 ? (count > 0 ? 100 : 0) : ratioPercent(count, previousCount),
+      landingConversionRate: index === 0 ? (count > 0 ? 100 : 0) : ratioPercent(count, landingIds.size)
+    };
+  });
+}
+
+function isContentConversionLandingPath(pathname: string | undefined) {
+  const contentType = getSeoContentType(pathname);
+  return contentType === "ai_news_listing" || contentType === "ai_news_article" || contentType === "tutorial_listing";
+}
+
+function isDirectConversionLandingPath(pathname: string | undefined) {
+  const contentType = getSeoContentType(pathname);
+  return contentType === "software_detail" || contentType === "account_service_detail" || contentType === "skill_learning_detail";
+}
+
+function getEventTrafficMedium(value: unknown) {
+  return getEventTrafficCohort(value).trafficMedium;
+}
+
+function getEventTrafficCohort(value: unknown) {
+  const metadata = getMetadataRecord(value);
+  const nested = getMetadataRecord(metadata.attribution);
+  const validNested = parseAnalyticsAttribution(nested);
+  if (validNested) {
+    return {
+      source: validNested.source,
+      trafficMedium: validNested.trafficMedium
+    };
+  }
+  const authority = Object.keys(nested).length ? nested : metadata;
+  const trafficMedium = stringValue(authority.trafficMedium);
+  return trafficMedium === "organic_search"
+    ? { source: null, trafficMedium: null }
+    : { source: stringValue(authority.source), trafficMedium };
+}
+
+function getEventAttribution(value: unknown) {
+  const metadata = getMetadataRecord(value);
+  const nested = getMetadataRecord(metadata.attribution);
+  const sessionId = stringValue(nested.sessionId);
+  const landingId = stringValue(nested.landingId);
+  const firstLandingPath = stringValue(nested.firstLandingPath);
+  return sessionId && landingId && firstLandingPath ? { sessionId, landingId, firstLandingPath } : null;
 }
 
 function classifyReferrer(referrer?: string | null): SeoTrafficInfo {
@@ -244,7 +460,7 @@ function classifyReferrer(referrer?: string | null): SeoTrafficInfo {
   const host = url.hostname.replace(/^www\./, "").toLowerCase();
   if (siteHosts.has(host)) return { source: "internal", medium: "internal", referrerHost: host };
 
-  const aiEngine = aiAnswerEngines.find((engine) => engine.hosts.some((knownHost) => host.includes(knownHost)));
+  const aiEngine = aiAnswerEngines.find((engine) => engine.hosts.some((knownHost) => matchesKnownHost(host, knownHost)));
   if (aiEngine) {
     return {
       source: aiEngine.source,
@@ -255,7 +471,7 @@ function classifyReferrer(referrer?: string | null): SeoTrafficInfo {
     };
   }
 
-  const searchEngine = searchEngines.find((engine) => engine.hosts.some((knownHost) => host.includes(knownHost)));
+  const searchEngine = searchEngines.find((engine) => engine.hosts.some((knownHost) => matchesKnownHost(host, knownHost)));
   if (searchEngine) {
     return {
       source: searchEngine.source,
@@ -266,12 +482,16 @@ function classifyReferrer(referrer?: string | null): SeoTrafficInfo {
     };
   }
 
-  const socialSource = socialHosts.find((knownHost) => host.includes(knownHost));
+  const socialSource = socialHosts.find((knownHost) => matchesKnownHost(host, knownHost));
   return {
     source: socialSource ? socialSource.replace(".com", "") : host,
     medium: "referral",
     referrerHost: host
   };
+}
+
+function matchesKnownHost(host: string, knownHost: string) {
+  return host === knownHost || host.endsWith(`.${knownHost}`);
 }
 
 function buildRecommendations({
@@ -416,6 +636,11 @@ function normalizeQuery(value: string | null | undefined) {
     .replace(/\+/g, " ")
     .replace(/\s+/g, " ")
     .trim();
+}
+
+function ratioPercent(value: number, total: number) {
+  if (total <= 0) return 0;
+  return Math.round((value / total) * 1000) / 10;
 }
 
 function safeUrl(value: string) {

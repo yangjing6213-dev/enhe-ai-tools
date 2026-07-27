@@ -68,7 +68,7 @@ describe("product demo feature source contract", () => {
     expect(editor).toContain('name="relatedProductId"');
   });
 
-  it("keeps product demo public routes indexable and structured for SEO/GEO", () => {
+  it("keeps product demo routes structured while keeping low-priority pages out of the core sitemap", () => {
     const listing = readFileSync(new URL("../app/product-demos/page-shell.tsx", import.meta.url), "utf8");
     const detail = readFileSync(new URL("../app/product-demos/[slug]/page-shell.tsx", import.meta.url), "utf8");
     const sitemap = readFileSync(new URL("../app/sitemap.ts", import.meta.url), "utf8");
@@ -83,8 +83,9 @@ describe("product demo feature source contract", () => {
     expect(detail).toContain('preload="metadata"');
     expect(detail).not.toContain("customCanonicalUrl");
     expect(detail).not.toContain("demo.canonicalUrl ? absoluteUrl");
-    expect(sitemap).toContain("prisma.productDemo");
-    expect(sitemap).toContain('where: { status: "published" }');
+    expect(sitemap).toContain("sitemapExcludedPaths");
+    expect(sitemap).toContain('"/product-demos"');
+    expect(sitemap).toContain('"/en/product-demos"');
     expect(robots).toContain('"/product-demos"');
     expect(seo).toContain("^\\/product-demos$");
     expect(seo).toContain("^\\/product-demos\\/.+$");

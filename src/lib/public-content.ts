@@ -8,6 +8,7 @@ import {
   type AiNewsKeywordCandidate,
   type AiNewsKeywordInterventionRule,
 } from "@/lib/ai-news-discovery";
+import { isEnglishNewsArticleIndexable } from "@/lib/ai-news";
 import { prisma } from "@/lib/db";
 import {
   getCanonicalAiNewsSlug,
@@ -292,6 +293,24 @@ const getCachedPublicNewsListing = unstable_cache(
                 { publishedAt: "desc" },
               ]
             : [{ isPinned: "desc" }, { publishedAt: "desc" }];
+      if (filters.locale === "en") {
+        const candidateArticles = await prisma.newsArticle.findMany({
+          where,
+          include: { category: true, tagLinks: { include: { tag: true } } },
+          orderBy,
+        });
+        const indexableArticles = candidateArticles.filter(
+          isEnglishNewsArticleIndexable,
+        );
+        const skip = filters.skip ?? 0;
+        const take = filters.take ?? 9;
+
+        return {
+          articles: indexableArticles.slice(skip, skip + take),
+          total: indexableArticles.length,
+        };
+      }
+
       const [articles, total] = await Promise.all([
         prisma.newsArticle.findMany({
           where,

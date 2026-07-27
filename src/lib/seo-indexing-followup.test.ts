@@ -26,30 +26,40 @@ describe("SEO indexing follow-up", () => {
       }),
     );
 
-    expect(serpTitles[0]).toBe("Claude-Style AI Workflows Impact Analysis");
+    expect(serpTitles[0]).toBe("Claude-Style AI Workflows");
+    for (const title of serpTitles) {
+      expect(title).not.toMatch(/Impact Analysis$/i);
+      expect(title).not.toMatch(/[|,:;.!?\-–—/]$/);
+    }
     expect(new Set(serpTitles).size).toBe(titles.length);
   });
 
   it("gives AI news pagination unique metadata and self-canonical alternates", async () => {
-    const metadata = await generateAiNewsPageMetadata("en", { page: "2" });
+    const metadata = await generateAiNewsPageMetadata(
+      "en",
+      Promise.resolve({ page: "2" }),
+    );
 
     expect(metadata.title).toContain("Page 2");
     expect(metadata.description).toContain("Page 2");
     expect(metadata.alternates?.canonical).toBe(
-      "https://www.enhe-tech.com.cn/en/ai-news?page=2",
+      "https://www.enhe-tech.com.cn/en/ai-news/page/2",
     );
     expect(metadata.alternates?.languages).toEqual({
-      "x-default": "https://www.enhe-tech.com.cn/ai-news?page=2",
-      "zh-CN": "https://www.enhe-tech.com.cn/ai-news?page=2",
-      "en-US": "https://www.enhe-tech.com.cn/en/ai-news?page=2",
+      "x-default": "https://www.enhe-tech.com.cn/ai-news/page/2",
+      "zh-CN": "https://www.enhe-tech.com.cn/ai-news/page/2",
+      "en-US": "https://www.enhe-tech.com.cn/en/ai-news/page/2",
     });
   });
 
   it("keeps filtered AI news listings non-indexable on the root canonical", async () => {
-    const metadata = await generateAiNewsPageMetadata("zh", {
-      page: "2",
-      q: "agent",
-    });
+    const metadata = await generateAiNewsPageMetadata(
+      "zh",
+      Promise.resolve({
+        page: "2",
+        q: "agent",
+      }),
+    );
 
     expect(metadata.alternates?.canonical).toBe(
       "https://www.enhe-tech.com.cn/ai-news",

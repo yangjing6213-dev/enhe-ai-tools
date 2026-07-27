@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { AdminSection, Field, SubmitButton, inputClass, selectClass, textareaClass } from "@/app/admin/admin-ui";
 import {
+  GEO_MINIMUM_VALID_SAMPLE_SIZE,
   GEO_MONITORING_QUERIES,
   buildGeoMonitoringReport,
   type GeoMonitoringProvider,
@@ -14,34 +15,27 @@ export const dynamic = "force-dynamic";
 
 export default async function AdminGeoMonitoringPage() {
   await ensureGeoMonitoringDefaults();
-  const queryResults = await prisma.geoVisibilityResult
-    .findMany({
-      select: {
-        queryText: true,
-        providerKey: true,
-        isBrandMentioned: true,
-        isDomainCited: true,
-        citedUrls: true,
-        competitors: true
-      },
-      orderBy: { checkedAt: "desc" },
-      take: 300
-    })
-    .then((results) =>
-      results.map((result) => ({
-        query: result.queryText,
-        providerId: result.providerKey,
-        isBrandMentioned: result.isBrandMentioned,
-        isDomainCited: result.isDomainCited,
-        citedUrls: result.citedUrls,
-        competitors: result.competitors
-      }))
-    )
-    .catch(() => []);
-  const [savedQueries, savedProviders, openRecommendations] = await Promise.all([
+  const latestResultRead = await getLatestGeoVisibilityResults();
+  const queryResults = latestResultRead.results.map((result) => ({
+    query: result.queryText,
+    providerId: result.providerKey,
+    collectionStatus:
+      result.sentiment === "geo:unavailable"
+        ? "unavailable" as const
+        : result.sentiment === "geo:uncollected"
+          ? "uncollected" as const
+          : "collected" as const,
+    isBrandMentioned: result.isBrandMentioned,
+    isDomainCited: result.isDomainCited,
+    citedUrls: result.citedUrls,
+    answerSummary: result.answerSummary,
+    screenshotUrl: result.screenshotUrl,
+    checkedAt: result.checkedAt,
+    competitors: result.competitors
+  }));
+  const [savedQueries, savedProviders] = await Promise.all([
     prisma.geoQuery.count().catch(() => 0),
-    prisma.geoProvider.count().catch(() => 0),
-    prisma.geoRecommendation.count({ where: { status: { in: ["open", "planned"] } } }).catch(() => 0)
+    prisma.geoProvider.count().catch(() => 0)
   ]);
   const report = buildGeoMonitoringReport({ queryResults });
   const globalProviders = report.providers.filter((provider) => provider.region === "global");
@@ -49,24 +43,38 @@ export default async function AdminGeoMonitoringPage() {
 
   return (
     <AdminSection
-      title="GEO 监控中心"
-      intro="统一跟踪 ChatGPT、Perplexity、Google AI Overview、Bing/Copilot、Claude，以及百度、豆包、Kimi、通义、腾讯元宝、DeepSeek 等平台的品牌可见度、引用页面和下一步内容动作。"
+      title="GEO 人工巡检证据台账"
+      intro="仅记录 ChatGPT、Perplexity、Google AI Overview、Claude，以及百度、豆包、Kimi、通义、腾讯元宝、DeepSeek 等平台的人工巡检样本；本页面不代表自动监控或真实自动采集。"
     >
-      <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-6">
+      <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-8">
         <GeoStat label="核心查询" value={report.summary.totalQueries} accent />
-        <GeoStat label="监控平台" value={report.summary.totalProviders} />
-        <GeoStat label="中国平台" value={report.summary.chinaProviders} />
-        <GeoStat label="已记录结果" value={report.summary.reviewedResults} />
-        <GeoStat label="品牌提及率" value={`${report.summary.brandMentionRate}%`} />
-        <GeoStat label="待处理建议" value={openRecommendations || report.summary.openGaps} />
+        <GeoStat label="人工巡检平台" value={report.summary.eligibleProviders} />
+        <GeoStat label="已记录结果" value={report.summary.recordedResults} />
+        <GeoStat label="有效样本数" value={report.summary.validSampleCount} />
+        <GeoStat label="目标覆盖" value={`${report.summary.validSampleCount} / ${report.summary.targetSampleCount}`} />
+        <GeoStat label="品牌提及率" value={formatRate(report.summary.brandMentionRate)} />
+        <GeoStat label="官网引用率" value={formatRate(report.summary.domainCitationRate)} />
+        <GeoStat
+          label="人工证据状态"
+          value={latestResultRead.failed ? "读取失败" : evidenceStatusLabel(report.summary.evidenceStatus)}
+        />
+      </div>
+
+      <div className="mt-4 flex flex-wrap gap-x-6 gap-y-2 border-y border-white/10 py-3 text-sm text-[var(--marketing-muted)]">
+        <span>日期范围：{formatDateRange(report.summary.firstCheckedAt, report.summary.lastCheckedAt)}</span>
+        <span>最近巡检时间：{formatCheckedAt(report.summary.lastCheckedAt)}</span>
+        <span>最低有效样本：{GEO_MINIMUM_VALID_SAMPLE_SIZE} 条</span>
+        <span>已排除搜索绩效结果：{report.summary.excludedResults} 条</span>
+        {latestResultRead.failed ? <span>数据库读取失败，当前按空态显示。</span> : null}
+        <span>阶段边界：不含完整审核人、证据哈希、自动采集或数据库迁移。</span>
       </div>
 
       <section className="surface-panel mt-8 p-6">
         <div className="flex flex-wrap items-center justify-between gap-3">
           <div>
-            <h2 className="text-xl font-semibold text-[var(--marketing-text)]">平台覆盖</h2>
+            <h2 className="text-xl font-semibold text-[var(--marketing-text)]">人工巡检平台范围</h2>
             <p className="mt-2 text-sm leading-6 text-[var(--marketing-muted)]">
-              API 优先；没有稳定官方 API 或需要登录的平台，先使用浏览器巡检记录，避免硬抓取导致数据不稳定。
+              台账只保存人工浏览器巡检证据。GSC 与 Bing Webmaster 仅作为搜索绩效来源，不计入 AI 品牌提及率、官网引用率或内容建议。
             </p>
           </div>
           <span className="rounded-full border border-white/10 bg-white/8 px-3 py-1 text-xs font-semibold text-[var(--marketing-muted)]">
@@ -97,9 +105,11 @@ export default async function AdminGeoMonitoringPage() {
         <section className="surface-panel p-6">
           <h2 className="text-xl font-semibold text-[var(--marketing-text)]">下一步优化建议</h2>
           <div className="mt-5 space-y-4">
-            {report.recommendations.map((item) => (
+            {report.recommendations.length ? report.recommendations.map((item) => (
               <RecommendationCard key={`${item.type}-${item.query}`} item={item} />
-            ))}
+            )) : (
+              <p className="text-sm leading-7 text-[var(--marketing-muted)]">暂无基于有效人工样本的内容建议。</p>
+            )}
           </div>
         </section>
       </div>
@@ -107,8 +117,8 @@ export default async function AdminGeoMonitoringPage() {
       <section className="surface-panel mt-8 p-6">
         <h2 className="text-xl font-semibold text-[var(--marketing-text)]">月度巡检流程</h2>
         <div className="mt-5 grid gap-4 md:grid-cols-2 xl:grid-cols-4">
-          <ProcessCard title="1. 运行核心查询" text="每月在国际平台与中国平台分别检查 20+ 个查询，记录是否出现 ENHE AI、官网链接和竞品来源。" />
-          <ProcessCard title="2. 记录引用来源" text="保存回答摘要、引用 URL、截图地址、竞争品牌和情绪判断，形成可回溯的 GEO 数据资产。" />
+          <ProcessCard title="1. 人工运行核心查询" text="每月由人员在国际平台与中国平台分别检查 20+ 个查询，记录是否出现 ENHE AI、官网链接和竞品来源。" />
+          <ProcessCard title="2. 保存人工证据" text="保存原始回答摘要、引用 URL、截图地址、竞争品牌和情绪判断，形成可回溯的人工巡检样本。" />
           <ProcessCard title="3. 生成内容动作" text="根据缺口补 FAQ、对比表、来源引用、可摘录答案段，并把高价值主题写入 OKF 概念页。" />
           <ProcessCard title="4. 回看转化路径" text="把 GEO 建议连接到站内 AI 资讯、软件应用、账号服务和技能教程，优先补能带来转化的页面。" />
         </div>
@@ -117,7 +127,7 @@ export default async function AdminGeoMonitoringPage() {
       <section className="surface-panel mt-8 p-6">
         <h2 className="text-xl font-semibold text-[var(--marketing-text)]">记录巡检结果</h2>
         <p className="mt-2 text-sm leading-6 text-[var(--marketing-muted)]">
-          用于录入 ChatGPT、Perplexity、百度、豆包等平台的人工或浏览器巡检结果。系统会基于未提及、未引用和竞品出现情况生成下一步内容建议。
+          仅用于人工录入 ChatGPT、Perplexity、百度、豆包等平台的巡检证据。官网引用只有在同时提供 enhe-tech.com.cn 官方 URL 和原始回答摘要或截图证据时才会计入。
         </p>
         <form action={recordGeoVisibilityResultAction} className="mt-6 grid gap-4 rounded-2xl border border-white/10 bg-white/5 p-5 md:grid-cols-2">
           <Field label="查询词">
@@ -136,6 +146,13 @@ export default async function AdminGeoMonitoringPage() {
                   {provider.name}
                 </option>
               ))}
+            </select>
+          </Field>
+          <Field label="人工证据状态" className="md:col-span-2">
+            <select name="collectionStatus" className={selectClass} defaultValue="collected">
+              <option value="collected">人工样本已记录</option>
+              <option value="uncollected">尚未人工巡检</option>
+              <option value="unavailable">平台不可用</option>
             </select>
           </Field>
           <Field label="回答摘要" className="md:col-span-2">
@@ -158,18 +175,88 @@ export default async function AdminGeoMonitoringPage() {
               <input name="isBrandMentioned" type="checkbox" className="h-4 w-4 accent-[var(--marketing-accent)]" />
               已提及 ENHE AI
             </label>
-            <label className="flex items-center gap-3 rounded-xl border border-white/10 bg-white/5 px-4 py-3 text-sm font-semibold text-[#E8EEF8]">
-              <input name="isDomainCited" type="checkbox" className="h-4 w-4 accent-[var(--marketing-accent)]" />
-              已引用官网链接
-            </label>
           </div>
           <div className="md:col-span-2">
-            <SubmitButton pendingLabel="保存中...">保存巡检结果</SubmitButton>
+            <SubmitButton pendingLabel="保存中...">保存人工巡检样本</SubmitButton>
           </div>
         </form>
       </section>
     </AdminSection>
   );
+}
+
+async function getLatestGeoVisibilityResults() {
+  try {
+    const groups = await prisma.geoVisibilityResult.groupBy({
+      by: ["queryText", "providerKey"],
+      _max: { checkedAt: true }
+    });
+    const latestFilters = groups.flatMap((group) =>
+      group._max.checkedAt
+        ? [{
+            queryText: group.queryText,
+            providerKey: group.providerKey,
+            checkedAt: group._max.checkedAt
+          }]
+        : []
+    );
+    if (!latestFilters.length) return { results: [], failed: false };
+
+    const candidates = await prisma.geoVisibilityResult.findMany({
+      where: { OR: latestFilters },
+      select: {
+        id: true,
+        queryText: true,
+        providerKey: true,
+        isBrandMentioned: true,
+        isDomainCited: true,
+        citedUrls: true,
+        answerSummary: true,
+        screenshotUrl: true,
+        competitors: true,
+        sentiment: true,
+        checkedAt: true,
+        createdAt: true
+      },
+      orderBy: [{ checkedAt: "desc" }, { createdAt: "desc" }, { id: "desc" }]
+    });
+    const latestByQueryProvider = new Map<string, (typeof candidates)[number]>();
+    for (const candidate of candidates) {
+      const key = JSON.stringify([candidate.queryText, candidate.providerKey]);
+      if (!latestByQueryProvider.has(key)) latestByQueryProvider.set(key, candidate);
+    }
+    return { results: Array.from(latestByQueryProvider.values()), failed: false };
+  } catch (error) {
+    console.error("[geo-monitoring] failed to load latest visibility results", error);
+    return { results: [], failed: true };
+  }
+}
+
+function formatRate(value: number | null) {
+  return value === null ? "数据不足" : `${value}%`;
+}
+
+function evidenceStatusLabel(status: "no_records" | "insufficient" | "sufficient") {
+  if (status === "no_records") return "暂无人工证据";
+  if (status === "insufficient") return "数据不足";
+  return "人工样本已达阈值";
+}
+
+function formatDateRange(firstCheckedAt: string | null, lastCheckedAt: string | null) {
+  if (!firstCheckedAt || !lastCheckedAt) return "暂无巡检记录";
+  return `${formatCheckedAt(firstCheckedAt)} - ${formatCheckedAt(lastCheckedAt)}`;
+}
+
+function formatCheckedAt(value: string | null) {
+  if (!value) return "暂无巡检记录";
+  return new Intl.DateTimeFormat("zh-CN", {
+    timeZone: "Asia/Shanghai",
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+    hour: "2-digit",
+    minute: "2-digit"
+  }).format(new Date(value));
 }
 
 function GeoStat({ label, value, accent = false }: { label: string; value: number | string; accent?: boolean }) {
@@ -255,9 +342,9 @@ function ProcessCard({ title, text }: { title: string; text: string }) {
 
 function modeLabel(mode: GeoMonitoringProvider["mode"]) {
   if (mode === "api") return "API";
-  if (mode === "search_console") return "GSC";
-  if (mode === "bing_webmaster") return "Bing";
-  return "浏览器巡检";
+  if (mode === "search_console") return "GSC 搜索绩效（不计 AI）";
+  if (mode === "bing_webmaster") return "Bing 搜索绩效（不计 AI）";
+  return "人工浏览器巡检";
 }
 
 function intentLabel(intent: GeoMonitoringQuery["intent"]) {

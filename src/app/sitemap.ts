@@ -1,8 +1,11 @@
 import type { MetadataRoute } from "next";
-import { isEnglishNewsArticleIndexable } from "@/lib/ai-news";
+import {
+  getNewsPageCount,
+  getNewsPaginationLocales,
+  isEnglishNewsArticleIndexable,
+} from "@/lib/ai-news";
 import { aiNewsTopics, getAiNewsTopicPath } from "@/lib/ai-news-topics";
 import { getPublicAiNewsTopics } from "@/lib/ai-news-topic-config";
-import { aiTopicClusters, getAiTopicPath } from "@/lib/ai-topic-clusters";
 import { prisma } from "@/lib/db";
 import {
   buildCanonicalToolPath,
@@ -28,6 +31,20 @@ const aiNewsTopicSitemapPathHints = [
   "/ai-news/topics/ai-account-service",
   "/ai-news/topics/ai-regulation",
 ] as const;
+const sitemapExcludedPaths = new Set([
+  "/build-your-own-x",
+  "/en/build-your-own-x",
+  "/ai-topics",
+  "/en/ai-topics",
+  "/product-demos",
+  "/en/product-demos",
+  "/product-paths/work-efficiency",
+  "/en/product-paths/work-efficiency",
+  "/product-paths/media-generation",
+  "/en/product-paths/media-generation",
+  "/product-paths/future-ai",
+  "/en/product-paths/future-ai",
+]);
 
 function getPriority(path: string) {
   if (path === "/" || path === "/en") return 1;
@@ -67,7 +84,7 @@ function isKnownAiNewsTopicPath(path: string) {
 }
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-  const [tools, newsArticles, productDemos, publicAiNewsTopics] = await Promise.all([
+  const [tools, newsArticles, publicAiNewsTopics] = await Promise.all([
     prisma.tool
       .findMany({
         where: { status: "published" },
@@ -95,18 +112,42 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
         },
       })
       .catch(() => []),
-    prisma.productDemo
-      .findMany({
-        where: { status: "published" },
-        select: { slug: true, updatedAt: true },
-        orderBy: [{ sortOrder: "asc" }, { updatedAt: "desc" }],
-      })
-      .catch(() => []),
     getPublicAiNewsTopics().catch(() => aiNewsTopics),
   ]);
 
+  const latestNewsUpdate = newsArticles.reduce<Date>(
+    (latest, article) => (article.updatedAt > latest ? article.updatedAt : latest),
+    new Date("2026-06-18T00:00:00.000Z"),
+  );
+  const chineseNewsPageCount = getNewsPageCount(newsArticles.length);
+  const englishNewsTotal = newsArticles.filter(isEnglishNewsArticleIndexable).length;
+  const englishNewsPageCount = getNewsPageCount(englishNewsTotal);
+  const newsPaginationEntries = [
+    ...Array.from({ length: Math.max(0, chineseNewsPageCount - 1) }, (_, index) => index + 2).map((page) => {
+      const path = `/ai-news/page/${page}`;
+      const locales = getNewsPaginationLocales(page, englishNewsTotal);
+      return {
+        url: absoluteUrl(path),
+        lastModified: latestNewsUpdate,
+        alternates: { languages: buildAvailableLanguageAlternates(path, [...locales]) },
+        changeFrequency: "daily" as const,
+        priority: 0.68,
+      };
+    }),
+    ...Array.from({ length: Math.max(0, englishNewsPageCount - 1) }, (_, index) => index + 2).map((page) => {
+      const canonicalPath = `/ai-news/page/${page}`;
+      return {
+        url: absoluteUrl(`/en${canonicalPath}`),
+        lastModified: latestNewsUpdate,
+        alternates: { languages: buildAvailableLanguageAlternates(canonicalPath, ["zh", "en"]) },
+        changeFrequency: "daily" as const,
+        priority: 0.64,
+      };
+    }),
+  ];
+
   const entries = [
-    ...publicDiscoveryRoutes.map((route) => ({
+    ...publicDiscoveryRoutes.filter((route) => !sitemapExcludedPaths.has(route.path)).map((route) => ({
       url: absoluteSitemapUrl(route.path),
       lastModified: new Date(route.lastModified),
       alternates: {
@@ -135,23 +176,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
         };
       }),
     ),
-    ...aiTopicClusters.flatMap((topic) =>
-      (["zh", "en"] as const).map((locale) => {
-        const path = getAiTopicPath(topic.slug, locale);
-        return {
-          url: absoluteSitemapUrl(path),
-          lastModified: new Date(topic.updatedAt),
-          alternates: {
-            languages: buildAvailableLanguageAlternates(
-              `/ai-topics/${topic.slug}`,
-              ["zh", "en"],
-            ),
-          },
-          changeFrequency: "weekly" as const,
-          priority: 0.73,
-        };
-      }),
-    ),
+    ...newsPaginationEntries,
     ...tools.flatMap((tool) => {
       const canonicalPath = buildCanonicalToolPath(tool, "zh");
       const hasEnglishPage = shouldIndexEnglishToolPage(tool);
@@ -194,18 +219,6 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
         },
         changeFrequency: "weekly" as const,
         priority: route.priority,
-      }));
-    }),
-    ...productDemos.flatMap((demo) => {
-      const canonicalPath = `/product-demos/${demo.slug}`;
-      return [canonicalPath, `/en/product-demos/${demo.slug}`].map((path) => ({
-        url: absoluteUrl(path),
-        lastModified: demo.updatedAt,
-        alternates: {
-          languages: buildAvailableLanguageAlternates(canonicalPath, ["zh", "en"]),
-        },
-        changeFrequency: "weekly" as const,
-        priority: path.startsWith("/en/") ? 0.68 : 0.74,
       }));
     }),
   ];

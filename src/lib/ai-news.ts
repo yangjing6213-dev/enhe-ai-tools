@@ -34,7 +34,54 @@ export type NewsContentBlock =
   | { type: "quote"; text: string }
   | { type: "code"; language?: string; code: string };
 
-const newsPageSize = 9;
+export const newsPageSize = 9;
+const maxNewsQueryOffset = 2_147_483_647;
+const maxNewsPaginationPage =
+  Math.floor(maxNewsQueryOffset / newsPageSize) + 1;
+
+export function getNewsPageCount(total: number) {
+  return Math.max(1, Math.ceil(Math.max(0, total) / newsPageSize));
+}
+
+export function parseNewsPaginationPage(value: string) {
+  if (!/^[1-9]\d*$/.test(value)) return null;
+
+  const page = Number(value);
+  return isNewsPaginationPageQueryable(page) ? page : null;
+}
+
+export function isNewsPaginationPageQueryable(page: number) {
+  return (
+    Number.isSafeInteger(page) &&
+    page >= 1 &&
+    page <= maxNewsPaginationPage
+  );
+}
+
+export function getNewsPaginationLocales(page: number, englishTotal: number) {
+  return page <= getNewsPageCount(englishTotal)
+    ? (["zh", "en"] as const)
+    : (["zh"] as const);
+}
+
+export function isNewsPaginationPageInRange(page: number, total: number) {
+  return (
+    isNewsPaginationPageQueryable(page) &&
+    page >= 2 &&
+    page <= getNewsPageCount(total)
+  );
+}
+
+export function hasActiveNewsFilters(
+  filters: Pick<NewsSearchFilters, "q" | "category" | "tag" | "sort">,
+) {
+  return Boolean(
+    filters.q ||
+      filters.category ||
+      filters.tag ||
+      filters.sort !== "latest",
+  );
+}
 
 export function resolveNewsSlug({
   title,
@@ -102,7 +149,9 @@ export function parseNewsSearchParams(
     sort,
     page,
     pageSize: newsPageSize,
-    skip: (page - 1) * newsPageSize,
+    skip: isNewsPaginationPageQueryable(page)
+      ? (page - 1) * newsPageSize
+      : 0,
   };
 }
 
@@ -331,8 +380,12 @@ export function renderNewsContentBlocks(content: string): NewsContentBlock[] {
   return blocks;
 }
 
-const cjkTextPattern = /[\u3400-\u9fff]/;
+const hanCharacterPattern = /\p{Script=Han}/gu;
+const hanSequencePattern = /\p{Script=Han}+/gu;
+const englishAndHanCharacterPattern = /[A-Za-z]|\p{Script=Han}/gu;
 const englishWordPattern = /[A-Za-z][A-Za-z0-9'+-]*/g;
+export const maxIncidentalEnglishNewsHanCharacters = 8;
+export const maxEnglishNewsHanCharacterRatio = 0.05;
 
 function normalizeEnglishCandidate(value: string | null | undefined) {
   return String(value ?? "")
@@ -344,12 +397,29 @@ function countEnglishWords(value: string) {
   return value.match(englishWordPattern)?.length ?? 0;
 }
 
+function hasAcceptableEnglishNewsHanMix(value: string) {
+  const hanCharacterCount = value.match(hanCharacterPattern)?.length ?? 0;
+  const hasOversizedHanSequence = (value.match(hanSequencePattern) ?? []).some(
+    (sequence) => Array.from(sequence).length > maxIncidentalEnglishNewsHanCharacters,
+  );
+  if (hasOversizedHanSequence) return false;
+  if (hanCharacterCount <= maxIncidentalEnglishNewsHanCharacters) return true;
+
+  const comparableCharacterCount =
+    value.match(englishAndHanCharacterPattern)?.length ?? 0;
+  return (
+    comparableCharacterCount > 0 &&
+    hanCharacterCount / comparableCharacterCount <=
+      maxEnglishNewsHanCharacterRatio
+  );
+}
+
 export function isUsableEnglishNewsText(
   value: string | null | undefined,
   minimumWords: number,
 ) {
   const normalized = normalizeEnglishCandidate(value);
-  if (!normalized || cjkTextPattern.test(normalized)) return false;
+  if (!normalized || !hasAcceptableEnglishNewsHanMix(normalized)) return false;
   return countEnglishWords(normalized) >= minimumWords;
 }
 
@@ -437,11 +507,11 @@ export function resolveAiNewsMetaDescription(
     ? normalizedFallback
     : "";
 
-  if (!validCandidate) return validFallback;
+  if (!validCandidate) return truncateAiNewsMetaDescription(validFallback, 150);
 
   const targetLength = /[\u4e00-\u9fff]/.test(validCandidate) ? 70 : 110;
   if (validCandidate.length >= targetLength || validFallback.length < targetLength) {
-    return validCandidate;
+    return truncateAiNewsMetaDescription(validCandidate, 150);
   }
 
   if (validFallback.includes(validCandidate)) {
@@ -449,7 +519,7 @@ export function resolveAiNewsMetaDescription(
   }
 
   if (validCandidate.includes(validFallback)) {
-    return validCandidate;
+    return truncateAiNewsMetaDescription(validCandidate, 150);
   }
 
   return truncateAiNewsMetaDescription(`${validCandidate} ${validFallback}`, 150);
@@ -484,10 +554,54 @@ export function buildAiNewsDescriptionFallback({
   );
 }
 
-function truncateAiNewsMetaDescription(value: string, maxLength: number) {
+const asciiTokenCharacterPattern = /[A-Za-z0-9._+#/@?%=&~:\-]/;
+
+function isAsciiTokenCharacter(value: string | undefined) {
+  return Boolean(value && asciiTokenCharacterPattern.test(value));
+}
+
+function findAsciiTokenSafeEnd(value: string, maxLength: number) {
+  let end = maxLength;
+  if (
+    isAsciiTokenCharacter(value.charAt(end - 1)) &&
+    isAsciiTokenCharacter(value.charAt(end))
+  ) {
+    while (end > 0 && isAsciiTokenCharacter(value.charAt(end - 1))) {
+      end -= 1;
+    }
+  }
+  return end;
+}
+
+export function truncateAiNewsMetaDescription(value: string, maxLength: number) {
   const normalized = normalizeAiNewsMetaCandidate(value);
   if (normalized.length <= maxLength) return normalized;
-  return `${normalized.slice(0, maxLength - 3).trimEnd()}...`;
+  if (maxLength <= 0) return "";
+
+  const end = findAsciiTokenSafeEnd(normalized, maxLength);
+  if (end === 0) {
+    const firstWhitespace = normalized.search(/\s/);
+    if (firstWhitespace > 0) {
+      const remainder = normalized.slice(firstWhitespace).trim();
+      if (remainder) {
+        return truncateAiNewsMetaDescription(remainder, maxLength);
+      }
+    }
+    return buildStableAiNewsReference(normalized, maxLength);
+  }
+
+  const candidate = normalized.slice(0, end).trimEnd();
+  const naturalBreak = Math.max(
+    ...["：", "、", "，", "；", "。", "！", "？", ":", ",", ";", "!", "?"].map(
+      (separator) => candidate.lastIndexOf(separator),
+    ),
+  );
+  const preferred =
+    naturalBreak >= Math.floor(end * 0.6)
+      ? candidate.slice(0, naturalBreak).trimEnd()
+      : candidate;
+
+  return preferred.replace(/[、，；：,:;\-–—|｜/\s]+$/g, "").trim();
 }
 
 function stripGenericEnglishNewsTitlePrefix(value: string) {
@@ -497,21 +611,108 @@ function stripGenericEnglishNewsTitlePrefix(value: string) {
     .trim();
 }
 
-function truncateAiNewsTitleSource(
+function cleanAiNewsSerpTitle(value: string) {
+  return normalizeAiNewsMetaCandidate(value)
+    .replace(/\s*(?:[|｜\-–—:：]\s*)?(?:影响解读|Impact Analysis)\s*$/i, "")
+    .replace(/(?:\s*[|｜]\s*){2,}/g, " | ")
+    .replace(/\s+/g, " ")
+    .replace(/\s+([、，；。！？,:;!?])/g, "$1")
+    .replace(/[\s、，；。！？,:;!?\-–—|｜/]+$/g, "")
+    .replace(/(?:\s*[|｜:：、，；。！？,;!?\-–—/])+\s*$/u, "")
+    .trim();
+}
+
+function isSingleOversizedAsciiToken(value: string, maxLength: number) {
+  return (
+    value.length > maxLength &&
+    value.length > 0 &&
+    Array.from(value).every((character) => isAsciiTokenCharacter(character))
+  );
+}
+
+function buildReadableAsciiTokenTitle(value: string, maxLength: number) {
+  const words = value
+    .replace(/([a-z])([A-Z])/g, "$1 $2")
+    .replace(/([A-Za-z])(\d)/g, "$1 $2")
+    .replace(/(\d)([A-Za-z])/g, "$1 $2")
+    .split(/[^A-Za-z0-9]+/)
+    .filter(Boolean);
+  if (words.length < 2) return "";
+
+  let title = "";
+  for (const word of words) {
+    const candidate = title ? `${title} ${word}` : word;
+    if (candidate.length > maxLength) {
+      if (!title) continue;
+      break;
+    }
+    title = candidate;
+  }
+  return title;
+}
+
+function buildStableAiNewsFingerprint(value: string) {
+  let hash = 2_166_136_261;
+  for (const character of value) {
+    hash ^= character.charCodeAt(0);
+    hash = Math.imul(hash, 16_777_619);
+  }
+  return (hash >>> 0).toString(36).padStart(6, "0").slice(-6);
+}
+
+function buildStableAiNewsReference(value: string, maxLength: number) {
+  const fingerprint = buildStableAiNewsFingerprint(value);
+  for (const label of ["Reference", "Ref"]) {
+    const reference = `${label} ${fingerprint}`;
+    if (reference.length <= maxLength) return reference;
+  }
+  return fingerprint.slice(0, maxLength);
+}
+
+function buildOversizedAsciiTokenTitle({
+  value,
+  categoryName,
+  maxLength,
+}: {
+  value: string;
+  categoryName: string;
+  maxLength: number;
+}) {
+  const readableTitle = buildReadableAsciiTokenTitle(value, maxLength);
+  if (readableTitle) return readableTitle;
+
+  const fingerprint = buildStableAiNewsFingerprint(value);
+  for (const label of [categoryName, "AI"]) {
+    const candidate = `${label} ${fingerprint}`.trim();
+    if (candidate.length <= maxLength) return candidate;
+  }
+  return maxLength >= fingerprint.length ? fingerprint : "";
+}
+
+function truncateAiNewsSerpTitle(
   value: string,
   maxLength: number,
   locale: "zh" | "en",
 ) {
-  if (value.length <= maxLength) return value;
+  const cleaned = cleanAiNewsSerpTitle(value);
+  if (maxLength <= 0) return "";
+  if (cleaned.length <= maxLength) return cleaned;
 
-  const candidate = value.slice(0, maxLength).trimEnd();
-  if (locale !== "en") return candidate;
-  if (/\s/.test(value.charAt(candidate.length))) return candidate;
+  const end = findAsciiTokenSafeEnd(cleaned, maxLength);
 
-  const lastWordBoundary = candidate.lastIndexOf(" ");
-  return lastWordBoundary > 0
-    ? candidate.slice(0, lastWordBoundary).trimEnd()
-    : candidate;
+  const candidate = cleaned.slice(0, end).trimEnd();
+  if (locale === "zh") {
+    const naturalBreak = Math.max(
+      ...["：", "、", "，", "；", "。", "！", "？"].map((separator) =>
+        candidate.lastIndexOf(separator),
+      ),
+    );
+    if (naturalBreak >= Math.floor(maxLength * 0.45)) {
+      return cleanAiNewsSerpTitle(candidate.slice(0, naturalBreak));
+    }
+  }
+
+  return cleanAiNewsSerpTitle(candidate);
 }
 
 export function buildAiNewsSerpTitle({
@@ -525,25 +726,32 @@ export function buildAiNewsSerpTitle({
   locale: "zh" | "en";
   maxLength: number;
 }) {
+  if (maxLength <= 0) return "";
+  if (maxLength === 1) return "";
+  if (maxLength <= 5) return "AI";
+
   const normalizedTitle = normalizeAiNewsMetaCandidate(title);
-  const normalizedCategory = normalizeAiNewsMetaCandidate(categoryName);
-  const suffix = locale === "en" ? "Impact Analysis" : "影响解读";
-  const reservedLength = ` ${suffix}`.length;
-  const englishTitle =
+  const normalizedCategory = cleanAiNewsSerpTitle(categoryName ?? "");
+  const localizedTitle =
     locale === "en"
       ? stripGenericEnglishNewsTitlePrefix(normalizedTitle)
       : normalizedTitle;
-  const source = englishTitle || normalizedCategory || "AI";
-  const compactSource =
-    source.length + reservedLength <= maxLength
-      ? source
-      : truncateAiNewsTitleSource(
-          source,
-          Math.max(12, maxLength - reservedLength),
-          locale,
-        );
+  const source = cleanAiNewsSerpTitle(localizedTitle) || normalizedCategory || "AI";
+  const compactTitle = truncateAiNewsSerpTitle(source, maxLength, locale);
+  if (compactTitle) return compactTitle;
 
-  return `${compactSource} ${suffix}`;
+  if (isSingleOversizedAsciiToken(source, maxLength)) {
+    return buildOversizedAsciiTokenTitle({
+      value: source,
+      categoryName: normalizedCategory,
+      maxLength,
+    });
+  }
+
+  return (
+    truncateAiNewsSerpTitle(normalizedCategory, maxLength, locale) ||
+    (maxLength >= "AI".length ? "AI" : "")
+  );
 }
 
 export function parseNewsRelationIds(value: string | null | undefined) {

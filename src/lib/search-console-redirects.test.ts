@@ -2,6 +2,10 @@ import { describe, expect, it } from "vitest";
 import nextConfig from "../../next.config";
 
 describe("Search Console legacy URL redirects", () => {
+  it("renders metadata in the initial HTML for every crawler", () => {
+    expect(nextConfig.htmlLimitedBots).toEqual(/.*/);
+  });
+
   it("permanently maps known legacy product, learning, and image URLs", async () => {
     const redirects = await nextConfig.redirects?.();
 

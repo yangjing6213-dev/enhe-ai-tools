@@ -30,6 +30,36 @@ describe("public discovery manifest", () => {
     for (const forbidden of ["/admin", "/user", "/checkout", "/orders", "/api"]) {
       expect(paths.some((path) => path === forbidden || path.startsWith(`${forbidden}/`))).toBe(false);
     }
+    for (const deprioritized of [
+      "/build-your-own-x",
+      "/en/build-your-own-x",
+      "/ai-topics",
+      "/en/ai-topics",
+      "/product-demos",
+      "/en/product-demos",
+    ]) {
+      expect(paths).not.toContain(deprioritized);
+    }
+  });
+
+  it("does not recommend sitemap-excluded non-core pages through llms or OKF", () => {
+    const renderedSignals = [
+      renderLlmsImportantPages(),
+      renderLlmsMachineReadableResources(),
+      renderOkfFiles(),
+      renderOkfCanonicalSections(),
+    ].join("\n");
+
+    expect(renderedSignals).not.toMatch(/build-your-own-x|ai-topics|product-demos/);
+  });
+
+  it("retains code-level contextual inbound links without claiming production crawl state", () => {
+    const home = read("src/app/page-shell.tsx");
+    const header = read("src/components/site-header.tsx");
+
+    expect(home).toContain('href: "/ai-topics"');
+    expect(home).toContain('buildLocalePath("/product-demos", forceLocale)');
+    expect(header).toContain('buildLocalePath("/build-your-own-x", locale)');
   });
 
   it("keeps llms and OKF generated blocks synchronized with the manifest", () => {
@@ -50,7 +80,8 @@ describe("public discovery manifest", () => {
     const generator = read("scripts/generate-public-discovery.ts");
 
     expect(sitemap).toContain('import { publicDiscoveryRoutes } from "@/lib/public-discovery-manifest"');
-    expect(sitemap).toContain("publicDiscoveryRoutes.map");
+    expect(sitemap).toContain("publicDiscoveryRoutes.filter");
+    expect(sitemap).toContain("sitemapExcludedPaths");
     expect(sitemap).not.toContain("const staticRoutes =");
     expect(packageJson).toContain("tsx scripts/generate-public-discovery.ts &&");
     expect(generator).toContain("renderLlmsImportantPages");

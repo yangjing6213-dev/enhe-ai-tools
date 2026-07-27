@@ -3,6 +3,7 @@ import Link from "next/link";
 import { StructuredData } from "@/components/structured-data";
 import { Container, EmptyState, SectionTitle } from "@/components/ui";
 import { ToolCard } from "@/components/tool-card";
+import { enheOrganizationReference } from "@/lib/brand-entity";
 import { getDictionary, type Locale } from "@/lib/dictionaries";
 import {
   getPublicToolCategories,
@@ -126,10 +127,7 @@ function buildAccountServicesCollectionSchema(forceLocale: Locale) {
       serviceType: isEnglish
         ? "AI account subscription and usage guidance"
         : "AI工具订阅与账号使用支持",
-      provider: {
-        "@type": "Organization",
-        name: "ENHE AI",
-      },
+      provider: enheOrganizationReference,
       areaServed: "CN",
       url,
     },

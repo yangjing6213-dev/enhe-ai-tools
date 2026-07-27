@@ -2,6 +2,10 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { StructuredData } from "@/components/structured-data";
 import { Badge, Container, SectionTitle } from "@/components/ui";
+import {
+  buildEnheOrganizationSchema,
+  enheOrganizationReference,
+} from "@/lib/brand-entity";
 import { getDictionary, type Locale } from "@/lib/dictionaries";
 import {
   absoluteUrl,
@@ -9,7 +13,6 @@ import {
   buildFaqSchema,
   buildLocalePath,
   buildMetadataTitle,
-  buildOrganizationSchema,
   buildPageMetadata,
 } from "@/lib/seo";
 
@@ -205,8 +208,7 @@ export function AboutPageShell({ forceLocale }: { forceLocale: Locale }) {
   });
   const faqSchema = buildFaqSchema({ items: [...copy.faq] });
   const organizationSchema = {
-    ...buildOrganizationSchema({
-      name: forceLocale === "en" ? "ENHE AI" : "恩禾ENHE AI",
+    ...buildEnheOrganizationSchema({
       logo: "/images/brand/enhe-icon-gradient-white-bg-cropped.png",
       url: absoluteUrl("/"),
       description: copy.description,
@@ -227,8 +229,8 @@ export function AboutPageShell({ forceLocale }: { forceLocale: Locale }) {
     description: copy.description,
     url: absoluteUrl(localePath),
     inLanguage,
-    about: organizationSchema,
-    mainEntity: organizationSchema,
+    about: enheOrganizationReference,
+    mainEntity: enheOrganizationReference,
   };
 
   return (

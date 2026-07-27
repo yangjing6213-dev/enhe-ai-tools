@@ -5,10 +5,21 @@ import { redirect } from "next/navigation";
 import { z } from "zod";
 import { requireAdmin } from "@/lib/auth";
 import { prisma } from "@/lib/db";
-import { GEO_MONITORING_PROVIDERS, GEO_MONITORING_QUERIES } from "@/lib/geo-monitoring";
+import {
+  GEO_MONITORING_PROVIDERS,
+  GEO_MONITORING_QUERIES,
+  hasVerifiableEnheCitationEvidence,
+  isConfiguredGeoProvider,
+  isConfiguredGeoQuery
+} from "@/lib/geo-monitoring";
 
-const providerKeySchema = z.string().min(1);
-const queryTextSchema = z.string().min(1);
+const providerKeySchema = z.string().refine(isConfiguredGeoProvider, {
+  message: "请选择预置 GEO 平台"
+});
+const queryTextSchema = z.string().refine(isConfiguredGeoQuery, {
+  message: "请选择预置 GEO 查询"
+});
+const collectionStatusSchema = z.enum(["collected", "uncollected", "unavailable"]);
 
 export async function ensureGeoMonitoringDefaults() {
   await requireAdmin();
@@ -73,13 +84,22 @@ export async function recordGeoVisibilityResultAction(formData: FormData) {
 
   const queryText = queryTextSchema.parse(formData.get("queryText"));
   const providerKey = providerKeySchema.parse(formData.get("providerKey"));
+  const collectionStatus = collectionStatusSchema.parse(
+    formData.get("collectionStatus") ?? "collected"
+  );
   const answerSummary = optionalText(formData.get("answerSummary"));
   const citedUrls = parseLines(formData.get("citedUrls")).filter((url) => /^https?:\/\//i.test(url));
   const competitors = parseLines(formData.get("competitors"));
-  const isBrandMentioned = formData.get("isBrandMentioned") === "on";
-  const isDomainCited = formData.get("isDomainCited") === "on" || citedUrls.some((url) => url.includes("enhe-tech.com.cn"));
+  const isBrandMentioned = collectionStatus === "collected" && formData.get("isBrandMentioned") === "on";
   const screenshotUrl = optionalText(formData.get("screenshotUrl"));
-  const sentiment = optionalText(formData.get("sentiment"));
+  const isDomainCited = collectionStatus === "collected" && hasVerifiableEnheCitationEvidence({
+    citedUrls,
+    answerSummary,
+    screenshotUrl
+  });
+  const sentiment = collectionStatus === "collected"
+    ? optionalText(formData.get("sentiment"))
+    : `geo:${collectionStatus}`;
 
   const [query, provider] = await Promise.all([
     prisma.geoQuery.findFirst({ where: { query: queryText }, select: { id: true } }),

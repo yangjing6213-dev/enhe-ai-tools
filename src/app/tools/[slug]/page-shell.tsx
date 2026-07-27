@@ -13,6 +13,7 @@ import { Badge, ButtonLink, Container, SectionTitle } from "@/components/ui";
 import { ToolCard } from "@/components/tool-card";
 import { ToolRichContent } from "@/components/tool-rich-content";
 import { getCurrentUser } from "@/lib/auth";
+import { enheOrganizationReference } from "@/lib/brand-entity";
 import { prisma } from "@/lib/db";
 import { getDictionary, type Locale } from "@/lib/dictionaries";
 import { normalizeImageSrc } from "@/lib/media";
@@ -30,6 +31,7 @@ import {
   buildLocalePath,
   buildPageMetadata,
   buildProductStructuredData,
+  getRevenuePageSeoTitle,
   buildToolMetaDescription,
   buildToolMetadataTitle,
   buildToolStructuredData,
@@ -96,12 +98,23 @@ export async function generateToolDetailPageMetadata(
     });
   }
 
+  const revenuePageSeoTitle = getRevenuePageSeoTitle(
+    canonicalSlug,
+    forceLocale,
+  );
   const metadata = buildPageMetadata({
     title: buildToolMetadataTitle({
-      name: buildLocalizedToolMetaHeading(tool, forceLocale),
-      englishName: forceLocale === "en" ? null : tool.englishName,
+      name:
+        revenuePageSeoTitle ?? buildLocalizedToolMetaHeading(tool, forceLocale),
+      englishName:
+        revenuePageSeoTitle || forceLocale === "en" ? null : tool.englishName,
       brand: t.brand,
       locale: forceLocale,
+      maxLength: revenuePageSeoTitle
+        ? forceLocale === "en"
+          ? 58
+          : 38
+        : undefined,
     }),
     description: buildToolMetaDescription({
       name: buildLocalizedToolMetaHeading(tool, forceLocale),
@@ -341,6 +354,10 @@ export async function ToolDetailPageShell({
     protectedDownloadHref,
     publicDownloadHref,
   });
+  const softwareDownloadCtaEvent =
+    softwareDownloadCtaHref === "#download-purchase"
+      ? "product_purchase_cta_click"
+      : "product_download_click";
   const related = await prisma.tool.findMany({
     where: { type: tool.type, status: "published", id: { not: tool.id } },
     include: {
@@ -426,7 +443,7 @@ export async function ToolDetailPageShell({
   const faqSchema = schemaContent.faq.length
     ? buildFaqSchema({ items: schemaContent.faq })
     : null;
-  const toolStructuredData = buildToolStructuredData({
+  const rawToolStructuredData = buildToolStructuredData({
     schemaType,
     name: localizedTool.primaryName,
     description: buildToolMetaDescription({
@@ -455,6 +472,13 @@ export async function ToolDetailPageShell({
     })),
     aggregateRating: schemaContent.aggregateRating,
   });
+  const toolStructuredData =
+    schemaType === "SoftwareApplication"
+      ? rawToolStructuredData
+      : {
+          ...rawToolStructuredData,
+          provider: enheOrganizationReference,
+        };
   const productStructuredData =
     tool.type === "software"
       ? buildProductStructuredData({
@@ -663,6 +687,9 @@ export async function ToolDetailPageShell({
                       }
                       action={createSoftwareDownloadOrderAction}
                       className="grid w-full gap-4"
+                      data-analytics-event="begin_checkout"
+                      data-analytics-entity-type="tool"
+                      data-analytics-entity-id={tool.id}
                     >
                       <input type="hidden" name="toolId" value={tool.id} />
                       {localizedPriceSpecs.length ? (
@@ -752,6 +779,9 @@ export async function ToolDetailPageShell({
                         </div>
                         <FormSubmitButton
                           className="w-full sm:w-auto sm:justify-self-start"
+                          data-analytics-event="product_purchase_cta_click"
+                          data-analytics-entity-type="tool"
+                          data-analytics-entity-id={tool.id}
                           pendingLabel={
                             forceLocale === "en"
                               ? "Generating payment QR..."
@@ -763,7 +793,12 @@ export async function ToolDetailPageShell({
                       </div>
                     </form>
                   ) : tool.type === "software" ? (
-                    <ButtonLink href={softwareDownloadCtaHref}>
+                    <ButtonLink
+                      href={softwareDownloadCtaHref}
+                      data-analytics-event={softwareDownloadCtaEvent}
+                      data-analytics-entity-type="tool"
+                      data-analytics-entity-id={tool.id}
+                    >
                       {paidSoftware && hasDownloadPurchase
                         ? td.downloadSoftware
                         : freeDownloadButtonLabel}
@@ -775,6 +810,9 @@ export async function ToolDetailPageShell({
                           ? `/api/tools/${tool.id}/use`
                           : "#tool-intro"
                       }
+                      data-analytics-event="product_use_cta_click"
+                      data-analytics-entity-type="tool"
+                      data-analytics-entity-id={tool.id}
                     >
                       {td.useOnline}
                     </ButtonLink>
@@ -1200,7 +1238,12 @@ export async function ToolDetailPageShell({
                 </div>
                 {canOpenDownloadEntry ? (
                   <div>
-                    <ButtonLink href={protectedDownloadHref}>
+                    <ButtonLink
+                      href={protectedDownloadHref}
+                      data-analytics-event="product_download_click"
+                      data-analytics-entity-type="tool"
+                      data-analytics-entity-id={tool.id}
+                    >
                       {td.downloadNow}
                     </ButtonLink>
                   </div>

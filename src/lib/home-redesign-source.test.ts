@@ -363,7 +363,7 @@ describe("homepage SaaS redesign source", () => {
 
     expect(page).toContain("generateHomePageMetadata");
     expect(publicChrome).toContain("buildWebsiteSchema");
-    expect(publicChrome).toContain("buildOrganizationSchema");
+    expect(publicChrome).toContain("buildEnheOrganizationSchema");
     expect(css).not.toContain(".home-hero-background");
     expect(css).not.toContain("home-hero-unicorn-remix");
   });

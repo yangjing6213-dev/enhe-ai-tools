@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
+import { notFound } from "next/navigation";
 import { StructuredData } from "@/components/structured-data";
 import {
   Badge,
@@ -9,7 +10,15 @@ import {
   EmptyState,
   SectionTitle,
 } from "@/components/ui";
-import { parseNewsSearchParams } from "@/lib/ai-news";
+import {
+  getNewsPageCount,
+  getNewsPaginationLocales,
+  hasActiveNewsFilters,
+  isNewsPaginationPageInRange,
+  isNewsPaginationPageQueryable,
+  parseNewsSearchParams,
+  type NewsSearchFilters,
+} from "@/lib/ai-news";
 import {
   getAiNewsTopicCopy,
   getAiNewsTopicPath,
@@ -36,8 +45,9 @@ import { publicPageCacheSeconds } from "@/lib/public-routes";
 import {
   absoluteUrl,
   buildBreadcrumbSchema,
-  buildAvailableLanguageAlternates,
   buildListingMetadataTitle,
+  buildFaqSchema,
+  buildAvailableLanguageAlternates,
   buildListingMetaDescription,
   buildLocalePath,
   buildMetadataTitle,
@@ -122,58 +132,122 @@ const aiNewsGeoSections = {
   ],
 } as const;
 
+const aiNewsAnswerBlock = {
+  zh: "ENHE AI 的 AI前沿资讯重点不是追热点，而是把 AI智能体、MCP 工具生态、本地 AI、开源模型、平台政策和实用工具变化解释成可执行的下一步：关注趋势、选择软件、学习技能或确认账号服务边界。",
+  en: "ENHE AI news is not a raw headline feed. It turns changes in AI agents, MCP-style tool ecosystems, local AI, open models, platform policy, and practical AI tools into clear next steps: watch the trend, choose software, learn a skill, or check account-service boundaries.",
+} as const;
+
+const aiNewsFaqItems = {
+  zh: [
+    {
+      question: "ENHE AI 的 AI前沿资讯和普通 AI 新闻有什么不同？",
+      answer:
+        "ENHE AI 更关注新闻对用户工作流的影响。每条高价值资讯都应解释发生了什么、为什么重要、用户下一步能做什么，并自然连接到相关软件、教程、课程或账号服务说明。",
+    },
+    {
+      question: "阅读 AI 资讯后应该如何行动？",
+      answer:
+        "先判断这条资讯属于趋势、工具、政策还是教程，再进入 AI趋势分析、AI软件应用、AI技能学习或 AI账号服务页面，形成明确的试用、学习或合规确认路径。",
+    },
+    {
+      question: "AI 资讯内容如何提高 SEO 和 GEO 表现？",
+      answer:
+        "资讯页面需要清晰标题、摘要、发布时间、来源链接、FAQ、相关工具和站内内链。这样既方便真实用户阅读，也方便 AI 搜索系统抽取和引用。",
+    },
+  ],
+  en: [
+    {
+      question: "How is ENHE AI news different from a generic AI news feed?",
+      answer:
+        "ENHE AI focuses on how news affects real workflows. A useful article explains what changed, why it matters, what users can do next, and which related software, tutorials, courses, or account guidance can help.",
+    },
+    {
+      question: "What should users do after reading an AI news article?",
+      answer:
+        "Classify the update as a trend, tool, policy, or tutorial signal, then move to AI trends, software apps, skill learning, or account-service guidance for the next action.",
+    },
+    {
+      question: "How does AI news improve SEO and GEO visibility?",
+      answer:
+        "News pages should include clear titles, summaries, dates, source links, FAQ, related tools, and internal links. This helps both human readers and AI answer engines extract and cite the content.",
+    },
+  ],
+} as const;
+
 export async function generateAiNewsPageMetadata(
   forceLocale: Locale,
-  searchParams: AiNewsPageSearchParams = {},
+  searchParams: Promise<Record<string, string | undefined>> = Promise.resolve({}),
+  pageOverride?: number,
 ): Promise<Metadata> {
   const t = getDictionary(forceLocale);
-  const page = getAiNewsPageNumber(searchParams);
-  const isFiltered = hasAiNewsFilters(searchParams);
-  const canonicalPath =
-    page > 1 && !isFiltered ? `/ai-news?page=${page}` : "/ai-news";
-  const pageLabel = forceLocale === "en" ? `Page ${page}` : `第${page}页`;
+  const params = await searchParams;
+  const filters = parseNewsSearchParams({
+    ...params,
+    ...(pageOverride ? { page: String(pageOverride) } : {}),
+  });
+  if (!isNewsPaginationPageQueryable(filters.page)) notFound();
+  const isFiltered = hasActiveNewsFilters(filters);
+  const canonicalPath = isFiltered
+    ? "/ai-news"
+    : filters.page > 1
+      ? `/ai-news/page/${filters.page}`
+      : "/ai-news";
+  const pageLabel =
+    forceLocale === "en" ? `Page ${filters.page}` : `第${filters.page}页`;
   const baseDescription = buildListingMetaDescription("ai-news", forceLocale);
+  const languageLocales =
+    !isFiltered && forceLocale === "zh" && filters.page > 1
+      ? getNewsPaginationLocales(
+          filters.page,
+          (
+            await getPublicNewsListing({
+              sort: "latest",
+              take: 0,
+              locale: "en",
+            })
+          ).total,
+        )
+      : (['zh', 'en'] as const);
   const metadata = buildPageMetadata({
-    title:
-      page > 1 && !isFiltered
-        ? buildMetadataTitle({
-            pageTitle: `${t.aiNews.title} - ${pageLabel}`,
-            brand: t.brand,
-          })
-        : buildListingMetadataTitle("ai-news", forceLocale, t.brand),
+    title: !isFiltered && filters.page > 1
+      ? buildMetadataTitle({
+          pageTitle: `${t.aiNews.title} - ${pageLabel}`,
+          brand: t.brand,
+        })
+      : buildListingMetadataTitle("ai-news", forceLocale, t.brand),
     description:
-      page > 1 && !isFiltered
+      !isFiltered && filters.page > 1
         ? `${pageLabel}: ${baseDescription}`
         : baseDescription,
     path: canonicalPath,
     locale: forceLocale === "en" ? "en_US" : "zh_CN",
     localeKey: forceLocale,
-    languageAlternates: buildAvailableLanguageAlternates(canonicalPath, [
-      "zh",
-      "en",
-    ]),
+    languageAlternates: buildAvailableLanguageAlternates(canonicalPath, [...languageLocales]),
   });
 
-  return isFiltered
-    ? {
-        ...metadata,
-        robots: {
-          index: false,
-          follow: true,
-        },
-      }
-    : metadata;
+  if (isFiltered) {
+    metadata.robots = { index: false, follow: true };
+  }
+
+  return metadata;
 }
 
 export async function AiNewsPageShell({
   searchParams,
   forceLocale,
+  pageOverride,
 }: {
   searchParams: Promise<AiNewsPageSearchParams>;
   forceLocale: Locale;
+  pageOverride?: number;
 }) {
-  const params = await searchParams;
+  const params = {
+    ...(await searchParams),
+    ...(pageOverride ? { page: String(pageOverride) } : {}),
+  };
   const filters = parseNewsSearchParams(params);
+  if (!isNewsPaginationPageQueryable(filters.page)) notFound();
+  const filtered = hasActiveNewsFilters(filters);
   const t = getDictionary(forceLocale);
   const [{ articles, total }, featured, hot, categories, tags, discovery, topics] =
     await Promise.all([
@@ -188,7 +262,17 @@ export async function AiNewsPageShell({
       getPublicAiNewsDiscovery(forceLocale),
       getPublicAiNewsTopics(),
     ]);
-  const pageCount = Math.max(1, Math.ceil(total / filters.pageSize));
+  const pageCount = getNewsPageCount(total);
+  if (
+    pageOverride &&
+    !isNewsPaginationPageInRange(pageOverride, total)
+  ) {
+    notFound();
+  }
+  const collectionPath =
+    !filtered && filters.page > 1
+      ? `/ai-news/page/${filters.page}`
+      : "/ai-news";
   const breadcrumbSchema = buildBreadcrumbSchema({
     items: [
       { name: t.nav.home, path: buildLocalePath("/", forceLocale) },
@@ -200,14 +284,30 @@ export async function AiNewsPageShell({
     "@type": "CollectionPage",
     name: t.aiNews.title,
     description: t.aiNews.intro,
-    url: absoluteUrl(buildLocalePath("/ai-news", forceLocale)),
+    url: absoluteUrl(buildLocalePath(collectionPath, forceLocale)),
     inLanguage: forceLocale === "en" ? "en-US" : "zh-CN",
   };
+  const webPageSchema = {
+    "@context": "https://schema.org",
+    "@type": "WebPage",
+    name: t.aiNews.title,
+    description: aiNewsAnswerBlock[forceLocale],
+    url: absoluteUrl(buildLocalePath(collectionPath, forceLocale)),
+    inLanguage: forceLocale === "en" ? "en-US" : "zh-CN",
+    mainEntity: {
+      "@type": "Thing",
+      name: forceLocale === "en" ? "AI news and trend interpretation" : "AI前沿资讯与趋势解读",
+      description: aiNewsAnswerBlock[forceLocale],
+    },
+  };
+  const faqSchema = buildFaqSchema({
+    items: aiNewsFaqItems[forceLocale],
+  });
 
   return (
     <main>
       <Container className="py-14">
-        <StructuredData data={[breadcrumbSchema, collectionSchema]} />
+        <StructuredData data={[breadcrumbSchema, collectionSchema, webPageSchema, faqSchema]} />
         <section className="glass relative overflow-hidden rounded-[2rem] p-7 md:p-10">
           <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_16%_10%,rgba(65,197,219,0.22),transparent_30%),radial-gradient(circle_at_82%_20%,rgba(122,167,255,0.16),transparent_32%)]" />
           <div className="relative max-w-4xl">
@@ -227,6 +327,18 @@ export async function AiNewsPageShell({
         </section>
 
         <AiNewsGeoBlock forceLocale={forceLocale} />
+
+        <section className="glass mt-8 rounded-2xl p-6">
+          <p className="text-xs font-bold uppercase tracking-[0.16em] text-[var(--marketing-accent)]">
+            {forceLocale === "en" ? "Extractable answer" : "可摘录答案"}
+          </p>
+          <h2 className="mt-4 text-2xl font-black text-[var(--marketing-text)]">
+            {forceLocale === "en" ? "What ENHE AI news is for" : "ENHE AI 资讯真正解决什么"}
+          </h2>
+          <p className="mt-4 max-w-4xl text-base leading-8 text-[var(--marketing-muted)]">
+            {aiNewsAnswerBlock[forceLocale]}
+          </p>
+        </section>
 
         <FilterBar
           categories={categories}
@@ -269,6 +381,7 @@ export async function AiNewsPageShell({
                   page={filters.page}
                   pageCount={pageCount}
                   locale={forceLocale}
+                  filters={filters}
                 />
               </>
             ) : (
@@ -309,6 +422,24 @@ export async function AiNewsPageShell({
             >
               {t.nav.user}
             </ButtonLink>
+          </div>
+        </section>
+
+        <section className="glass mt-8 rounded-2xl p-6">
+          <h2 className="text-2xl font-black text-[var(--marketing-text)]">
+            {forceLocale === "en" ? "AI news FAQ" : "AI前沿资讯常见问题"}
+          </h2>
+          <div className="mt-5 grid gap-4 md:grid-cols-3">
+            {aiNewsFaqItems[forceLocale].map((item) => (
+              <article key={item.question} className="rounded-2xl border border-white/10 bg-white/7 p-5">
+                <h3 className="text-base font-black leading-snug text-[var(--marketing-text)]">
+                  {item.question}
+                </h3>
+                <p className="mt-3 text-sm leading-7 text-[var(--marketing-muted)]">
+                  {item.answer}
+                </p>
+              </article>
+            ))}
           </div>
         </section>
       </Container>
@@ -712,10 +843,12 @@ function Pagination({
   page,
   pageCount,
   locale,
+  filters,
 }: {
   page: number;
   pageCount: number;
   locale: Locale;
+  filters: NewsSearchFilters;
 }) {
   if (pageCount <= 1) return null;
 
@@ -723,11 +856,26 @@ function Pagination({
     <div className="mt-8 flex flex-wrap gap-3">
       {Array.from({ length: pageCount }).map((_, index) => {
         const nextPage = index + 1;
+        const filtered = hasActiveNewsFilters(filters);
+        const query = new URLSearchParams();
+        if (filters.q) query.set("q", filters.q);
+        if (filters.category) query.set("category", filters.category);
+        if (filters.tag) query.set("tag", filters.tag);
+        if (filters.sort && filters.sort !== "latest") {
+          query.set("sort", filters.sort);
+        }
+        if (filtered && nextPage > 1) query.set("page", String(nextPage));
+        const basePath = filtered
+          ? buildLocalePath("/ai-news", locale)
+          : nextPage > 1
+            ? buildLocalePath(`/ai-news/page/${nextPage}`, locale)
+            : buildLocalePath("/ai-news", locale);
+        const href = query.size ? `${basePath}?${query.toString()}` : basePath;
         return (
           <Link
             key={nextPage}
-            href={`${buildLocalePath("/ai-news", locale)}?page=${nextPage}`}
-                className={`rounded-full border px-4 py-2 text-sm font-semibold transition-[background-color,border-color,color] ${page === nextPage ? "border-[var(--marketing-accent)] bg-[var(--marketing-accent)]/14 text-[var(--marketing-accent)]" : "border-white/14 bg-white/7 text-[var(--marketing-muted)] hover:border-[var(--marketing-accent)] hover:text-[var(--marketing-accent)]"}`}
+            href={href}
+            className={`rounded-full border px-4 py-2 text-sm font-semibold transition-[background-color,border-color,color] ${page === nextPage ? "border-[var(--marketing-accent)] bg-[var(--marketing-accent)]/14 text-[var(--marketing-accent)]" : "border-white/14 bg-white/7 text-[var(--marketing-muted)] hover:border-[var(--marketing-accent)] hover:text-[var(--marketing-accent)]"}`}
           >
             {nextPage}
           </Link>

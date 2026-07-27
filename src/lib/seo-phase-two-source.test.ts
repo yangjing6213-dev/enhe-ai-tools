@@ -94,10 +94,13 @@ describe("seo phase two source contracts", () => {
     const skillLearning = read("src/app/skill-learning/page-shell.tsx");
     const accountServices = read("src/app/account-services/page-shell.tsx");
 
-    expect(sitemap).toContain("aiTopicClusters");
-    expect(discovery).toContain('path: "/ai-topics"');
-    expect(discovery).toContain('path: "/en/ai-topics"');
-    expect(sitemap).toContain("getAiTopicPath");
+    expect(sitemap).toContain("sitemapExcludedPaths");
+    expect(sitemap).toContain('"/ai-topics"');
+    expect(sitemap).toContain('"/en/ai-topics"');
+    expect(sitemap).not.toContain("aiTopicClusters");
+    expect(discovery).not.toContain('path: "/ai-topics"');
+    expect(discovery).not.toContain('path: "/en/ai-topics"');
+    expect(sitemap).not.toContain("getAiTopicPath");
     expect(seo).toContain("/^\\/ai-topics$/");
     expect(seo).toContain("/^\\/ai-topics\\/.+$/");
     expect(home).toContain('"/ai-topics"');

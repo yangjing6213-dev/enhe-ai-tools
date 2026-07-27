@@ -52,6 +52,7 @@ const securityHeaders = [
 
 const nextConfig: NextConfig = {
   output: "standalone",
+  htmlLimitedBots: /.*/,
   async redirects() {
     return [
       { source: "/enhe-ai", destination: "/about", statusCode: 301 },

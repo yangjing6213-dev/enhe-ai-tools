@@ -1474,6 +1474,32 @@ select option:disabled {
   color: var(--marketing-text);
 }
 
+.mobile-nav-children {
+  display: grid;
+  gap: 4px;
+  margin: 0 0 6px 12px;
+  border-left: 1px solid rgba(255, 255, 255, 0.12);
+  padding-left: 10px;
+}
+
+.mobile-nav-child-link {
+  display: flex;
+  min-height: 38px;
+  align-items: center;
+  border-radius: 10px;
+  color: var(--marketing-muted);
+  font-size: 13px;
+  font-weight: 700;
+  line-height: 1.2;
+  padding: 9px 10px;
+  text-decoration: none;
+}
+
+.mobile-nav-child-link:hover {
+  background: rgba(240, 90, 53, 0.08);
+  color: var(--marketing-text);
+}
+
 .mobile-nav-user-center {
   margin-top: 4px;
   background: var(--marketing-button);
