@@ -30,7 +30,8 @@ describe("GEO brand profile source contracts", () => {
     );
     expect(about).toContain("buildFaqSchema");
     expect(about).toContain('"@type": "AboutPage"');
-    expect(about).toContain("contactPoint");
+    expect(about).toContain("enheOrganizationReference");
+    expect(about).not.toContain("const organizationSchema =");
   });
 
   it("keeps footer legal and company details discoverable while linking to the brand profile", () => {

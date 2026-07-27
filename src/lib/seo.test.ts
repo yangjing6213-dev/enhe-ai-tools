@@ -304,6 +304,55 @@ describe("seo helpers", () => {
     expect(englishDescription).toContain("ENHE AI");
   });
 
+  it("turns short Chinese commercial descriptions into natural bounded sentences", () => {
+    const description = buildToolMetaDescription({
+      name: "聊天截图素材制作｜无需代码",
+      englishName: "No-Code Chat Screenshot Maker",
+      description: "快速制作可编辑的手机聊天截图素材，适合剧情、课程和原型",
+      brand: "恩禾 ENHE AI",
+      locale: "zh",
+      type: "software",
+    });
+
+    expect(description).toMatch(/^快速制作可编辑的手机聊天截图素材，适合剧情、课程和原型。/);
+    expect(description).not.toContain("原型 在");
+    expect(description).not.toContain("在 恩禾 ENHE AI 查看");
+    expect(description).not.toMatch(/查看[^。]*价格/);
+    expect(description).toContain("价格");
+    expect(description).toContain("教程");
+    expect(description).toContain("恩禾 ENHE AI");
+    expect(description).toMatch(/[。！？]$/);
+    expect(description.length).toBeLessThanOrEqual(120);
+  });
+
+  it("keeps longer Chinese commercial facts without appending a long template", () => {
+    const description = buildToolMetaDescription({
+      name: "FaceSwap Studio｜本地人像合成研究工具",
+      description:
+        "适合需要人物素材处理、换脸预览和创作草稿的用户，重点是降低素材外传顾虑，并把生成流程放进可重复的本地工作流。",
+      brand: "恩禾 ENHE AI",
+      locale: "zh",
+      type: "software",
+    });
+
+    expect(description).toContain("降低素材外传顾虑");
+    expect(description).not.toContain("在 恩禾 ENHE AI 查看");
+    expect(description.length).toBeLessThanOrEqual(120);
+  });
+
+  it("punctuates controlled-workflow product descriptions naturally", () => {
+    const description = buildToolMetaDescription({
+      name: "InfiniteTalk：本地 AI 数字人口播视频生成工具",
+      description: "一张图片即可生成数字人视频，本地部署处理素材",
+      brand: "恩禾 ENHE AI",
+      locale: "zh",
+      type: "software",
+    });
+
+    expect(description).toContain("生成工具，适合");
+    expect(description.length).toBeLessThanOrEqual(120);
+  });
+
   it("keeps account-service detail descriptions long enough when generic safe copy is used", () => {
     const description = buildToolMetaDescription({
       name: "Gemini Pro",

@@ -63,6 +63,37 @@ import { getVisibleToolMetrics } from "@/lib/tool-metrics";
 
 export const toolDetailPageRevalidate = publicPageCacheSeconds;
 
+export function resolveToolDetailSchemaPrice({
+  toolType,
+  isDownloadPaid,
+  servicePrice,
+}: {
+  toolType: "software" | "online" | "skill_learning";
+  isDownloadPaid: boolean;
+  servicePrice: number;
+}) {
+  if (Number.isFinite(servicePrice) && servicePrice > 0) return servicePrice;
+  if (
+    toolType === "skill_learning" &&
+    Number.isFinite(servicePrice) &&
+    servicePrice <= 0
+  ) {
+    return 0;
+  }
+  if (toolType === "software" && !isDownloadPaid) return 0;
+  return null;
+}
+
+export function buildFreeToolDetailOffer(url: string) {
+  return {
+    "@type": "Offer",
+    price: "0.00",
+    priceCurrency: "CNY",
+    availability: "https://schema.org/InStock",
+    url,
+  };
+}
+
 export async function generateToolDetailPageMetadata(
   forceLocale: Locale,
   slug: string,
@@ -281,6 +312,7 @@ export async function ToolDetailPageShell({
     tool.type === "software" && tool.isDownloadPaid && servicePrice > 0;
   const isPurchasableAccountService = isAccountService && servicePrice > 0;
   const paidSkillCourse = isSkillLearning && servicePrice > 0;
+  const isFreeSkillCourse = isSkillLearning && servicePrice <= 0;
   const coverImage = normalizeImageSrc(tool.coverImage);
   const productVideos = resolveProductVideos([
     {
@@ -386,17 +418,20 @@ export async function ToolDetailPageShell({
     forceLocale === "en"
       ? "Before using this page, review the suitable scenario, delivery boundary, platform rules, and support contact. ENHE AI will continue adding common questions as the page evolves."
       : "使用前请先确认适用场景、交付边界、平台规则和支持方式；页面会随产品与课程内容持续补充常见问题。";
-  const freeDownloadButtonLabel =
-    forceLocale === "en" ? "Free download" : "免费下载";
+  const freeDownloadButtonLabel = t.toolCard.getFreeTool;
   const priceSpecHelpId = "tool-purchase-price-spec-help";
   const paymentMethodLabelId = "tool-purchase-payment-method-label";
   const paymentMethodHelpId = "tool-purchase-payment-method-help";
   const commentHelpId = "tool-comment-help";
-  const purchaseButtonLabel = isAccountService ? td.buyService : isSkillLearning
-    ? td.buyCourse.replace("{price}", Number(servicePrice).toFixed(2))
-    : servicePrice > 0
-      ? td.buyDownload.replace("{price}", Number(servicePrice).toFixed(2))
-      : freeDownloadButtonLabel;
+  const purchaseButtonLabel = isAccountService
+    ? td.buyService
+    : paidSkillCourse
+      ? td.buyCourse.replace("{price}", Number(servicePrice).toFixed(2))
+      : isFreeSkillCourse
+        ? t.toolCard.getFreeTool
+        : servicePrice > 0
+          ? td.buyDownload.replace("{price}", Number(servicePrice).toFixed(2))
+          : freeDownloadButtonLabel;
   const introTitle = isAccountService ? td.serviceIntroTitle : td.introTitle;
   const productImagesIntro = isAccountService
     ? td.serviceProductImagesIntro
@@ -407,6 +442,11 @@ export async function ToolDetailPageShell({
       : tool.type === "online"
         ? "Service"
         : "Course";
+  const schemaPrice = resolveToolDetailSchemaPrice({
+    toolType: tool.type,
+    isDownloadPaid: tool.isDownloadPaid,
+    servicePrice,
+  });
   const baseListingPath =
     tool.type === "software"
       ? buildLocalePath("/software", forceLocale)
@@ -464,7 +504,7 @@ export async function ToolDetailPageShell({
     category: localizedCategoryName,
     operatingSystem: tool.systemRequirement ?? null,
     locale: forceLocale === "en" ? "en-US" : "zh-CN",
-    price: servicePrice > 0 ? servicePrice : null,
+    price: schemaPrice,
     softwareVersion: tool.version ?? null,
     priceSpecs: localizedPriceSpecs.map((spec) => ({
       name: spec.localizedName,
@@ -479,7 +519,7 @@ export async function ToolDetailPageShell({
           ...rawToolStructuredData,
           provider: enheOrganizationReference,
         };
-  const productStructuredData =
+  const rawProductStructuredData =
     tool.type === "software"
       ? buildProductStructuredData({
           name: localizedTool.primaryName,
@@ -488,13 +528,20 @@ export async function ToolDetailPageShell({
           image: coverImage,
           brand: t.brand,
           category: localizedCategoryName,
-          price: servicePrice > 0 ? servicePrice : null,
+          price: schemaPrice,
           priceSpecs: localizedPriceSpecs.map((spec) => ({
             name: spec.localizedName,
             price: Number(spec.price),
           })),
         })
       : null;
+  const productStructuredData =
+    rawProductStructuredData && schemaPrice === 0
+      ? {
+          ...rawProductStructuredData,
+          offers: buildFreeToolDetailOffer(rawProductStructuredData.url),
+        }
+      : rawProductStructuredData;
   // Service schemas can emit hasOfferCatalog, and course schemas can emit CourseInstance when the tool data supports them.
   const detailNavItems = [
     { href: "#tool-purchase", label: purchaseButtonLabel },
@@ -814,7 +861,9 @@ export async function ToolDetailPageShell({
                       data-analytics-entity-type="tool"
                       data-analytics-entity-id={tool.id}
                     >
-                      {td.useOnline}
+                      {isFreeSkillCourse
+                        ? t.toolCard.getFreeTool
+                        : td.useOnline}
                     </ButtonLink>
                   )}
                 </div>

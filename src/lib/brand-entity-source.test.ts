@@ -48,9 +48,10 @@ describe("ENHE AI Organization source contracts", () => {
     expect(article).not.toContain("buildOrganizationSchema");
     expect(article).not.toContain("const organizationSchema =");
 
-    expect(about).toContain("...buildEnheOrganizationSchema({");
     expect(about).toContain("about: enheOrganizationReference");
     expect(about).toContain("mainEntity: enheOrganizationReference");
+    expect(about).not.toContain("buildEnheOrganizationSchema");
+    expect(about).not.toContain("const organizationSchema =");
     expect(about).not.toContain("buildOrganizationSchema");
 
     expect(toolDetail).toContain("provider: enheOrganizationReference");

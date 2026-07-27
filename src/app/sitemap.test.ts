@@ -83,7 +83,38 @@ describe("sitemap canonical URL contract", () => {
     expect(urls).toContain("https://www.enhe-tech.com.cn/skill-learning/prompt-course");
     expect(urls).toContain("https://www.enhe-tech.com.cn/ai-news/ai-agents-reshape-daily-workflows");
 
-    for (const forbidden of ["/admin", "/dashboard", "/user-center", "/login", "/register", "/checkout", "/orders", "/payment", "/api", "/online-tools", "/tools/", "/product-demos", "/product-paths/"]) {
+    for (const auditedIndexablePath of [
+      "/ai-topics",
+      "/ai-topics/ai-content-creation-tools",
+      "/ai-topics/local-ai-deployment",
+      "/build-your-own-x",
+      "/ai-topics/ai-account-service-compliance",
+      "/ai-topics/ai-skill-learning-path",
+      "/product-paths/work-efficiency",
+      "/product-demos/windows-ai-video-studio",
+      "/product-paths/media-generation",
+      "/product-demos/ai-video",
+      "/product-demos/windows-ai-lumi",
+      "/product-demos",
+      "/en/ai-topics",
+      "/en/build-your-own-x",
+      "/en/ai-topics/ai-content-creation-tools",
+      "/en/product-demos/windows-ai-lumi",
+      "/en/product-demos/ai-video",
+      "/en/product-paths/media-generation",
+      "/en/product-paths/work-efficiency",
+      "/en/product-demos",
+      "/en/product-demos/windows-ai-video-studio",
+      "/en/ai-topics/local-ai-deployment",
+      "/en/ai-topics/ai-account-service-compliance",
+      "/en/ai-topics/ai-skill-learning-path",
+    ]) {
+      expect(urls).toContain(
+        `https://www.enhe-tech.com.cn${auditedIndexablePath}`,
+      );
+    }
+
+    for (const forbidden of ["/admin", "/dashboard", "/user-center", "/login", "/register", "/checkout", "/orders", "/payment", "/api", "/online-tools", "/tools/", "/product-paths/future-ai"]) {
       expect(urls.some((url) => url.includes(forbidden)), forbidden).toBe(false);
     }
 

@@ -50,4 +50,24 @@ describe("CTR title formatting", () => {
     );
     expect(title).not.toMatch(/\bSecuri\b/);
   });
+
+  it.each([
+    {
+      name: "Codex智能切换助手 | 官方API与第三方模型快速切换工具",
+      englishName: null,
+    },
+    {
+      name: "聊天截图素材制作｜无需代码",
+      englishName: "No-Code Chat Screenshot Maker",
+    },
+  ])("keeps audited Chinese commercial titles within budget", (input) => {
+    const title = buildToolMetadataTitle({
+      ...input,
+      brand: "恩禾 ENHE AI",
+      locale: "zh",
+    });
+
+    expect(title.length).toBeLessThanOrEqual(42);
+    expect(title).toMatch(/\| 恩禾 ENHE AI$/);
+  });
 });

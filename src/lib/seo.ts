@@ -225,6 +225,8 @@ export function isLocalizedPublicPath(path: string) {
 
 export function buildLanguageSwitcherHref(path: string, locale: Locale) {
   const normalized = stripLocalePrefix(path);
+  const isEnglishPath = path === "/en" || path.startsWith("/en/");
+  const aiNewsPageMatch = normalized.match(/^\/ai-news\/page\/(\d+)$/);
   const withLocaleSwitch = (href: string) =>
     `${href}${href.includes("?") ? "&" : "?"}${localeSwitchQueryName}=${locale}`;
 
@@ -234,6 +236,15 @@ export function buildLanguageSwitcherHref(path: string, locale: Locale) {
 
   if (!isLocalizedPublicPath(path)) {
     return withLocaleSwitch(buildLocalePath("/", locale));
+  }
+
+  if (
+    locale === "en" &&
+    !isEnglishPath &&
+    aiNewsPageMatch &&
+    Number.parseInt(aiNewsPageMatch[1], 10) > 1
+  ) {
+    return buildLocalePath("/ai-news", locale);
   }
 
   return buildLocalePath(path, locale);
@@ -729,7 +740,13 @@ function buildControlledAiWorkflowDescription(
     return `${primaryName} helps users build safer, more private, stable, and controlled AI workflows. Review pricing, tutorials, delivery scope, and system requirements on ${brand} before use.`;
   }
 
-  return `${primaryName}适合需要安全、隐私、稳定、可控 AI 流程的用户。购买前在 ${brand} 确认价格、教程、交付方式、设备要求和隐私边界。`;
+  return `${primaryName}，适合需要安全、隐私、稳定、可控 AI 流程的用户。购买前在 ${brand} 确认价格、教程、交付方式、设备要求和隐私边界。`;
+}
+
+function ensureChineseSentence(value: string) {
+  const normalized = normalizeWhitespace(value);
+  if (!normalized || /[。！？!?；;.]$/u.test(normalized)) return normalized;
+  return `${normalized.replace(/[，,：:\s]+$/u, "")}。`;
 }
 
 export function buildToolMetadataTitle({
@@ -739,7 +756,7 @@ export function buildToolMetadataTitle({
   maxLength,
   locale = "zh",
 }: BuildTitleInput) {
-  const targetMaxLength = maxLength ?? (locale === "en" ? 58 : 62);
+  const targetMaxLength = maxLength ?? (locale === "en" ? 58 : 42);
   const { primaryName, secondaryName } = resolveToolTitleNames(
     name,
     englishName,
@@ -808,7 +825,7 @@ export function buildToolMetaDescription({
       : normalizeWhitespace(description ?? "");
   const { primaryName } = resolveToolTitleNames(name, englishName, locale);
   const typeLabel = resolveToolTypeLabel(type, locale);
-  const targetMaxLength = Math.min(maxLength, locale === "en" ? 135 : 145);
+  const targetMaxLength = Math.min(maxLength, locale === "en" ? 135 : 120);
   const shortDescriptionLimit = locale === "en" ? 95 : 90;
   const shouldNameGenericAccountServiceCopy =
     type === "online" &&
@@ -869,14 +886,11 @@ export function buildToolMetaDescription({
       );
     }
 
-    const brandLower = normalizeWhitespace(brand).toLowerCase();
-    const descriptionLower = normalizedDescription.toLowerCase();
+    const naturalDescription = ensureChineseSentence(normalizedDescription);
     const compactDescription =
-      normalizedDescription.length < shortDescriptionLimit
-        ? `${normalizedDescription} 在 ${brand} 查看${primaryName}价格、教程、交付方式、隐私边界和适用任务，判断是否适合当前创作或效率工作流。`
-        : descriptionLower.includes(brandLower)
-          ? normalizedDescription
-          : `${normalizedDescription} 在 ${brand} 查看使用建议。`;
+      normalizedDescription.length < 48
+        ? `${naturalDescription}相关价格、教程、交付方式、隐私边界与适用任务可在 ${brand} 核对，便于购买前判断是否符合当前创作或效率工作流。`
+        : naturalDescription;
 
     return buildMetaDescription(
       compactDescription,
@@ -886,7 +900,7 @@ export function buildToolMetaDescription({
   }
 
   return buildMetaDescription(
-    `在 ${brand} 查看 ${primaryName} 的价格、教程、交付方式、使用边界和适用任务，判断这款${typeLabel}是否值得使用。`,
+    `了解${primaryName}的价格、教程、交付方式、使用边界与适用任务，并结合当前需求判断这款${typeLabel}是否适合；相关信息可在 ${brand} 核对。`,
     defaultSiteDescription,
     targetMaxLength,
   );

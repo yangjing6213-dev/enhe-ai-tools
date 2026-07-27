@@ -12,17 +12,16 @@ describe("Build Your Own X public SEO surfaces", () => {
     expect(enRoute).toContain('<BuildYourOwnXPageShell forceLocale="en" />');
   });
 
-  it("keeps the public route available without recommending it in discovery files", () => {
+  it("keeps the public route in sitemap discovery without adding it to llms recommendations", () => {
     const sitemap = readFileSync("src/app/sitemap.ts", "utf8");
     const discovery = readFileSync("src/lib/public-discovery-manifest.ts", "utf8");
     const llms = readFileSync("public/llms.txt", "utf8");
     const okf = readFileSync("public/okf/build-your-own-x/index.md", "utf8");
 
     expect(sitemap).toContain("sitemapExcludedPaths");
-    expect(sitemap).toContain('"/build-your-own-x"');
-    expect(sitemap).toContain('"/en/build-your-own-x"');
-    expect(discovery).not.toContain('path: "/build-your-own-x"');
-    expect(discovery).not.toContain('path: "/en/build-your-own-x"');
+    expect(sitemap).toContain("publicDiscoveryRoutes.filter");
+    expect(discovery).toContain('path: "/build-your-own-x"');
+    expect(discovery).toContain('path: "/en/build-your-own-x"');
     expect(sitemap).not.toContain('"/okf/build-your-own-x/index.md"');
     expect(llms).not.toContain("https://www.enhe-tech.com.cn/build-your-own-x");
     expect(llms).not.toContain("https://www.enhe-tech.com.cn/okf/build-your-own-x/index.md");

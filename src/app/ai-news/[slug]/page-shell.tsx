@@ -8,9 +8,11 @@ import { Badge, ButtonLink, Container, SectionTitle } from "@/components/ui";
 import { ToolCard } from "@/components/tool-card";
 import { enheOrganizationReference } from "@/lib/brand-entity";
 import {
+  buildAiNewsAuthorSchema,
   buildAiNewsRelatedKeywords,
   buildAiNewsDescriptionFallback,
   buildAiNewsSerpTitle,
+  detectAiNewsEmbeddedSections,
   extractNewsTableOfContents,
   isEnglishNewsArticleIndexable,
   mergeAiNewsRelatedItems,
@@ -22,6 +24,7 @@ import {
   type NewsContentBlock,
   type NewsInlinePart,
 } from "@/lib/ai-news";
+import { resolveAiNewsCoverImage } from "@/lib/ai-news-cover-images";
 import {
   buildLocalizedNewsKeywordList,
   buildLocalizedNewsSummary,
@@ -108,7 +111,7 @@ export async function generateAiNewsDetailPageMetadata(
     }),
     description: localized.description,
     path: `/ai-news/${canonicalSlug}`,
-    image: normalizeImageSrc(article.coverImage),
+    image: normalizeImageSrc(resolveAiNewsCoverImage(article.coverImage)),
     locale: forceLocale === "en" ? "en_US" : "zh_CN",
     localeKey: forceLocale,
     type: "article",
@@ -148,8 +151,11 @@ export async function AiNewsDetailPageShell({
 
   const t = getDictionary(forceLocale);
   const localized = localizeArticle(article, forceLocale);
-  const coverImage = normalizeImageSrc(article.coverImage);
+  const coverImage = normalizeImageSrc(
+    resolveAiNewsCoverImage(article.coverImage),
+  );
   const publishedAt = article.publishedAt ?? article.createdAt;
+  const embeddedSections = detectAiNewsEmbeddedSections(localized.content);
   const toc = extractNewsTableOfContents(localized.content);
   const contentBlocks = renderNewsContentBlocks(localized.content);
   const articleVideo = resolveNewsVideo(article, localized.title);
@@ -182,12 +188,18 @@ export async function AiNewsDetailPageShell({
     coverImage,
   );
   const articleFaqItems = buildAiNewsFaqItems(localized, forceLocale);
-  const faqSchema = buildFaqSchema({ items: articleFaqItems });
+  const faqSchema = embeddedSections.faq
+    ? null
+    : buildFaqSchema({ items: articleFaqItems });
 
   return (
     <Container className="py-14">
       <StructuredData
-        data={[breadcrumbSchema, newsArticleSchema, faqSchema]}
+        data={[
+          breadcrumbSchema,
+          newsArticleSchema,
+          ...(faqSchema ? [faqSchema] : []),
+        ]}
       />
       <main>
         <article>
@@ -244,6 +256,7 @@ export async function AiNewsDetailPageShell({
 
         <div className="mt-10 grid gap-8 lg:grid-cols-[minmax(0,1fr)_300px]">
           <div className="space-y-8">
+            {!embeddedSections.keyTakeaways ? (
             <section className="glass rounded-2xl p-6">
               <h2 className="text-xl font-black text-[var(--marketing-text)]">
                 {t.aiNews.keyTakeaways}
@@ -264,6 +277,7 @@ export async function AiNewsDetailPageShell({
                 </div>
               ) : null}
             </section>
+            ) : null}
 
             <section className="glass rounded-2xl p-6">
               <NewsContent blocks={contentBlocks} />
@@ -301,7 +315,7 @@ export async function AiNewsDetailPageShell({
               </section>
             ) : null}
 
-            {relatedTools.length ? (
+            {relatedTools.length && !embeddedSections.relatedTools ? (
               <section>
                 <SectionTitle title={t.aiNews.relatedTools} />
                 <div className="grid gap-5 md:grid-cols-3">
@@ -321,7 +335,7 @@ export async function AiNewsDetailPageShell({
               </section>
             ) : null}
 
-            {relatedTutorials.length ? (
+            {relatedTutorials.length && !embeddedSections.relatedTutorials ? (
               <section className="glass rounded-2xl p-6">
                 <h2 className="text-2xl font-black text-[var(--marketing-text)]">
                   {t.aiNews.relatedTutorials}
@@ -352,6 +366,8 @@ export async function AiNewsDetailPageShell({
               </section>
             ) : null}
 
+            {!embeddedSections.relatedTools &&
+            !embeddedSections.relatedTutorials ? (
             <section className="glass rounded-2xl p-6">
               <h2 className="text-2xl font-black text-[var(--marketing-text)]">
                 {forceLocale === "en" ? "Related Tools And Tutorials" : "相关工具/教程"}
@@ -386,6 +402,7 @@ export async function AiNewsDetailPageShell({
                 ))}
               </div>
             </section>
+            ) : null}
 
             {relatedArticles.length ? (
               <section className="glass rounded-2xl p-6">
@@ -433,7 +450,7 @@ export async function AiNewsDetailPageShell({
               </section>
             ) : null}
 
-            {localized.conclusion ? (
+            {localized.conclusion && !embeddedSections.summary ? (
               <section className="glass rounded-2xl p-6">
                 <h2 className="text-2xl font-black text-[var(--marketing-text)]">
                   {t.aiNews.conclusion}
@@ -444,7 +461,7 @@ export async function AiNewsDetailPageShell({
               </section>
             ) : null}
 
-            {article.externalSources.length ? (
+            {article.externalSources.length && !embeddedSections.sources ? (
               <section className="glass rounded-2xl p-6">
                 <h2 className="text-2xl font-black text-[var(--marketing-text)]">
                   {t.aiNews.sources}
@@ -472,6 +489,7 @@ export async function AiNewsDetailPageShell({
               </section>
             ) : null}
 
+            {!embeddedSections.faq ? (
             <section className="glass rounded-2xl p-6">
               <h2 className="text-2xl font-black text-[var(--marketing-text)]">
                 FAQ
@@ -489,6 +507,7 @@ export async function AiNewsDetailPageShell({
                 ))}
               </div>
             </section>
+            ) : null}
 
             <AiNewsInteractions
               slug={canonicalSlug}
@@ -504,6 +523,7 @@ export async function AiNewsDetailPageShell({
           </div>
 
           <section className="space-y-5 lg:sticky lg:top-28 lg:self-start" aria-label="Article support links">
+            {!embeddedSections.tableOfContents ? (
             <section className="glass rounded-2xl p-5">
               <h2 className="text-lg font-black text-[var(--marketing-text)]">
                 {t.aiNews.tableOfContents}
@@ -526,6 +546,7 @@ export async function AiNewsDetailPageShell({
                 )}
               </div>
             </section>
+            ) : null}
             <ButtonLink
               href={buildLocalePath("/ai-news", forceLocale)}
               variant="ghost"
@@ -1022,10 +1043,10 @@ function buildNewsArticleSchema(
     inLanguage: locale === "en" ? "en-US" : "zh-CN",
     datePublished: toNewsIsoDate(article.publishedAt ?? article.createdAt),
     dateModified: toNewsIsoDate(article.updatedAt),
-    author: {
-      "@type": "Person",
-      name: article.author || siteName,
-    },
+    author: buildAiNewsAuthorSchema(
+      article.author || siteName,
+      enheOrganizationReference,
+    ),
     publisher: enheOrganizationReference,
     ...(coverImage ? { image: [absoluteUrl(coverImage)] } : {}),
     keywords:

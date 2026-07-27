@@ -68,10 +68,11 @@ describe("product demo feature source contract", () => {
     expect(editor).toContain('name="relatedProductId"');
   });
 
-  it("keeps product demo routes structured while keeping low-priority pages out of the core sitemap", () => {
+  it("keeps audited product demo routes structured and discoverable in the sitemap", () => {
     const listing = readFileSync(new URL("../app/product-demos/page-shell.tsx", import.meta.url), "utf8");
     const detail = readFileSync(new URL("../app/product-demos/[slug]/page-shell.tsx", import.meta.url), "utf8");
     const sitemap = readFileSync(new URL("../app/sitemap.ts", import.meta.url), "utf8");
+    const discovery = readFileSync(new URL("./public-discovery-manifest.ts", import.meta.url), "utf8");
     const robots = readFileSync(new URL("../app/robots.ts", import.meta.url), "utf8");
     const seo = readFileSync(new URL("./seo.ts", import.meta.url), "utf8");
 
@@ -84,8 +85,9 @@ describe("product demo feature source contract", () => {
     expect(detail).not.toContain("customCanonicalUrl");
     expect(detail).not.toContain("demo.canonicalUrl ? absoluteUrl");
     expect(sitemap).toContain("sitemapExcludedPaths");
-    expect(sitemap).toContain('"/product-demos"');
-    expect(sitemap).toContain('"/en/product-demos"');
+    expect(sitemap).toContain("publicDiscoveryRoutes.filter");
+    expect(discovery).toContain('path: "/product-demos"');
+    expect(discovery).toContain('path: "/en/product-demos"');
     expect(robots).toContain('"/product-demos"');
     expect(seo).toContain("^\\/product-demos$");
     expect(seo).toContain("^\\/product-demos\\/.+$");

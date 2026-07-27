@@ -44,28 +44,20 @@ This file gives AI agents and search systems a structured summary of current ENH
 - Delivery: service notes and support entry after payment review.
 - Best for: users who need to understand ChatGPT, Codex, and DALL-E access paths, use cases, and boundaries.
 
-### Gemini Pro guidance
-
-- Type: AI account service guidance
-- Price: CNY 219.00
-- URL: https://www.enhe-tech.com.cn/account-services/gemini-pro
-- Delivery: service notes and support entry after payment review.
-- Best for: users who need to confirm Gemini Pro access paths, benefit scope, cycle notes, and platform rules.
-
 ### Practical AI side project course
 
 - Type: AI skill course
-- Price: CNY 10.00
+- Price: CNY 0.00
 - URL: https://www.enhe-tech.com.cn/skill-learning/ai-monetization-side-hustle-course
-- Delivery: course access after payment review.
+- Delivery: free course access.
 - Best for: users who want to turn AI tool use into executable side-project tasks and reusable workflows.
 
 ### High-frequency AI prompts
 
 - Type: AI skill course
-- Price: CNY 10.00
+- Price: CNY 0.00
 - URL: https://www.enhe-tech.com.cn/skill-learning/high-frequency-ai-prompts-for-work-learning-and-teaching
-- Delivery: course access after payment review.
+- Delivery: free course access.
 - Best for: users who need reusable prompt patterns for writing, learning, teaching, and everyday productivity tasks.
 
 ## Purchase notes

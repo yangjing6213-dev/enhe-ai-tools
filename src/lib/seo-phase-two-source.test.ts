@@ -95,11 +95,10 @@ describe("seo phase two source contracts", () => {
     const accountServices = read("src/app/account-services/page-shell.tsx");
 
     expect(sitemap).toContain("sitemapExcludedPaths");
-    expect(sitemap).toContain('"/ai-topics"');
-    expect(sitemap).toContain('"/en/ai-topics"');
+    expect(sitemap).toContain("publicDiscoveryRoutes.filter");
     expect(sitemap).not.toContain("aiTopicClusters");
-    expect(discovery).not.toContain('path: "/ai-topics"');
-    expect(discovery).not.toContain('path: "/en/ai-topics"');
+    expect(discovery).toContain('path: "/ai-topics"');
+    expect(discovery).toContain('path: "/en/ai-topics"');
     expect(sitemap).not.toContain("getAiTopicPath");
     expect(seo).toContain("/^\\/ai-topics$/");
     expect(seo).toContain("/^\\/ai-topics\\/.+$/");

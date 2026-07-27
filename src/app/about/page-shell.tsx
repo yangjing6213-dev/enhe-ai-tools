@@ -2,10 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { StructuredData } from "@/components/structured-data";
 import { Badge, Container, SectionTitle } from "@/components/ui";
-import {
-  buildEnheOrganizationSchema,
-  enheOrganizationReference,
-} from "@/lib/brand-entity";
+import { enheOrganizationReference } from "@/lib/brand-entity";
 import { getDictionary, type Locale } from "@/lib/dictionaries";
 import {
   absoluteUrl,
@@ -207,21 +204,6 @@ export function AboutPageShell({ forceLocale }: { forceLocale: Locale }) {
     ],
   });
   const faqSchema = buildFaqSchema({ items: [...copy.faq] });
-  const organizationSchema = {
-    ...buildEnheOrganizationSchema({
-      logo: "/images/brand/enhe-icon-gradient-white-bg-cropped.png",
-      url: absoluteUrl("/"),
-      description: copy.description,
-    }),
-    alternateName: ["恩禾 ENHE AI", "ENHE AI"],
-    email: contactEmail,
-    contactPoint: {
-      "@type": "ContactPoint",
-      email: contactEmail,
-      contactType: "customer support",
-      availableLanguage: ["zh-CN", "en-US"],
-    },
-  };
   const aboutPageSchema = {
     "@context": "https://schema.org",
     "@type": "AboutPage",
@@ -236,7 +218,7 @@ export function AboutPageShell({ forceLocale }: { forceLocale: Locale }) {
   return (
     <main>
       <Container className="py-14">
-        <StructuredData data={[breadcrumbSchema, aboutPageSchema, organizationSchema, faqSchema]} />
+        <StructuredData data={[breadcrumbSchema, aboutPageSchema, faqSchema]} />
         <section className="glass relative overflow-hidden rounded-[2rem] p-7 md:p-10">
           <div className="relative max-w-4xl">
             <Badge>{copy.eyebrow}</Badge>

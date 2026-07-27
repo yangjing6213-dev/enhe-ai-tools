@@ -500,6 +500,137 @@ describe("AI news helpers", () => {
     expect(description).not.toContain("Alpha@");
   });
 
+  it("removes dangling English stopwords after title and description truncation", () => {
+    const value =
+      "OpenAI agents coordinate workflows with secure model tools for creators";
+    const title = buildAiNewsSerpTitle({
+      title: value,
+      categoryName: "AI News",
+      locale: "en",
+      maxLength: 43,
+    });
+    const description = truncateAiNewsMetaDescription(value, 43);
+
+    expect(title).toBe("OpenAI agents coordinate workflows");
+    expect(description).toBe("OpenAI agents coordinate workflows");
+    expect(title).not.toMatch(/\b(?:and|for|of|the|to|with)$/i);
+    expect(description).not.toMatch(/\b(?:and|for|of|the|to|with)$/i);
+  });
+
+  it("keeps the audited Claude and Copilot Chinese SERP titles distinct", () => {
+    const titles = [
+      "恩禾ENHE AI如何帮助用户理解Copilot CLI、BYOK、AI credit与GitHub Models退役？",
+      "恩禾ENHE AI如何帮助中文用户理解GitHub Copilot App与桌面AI智能体？",
+      "恩禾ENHE AI如何帮助中文用户理解Copilot OTel与智能体治理？",
+      "恩禾ENHE AI如何帮助中文用户理解Copilot安全审查、CodeQL与代码安全治理？",
+      "恩禾ENHE AI如何帮助中文用户理解Claude Science、AI工作台与可审计产物？",
+      "恩禾ENHE AI如何帮助中文用户理解Claude Code与AI代码安全治理？",
+      "恩禾ENHE AI如何帮助中文用户理解Claude Reflect和AI技能复盘？",
+    ].map((title) =>
+      buildAiNewsSerpTitle({
+        title,
+        categoryName: "AI资讯",
+        locale: "zh",
+        maxLength: 23,
+      }),
+    );
+
+    expect(new Set(titles).size).toBe(titles.length);
+    expect(titles).toEqual(
+      expect.arrayContaining([
+        expect.stringContaining("Copilot CLI"),
+        expect.stringContaining("Copilot App"),
+        expect.stringContaining("Claude Science"),
+        expect.stringContaining("Claude Code"),
+      ]),
+    );
+  });
+
+  it.each([
+    [
+      "English",
+      [
+        "## Table of Contents",
+        "## Key Takeaways",
+        "## Related Tools and Tutorials",
+        "## Sources",
+        "## FAQ",
+        "## Summary",
+      ].join("\n\nBody\n\n"),
+    ],
+    [
+      "Chinese",
+      [
+        "## 文章目录",
+        "## 本文核心看点",
+        "## 相关工具/教程",
+        "## 参考来源",
+        "## 常见问题",
+        "## 总结",
+      ].join("\n\n正文\n\n"),
+    ],
+  ])("detects %s body headings that replace detail templates", async (_, content) => {
+    const aiNews = (await import("@/lib/ai-news")) as Record<string, unknown>;
+    const detect = aiNews.detectAiNewsEmbeddedSections as
+      | ((value: string) => Record<string, boolean>)
+      | undefined;
+
+    expect(detect).toBeTypeOf("function");
+    expect(detect?.(content)).toEqual({
+      faq: true,
+      keyTakeaways: true,
+      relatedTools: true,
+      relatedTutorials: true,
+      sources: true,
+      summary: true,
+      tableOfContents: true,
+    });
+  });
+
+  it("detects descriptive Chinese related-content and summary headings", async () => {
+    const aiNews = (await import("@/lib/ai-news")) as Record<string, unknown>;
+    const detect = aiNews.detectAiNewsEmbeddedSections as
+      | ((value: string) => Record<string, boolean>)
+      | undefined;
+
+    expect(detect).toBeTypeOf("function");
+    expect(
+      detect?.(
+        "## 有哪些相关工具或教程？\n\n正文\n\n## 总结：下一步该如何行动？\n\n正文",
+      ),
+    ).toEqual({
+      faq: false,
+      keyTakeaways: false,
+      relatedTools: true,
+      relatedTutorials: true,
+      sources: false,
+      summary: true,
+      tableOfContents: false,
+    });
+  });
+
+  it("does not treat section words in body prose as embedded template headings", async () => {
+    const aiNews = (await import("@/lib/ai-news")) as Record<string, unknown>;
+    const detect = aiNews.detectAiNewsEmbeddedSections as
+      | ((value: string) => Record<string, boolean>)
+      | undefined;
+
+    expect(detect).toBeTypeOf("function");
+    expect(
+      detect?.(
+        "This paragraph mentions FAQ, sources, summary, and related tools without adding headings.",
+      ),
+    ).toEqual({
+      faq: false,
+      keyTakeaways: false,
+      relatedTools: false,
+      relatedTutorials: false,
+      sources: false,
+      summary: false,
+      tableOfContents: false,
+    });
+  });
+
   it("keeps a 110+ character candidate even when the fallback contains it", () => {
     const candidate =
       `Candidate priority ${"verified workflow context ".repeat(4)}`.trim();

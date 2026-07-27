@@ -185,6 +185,69 @@ export function extractNewsTableOfContents(content: string): NewsTocItem[] {
     .filter((item): item is NewsTocItem => Boolean(item));
 }
 
+const aiNewsSectionHeadingAliases = {
+  faq: ["faq", "faq 常见问题", "frequently asked questions", "common questions", "常见问题", "常见问答"],
+  keyTakeaways: ["key takeaways", "key points", "highlights", "本文核心看点", "核心看点", "关键要点", "核心要点"],
+  relatedTools: [
+    "related tools",
+    "tools you may use",
+    "related tools and tutorials",
+    "tools and tutorials",
+    "相关工具",
+    "你可能会用到这些工具",
+    "相关工具 教程",
+    "相关工具与教程",
+    "有哪些相关工具或教程",
+  ],
+  relatedTutorials: [
+    "related tutorials",
+    "related tools and tutorials",
+    "tools and tutorials",
+    "相关教程",
+    "相关工具 教程",
+    "相关工具与教程",
+    "有哪些相关工具或教程",
+  ],
+  sources: ["sources", "references", "source references", "参考来源", "资料来源", "来源"],
+  summary: ["summary", "conclusion", "总结", "结论"],
+  tableOfContents: ["table of contents", "contents", "article contents", "文章目录", "目录"],
+} as const;
+
+function normalizeAiNewsSectionHeading(value: string) {
+  return value
+    .toLowerCase()
+    .replace(/<[^>]*>/g, " ")
+    .replace(/[`*_~]/g, "")
+    .replace(/&(?:amp;)?/g, " and ")
+    .replace(/[：:!?！？。.、,，;；/|｜\-–—()[\]{}]+/g, " ")
+    .replace(/\s+/g, " ")
+    .trim();
+}
+
+export function detectAiNewsEmbeddedSections(content: string) {
+  const headings = new Set(
+    extractNewsTableOfContents(content).map((item) =>
+      normalizeAiNewsSectionHeading(item.title),
+    ),
+  );
+  const hasAlias = (aliases: readonly string[]) =>
+    aliases.some((alias) =>
+      [...headings].some(
+        (heading) => heading === alias || heading.startsWith(`${alias} `),
+      ),
+    );
+
+  return {
+    faq: hasAlias(aiNewsSectionHeadingAliases.faq),
+    keyTakeaways: hasAlias(aiNewsSectionHeadingAliases.keyTakeaways),
+    relatedTools: hasAlias(aiNewsSectionHeadingAliases.relatedTools),
+    relatedTutorials: hasAlias(aiNewsSectionHeadingAliases.relatedTutorials),
+    sources: hasAlias(aiNewsSectionHeadingAliases.sources),
+    summary: hasAlias(aiNewsSectionHeadingAliases.summary),
+    tableOfContents: hasAlias(aiNewsSectionHeadingAliases.tableOfContents),
+  };
+}
+
 function pushParagraph(lines: string[], blocks: NewsContentBlock[]) {
   const text = lines.join(" ").trim();
   if (text) blocks.push(inlineTextBlock(text));
@@ -555,6 +618,25 @@ export function buildAiNewsDescriptionFallback({
 }
 
 const asciiTokenCharacterPattern = /[A-Za-z0-9._+#/@?%=&~:\-]/;
+const danglingEnglishStopwords = new Set([
+  "a",
+  "an",
+  "and",
+  "as",
+  "at",
+  "by",
+  "for",
+  "from",
+  "in",
+  "into",
+  "of",
+  "on",
+  "or",
+  "the",
+  "to",
+  "with",
+  "without",
+]);
 
 function isAsciiTokenCharacter(value: string | undefined) {
   return Boolean(value && asciiTokenCharacterPattern.test(value));
@@ -571,6 +653,20 @@ function findAsciiTokenSafeEnd(value: string, maxLength: number) {
     }
   }
   return end;
+}
+
+function trimDanglingEnglishStopwords(value: string) {
+  let trimmed = value.trim();
+
+  while (trimmed) {
+    const match = trimmed.match(/(?:^|\s)([A-Za-z]+)$/);
+    if (!match || !danglingEnglishStopwords.has(match[1].toLowerCase())) break;
+    const next = trimmed.slice(0, match.index).trimEnd();
+    if (!next) break;
+    trimmed = next;
+  }
+
+  return trimmed;
 }
 
 export function truncateAiNewsMetaDescription(value: string, maxLength: number) {
@@ -601,13 +697,21 @@ export function truncateAiNewsMetaDescription(value: string, maxLength: number) 
       ? candidate.slice(0, naturalBreak).trimEnd()
       : candidate;
 
-  return preferred.replace(/[、，；：,:;\-–—|｜/\s]+$/g, "").trim();
+  return trimDanglingEnglishStopwords(
+    preferred.replace(/[、，；：,:;\-–—|｜/\s]+$/g, "").trim(),
+  );
 }
 
 function stripGenericEnglishNewsTitlePrefix(value: string) {
   return value
     .replace(/^how\s+enhe\s+ai\s+helps\s+users\s+understand\s+/i, "")
     .replace(/^enhe\s+ai\s+helps\s+users\s+understand\s+/i, "")
+    .trim();
+}
+
+function stripGenericChineseNewsTitlePrefix(value: string) {
+  return value
+    .replace(/^恩禾\s*ENHE\s*AI\s*如何帮助(?:中文)?用户理解\s*/i, "")
     .trim();
 }
 
@@ -712,7 +816,10 @@ function truncateAiNewsSerpTitle(
     }
   }
 
-  return cleanAiNewsSerpTitle(candidate);
+  const truncated = cleanAiNewsSerpTitle(candidate);
+  return locale === "en"
+    ? trimDanglingEnglishStopwords(truncated)
+    : truncated;
 }
 
 export function buildAiNewsSerpTitle({
@@ -732,10 +839,11 @@ export function buildAiNewsSerpTitle({
 
   const normalizedTitle = normalizeAiNewsMetaCandidate(title);
   const normalizedCategory = cleanAiNewsSerpTitle(categoryName ?? "");
-  const localizedTitle =
+  const strippedTitle =
     locale === "en"
       ? stripGenericEnglishNewsTitlePrefix(normalizedTitle)
-      : normalizedTitle;
+      : stripGenericChineseNewsTitlePrefix(normalizedTitle);
+  const localizedTitle = strippedTitle || normalizedTitle;
   const source = cleanAiNewsSerpTitle(localizedTitle) || normalizedCategory || "AI";
   const compactTitle = truncateAiNewsSerpTitle(source, maxLength, locale);
   if (compactTitle) return compactTitle;
@@ -752,6 +860,23 @@ export function buildAiNewsSerpTitle({
     truncateAiNewsSerpTitle(normalizedCategory, maxLength, locale) ||
     (maxLength >= "AI".length ? "AI" : "")
   );
+}
+
+export function buildAiNewsAuthorSchema(
+  author: string | null | undefined,
+  organizationReference: { "@id": string },
+) {
+  const name = String(author ?? "").replace(/\s+/g, " ").trim();
+  const normalizedName = name.toLowerCase().replace(/\s+/g, "");
+
+  if (!name || normalizedName === "enheai" || normalizedName === "恩禾enheai") {
+    return organizationReference;
+  }
+
+  return {
+    "@type": "Person",
+    name,
+  };
 }
 
 export function parseNewsRelationIds(value: string | null | undefined) {

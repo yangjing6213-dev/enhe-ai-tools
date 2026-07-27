@@ -31,20 +31,11 @@ const aiNewsTopicSitemapPathHints = [
   "/ai-news/topics/ai-account-service",
   "/ai-news/topics/ai-regulation",
 ] as const;
-const sitemapExcludedPaths = new Set([
-  "/build-your-own-x",
-  "/en/build-your-own-x",
-  "/ai-topics",
-  "/en/ai-topics",
-  "/product-demos",
-  "/en/product-demos",
-  "/product-paths/work-efficiency",
-  "/en/product-paths/work-efficiency",
-  "/product-paths/media-generation",
-  "/en/product-paths/media-generation",
-  "/product-paths/future-ai",
-  "/en/product-paths/future-ai",
-]);
+const sitemapExcludedPaths = new Set(
+  publicDiscoveryRoutes
+    .filter((route) => route.indexable === false)
+    .map((route) => route.path),
+);
 
 function getPriority(path: string) {
   if (path === "/" || path === "/en") return 1;

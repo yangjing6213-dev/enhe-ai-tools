@@ -30,19 +30,43 @@ describe("public discovery manifest", () => {
     for (const forbidden of ["/admin", "/user", "/checkout", "/orders", "/api"]) {
       expect(paths.some((path) => path === forbidden || path.startsWith(`${forbidden}/`))).toBe(false);
     }
-    for (const deprioritized of [
+    for (const auditedIndexableRoute of [
       "/build-your-own-x",
       "/en/build-your-own-x",
       "/ai-topics",
       "/en/ai-topics",
+      "/ai-topics/ai-content-creation-tools",
+      "/en/ai-topics/ai-content-creation-tools",
+      "/ai-topics/local-ai-deployment",
+      "/en/ai-topics/local-ai-deployment",
+      "/ai-topics/ai-account-service-compliance",
+      "/en/ai-topics/ai-account-service-compliance",
+      "/ai-topics/ai-skill-learning-path",
+      "/en/ai-topics/ai-skill-learning-path",
+      "/product-paths/work-efficiency",
+      "/en/product-paths/work-efficiency",
+      "/product-paths/media-generation",
+      "/en/product-paths/media-generation",
       "/product-demos",
       "/en/product-demos",
+      "/product-demos/windows-ai-video-studio",
+      "/en/product-demos/windows-ai-video-studio",
+      "/product-demos/ai-video",
+      "/en/product-demos/ai-video",
+      "/product-demos/windows-ai-lumi",
+      "/en/product-demos/windows-ai-lumi",
     ]) {
-      expect(paths).not.toContain(deprioritized);
+      expect(paths).toContain(auditedIndexableRoute);
     }
+
+    expect(
+      publicDiscoveryRoutes.find(
+        (route) => route.path === "/product-paths/future-ai",
+      )?.indexable,
+    ).toBe(false);
   });
 
-  it("does not recommend sitemap-excluded non-core pages through llms or OKF", () => {
+  it("does not add supporting sitemap pages to llms or OKF recommendations", () => {
     const renderedSignals = [
       renderLlmsImportantPages(),
       renderLlmsMachineReadableResources(),

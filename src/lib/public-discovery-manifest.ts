@@ -1,6 +1,7 @@
 export type PublicDiscoveryRoute = {
   path: string;
   lastModified: string;
+  indexable?: boolean;
   llmsLabel?: string;
   okfFile?: string;
   okfLabel?: string;
@@ -24,6 +25,18 @@ export const publicDiscoveryRoutes: readonly PublicDiscoveryRoute[] = [
     okfLabel: "ENHE AI overview",
   },
   { path: "/en/about", lastModified: "2026-07-23T00:00:00.000Z" },
+  { path: "/ai-topics", lastModified: "2026-06-28T00:00:00.000Z" },
+  { path: "/en/ai-topics", lastModified: "2026-06-28T00:00:00.000Z" },
+  { path: "/ai-topics/ai-content-creation-tools", lastModified: "2026-06-28T00:00:00.000Z" },
+  { path: "/en/ai-topics/ai-content-creation-tools", lastModified: "2026-06-28T00:00:00.000Z" },
+  { path: "/ai-topics/local-ai-deployment", lastModified: "2026-06-28T00:00:00.000Z" },
+  { path: "/en/ai-topics/local-ai-deployment", lastModified: "2026-06-28T00:00:00.000Z" },
+  { path: "/ai-topics/ai-account-service-compliance", lastModified: "2026-06-28T00:00:00.000Z" },
+  { path: "/en/ai-topics/ai-account-service-compliance", lastModified: "2026-06-28T00:00:00.000Z" },
+  { path: "/ai-topics/ai-skill-learning-path", lastModified: "2026-06-28T00:00:00.000Z" },
+  { path: "/en/ai-topics/ai-skill-learning-path", lastModified: "2026-06-28T00:00:00.000Z" },
+  { path: "/build-your-own-x", lastModified: "2026-06-28T00:00:00.000Z" },
+  { path: "/en/build-your-own-x", lastModified: "2026-06-28T00:00:00.000Z" },
   {
     path: "/software",
     lastModified: "2026-06-17T00:00:00.000Z",
@@ -64,8 +77,16 @@ export const publicDiscoveryRoutes: readonly PublicDiscoveryRoute[] = [
   { path: "/en/product-paths/work-efficiency", lastModified: "2026-07-04T00:00:00.000Z" },
   { path: "/product-paths/media-generation", lastModified: "2026-07-04T00:00:00.000Z" },
   { path: "/en/product-paths/media-generation", lastModified: "2026-07-04T00:00:00.000Z" },
-  { path: "/product-paths/future-ai", lastModified: "2026-07-04T00:00:00.000Z" },
-  { path: "/en/product-paths/future-ai", lastModified: "2026-07-04T00:00:00.000Z" },
+  { path: "/product-paths/future-ai", lastModified: "2026-07-04T00:00:00.000Z", indexable: false },
+  { path: "/en/product-paths/future-ai", lastModified: "2026-07-04T00:00:00.000Z", indexable: false },
+  { path: "/product-demos", lastModified: "2026-07-01T00:00:00.000Z" },
+  { path: "/en/product-demos", lastModified: "2026-07-01T00:00:00.000Z" },
+  { path: "/product-demos/windows-ai-video-studio", lastModified: "2026-07-01T00:00:00.000Z" },
+  { path: "/en/product-demos/windows-ai-video-studio", lastModified: "2026-07-01T00:00:00.000Z" },
+  { path: "/product-demos/ai-video", lastModified: "2026-07-01T00:00:00.000Z" },
+  { path: "/en/product-demos/ai-video", lastModified: "2026-07-01T00:00:00.000Z" },
+  { path: "/product-demos/windows-ai-lumi", lastModified: "2026-07-01T00:00:00.000Z" },
+  { path: "/en/product-demos/windows-ai-lumi", lastModified: "2026-07-01T00:00:00.000Z" },
   { path: "/pricing", lastModified: "2026-06-17T00:00:00.000Z", llmsLabel: "Pricing and purchase notes" },
   { path: "/en/pricing", lastModified: "2026-06-17T00:00:00.000Z" },
   { path: "/tutorials", lastModified: "2026-06-17T00:00:00.000Z", llmsLabel: "AI tutorials", okfLabel: "Tutorials" },

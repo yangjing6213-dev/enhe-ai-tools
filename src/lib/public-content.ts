@@ -9,6 +9,7 @@ import {
   type AiNewsKeywordInterventionRule,
 } from "@/lib/ai-news-discovery";
 import { isEnglishNewsArticleIndexable } from "@/lib/ai-news";
+import { resolveLocalizedNewsTagName } from "@/lib/ai-news-localization";
 import { prisma } from "@/lib/db";
 import {
   getCanonicalAiNewsSlug,
@@ -17,6 +18,42 @@ import {
 import { parseVirtualToolCategoryId } from "@/lib/tool-category-groups";
 
 const publicContentRevalidate = 300;
+
+export const publicNewsTagLimit = 48;
+
+export function filterPublicNewsTags<
+  T extends { slug: string; name: string },
+>(tags: readonly T[], locale: "zh" | "en"): T[] {
+  if (locale === "zh") return tags.slice(0, publicNewsTagLimit);
+
+  const seenNames = new Set<string>();
+  const result: T[] = [];
+
+  for (const tag of tags) {
+    const normalizedName = tag.name.replace(/\s+/g, " ").trim();
+    const localizedName =
+      resolveLocalizedNewsTagName(normalizedName, "en") ||
+      (!/[\u3040-\u30ff\u3400-\u9fff\uf900-\ufaff]/u.test(normalizedName) &&
+      /[A-Za-z]/.test(normalizedName)
+        ? normalizedName
+        : "");
+    const normalizedKey = localizedName.toLowerCase();
+
+    if (
+      !localizedName ||
+      /[\u3040-\u30ff\u3400-\u9fff\uf900-\ufaff]/u.test(localizedName) ||
+      seenNames.has(normalizedKey)
+    ) {
+      continue;
+    }
+
+    seenNames.add(normalizedKey);
+    result.push({ ...tag, name: localizedName });
+    if (result.length === publicNewsTagLimit) break;
+  }
+
+  return result;
+}
 
 type PublicToolType = "software" | "online" | "skill_learning";
 
@@ -785,8 +822,8 @@ export async function getPublicNewsCategories() {
   return getCachedPublicNewsCategories();
 }
 
-export async function getPublicNewsTags() {
-  return getCachedPublicNewsTags();
+export async function getPublicNewsTags(locale: "zh" | "en" = "zh") {
+  return filterPublicNewsTags(await getCachedPublicNewsTags(), locale);
 }
 
 export async function getPublicNewsArticleBySlug(slug: string) {

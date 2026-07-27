@@ -258,7 +258,7 @@ export async function AiNewsPageShell({
       getPublicNewsListing({ sort: "featured", take: 3, locale: forceLocale }),
       getPublicNewsListing({ sort: "hot", take: 6, locale: forceLocale }),
       getPublicNewsCategories(),
-      getPublicNewsTags(),
+      getPublicNewsTags(forceLocale),
       getPublicAiNewsDiscovery(forceLocale),
       getPublicAiNewsTopics(),
     ]);
