@@ -79,6 +79,7 @@ type OrganizationSchemaInput = {
     contactType?: string;
     availableLanguage?: string[];
   } | null;
+  returnPolicyPath?: string;
   schemaType?: "Organization";
 };
 
@@ -147,6 +148,21 @@ type ProductStructuredDataInput = {
   currency?: string;
   priceSpecs?: OfferSpecInput[];
 };
+
+export function buildMerchantReturnPolicyReference(path = "/") {
+  const refundPath =
+    path === "/en" || path.startsWith("/en/")
+      ? "/en/legal/membership-refund"
+      : "/legal/membership-refund";
+
+  return {
+    "@type": "MerchantReturnPolicy",
+    applicableCountry: "CN",
+    returnPolicyCategory:
+      "https://schema.org/MerchantReturnNotPermitted",
+    merchantReturnLink: absoluteUrl(refundPath),
+  } as const;
+}
 
 export function getSiteBaseUrl() {
   return (
@@ -972,6 +988,7 @@ export function buildOrganizationSchema({
   knowsAbout = [],
   subjectOf = [],
   contactPoint,
+  returnPolicyPath = "/",
   schemaType = "Organization",
 }: OrganizationSchemaInput) {
   const organizationId = absoluteUrl("/#organization");
@@ -992,6 +1009,7 @@ export function buildOrganizationSchema({
     name,
     ...(alternateName.length ? { alternateName } : {}),
     url,
+    hasMerchantReturnPolicy: buildMerchantReturnPolicyReference(returnPolicyPath),
     ...(description ? { description: buildMetaDescription(description) } : {}),
     ...(logo ? { logo: absoluteUrl(logo) } : {}),
     ...(externalSameAs.length ? { sameAs: externalSameAs } : {}),
@@ -1116,6 +1134,7 @@ function buildOfferData(
         priceCurrency: currency,
         availability: "https://schema.org/InStock",
         url: absoluteUrl(url),
+        hasMerchantReturnPolicy: buildMerchantReturnPolicyReference(url),
       },
     };
   }
@@ -1131,6 +1150,7 @@ function buildOfferData(
       priceCurrency: currency,
       availability: "https://schema.org/InStock",
       url: absoluteUrl(url),
+      hasMerchantReturnPolicy: buildMerchantReturnPolicyReference(url),
     },
   };
 }
@@ -1190,6 +1210,7 @@ export function buildToolStructuredData({
             priceCurrency: currency,
             availability: "https://schema.org/InStock",
             url: absoluteUrl(url),
+            hasMerchantReturnPolicy: buildMerchantReturnPolicyReference(url),
           },
         }
       : {};
@@ -1232,6 +1253,7 @@ export function buildToolStructuredData({
                 priceCurrency: currency,
                 availability: "https://schema.org/InStock",
                 url: absoluteUrl(url),
+                hasMerchantReturnPolicy: buildMerchantReturnPolicyReference(url),
               })),
             },
           }
@@ -1286,6 +1308,7 @@ export function buildProductStructuredData({
             priceCurrency: currency,
             availability: "https://schema.org/InStock",
             url: absoluteUrl(url),
+            hasMerchantReturnPolicy: buildMerchantReturnPolicyReference(url),
           },
         }
       : {};

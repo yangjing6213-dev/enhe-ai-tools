@@ -45,6 +45,7 @@ export async function PublicSiteChrome({
     description: siteDescription,
     logo: siteLogo,
     url: languageAlternates["x-default"],
+    returnPolicyPath: buildLocalePath("/legal/membership-refund", forceLocale),
     contactPoint: {
       email: "ENHEAI.life@protonmail.com",
       contactType: "customer support",

@@ -2,6 +2,14 @@ import { readFileSync } from "node:fs";
 import { describe, expect, it } from "vitest";
 
 describe("homepage SaaS redesign source", () => {
+  it("does not emit FAQPage schema when the homepage has no visible FAQ section", () => {
+    const page = readFileSync(new URL("../app/page-shell.tsx", import.meta.url), "utf8");
+
+    expect(page).not.toContain("homeFaqItems");
+    expect(page).not.toContain("buildFaqSchema");
+    expect(page).not.toContain("faqSchema");
+  });
+
   it("uses a simplified task-first homepage without recommended cards while keeping SEO support links", () => {
     const page = readFileSync(new URL("../app/page-shell.tsx", import.meta.url), "utf8");
     const header = readFileSync(new URL("../components/site-header.tsx", import.meta.url), "utf8");

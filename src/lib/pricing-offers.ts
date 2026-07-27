@@ -1,4 +1,13 @@
+import { unstable_cache } from "next/cache";
 import type { Locale } from "@/lib/dictionaries";
+import { prisma } from "@/lib/db";
+import { publicPageCacheSeconds } from "@/lib/public-routes";
+import {
+  buildLocalizedToolOfferName,
+  buildLocalizedToolSummary,
+  resolveLocalizedToolCategoryName,
+  resolveLocalizedToolIdentity,
+} from "@/lib/tool-localization";
 
 type PricingOfferCopy = {
   name: string;
@@ -7,162 +16,339 @@ type PricingOfferCopy = {
   delivery: string;
 };
 
+export type PricingCatalogTool = {
+  slug: string;
+  name: string;
+  englishName: string | null;
+  type: "software" | "online" | "skill_learning";
+  status: "draft" | "published" | "offline";
+  shortDescription: string;
+  content: string;
+  category: { name: string } | null;
+  isDownloadPaid: boolean;
+  downloadPrice: unknown;
+  tutorials: Array<{ status: "active" | "disabled" }>;
+  priceSpecs: Array<{
+    id: string;
+    name: string;
+    price: unknown;
+    sortOrder: number;
+    status: "active" | "disabled";
+  }>;
+};
+
+export type PricingOffer = {
+  id: string;
+  name: string;
+  price: number;
+};
+
 export type PricingOfferItem = {
   slug: string;
   path: string;
   price: number;
+  offers: PricingOffer[];
   type: "software" | "account_service" | "course";
-  zh: PricingOfferCopy;
-  en: PricingOfferCopy;
+  localized: PricingOfferCopy;
 };
 
-export const pricingOfferItems: PricingOfferItem[] = [
-  {
-    slug: "windows-ai",
-    path: "/software/windows-ai",
-    price: 50,
-    type: "software",
-    zh: {
-      name: "Lumi-OS｜AI情感智能体",
-      description:
-        "把记忆、工具调用和桌面工作台放在一起，适合想用 AI 辅助整理任务、陪伴创作和推进下一步的用户。",
-      category: "AI软件应用",
-      delivery: "付款审核后开放下载与使用说明",
-    },
-    en: {
-      name: "Lumi-OS AI companion workspace",
-      description:
-        "A desktop AI companion workspace for memory, tool use, task support, and private creative workflows.",
-      category: "AI software app",
-      delivery: "Download and setup notes after payment review",
-    },
-  },
-  {
-    slug: "local-ai-voice-generator-for-voiceover-materials",
-    path: "/software/local-ai-voice-generator-for-voiceover-materials",
-    price: 30,
-    type: "software",
-    zh: {
-      name: "AI语音生成｜本地配音素材工作台",
-      description:
-        "适合需要旁白、配音和多角色对话素材的创作者，在本地电脑生成可复用的音频素材。",
-      category: "AI软件应用",
-      delivery: "付款审核后开放下载与使用说明",
-    },
-    en: {
-      name: "Local AI voice generator",
-      description:
-        "A local voiceover material workspace for narration, dubbing, and reusable dialogue assets.",
-      category: "AI software app",
-      delivery: "Download and setup notes after payment review",
-    },
-  },
-  {
-    slug: "ultimate-edition-ai-video-generation-suite",
-    path: "/software/ultimate-edition-ai-video-generation-suite",
-    price: 35,
-    type: "software",
-    zh: {
-      name: "AI生成视频应用",
-      description:
-        "适合想稳定生成视频素材的创作者，在本地电脑完成文生视频、图生视频和素材管理，减少上传敏感素材的顾虑。",
-      category: "AI软件应用",
-      delivery: "付款审核后开放下载与使用说明",
-    },
-    en: {
-      name: "AI video generation suite",
-      description:
-        "A local video-generation workflow for creators who need text-to-video, image-to-video, and material management.",
-      category: "AI software app",
-      delivery: "Download and setup notes after payment review",
-    },
-  },
-  {
-    slug: "gmail-google",
-    path: "/account-services/gmail-google",
-    price: 30.8,
-    type: "account_service",
-    zh: {
-      name: "Gmail 使用与Google生态咨询",
-      description:
-        "帮助用户了解 Gmail 与 Google 生态的基础使用场景、注意事项、访问路径和服务边界。",
-      category: "AI账号服务咨询",
-      delivery: "付款审核后开放服务说明与支持入口",
-    },
-    en: {
-      name: "Gmail and Google ecosystem guidance",
-      description:
-        "Usage guidance for Gmail and Google ecosystem access paths, service boundaries, and practical setup notes.",
-      category: "AI account service guidance",
-      delivery: "Service notes and support entry after payment review",
-    },
-  },
-  {
-    slug: "chatgpt-codex-dalle",
-    path: "/account-services/chatgpt-codex-dalle",
-    price: 58.8,
-    type: "account_service",
-    zh: {
-      name: "ChatGPT 多功能入口使用咨询",
-      description:
-        "帮助用户先弄清 ChatGPT、Codex、DALL-E 的能力入口、适合场景、使用边界和注意事项。",
-      category: "AI账号服务咨询",
-      delivery: "付款审核后开放服务说明与支持入口",
-    },
-    en: {
-      name: "ChatGPT, Codex, and DALL-E guidance",
-      description:
-        "Guidance for understanding ChatGPT, Codex, and DALL-E access paths, use cases, boundaries, and support scope.",
-      category: "AI account service guidance",
-      delivery: "Service notes and support entry after payment review",
-    },
-  },
-  {
-    slug: "ai-monetization-side-hustle-course",
-    path: "/skill-learning/ai-monetization-side-hustle-course",
-    price: 0,
-    type: "course",
-    zh: {
-      name: "AI副业实操课｜从工具到项目",
-      description:
-        "通过项目练习建立从工具使用到实际执行的路径，适合想把 AI 方法落到真实副业任务的用户。",
-      category: "AI技能学习",
-      delivery: "免费获取课程内容",
-    },
-    en: {
-      name: "Practical AI side project course",
-      description:
-        "A practical course for turning AI tool use into executable side-project tasks and reusable workflows.",
-      category: "AI skill course",
-      delivery: "Free course access",
-    },
-  },
-  {
-    slug: "high-frequency-ai-prompts-for-work-learning-and-teaching",
-    path: "/skill-learning/high-frequency-ai-prompts-for-work-learning-and-teaching",
-    price: 0,
-    type: "course",
-    zh: {
-      name: "高频AI提示词｜日常工作学习教学",
-      description:
-        "把写作、学习、教学和办公任务整理成可复用提示词，适合希望快速提升日常效率的用户。",
-      category: "AI技能学习",
-      delivery: "免费获取课程内容",
-    },
-    en: {
-      name: "High-frequency AI prompts",
-      description:
-        "Reusable prompt patterns for writing, learning, teaching, and everyday productivity tasks.",
-      category: "AI skill course",
-      delivery: "Free course access",
-    },
-  },
-];
+const siteBaseUrl = "https://www.enhe-tech.com.cn";
 
-export function getPricingOfferItems(locale: Locale) {
-  return pricingOfferItems.map((item) => ({
-    ...item,
-    path: locale === "en" ? `/en${item.path}` : item.path,
-    localized: item[locale],
-  }));
+function toFinitePrice(value: unknown) {
+  const price = Number(value ?? 0);
+  return Number.isFinite(price) && price > 0 ? price : 0;
+}
+
+function getCatalogType(type: PricingCatalogTool["type"]): PricingOfferItem["type"] {
+  if (type === "online") return "account_service";
+  if (type === "skill_learning") return "course";
+  return "software";
+}
+
+function getCatalogPath(type: PricingCatalogTool["type"], slug: string) {
+  if (type === "online") return `/account-services/${slug}`;
+  if (type === "skill_learning") return `/skill-learning/${slug}`;
+  return `/software/${slug}`;
+}
+
+function getDefaultOfferName(
+  type: PricingCatalogTool["type"],
+  locale: Locale,
+  isFree: boolean,
+) {
+  if (locale === "en") {
+    if (isFree) return "Free access";
+    if (type === "online") return "Service access";
+    if (type === "skill_learning") return "Course access";
+    return "Download access";
+  }
+
+  if (isFree) return "免费获取";
+  if (type === "online") return "服务方案";
+  if (type === "skill_learning") return "课程权限";
+  return "下载权限";
+}
+
+function buildOffers(tool: PricingCatalogTool, locale: Locale): PricingOffer[] {
+  const activeSpecs = tool.priceSpecs
+    .filter((spec) => spec.status === "active" && toFinitePrice(spec.price) > 0)
+    .sort((left, right) => left.sortOrder - right.sortOrder);
+
+  const usesPaidAccess = tool.type !== "software" || tool.isDownloadPaid;
+  if (usesPaidAccess && activeSpecs.length) {
+    return activeSpecs.map((spec, index) => ({
+      id: spec.id,
+      name: buildLocalizedToolOfferName(spec.name, tool.type, locale, index),
+      price: toFinitePrice(spec.price),
+    }));
+  }
+
+  const legacySoftwarePrice =
+    tool.type === "software" && tool.isDownloadPaid
+      ? toFinitePrice(tool.downloadPrice)
+      : 0;
+
+  return [
+    {
+      id: `${tool.slug}-default`,
+      name: getDefaultOfferName(tool.type, locale, legacySoftwarePrice === 0),
+      price: legacySoftwarePrice,
+    },
+  ];
+}
+
+function containsFreeClaim(value: string) {
+  return /\bfree\b/i.test(value) || value.includes("免费");
+}
+
+function buildAccurateDescription(
+  tool: PricingCatalogTool,
+  locale: Locale,
+  name: string,
+  offers: PricingOffer[],
+) {
+  const localizedInput = {
+    slug: tool.slug,
+    name: tool.name,
+    englishName: tool.englishName,
+    shortDescription: tool.shortDescription,
+    content: tool.content,
+    type: tool.type,
+    categoryName: tool.category?.name,
+  };
+  const description = buildLocalizedToolSummary(localizedInput, locale);
+  const isPaid = offers.some((offer) => offer.price > 0);
+
+  if (!isPaid || !containsFreeClaim(description)) return description;
+
+  if (locale === "en") {
+    if (tool.type === "online") {
+      return `${name} is currently a paid AI account service. Review the available service options, delivery notes, and support boundaries before purchase.`;
+    }
+    if (tool.type === "skill_learning") {
+      return `${name} is currently a paid AI skill course. Review the course access, lesson scope, and delivery notes before purchase.`;
+    }
+    return `${name} is currently a paid AI software app. Review the available download options, delivery notes, and system requirements before purchase.`;
+  }
+
+  if (tool.type === "online") {
+    return `${name} 当前为付费 AI 账号服务，请在购买前核对服务方案、交付说明和支持边界。`;
+  }
+  if (tool.type === "skill_learning") {
+    return `${name} 当前为付费 AI 技能课程，请在购买前核对课程权限、学习范围和交付说明。`;
+  }
+  return `${name} 当前为付费 AI 软件，请在购买前核对下载方案、交付说明和系统要求。`;
+}
+
+function buildDeliveryCopy(
+  type: PricingCatalogTool["type"],
+  locale: Locale,
+  isFree: boolean,
+) {
+  if (locale === "en") {
+    if (type === "online") {
+      return isFree
+        ? "Free service access from the detail page"
+        : "Service notes and support entry after payment review";
+    }
+    if (type === "skill_learning") {
+      return isFree
+        ? "Free course access"
+        : "Course access after payment review";
+    }
+    return isFree
+      ? "Free download or access from the detail page"
+      : "Download and setup notes after payment review";
+  }
+
+  if (type === "online") {
+    return isFree ? "从详情页免费获取服务" : "付款审核后开放服务说明与支持入口";
+  }
+  if (type === "skill_learning") {
+    return isFree ? "免费获取课程内容" : "付款审核后开放课程权限";
+  }
+  return isFree ? "从详情页免费下载或获取" : "付款审核后开放下载与使用说明";
+}
+
+export function buildPricingOfferItems(
+  tools: PricingCatalogTool[],
+  locale: Locale,
+): PricingOfferItem[] {
+  return tools
+    .filter(
+      (tool) =>
+        tool.status === "published" &&
+        (tool.type !== "skill_learning" ||
+          tool.tutorials.some((tutorial) => tutorial.status === "active")),
+    )
+    .map((tool) => {
+      const localizedInput = {
+        slug: tool.slug,
+        name: tool.name,
+        englishName: tool.englishName,
+        shortDescription: tool.shortDescription,
+        content: tool.content,
+        type: tool.type,
+        categoryName: tool.category?.name,
+      };
+      const localizedName = resolveLocalizedToolIdentity(
+        localizedInput,
+        locale,
+      ).primaryName;
+      const offers = buildOffers(tool, locale);
+      const isFree = offers.every((offer) => offer.price === 0);
+      const path = getCatalogPath(tool.type, tool.slug);
+
+      return {
+        slug: tool.slug,
+        path: locale === "en" ? `/en${path}` : path,
+        price: offers[0]?.price ?? 0,
+        offers,
+        type: getCatalogType(tool.type),
+        localized: {
+          name: localizedName,
+          description: buildAccurateDescription(
+            tool,
+            locale,
+            localizedName,
+            offers,
+          ),
+          category: resolveLocalizedToolCategoryName(
+            tool.category?.name,
+            tool.type,
+            locale,
+          ),
+          delivery: buildDeliveryCopy(tool.type, locale, isFree),
+        },
+      };
+    });
+}
+
+export async function loadPublicPricingCatalogTools(): Promise<
+  PricingCatalogTool[]
+> {
+  return prisma.tool.findMany({
+    where: {
+      status: "published",
+      type: { in: ["software", "online", "skill_learning"] },
+    },
+    select: {
+      slug: true,
+      name: true,
+      englishName: true,
+      type: true,
+      status: true,
+      shortDescription: true,
+      content: true,
+      category: { select: { name: true } },
+      isDownloadPaid: true,
+      downloadPrice: true,
+      tutorials: {
+        where: { status: "active" },
+        select: { status: true },
+      },
+      priceSpecs: {
+        where: { status: "active" },
+        select: {
+          id: true,
+          name: true,
+          price: true,
+          sortOrder: true,
+          status: true,
+        },
+        orderBy: [{ sortOrder: "asc" }, { createdAt: "asc" }],
+      },
+    },
+    orderBy: [{ type: "asc" }, { sortOrder: "asc" }, { createdAt: "desc" }],
+  });
+}
+
+const getCachedPublicPricingCatalogTools = unstable_cache(
+  loadPublicPricingCatalogTools,
+  ["public-pricing-catalog-tools"],
+  {
+    revalidate: publicPageCacheSeconds,
+    tags: ["public-tools"],
+  },
+);
+
+export async function getPricingOfferItems(locale: Locale) {
+  const tools = await getCachedPublicPricingCatalogTools();
+  return buildPricingOfferItems(tools, locale);
+}
+
+function getMarkdownType(type: PricingOfferItem["type"]) {
+  if (type === "account_service") return "AI account service guidance";
+  if (type === "course") return "AI skill course";
+  return "AI software app";
+}
+
+function formatPrice(price: number) {
+  return price.toFixed(2);
+}
+
+export function renderPricingMarkdown(items: PricingOfferItem[]) {
+  const offerSections = items.map((item) => {
+    const priceLines =
+      item.offers.length === 1
+        ? [`- Price: CNY ${formatPrice(item.offers[0].price)}`]
+        : item.offers.map(
+            (offer) =>
+              `- Offer: ${offer.name} | CNY ${formatPrice(offer.price)}`,
+          );
+
+    return [
+      `### ${item.localized.name}`,
+      "",
+      `- Type: ${getMarkdownType(item.type)}`,
+      ...priceLines,
+      `- URL: ${siteBaseUrl}${item.path.replace(/^\/en(?=\/)/, "")}`,
+      `- Delivery: ${item.localized.delivery}.`,
+      `- Summary: ${item.localized.description}`,
+    ].join("\n");
+  });
+
+  return [
+    "# ENHE AI Pricing and Service Access",
+    "",
+    "This file gives AI agents and search systems a structured summary of current public software, account service, and course offers from ENHE AI. Final availability, delivery notes, and support boundaries are shown on the matching public detail page.",
+    "",
+    "## Product-level offers",
+    "",
+    offerSections.join("\n\n"),
+    "",
+    "## Purchase notes",
+    "",
+    "- Prices are listed in CNY.",
+    "- Users should review the matching detail page before purchase or access.",
+    "- Payment proof review is required before paid download, course, or service access is unlocked.",
+    "- Third-party platform services must follow the official rules of that platform.",
+    "",
+    "## Support",
+    "",
+    "- Company: ENHE AI",
+    "- Email: ENHEAI.life@protonmail.com",
+    "- Website: https://www.enhe-tech.com.cn/",
+    "",
+  ].join("\n");
 }

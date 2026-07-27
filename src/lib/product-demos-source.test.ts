@@ -93,6 +93,22 @@ describe("product demo feature source contract", () => {
     expect(seo).toContain("^\\/product-demos\\/.+$");
   });
 
+  it("uses localized FAQ and related-product names on English demo pages", () => {
+    const detail = readFileSync(new URL("../app/product-demos/[slug]/page-shell.tsx", import.meta.url), "utf8");
+
+    expect(detail).toContain("getLocalizedProductDemoFaq");
+    expect(detail).toContain("resolveLocalizedToolIdentity");
+    expect(detail).toContain("buildLocalizedToolPreviewText");
+    expect(detail).toContain("resolveLocalizedToolCategoryName");
+    expect(detail).toContain("buildLocalizedToolOfferName");
+    expect(detail).toContain("buildLocalizedToolTutorialItems");
+    expect(detail).toContain("name: localizedRelatedProductName");
+    expect(detail).toContain("description: localizedRelatedProductDescription");
+    expect(detail).toContain("category: localizedRelatedProductCategory");
+    expect(detail).toContain("priceSpecs: localizedRelatedProductPriceSpecs");
+    expect(detail).not.toContain("const faqItems = parseProductDemoFaq(demo.faq)");
+  });
+
   it("keeps product demo cards localized and avoids back-navigation overlap", () => {
     const productDemos = readFileSync(new URL("./product-demos.ts", import.meta.url), "utf8");
     const card = readFileSync(new URL("../components/product-demo-card.tsx", import.meta.url), "utf8");

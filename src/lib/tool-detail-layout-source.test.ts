@@ -23,6 +23,18 @@ describe("tool detail layout source", () => {
     expect(source.indexOf("tool-detail-product-gallery")).toBeLessThan(source.indexOf("tool-detail-copy-card"));
   });
 
+  it("loads the core product cover eagerly with high fetch priority", () => {
+    const source = readFileSync(resolve(root, "src/app/tools/[slug]/page-shell.tsx"), "utf8");
+    const coverStart = source.indexOf("tool-detail-cover-frame");
+    const coverEnd = source.indexOf("tool-detail-product-gallery", coverStart);
+    const coverBlock = source.slice(coverStart, coverEnd);
+
+    expect(coverBlock).toContain("<Image");
+    expect(coverBlock).toContain("priority");
+    expect(coverBlock).toContain('fetchPriority="high"');
+    expect(coverBlock).not.toContain('loading="lazy"');
+  });
+
   it("does not show review-promise or VIP-only download-link notices on the public tool page", () => {
     const pageSource = readFileSync(resolve(root, "src/app/tools/[slug]/page-shell.tsx"), "utf8");
     const i18nSource = readFileSync(resolve(root, "src/lib/i18n.ts"), "utf8");

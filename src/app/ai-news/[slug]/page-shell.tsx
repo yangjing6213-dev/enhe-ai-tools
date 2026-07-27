@@ -17,6 +17,7 @@ import {
   isEnglishNewsArticleIndexable,
   mergeAiNewsRelatedItems,
   renderNewsContentBlocks,
+  resolveAiNewsMetadataTitle,
   resolveAiNewsMetaDescription,
   resolveLocalizedNewsContent,
   resolveNewsVideo,
@@ -101,7 +102,12 @@ export async function generateAiNewsDetailPageMetadata(
   const metadata = buildPageMetadata({
     title: buildMetadataTitle({
       pageTitle: buildAiNewsSerpTitle({
-        title: localized.title,
+        title: resolveAiNewsMetadataTitle({
+          seoTitle: article.seoTitle,
+          englishSeoTitle: article.englishSeoTitle,
+          localizedTitle: localized.title,
+          locale: forceLocale,
+        }),
         categoryName: article.category?.name,
         locale: forceLocale,
         maxLength: metadataPageTitleMaxLength,
@@ -151,6 +157,7 @@ export async function AiNewsDetailPageShell({
 
   const t = getDictionary(forceLocale);
   const localized = localizeArticle(article, forceLocale);
+  const hasIndexableEnglishPage = isEnglishNewsArticleIndexable(article);
   const coverImage = normalizeImageSrc(
     resolveAiNewsCoverImage(article.coverImage),
   );
@@ -181,12 +188,15 @@ export async function AiNewsDetailPageShell({
       },
     ],
   });
-  const newsArticleSchema = buildNewsArticleSchema(
-    article,
-    localized,
-    forceLocale,
-    coverImage,
-  );
+  const newsArticleSchema =
+    forceLocale === "en" && !hasIndexableEnglishPage
+      ? null
+      : buildNewsArticleSchema(
+          article,
+          localized,
+          forceLocale,
+          coverImage,
+        );
   const articleFaqItems = buildAiNewsFaqItems(localized, forceLocale);
   const faqSchema = embeddedSections.faq
     ? null
@@ -197,7 +207,7 @@ export async function AiNewsDetailPageShell({
       <StructuredData
         data={[
           breadcrumbSchema,
-          newsArticleSchema,
+          ...(newsArticleSchema ? [newsArticleSchema] : []),
           ...(faqSchema ? [faqSchema] : []),
         ]}
       />
@@ -1040,6 +1050,10 @@ function buildNewsArticleSchema(
     headline: localized.title,
     description: localized.description,
     url,
+    mainEntityOfPage: {
+      "@type": "WebPage",
+      "@id": url,
+    },
     inLanguage: locale === "en" ? "en-US" : "zh-CN",
     datePublished: toNewsIsoDate(article.publishedAt ?? article.createdAt),
     dateModified: toNewsIsoDate(article.updatedAt),

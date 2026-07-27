@@ -151,20 +151,20 @@ describe("site audit regression coverage", () => {
   it("adds an offer catalog schema to the pricing page", () => {
     const pricingPage = read("src/app/pricing/page-shell.tsx");
     const pricingOffers = read("src/lib/pricing-offers.ts");
-    const pricingMarkdown = read("public/pricing.md");
+    const pricingMarkdownRoute = read("src/app/pricing.md/route.ts");
 
     expect(pricingPage).toContain('"@type": "OfferCatalog"');
     expect(pricingPage).toContain("pricingOfferCatalogSchema");
     expect(pricingPage).toContain("pricingOfferItems");
-    expect(pricingOffers).toContain('path: "/software/windows-ai"');
-    expect(pricingOffers).toContain("price: 50");
-    expect(pricingOffers).toContain('path: "/account-services/gmail-google"');
-    expect(pricingOffers).toContain("price: 30.8");
+    expect(pricingOffers).toContain("loadPublicPricingCatalogTools");
+    expect(pricingOffers).toContain('status: "published"');
+    expect(pricingOffers).toContain(
+      'type: { in: ["software", "online", "skill_learning"] }',
+    );
+    expect(pricingOffers).toContain("renderPricingMarkdown");
+    expect(pricingMarkdownRoute).toContain('getPricingOfferItems("en")');
+    expect(pricingMarkdownRoute).toContain("renderPricingMarkdown");
     expect(pricingPage).toContain("StructuredData data={[breadcrumbSchema, pricingOfferCatalogSchema]}");
-    expect(pricingMarkdown).toContain("https://www.enhe-tech.com.cn/software/windows-ai");
-    expect(pricingMarkdown).toContain("Price: CNY 50.00");
-    expect(pricingMarkdown).toContain("https://www.enhe-tech.com.cn/account-services/gmail-google");
-    expect(pricingMarkdown).toContain("Price: CNY 30.80");
   });
 
   it("keeps product demos in a single-column layout without horizontal scrolling", () => {

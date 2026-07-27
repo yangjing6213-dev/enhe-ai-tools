@@ -6,7 +6,7 @@ import { buildPricingOfferCatalogSchema } from "@/app/pricing/page-shell";
 
 describe("shared ENHE structured-data entity references", () => {
   it("uses the canonical organization reference for pricing offers", () => {
-    const schema = buildPricingOfferCatalogSchema("zh");
+    const schema = buildPricingOfferCatalogSchema("zh", []);
 
     expect(schema.provider).toEqual(enheOrganizationReference);
     expect(schema.provider).not.toHaveProperty("@type");
@@ -40,6 +40,17 @@ describe("shared ENHE structured-data entity references", () => {
     expect(detail).toContain("buildAiNewsAuthorSchema");
     expect(detail).toContain("author: buildAiNewsAuthorSchema(");
     expect(detail).toContain("resolveAiNewsCoverImage(article.coverImage)");
+  });
+
+  it("identifies the canonical article URL as the NewsArticle main entity page", () => {
+    const detail = readFileSync(
+      join(process.cwd(), "src/app/ai-news/[slug]/page-shell.tsx"),
+      "utf8",
+    );
+
+    expect(detail).toContain('mainEntityOfPage: {');
+    expect(detail).toContain('"@type": "WebPage"');
+    expect(detail).toContain('"@id": url');
   });
 
   it("emits zero-price offers only for confirmed free course and software details", async () => {

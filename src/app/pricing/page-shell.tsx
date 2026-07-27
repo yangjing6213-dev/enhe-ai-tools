@@ -1,10 +1,14 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import { connection } from "next/server";
 import { ArrowRight, PackageOpen } from "lucide-react";
 import { StructuredData } from "@/components/structured-data";
 import { Container, SectionTitle } from "@/components/ui";
 import { getDictionary, type Locale } from "@/lib/dictionaries";
-import { getPricingOfferItems } from "@/lib/pricing-offers";
+import {
+  getPricingOfferItems,
+  type PricingOfferItem,
+} from "@/lib/pricing-offers";
 import { enheOrganizationReference } from "@/lib/brand-entity";
 import { publicPageCacheSeconds } from "@/lib/public-routes";
 import {
@@ -38,10 +42,13 @@ function formatPrice(price: number) {
   return price.toFixed(2);
 }
 
-export function buildPricingOfferCatalogSchema(forceLocale: Locale) {
+export function buildPricingOfferCatalogSchema(
+  forceLocale: Locale,
+  pricingOfferItemsForLocale: PricingOfferItem[],
+) {
   const isEnglish = forceLocale === "en";
   const pricingUrl = absoluteUrl(forceLocale === "en" ? "/en/pricing" : "/pricing");
-  const pricingOfferItemsForLocale = getPricingOfferItems(forceLocale);
+  let position = 0;
 
   return {
     "@context": "https://schema.org",
@@ -51,28 +58,33 @@ export function buildPricingOfferCatalogSchema(forceLocale: Locale) {
     url: pricingUrl,
     inLanguage: isEnglish ? "en-US" : "zh-CN",
     provider: enheOrganizationReference,
-    itemListElement: pricingOfferItemsForLocale.map((item, index) => ({
-      "@type": "Offer",
-      position: index + 1,
-      name: item.localized.name,
-      description: item.localized.description,
-      price: formatPrice(item.price),
-      priceCurrency: "CNY",
-      availability: "https://schema.org/InStock",
-      url: absoluteUrl(item.path),
-      itemOffered: {
-        "@type": getSchemaItemType(item.type),
-        name: item.localized.name,
+    itemListElement: pricingOfferItemsForLocale.flatMap((item) =>
+      item.offers.map((offer) => ({
+        "@type": "Offer",
+        position: (position += 1),
+        name:
+          item.offers.length > 1
+            ? `${item.localized.name} - ${offer.name}`
+            : item.localized.name,
         description: item.localized.description,
+        price: formatPrice(offer.price),
+        priceCurrency: "CNY",
         url: absoluteUrl(item.path),
-      },
-    })),
+        itemOffered: {
+          "@type": getSchemaItemType(item.type),
+          name: item.localized.name,
+          description: item.localized.description,
+          url: absoluteUrl(item.path),
+        },
+      })),
+    ),
   };
 }
 
 export async function PricingPageShell({ forceLocale }: { forceLocale: Locale }) {
+  await connection();
   const t = getDictionary(forceLocale);
-  const pricingOfferItemsForLocale = getPricingOfferItems(forceLocale);
+  const pricingOfferItemsForLocale = await getPricingOfferItems(forceLocale);
   const copy =
     forceLocale === "en"
       ? {
@@ -118,7 +130,10 @@ export async function PricingPageShell({ forceLocale }: { forceLocale: Locale })
       { name: copy.title, path: forceLocale === "en" ? "/en/pricing" : "/pricing" }
     ]
   });
-  const pricingOfferCatalogSchema = buildPricingOfferCatalogSchema(forceLocale);
+  const pricingOfferCatalogSchema = buildPricingOfferCatalogSchema(
+    forceLocale,
+    pricingOfferItemsForLocale,
+  );
 
   return (
     <main>
@@ -168,9 +183,18 @@ export async function PricingPageShell({ forceLocale }: { forceLocale: Locale })
                   <span className="block text-xs font-semibold text-[var(--marketing-muted)]">
                     {copy.currentPrice}
                   </span>
-                  <strong className="mt-1 block text-lg text-[var(--marketing-text)]">
-                    ¥{formatPrice(item.price)}
-                  </strong>
+                  {item.offers.map((offer) => (
+                    <div key={offer.id} className="mt-1">
+                      {item.offers.length > 1 ? (
+                        <span className="block text-xs text-[var(--marketing-muted)]">
+                          {offer.name}
+                        </span>
+                      ) : null}
+                      <strong className="block text-lg text-[var(--marketing-text)]">
+                        ¥{formatPrice(offer.price)}
+                      </strong>
+                    </div>
+                  ))}
                 </div>
               </div>
               <Link

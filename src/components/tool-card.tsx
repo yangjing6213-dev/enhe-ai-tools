@@ -15,6 +15,7 @@ import { getVisibleToolMetrics } from "@/lib/tool-metrics";
 import { getPrimaryToolPrice, type ToolPriceSpecStatus } from "@/lib/tool-price-specs";
 
 type ToolCardProps = {
+  headingLevel?: 2 | 3;
   locale?: Locale;
   variant?: "default" | "homeFeatured";
   tool: {
@@ -34,8 +35,14 @@ type ToolCardProps = {
   };
 };
 
-export function ToolCard({ tool, locale = "zh", variant = "default" }: ToolCardProps) {
+export function ToolCard({
+  tool,
+  headingLevel = 3,
+  locale = "zh",
+  variant = "default",
+}: ToolCardProps) {
   const t = getDictionary(locale);
+  const Heading = headingLevel === 2 ? "h2" : "h3";
   const coverImage = normalizeImageSrc(tool.coverImage);
   const localizedTool = resolveLocalizedToolIdentity(tool, locale);
   const localizedCategory = resolveLocalizedToolCategoryName(tool.category?.name, tool.type, locale);
@@ -111,7 +118,7 @@ export function ToolCard({ tool, locale = "zh", variant = "default" }: ToolCardP
                 )}
               </div>
             ) : null}
-            <h3 className="text-xl font-bold text-[var(--marketing-text)]">{localizedTool.primaryName}</h3>
+            <Heading className="text-xl font-bold text-[var(--marketing-text)]">{localizedTool.primaryName}</Heading>
             {shouldShowSecondaryName ? <p className="mt-1 text-sm font-medium text-[var(--marketing-accent)]">{localizedTool.secondaryName}</p> : null}
           </div>
           <ArrowUpRight className="text-[var(--marketing-muted)] transition-colors group-hover:text-[var(--marketing-accent)]" />

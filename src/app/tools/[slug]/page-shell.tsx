@@ -580,6 +580,8 @@ export async function ToolDetailPageShell({
                     fill
                     className="content-thumbnail-outline object-contain"
                     sizes="(min-width: 1024px) 1120px, 100vw"
+                    priority
+                    fetchPriority="high"
                     unoptimized
                   />
                 ) : (

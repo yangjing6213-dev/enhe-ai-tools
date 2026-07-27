@@ -193,7 +193,7 @@ export async function AccountServicesPageShell({
         {tools.length ? (
           <div className="listing-grid mt-8 grid gap-5 md:grid-cols-3">
             {tools.map((tool) => (
-              <ToolCard key={tool.id} tool={tool} locale={forceLocale} />
+              <ToolCard key={tool.id} tool={tool} locale={forceLocale} headingLevel={2} />
             ))}
           </div>
         ) : (

@@ -124,13 +124,27 @@ const nextConfig: NextConfig = {
         value: "public, s-maxage=300, stale-while-revalidate=86400"
       }
     ];
+    const pricingAssetCacheHeaders = [
+      {
+        key: "Cache-Control",
+        value: "public, s-maxage=300, stale-while-revalidate=300"
+      }
+    ];
+    const zhPricingCacheHeaders = [
+      ...pricingAssetCacheHeaders,
+      { key: "Content-Language", value: "zh-CN" }
+    ];
+    const enPricingCacheHeaders = [
+      ...pricingAssetCacheHeaders,
+      { key: "Content-Language", value: "en-US" }
+    ];
 
     return [
       { source: "/:path*", headers: securityHeaders },
       { source: "/robots.txt", headers: publicAssetCacheHeaders },
       { source: "/sitemap.xml", headers: publicAssetCacheHeaders },
       { source: "/llms.txt", headers: publicAssetCacheHeaders },
-      { source: "/pricing.md", headers: publicAssetCacheHeaders },
+      { source: "/pricing.md", headers: pricingAssetCacheHeaders },
       { source: "/okf/index.md", headers: publicAssetCacheHeaders },
       { source: "/okf/enhe-ai-overview.md", headers: publicAssetCacheHeaders },
       { source: "/okf/ai-news/index.md", headers: publicAssetCacheHeaders },
@@ -152,8 +166,8 @@ const nextConfig: NextConfig = {
       { source: "/en/account-services", headers: enPublicCacheHeaders },
       { source: "/skill-learning", headers: zhPublicCacheHeaders },
       { source: "/en/skill-learning", headers: enPublicCacheHeaders },
-      { source: "/pricing", headers: zhPublicCacheHeaders },
-      { source: "/en/pricing", headers: enPublicCacheHeaders },
+      { source: "/pricing", headers: zhPricingCacheHeaders },
+      { source: "/en/pricing", headers: enPricingCacheHeaders },
       { source: "/tutorials", headers: zhPublicCacheHeaders },
       { source: "/en/tutorials", headers: enPublicCacheHeaders },
       { source: "/ai-news", headers: zhPublicCacheHeaders },

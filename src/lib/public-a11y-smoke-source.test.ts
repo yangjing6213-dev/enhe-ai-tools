@@ -80,13 +80,15 @@ describe("public a11y smoke source contract", () => {
 
   it("guards Core Web Vitals improvements for homepage and product videos", () => {
     const sharedLayout = read("src/app/root-layout-shared.tsx");
+    const toolDetail = read("src/app/tools/[slug]/page-shell.tsx");
     const css = read("src/app/globals.css");
     const player = read("src/components/product-video-player.tsx");
     const a11yScript = read("scripts/audit-public-a11y.mjs");
 
-    expect(sharedLayout).toContain('rel="preload"');
-    expect(sharedLayout).toContain("montserrat-latin-800-normal.woff2");
-    expect(sharedLayout).toContain("montserrat-latin-900-normal.woff2");
+    expect(sharedLayout).not.toContain("montserrat-latin-800-normal.woff2");
+    expect(sharedLayout).not.toContain("montserrat-latin-900-normal.woff2");
+    expect(toolDetail).toContain("priority");
+    expect(toolDetail).toContain('fetchPriority="high"');
     expect(css).not.toContain(".home-featured-shell");
     expect(player).toContain('preload="none"');
     expect(player).toContain("IntersectionObserver");

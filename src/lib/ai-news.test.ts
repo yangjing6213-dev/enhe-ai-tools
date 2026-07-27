@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
 import {
+  buildAiNewsDescriptionFallback,
   buildAiNewsRelatedKeywords,
   buildAiNewsSerpTitle,
   truncateAiNewsMetaDescription,
@@ -15,6 +16,7 @@ import {
   parseNewsSearchParams,
   renderNewsContentBlocks,
   resolveLocalizedNewsContent,
+  resolveAiNewsMetadataTitle,
   resolveAiNewsMetaDescription,
   resolveNewsVideo,
   resolveAiNewsCanonicalSlug,
@@ -375,16 +377,80 @@ describe("AI news helpers", () => {
     ).toBe("");
   });
 
-  it("extends short but valid AI news descriptions with the fallback context", () => {
+  it("keeps a short valid AI news description without template padding", () => {
+    const summary =
+      "这是一条面向普通用户的AI资讯摘要，说明事件影响和下一步行动。";
     const description = resolveAiNewsMetaDescription(
-      ["这是一条面向普通用户的AI资讯摘要，说明事件影响和下一步行动。"],
+      [summary],
       "阅读 ENHE AI 对“AI智能体安全边界”的资讯解读，了解发生了什么、为什么重要、对普通AI用户的实际影响、相关工具教程、来源线索、风险边界和下一步落地建议。",
     );
 
-    expect(description.length).toBeGreaterThanOrEqual(70);
-    expect(description.length).toBeLessThanOrEqual(150);
-    expect(description).toContain("普通用户");
-    expect(description).toContain("ENHE AI");
+    expect(description).toBe(summary);
+    expect(description).not.toContain("阅读 ENHE AI 对");
+  });
+
+  it("recognizes the current English fallback template without padding a valid summary", () => {
+    const summary =
+      "This update changes how creators plan AI workflows, review risks, and choose their next practical step.";
+    const fallback = buildAiNewsDescriptionFallback({
+      title: "OpenAI workspace agents connect team workflows",
+      categoryName: "AI Agent",
+      locale: "en",
+    });
+
+    expect(resolveAiNewsMetaDescription([summary], fallback)).toBe(summary);
+  });
+
+  it("prefers the locale-specific CMS SEO title", () => {
+    expect(
+      resolveAiNewsMetadataTitle({
+        seoTitle: "涓枃 SEO 鏍囬",
+        englishSeoTitle: "English CMS SEO title",
+        localizedTitle: "Localized article title",
+        locale: "en",
+      }),
+    ).toBe("English CMS SEO title");
+    expect(
+      resolveAiNewsMetadataTitle({
+        seoTitle: "涓枃 SEO 鏍囬",
+        englishSeoTitle: null,
+        localizedTitle: "Localized article title",
+        locale: "zh",
+      }),
+    ).toBe("涓枃 SEO 鏍囬");
+  });
+
+  it("does not repeat a full article title through the generated description fallback", () => {
+    const title =
+      "OpenAI 发布 GPT-5.6：面向创作者的多模态工作流与自动化能力全面升级";
+    const summary =
+      "这次更新重点影响内容创作效率、工具选择和工作流迁移。";
+    const fallback = buildAiNewsDescriptionFallback({
+      title,
+      categoryName: "AI前沿资讯",
+      locale: "zh",
+    });
+    const description = resolveAiNewsMetaDescription([summary], fallback);
+
+    expect(description).toBe(summary);
+    expect(description).not.toContain(title);
+    expect(description).not.toContain("阅读 ENHE AI 对");
+  });
+
+  it("keeps an article-specific English fallback concise when no summary is usable", () => {
+    const title =
+      "OpenAI workspace agents connect ChatGPT with team workflows";
+    const fallback = buildAiNewsDescriptionFallback({
+      title,
+      categoryName: "AI Agent",
+      locale: "en",
+    });
+
+    expect(fallback).toContain(title);
+    expect(fallback).toContain("ENHE AI");
+    expect(fallback).not.toContain("Read ENHE AI's analysis of");
+    expect(fallback.length).toBeGreaterThanOrEqual(80);
+    expect(fallback.length).toBeLessThanOrEqual(135);
   });
 
   it("removes generic English news prefixes and analysis suffixes from SERP titles", () => {
@@ -515,6 +581,67 @@ describe("AI news helpers", () => {
     expect(description).toBe("OpenAI agents coordinate workflows");
     expect(title).not.toMatch(/\b(?:and|for|of|the|to|with)$/i);
     expect(description).not.toMatch(/\b(?:and|for|of|the|to|with)$/i);
+  });
+
+  it("removes dangling Chinese conjunctions and English prepositions from SERP titles", () => {
+    expect(
+      buildAiNewsSerpTitle({
+        title: "Kimi K3与下一代AI创作工作流升级",
+        categoryName: "AI资讯",
+        locale: "zh",
+        maxLength: 8,
+      }),
+    ).toBe("Kimi K3");
+
+    expect(
+      buildAiNewsSerpTitle({
+        title: "OpenAI agents coordinate workflows via secure tools for creators",
+        categoryName: "AI News",
+        locale: "en",
+        maxLength: 38,
+      }),
+    ).toBe("OpenAI agents coordinate workflows");
+  });
+
+  it("cleans dangling words even when the source title is already within the limit", () => {
+    expect(
+      buildAiNewsSerpTitle({
+        title: "Kimi K3与",
+        categoryName: "AI璧勮",
+        locale: "zh",
+        maxLength: 20,
+      }),
+    ).toBe("Kimi K3");
+    expect(
+      buildAiNewsSerpTitle({
+        title: "OpenAI workflows via",
+        categoryName: "AI News",
+        locale: "en",
+        maxLength: 30,
+      }),
+    ).toBe("OpenAI workflows");
+  });
+
+  it("does not expose an incomplete possessive ASCII token in a SERP title", () => {
+    expect(
+      buildAiNewsSerpTitle({
+        title: "California's Anthropic deal changes AI governance",
+        categoryName: "AI News",
+        locale: "en",
+        maxLength: 10,
+      }),
+    ).toBe("AI News");
+  });
+
+  it("prefers a complete phrase before natural punctuation for English titles", () => {
+    expect(
+      buildAiNewsSerpTitle({
+        title: "OpenAI releases GPT-5.6: creators get faster multimodal workflows",
+        categoryName: "AI News",
+        locale: "en",
+        maxLength: 40,
+      }),
+    ).toBe("OpenAI releases GPT-5.6");
   });
 
   it("keeps the audited Claude and Copilot Chinese SERP titles distinct", () => {

@@ -51,7 +51,7 @@ export async function OnlineToolsPageShell({
       <SectionTitle as="h1" title={t.listing.onlineTitle} intro={t.listing.onlineIntro} />
       <FilterBar categories={categories} locale={forceLocale} />
       {tools.length ? (
-        <div className="mt-8 grid gap-5 md:grid-cols-3">{tools.map((tool) => <ToolCard key={tool.id} tool={tool} locale={forceLocale} />)}</div>
+        <div className="mt-8 grid gap-5 md:grid-cols-3">{tools.map((tool) => <ToolCard key={tool.id} tool={tool} locale={forceLocale} headingLevel={2} />)}</div>
       ) : (
         <EmptyState title={t.listing.emptyTitle} text={t.listing.emptyText} />
       )}

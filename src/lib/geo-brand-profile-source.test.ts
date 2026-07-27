@@ -63,8 +63,9 @@ describe("GEO brand profile source contracts", () => {
     expect(homeShell).toContain("home-hero-positioning");
     expect(homeShell).toContain("buildBreadcrumbSchema");
     expect(homeShell).toContain(
-      "<StructuredData data={[breadcrumbSchema, webPageSchema, taskCollectionSchema, taskItemListSchema, faqSchema]} />",
+      "<StructuredData data={[breadcrumbSchema, webPageSchema, taskCollectionSchema, taskItemListSchema]} />",
     );
+    expect(homeShell).not.toContain("faqSchema");
     for (const term of ["面向中文用户", "AI 工具与技能学习平台", "AI工具", "本地部署AI应用", "AI智能体", "AI技能教程", "AI账号服务", "AI最新资讯", "AI趋势分析", "可执行成果"]) {
       expect(dictionaries).toContain(term);
     }

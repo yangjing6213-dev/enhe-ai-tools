@@ -94,7 +94,20 @@ export function middleware(request: NextRequest) {
       headers: requestHeaders
     }
   });
-  response.headers.set("Content-Language", htmlLocale === "en" ? "en-US" : "zh-CN");
+  const isLanguageNeutralMachinePath =
+    pathname === "/robots.txt" || pathname === "/sitemap.xml";
+  const contentLanguage =
+    pathname === "/pricing.md" || pathname.startsWith("/okf/")
+      ? "en-US"
+      : pathname === "/llms.txt"
+        ? "zh-CN, en-US"
+        : htmlLocale === "en"
+          ? "en-US"
+          : "zh-CN";
+
+  if (!isLanguageNeutralMachinePath) {
+    response.headers.set("Content-Language", contentLanguage);
+  }
 
   if (isEnglishPath && cookieLocale !== "en") {
     response.cookies.set(localeCookieName, "en", {

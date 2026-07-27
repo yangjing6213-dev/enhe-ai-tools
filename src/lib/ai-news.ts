@@ -557,6 +557,30 @@ function normalizeAiNewsMetaCandidate(value: string | null | undefined) {
     .trim();
 }
 
+function looksLikeGeneratedAiNewsDescriptionFallback(value: string) {
+  return (
+    /阅读\s+ENHE AI\s+对/u.test(value) ||
+    /ENHE AI梳理关键事实/u.test(value) ||
+    /Read ENHE AI's analysis of/i.test(value) ||
+    /ENHE AI summarizes (?:the )?key facts/i.test(value)
+  );
+}
+
+export function resolveAiNewsMetadataTitle({
+  seoTitle,
+  englishSeoTitle,
+  localizedTitle,
+  locale,
+}: {
+  seoTitle?: string | null;
+  englishSeoTitle?: string | null;
+  localizedTitle: string;
+  locale: "zh" | "en";
+}) {
+  const preferred = locale === "en" ? englishSeoTitle : seoTitle;
+  return normalizeAiNewsMetaCandidate(preferred) || localizedTitle;
+}
+
 export function resolveAiNewsMetaDescription(
   candidates: Array<string | null | undefined>,
   fallback: string,
@@ -571,6 +595,10 @@ export function resolveAiNewsMetaDescription(
     : "";
 
   if (!validCandidate) return truncateAiNewsMetaDescription(validFallback, 150);
+
+  if (looksLikeGeneratedAiNewsDescriptionFallback(validFallback)) {
+    return truncateAiNewsMetaDescription(validCandidate, 150);
+  }
 
   const targetLength = /[\u4e00-\u9fff]/.test(validCandidate) ? 70 : 110;
   if (validCandidate.length >= targetLength || validFallback.length < targetLength) {
@@ -605,26 +633,34 @@ export function buildAiNewsDescriptionFallback({
       ? `${normalizedCategory} topic`
       : "AI trend";
     return truncateAiNewsMetaDescription(
-      `Read ENHE AI's analysis of ${normalizedTitle || topic}, including the key facts, practical impact, related tools, tutorials, and next steps for AI workflows.`,
+      `${normalizedTitle || topic}. ENHE AI summarizes key facts, practical impact, risks, and next steps.`,
       150,
     );
   }
 
   const topic = normalizedCategory ? `“${normalizedCategory}”方向` : "AI趋势";
   return truncateAiNewsMetaDescription(
-    `阅读 ENHE AI 对${normalizedTitle ? `“${normalizedTitle}”` : topic}的资讯解读，了解发生了什么、为什么重要、对普通AI用户的实际影响、相关工具教程、来源线索、风险边界和下一步落地建议。`,
+    `${normalizedTitle || topic}：ENHE AI梳理关键事实、来源线索、实际影响、适用场景、相关工具、风险边界与下一步行动，帮助普通AI用户节省筛选时间，并快速判断是否值得关注、如何用于真实任务。`,
     150,
   );
 }
 
-const asciiTokenCharacterPattern = /[A-Za-z0-9._+#/@?%=&~:\-]/;
+const asciiTokenCharacterPattern = /[A-Za-z0-9'._+#/@?%=&~:\-]/;
 const danglingEnglishStopwords = new Set([
   "a",
   "an",
   "and",
+  "about",
+  "across",
+  "after",
+  "against",
   "as",
   "at",
+  "around",
+  "before",
+  "between",
   "by",
+  "during",
   "for",
   "from",
   "in",
@@ -632,11 +668,40 @@ const danglingEnglishStopwords = new Set([
   "of",
   "on",
   "or",
+  "over",
   "the",
+  "through",
   "to",
+  "toward",
+  "towards",
+  "under",
+  "upon",
+  "versus",
+  "via",
+  "vs",
   "with",
+  "within",
   "without",
 ]);
+const danglingChineseTitleEndings = [
+  "以及",
+  "关于",
+  "基于",
+  "通过",
+  "与",
+  "和",
+  "及",
+  "或",
+  "对",
+  "从",
+  "向",
+  "在",
+  "为",
+  "由",
+  "至",
+  "到",
+  "跟",
+] as const;
 
 function isAsciiTokenCharacter(value: string | undefined) {
   return Boolean(value && asciiTokenCharacterPattern.test(value));
@@ -662,6 +727,22 @@ function trimDanglingEnglishStopwords(value: string) {
     const match = trimmed.match(/(?:^|\s)([A-Za-z]+)$/);
     if (!match || !danglingEnglishStopwords.has(match[1].toLowerCase())) break;
     const next = trimmed.slice(0, match.index).trimEnd();
+    if (!next) break;
+    trimmed = next;
+  }
+
+  return trimmed;
+}
+
+function trimDanglingTitleWords(value: string) {
+  let trimmed = trimDanglingEnglishStopwords(value);
+
+  while (trimmed) {
+    const ending = danglingChineseTitleEndings.find((word) =>
+      trimmed.endsWith(word),
+    );
+    if (!ending) break;
+    const next = trimmed.slice(0, -ending.length).trimEnd();
     if (!next) break;
     trimmed = next;
   }
@@ -796,30 +877,27 @@ function buildOversizedAsciiTokenTitle({
 function truncateAiNewsSerpTitle(
   value: string,
   maxLength: number,
-  locale: "zh" | "en",
 ) {
   const cleaned = cleanAiNewsSerpTitle(value);
   if (maxLength <= 0) return "";
-  if (cleaned.length <= maxLength) return cleaned;
+  if (cleaned.length <= maxLength) return trimDanglingTitleWords(cleaned);
 
   const end = findAsciiTokenSafeEnd(cleaned, maxLength);
 
   const candidate = cleaned.slice(0, end).trimEnd();
-  if (locale === "zh") {
-    const naturalBreak = Math.max(
-      ...["：", "、", "，", "；", "。", "！", "？"].map((separator) =>
-        candidate.lastIndexOf(separator),
-      ),
+  const naturalBreak = Math.max(
+    ...["：", "、", "，", "；", "。", "！", "？", ":", ",", ";", "!", "?"].map(
+      (separator) => candidate.lastIndexOf(separator),
+    ),
+  );
+  if (naturalBreak >= Math.floor(maxLength * 0.45)) {
+    return trimDanglingTitleWords(
+      cleanAiNewsSerpTitle(candidate.slice(0, naturalBreak)),
     );
-    if (naturalBreak >= Math.floor(maxLength * 0.45)) {
-      return cleanAiNewsSerpTitle(candidate.slice(0, naturalBreak));
-    }
   }
 
   const truncated = cleanAiNewsSerpTitle(candidate);
-  return locale === "en"
-    ? trimDanglingEnglishStopwords(truncated)
-    : truncated;
+  return trimDanglingTitleWords(truncated);
 }
 
 export function buildAiNewsSerpTitle({
@@ -845,7 +923,7 @@ export function buildAiNewsSerpTitle({
       : stripGenericChineseNewsTitlePrefix(normalizedTitle);
   const localizedTitle = strippedTitle || normalizedTitle;
   const source = cleanAiNewsSerpTitle(localizedTitle) || normalizedCategory || "AI";
-  const compactTitle = truncateAiNewsSerpTitle(source, maxLength, locale);
+  const compactTitle = truncateAiNewsSerpTitle(source, maxLength);
   if (compactTitle) return compactTitle;
 
   if (isSingleOversizedAsciiToken(source, maxLength)) {
@@ -857,7 +935,7 @@ export function buildAiNewsSerpTitle({
   }
 
   return (
-    truncateAiNewsSerpTitle(normalizedCategory, maxLength, locale) ||
+    truncateAiNewsSerpTitle(normalizedCategory, maxLength) ||
     (maxLength >= "AI".length ? "AI" : "")
   );
 }

@@ -8,7 +8,7 @@ type OrganizationSchemaInput = Parameters<typeof buildOrganizationSchema>[0];
 
 type EnheOrganizationSchemaInput = Pick<
   OrganizationSchemaInput,
-  "contactPoint" | "description" | "logo" | "url"
+  "contactPoint" | "description" | "logo" | "returnPolicyPath" | "url"
 >;
 
 export const enheOrganizationId = absoluteUrl("/#organization");

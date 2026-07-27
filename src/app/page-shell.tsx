@@ -26,7 +26,6 @@ import { getHomeProductDemos } from "@/lib/product-demos";
 import { enheOrganizationReference } from "@/lib/brand-entity";
 import {
   buildBreadcrumbSchema,
-  buildFaqSchema,
   buildHomeMetaDescription,
   buildHomeMetadataTitle,
   buildLocalePath,
@@ -38,43 +37,6 @@ import { publicPageCacheSeconds } from "@/lib/public-routes";
 import { getEffectiveLocalizedHomeHeroIntro, getSettingsMap } from "@/lib/settings";
 
 export const publicPageRevalidate = publicPageCacheSeconds;
-
-const homeFaqItems = {
-  zh: [
-    {
-      question: "恩禾 ENHE AI 是什么？",
-      answer:
-        "ENHE AI 帮助用户把 AI 用到真实任务里：更快完成工作、创作内容、整理资料、学习技能、解决工具选择和使用问题。在需要处理敏感素材、长期稳定流程或隐私边界时，提供更可控的AI工具和路径。",
-    },
-    {
-      question: "新用户应该从哪里开始使用 ENHE AI？",
-      answer:
-        "先从要完成的任务开始：提效、创作、整理资料、学习技能或处理敏感素材。任务明确后，再进入 AI软件应用、AI技能学习、AI前沿资讯或 AI账号服务页面选择合适路径。",
-    },
-    {
-      question: "ENHE AI 为什么强调安全、隐私和稳定？",
-      answer:
-        "普通用户使用 AI 时，常会处理客户资料、创作素材、账号信息、内部文档和课程文件。ENHE AI 会把本地或更可控的 AI 路径解释成安全、隐私和稳定收益，帮助用户减少盲目上传和反复试错。",
-    },
-  ],
-  en: [
-    {
-      question: "What is ENHE AI?",
-      answer:
-        "ENHE AI helps users apply AI to real tasks: work faster, create content, organize material, learn skills, and solve tool-selection and usage problems. When sensitive material, long-running workflows, or privacy boundaries matter, it provides more controllable AI tools and paths.",
-    },
-    {
-      question: "Where should new users start on ENHE AI?",
-      answer:
-        "Start from the task: productivity, content creation, material organization, skill learning, or sensitive-material handling. Then choose AI software apps, AI skill learning, AI news, or account-service guidance as the matching path.",
-    },
-    {
-      question: "Why does ENHE AI emphasize safety, privacy, and stability?",
-      answer:
-        "AI users often work with client files, creative assets, account information, internal documents, and course material. ENHE AI explains local or more controlled AI paths as safety, privacy, and stability benefits, not as abstract technical features.",
-    },
-  ],
-} as const;
 
 type HomeTrustSignal = {
   title: string;
@@ -380,7 +342,6 @@ export async function HomePageShell({ forceLocale }: { forceLocale: Locale }) {
     }),
     "@id": breadcrumbId,
   };
-  const faqSchema = buildFaqSchema({ items: homeFaqItems[forceLocale] });
   const webPageSchema = {
     "@context": "https://schema.org",
     "@type": "WebPage",
@@ -425,7 +386,7 @@ export async function HomePageShell({ forceLocale }: { forceLocale: Locale }) {
 
   return (
     <main className="home-page-shell">
-      <StructuredData data={[breadcrumbSchema, webPageSchema, taskCollectionSchema, taskItemListSchema, faqSchema]} />
+      <StructuredData data={[breadcrumbSchema, webPageSchema, taskCollectionSchema, taskItemListSchema]} />
       <div className="home-pointer-glow" aria-hidden="true" />
       <section className="home-hero-shell">
         <div className="home-hero-liquid-layer" aria-hidden="true">
