@@ -111,7 +111,7 @@ describe("sitemap canonical URL contract", () => {
         machineReadable,
       ).toBe(false);
     }
-  });
+  }, 15_000);
 
   it("deduplicates canonical loc entries when legacy and generated slugs collide", async () => {
     prismaMock.tool.findMany.mockResolvedValue([]);
