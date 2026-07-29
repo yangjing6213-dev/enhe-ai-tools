@@ -291,6 +291,17 @@ describe("AI news helpers", () => {
     ).toBe(true);
   });
 
+  it("allows quoted Chinese source names in otherwise complete English articles", () => {
+    expect(
+      isEnglishNewsArticleIndexable({
+        englishTitle: "Global AI agent trust and interoperability initiative",
+        englishSummary:
+          "The initiative explains identity, discovery, privacy, security, and cross-platform execution for AI agents.",
+        englishContent: `${"This English analysis explains the source facts, workflow impact, governance boundaries, and practical checks for users. ".repeat(8)} Official source: 推动全球智能体互信互联互通合作倡议.`,
+      }),
+    ).toBe(true);
+  });
+
   it("allows dispersed short Han brand names but rejects a continuous nine-character run", () => {
     expect(maxIncidentalEnglishNewsHanCharacters).toBe(8);
     expect(maxEnglishNewsHanCharacterRatio).toBe(0.05);

@@ -294,6 +294,22 @@ export function normalizeWhitespace(value: string) {
   return value.replace(/\s+/g, " ").trim();
 }
 
+export function applyFilteredListingRobots(
+  metadata: Metadata,
+  searchParams: Record<string, string | undefined>,
+  filterParamNames: readonly string[],
+) {
+  const hasActiveFilter = filterParamNames.some((name) =>
+    Boolean(String(searchParams[name] ?? "").trim()),
+  );
+
+  if (hasActiveFilter) {
+    metadata.robots = { index: false, follow: true };
+  }
+
+  return metadata;
+}
+
 export function truncateText(value: string, maxLength: number) {
   const normalized = normalizeWhitespace(value)
     .replace(/\.{3,}|…+/g, " ")

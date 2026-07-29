@@ -460,12 +460,15 @@ function countEnglishWords(value: string) {
   return value.match(englishWordPattern)?.length ?? 0;
 }
 
-function hasAcceptableEnglishNewsHanMix(value: string) {
+function hasAcceptableEnglishNewsHanMix(
+  value: string,
+  allowLongHanSequence = false,
+) {
   const hanCharacterCount = value.match(hanCharacterPattern)?.length ?? 0;
   const hasOversizedHanSequence = (value.match(hanSequencePattern) ?? []).some(
     (sequence) => Array.from(sequence).length > maxIncidentalEnglishNewsHanCharacters,
   );
-  if (hasOversizedHanSequence) return false;
+  if (!allowLongHanSequence && hasOversizedHanSequence) return false;
   if (hanCharacterCount <= maxIncidentalEnglishNewsHanCharacters) return true;
 
   const comparableCharacterCount =
@@ -480,9 +483,15 @@ function hasAcceptableEnglishNewsHanMix(value: string) {
 export function isUsableEnglishNewsText(
   value: string | null | undefined,
   minimumWords: number,
+  allowLongHanSequence = false,
 ) {
   const normalized = normalizeEnglishCandidate(value);
-  if (!normalized || !hasAcceptableEnglishNewsHanMix(normalized)) return false;
+  if (
+    !normalized ||
+    !hasAcceptableEnglishNewsHanMix(normalized, allowLongHanSequence)
+  ) {
+    return false;
+  }
   return countEnglishWords(normalized) >= minimumWords;
 }
 
@@ -501,7 +510,7 @@ export function isEnglishNewsArticleIndexable(article: {
     content.length >= 180 &&
     isUsableEnglishNewsText(title, 3) &&
     isUsableEnglishNewsText(summary, 8) &&
-    isUsableEnglishNewsText(content, 45)
+    isUsableEnglishNewsText(content, 45, true)
   );
 }
 

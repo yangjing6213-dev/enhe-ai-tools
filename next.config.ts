@@ -88,6 +88,7 @@ const nextConfig: NextConfig = {
       { source: "/skill-learning-3", destination: "/skill-learning", statusCode: 301 },
       { source: "/uploads/1780672763703-tool-product-tool-mq12l5w6-chatgpt-image-2026-6-4-22-18-45-2-.png-2", destination: "/uploads/1780672763703-tool-product-tool-mq12l5w6-chatgpt-image-2026-6-4-22-18-45-2-.png", statusCode: 301 },
       { source: "/uploads/1781369296949-tool-product-gemini-12-20-80-chatgpt-image-2026-6-13-14-15-46.png-0", destination: "/uploads/1781369296949-tool-product-gemini-12-20-80-chatgpt-image-2026-6-13-14-15-46.png", statusCode: 301 },
+      { source: "/uploads/1781699117927-tool-product-faceswap-studio-ai-chatgpt-image-2026-6-17-20-24-09-5-.png-5", destination: "/uploads/1781699117927-tool-product-faceswap-studio-ai-chatgpt-image-2026-6-17-20-24-09-5-.png", statusCode: 301 },
       { source: "/okf", destination: "/okf/index.md", statusCode: 308 },
       { source: "/okf/", destination: "/okf/index.md", statusCode: 308 },
       { source: "/online-tools", destination: "/account-services", statusCode: 301 },

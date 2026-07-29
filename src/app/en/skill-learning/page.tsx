@@ -3,8 +3,12 @@ import { PublicSiteChrome } from "@/components/public-site-chrome";
 
 export const revalidate = 300;
 
-export async function generateMetadata() {
-  return generateSkillLearningPageMetadata("en");
+export async function generateMetadata({
+  searchParams,
+}: {
+  searchParams: Promise<Record<string, string | undefined>>;
+}) {
+  return generateSkillLearningPageMetadata("en", searchParams);
 }
 
 export default async function EnglishSkillLearningPage({ searchParams }: { searchParams: Promise<Record<string, string | undefined>> }) {

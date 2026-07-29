@@ -329,7 +329,7 @@ describe("seo helpers", () => {
     const description = buildToolMetaDescription({
       name: "FaceSwap Studio｜本地人像合成研究工具",
       description:
-        "适合需要人物素材处理、换脸预览和创作草稿的用户，重点是降低素材外传顾虑，并把生成流程放进可重复的本地工作流。",
+        "FaceSwap Studio 面向需要人物素材处理、换脸预览和创作草稿的用户，在本地完成素材导入、处理与结果检查，降低素材外传顾虑，并把常用步骤整理成可重复、可控制的创作工作流。",
       brand: "恩禾 ENHE AI",
       locale: "zh",
       type: "software",
@@ -337,6 +337,7 @@ describe("seo helpers", () => {
 
     expect(description).toContain("降低素材外传顾虑");
     expect(description).not.toContain("在 恩禾 ENHE AI 查看");
+    expect(description.length).toBeGreaterThanOrEqual(70);
     expect(description.length).toBeLessThanOrEqual(120);
   });
 

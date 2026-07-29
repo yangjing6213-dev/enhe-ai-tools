@@ -15,6 +15,7 @@ import {
 } from "@/lib/product-demos";
 import {
   absoluteUrl,
+  applyFilteredListingRobots,
   buildBreadcrumbSchema,
   buildLocalePath,
   buildPageMetadata,
@@ -43,15 +44,20 @@ const listingCopy = {
   },
 } as const;
 
-export async function generateProductDemoListingMetadata(forceLocale: Locale): Promise<Metadata> {
+export async function generateProductDemoListingMetadata(
+  forceLocale: Locale,
+  searchParams: Promise<Record<string, string | undefined>> = Promise.resolve({}),
+): Promise<Metadata> {
   const copy = listingCopy[forceLocale];
-  return buildPageMetadata({
+  const metadata = buildPageMetadata({
     title: forceLocale === "en" ? "Tool Function Demos - ENHE AI" : "工具功能演示 - 恩禾ENHE AI",
     description: copy.description,
     path: "/product-demos",
     locale: forceLocale === "en" ? "en_US" : "zh_CN",
     localeKey: forceLocale,
   });
+
+  return applyFilteredListingRobots(metadata, await searchParams, ["type"]);
 }
 
 export async function ProductDemoListingPageShell({

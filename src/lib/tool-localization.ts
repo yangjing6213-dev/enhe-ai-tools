@@ -108,7 +108,7 @@ const userFirstToolCopyOverrides: Record<string, Partial<Record<Locale, string>>
     en: "A local video-generation workflow for creators who need text-to-video, image-to-video, and material management for drafts, courses, ads, and personal content.",
   },
   "faceswap-studio-ai": {
-    zh: "适合需要人物素材处理、换脸预览和创作草稿的用户，重点是降低素材外传顾虑，并把生成流程放进可重复的本地工作流。",
+    zh: "FaceSwap Studio 面向需要人物素材处理、换脸预览和创作草稿的用户，在本地完成素材导入、处理与结果检查，降低素材外传顾虑，并把常用步骤整理成可重复、可控制的创作工作流。",
     en: "A local workflow for face-swap previews and creator drafts, focused on reducing material upload concerns and making the process repeatable.",
   },
   "gmail-google": {

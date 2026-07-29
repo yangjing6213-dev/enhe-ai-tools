@@ -68,6 +68,13 @@ describe("Search Console legacy URL redirects", () => {
             "/uploads/1781369296949-tool-product-gemini-12-20-80-chatgpt-image-2026-6-13-14-15-46.png",
           statusCode: 301,
         },
+        {
+          source:
+            "/uploads/1781699117927-tool-product-faceswap-studio-ai-chatgpt-image-2026-6-17-20-24-09-5-.png-5",
+          destination:
+            "/uploads/1781699117927-tool-product-faceswap-studio-ai-chatgpt-image-2026-6-17-20-24-09-5-.png",
+          statusCode: 301,
+        },
       ]),
     );
   });

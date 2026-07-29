@@ -14,6 +14,7 @@ import { buildThemedToolCategories } from "@/lib/tool-category-groups";
 import { resolveLocalizedToolCategoryName } from "@/lib/tool-localization";
 import {
   absoluteUrl,
+  applyFilteredListingRobots,
   buildBreadcrumbSchema,
   buildFaqSchema,
   buildListingMetadataTitle,
@@ -278,15 +279,24 @@ const softwareGeoLabels = {
 
 export async function generateSoftwarePageMetadata(
   forceLocale: Locale,
+  searchParams: Promise<Record<string, string | undefined>> = Promise.resolve({}),
 ): Promise<Metadata> {
   const t = getDictionary(forceLocale);
-  return buildPageMetadata({
+  const metadata = buildPageMetadata({
     title: buildListingMetadataTitle("software", forceLocale, t.brand),
     description: buildListingMetaDescription("software", forceLocale),
     path: "/software",
     locale: forceLocale === "en" ? "en_US" : "zh_CN",
     localeKey: forceLocale,
   });
+
+  return applyFilteredListingRobots(metadata, await searchParams, [
+    "q",
+    "category",
+    "categoryName",
+    "paid",
+    "sort",
+  ]);
 }
 
 export async function SoftwarePageShell({

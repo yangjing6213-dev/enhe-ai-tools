@@ -13,6 +13,7 @@ import { publicPageCacheSeconds } from "@/lib/public-routes";
 import { resolveLocalizedToolCategoryName } from "@/lib/tool-localization";
 import {
   absoluteUrl,
+  applyFilteredListingRobots,
   buildBreadcrumbSchema,
   buildFaqSchema,
   buildListingMetadataTitle,
@@ -136,15 +137,22 @@ function buildAccountServicesCollectionSchema(forceLocale: Locale) {
 
 export async function generateAccountServicesPageMetadata(
   forceLocale: Locale,
+  searchParams: Promise<Record<string, string | undefined>> = Promise.resolve({}),
 ): Promise<Metadata> {
   const t = getDictionary(forceLocale);
-  return buildPageMetadata({
+  const metadata = buildPageMetadata({
     title: buildListingMetadataTitle("account-services", forceLocale, t.brand),
     description: buildListingMetaDescription("account-services", forceLocale),
     path: "/account-services",
     locale: forceLocale === "en" ? "en_US" : "zh_CN",
     localeKey: forceLocale,
   });
+
+  return applyFilteredListingRobots(metadata, await searchParams, [
+    "q",
+    "category",
+    "sort",
+  ]);
 }
 
 export async function AccountServicesPageShell({
