@@ -55,25 +55,38 @@ export function summarizeValidationOrders(orders: EbosValidationOrderRecord[]): 
       paidOrders: 0,
       revenue: 0,
       refundedAmount: 0,
-      refundCount: 0
+      refundCount: 0,
+      pendingRefundOrders: 0,
+      undeliveredPaidOrders: 0
     };
     current.totalOrders += 1;
-    if (isPaidStatus(order.status)) {
+    if (isCountablePurchase(order)) {
       current.paidOrders += 1;
       current.revenue = round(current.revenue + order.amount);
     }
-    current.refundedAmount = round(current.refundedAmount + order.refundedAmount);
-    current.refundCount += order.refundCount;
+    if (order.isTestData !== true) {
+      current.refundedAmount = round(current.refundedAmount + order.refundedAmount);
+      current.refundCount += order.refundCount;
+      current.pendingRefundOrders = (current.pendingRefundOrders ?? 0) + (hasPendingRefund(order) ? 1 : 0);
+      current.undeliveredPaidOrders = (current.undeliveredPaidOrders ?? 0) + (isUndeliveredPaidOrder(order) ? 1 : 0);
+    }
     ordersByProductOrSlug[key] = current;
   }
 
   return {
     ordersAvailable: true,
     totalOrders: orders.length,
-    paidOrders: orders.filter((order) => isPaidStatus(order.status)).length,
-    revenue: round(orders.filter((order) => isPaidStatus(order.status)).reduce((total, order) => total + order.amount, 0)),
-    refundedAmount: round(orders.reduce((total, order) => total + order.refundedAmount, 0)),
-    refundCount: orders.reduce((total, order) => total + order.refundCount, 0),
+    paidOrders: orders.filter(isCountablePurchase).length,
+    revenue: round(orders.filter(isCountablePurchase).reduce((total, order) => total + order.amount, 0)),
+    refundedAmount: round(orders
+      .filter((order) => order.isTestData !== true)
+      .reduce((total, order) => total + order.refundedAmount, 0)),
+    refundCount: orders
+      .filter((order) => order.isTestData !== true)
+      .reduce((total, order) => total + order.refundCount, 0),
+    pendingRefundOrders: orders.filter((order) => order.isTestData !== true && hasPendingRefund(order)).length,
+    undeliveredPaidOrders: orders.filter(isUndeliveredPaidOrder).length,
+    testOrdersExcluded: orders.filter((order) => order.isTestData === true).length,
     ordersByProductOrSlug,
     warnings: [
       warning("currency_inferred", "Currency inferred as CNY because no explicit currency field was detected."),
@@ -88,16 +101,32 @@ export function mapOrdersToValidationPlans(orders: EbosValidationOrderRecord[]) 
 }
 
 export function mapOrderSummaryToValidationPlans(summary: EbosValidationOrderSummary) {
-  const mapped: Record<string, { paidOrders: number; revenue: number; refundCount: number; refundedAmount: number }> = {};
+  const mapped: Record<string, {
+    paidOrders: number;
+    revenue: number;
+    refundCount: number;
+    refundedAmount: number;
+    pendingRefundOrders: number;
+    undeliveredPaidOrders: number;
+  }> = {};
 
   for (const [key, productSummary] of Object.entries(summary.ordersByProductOrSlug)) {
     const planId = planIdFromProductKey(key);
     if (!planId) continue;
-    const current = mapped[planId] ?? { paidOrders: 0, revenue: 0, refundCount: 0, refundedAmount: 0 };
+    const current = mapped[planId] ?? {
+      paidOrders: 0,
+      revenue: 0,
+      refundCount: 0,
+      refundedAmount: 0,
+      pendingRefundOrders: 0,
+      undeliveredPaidOrders: 0
+    };
     current.paidOrders += productSummary.paidOrders;
     current.revenue = round(current.revenue + productSummary.revenue);
     current.refundCount += productSummary.refundCount;
     current.refundedAmount = round(current.refundedAmount + productSummary.refundedAmount);
+    current.pendingRefundOrders += productSummary.pendingRefundOrders ?? 0;
+    current.undeliveredPaidOrders += productSummary.undeliveredPaidOrders ?? 0;
     mapped[planId] = current;
   }
 
@@ -114,6 +143,9 @@ export function planIdFromProductKey(value: string) {
   }
   if (normalized.includes("ai-video") || normalized.includes("ai video") || normalized.includes("local-ai-video-studio")) {
     return "validation-product-2-local-ai-video-studio-for-creator-workflows";
+  }
+  if (normalized.includes("seo-audit") || normalized.includes("seo/geo") || normalized.includes("seo geo")) {
+    return "validation-product-seo-geo-audit";
   }
   return null;
 }
@@ -141,6 +173,15 @@ function buildOrderQuery(options: { periodStart?: string | Date; periodEnd?: str
           createdAt: true,
           completedAt: true
         }
+      },
+      paymentTransaction: {
+        select: { status: true, paidAt: true }
+      },
+      paymentProof: {
+        select: { reviewStatus: true }
+      },
+      seoAuditOffer: {
+        select: { code: true, name: true }
       }
     }
   };
@@ -154,22 +195,41 @@ async function loadDefaultPrismaClient(): Promise<ValidationOrderPrismaClient> {
 function normalizeOrder(value: unknown): EbosValidationOrderRecord {
   const row = toRecord(value);
   const tool = toRecord(row.tool);
+  const seoAuditOffer = toRecord(row.seoAuditOffer);
+  const paymentTransaction = toRecord(row.paymentTransaction);
+  const paymentProof = toRecord(row.paymentProof);
   const refunds = Array.isArray(row.refundRecords) ? row.refundRecords.map(toRecord) : [];
-  const activeRefunds = refunds.filter((refund) => readString(refund.status) !== "rejected");
+  const completedRefunds = refunds.filter((refund) => readString(refund.status) === "completed");
+  const pendingRefunds = refunds.filter((refund) => readString(refund.status) === "pending");
+  const hasDetailedRefunds = refunds.length > 0;
+  const status = readString(row.status) ?? readString(row.orderStatus);
+  const paidAt = toIso(row.paidAt) ?? toIso(paymentTransaction.paidAt);
+  const activatedAt = toIso(row.activatedAt);
+  const paymentSucceeded = readString(paymentTransaction.status) === "paid"
+    || readString(paymentProof.reviewStatus) === "approved"
+    || (status === "activated" && Boolean(paidAt));
 
   return {
     id: readString(row.id) ?? "unknown-order",
-    productSlug: readString(row.productSlug) ?? readString(tool.slug),
-    productName: readString(row.productName) ?? readString(tool.name) ?? readString(tool.englishName),
+    productSlug: readString(row.productSlug) ?? readString(tool.slug) ?? readString(seoAuditOffer.code),
+    productName: readString(row.productName) ?? readString(tool.name) ?? readString(tool.englishName) ?? readString(seoAuditOffer.name),
     productId: readString(row.productId) ?? readString(row.toolId) ?? readString(tool.id),
     amount: readMoney(row.amount),
-    status: readString(row.status) ?? readString(row.orderStatus),
-    paidAt: toIso(row.paidAt),
+    status,
+    paidAt,
     createdAt: toIso(row.createdAt),
-    refundCount: typeof row.refundCount === "number" ? row.refundCount : activeRefunds.length,
-    refundedAmount: typeof row.refundedAmount === "number"
-      ? row.refundedAmount
-      : round(activeRefunds.reduce((total, refund) => total + readMoney(refund.amount), 0))
+    isTestData: row.isTestData === true,
+    paymentSucceeded,
+    delivered: status === "activated" && Boolean(activatedAt),
+    refundCount: hasDetailedRefunds
+      ? completedRefunds.length
+      : typeof row.refundCount === "number" ? row.refundCount : 0,
+    pendingRefundCount: hasDetailedRefunds
+      ? pendingRefunds.length
+      : typeof row.pendingRefundCount === "number" ? row.pendingRefundCount : 0,
+    refundedAmount: hasDetailedRefunds
+      ? round(completedRefunds.reduce((total, refund) => total + readMoney(refund.amount), 0))
+      : typeof row.refundedAmount === "number" ? row.refundedAmount : 0
   };
 }
 
@@ -180,8 +240,33 @@ function attributionKey(order: EbosValidationOrderRecord) {
   return order.productSlug ?? order.productName ?? planId;
 }
 
-function isPaidStatus(status: string | undefined) {
-  return status === "paid" || status === "activated" || status === "refunded";
+function isCountablePurchase(order: EbosValidationOrderRecord) {
+  return order.isTestData !== true
+    && paymentSucceeded(order)
+    && delivered(order)
+    && order.status !== "refunded"
+    && order.refundCount === 0
+    && !hasPendingRefund(order);
+}
+
+function isUndeliveredPaidOrder(order: EbosValidationOrderRecord) {
+  return order.isTestData !== true
+    && paymentSucceeded(order)
+    && !delivered(order)
+    && order.status !== "refunded"
+    && order.refundCount === 0;
+}
+
+function paymentSucceeded(order: EbosValidationOrderRecord) {
+  return order.paymentSucceeded ?? (order.status === "paid" || order.status === "activated" || order.status === "refunded");
+}
+
+function delivered(order: EbosValidationOrderRecord) {
+  return order.delivered ?? (order.status === "activated" || order.status === "refunded");
+}
+
+function hasPendingRefund(order: EbosValidationOrderRecord) {
+  return (order.pendingRefundCount ?? 0) > 0;
 }
 
 function emptyOrderSummary(ordersAvailable: boolean, warnings: EbosValidationCaptureWarning[]): EbosValidationOrderSummary {
@@ -192,6 +277,9 @@ function emptyOrderSummary(ordersAvailable: boolean, warnings: EbosValidationCap
     revenue: 0,
     refundedAmount: 0,
     refundCount: 0,
+    pendingRefundOrders: 0,
+    undeliveredPaidOrders: 0,
+    testOrdersExcluded: 0,
     ordersByProductOrSlug: {},
     warnings
   };

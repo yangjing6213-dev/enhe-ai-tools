@@ -2,26 +2,16 @@ import Image from "next/image";
 import { ChevronDown, Mail, Music2, NotebookText, Youtube, type LucideIcon } from "lucide-react";
 import { PrefetchLink } from "@/components/prefetch-link";
 import { Container } from "@/components/ui";
+import { companyProfile } from "@/lib/company-profile";
 import { getDictionary, type Locale } from "@/lib/dictionaries";
 import { getCurrentLocale } from "@/lib/i18n";
 import { legalPages } from "@/lib/legal";
 import { buildLocalePath } from "@/lib/seo";
 import { getEffectiveFooterCopyright, getEffectiveLocalizedSiteName, getSettingsMap } from "@/lib/settings";
 
-const companyContact = {
-  name: "深圳市龙岗区恩禾网络科技工作室",
-  address: "深圳市龙岗区横岗街道塘坑社区宸和路51号中联展数字电商产业园C栋C305",
-  englishName: "Shenzhen Longgang District Enhe Network Technology Studio",
-  englishAddress: "Room C305, Building C, Zhonglianzhan Digital E-commerce Industrial Park, 51 Chenhe Road, Tangkeng Community, Henggang Street, Longgang District, Shenzhen",
-  phone: "15715097597",
-  phoneHref: "tel:15715097597",
-  email: "ENHEAI.life@protonmail.com",
-  emailHref: "mailto:ENHEAI.life@protonmail.com"
-};
-
 const footerSocialLinks: { label: string; href?: string; icon: LucideIcon }[] = [
-  { label: "Gmail", href: companyContact.emailHref, icon: Mail },
-  { label: "小红书", href: companyContact.phoneHref, icon: NotebookText },
+  { label: "Gmail", href: companyProfile.email.href, icon: Mail },
+  { label: "小红书", href: companyProfile.phone.href, icon: NotebookText },
   { label: "抖音", icon: Music2 },
   { label: "YouTube", href: "https://www.youtube.com/@ENHE-AI", icon: Youtube }
 ];
@@ -47,8 +37,8 @@ export async function SiteFooter({ forceLocale }: { forceLocale?: Locale }) {
           publicSecurity: "闽公网安备 35030302900035号",
           icp: "闽ICP备2025092404号-2"
         };
-  const companyName = locale === "en" ? companyContact.englishName : companyContact.name;
-  const companyAddress = locale === "en" ? companyContact.englishAddress : companyContact.address;
+  const companyName = companyProfile.name[locale];
+  const companyAddress = companyProfile.address[locale];
   const footerGroups = [
     {
       title: locale === "en" ? "Explore" : "平台入口",
@@ -156,16 +146,16 @@ export async function SiteFooter({ forceLocale }: { forceLocale?: Locale }) {
                 <div className="site-footer-company-row">
                   <dt>{contactLabels.phone}</dt>
                   <dd>
-                    <a href={companyContact.phoneHref} className="site-footer-link cursor-target">
-                      {companyContact.phone}
+                    <a href={companyProfile.phone.href} className="site-footer-link cursor-target">
+                      {companyProfile.phone.value}
                     </a>
                   </dd>
                 </div>
                 <div className="site-footer-company-row">
                   <dt>{contactLabels.email}</dt>
                   <dd>
-                    <a href={companyContact.emailHref} className="site-footer-link cursor-target">
-                      {companyContact.email}
+                    <a href={companyProfile.email.href} className="site-footer-link cursor-target">
+                      {companyProfile.email.value}
                     </a>
                   </dd>
                 </div>

@@ -6,17 +6,30 @@ import { Container } from "@/components/ui";
 import { getOrCreateCsrfToken } from "@/lib/csrf";
 import { getCurrentLocale, getDictionary, type Locale } from "@/lib/i18n";
 import { buildLocalePath } from "@/lib/seo";
+import { resolveSafeReturnPath } from "@/lib/safe-return-path";
 
-export async function RegisterPageShell({ forceLocale }: { forceLocale?: Locale } = {}) {
+export async function RegisterPageShell({
+  forceLocale,
+  searchParams = Promise.resolve({}),
+}: {
+  forceLocale?: Locale;
+  searchParams?: Promise<{ returnTo?: string }>;
+} = {}) {
   const locale = forceLocale ?? (await getCurrentLocale());
   const t = getDictionary(locale);
   const csrfToken = await getOrCreateCsrfToken();
+  const params = await searchParams;
+  const returnTo = resolveSafeReturnPath(
+    params.returnTo,
+    buildLocalePath("/user", locale),
+  );
 
   return (
     <main>
       <Container className="flex min-h-[calc(100vh-4rem)] items-center justify-center py-16">
         <form action={registerAction} className="surface-panel w-full max-w-md p-8">
         <input type="hidden" name="csrfToken" value={csrfToken} />
+        <input type="hidden" name="returnTo" value={returnTo} />
         <h1 className="text-3xl font-black text-[var(--marketing-text)]">{t.auth.registerTitle}</h1>
         <p className="mt-3 text-sm font-medium text-[var(--marketing-muted)]">{t.auth.registerIntro}</p>
         <label htmlFor="register-email" className="mt-8 block text-sm font-semibold text-[var(--marketing-text)]">{t.auth.email}</label>
@@ -71,7 +84,10 @@ export async function RegisterPageShell({ forceLocale }: { forceLocale?: Locale 
         </FormSubmitButton>
         <p className="mt-5 text-center text-sm text-[var(--marketing-muted)]">
           {t.auth.hasAccount}
-          <Link className="font-semibold text-[var(--marketing-accent)]" href={buildLocalePath("/login", locale)}>
+          <Link
+            className="font-semibold text-[var(--marketing-accent)]"
+            href={`${buildLocalePath("/login", locale)}?returnTo=${encodeURIComponent(returnTo)}`}
+          >
             {t.auth.goLogin}
           </Link>
         </p>

@@ -166,7 +166,7 @@ function getMigrationIndexes() {
 }
 
 describe("SEO audit commercial schema contract", () => {
-  it("locks the four OrderType values and exactly nine SEO audit models", () => {
+  it("locks the four OrderType values and exactly ten SEO audit models", () => {
     expect(getPrismaBlock("enum", "OrderType")).toEqual([
       "vip",
       "software_download",
@@ -186,7 +186,8 @@ describe("SEO audit commercial schema contract", () => {
       "SeoAuditSubscription",
       "SeoAuditSubscriptionOrder",
       "SeoAuditSchedule",
-      "SeoAuditWorkerHeartbeat"
+      "SeoAuditWorkerHeartbeat",
+      "SeoAuditEmailOutbox"
     ]);
 
     expectExactPrismaLines("User", [
@@ -269,10 +270,10 @@ describe("SEO audit commercial schema contract", () => {
 
   it("locks public tokens, worker leases, retries, complete summaries, and private report keys", () => {
     expectExactPrismaLines("SeoAuditRun", [
-      'requestIpHash String? @db.Char(64) @map("request_ip_hash")',
-      'requestOriginHash String? @db.Char(64) @map("request_origin_hash")',
-      'publicTokenHash String? @unique @db.Char(64) @map("public_token_hash")',
-      'leaseTokenHash String? @db.Char(64) @map("lease_token_hash")',
+      'requestIpHash String? @map("request_ip_hash") @db.Char(64)',
+      'requestOriginHash String? @map("request_origin_hash") @db.Char(64)',
+      'publicTokenHash String? @unique @map("public_token_hash") @db.Char(64)',
+      'leaseTokenHash String? @map("lease_token_hash") @db.Char(64)',
       'leaseExpiresAt DateTime? @map("lease_expires_at")',
       'availableAt DateTime @default(now()) @map("available_at")',
       'attemptCount Int @default(0) @map("attempt_count")',
@@ -288,7 +289,7 @@ describe("SEO audit commercial schema contract", () => {
       'failureMessage String? @map("failure_message")',
       'reportJsonKey String? @map("report_json_key")',
       'reportMarkdownKey String? @map("report_markdown_key")',
-      'reportSha256 String? @db.Char(64) @map("report_sha256")',
+      'reportSha256 String? @map("report_sha256") @db.Char(64)',
       "user User? @relation(fields: [userId], references: [id], onDelete: Restrict)",
       "project SeoAuditProject? @relation(fields: [projectId], references: [id], onDelete: SetNull)",
       "offer SeoAuditOffer? @relation(fields: [offerId], references: [id], onDelete: SetNull)",
@@ -339,7 +340,7 @@ describe("SEO audit commercial schema contract", () => {
     expectExactPrismaLines("SeoAuditArtifactUpload", [
       'runId String @map("run_id")',
       "reservation String @unique",
-      'reportSha256 String @db.Char(64) @map("report_sha256")',
+      'reportSha256 String @map("report_sha256") @db.Char(64)',
       'reportJsonKey String @unique @map("report_json_key")',
       'reportMarkdownKey String @unique @map("report_markdown_key")',
       'cleanupAfter DateTime @map("cleanup_after")',

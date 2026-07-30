@@ -21,10 +21,11 @@ describe("site footer source", () => {
   it("publishes company contact information in the footer", () => {
     const footer = readFileSync(new URL("../components/site-footer.tsx", import.meta.url), "utf8");
 
-    expect(footer).toContain("深圳市龙岗区恩禾网络科技工作室");
-    expect(footer).toContain("深圳市龙岗区横岗街道塘坑社区宸和路51号中联展数字电商产业园C栋C305");
-    expect(footer).toContain("tel:15715097597");
-    expect(footer).toContain("mailto:ENHEAI.life@protonmail.com");
+    expect(footer).toContain('import { companyProfile } from "@/lib/company-profile"');
+    expect(footer).toContain("companyProfile.name[locale]");
+    expect(footer).toContain("companyProfile.address[locale]");
+    expect(footer).toContain("companyProfile.phone.href");
+    expect(footer).toContain("companyProfile.email.href");
   });
 
   it("keeps every footer group available through a visible disclosure", () => {

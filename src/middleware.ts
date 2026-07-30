@@ -11,6 +11,14 @@ import {
 } from "@/lib/locale-routing";
 
 export function middleware(request: NextRequest) {
+  if (request.nextUrl.hostname.toLowerCase() === "enhe-tech.com.cn") {
+    const redirectUrl = request.nextUrl.clone();
+    redirectUrl.protocol = "https:";
+    redirectUrl.hostname = "www.enhe-tech.com.cn";
+    redirectUrl.port = "";
+    return NextResponse.redirect(redirectUrl, 301);
+  }
+
   const requestHeaders = new Headers(request.headers);
   const pathname = request.nextUrl.pathname;
   const cookieLocale = request.cookies.get(localeCookieName)?.value;

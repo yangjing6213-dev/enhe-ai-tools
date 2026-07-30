@@ -1,4 +1,4 @@
-import { createHash } from "node:crypto";
+import { createHash, randomUUID } from "node:crypto";
 import { PrismaClient } from "@prisma/client";
 import { afterAll, beforeAll, describe, expect, it, vi } from "vitest";
 import {
@@ -93,10 +93,17 @@ async function reapPersistedUploads(input: {
 
 describePostgres("PostgreSQL SEO audit job concurrency", () => {
   let db: PrismaClient;
+  let refundDb: PrismaClient;
   const createdRunIds: string[] = [];
+  const createdOrderIds: string[] = [];
+  const createdUserIds: string[] = [];
 
   beforeAll(() => {
     db = new PrismaClient({
+      datasourceUrl: databaseUrl,
+      transactionOptions: { maxWait: 10_000, timeout: 30_000 },
+    });
+    refundDb = new PrismaClient({
       datasourceUrl: databaseUrl,
       transactionOptions: { maxWait: 10_000, timeout: 30_000 },
     });
@@ -118,6 +125,16 @@ describePostgres("PostgreSQL SEO audit job concurrency", () => {
       });
       await db.seoAuditRun.deleteMany({ where: { id: { in: createdRunIds } } });
     }
+    if (createdOrderIds.length) {
+      await db.orderRefundRecord.deleteMany({
+        where: { orderId: { in: createdOrderIds } },
+      });
+      await db.order.deleteMany({ where: { id: { in: createdOrderIds } } });
+    }
+    if (createdUserIds.length) {
+      await db.user.deleteMany({ where: { id: { in: createdUserIds } } });
+    }
+    await refundDb?.$disconnect();
     await db?.$disconnect();
   });
 
@@ -153,6 +170,55 @@ describePostgres("PostgreSQL SEO audit job concurrency", () => {
     return run;
   }
 
+  async function createPaidRun(input: {
+    targetUrl: string;
+    availableAt: Date;
+  }) {
+    const offer = await db.seoAuditOffer.findUniqueOrThrow({
+      where: { code: "professional" },
+    });
+    const user = await db.user.create({
+      data: {
+        email: `jobs-refund-race-${randomUUID()}@example.test`,
+        passwordHash: "test-only",
+        isTestData: true,
+      },
+    });
+    createdUserIds.push(user.id);
+    const order = await db.order.create({
+      data: {
+        orderNo: `JOBS-REFUND-RACE-${randomUUID()}`,
+        userId: user.id,
+        orderType: "seo_audit_credit",
+        seoAuditOfferId: offer.id,
+        seoAuditTargetOrigin: new URL(input.targetUrl).origin,
+        amount: "19.90",
+        paymentMethod: "wechat",
+        orderStatus: "activated",
+        paidAt: input.availableAt,
+        activatedAt: input.availableAt,
+        isTestData: true,
+      },
+    });
+    createdOrderIds.push(order.id);
+    const run = await db.seoAuditRun.create({
+      data: {
+        userId: user.id,
+        offerId: offer.id,
+        sourceOrderId: order.id,
+        status: "queued",
+        kind: "professional",
+        targetUrl: input.targetUrl,
+        normalizedOrigin: new URL(input.targetUrl).origin,
+        pageLimit: offer.pageLimit,
+        totalTimeoutSeconds: 720,
+        availableAt: input.availableAt,
+      },
+    });
+    createdRunIds.push(run.id);
+    return { order, run, user };
+  }
+
   it(
     "lets only one concurrent claim obtain a queued run",
     async () => {
@@ -181,6 +247,128 @@ describePostgres("PostgreSQL SEO audit job concurrency", () => {
       ).toMatchObject({ status: "running", attemptCount: 1 });
     },
     30_000,
+  );
+
+  it(
+    "skips an order locked by a pending refund and rechecks it after commit",
+    async () => {
+      const now = new Date("2000-01-01T00:00:00.000Z");
+      const paid = await createPaidRun({
+        targetUrl: "https://postgres-refund-race.example/",
+        availableAt: now,
+      });
+      const freeRun = await createRun({
+        status: "queued",
+        targetUrl: "https://postgres-refund-fallback.example/",
+        availableAt: now,
+      });
+      const refundReady = deferred();
+      const releaseRefund = deferred();
+      const refundTransaction = refundDb.$transaction(async (tx) => {
+        await tx.$queryRaw`
+          SELECT id
+          FROM orders
+          WHERE id = ${paid.order.id}
+          FOR UPDATE
+        `;
+        await tx.orderRefundRecord.create({
+          data: {
+            orderId: paid.order.id,
+            requesterId: paid.user.id,
+            amount: paid.order.amount,
+            status: "pending",
+            reason: "Worker claim/refund race test",
+          },
+        });
+        refundReady.resolve();
+        await releaseRefund.promise;
+      });
+
+      await refundReady.promise;
+      let claimed;
+      try {
+        claimed = await claimSeoAuditJob(
+          { workerId: "postgres-worker-refund-race", engineVersion: "1.4.8" },
+          { db, now, randomBytes: () => Buffer.alloc(32, 3) },
+        );
+      } finally {
+        releaseRefund.resolve();
+        await refundTransaction;
+      }
+
+      expect(claimed?.id).toBe(freeRun.id);
+      await expect(
+        claimSeoAuditJob(
+          { workerId: "postgres-worker-after-refund", engineVersion: "1.4.8" },
+          { db, now, randomBytes: () => Buffer.alloc(32, 4) },
+        ),
+      ).resolves.toBeNull();
+      await expect(
+        db.seoAuditRun.findUniqueOrThrow({ where: { id: paid.run.id } }),
+      ).resolves.toMatchObject({ status: "queued", attemptCount: 0 });
+    },
+    30_000,
+  );
+
+  it(
+    "continues past a full locked candidate batch to claim the next free run",
+    async () => {
+      const now = new Date("2000-01-01T00:00:00.000Z");
+      const paidRuns: Awaited<ReturnType<typeof createPaidRun>>[] = [];
+      for (let index = 0; index < 32; index += 1) {
+        paidRuns.push(
+          await createPaidRun({
+            targetUrl: `https://postgres-locked-batch-${index}.example/`,
+            availableAt: now,
+          }),
+        );
+      }
+      const freeRun = await createRun({
+        status: "queued",
+        targetUrl: "https://postgres-after-locked-batch.example/",
+        availableAt: now,
+      });
+      const refundsReady = deferred();
+      const releaseRefunds = deferred();
+      const refundTransaction = refundDb.$transaction(async (tx) => {
+        for (const paid of [...paidRuns].sort((left, right) =>
+          left.order.id.localeCompare(right.order.id),
+        )) {
+          await tx.$queryRaw`
+            SELECT id
+            FROM orders
+            WHERE id = ${paid.order.id}
+            FOR UPDATE
+          `;
+          await tx.orderRefundRecord.create({
+            data: {
+              orderId: paid.order.id,
+              requesterId: paid.user.id,
+              amount: paid.order.amount,
+              status: "pending",
+              reason: "Full locked claim batch test",
+            },
+          });
+        }
+        refundsReady.resolve();
+        await releaseRefunds.promise;
+      });
+
+      await refundsReady.promise;
+      let claimed;
+      try {
+        claimed = await claimSeoAuditJob(
+          { workerId: "postgres-worker-after-locked-batch", engineVersion: "1.4.8" },
+          { db, now, randomBytes: () => Buffer.alloc(32, 5) },
+        );
+      } finally {
+        releaseRefunds.resolve();
+        await refundTransaction;
+      }
+
+      expect(claimed?.id).toBe(freeRun.id);
+    },
+    60_000,
   );
 
   it(

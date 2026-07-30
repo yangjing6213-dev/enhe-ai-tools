@@ -26,6 +26,9 @@ export type EbosOrderSummary = {
   unpaidOrders: number;
   cancelledOrders: number;
   refundedOrders: number;
+  pendingRefundOrders?: number;
+  undeliveredPaidOrders?: number;
+  testOrdersExcluded?: number;
   currentPeriodOrders: number;
   currentPeriodPaidOrders: number;
   conversionEvidenceAvailable: boolean;
@@ -87,6 +90,11 @@ export type EbosRevenueOrderRecord = {
   paidAt?: string;
   createdAt?: string;
   refundedAmount?: number;
+  isTestData?: boolean;
+  paymentSucceeded?: boolean;
+  delivered?: boolean;
+  hasPendingRefund?: boolean;
+  hasCompletedRefund?: boolean;
 };
 
 export type EbosRevenueRefundRecord = {

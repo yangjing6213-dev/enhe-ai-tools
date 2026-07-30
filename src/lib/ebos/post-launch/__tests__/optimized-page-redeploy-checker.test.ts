@@ -1,4 +1,5 @@
-import { mkdir, writeFile } from "node:fs/promises";
+import { mkdir, mkdtemp, rm, writeFile } from "node:fs/promises";
+import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { describe, expect, test } from "vitest";
 import {
@@ -69,39 +70,43 @@ describe("optimized page redeploy checker", () => {
   });
 
   test("reads redeploy status summary from generated report", async () => {
-    const reportsRoot = join(process.cwd(), "tmp-ebos-optimized-redeploy-test");
-    const postLaunchDir = join(reportsRoot, "deployment", "post-launch");
-    await mkdir(postLaunchDir, { recursive: true });
-    await writeFile(join(postLaunchDir, "2026-07-03-optimized-page-redeploy-check.json"), "{}\n", "utf8");
-    await writeFile(join(postLaunchDir, "2026-07-03-optimized-validation-page-redeploy.json"), JSON.stringify({
-      reportType: "optimized_validation_page_redeploy",
-      targetDate: "2026-07-03",
-      generatedAt: "2026-07-06T00:00:00.000Z",
-      gitCommitHash: "abc123",
-      gitPushResult: "success",
-      serverPath: "/opt/enhe-ai-tools",
-      gitPullResult: "success",
-      dockerBuildResult: "success",
-      dockerUpResult: "success",
-      nginxReloadResult: "success",
-      checkedRoutes: ["/validation/ai-prompt-kit", "/en/validation/ai-prompt-kit"],
-      optimizedContentCheckStatus: "passed",
-      deploymentStatus: "verified",
-      postLaunchCheckStatus: "passed",
-      externalPublishingStatus: "waiting_real_data",
-      hasRealSignals: false,
-      canBackfill: false,
-      warnings: [],
-      nextActions: []
-    }, null, 2), "utf8");
+    const reportsRoot = await mkdtemp(join(tmpdir(), "enhe-ebos-redeploy-"));
+    try {
+      const postLaunchDir = join(reportsRoot, "deployment", "post-launch");
+      await mkdir(postLaunchDir, { recursive: true });
+      await writeFile(join(postLaunchDir, "2026-07-03-optimized-page-redeploy-check.json"), "{}\n", "utf8");
+      await writeFile(join(postLaunchDir, "2026-07-03-optimized-validation-page-redeploy.json"), JSON.stringify({
+        reportType: "optimized_validation_page_redeploy",
+        targetDate: "2026-07-03",
+        generatedAt: "2026-07-06T00:00:00.000Z",
+        gitCommitHash: "abc123",
+        gitPushResult: "success",
+        serverPath: "/opt/enhe-ai-tools",
+        gitPullResult: "success",
+        dockerBuildResult: "success",
+        dockerUpResult: "success",
+        nginxReloadResult: "success",
+        checkedRoutes: ["/validation/ai-prompt-kit", "/en/validation/ai-prompt-kit"],
+        optimizedContentCheckStatus: "passed",
+        deploymentStatus: "verified",
+        postLaunchCheckStatus: "passed",
+        externalPublishingStatus: "waiting_real_data",
+        hasRealSignals: false,
+        canBackfill: false,
+        warnings: [],
+        nextActions: []
+      }, null, 2), "utf8");
 
-    const status = await readOptimizedValidationPageRedeployStatusForDate({
-      targetDate: "2026-07-03",
-      reportsRoot
-    });
+      const status = await readOptimizedValidationPageRedeployStatusForDate({
+        targetDate: "2026-07-03",
+        reportsRoot
+      });
 
-    expect(status.status).toBe("generated");
-    expect(status.redeployed).toBe(true);
-    expect(status.gitCommitHash).toBe("abc123");
+      expect(status.status).toBe("generated");
+      expect(status.redeployed).toBe(true);
+      expect(status.gitCommitHash).toBe("abc123");
+    } finally {
+      await rm(reportsRoot, { recursive: true, force: true });
+    }
   });
 });

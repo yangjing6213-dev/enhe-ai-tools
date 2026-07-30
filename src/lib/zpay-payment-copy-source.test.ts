@@ -8,8 +8,10 @@ describe("zpay payment page copy", () => {
   it("keeps provider and internal status details out of the customer-facing payment panel", () => {
     const payPage = readFileSync(resolve(root, "src/app/orders/[id]/pay/page.tsx"), "utf8");
     const poller = readFileSync(resolve(root, "src/components/zpay-payment-status-poller.tsx"), "utf8");
+    const presentation = readFileSync(resolve(root, "src/lib/order-payment-presentation.ts"), "utf8");
 
-    expect(payPage).toContain("支付成功后，自动解锁该软件的下载链接。");
+    expect(payPage).toContain("presentation.paymentCompletionText");
+    expect(presentation).toContain("支付成功后，自动解锁该软件的下载链接。");
     expect(payPage).not.toContain("ZPAY 会通知网站");
     expect(payPage).not.toContain("ZPAY 订单号");
     expect(poller).not.toContain("当前订单状态");
@@ -22,6 +24,18 @@ describe("zpay payment page copy", () => {
 
     expect(payPage).toContain('order.orderStatus === "cancelled" || order.orderStatus === "refunded"');
     expect(payPage).toContain("order.paymentTransaction && !isTerminalUnpayable");
+  });
+
+  it("creates ZPAY payments and renders entitlement state for SEO audit products", () => {
+    const payPage = readFileSync(resolve(root, "src/app/orders/[id]/pay/page.tsx"), "utf8");
+
+    expect(payPage).toContain("getOrderPaymentPresentation");
+    expect(payPage).toContain("seoAuditOffer: true");
+    expect(payPage).toContain("seoAuditCredit: true");
+    expect(payPage).toContain("seoAuditSubscriptionOrder: true");
+    expect(payPage).toContain("presentation.isZpayPayable");
+    expect(payPage).toContain("presentation.isUnlocked");
+    expect(payPage).toContain("order.seoAuditOffer?.name");
   });
 
   it("shows a purchase success hint when mobile payment returns to login", () => {

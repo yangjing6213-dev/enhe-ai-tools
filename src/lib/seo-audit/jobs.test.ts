@@ -143,26 +143,29 @@ describe("durable SEO audit job claiming", () => {
     expect(db.$transaction).not.toHaveBeenCalled();
   });
 
-  it("claims a queued run with one atomic SKIP LOCKED CTE and stores only the lease hash", async () => {
+  it("locks a paid candidate's order before atomically claiming it and stores only the lease hash", async () => {
     const { db, tx } = createJobDb();
     const leaseBytes = Buffer.alloc(32, 7);
     const expectedLease = leaseBytes.toString("base64url");
     const expectedHash = createHash("sha256")
       .update(expectedLease)
       .digest("hex");
-    tx.$queryRaw.mockResolvedValueOnce([
-      {
-        id: "run-1",
-        kind: "professional",
-        targetUrl: "https://example.com/path",
-        normalizedOrigin: "https://example.com",
-        pageLimit: 100,
-        totalTimeoutSeconds: 720,
-        leaseExpiresAt: new Date("2026-07-25T08:01:30.000Z"),
-        attemptCount: 1,
-        engineVersion: "1.4.8",
-      },
-    ]);
+    tx.$queryRaw
+      .mockResolvedValueOnce([{ id: "run-1", sourceOrderId: "order-1" }])
+      .mockResolvedValueOnce([{ id: "order-1" }])
+      .mockResolvedValueOnce([
+        {
+          id: "run-1",
+          kind: "professional",
+          targetUrl: "https://example.com/path",
+          normalizedOrigin: "https://example.com",
+          pageLimit: 100,
+          totalTimeoutSeconds: 720,
+          leaseExpiresAt: new Date("2026-07-25T08:01:30.000Z"),
+          attemptCount: 1,
+          engineVersion: "1.4.8",
+        },
+      ]);
 
     const job = await claimSeoAuditJob(
       { workerId: "worker-1", engineVersion: "1.4.8" },
@@ -191,25 +194,48 @@ describe("durable SEO audit job claiming", () => {
     expect(job).not.toHaveProperty("reportJsonKey");
     expect(job).not.toHaveProperty("requestIpHash");
 
-    const claimSql = rawSql(tx.$queryRaw.mock.calls[0][0]);
+    const candidateSql = rawSql(tx.$queryRaw.mock.calls[0][0]);
+    expect(candidateSql.sql).toContain("available_at");
+    expect(candidateSql.sql).toContain("created_at");
+    expect(candidateSql.sql).toContain("professional");
+    expect(candidateSql.sql).toContain("scheduled");
+    expect(candidateSql.sql).toContain("free");
+    expect(candidateSql.sql).toMatch(/EXTRACT\s*\(\s*EPOCH/i);
+
+    const orderLockSql = rawSql(tx.$queryRaw.mock.calls[1][0]);
+    expect(orderLockSql.sql).toContain('FROM "orders"');
+    expect(orderLockSql.sql).toMatch(/FOR UPDATE\s+SKIP LOCKED/i);
+    expect(orderLockSql.values).toContain("order-1");
+
+    const claimSql = rawSql(tx.$queryRaw.mock.calls[2][0]);
     expect(claimSql.sql).toMatch(/FOR UPDATE\s+SKIP LOCKED/i);
     expect(claimSql.sql).toMatch(/"status"\s*=\s*'queued'/i);
     expect(claimSql.sql).toContain("lease_token_hash");
     expect(claimSql.sql).toMatch(
       /"attempt_count"\s*=\s*runs\."attempt_count"\s*\+\s*1/,
     );
-    expect(claimSql.sql).toContain("available_at");
-    expect(claimSql.sql).toContain("created_at");
-    expect(claimSql.sql).toContain("professional");
-    expect(claimSql.sql).toContain("scheduled");
-    expect(claimSql.sql).toContain("free");
-    expect(claimSql.sql).toMatch(/EXTRACT\s*\(\s*EPOCH/i);
+    expect(claimSql.sql).toContain("source_order_id");
+    expect(claimSql.sql).toContain("order_refund_records");
+    expect(claimSql.sql).toContain("order_status");
     expect(claimSql.values).toContain(expectedHash);
     expect(claimSql.values).not.toContain(expectedLease);
   });
 
-  it("recovers expired leases before claiming and refunds max-attempt system failures in the same transaction", async () => {
+  it("commits expired lease recovery before opening the order-lock claim transaction", async () => {
     const { db, tx } = createJobDb();
+    const transactionOperations: Array<{ execute: number; query: number }> = [];
+    db.$transaction.mockImplementation(
+      async (callback: (client: typeof tx) => Promise<unknown>) => {
+        const executeBefore = tx.$executeRaw.mock.calls.length;
+        const queryBefore = tx.$queryRaw.mock.calls.length;
+        const result = await callback(tx);
+        transactionOperations.push({
+          execute: tx.$executeRaw.mock.calls.length - executeBefore,
+          query: tx.$queryRaw.mock.calls.length - queryBefore,
+        });
+        return result;
+      },
+    );
     tx.$queryRaw.mockResolvedValueOnce([]);
 
     await expect(
@@ -218,6 +244,11 @@ describe("durable SEO audit job claiming", () => {
         { db: db as never, now, randomBytes: () => Buffer.alloc(32, 1) },
       ),
     ).resolves.toBeNull();
+
+    expect(transactionOperations).toEqual([
+      { execute: 1, query: 0 },
+      { execute: 0, query: 1 },
+    ]);
 
     const recoverySql = rawSql(tx.$executeRaw.mock.calls[0][0]);
     expect(recoverySql.sql).toContain("lease_expires_at");
@@ -362,7 +393,7 @@ describe("SEO audit job state machine", () => {
     });
   });
 
-  it("reserves and finalizes in short transactions, uploads outside them, and accepts a historical identical retry", async () => {
+  it("runs first-completion lifecycle effects after commit and accepts a historical identical retry", async () => {
     const { db, tx } = createJobDb();
     db.seoAuditRun.findUnique
       .mockResolvedValueOnce(completionRun())
@@ -389,6 +420,15 @@ describe("SEO audit job state machine", () => {
         }
       },
     );
+    const notificationError = new Error("SMTP unavailable");
+    const trackAnalyticsEvent = vi.fn().mockImplementation(async () => {
+      expect(transactionOpen).toBe(false);
+    });
+    const notifyRunCompletion = vi.fn().mockImplementation(async () => {
+      expect(transactionOpen).toBe(false);
+      throw notificationError;
+    });
+    const reportLifecycleError = vi.fn();
     const storeArtifacts = vi
       .fn()
       .mockImplementation(async (input: Record<string, unknown>) => {
@@ -412,6 +452,9 @@ describe("SEO audit job state machine", () => {
         parseReport,
         storeArtifacts,
         randomBytes: () => Buffer.alloc(24, 1),
+        trackAnalyticsEvent,
+        notifyRunCompletion,
+        reportLifecycleError,
       },
     );
     const repeated = await completeSeoAuditJob(
@@ -421,13 +464,45 @@ describe("SEO audit job state machine", () => {
         reportGzipBase64: "bundle",
         summary: completionSummary,
       },
-      { db: db as never, now, parseReport, storeArtifacts },
+      {
+        db: db as never,
+        now,
+        parseReport,
+        storeArtifacts,
+        trackAnalyticsEvent,
+        notifyRunCompletion,
+        reportLifecycleError,
+      },
     );
 
     expect(first).toEqual({ status: "completed", alreadyCompleted: false });
     expect(repeated).toEqual({ status: "completed", alreadyCompleted: true });
     expect(parseReport).toHaveBeenCalledTimes(2);
     expect(storeArtifacts).toHaveBeenCalledTimes(1);
+    expect(trackAnalyticsEvent).toHaveBeenCalledTimes(1);
+    expect(trackAnalyticsEvent).toHaveBeenCalledWith({
+      eventName: "seo_audit_completed",
+      entityType: "seo_audit_run",
+      entityId: "run-1",
+      metadata: { runId: "run-1" },
+      networkContext: { ip: null, userAgent: null },
+    });
+    expect(JSON.stringify(trackAnalyticsEvent.mock.calls)).not.toContain(
+      "https://",
+    );
+    expect(JSON.stringify(trackAnalyticsEvent.mock.calls)).not.toContain(
+      "# Report",
+    );
+    expect(notifyRunCompletion).toHaveBeenCalledTimes(1);
+    expect(notifyRunCompletion).toHaveBeenCalledWith("run-1");
+    expect(reportLifecycleError).toHaveBeenCalledWith(
+      {
+        effect: "notification",
+        eventName: "seo_audit_completed",
+        runId: "run-1",
+      },
+      notificationError,
+    );
     expect(storeArtifacts).toHaveBeenCalledWith({
       runId: "run-1",
       parsed: parsedReport,
@@ -745,6 +820,17 @@ describe("SEO audit job state machine", () => {
 
   it("fails idempotently and refunds a consumed credit exactly once for a system failure", async () => {
     const { db, tx } = createJobDb();
+    let transactionOpen = false;
+    db.$transaction.mockImplementation(
+      async (callback: (client: typeof tx) => Promise<unknown>) => {
+        transactionOpen = true;
+        try {
+          return await callback(tx);
+        } finally {
+          transactionOpen = false;
+        }
+      },
+    );
     tx.$queryRaw.mockResolvedValue([{ id: "run-1" }]);
     tx.seoAuditRun.findUnique
       .mockResolvedValueOnce({
@@ -766,19 +852,64 @@ describe("SEO audit job state machine", () => {
     tx.seoAuditRun.updateMany.mockResolvedValueOnce({ count: 1 });
     tx.seoAuditRun.update.mockResolvedValueOnce({ id: "run-1" });
     tx.$executeRaw.mockResolvedValueOnce(1);
+    const analyticsError = new Error("analytics unavailable");
+    const trackAnalyticsEvent = vi.fn().mockImplementation(async () => {
+      expect(transactionOpen).toBe(false);
+      throw analyticsError;
+    });
+    const notifyRunFailure = vi.fn().mockImplementation(async () => {
+      expect(transactionOpen).toBe(false);
+    });
+    const reportLifecycleError = vi.fn();
 
     const first = await failSeoAuditJob(
       { runId: "run-1", leaseToken, failureCode: "SYSTEM_TIMEOUT" },
-      { db: db as never, now },
+      {
+        db: db as never,
+        now,
+        trackAnalyticsEvent,
+        notifyRunFailure,
+        reportLifecycleError,
+      },
     );
     const repeated = await failSeoAuditJob(
       { runId: "run-1", leaseToken, failureCode: "SYSTEM_TIMEOUT" },
-      { db: db as never, now },
+      {
+        db: db as never,
+        now,
+        trackAnalyticsEvent,
+        notifyRunFailure,
+        reportLifecycleError,
+      },
     );
 
     expect(first).toEqual({ status: "failed", alreadyFailed: false });
     expect(repeated).toEqual({ status: "failed", alreadyFailed: true });
     expect(tx.seoAuditRun.updateMany).toHaveBeenCalledTimes(1);
+    expect(trackAnalyticsEvent).toHaveBeenCalledTimes(1);
+    expect(trackAnalyticsEvent).toHaveBeenCalledWith({
+      eventName: "seo_audit_failed",
+      entityType: "seo_audit_run",
+      entityId: "run-1",
+      metadata: { runId: "run-1" },
+      networkContext: { ip: null, userAgent: null },
+    });
+    expect(JSON.stringify(trackAnalyticsEvent.mock.calls)).not.toContain(
+      "https://",
+    );
+    expect(JSON.stringify(trackAnalyticsEvent.mock.calls)).not.toContain(
+      "# Report",
+    );
+    expect(notifyRunFailure).toHaveBeenCalledTimes(1);
+    expect(notifyRunFailure).toHaveBeenCalledWith("run-1");
+    expect(reportLifecycleError).toHaveBeenCalledWith(
+      {
+        effect: "analytics",
+        eventName: "seo_audit_failed",
+        runId: "run-1",
+      },
+      analyticsError,
+    );
     expect(tx.seoAuditRun.updateMany).toHaveBeenCalledWith(
       expect.objectContaining({
         data: expect.objectContaining({
@@ -811,6 +942,8 @@ describe("SEO audit job state machine", () => {
 
   it("turns cancel_requested into cancelled instead of allowing failure to win", async () => {
     const { db, tx } = createJobDb();
+    const trackAnalyticsEvent = vi.fn();
+    const notifyRunFailure = vi.fn();
     tx.$queryRaw.mockResolvedValueOnce([{ id: "run-1" }]);
     tx.seoAuditRun.findUnique.mockResolvedValueOnce({
       id: "run-1",
@@ -825,7 +958,7 @@ describe("SEO audit job state machine", () => {
     await expect(
       failSeoAuditJob(
         { runId: "run-1", leaseToken, failureCode: "SYSTEM_INTERNAL" },
-        { db: db as never, now },
+        { db: db as never, now, trackAnalyticsEvent, notifyRunFailure },
       ),
     ).resolves.toEqual({ status: "cancelled", alreadyFailed: false });
     expect(tx.seoAuditRun.update).toHaveBeenCalledWith({
@@ -842,6 +975,8 @@ describe("SEO audit job state machine", () => {
     });
     expect(tx.seoAuditRun.updateMany).not.toHaveBeenCalled();
     expect(tx.$executeRaw).not.toHaveBeenCalled();
+    expect(trackAnalyticsEvent).not.toHaveBeenCalled();
+    expect(notifyRunFailure).not.toHaveBeenCalled();
   });
 
   it("moves queued jobs directly to cancelled and running jobs to cancel_requested", async () => {

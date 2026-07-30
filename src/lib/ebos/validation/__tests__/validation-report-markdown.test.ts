@@ -117,6 +117,16 @@ describe("validation result markdown", () => {
     expect(markdown).toContain("Record actual channel metrics before judging demand.");
   });
 
+  test("includes first-week pause directions without changing existing report sections", () => {
+    const markdown = renderValidationResultReportMarkdown(report({
+      pauseDirections: ["SEO/GEO Audit"]
+    }));
+
+    expect(markdown).toContain("First-week pause directions");
+    expect(markdown).toContain("SEO/GEO Audit");
+    expect(markdown).toContain("## 7.");
+  });
+
   test("includes validation capture summary when provided", () => {
     const markdown = renderValidationResultReportMarkdown(report({
       captureReportPath: "reports/ebos/validation/capture/2026-07-03-validation-capture-report.json",

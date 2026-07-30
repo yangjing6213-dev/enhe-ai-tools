@@ -1,5 +1,8 @@
 # 恩禾 ENHE AI工具站独立部署说明
 
+Runtime configuration is loaded only from the untracked `deploy/enhe-ai-tools/.env` file.
+Every Compose command must pass `--env-file deploy/enhe-ai-tools/.env`.
+
 这套部署文件专门用于新项目 `/opt/enhe-ai-tools`。它不会修改 `hot-content-os`，不会改现有 Nginx，也不会占用旧项目正在使用的宿主机端口。
 
 ## 端口与容器
@@ -54,7 +57,10 @@ AUTH_SECRET=换成长随机字符串
 APP_URL=http://服务器IP:3001
 NEXT_PUBLIC_APP_URL=http://服务器IP:3001
 TENCENT_COS_SIGNED_URL_EXPIRES_SECONDS=600
+SEO_AUDIT_MONITORING_SALES_ENABLED=false
 ```
+
+持续监控销售门禁默认关闭。只有在计划、差异报告、邮件、到期控制和真实支付/退款全部完成生产验收后，才将 `SEO_AUDIT_MONITORING_SALES_ENABLED` 改为 `true`；该套餐始终为 30 天手动续费，不自动扣款。
 
 正式绑定 HTTPS 域名后，请把 `APP_URL` 和 `NEXT_PUBLIC_APP_URL` 都改为 `https://你的域名`，这样 canonical、robots 和 sitemap 会输出正式域名。
 

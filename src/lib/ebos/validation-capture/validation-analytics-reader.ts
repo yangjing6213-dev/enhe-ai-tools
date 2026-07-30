@@ -3,12 +3,31 @@ import type {
   EbosValidationAnalyticsSummary,
   EbosValidationCaptureWarning
 } from "./validation-capture-types";
+import {
+  isSeoAuditAnalyticsEventName,
+  seoAuditEventNames,
+  type SeoAuditAnalyticsEventName
+} from "@/lib/analytics";
 
 export const validationCtaEventNames = [
   "validation_ai_prompt_kit_cta_click",
   "validation_faceswap_cta_click",
-  "validation_ai_video_cta_click"
+  "validation_ai_video_cta_click",
+  "seo_audit_paywall_viewed"
 ] as const;
+
+const trustedSeoAuditEventNames = new Set<SeoAuditAnalyticsEventName>([
+  "seo_audit_submitted",
+  "seo_audit_completed",
+  "seo_audit_failed",
+  "seo_audit_checkout_started",
+  "seo_audit_purchased",
+  "seo_audit_report_downloaded",
+  "seo_audit_recheck_started",
+  "seo_audit_monitoring_purchased",
+  "seo_audit_schedule_enabled",
+  "seo_audit_schedule_paused"
+]);
 
 const pageViewEventNames = new Set([
   "page_view",
@@ -81,6 +100,7 @@ export function summarizeAnalyticsEvents(events: EbosValidationAnalyticsEvent[])
     ctaClicksDetected,
     eventsByName,
     eventsByPath,
+    seoAuditFunnel: summarizeSeoAuditFunnel(events),
     warnings: []
   };
 }
@@ -90,6 +110,7 @@ export function mapAnalyticsEventsToValidationMetrics(events: EbosValidationAnal
 }
 
 export function mapAnalyticsSummaryToValidationMetrics(summary: EbosValidationAnalyticsSummary) {
+  const funnel = summary.seoAuditFunnel;
   return {
     "validation-direction-3-ai-prompt-kit": {
       ctaClicks: summary.eventsByName.validation_ai_prompt_kit_cta_click ?? 0,
@@ -102,6 +123,11 @@ export function mapAnalyticsSummaryToValidationMetrics(summary: EbosValidationAn
     "validation-product-2-local-ai-video-studio-for-creator-workflows": {
       productPageCtaClicks: summary.eventsByName.validation_ai_video_cta_click ?? 0,
       productPageViews: sumPaths(summary.eventsByPath, validationPaths.aiVideo)
+    },
+    "validation-product-seo-geo-audit": {
+      pageViews: funnel?.counts.seo_audit_landing_view ?? 0,
+      ctaClicks: funnel?.counts.seo_audit_paywall_viewed ?? 0,
+      completedScans: funnel?.completedScans ?? 0
     }
   } satisfies Record<string, Record<string, number>>;
 }
@@ -166,8 +192,80 @@ function emptySummary(analyticsAvailable: boolean, warnings: EbosValidationCaptu
     ctaClicksDetected: 0,
     eventsByName: {},
     eventsByPath: {},
+    seoAuditFunnel: summarizeSeoAuditFunnel([]),
     warnings
   };
+}
+
+function summarizeSeoAuditFunnel(events: EbosValidationAnalyticsEvent[]) {
+  const counts = Object.fromEntries(seoAuditEventNames.map((eventName) => [eventName, 0])) as Record<SeoAuditAnalyticsEventName, number>;
+  const channels = new Map<string, {
+    source: string;
+    medium: string;
+    campaign?: string;
+    offerId?: string;
+    landingViews: number;
+    completedScans: number;
+    offerClicks: number;
+    ordersCreated: number;
+    paymentSucceeded: number;
+    reportsDelivered: number;
+    refunds: number;
+  }>();
+
+  for (const event of events) {
+    if (!isSeoAuditAnalyticsEventName(event.eventName)) continue;
+    const metadata = toRecord(event.metadata);
+    if (trustedSeoAuditEventNames.has(event.eventName) && metadata.eventTrust !== "server") continue;
+
+    counts[event.eventName] += 1;
+    const source = readString(metadata.source) ?? "unknown";
+    const medium = readString(metadata.medium) ?? "unknown";
+    const campaign = readString(metadata.campaign);
+    const offerId = readString(metadata.offerId);
+    const key = [source, medium, campaign ?? "", offerId ?? ""].join("\u001f");
+    const channel = channels.get(key) ?? {
+      source,
+      medium,
+      ...(campaign ? { campaign } : {}),
+      ...(offerId ? { offerId } : {}),
+      landingViews: 0,
+      completedScans: 0,
+      offerClicks: 0,
+      ordersCreated: 0,
+      paymentSucceeded: 0,
+      reportsDelivered: 0,
+      refunds: 0
+    };
+    incrementChannelMetric(channel, event.eventName);
+    channels.set(key, channel);
+  }
+
+  return {
+    counts,
+    completedScans: counts.seo_audit_completed,
+    channels: [...channels.values()]
+  };
+}
+
+function incrementChannelMetric(
+  channel: {
+    landingViews: number;
+    completedScans: number;
+    offerClicks: number;
+    ordersCreated: number;
+    paymentSucceeded: number;
+    reportsDelivered: number;
+    refunds: number;
+  },
+  eventName: SeoAuditAnalyticsEventName
+) {
+  if (eventName === "seo_audit_landing_view") channel.landingViews += 1;
+  if (eventName === "seo_audit_completed") channel.completedScans += 1;
+  if (eventName === "seo_audit_paywall_viewed") channel.offerClicks += 1;
+  if (eventName === "seo_audit_checkout_started") channel.ordersCreated += 1;
+  if (eventName === "seo_audit_purchased") channel.paymentSucceeded += 1;
+  if (eventName === "seo_audit_report_downloaded") channel.reportsDelivered += 1;
 }
 
 function toDate(value: string | Date) {

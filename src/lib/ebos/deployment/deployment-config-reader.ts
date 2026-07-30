@@ -141,8 +141,10 @@ export async function detectMigrationGuard(rootDir: string): Promise<{
 }> {
   const entrypointPath = join(rootDir, "deploy", "enhe-ai-tools", "scripts", "app-entrypoint.sh");
   const composePath = join(rootDir, "deploy", "enhe-ai-tools", "docker-compose.yml");
+  const deployScriptPath = join(rootDir, "deploy.sh");
   const entrypointSource = await readOptionalTextFile(entrypointPath);
   const composeSource = await readOptionalTextFile(composePath);
+  const deployScriptSource = await readOptionalTextFile(deployScriptPath);
 
   const runGuardDetected = Boolean(
     entrypointSource
@@ -160,7 +162,24 @@ export async function detectMigrationGuard(rootDir: string): Promise<{
     composeSource
     && /\bRUN_PRISMA_MIGRATE\s*:\s*(?:"0"|'0'|\$\{RUN_PRISMA_MIGRATE:-0\})/.test(composeSource)
   );
-  const migrationGuardDetected = runGuardDetected || skipGuardDetected;
+  const entrypointRunsMigration = /\bprisma\s+migrate\s+deploy\b/i.test(entrypointSource);
+  const backupIndex = deployScriptSource.indexOf("enhe-backup-db.sh");
+  const backupVerificationIndex = deployScriptSource.indexOf("pg_restore --list");
+  const deployMigrationIndex = deployScriptSource.search(/\bprisma\s+migrate\s+deploy\b/i);
+  const oneShotMigrationDetected = /\bcompose\s+run\s+--rm\s+app\b[^\r\n]*\bprisma\s+migrate\s+deploy\b/i.test(
+    deployScriptSource,
+  );
+  const isolatedDeploymentMigrationDetected = Boolean(
+    entrypointSource
+    && !entrypointRunsMigration
+    && backupIndex >= 0
+    && backupVerificationIndex > backupIndex
+    && deployMigrationIndex > backupVerificationIndex
+    && oneShotMigrationDetected
+  );
+  const migrationGuardDetected = runGuardDetected
+    || skipGuardDetected
+    || isolatedDeploymentMigrationDetected;
   const guardVariable = runGuardDetected
     ? "RUN_PRISMA_MIGRATE"
     : skipGuardDetected
@@ -169,6 +188,7 @@ export async function detectMigrationGuard(rootDir: string): Promise<{
   const defaultMigrationBehavior = buildDefaultMigrationBehavior({
     runGuardDetected,
     skipGuardDetected,
+    isolatedDeploymentMigrationDetected,
     entrypointSource
   });
   const warnings = [
@@ -186,7 +206,10 @@ export async function detectMigrationGuard(rootDir: string): Promise<{
     evidence: [
       ...(runGuardDetected ? ["app-entrypoint.sh gates prisma migrate deploy behind RUN_PRISMA_MIGRATE=1."] : []),
       ...(skipGuardDetected ? ["app-entrypoint.sh supports SKIP_PRISMA_MIGRATE."] : []),
-      ...(composeDefaultsRunGuardOff ? ["docker-compose.yml defaults RUN_PRISMA_MIGRATE to 0."] : [])
+      ...(composeDefaultsRunGuardOff ? ["docker-compose.yml defaults RUN_PRISMA_MIGRATE to 0."] : []),
+      ...(isolatedDeploymentMigrationDetected
+        ? ["deploy.sh verifies a database backup before running migrations in a one-shot app container."]
+        : [])
     ],
     warnings
   };
@@ -233,9 +256,10 @@ async function readOptionalTextFile(filePath: string) {
 function buildDefaultMigrationBehavior(options: {
   runGuardDetected: boolean;
   skipGuardDetected: boolean;
+  isolatedDeploymentMigrationDetected: boolean;
   entrypointSource: string;
 }): EbosDeploymentDefaultMigrationBehavior {
-  if (options.runGuardDetected) return "skip_unless_explicit";
+  if (options.runGuardDetected || options.isolatedDeploymentMigrationDetected) return "skip_unless_explicit";
   if (options.skipGuardDetected) return "skip_when_configured";
   if (/\bnpx\s+prisma\s+migrate\s+deploy\b/i.test(options.entrypointSource)) return "runs_by_default";
   return "unknown";

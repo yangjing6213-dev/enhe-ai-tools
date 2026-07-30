@@ -6,6 +6,7 @@ import { Container, SectionTitle } from "@/components/ui";
 import { ZpayPaymentStatusPoller } from "@/components/zpay-payment-status-poller";
 import { requireUser } from "@/lib/auth";
 import { prisma } from "@/lib/db";
+import { getOrderPaymentPresentation } from "@/lib/order-payment-presentation";
 import { buildCanonicalToolPath } from "@/lib/public-slugs";
 import { formatCurrency } from "@/lib/utils";
 import { ensureZpayPaymentForOrder, type ZpayPaymentView } from "@/lib/zpay-orders";
@@ -24,17 +25,30 @@ export default async function PayPage({ params }: PayPageProps) {
     "127.0.0.1";
   const order = await prisma.order.findFirst({
     where: { id, userId: user.id },
-    include: { plan: true, tool: true, toolPurchase: true, paymentTransaction: true }
+    include: {
+      plan: true,
+      tool: true,
+      seoAuditOffer: true,
+      toolPurchase: true,
+      seoAuditCredit: true,
+      seoAuditSubscriptionOrder: true,
+      paymentTransaction: true,
+    }
   });
   if (!order) notFound();
 
   let zpayPayment: ZpayPaymentView | null = null;
   let zpayError: string | null = null;
-  const isSoftwareDownloadOrder = order.orderType === "software_download";
-  const isUnlocked = order.orderStatus === "activated" || order.orderStatus === "paid" || Boolean(order.toolPurchase);
+  const presentation = getOrderPaymentPresentation({
+    orderType: order.orderType,
+    orderStatus: order.orderStatus,
+    hasToolPurchase: Boolean(order.toolPurchase),
+    hasSeoAuditCredit: Boolean(order.seoAuditCredit),
+    hasSeoAuditSubscriptionOrder: Boolean(order.seoAuditSubscriptionOrder),
+  });
   const isTerminalUnpayable = order.orderStatus === "cancelled" || order.orderStatus === "refunded";
 
-  if (isSoftwareDownloadOrder && !isUnlocked && !isTerminalUnpayable) {
+  if (presentation.isZpayPayable && !presentation.isUnlocked && !isTerminalUnpayable) {
     try {
       zpayPayment = await ensureZpayPaymentForOrder({ orderId: order.id, userId: user.id, clientIp });
     } catch (error) {
@@ -54,7 +68,7 @@ export default async function PayPage({ params }: PayPageProps) {
     <Container className="py-14">
       <SectionTitle
         title="订单支付"
-        intro="请使用当前订单二维码完成支付。支付成功后，系统会自动解锁该软件的下载链接。"
+        intro={`请使用当前订单二维码完成支付。${presentation.paymentCompletionText}`}
       />
 
       <div className="grid gap-6 lg:grid-cols-[0.9fr_1.1fr]">
@@ -63,9 +77,9 @@ export default async function PayPage({ params }: PayPageProps) {
           <h1 className="mt-2 break-all text-2xl font-black text-[var(--marketing-accent)]">{order.orderNo}</h1>
 
           <div className="mt-7 grid gap-4">
-            <Info label="项目" value={order.tool?.name ?? order.plan?.name ?? "订单项目"} />
+            <Info label="项目" value={order.tool?.name ?? order.seoAuditOffer?.name ?? order.plan?.name ?? "订单项目"} />
             {order.toolPriceSpecName ? <Info label="规格" value={order.toolPriceSpecName} /> : null}
-            <Info label="类型" value={isSoftwareDownloadOrder ? "软件下载解锁" : "订单"} />
+            <Info label="类型" value={presentation.typeLabel} />
             <Info label="金额" value={formatCurrency(order.amount.toString())} />
             <Info label="订单状态" value={order.orderStatus} />
             <Info label="支付方式" value={order.paymentMethod === "wechat" ? "微信支付" : "支付宝"} />
@@ -73,11 +87,11 @@ export default async function PayPage({ params }: PayPageProps) {
         </div>
 
         <div className="surface-panel p-7">
-          {isUnlocked ? (
+          {presentation.isUnlocked ? (
             <div>
-              <h2 className="text-xl font-bold text-[var(--marketing-accent)]">已解锁下载链接</h2>
+              <h2 className="text-xl font-bold text-[var(--marketing-accent)]">{presentation.unlockedTitle}</h2>
               <p className="mt-3 text-sm leading-6 text-[#8B95A7]">
-                该订单已经完成支付并开通权益。你可以返回工具详情页查看下载链接内容。
+                {presentation.unlockedDescription}
               </p>
               <div className="mt-6 flex flex-wrap gap-3">
                 {order.tool ? (
@@ -135,7 +149,7 @@ export default async function PayPage({ params }: PayPageProps) {
 
                 <div className="flex flex-col justify-between gap-5">
                   <div className="space-y-3 text-sm leading-6 text-[#8B95A7]">
-                    <p>支付成功后，自动解锁该软件的下载链接。</p>
+                    <p>{presentation.paymentCompletionText}</p>
                     <p>请使用微信扫码完成支付，付款后页面会自动更新。</p>
                     {zpayPayment.transaction.providerTradeNo ? (
                       <p className="break-all">支付订单号：{zpayPayment.transaction.providerTradeNo}</p>

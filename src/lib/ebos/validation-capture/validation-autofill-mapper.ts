@@ -76,6 +76,26 @@ export function buildValidationAutofillChanges(options: {
       current: inputByPlan.get(planId),
       force: options.force
     });
+    pushNumericChange(changes, {
+      planId,
+      field: "pendingRefundOrders",
+      value: metrics.pendingRefundOrders,
+      source: "orders",
+      confidence: "high",
+      reason: "Captured from existing pending refund records attributed to this validation plan.",
+      current: inputByPlan.get(planId),
+      force: options.force
+    });
+    pushNumericChange(changes, {
+      planId,
+      field: "undeliveredPaidOrders",
+      value: metrics.undeliveredPaidOrders,
+      source: "orders",
+      confidence: "high",
+      reason: "Captured from existing paid but undelivered orders attributed to this validation plan.",
+      current: inputByPlan.get(planId),
+      force: options.force
+    });
   }
 
   return changes;

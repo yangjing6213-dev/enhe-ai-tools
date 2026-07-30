@@ -53,6 +53,14 @@ const legalPageMap: Record<Locale, Record<LegalSlug, LegalPage>> = {
             "用户上传、发布或提交的文字、图片、截图、评论、反馈、文件等内容，应保证来源合法，并不侵犯任何第三方合法权益。",
             "用户上传或发布的内容不代表本网站立场。本网站有权对用户上传内容、评论内容及相关信息进行审核、删除、隐藏、限制展示或采取其他必要管理措施。"
           ]
+        },
+        {
+          title: "四、SEO/GEO 巡检授权与使用边界",
+          paragraphs: [
+            "提交目标网站进行 SEO/GEO 巡检的用户，应当是网站所有者、管理者，或已获得网站权利人的合法授权，并确认自己有权提交并授权本网站检查该公开站点。",
+            "巡检仅以只读方式访问公开可访问的网页、站点地图、robots.txt 和相关公开资源，不登录目标网站、不修改其内容。禁止利用巡检服务探测非公开系统、绕过访问控制、实施高频或恶意抓取、攻击、侵权或其他违法违规行为。",
+            "如用户无权检查目标网站，或使用方式可能损害目标网站、第三方权益或网络安全，本网站有权拒绝、暂停或终止任务并保留必要记录。"
+          ]
         }
       ]
     },
@@ -80,6 +88,14 @@ const legalPageMap: Record<Locale, Record<LegalSlug, LegalPage>> = {
           paragraphs: [
             "本网站将尽力采用合理的技术与管理措施保护用户信息安全，但互联网环境并非绝对安全。",
             "如您对隐私保护、信息更正或删除有疑问，可通过联系邮箱 292055066@qq.com 与我们联系。"
+          ]
+        },
+        {
+          title: "四、SEO/GEO 巡检数据与留存",
+          paragraphs: [
+            "为创建任务、限制匿名滥用、生成和交付报告、处理售后及保障服务安全，巡检服务可能保存用户提交的目标网址、公开网页抓取证据、任务状态、哈希处理的 IP、浏览器信息、订单关联和生成的报告。哈希 IP 用于限额与安全判断，不在巡检页面公开展示。",
+            "巡检报告文件默认保留 180 天，届满后可删除或匿名化；页面另有更短期限提示的，以该提示为准。订单、支付、退款和必要审计记录可能依据法律、财务及争议处理要求保留更长时间，不随报告文件一并删除。",
+            "用户不应提交登录凭据、后台地址、个人敏感信息或非公开数据。目标公开站点被抓取时，其自身公开内容仍受对应权利人规则和适用法律约束。"
           ]
         }
       ]
@@ -169,6 +185,13 @@ const legalPageMap: Record<Locale, Record<LegalSlug, LegalPage>> = {
             "本声明不排除、不限制用户依法享有的消费者权益，也不免除本网站依法应承担的责任。如本声明部分条款被认定为无效，不影响其他条款的效力。"
           ]
         },
+        {
+          title: "SEO/GEO 巡检结果说明",
+          paragraphs: [
+            "巡检报告基于检查时可访问的公开内容、规则版本和自动化分析生成，仅提供问题线索、证据与改进建议，不替代搜索引擎、AI 平台或人工专业判断。",
+            "本网站不保证搜索排名、搜索引擎收录或 AI 引用，也不保证实施建议后一定获得流量、转化或收入。搜索引擎及 AI 平台可能随时调整规则，用户应结合自身业务复核后再实施。"
+          ]
+        },
         { title: "十一、规则更新", paragraphs: ["本网站有权根据法律法规变化、业务调整及运营需要更新本声明。更新后的声明将在网站相关页面公示，并自公示之日起生效。用户继续使用本网站服务的，视为接受更新后的声明。"] },
         { title: "十二、联系方式", paragraphs: ["如您对本声明、用户权益、版权投诉、未成年人付费、隐私保护或服务使用有任何问题，可通过以下方式联系我们：联系邮箱：292055066@qq.com。", "网站名称：恩禾 ENHE AI工具站。网站域名：www.enhe-tech.com.cn。"] }
       ]
@@ -180,7 +203,9 @@ const legalPageMap: Record<Locale, Record<LegalSlug, LegalPage>> = {
       sections: [
         { title: "一、会员服务说明", paragraphs: ["本网站可能提供 VIP 会员服务。会员权益、有效期、价格、开通方式、适用范围、退款规则等，以网站页面公示的会员服务规则为准。", "本网站当前可能采用个人收款码、订单号备注、付款截图上传、后台人工审核等方式完成会员开通。用户付款时应仔细核对订单号、金额、套餐内容及收款信息。"] },
         { title: "二、付款凭证与审核", paragraphs: ["用户付款后，应按照页面提示上传付款凭证。经后台审核确认后，本网站将为对应账号开通相应会员权益。将在2个小时完成审核。", "因用户未备注订单号、付款账号不一致、截图不清晰、重复付款、错误付款或其他原因导致无法核验的，用户应及时联系本站处理。"] },
-        { title: "三、退款处理", paragraphs: ["会员服务属于数字化服务或虚拟权益服务。已经完成开通、下载或实际使用的服务，除法律法规另有规定或本站明确承诺外，原则上不支持无理由退款。", "如因重复付款、错误付款、未开通且可核验、未成年人未经监护人同意付费等情况需要处理，可通过联系邮箱 292055066@qq.com 提交订单号、支付凭证、账号信息和必要说明，本站将在核实后依法依规处理。"] }
+        { title: "三、退款处理", paragraphs: ["会员服务属于数字化服务或虚拟权益服务。已经完成开通、下载或实际使用的服务，除法律法规另有规定或本站明确承诺外，原则上不支持无理由退款。", "如因重复付款、错误付款、未开通且可核验、未成年人未经监护人同意付费等情况需要处理，可通过联系邮箱 292055066@qq.com 提交订单号、支付凭证、账号信息和必要说明，本站将在核实后依法依规处理。"] },
+        { title: "四、巡检报告交付与退款边界", paragraphs: ["SEO/GEO 巡检属于数字化报告服务。任务完成且报告已在账号内开放查看或下载，视为完成主要交付；用户已消耗的巡检次数或已交付报告，除报告无法访问、服务重大故障、重复付款、法律法规另有规定或页面明确承诺外，原则上不支持无理由退款。", "任务因本站系统原因未开始、长期失败且无法重试，或付款后未获得约定权益的，用户可提交订单号和任务编号申请核验。退款获批后，对应未使用次数、监控权益及报告访问权可被撤销；已发生的支付、退款和审计记录依法保留。"] },
+        { title: "五、持续监控续购", paragraphs: ["持续监控是 30 天服务包，绑定一个规范化站点和一个可编辑计划，具体运行次数以购买页面公示权益为准。", "持续监控到期后需用户手动续购，本网站不会自动扣款。未续购时计划停止执行；续购成功后按新服务期恢复相应权益。"] }
       ]
     },
     "copyright-complaint": {
@@ -230,6 +255,14 @@ const legalPageMap: Record<Locale, Record<LegalSlug, LegalPage>> = {
             "Text, images, screenshots, comments, feedback, files, and other content submitted by users must come from lawful sources and must not infringe any third-party rights.",
             "User-submitted content does not represent the position of this website. The website may review, delete, hide, restrict display of, or otherwise manage user-submitted content and comments when necessary."
           ]
+        },
+        {
+          title: "4. SEO/GEO Audit Authorization and Use Boundaries",
+          paragraphs: [
+            "A user submitting a site for an SEO/GEO audit must own or administer the site, or have lawful authorization from the rights holder, and confirms that they have the right to submit and authorize inspection of the public site.",
+            "The audit accesses only publicly available pages, sitemaps, robots.txt files, and related public resources on a read-only basis. It does not log into or modify the target site. Prohibited uses include probing non-public systems, bypassing access controls, abusive or high-frequency crawling, attacks, infringement, or any unlawful activity.",
+            "We may reject, pause, or terminate a task and retain necessary records if the user lacks authority or the use may harm the target site, third-party rights, or network security."
+          ]
         }
       ]
     },
@@ -257,6 +290,14 @@ const legalPageMap: Record<Locale, Record<LegalSlug, LegalPage>> = {
           paragraphs: [
             "We will use reasonable technical and administrative measures to protect user information, but the internet environment is not absolutely secure.",
             "For privacy protection, correction, or deletion requests, please contact us at 292055066@qq.com."
+          ]
+        },
+        {
+          title: "4. SEO/GEO Audit Data and Retention",
+          paragraphs: [
+            "To create tasks, limit anonymous abuse, generate and deliver reports, provide support, and protect service security, the audit service may retain the submitted target URL, public crawl evidence, task status, hashed IP, browser information, order linkage, and generated reports. Hashed IP data is used for limits and security decisions and is not displayed publicly on audit pages.",
+            "Audit report files are retained for 180 days by default and may then be deleted or anonymized; a shorter period displayed on the relevant page takes precedence. Order, payment, refund, and necessary audit records may be retained longer for legal, financial, and dispute-handling purposes and are not deleted with report files.",
+            "Users must not submit login credentials, administrative URLs, sensitive personal information, or non-public data. Public content collected from a target site remains subject to the rights holder's rules and applicable law."
           ]
         }
       ]
@@ -346,6 +387,13 @@ const legalPageMap: Record<Locale, Record<LegalSlug, LegalPage>> = {
             "This statement does not exclude or limit consumer rights users are entitled to by law, nor does it exempt the website from responsibilities it must legally bear. If any provision is deemed invalid, the remaining provisions remain effective."
           ]
         },
+        {
+          title: "SEO/GEO Audit Result Notice",
+          paragraphs: [
+            "Audit reports are generated from public content available at the time of inspection, the applicable ruleset, and automated analysis. They provide issue leads, evidence, and recommendations and do not replace decisions by search engines, AI platforms, or qualified human professionals.",
+            "The service does not guarantee search rankings, search-engine indexing, or AI citations, nor does it guarantee traffic, conversions, or revenue after recommendations are applied. Search engines and AI platforms may change their rules at any time, and users should review recommendations in the context of their own business before implementation."
+          ]
+        },
         { title: "11. Updates", paragraphs: ["We may update this statement due to changes in laws and regulations, business adjustments, or operational needs. Updated terms will be displayed on the relevant website pages and take effect from the date of publication. Continued use of the website indicates acceptance of the updated statement."] },
         { title: "12. Contact", paragraphs: ["For questions about this statement, user rights, copyright complaints, minor payments, privacy protection, or service usage, contact us at 292055066@qq.com.", "Website name: ENHE AI Tools. Domain: www.enhe-tech.com.cn."] }
       ]
@@ -357,7 +405,9 @@ const legalPageMap: Record<Locale, Record<LegalSlug, LegalPage>> = {
       sections: [
         { title: "1. Membership Services", paragraphs: ["The website may provide VIP membership services. Benefits, validity periods, prices, activation methods, scope, and refund rules are subject to the membership rules displayed on the website.", "The current version may use personal payment QR codes, order number remarks, payment screenshot uploads, and manual backend review to activate membership. Users should carefully verify the order number, amount, plan details, and recipient information before paying."] },
         { title: "2. Payment Proof and Review", paragraphs: ["After payment, users should upload payment proof as instructed. After backend approval, the corresponding membership benefits will be activated for the account. Review will be completed within 2 hours.", "If verification fails due to missing order remarks, inconsistent payer accounts, unclear screenshots, duplicate payments, incorrect payments, or other reasons, users should contact us promptly."] },
-        { title: "3. Refund Handling", paragraphs: ["Membership services are digital services or virtual benefits. Once activated, downloaded, or actually used, they generally do not support no-reason refunds unless otherwise required by law or expressly promised by the website.", "For duplicate payments, incorrect payments, unactivated and verifiable orders, or payments made by minors without guardian consent, please email 292055066@qq.com with the order number, payment proof, account information, and necessary explanation. We will handle the matter after verification according to applicable laws and rules."] }
+        { title: "3. Refund Handling", paragraphs: ["Membership services are digital services or virtual benefits. Once activated, downloaded, or actually used, they generally do not support no-reason refunds unless otherwise required by law or expressly promised by the website.", "For duplicate payments, incorrect payments, unactivated and verifiable orders, or payments made by minors without guardian consent, please email 292055066@qq.com with the order number, payment proof, account information, and necessary explanation. We will handle the matter after verification according to applicable laws and rules."] },
+        { title: "4. Audit Report Delivery and Refund Boundaries", paragraphs: ["An SEO/GEO audit is a digital report service. The primary delivery is complete when a finished report is available to view or download in the user's account. A consumed audit run or delivered digital report generally does not qualify for a no-reason refund unless the report is inaccessible, the service has a material failure, payment was duplicated, applicable law requires otherwise, or the purchase page expressly promises a refund.", "If a task does not start, repeatedly fails for reasons attributable to our system and cannot be retried, or the paid entitlement is not granted, the user may submit the order and task identifiers for review. Once a refund is approved, unused runs, monitoring entitlements, and report access may be revoked; payment, refund, and audit records are retained as required by law."] },
+        { title: "5. Continuous Monitoring Renewal", paragraphs: ["Continuous monitoring is a 30-day service package tied to one normalized site and one editable schedule. The included run limits are those displayed on the purchase page.", "Renewal is manual and there is no automatic debit. The schedule stops when the service expires; the corresponding entitlement resumes for a new service period after a successful manual renewal."] }
       ]
     },
     "copyright-complaint": {

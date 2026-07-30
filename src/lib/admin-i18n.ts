@@ -11,6 +11,7 @@ export const adminDictionaries = {
     },
     nav: {
       dashboard: "数据看板",
+      seoAudit: "SEO/GEO 巡检",
       seoInsights: "SEO 洞察",
       geoMonitoring: "GEO 监控中心",
       manuals: "操作说明",
@@ -112,6 +113,7 @@ export const adminDictionaries = {
     },
     nav: {
       dashboard: "Dashboard",
+      seoAudit: "SEO/GEO audits",
       seoInsights: "SEO insights",
       geoMonitoring: "GEO monitoring",
       manuals: "Operation manuals",

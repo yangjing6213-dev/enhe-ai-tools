@@ -179,7 +179,7 @@ function buildInstructions() {
   return [
     "Edit the manual validation input JSON under reports/ebos/validation/inputs.",
     "For each result, keep planId unchanged and set status to not_started, running, completed, or skipped.",
-    "Record only observed metrics: ctaClicks, leads, presaleOrders, paidOrders, revenue, refunds, replies, feedback, and notes.",
+    "Record only observed metrics, including completed scans, channel and total spend, paid orders, refunds, factual checks, delivery risks, feedback, and notes.",
     "Leave unknown fields empty; EBOS must not fabricate clicks, leads, orders, or revenue.",
     "Run scripts/generate-ebos-validation-report.ts after manual results are recorded."
   ];
@@ -196,6 +196,13 @@ function buildManualInputSchema(plans: EbosValidationPlanTracker[]) {
       "paidOrders",
       "revenue",
       "refundCount",
+      "completedScans",
+      "channelSpend",
+      "totalValidationSpend",
+      "factualErrorCount",
+      "factCheckedItems",
+      "undeliveredPaidOrders",
+      "pendingRefundOrders",
       "manualOutreachCount",
       "positiveReplies",
       "negativeReplies"

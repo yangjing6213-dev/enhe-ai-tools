@@ -2,15 +2,34 @@
 
 import { useEffect } from "react";
 import { usePathname } from "next/navigation";
+import {
+  getPageViewEventName,
+  isClientWritableAnalyticsEventName,
+  normalizeAnalyticsPublicPath,
+} from "@/lib/analytics-client";
 import { classifyTrafficSource, getSeoContentType, isSeoTrackablePath } from "@/lib/seo-insights";
 
-type AnalyticsPayload = {
+export type ClientAnalyticsPayload = {
   eventName: string;
   path?: string;
   entityType?: string;
   entityId?: string;
   metadata?: Record<string, string | number | boolean | null | undefined>;
+  context?: AnalyticsContext;
 };
+
+type AnalyticsContext = {
+  clientId: string;
+  sessionId: string;
+  source?: string;
+  medium?: string;
+  campaign?: string;
+  offerId?: string;
+};
+
+const analyticsClientIdKey = "enhe_analytics_client_id";
+const analyticsSessionIdKey = "enhe_analytics_session_id";
+const analyticsAttributionKey = "enhe_analytics_attribution";
 
 export function AnalyticsTracker() {
   const pathname = usePathname();
@@ -27,6 +46,14 @@ export function AnalyticsTracker() {
         eventName: "seo_landing_view",
         path: pathname ?? window.location.pathname,
         metadata: seoMetadata
+      });
+    }
+
+    if (isSeoAuditLandingPath(pathname)) {
+      sendAnalyticsEvent({
+        eventName: "seo_audit_landing_view",
+        path: pathname ?? window.location.pathname,
+        entityType: "seo_audit_product"
       });
     }
   }, [pathname]);
@@ -57,24 +84,8 @@ export function AnalyticsTracker() {
   return null;
 }
 
-function getPageViewEventName(pathname: string | null) {
-  const path = (pathname ?? "/").replace(/\/+$/, "") || "/";
-  if (path === "/") return "visit_home";
-  if (path === "/pricing") return "view_pricing";
-  if (path === "/user") return "view_user_center";
-  if (
-    path.startsWith("/software/") ||
-    path.startsWith("/skill-learning/") ||
-    path.startsWith("/account-services/") ||
-    path.startsWith("/tools/")
-  ) {
-    return "view_tool";
-  }
-  return null;
-}
-
 function getSeoLandingMetadata(pathname: string | null) {
-  const path = normalizePublicPath(pathname ?? window.location.pathname);
+  const path = normalizeAnalyticsPublicPath(pathname ?? window.location.pathname);
   const contentType = getSeoContentType(path);
   if (!isSeoTrackablePath(path)) return null;
 
@@ -94,10 +105,11 @@ function getSeoLandingMetadata(pathname: string | null) {
   };
 }
 
-function normalizePublicPath(pathname: string) {
-  const rawPath = String(pathname || "/").split("?")[0].replace(/\/+$/, "") || "/";
-  if (rawPath === "/en") return "/";
-  return rawPath.replace(/^\/en(?=\/)/, "") || "/";
+export function isSeoAuditLandingPath(pathname: string | null) {
+  const path = normalizeAnalyticsPublicPath(pathname ?? "/");
+  return path === "/seo-geo-audit"
+    || path === "/tools/seo-geo-audit"
+    || path === "/online-tools/seo-geo-audit";
 }
 
 function collectAnalyticsMetadata(element: HTMLElement) {
@@ -110,9 +122,14 @@ function collectAnalyticsMetadata(element: HTMLElement) {
   return Object.keys(metadata).length ? metadata : undefined;
 }
 
-function sendAnalyticsEvent(payload: AnalyticsPayload) {
-  if (!payload.eventName) return;
-  const body = JSON.stringify(payload);
+export function trackClientAnalyticsEvent(payload: ClientAnalyticsPayload) {
+  sendAnalyticsEvent(payload);
+}
+
+function sendAnalyticsEvent(payload: ClientAnalyticsPayload) {
+  if (!isClientWritableAnalyticsEventName(payload.eventName)) return;
+  const context = getAnalyticsContext(payload);
+  const body = JSON.stringify({ ...payload, context });
   if (navigator.sendBeacon) {
     const blob = new Blob([body], { type: "application/json" });
     navigator.sendBeacon("/api/analytics", blob);
@@ -125,4 +142,61 @@ function sendAnalyticsEvent(payload: AnalyticsPayload) {
     body,
     keepalive: true
   }).catch(() => undefined);
+}
+
+function getAnalyticsContext(payload: ClientAnalyticsPayload): AnalyticsContext {
+  const attribution = getSessionAttribution();
+  const offerId = readMetadataString(payload.metadata, "offerId")
+    ?? readMetadataString(payload.metadata, "offerid")
+    ?? (payload.entityType === "seo_audit_offer" ? payload.entityId : undefined);
+  return {
+    clientId: getOrCreateStorageId("local", analyticsClientIdKey),
+    sessionId: getOrCreateStorageId("session", analyticsSessionIdKey),
+    ...attribution,
+    ...(offerId ? { offerId } : {})
+  };
+}
+
+function getSessionAttribution(): Pick<AnalyticsContext, "source" | "medium" | "campaign"> {
+  try {
+    const stored = window.sessionStorage.getItem(analyticsAttributionKey);
+    if (stored) return JSON.parse(stored) as Pick<AnalyticsContext, "source" | "medium" | "campaign">;
+
+    const traffic = classifyTrafficSource({ pageUrl: window.location.href, referrer: document.referrer });
+    const attribution = {
+      source: traffic.utmSource ?? traffic.source,
+      medium: traffic.utmMedium ?? traffic.medium,
+      ...(traffic.utmCampaign ? { campaign: traffic.utmCampaign } : {})
+    };
+    window.sessionStorage.setItem(analyticsAttributionKey, JSON.stringify(attribution));
+    return attribution;
+  } catch {
+    return {};
+  }
+}
+
+function getOrCreateStorageId(storage: "local" | "session", key: string) {
+  const fallback = createAnalyticsId();
+  try {
+    const target = storage === "local" ? window.localStorage : window.sessionStorage;
+    const existing = target.getItem(key);
+    if (existing) return existing;
+    target.setItem(key, fallback);
+  } catch {
+    return fallback;
+  }
+  return fallback;
+}
+
+function createAnalyticsId() {
+  return globalThis.crypto?.randomUUID?.()
+    ?? `${Date.now().toString(36)}-${Math.random().toString(36).slice(2)}`;
+}
+
+function readMetadataString(
+  metadata: ClientAnalyticsPayload["metadata"],
+  key: string
+) {
+  const value = metadata?.[key];
+  return typeof value === "string" && value.trim() ? value.trim() : undefined;
 }

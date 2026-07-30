@@ -264,6 +264,13 @@ function normalizeSingleResult(item: unknown): EbosValidationResultInput | null 
   assignNumber(result, "paidOrders", raw.paidOrders);
   assignNumber(result, "revenue", raw.revenue);
   assignNumber(result, "refundCount", raw.refundCount);
+  assignNumber(result, "completedScans", raw.completedScans);
+  assignNumber(result, "channelSpend", raw.channelSpend);
+  assignNumber(result, "totalValidationSpend", raw.totalValidationSpend);
+  assignNumber(result, "factualErrorCount", raw.factualErrorCount);
+  assignNumber(result, "factCheckedItems", raw.factCheckedItems);
+  assignNumber(result, "undeliveredPaidOrders", raw.undeliveredPaidOrders);
+  assignNumber(result, "pendingRefundOrders", raw.pendingRefundOrders);
   assignString(result, "priceShown", raw.priceShown);
   assignNumber(result, "manualOutreachCount", raw.manualOutreachCount);
   assignNumber(result, "outreachCount", raw.outreachCount);
@@ -339,6 +346,7 @@ function assignChannelResults(target: EbosValidationResultInput, value: unknown)
     const result: NonNullable<EbosValidationResultInput["channelResults"]>[number] = {
       channel: raw.channel
     };
+    assignNumber(result, "spend", raw.spend);
     assignString(result, "metricLabel", raw.metricLabel);
     assignNumber(result, "metricValue", raw.metricValue);
     assignNumber(result, "ctaClicks", raw.ctaClicks);

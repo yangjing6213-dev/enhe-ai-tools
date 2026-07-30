@@ -17,6 +17,7 @@ import { getNotificationDisplay } from "@/lib/notification-display";
 import { canUserCancelOrder } from "@/lib/order-rules";
 import { buildCanonicalToolPath } from "@/lib/public-slugs";
 import { reviewCompletionNotice, reviewCompletionNoticeEn } from "@/lib/review-copy";
+import { buildLocalePath } from "@/lib/seo";
 import { buildUserToolEntitlements, type UserEntitlementTool } from "@/lib/user-entitlements";
 import { formatCurrency } from "@/lib/utils";
 
@@ -99,6 +100,14 @@ export async function UserCenterPageShell({
         </form>
       </div>
       {orderMessage ? <p className="status-success mb-6">{orderMessage}</p> : null}
+      <div className="mb-6 flex flex-wrap gap-3">
+        <Link
+          href={buildCanonicalUserSeoAuditPath(locale)}
+          className="rounded-md bg-[var(--marketing-accent)] px-4 py-2 text-sm font-bold text-[#050505]"
+        >
+          {locale === "en" ? "SEO/GEO audit workspace" : "SEO/GEO 巡检工作台"}
+        </Link>
+      </div>
 
       <div className="grid gap-6 lg:grid-cols-[320px_1fr]">
         <aside className="space-y-4">
@@ -416,4 +425,8 @@ function formatLegacyPlanName(locale: Locale) {
 
 function getReviewNotice(locale: Locale) {
   return locale === "en" ? reviewCompletionNoticeEn : reviewCompletionNotice;
+}
+
+function buildCanonicalUserSeoAuditPath(locale: Locale) {
+  return buildLocalePath("/user/seo-audit", locale);
 }

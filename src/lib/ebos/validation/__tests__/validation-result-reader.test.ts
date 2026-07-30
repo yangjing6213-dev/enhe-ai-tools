@@ -92,6 +92,34 @@ describe("validation result reader", () => {
     expect(normalized.results[0]?.leads).toBeUndefined();
   });
 
+  test("normalizes SEO audit first-week validation fields", () => {
+    const normalized = normalizeValidationResultInput({
+      results: [{
+        planId: "validation-product-seo-geo-audit",
+        status: "completed",
+        completedScans: "50",
+        channelSpend: "21",
+        totalValidationSpend: 35,
+        factualErrorCount: 1,
+        factCheckedItems: 20,
+        undeliveredPaidOrders: 0,
+        pendingRefundOrders: 0,
+        channelResults: [{ channel: "xiaohongshu", spend: "12.5" }]
+      }]
+    });
+
+    expect(normalized.results[0]).toMatchObject({
+      completedScans: 50,
+      channelSpend: 21,
+      totalValidationSpend: 35,
+      factualErrorCount: 1,
+      factCheckedItems: 20,
+      undeliveredPaidOrders: 0,
+      pendingRefundOrders: 0,
+      channelResults: [{ channel: "xiaohongshu", spend: 12.5 }]
+    });
+  });
+
   test("returns warning for corrupted JSON instead of throwing", async () => {
     const filePath = await tempFile("{bad json");
 

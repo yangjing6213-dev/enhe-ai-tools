@@ -11,8 +11,13 @@ import type {
   EbosRevenueRefundRecord,
   EbosRevenueSummary
 } from "./revenue-evidence-types";
+import {
+  isCompletedRefund,
+  isCountableRevenueOrder,
+  isUndeliveredPaidRevenueOrder
+} from "./revenue-order-qualification";
 
-const ORDER_FIELDS = ["id", "orderNo", "toolId", "toolPriceSpecId", "amount", "orderStatus", "paidAt", "createdAt"];
+const ORDER_FIELDS = ["id", "orderNo", "toolId", "toolPriceSpecId", "amount", "orderStatus", "isTestData", "paidAt", "activatedAt", "createdAt"];
 const REFUND_FIELDS = ["id", "orderId", "amount", "status", "createdAt", "completedAt"];
 const PRODUCT_FIELDS = ["id", "slug", "name", "englishName", "isDownloadPaid", "downloadPrice", "downloadFileId", "onlineUrl", "priceSpecs", "faqs"];
 const ATTRIBUTION_FIELDS = ["toolId", "tool.id", "tool.slug", "tool.name"];
@@ -44,12 +49,20 @@ export async function auditRevenueDatabase(
       "internal_database"
     ));
 
-    const orders = rawOrders.map(normalizeOrder);
     const refunds = normalizeRefunds(rawRefunds, rawOrders);
+    const orders = mergeRefundsIntoOrders(rawOrders.map(normalizeOrder), refunds);
     const products = rawProducts.map(normalizeProduct);
-    const refundedAmount = sum(refunds.filter((refund) => refund.status !== "rejected").map((refund) => refund.amount));
+    const nonTestOrderIds = new Set(orders
+      .filter((order) => order.isTestData !== true)
+      .map((order) => order.id));
+    const completedRefunds = refunds.filter((refund) =>
+      refund.status === "completed"
+      && Boolean(refund.orderId)
+      && nonTestOrderIds.has(refund.orderId!)
+    );
+    const refundedAmount = sum(completedRefunds.map((refund) => refund.amount));
     const orderSummary = summarizeOrders(orders, periodStart, periodEnd);
-    const refundSummary = summarizeRefunds(refunds, refundedAmount, grossRevenue(orders), periodStart, periodEnd);
+    const refundSummary = summarizeRefunds(completedRefunds, refundedAmount, orders, periodStart, periodEnd);
     const revenueSummary = summarizeRevenue(orders, refundedAmount);
 
     return {
@@ -192,7 +205,19 @@ function productQueryArgs() {
 function normalizeOrder(value: unknown): EbosRevenueOrderRecord {
   const row = asRecord(value) ?? {};
   const tool = asRecord(row.tool);
+  const paymentTransaction = asRecord(row.paymentTransaction);
+  const paymentProof = asRecord(row.paymentProof);
   const refundRecords = arrayFrom(row.refundRecords);
+  const status = readString(row.orderStatus) ?? readString(row.status);
+  const activatedAt = toIso(row.activatedAt);
+  const paidAt = toIso(row.paidAt) ?? toIso(paymentTransaction?.paidAt);
+  const hasPendingRefund = refundRecords.some((refund) => readString(asRecord(refund)?.status) === "pending");
+  const hasCompletedRefund = status === "refunded"
+    || readString(paymentTransaction?.status) === "refunded"
+    || refundRecords.some((refund) => readString(asRecord(refund)?.status) === "completed");
+  const paymentSucceeded = readString(paymentTransaction?.status) === "paid"
+    || readString(paymentProof?.reviewStatus) === "approved"
+    || (status === "activated" && Boolean(paidAt));
 
   return {
     id: readString(row.id) ?? "unknown-order",
@@ -202,11 +227,18 @@ function normalizeOrder(value: unknown): EbosRevenueOrderRecord {
     productSlug: readString(tool?.slug),
     productName: readString(tool?.name) ?? readString(tool?.englishName),
     amount: readMoney(row.amount),
-    status: readString(row.orderStatus) ?? readString(row.status),
+    status,
     orderType: readString(row.orderType),
-    paidAt: toIso(row.paidAt),
+    paidAt,
     createdAt: toIso(row.createdAt),
-    refundedAmount: sum(refundRecords.map((refund) => readMoney(asRecord(refund)?.amount)))
+    isTestData: row.isTestData === true,
+    paymentSucceeded,
+    delivered: status === "activated" && Boolean(activatedAt),
+    hasPendingRefund,
+    hasCompletedRefund,
+    refundedAmount: sum(refundRecords
+      .filter((refund) => readString(asRecord(refund)?.status) === "completed")
+      .map((refund) => readMoney(asRecord(refund)?.amount)))
   };
 }
 
@@ -235,6 +267,28 @@ function normalizeRefund(value: unknown): EbosRevenueRefundRecord {
   };
 }
 
+function mergeRefundsIntoOrders(
+  orders: EbosRevenueOrderRecord[],
+  refunds: EbosRevenueRefundRecord[]
+) {
+  return orders.map((order) => {
+    const orderRefunds = refunds.filter((refund) => refund.orderId === order.id);
+    if (orderRefunds.length === 0) return order;
+    const completedAmount = sum(orderRefunds
+      .filter((refund) => refund.status === "completed")
+      .map((refund) => refund.amount));
+
+    return {
+      ...order,
+      hasPendingRefund: order.hasPendingRefund === true
+        || orderRefunds.some((refund) => refund.status === "pending"),
+      hasCompletedRefund: order.hasCompletedRefund === true
+        || orderRefunds.some((refund) => refund.status === "completed"),
+      refundedAmount: Math.max(order.refundedAmount ?? 0, completedAmount)
+    };
+  });
+}
+
 function normalizeProduct(value: unknown): EbosRevenueProductRecord {
   const row = asRecord(value) ?? {};
   return {
@@ -260,13 +314,16 @@ function summarizeOrders(
 
   return {
     totalOrders: orders.length,
-    paidOrders: orders.filter((order) => isPaidStatus(order.status)).length,
+    paidOrders: orders.filter(isCountableRevenueOrder).length,
     pendingOrders: orders.filter((order) => isPendingStatus(order.status)).length,
     unpaidOrders: orders.filter((order) => isUnpaidStatus(order.status)).length,
     cancelledOrders: orders.filter((order) => isCancelledStatus(order.status)).length,
-    refundedOrders: orders.filter((order) => order.status === "refunded").length,
+    refundedOrders: orders.filter((order) => order.isTestData !== true && isCompletedRefund(order)).length,
+    pendingRefundOrders: orders.filter((order) => order.isTestData !== true && order.hasPendingRefund === true).length,
+    undeliveredPaidOrders: orders.filter(isUndeliveredPaidRevenueOrder).length,
+    testOrdersExcluded: orders.filter((order) => order.isTestData === true).length,
     currentPeriodOrders: orders.filter((order) => inPeriod(order.createdAt, periodStart, periodEnd)).length,
-    currentPeriodPaidOrders: orders.filter((order) => isPaidStatus(order.status) && inPeriod(order.paidAt ?? order.createdAt, periodStart, periodEnd)).length,
+    currentPeriodPaidOrders: orders.filter((order) => isCountableRevenueOrder(order) && inPeriod(order.paidAt ?? order.createdAt, periodStart, periodEnd)).length,
     conversionEvidenceAvailable: orders.length > 0,
     orderStatusBreakdown: breakdown
   };
@@ -275,12 +332,14 @@ function summarizeOrders(
 function summarizeRefunds(
   refunds: EbosRevenueRefundRecord[],
   refundedAmount: number,
-  gross: number,
+  orders: EbosRevenueOrderRecord[],
   periodStart?: Date,
   periodEnd?: Date
 ): EbosRefundSummary {
-  const refundRate = gross > 0 ? round(refundedAmount / gross, 4) : 0;
-  const refundRisks = refundRate > 0.2 ? ["Refund rate is higher than 20%."] : [];
+  const refundedOrderIds = new Set(refunds.map((refund) => refund.orderId).filter(Boolean));
+  const purchaseBase = orders.filter(isCountableRevenueOrder).length + refundedOrderIds.size;
+  const refundRate = purchaseBase > 0 ? round(refundedOrderIds.size / purchaseBase, 4) : 0;
+  const refundRisks = refundRate > 0.1 ? ["Refund rate is higher than 10%."] : [];
   return {
     totalRefunds: refunds.length,
     currentPeriodRefunds: refunds.filter((refund) => inPeriod(refund.completedAt ?? refund.createdAt, periodStart, periodEnd)).length,
@@ -294,9 +353,9 @@ function summarizeRevenue(
   orders: EbosRevenueOrderRecord[],
   refundedAmount: number
 ): EbosRevenueSummary {
-  const paidOrders = orders.filter((order) => isPaidStatus(order.status));
+  const paidOrders = orders.filter(isCountableRevenueOrder);
   const gross = grossRevenue(orders);
-  const net = Math.max(0, round(gross - refundedAmount));
+  const net = gross;
   const paidDates = paidOrders
     .map((order) => order.paidAt)
     .filter((date): date is string => Boolean(date))
@@ -373,6 +432,9 @@ function emptyOrderSummary(): EbosOrderSummary {
     unpaidOrders: 0,
     cancelledOrders: 0,
     refundedOrders: 0,
+    pendingRefundOrders: 0,
+    undeliveredPaidOrders: 0,
+    testOrdersExcluded: 0,
     currentPeriodOrders: 0,
     currentPeriodPaidOrders: 0,
     conversionEvidenceAvailable: false,
@@ -391,11 +453,7 @@ function emptyRefundSummary(): EbosRefundSummary {
 }
 
 function grossRevenue(orders: EbosRevenueOrderRecord[]) {
-  return round(sum(orders.filter((order) => isPaidStatus(order.status)).map((order) => order.amount)));
-}
-
-function isPaidStatus(status: string | undefined) {
-  return status === "paid" || status === "activated" || status === "refunded";
+  return round(sum(orders.filter(isCountableRevenueOrder).map((order) => order.amount)));
 }
 
 function isPendingStatus(status: string | undefined) {

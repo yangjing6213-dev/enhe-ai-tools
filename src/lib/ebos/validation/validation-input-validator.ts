@@ -35,6 +35,13 @@ const NUMERIC_FIELDS = [
   "paidOrders",
   "revenue",
   "refundCount",
+  "completedScans",
+  "channelSpend",
+  "totalValidationSpend",
+  "factualErrorCount",
+  "factCheckedItems",
+  "undeliveredPaidOrders",
+  "pendingRefundOrders",
   "manualOutreachCount",
   "outreachCount",
   "positiveReplies",
@@ -180,6 +187,10 @@ function collectSinglePlanWarnings(raw: Record<string, unknown>): EbosValidation
   const revenue = readNumber(raw.revenue);
   const refundCount = readNumber(raw.refundCount);
   const conversionRate = readNumber(raw.conversionRate);
+  const factualErrorCount = readNumber(raw.factualErrorCount);
+  const factCheckedItems = readNumber(raw.factCheckedItems);
+  const channelSpend = readNumber(raw.channelSpend);
+  const totalValidationSpend = readNumber(raw.totalValidationSpend);
 
   if ((revenue ?? 0) > 0 && (paidOrders ?? 0) === 0) {
     warnings.push(issue(
@@ -206,6 +217,24 @@ function collectSinglePlanWarnings(raw: Record<string, unknown>): EbosValidation
       "refundCount is greater than paidOrders; verify order and refund records.",
       planId,
       "refundCount"
+    ));
+  }
+  if ((factualErrorCount ?? 0) > (factCheckedItems ?? 0)) {
+    warnings.push(issue(
+      "validation_factual_errors_exceed_checked_items",
+      "warning",
+      "factualErrorCount is greater than factCheckedItems; verify the review sample.",
+      planId,
+      "factualErrorCount"
+    ));
+  }
+  if (channelSpend !== undefined && totalValidationSpend !== undefined && channelSpend > totalValidationSpend) {
+    warnings.push(issue(
+      "validation_channel_spend_exceeds_total_spend",
+      "warning",
+      "channelSpend is greater than totalValidationSpend; verify validation costs.",
+      planId,
+      "totalValidationSpend"
     ));
   }
   if ((leads ?? 0) > (ctaClicks ?? 0)) {

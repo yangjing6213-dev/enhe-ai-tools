@@ -7,6 +7,7 @@ describe("admin i18n", () => {
 
     expect(t.layout.title).toBe("后台管理");
     expect(t.nav.dashboard).toBe("数据看板");
+    expect(t.nav.seoAudit).toBe("SEO/GEO 巡检");
     expect(t.dashboard.title).toBe("数据看板");
     expect(t.dashboard.stats.paidRevenue).toBe("实收金额");
   });
@@ -16,6 +17,7 @@ describe("admin i18n", () => {
 
     expect(t.layout.title).toBe("Admin");
     expect(t.nav.dashboard).toBe("Dashboard");
+    expect(t.nav.seoAudit).toBe("SEO/GEO audits");
     expect(t.dashboard.title).toBe("Admin dashboard");
     expect(t.dashboard.stats.paidRevenue).toBe("Paid revenue");
   });

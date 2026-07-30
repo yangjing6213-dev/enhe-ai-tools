@@ -5,8 +5,11 @@ import { join } from "node:path";
 import { revalidatePath, revalidateTag } from "next/cache";
 import { redirect } from "next/navigation";
 import { z } from "zod";
-import type { Prisma, Order, PaymentTransaction } from "@prisma/client";
-import { getAdminAuditRequestContext, writeAdminAuditLog } from "@/lib/admin-audit";
+import { Prisma } from "@prisma/client";
+import {
+  getAdminAuditRequestContext,
+  writeAdminAuditLog,
+} from "@/lib/admin-audit";
 import {
   deleteOrderForAdmin,
   deleteToolForAdmin,
@@ -23,25 +26,31 @@ import {
 } from "@/lib/admin-form";
 import { parseNewsRelationIds, resolveAiNewsCanonicalSlug, resolveNewsSlug } from "@/lib/ai-news";
 import { hashPassword, requireAdmin } from "@/lib/auth";
-import { getOrderTimestampPatch } from "@/lib/admin-order";
+import {
+  createRefundRecordForAdmin,
+  prepareRefundExecutionForAdmin,
+  rejectRefundRecordForAdmin,
+  updateOrderForAdmin,
+} from "@/lib/admin-order-mutations";
 import { sendRefundProcessedAdminEmail } from "@/lib/admin-email-notifications";
 import { getAdminToolBasePath, getAdminToolEditPath } from "@/lib/admin-tool-routes";
 import { buildAiNewsImportPayloadFromHtml } from "@/lib/ai-news-html-import";
 import { importAiNewsArticle } from "@/lib/ai-news-import";
 import { notifyBaiduSearch } from "@/lib/baidu-push";
 import { notifyIndexNow } from "@/lib/indexnow";
-import { revokeEntitlementsForRefundedOrder } from "@/lib/membership";
 import { createLicenseCode, createLumiLicenseCode, isUnlimitedLicenseKeyValid, normalizeLumiMachineCode, parseLicenseCode, parseLumiLicenseCodePayload } from "@/lib/license-generator";
 import type { LicenseGeneratorActionState } from "@/lib/license-generator-action-state";
 import { isLikelyUploadableImage } from "@/lib/media";
 import { buildRefundProcessedNotification } from "@/lib/notification-messages";
 import { createUserNotification } from "@/lib/notifications";
 import {
-  assertAdminOrderStatusUpdateAllowed,
-  canRecordRefundForOrder,
-  getRefundStatusPatch,
-  normalizeRefundRecordAmount
-} from "@/lib/order-rules";
+  executeZpayRefund,
+  markStaleZpayRefundDispatchesAmbiguous,
+  resolveAmbiguousZpayRefund,
+  retryZpayRefundFinalization,
+  zpayRefundDispatchStaleAfterMs,
+  type RefundTerminalTransitionResult,
+} from "@/lib/refund-execution";
 import {
   deleteStoredCosObjectIfConfigured,
   deleteStoredLocalFileIfSafe,
@@ -57,7 +66,6 @@ import { buildCanonicalAiNewsPath, buildCanonicalToolPath } from "@/lib/public-s
 import { parseTopicDelimitedRows } from "@/lib/ai-news-topic-config";
 import { getUploadDiskPath } from "@/lib/upload-path";
 import { adminFileUploadMaxBytes } from "@/lib/upload-limits";
-import { refundZpayTransactionForOrder } from "@/lib/zpay-orders";
 import { generateAiNewsEnglishDraft } from "@/lib/ai-news-translation";
 import { buildProductDemoPath } from "@/lib/product-demos";
 import type { AiNewsTranslationActionState } from "@/app/admin/ai-news-translation-panel";
@@ -75,37 +83,65 @@ async function writeAdminAuditLogBestEffort(input: Parameters<typeof writeAdminA
   }
 }
 
-function toPrismaJson(value: Record<string, unknown>): Prisma.InputJsonValue {
-  return JSON.parse(JSON.stringify(value)) as Prisma.InputJsonValue;
-}
+type AdminRefundExecutionResult = RefundTerminalTransitionResult | {
+  outcome: "failed";
+  changed: false;
+};
 
-async function requestZpayRefundBeforeCompletion(input: {
-  order: Pick<Order, "orderNo" | "amount"> & { paymentTransaction?: PaymentTransaction | null };
-  redirectPath: string;
-}) {
+async function executeZpayRefundForAdmin(input: {
+  refundId: string;
+  adminId: string;
+  note?: string | null;
+  refundProofImage?: string | null;
+  refundConfirmation?: string | null;
+}): Promise<AdminRefundExecutionResult> {
   try {
-    const result = await refundZpayTransactionForOrder({ order: input.order });
-    return result.response ? (result.response as Record<string, unknown>) : null;
+    return await executeZpayRefund(input);
   } catch (error) {
-    const message = error instanceof Error ? error.message : "ZPAY 退款接口调用失败。";
-    redirect(`${input.redirectPath}?error=${encodeURIComponent(message)}`);
+    console.error("[admin-refund] ZPAY execution failed", error);
+    return { outcome: "failed", changed: false };
   }
 }
 
-async function markZpayTransactionRefunded(
-  tx: Prisma.TransactionClient,
-  orderId: string,
-  payload: Record<string, unknown> | null
-) {
-  if (!payload) return;
-  await tx.paymentTransaction.updateMany({
-    where: { orderId, provider: "zpay" },
-    data: {
-      status: "refunded",
-      refundedAt: new Date(),
-      refundPayload: toPrismaJson(payload)
-    }
-  });
+function getRefundExecutionErrorCode(result: AdminRefundExecutionResult) {
+  switch (result.outcome) {
+    case "ambiguous":
+      return "refund_ambiguous";
+    case "already_processing":
+      return "refund_already_processing";
+    case "finalize_retry":
+      return "refund_finalize_retry";
+    case "failed":
+      return "refund_execution_failed";
+    case "finalized":
+    case "provider_rejected":
+      return null;
+  }
+}
+
+function getRefundServiceActionErrorCode(error: unknown) {
+  const message = error instanceof Error ? error.message : null;
+  switch (message) {
+    case "REFUND_STATE_MISMATCH":
+    case "REFUND_NOT_FOUND":
+    case "REFUND_ORDER_NOT_FOUND":
+    case "REFUND_PAYMENT_NOT_FOUND":
+      return "refund_state_mismatch";
+    case "LATE_PAYMENT_REFUND_MUST_BE_CONFIRMED":
+      return "refund_late_payment_requires_provider_refund";
+    case "REFUND_PROVIDER_REFERENCE_REQUIRED":
+      return "refund_provider_reference_required";
+    case "REFUND_PROVIDER_REFERENCE_INVALID":
+      return "refund_provider_reference_invalid";
+    case "REFUND_PROVIDER_REFERENCE_REUSED":
+      return "refund_provider_reference_reused";
+    case "REFUND_PROOF_REQUIRED":
+      return "refund_proof_required";
+    case "REFUND_PROOF_INVALID":
+      return "refund_proof_invalid";
+    default:
+      return null;
+  }
 }
 
 async function syncToolPriceSpecs(toolId: string, specs: ToolPriceSpecDraft[]) {
@@ -452,29 +488,30 @@ export async function updateOrderAdminAction(formData: FormData) {
   const paymentMethodValue = parseOptionalString(formData.get("paymentMethod"));
   const paymentMethod = paymentMethodValue ? z.enum(["alipay", "wechat"]).parse(paymentMethodValue) : null;
   const amount = parseNumberField(formData.get("amount"), 0);
-  const order = await prisma.order.findUnique({ where: { id } });
-  if (order) {
-    assertAdminOrderStatusUpdateAllowed(orderStatus, order.orderStatus);
-  }
-  if (!order) throw new Error("订单不存在");
-
-  await prisma.order.update({
-    where: { id },
-    data: {
+  try {
+    await updateOrderForAdmin({
+      db: prisma,
+      orderId: id,
+      adminId: admin.id,
       amount,
       paymentMethod,
       orderStatus,
-      ...getOrderTimestampPatch(orderStatus, order.paidAt, order.activatedAt)
+      auditContext: await getAdminAuditRequestContext(),
+    });
+  } catch (error) {
+    const message = error instanceof Error ? error.message : "订单保存失败。";
+    if (message === "ORDER_NOT_FOUND") {
+      redirect(`/admin/orders?error=${encodeURIComponent("订单不存在，可能已经被删除。")}`);
     }
-  });
-  await writeAdminAuditLog({
-    adminId: admin.id,
-    action: "order.update",
-    targetType: "order",
-    targetId: id,
-    summary: "Updated order status, amount, or payment method.",
-    metadata: { beforeStatus: order.orderStatus, orderStatus, paymentMethod, amount }
-  });
+    if (
+      message === "Order amount cannot change after payment creation." ||
+      message === "Refunded status must be set by the refund workflow." ||
+      message.includes("订单不能通过手动改状态")
+    ) {
+      redirect(`/admin/orders/${id}?error=${encodeURIComponent(message)}`);
+    }
+    throw error;
+  }
 
   revalidatePath("/admin/orders");
   revalidatePath(`/admin/orders/${id}`);
@@ -508,66 +545,93 @@ export async function deleteOrderAdminAction(formData: FormData) {
 export async function createRefundRecordAdminAction(formData: FormData) {
   const admin = await requireAdmin();
   const orderId = idSchema.parse(formData.get("orderId"));
-  const status = z.enum(["pending", "completed", "rejected"]).parse(formData.get("status") ?? "completed");
+  const requestedStatus = z.enum(["pending", "completed", "rejected"]).parse(formData.get("status") ?? "completed");
   const reason = z.string().min(2, "必须填写售后/退款原因").parse(formData.get("reason"));
   const note = parseOptionalString(formData.get("note"));
   const refundReceiverQr = parseOptionalString(formData.get("refundReceiverQr"));
   const refundProofImage = parseOptionalString(formData.get("refundProofImage"));
-  const order = await prisma.order.findUnique({ where: { id: orderId }, include: { paymentTransaction: true } });
-  if (!order) {
-    redirect(`/admin/orders?error=${encodeURIComponent("订单不存在，无法记录售后/退款。")}`);
-  }
-  if (!canRecordRefundForOrder(order.orderStatus)) {
-    redirect(`/admin/orders?error=${encodeURIComponent("当前订单状态不允许创建退款记录。")}`);
-  }
-
-  let amount: number;
+  let created: Awaited<ReturnType<typeof createRefundRecordForAdmin>>;
   try {
-    amount = normalizeRefundRecordAmount(formData.get("amount"), Number(order.amount));
+    created = await createRefundRecordForAdmin({
+      db: prisma,
+      orderId,
+      adminId: admin.id,
+      amount: String(formData.get("amount") ?? ""),
+      requestedStatus,
+      reason,
+      note,
+      refundReceiverQr,
+      refundProofImage,
+      auditContext: await getAdminAuditRequestContext(),
+    });
   } catch (error) {
     const message = error instanceof Error ? error.message : "退款金额无效。";
-    redirect(`/admin/orders?error=${encodeURIComponent(message)}`);
+    if (message === "ORDER_NOT_FOUND") {
+      redirect(`/admin/orders?error=${encodeURIComponent("订单不存在，无法记录售后/退款。")}`);
+    }
+    if (message === "REFUND_ATTEMPT_EXISTS") {
+      redirect(`/admin/orders/${orderId}?error=refund_attempt_exists`);
+    }
+    if (message === "REFUND_STATUS_NOT_ALLOWED") {
+      redirect(`/admin/orders?error=${encodeURIComponent("当前订单状态不允许创建退款记录。")}`);
+    }
+    if (message.startsWith("Refund amount ")) {
+      redirect(`/admin/orders?error=${encodeURIComponent(message)}`);
+    }
+    throw error;
   }
 
-  const zpayRefundPayload = status === "completed"
-    ? await requestZpayRefundBeforeCompletion({ order, redirectPath: `/admin/orders/${orderId}` })
-    : null;
-
-  const refund = await prisma.$transaction(async (tx) => {
-    const created = await tx.orderRefundRecord.create({
-      data: {
-        orderId,
-        adminId: admin.id,
-        amount,
-        status,
-        reason,
-        note,
-        refundReceiverQr,
-        refundProofImage: refundProofImage ?? (zpayRefundPayload ? String(zpayRefundPayload.msg ?? "ZPAY refund completed") : null),
-        ...getRefundStatusPatch(status, null)
-      }
+  let processedStatus: "completed" | "rejected" | null = null;
+  let terminalTransitionChanged = false;
+  if (requestedStatus === "completed") {
+    const prepared = await prepareRefundExecutionForAdmin({
+      db: prisma,
+      refundId: created.refund.id,
+      adminId: admin.id,
+      note,
+      refundProofImage,
     });
-
-    if (status === "completed") {
-      await markZpayTransactionRefunded(tx, orderId, zpayRefundPayload);
-      await revokeEntitlementsForRefundedOrder(tx, order);
-      await tx.order.update({ where: { id: orderId }, data: { orderStatus: "refunded" } });
+    if (prepared.kind === "zpay") {
+      const result = await executeZpayRefundForAdmin({
+        refundId: created.refund.id,
+        adminId: admin.id,
+        note,
+        refundProofImage,
+      });
+      const errorCode = getRefundExecutionErrorCode(result);
+      if (errorCode) {
+        redirect(`/admin/refunds/${created.refund.id}?error=${errorCode}`);
+      }
+      processedStatus = result.outcome === "finalized" ? "completed" : "rejected";
+      terminalTransitionChanged = result.changed;
+    } else {
+      processedStatus = "completed";
+      terminalTransitionChanged = true;
     }
+  } else if (requestedStatus === "rejected") {
+    await rejectRefundRecordForAdmin({
+      db: prisma,
+      refundId: created.refund.id,
+      adminId: admin.id,
+      note,
+      refundProofImage,
+    });
+    processedStatus = "rejected";
+    terminalTransitionChanged = true;
+  }
 
-    return created;
-  });
-
-  await writeAdminAuditLog({
-    adminId: admin.id,
-    action: "order.refund.create",
-    targetType: "order",
-    targetId: orderId,
-    summary: "Created order after-sales/refund record.",
-    metadata: { refundId: refund.id, amount, status, reason, refundReceiverQr, refundProofImage }
-  });
-  if (status !== "pending") {
+  if (processedStatus && terminalTransitionChanged) {
+    await createUserNotification(
+      created.order.userId,
+      buildRefundProcessedNotification({
+        orderId,
+        orderNo: created.order.orderNo,
+        status: processedStatus,
+        note,
+      }),
+    );
     await sendRefundProcessedAdminEmail(orderId, {
-      status,
+      status: processedStatus,
       actorLabel: admin.email ?? admin.nickname ?? admin.id,
       note
     });
@@ -576,9 +640,9 @@ export async function createRefundRecordAdminAction(formData: FormData) {
   revalidatePath("/admin/orders");
   revalidatePath(`/admin/orders/${orderId}`);
   revalidatePath("/admin/refunds");
-  revalidatePath(`/admin/refunds/${refund.id}`);
+  revalidatePath(`/admin/refunds/${created.refund.id}`);
   revalidatePath("/user");
-  redirect(`/admin/orders/${orderId}?refund=1`);
+  redirect(`/admin/orders/${orderId}?refund=1${processedStatus ? `&status=${processedStatus}` : ""}`);
 }
 
 export async function processRefundRecordAdminAction(formData: FormData) {
@@ -587,6 +651,7 @@ export async function processRefundRecordAdminAction(formData: FormData) {
   const status = z.enum(["completed", "rejected"]).parse(formData.get("status"));
   const note = parseOptionalString(formData.get("note"));
   const refundProofImage = parseOptionalString(formData.get("refundProofImage"));
+  const refundConfirmation = parseOptionalString(formData.get("refundConfirmation"));
   const refund = await prisma.orderRefundRecord.findUnique({
     where: { id },
     include: { order: { include: { paymentTransaction: true } } }
@@ -598,50 +663,57 @@ export async function processRefundRecordAdminAction(formData: FormData) {
     redirect(`/admin/orders?error=${encodeURIComponent("该售后/退款记录已经处理。")}`);
   }
 
-  const zpayRefundPayload = status === "completed"
-    ? await requestZpayRefundBeforeCompletion({ order: refund.order, redirectPath: `/admin/refunds/${id}` })
-    : null;
-
-  await prisma.$transaction(async (tx) => {
-    await tx.orderRefundRecord.update({
-      where: { id },
-      data: {
-        status,
-        adminId: admin.id,
-        note: note ?? refund.note,
-        refundProofImage: refundProofImage ?? refund.refundProofImage ?? (zpayRefundPayload ? String(zpayRefundPayload.msg ?? "ZPAY refund completed") : null),
-        ...getRefundStatusPatch(status, refund.completedAt)
-      }
+  const resolvedNote = note ?? refund.note;
+  const resolvedProofImage = refundProofImage ?? refund.refundProofImage;
+  let result: AdminRefundExecutionResult;
+  if (status === "completed") {
+    const prepared = await prepareRefundExecutionForAdmin({
+      db: prisma,
+      refundId: id,
+      adminId: admin.id,
+      note: resolvedNote,
+      refundProofImage: resolvedProofImage,
     });
-
-    if (status === "completed") {
-      await markZpayTransactionRefunded(tx, refund.orderId, zpayRefundPayload);
-      await revokeEntitlementsForRefundedOrder(tx, refund.order);
-      await tx.order.update({ where: { id: refund.orderId }, data: { orderStatus: "refunded" } });
-    }
-  });
+    result = prepared.kind === "zpay"
+      ? await executeZpayRefundForAdmin({
+          refundId: id,
+          adminId: admin.id,
+          note: resolvedNote,
+          refundProofImage: resolvedProofImage,
+          refundConfirmation,
+        })
+      : { outcome: "finalized", changed: true };
+  } else {
+    const rejected = await rejectRefundRecordForAdmin({
+      db: prisma,
+      refundId: id,
+      adminId: admin.id,
+      note: resolvedNote,
+      refundProofImage: resolvedProofImage,
+    });
+    result = { ...rejected, changed: true };
+  }
+  const errorCode = getRefundExecutionErrorCode(result);
+  if (errorCode) {
+    redirect(`/admin/refunds/${id}?error=${errorCode}`);
+  }
+  const processedStatus = result.outcome === "finalized" ? "completed" : "rejected";
+  if (!result.changed) {
+    redirect(`/admin/refunds/${id}?processed=1&status=${processedStatus}&unchanged=1`);
+  }
   await createUserNotification(
     refund.requesterId ?? refund.order.userId,
     buildRefundProcessedNotification({
       orderId: refund.orderId,
       orderNo: refund.order.orderNo,
-      status,
-      note
+      status: processedStatus,
+      note: resolvedNote
     })
   );
   await sendRefundProcessedAdminEmail(refund.orderId, {
-    status,
+    status: processedStatus,
     actorLabel: admin.email ?? admin.nickname ?? admin.id,
-    note
-  });
-
-  await writeAdminAuditLog({
-    adminId: admin.id,
-    action: "order.refund.process",
-    targetType: "order",
-    targetId: refund.orderId,
-    summary: "Processed user after-sales/refund request.",
-    metadata: { refundId: id, status, note, refundProofImage }
+    note: resolvedNote
   });
 
   revalidatePath("/admin/orders");
@@ -650,7 +722,178 @@ export async function processRefundRecordAdminAction(formData: FormData) {
   revalidatePath(`/admin/refunds/${id}`);
   revalidatePath(`/orders/${refund.orderId}`);
   revalidatePath("/user");
-  redirect(`/admin/refunds/${id}?processed=1`);
+  redirect(`/admin/refunds/${id}?processed=1&status=${processedStatus}`);
+}
+
+export async function recoverStaleRefundDispatchAdminAction(formData: FormData) {
+  const admin = await requireAdmin();
+  const id = idSchema.parse(formData.get("refundId"));
+  let markedAmbiguous = 0;
+  try {
+    const result = await markStaleZpayRefundDispatchesAmbiguous({
+      refundId: id,
+      adminId: admin.id,
+      startedBefore: new Date(Date.now() - zpayRefundDispatchStaleAfterMs),
+    });
+    markedAmbiguous = result.markedAmbiguous;
+  } catch (error) {
+    console.error("[admin-refund] stale dispatch recovery failed", error);
+    redirect(`/admin/refunds/${id}?error=refund_dispatch_recovery_failed`);
+  }
+  if (markedAmbiguous !== 1) {
+    redirect(`/admin/refunds/${id}?error=refund_dispatch_not_stale`);
+  }
+
+  revalidatePath("/admin/refunds");
+  revalidatePath(`/admin/refunds/${id}`);
+  redirect(`/admin/refunds/${id}?recovered=1`);
+}
+
+export async function resolveAmbiguousRefundAdminAction(formData: FormData) {
+  const admin = await requireAdmin();
+  const id = idSchema.parse(formData.get("refundId"));
+  const resolution = z
+    .enum(["provider_succeeded", "provider_rejected"])
+    .safeParse(formData.get("resolution"));
+  const note = parseOptionalString(formData.get("note"));
+  const refundProofImage = parseOptionalString(formData.get("refundProofImage"));
+  const providerRefundReference = parseOptionalString(formData.get("providerRefundReference"));
+
+  if (!resolution.success) {
+    redirect(`/admin/refunds/${id}?error=refund_resolution_invalid`);
+  }
+  if (!note || note.length < 2) {
+    redirect(`/admin/refunds/${id}?error=refund_resolution_note_required`);
+  }
+
+  const refund = await prisma.orderRefundRecord.findUnique({
+    where: { id },
+    select: {
+      orderId: true,
+      requesterId: true,
+      order: { select: { userId: true, orderNo: true } },
+    },
+  });
+  if (!refund) {
+    redirect(`/admin/refunds/${id}?error=refund_state_mismatch`);
+  }
+
+  let result: RefundTerminalTransitionResult;
+  try {
+    result = await resolveAmbiguousZpayRefund({
+      refundId: id,
+      adminId: admin.id,
+      resolution: resolution.data,
+      note,
+      refundProofImage,
+      providerRefundReference,
+    });
+  } catch (error) {
+    console.error("[admin-refund] ambiguous resolution failed", error);
+    const actionErrorCode = getRefundServiceActionErrorCode(error);
+    if (actionErrorCode) {
+      redirect(`/admin/refunds/${id}?error=${actionErrorCode}`);
+    }
+    redirect(`/admin/refunds/${id}?error=refund_resolution_failed`);
+  }
+
+  const errorCode = getRefundExecutionErrorCode(result);
+  if (errorCode) {
+    redirect(`/admin/refunds/${id}?error=${errorCode}`);
+  }
+  const processedStatus = result.outcome === "finalized" ? "completed" : "rejected";
+  if (!result.changed) {
+    redirect(`/admin/refunds/${id}?processed=1&status=${processedStatus}&unchanged=1`);
+  }
+  await createUserNotification(
+    refund.requesterId ?? refund.order.userId,
+    buildRefundProcessedNotification({
+      orderId: refund.orderId,
+      orderNo: refund.order.orderNo,
+      status: processedStatus,
+      note,
+    }),
+  );
+  await sendRefundProcessedAdminEmail(refund.orderId, {
+    status: processedStatus,
+    actorLabel: admin.email ?? admin.nickname ?? admin.id,
+    note,
+  });
+
+  revalidatePath("/admin/orders");
+  revalidatePath(`/admin/orders/${refund.orderId}`);
+  revalidatePath("/admin/refunds");
+  revalidatePath(`/admin/refunds/${id}`);
+  revalidatePath(`/orders/${refund.orderId}`);
+  revalidatePath("/user");
+  redirect(`/admin/refunds/${id}?processed=1&status=${processedStatus}`);
+}
+
+export async function retryRefundFinalizationAdminAction(formData: FormData) {
+  const admin = await requireAdmin();
+  const id = idSchema.parse(formData.get("refundId"));
+  const refund = await prisma.orderRefundRecord.findUnique({
+    where: { id },
+    select: {
+      orderId: true,
+      requesterId: true,
+      note: true,
+      order: { select: { userId: true, orderNo: true } },
+    },
+  });
+  if (!refund) {
+    redirect(`/admin/refunds/${id}?error=refund_state_mismatch`);
+  }
+
+  const resolvedNote = refund.note;
+  let result: RefundTerminalTransitionResult;
+  try {
+    result = await retryZpayRefundFinalization({
+      refundId: id,
+      adminId: admin.id,
+    });
+  } catch (error) {
+    console.error("[admin-refund] local finalization retry failed", error);
+    const actionErrorCode = getRefundServiceActionErrorCode(error);
+    if (actionErrorCode) {
+      redirect(`/admin/refunds/${id}?error=${actionErrorCode}`);
+    }
+    redirect(`/admin/refunds/${id}?error=refund_finalization_failed`);
+  }
+
+  const errorCode = getRefundExecutionErrorCode(result);
+  if (errorCode) {
+    redirect(`/admin/refunds/${id}?error=${errorCode}`);
+  }
+  if (result.outcome !== "finalized") {
+    redirect(`/admin/refunds/${id}?error=refund_state_mismatch`);
+  }
+  if (!result.changed) {
+    redirect(`/admin/refunds/${id}?processed=1&status=completed&unchanged=1`);
+  }
+
+  await createUserNotification(
+    refund.requesterId ?? refund.order.userId,
+    buildRefundProcessedNotification({
+      orderId: refund.orderId,
+      orderNo: refund.order.orderNo,
+      status: "completed",
+      note: resolvedNote,
+    }),
+  );
+  await sendRefundProcessedAdminEmail(refund.orderId, {
+    status: "completed",
+    actorLabel: admin.email ?? admin.nickname ?? admin.id,
+    note: resolvedNote,
+  });
+
+  revalidatePath("/admin/orders");
+  revalidatePath(`/admin/orders/${refund.orderId}`);
+  revalidatePath("/admin/refunds");
+  revalidatePath(`/admin/refunds/${id}`);
+  revalidatePath(`/orders/${refund.orderId}`);
+  revalidatePath("/user");
+  redirect(`/admin/refunds/${id}?processed=1&status=completed`);
 }
 
 export async function upsertDevelopmentVersionAction(formData: FormData) {

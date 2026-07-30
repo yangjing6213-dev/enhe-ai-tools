@@ -90,9 +90,7 @@ const nextConfig: NextConfig = {
       { source: "/okf", destination: "/okf/index.md", statusCode: 308 },
       { source: "/okf/", destination: "/okf/index.md", statusCode: 308 },
       { source: "/online-tools", destination: "/account-services", statusCode: 301 },
-      { source: "/online-tools/:slug*", destination: "/account-services/:slug*", statusCode: 301 },
       { source: "/en/online-tools", destination: "/en/account-services", statusCode: 301 },
-      { source: "/en/online-tools/:slug*", destination: "/en/account-services/:slug*", statusCode: 301 }
     ];
   },
   async headers() {

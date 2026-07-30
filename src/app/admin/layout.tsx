@@ -10,6 +10,7 @@ import { getCurrentLocale } from "@/lib/i18n";
 
 const adminNav = [
   ["dashboard", "/admin"],
+  ["seoAudit", "/admin/seo-audit"],
   ["seoInsights", "/admin/seo-insights"],
   ["geoMonitoring", "/admin/geo-monitoring"],
   ["manuals", "/admin/manuals"],

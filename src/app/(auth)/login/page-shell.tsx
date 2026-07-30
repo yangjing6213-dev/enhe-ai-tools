@@ -11,6 +11,7 @@ import {
   buildMetadataTitle,
   buildPageMetadata,
 } from "@/lib/seo";
+import { resolveSafeReturnPath } from "@/lib/safe-return-path";
 
 export function generateLoginPageMetadata(forceLocale: Locale): Metadata {
   const t = getDictionary(forceLocale);
@@ -30,13 +31,17 @@ export async function LoginPageShell({
   searchParams,
   forceLocale
 }: {
-  searchParams: Promise<{ message?: string; payment?: string }>;
+  searchParams: Promise<{ message?: string; payment?: string; returnTo?: string }>;
   forceLocale?: Locale;
 }) {
   const locale = forceLocale ?? (await getCurrentLocale());
   const t = getDictionary(locale);
   const csrfToken = await getOrCreateCsrfToken();
   const params = await searchParams;
+  const returnTo = resolveSafeReturnPath(
+    params.returnTo,
+    buildLocalePath("/user", locale),
+  );
 
   const errorMessages: Record<string, string> = {
     invalid: t.auth.loginErrorInvalid,
@@ -52,6 +57,7 @@ export async function LoginPageShell({
       <Container className="flex min-h-[calc(100vh-4rem)] items-center justify-center py-16">
         <form action={loginAction} className="surface-panel w-full max-w-md p-8">
         <input type="hidden" name="csrfToken" value={csrfToken} />
+        <input type="hidden" name="returnTo" value={returnTo} />
         <h1 className="text-3xl font-black text-[var(--marketing-text)]">{t.auth.loginTitle}</h1>
         <p className="mt-3 text-sm font-medium text-[var(--marketing-muted)]">{t.auth.loginIntro}</p>
         {paymentSuccess ? <div className="status-success mt-4">{t.auth.loginSuccessPayment}</div> : null}
@@ -93,7 +99,10 @@ export async function LoginPageShell({
         </FormSubmitButton>
         <p className="mt-5 text-center text-sm text-[var(--marketing-muted)]">
           {t.auth.noAccount}
-          <Link className="font-semibold text-[var(--marketing-accent)]" href={buildLocalePath("/register", locale)}>
+          <Link
+            className="font-semibold text-[var(--marketing-accent)]"
+            href={`${buildLocalePath("/register", locale)}?returnTo=${encodeURIComponent(returnTo)}`}
+          >
             {t.auth.registerNow}
           </Link>
         </p>

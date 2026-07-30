@@ -4,19 +4,23 @@ import { describe, expect, test } from "vitest";
 import { detectMigrationGuard } from "../deployment-config-reader";
 
 describe("deployment migration guard artifacts", () => {
-  test("app entrypoint gates prisma migrate deploy behind RUN_PRISMA_MIGRATE=1", async () => {
+  test("app startup never runs database migrations", async () => {
     const source = await readFile(join(process.cwd(), "deploy", "enhe-ai-tools", "scripts", "app-entrypoint.sh"), "utf8");
 
-    expect(source).toContain("${RUN_PRISMA_MIGRATE:-0}");
-    expect(source).toContain("Prisma migrate deploy explicitly enabled by RUN_PRISMA_MIGRATE=1.");
-    expect(source).toContain("Prisma migrate deploy skipped because RUN_PRISMA_MIGRATE is not set to 1.");
-    expect(source.indexOf("npx prisma migrate deploy")).toBeGreaterThan(source.indexOf("${RUN_PRISMA_MIGRATE:-0}"));
+    expect(source).not.toContain("RUN_PRISMA_MIGRATE");
+    expect(source).not.toContain("prisma migrate deploy");
   });
 
-  test("docker compose defaults RUN_PRISMA_MIGRATE to 0", async () => {
-    const source = await readFile(join(process.cwd(), "deploy", "enhe-ai-tools", "docker-compose.yml"), "utf8");
+  test("deployment backs up and verifies before a one-shot migration", async () => {
+    const source = await readFile(join(process.cwd(), "deploy.sh"), "utf8");
+    const backupIndex = source.indexOf("enhe-backup-db.sh");
+    const verifyIndex = source.indexOf("pg_restore --list");
+    const migrateIndex = source.indexOf("compose run --rm app");
 
-    expect(source).toContain("RUN_PRISMA_MIGRATE: ${RUN_PRISMA_MIGRATE:-0}");
+    expect(backupIndex).toBeGreaterThan(-1);
+    expect(verifyIndex).toBeGreaterThan(backupIndex);
+    expect(migrateIndex).toBeGreaterThan(verifyIndex);
+    expect(source.slice(migrateIndex)).toContain("prisma migrate deploy");
   });
 
   test("deployment checker detects skip unless explicit migration guard", async () => {
@@ -24,7 +28,7 @@ describe("deployment migration guard artifacts", () => {
 
     expect(guard).toEqual(expect.objectContaining({
       migrationGuardDetected: true,
-      guardVariable: "RUN_PRISMA_MIGRATE",
+      guardVariable: "none",
       defaultMigrationBehavior: "skip_unless_explicit",
       migrationCommandRequiresExplicitApproval: true
     }));

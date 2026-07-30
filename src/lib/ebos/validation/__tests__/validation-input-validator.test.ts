@@ -41,6 +41,42 @@ describe("validation input validator", () => {
     }));
   });
 
+  test("validates SEO audit first-week counters and spend", () => {
+    const invalid = validateSinglePlanResult({
+      planId: "validation-product-seo-geo-audit",
+      status: "completed",
+      completedScans: -1,
+      channelSpend: -2,
+      totalValidationSpend: -3,
+      factualErrorCount: -1,
+      factCheckedItems: -1,
+      undeliveredPaidOrders: -1,
+      pendingRefundOrders: -1
+    });
+
+    expect(invalid.errors.map((error) => error.source)).toEqual(expect.arrayContaining([
+      "completedScans",
+      "channelSpend",
+      "totalValidationSpend",
+      "factualErrorCount",
+      "factCheckedItems",
+      "undeliveredPaidOrders",
+      "pendingRefundOrders"
+    ]));
+
+    const warnings = collectValidationInputWarnings({
+      results: [{
+        planId: "validation-product-seo-geo-audit",
+        status: "completed",
+        factualErrorCount: 2,
+        factCheckedItems: 1
+      }]
+    });
+    expect(warnings).toContainEqual(expect.objectContaining({
+      code: "validation_factual_errors_exceed_checked_items"
+    }));
+  });
+
   test("collects data consistency warnings", () => {
     const warnings = collectValidationInputWarnings({
       results: [{

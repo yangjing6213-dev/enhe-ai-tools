@@ -7,6 +7,7 @@ import type {
   EbosRevenueProductRecord,
   EbosRevenueRefundRecord
 } from "./revenue-evidence-types";
+import { isCountableRevenueOrder } from "./revenue-order-qualification";
 
 export function attributeRevenueToProducts(
   options: AttributeRevenueToProductsOptions
@@ -22,6 +23,7 @@ export function attributeRevenueToProducts(
   }
 
   for (const order of options.orders) {
+    if (order.isTestData === true) continue;
     const key = orderProductKey(order);
     const metric = key ? metricsByKey.get(key) : undefined;
     if (!metric) {
@@ -151,10 +153,20 @@ function addOrderToMetric(
   order: EbosRevenueOrderRecord,
   refunds: EbosRevenueRefundRecord[]
 ): EbosProductRevenueMetric {
-  const paid = isPaidStatus(order.status);
-  const refundedAmount = refunds
-    .filter((refund) => refund.orderId === order.id && refund.status !== "rejected")
-    .reduce((total, refund) => total + refund.amount, 0) || order.refundedAmount || 0;
+  const orderRefunds = refunds.filter((refund) => refund.orderId === order.id);
+  const paid = isCountableRevenueOrder({
+    ...order,
+    hasPendingRefund: order.hasPendingRefund === true
+      || orderRefunds.some((refund) => refund.status === "pending"),
+    hasCompletedRefund: order.hasCompletedRefund === true
+      || orderRefunds.some((refund) => refund.status === "completed")
+  });
+  const completedRefundedAmount = orderRefunds
+    .filter((refund) => refund.status === "completed")
+    .reduce((total, refund) => total + refund.amount, 0);
+  const refundedAmount = orderRefunds.length > 0
+    ? completedRefundedAmount
+    : order.refundedAmount || 0;
 
   return {
     ...metric,
@@ -229,10 +241,6 @@ function buildActionItems(metric: EbosProductRevenueMetric) {
   if (!metric.hasPriceConfigured) items.push("配置价格/购买入口");
   if (metric.paidOrdersCount === 0) items.push("进行首批收入验证");
   return items;
-}
-
-function isPaidStatus(status: string | undefined) {
-  return status === "paid" || status === "activated" || status === "refunded";
 }
 
 function round(value: number) {

@@ -8,8 +8,8 @@ describe("site footer social source", () => {
       "utf8",
     );
 
-    expect(footer).toContain("href: companyContact.emailHref");
-    expect(footer).toContain("href: companyContact.phoneHref");
+    expect(footer).toContain("href: companyProfile.email.href");
+    expect(footer).toContain("href: companyProfile.phone.href");
     expect(footer).toContain('href: "https://www.youtube.com/@ENHE-AI"');
     expect(footer).toContain('className="site-footer-newsletter-socials"');
     expect(footer).not.toContain("site-footer-contact-button");

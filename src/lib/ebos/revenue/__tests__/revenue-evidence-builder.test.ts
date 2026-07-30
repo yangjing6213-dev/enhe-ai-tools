@@ -70,7 +70,7 @@ describe("revenue evidence builder", () => {
     expect(evidence.overallScore).toBeLessThanOrEqual(55);
   });
 
-  test("marks first revenue achieved when paid orders exist", async () => {
+  test("marks first revenue achieved when a paid order is delivered", async () => {
     const evidence = await buildRevenueEvidence({
       targetDate: "2026-07-03",
       generatedAt: "2026-07-03T00:00:00.000Z",
@@ -79,9 +79,11 @@ describe("revenue evidence builder", () => {
           id: "order-1",
           toolId: "tool-1",
           amount: decimal(120),
-          orderStatus: "paid",
+          orderStatus: "activated",
           paidAt: new Date("2026-07-01T00:00:00.000Z"),
+          activatedAt: new Date("2026-07-01T00:01:00.000Z"),
           createdAt: new Date("2026-07-01T00:00:00.000Z"),
+          paymentTransaction: { status: "paid" },
           tool: { id: "tool-1", slug: "video-tool", name: "Video Tool" },
           refundRecords: []
         }

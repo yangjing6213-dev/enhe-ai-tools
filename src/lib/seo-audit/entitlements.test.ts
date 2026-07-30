@@ -2,9 +2,12 @@ import { createHmac } from "node:crypto";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import {
   consumeSeoAuditCreditAndEnqueue,
+  consumeSeoAuditSubscriptionManualRunAndEnqueue,
   enqueueAnonymousFreeAudit,
   enqueueDueSeoAuditSchedules,
   grantSeoAuditCreditForPaidOrder,
+  grantSeoAuditEntitlementsForPaidOrderInTransaction,
+  grantSeoAuditMonitoringForPaidOrder,
   hashAnonymousAuditIdentifier,
   normalizeSeoAuditTarget,
 } from "@/lib/seo-audit/entitlements";
@@ -15,7 +18,8 @@ const hmacSecret = "anonymous-audit-secret-with-32-bytes";
 function createEntitlementDb() {
   const tx = {
     $executeRaw: vi.fn().mockResolvedValue(0),
-    $queryRaw: vi.fn(),
+    $queryRaw: vi.fn().mockResolvedValue([{ id: "order-1" }]),
+    $transaction: vi.fn(),
     order: {
       findUnique: vi.fn(),
     },
@@ -27,6 +31,9 @@ function createEntitlementDb() {
     seoAuditOffer: {
       findUnique: vi.fn(),
     },
+    seoAuditProject: {
+      upsert: vi.fn(),
+    },
     seoAuditRun: {
       count: vi.fn(),
       create: vi.fn(),
@@ -34,6 +41,17 @@ function createEntitlementDb() {
     },
     seoAuditSchedule: {
       update: vi.fn(),
+      upsert: vi.fn(),
+    },
+    seoAuditSubscription: {
+      create: vi.fn(),
+      findFirst: vi.fn(),
+      update: vi.fn(),
+      updateMany: vi.fn(),
+    },
+    seoAuditSubscriptionOrder: {
+      create: vi.fn(),
+      findUnique: vi.fn(),
     },
   };
   const db = {
@@ -97,12 +115,12 @@ describe("SEO audit target validation", () => {
 describe("atomic paid entitlements", () => {
   it("decrements a live professional/deep credit conditionally and creates the run in one transaction", async () => {
     const { db, tx } = createEntitlementDb();
-    tx.seoAuditCredit.updateMany.mockResolvedValueOnce({ count: 1 });
     tx.seoAuditCredit.findUnique.mockResolvedValueOnce({
       offerId: "seo-audit-professional",
       orderId: "server-order-1",
       pageLimit: 100,
     });
+    tx.seoAuditCredit.updateMany.mockResolvedValueOnce({ count: 1 });
     tx.seoAuditRun.create.mockResolvedValueOnce({ id: "run-1" });
 
     const result = await consumeSeoAuditCreditAndEnqueue(
@@ -116,6 +134,9 @@ describe("atomic paid entitlements", () => {
     );
 
     expect(result).toEqual({ runId: "run-1" });
+    const orderLockSql = rawSql(tx.$queryRaw.mock.calls[0][0]);
+    expect(orderLockSql.sql).toMatch(/FROM orders[\s\S]+FOR UPDATE/i);
+    expect(orderLockSql.values).toContain("server-order-1");
     expect(tx.seoAuditCredit.updateMany).toHaveBeenCalledWith({
       where: {
         id: "credit-1",
@@ -124,6 +145,9 @@ describe("atomic paid entitlements", () => {
         remainingRuns: { gt: 0 },
         expiresAt: { gt: now },
         refundedAt: null,
+        order: {
+          refundRecords: { none: { status: "pending" } },
+        },
       },
       data: { remainingRuns: { decrement: 1 } },
     });
@@ -158,6 +182,67 @@ describe("atomic paid entitlements", () => {
       ),
     ).rejects.toMatchObject({ code: "ENTITLEMENT_UNAVAILABLE" });
     expect(tx.seoAuditRun.create).not.toHaveBeenCalled();
+  });
+
+  it("consumes a monitoring manual run against the server-bound project and funding order", async () => {
+    const { db, tx } = createEntitlementDb();
+    const subscription = {
+      id: "subscription-1",
+      projectId: "project-1",
+      offerId: "monitoring-offer",
+      project: {
+        normalizedOrigin: "https://example.com",
+        displayUrl: "https://example.com",
+      },
+      offer: { pageLimit: 100 },
+      orders: [{ orderId: "monitoring-order-1" }],
+    };
+    tx.seoAuditSubscription.findFirst
+      .mockResolvedValueOnce(subscription)
+      .mockResolvedValueOnce(subscription);
+    tx.$queryRaw
+      .mockResolvedValueOnce([{ id: "monitoring-order-1" }])
+      .mockResolvedValueOnce([{ id: "subscription-1" }]);
+    tx.seoAuditSubscription.updateMany.mockResolvedValueOnce({ count: 1 });
+    tx.seoAuditRun.create.mockResolvedValueOnce({ id: "run-monitoring-1" });
+
+    await expect(
+      consumeSeoAuditSubscriptionManualRunAndEnqueue(
+        { userId: "user-1", subscriptionId: "subscription-1" },
+        { db: db as never, now },
+      ),
+    ).resolves.toEqual({ runId: "run-monitoring-1" });
+
+    expect(tx.seoAuditSubscription.updateMany).toHaveBeenCalledWith({
+      where: {
+        id: "subscription-1",
+        userId: "user-1",
+        status: "active",
+        expiresAt: { gt: now },
+        manualRunsRemaining: { gt: 0 },
+      },
+      data: { manualRunsRemaining: { decrement: 1 } },
+    });
+    expect(tx.seoAuditRun.create).toHaveBeenCalledWith({
+      data: {
+        userId: "user-1",
+        projectId: "project-1",
+        offerId: "monitoring-offer",
+        sourceOrderId: "monitoring-order-1",
+        subscriptionId: "subscription-1",
+        status: "queued",
+        kind: "recheck",
+        targetUrl: "https://example.com/",
+        normalizedOrigin: "https://example.com",
+        pageLimit: 100,
+        totalTimeoutSeconds: 720,
+        availableAt: now,
+      },
+      select: { id: true },
+    });
+    expect(tx.$queryRaw).toHaveBeenCalledTimes(2);
+    expect(rawSql(tx.$queryRaw.mock.calls[0][0]).sql).toMatch(/FROM orders[\s\S]+FOR UPDATE/i);
+    expect(rawSql(tx.$queryRaw.mock.calls[1][0]).sql).toMatch(/FROM seo_audit_subscriptions[\s\S]+FOR UPDATE/i);
   });
 
   it("grants an idempotent credit from the paid order's server-owned offer", async () => {
@@ -195,6 +280,383 @@ describe("atomic paid entitlements", () => {
       },
       select: { id: true },
     });
+    expect(db.$transaction).toHaveBeenCalledTimes(1);
+    expect(tx.$transaction).not.toHaveBeenCalled();
+  });
+
+  it("grants a credit inside the caller's transaction without nesting a transaction", async () => {
+    const { tx } = createEntitlementDb();
+    tx.order.findUnique.mockResolvedValueOnce({
+      id: "order-1",
+      userId: "user-1",
+      orderType: "seo_audit_credit",
+      orderStatus: "paid",
+      paidAt: now,
+      seoAuditCredit: null,
+      seoAuditOffer: {
+        id: "seo-audit-professional",
+        code: "professional",
+        includedRuns: 2,
+        pageLimit: 100,
+        validityDays: 7,
+      },
+    });
+    tx.$queryRaw.mockResolvedValueOnce([{ lockAcquired: true }]);
+    tx.seoAuditCredit.create.mockResolvedValueOnce({ id: "credit-1" });
+
+    await expect(
+      grantSeoAuditEntitlementsForPaidOrderInTransaction(
+        tx as never,
+        "order-1",
+        now,
+      ),
+    ).resolves.toEqual({
+      orderType: "seo_audit_credit",
+      creditId: "credit-1",
+      alreadyGranted: false,
+    });
+    expect(tx.$transaction).not.toHaveBeenCalled();
+    expect(tx.seoAuditCredit.create).toHaveBeenCalledTimes(1);
+  });
+
+  it("returns the existing credit when the transaction-level grant is replayed", async () => {
+    const { tx } = createEntitlementDb();
+    tx.order.findUnique.mockResolvedValueOnce({
+      id: "order-1",
+      userId: "user-1",
+      orderType: "seo_audit_credit",
+      orderStatus: "activated",
+      paidAt: now,
+      seoAuditCredit: { id: "credit-1" },
+      seoAuditOffer: {
+        id: "seo-audit-professional",
+        code: "professional",
+        includedRuns: 2,
+        pageLimit: 100,
+        validityDays: 7,
+      },
+    });
+    tx.$queryRaw.mockResolvedValueOnce([{ lockAcquired: true }]);
+
+    await expect(
+      grantSeoAuditEntitlementsForPaidOrderInTransaction(
+        tx as never,
+        "order-1",
+        now,
+      ),
+    ).resolves.toEqual({
+      orderType: "seo_audit_credit",
+      creditId: "credit-1",
+      alreadyGranted: true,
+    });
+    expect(tx.$transaction).not.toHaveBeenCalled();
+    expect(tx.seoAuditCredit.create).not.toHaveBeenCalled();
+  });
+
+  it("returns an existing monitoring entitlement inside the caller's transaction", async () => {
+    const { tx } = createEntitlementDb();
+    tx.order.findUnique.mockResolvedValueOnce({
+      id: "monitoring-order-1",
+      userId: "user-1",
+      orderType: "seo_audit_monitoring",
+      orderStatus: "activated",
+      paidAt: now,
+      activatedAt: now,
+      seoAuditTargetOrigin: "https://example.com",
+      seoAuditOffer: {
+        id: "seo-audit-monitoring",
+        code: "monitoring",
+        validityDays: 30,
+        maxScheduledRuns: 5,
+        manualRuns: 2,
+      },
+    });
+    tx.$queryRaw
+      .mockResolvedValueOnce([{ lockAcquired: true }])
+      .mockResolvedValueOnce([{ lockAcquired: true }]);
+    tx.seoAuditSubscriptionOrder.findUnique.mockResolvedValueOnce({
+      subscriptionId: "subscription-1",
+    });
+
+    await expect(
+      grantSeoAuditEntitlementsForPaidOrderInTransaction(
+        tx as never,
+        "monitoring-order-1",
+        now,
+      ),
+    ).resolves.toEqual({
+      orderType: "seo_audit_monitoring",
+      subscriptionId: "subscription-1",
+      alreadyGranted: true,
+    });
+    expect(tx.$transaction).not.toHaveBeenCalled();
+    expect(tx.seoAuditProject.upsert).not.toHaveBeenCalled();
+  });
+
+  it("grants monitoring from the paid order's server-owned offer and target", async () => {
+    const { db, tx } = createEntitlementDb();
+    tx.order.findUnique.mockResolvedValueOnce({
+      id: "monitoring-order-1",
+      userId: "user-1",
+      orderType: "seo_audit_monitoring",
+      orderStatus: "paid",
+      paidAt: now,
+      activatedAt: null,
+      seoAuditTargetOrigin: "https://Example.COM:443",
+      seoAuditOffer: {
+        id: "seo-audit-monitoring",
+        code: "monitoring",
+        validityDays: 30,
+        maxScheduledRuns: 5,
+        manualRuns: 2,
+      },
+    });
+    tx.$queryRaw.mockResolvedValueOnce([{ lockAcquired: true }]);
+    tx.seoAuditSubscriptionOrder.findUnique.mockResolvedValueOnce(null);
+    tx.seoAuditProject.upsert.mockResolvedValueOnce({ id: "project-1" });
+    tx.seoAuditSubscription.findFirst.mockResolvedValueOnce(null);
+    tx.seoAuditSubscription.create.mockResolvedValueOnce({
+      id: "subscription-1",
+    });
+    tx.seoAuditSubscriptionOrder.create.mockResolvedValueOnce({
+      id: "subscription-order-1",
+    });
+    tx.seoAuditSchedule.upsert.mockResolvedValueOnce({ id: "schedule-1" });
+
+    await expect(
+      grantSeoAuditMonitoringForPaidOrder("monitoring-order-1", {
+        db: db as never,
+        now,
+      }),
+    ).resolves.toEqual({
+      subscriptionId: "subscription-1",
+      alreadyGranted: false,
+    });
+    expect(tx.seoAuditProject.upsert).toHaveBeenCalledWith({
+      where: {
+        userId_normalizedOrigin: {
+          userId: "user-1",
+          normalizedOrigin: "https://example.com",
+        },
+      },
+      create: {
+        userId: "user-1",
+        normalizedOrigin: "https://example.com",
+        displayUrl: "https://example.com",
+      },
+      update: {},
+      select: { id: true },
+    });
+    expect(tx.seoAuditSubscription.create).toHaveBeenCalledWith({
+      data: {
+        userId: "user-1",
+        projectId: "project-1",
+        offerId: "seo-audit-monitoring",
+        status: "active",
+        startsAt: now,
+        expiresAt: new Date("2026-08-24T08:00:00.000Z"),
+        maxScheduledRuns: 5,
+        manualRunsRemaining: 2,
+      },
+      select: { id: true },
+    });
+    expect(tx.seoAuditSubscriptionOrder.create).toHaveBeenCalledWith({
+      data: {
+        subscriptionId: "subscription-1",
+        orderId: "monitoring-order-1",
+        serviceStartsAt: now,
+        serviceEndsAt: new Date("2026-08-24T08:00:00.000Z"),
+        scheduledRunsGranted: 5,
+        manualRunsGranted: 2,
+        refundedAt: null,
+      },
+      select: { id: true },
+    });
+    expect(tx.seoAuditSchedule.upsert).toHaveBeenCalledWith({
+      where: { subscriptionId: "subscription-1" },
+      create: {
+        subscriptionId: "subscription-1",
+        cadence: "weekly",
+        weekday: 1,
+        hour: 9,
+        minute: 0,
+        timeZone: "Asia/Shanghai",
+        enabled: true,
+        nextRunAt: new Date("2026-07-27T01:00:00.000Z"),
+      },
+      update: {},
+      select: { id: true },
+    });
+    expect(db.$transaction).toHaveBeenCalledTimes(1);
+    expect(tx.$transaction).not.toHaveBeenCalled();
+  });
+
+  it("returns the existing monitoring binding when the same eligible order is replayed", async () => {
+    const { db, tx } = createEntitlementDb();
+    tx.order.findUnique.mockResolvedValueOnce({
+      id: "monitoring-order-1",
+      userId: "user-1",
+      orderType: "seo_audit_monitoring",
+      orderStatus: "activated",
+      paidAt: now,
+      activatedAt: now,
+      seoAuditTargetOrigin: "https://example.com",
+      seoAuditOffer: {
+        id: "seo-audit-monitoring",
+        code: "monitoring",
+        validityDays: 30,
+        maxScheduledRuns: 5,
+        manualRuns: 2,
+      },
+    });
+    tx.$queryRaw.mockResolvedValueOnce([{ lockAcquired: true }]);
+    tx.seoAuditSubscriptionOrder.findUnique.mockResolvedValueOnce({
+      subscriptionId: "subscription-1",
+    });
+
+    await expect(
+      grantSeoAuditMonitoringForPaidOrder("monitoring-order-1", {
+        db: db as never,
+        now,
+      }),
+    ).resolves.toEqual({
+      subscriptionId: "subscription-1",
+      alreadyGranted: true,
+    });
+    expect(tx.seoAuditProject.upsert).not.toHaveBeenCalled();
+    expect(tx.seoAuditSubscription.create).not.toHaveBeenCalled();
+    expect(tx.seoAuditSubscription.update).not.toHaveBeenCalled();
+    expect(tx.seoAuditSubscriptionOrder.create).not.toHaveBeenCalled();
+    expect(tx.seoAuditSchedule.upsert).not.toHaveBeenCalled();
+  });
+
+  it("renews the active same-site subscription and aggregates quotas", async () => {
+    const { db, tx } = createEntitlementDb();
+    tx.order.findUnique.mockResolvedValueOnce({
+      id: "monitoring-order-2",
+      userId: "user-1",
+      orderType: "seo_audit_monitoring",
+      orderStatus: "paid",
+      paidAt: now,
+      activatedAt: null,
+      seoAuditTargetOrigin: "https://example.com",
+      seoAuditOffer: {
+        id: "seo-audit-monitoring",
+        code: "monitoring",
+        validityDays: 30,
+        maxScheduledRuns: 5,
+        manualRuns: 2,
+      },
+    });
+    tx.$queryRaw.mockResolvedValueOnce([{ lockAcquired: true }]);
+    tx.seoAuditSubscriptionOrder.findUnique.mockResolvedValueOnce(null);
+    tx.seoAuditProject.upsert.mockResolvedValueOnce({ id: "project-1" });
+    tx.seoAuditSubscription.findFirst.mockResolvedValueOnce({
+      id: "subscription-1",
+      expiresAt: new Date("2026-08-01T08:00:00.000Z"),
+    });
+    tx.seoAuditSubscription.update.mockResolvedValueOnce({
+      id: "subscription-1",
+    });
+    tx.seoAuditSubscriptionOrder.create.mockResolvedValueOnce({
+      id: "subscription-order-2",
+    });
+    tx.seoAuditSchedule.upsert.mockResolvedValueOnce({ id: "schedule-1" });
+
+    await expect(
+      grantSeoAuditMonitoringForPaidOrder("monitoring-order-2", {
+        db: db as never,
+        now,
+      }),
+    ).resolves.toEqual({
+      subscriptionId: "subscription-1",
+      alreadyGranted: false,
+    });
+    expect(tx.seoAuditSubscription.update).toHaveBeenCalledWith({
+      where: { id: "subscription-1" },
+      data: {
+        offerId: "seo-audit-monitoring",
+        expiresAt: new Date("2026-08-31T08:00:00.000Z"),
+        maxScheduledRuns: { increment: 5 },
+        manualRunsRemaining: { increment: 2 },
+      },
+      select: { id: true },
+    });
+    expect(tx.seoAuditSubscriptionOrder.create).toHaveBeenCalledWith({
+      data: expect.objectContaining({
+        subscriptionId: "subscription-1",
+        orderId: "monitoring-order-2",
+        serviceStartsAt: new Date("2026-08-01T08:00:00.000Z"),
+        serviceEndsAt: new Date("2026-08-31T08:00:00.000Z"),
+        scheduledRunsGranted: 5,
+        manualRunsGranted: 2,
+        refundedAt: null,
+      }),
+      select: { id: true },
+    });
+  });
+
+  it("renews a paused same-site subscription without creating a second plan", async () => {
+    const { db, tx } = createEntitlementDb();
+    tx.order.findUnique.mockResolvedValueOnce({
+      id: "monitoring-order-2",
+      userId: "user-1",
+      orderType: "seo_audit_monitoring",
+      orderStatus: "paid",
+      paidAt: now,
+      activatedAt: null,
+      seoAuditTargetOrigin: "https://example.com",
+      seoAuditOffer: {
+        id: "seo-audit-monitoring",
+        code: "monitoring",
+        validityDays: 30,
+        maxScheduledRuns: 5,
+        manualRuns: 2,
+      },
+    });
+    tx.$queryRaw.mockResolvedValueOnce([{ lockAcquired: true }]);
+    tx.seoAuditSubscriptionOrder.findUnique.mockResolvedValueOnce(null);
+    tx.seoAuditProject.upsert.mockResolvedValueOnce({ id: "project-1" });
+    tx.seoAuditSubscription.findFirst.mockResolvedValueOnce({
+      id: "subscription-1",
+      status: "paused",
+      expiresAt: new Date("2026-08-01T08:00:00.000Z"),
+    });
+    tx.seoAuditSubscription.update.mockResolvedValueOnce({
+      id: "subscription-1",
+    });
+    tx.seoAuditSubscriptionOrder.create.mockResolvedValueOnce({
+      id: "subscription-order-2",
+    });
+    tx.seoAuditSchedule.upsert.mockResolvedValueOnce({ id: "schedule-1" });
+
+    await grantSeoAuditMonitoringForPaidOrder("monitoring-order-2", {
+      db: db as never,
+      now,
+    });
+
+    expect(tx.seoAuditSubscription.findFirst).toHaveBeenCalledWith({
+      where: {
+        userId: "user-1",
+        projectId: "project-1",
+        status: { in: ["active", "paused"] },
+        expiresAt: { gt: now },
+      },
+      orderBy: { expiresAt: "desc" },
+      select: { id: true, expiresAt: true },
+    });
+    expect(tx.seoAuditSubscription.update).toHaveBeenCalledWith({
+      where: { id: "subscription-1" },
+      data: expect.not.objectContaining({ status: expect.anything() }),
+      select: { id: true },
+    });
+    expect(tx.seoAuditSubscription.create).not.toHaveBeenCalled();
+    expect(tx.seoAuditSchedule.upsert).toHaveBeenCalledWith(
+      expect.objectContaining({
+        where: { subscriptionId: "subscription-1" },
+        update: {},
+      }),
+    );
   });
 });
 
@@ -408,6 +870,7 @@ describe("scheduled audit entitlements", () => {
           userId: "user-1",
           projectId: "project-1",
           offerId: "seo-audit-monitoring",
+          sourceOrderId: "monitoring-order-1",
           targetUrl: "https://example.com",
           pageLimit: 100,
           cadence: "weekly",
@@ -432,6 +895,18 @@ describe("scheduled audit entitlements", () => {
     expect(selectSql.sql).toContain(
       "subscriptions.scheduled_runs_used < subscriptions.max_scheduled_runs",
     );
+    expect(selectSql.sql).toContain("seo_audit_subscription_orders");
+    expect(selectSql.sql).toContain("funding_orders");
+    expect(selectSql.sql).toContain("order_refund_records");
+    expect(selectSql.sql).toContain("refund_records.status = 'pending'");
+    expect(selectSql.sql).toContain("subscription_orders.refunded_at IS NULL");
+    expect(selectSql.sql).toContain("subscription_orders.service_starts_at");
+    expect(selectSql.sql).toContain("subscription_orders.service_ends_at");
+    expect(selectSql.sql).toContain("subscription_orders.scheduled_runs_granted");
+    expect(selectSql.sql).toContain("funded_runs.source_order_id");
+    expect(selectSql.sql).toContain("funded_runs.kind = 'scheduled'");
+    expect(selectSql.sql).toMatch(/FOR UPDATE OF funding_orders/i);
+    expect(selectSql.sql).not.toMatch(/FOR UPDATE OF subscription_orders/i);
     const consumeSql = rawSql(tx.$queryRaw.mock.calls[1][0]);
     expect(consumeSql.sql).toContain("scheduled_runs_used + 1");
     expect(consumeSql.sql).toContain("status = 'active'");
@@ -440,9 +915,46 @@ describe("scheduled audit entitlements", () => {
         kind: "scheduled",
         subscriptionId: "subscription-1",
         projectId: "project-1",
+        sourceOrderId: "monitoring-order-1",
         status: "queued",
       }),
       select: { id: true },
+    });
+  });
+
+  it("keeps monthly monitoring in the next calendar month at month end", async () => {
+    const { db, tx } = createEntitlementDb();
+    const monthEndNow = new Date("2027-01-31T01:00:00.000Z");
+    tx.$queryRaw
+      .mockResolvedValueOnce([
+        {
+          scheduleId: "schedule-monthly",
+          subscriptionId: "subscription-monthly",
+          userId: "user-1",
+          projectId: "project-1",
+          offerId: "seo-audit-monitoring",
+          sourceOrderId: "monitoring-order-1",
+          targetUrl: "https://example.com",
+          pageLimit: 100,
+          cadence: "monthly",
+          nextRunAt: new Date("2027-01-31T00:59:00.000Z"),
+        },
+      ])
+      .mockResolvedValueOnce([{ id: "subscription-monthly" }]);
+    tx.seoAuditRun.create.mockResolvedValueOnce({ id: "scheduled-run-1" });
+    tx.seoAuditSchedule.update.mockResolvedValueOnce({ id: "schedule-monthly" });
+
+    await enqueueDueSeoAuditSchedules(
+      { limit: 10 },
+      { db: db as never, now: monthEndNow },
+    );
+
+    expect(tx.seoAuditSchedule.update).toHaveBeenCalledWith({
+      where: { id: "schedule-monthly" },
+      data: {
+        lastRunAt: monthEndNow,
+        nextRunAt: new Date("2027-02-28T00:59:00.000Z"),
+      },
     });
   });
 });

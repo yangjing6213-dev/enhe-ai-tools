@@ -1,8 +1,11 @@
 #!/bin/sh
 set -eu
 
-APP_DIR="/opt/enhe-ai-tools"
+APP_DIR="${APP_DIR:-/opt/enhe-ai-tools}"
+COMPOSE_FILE="$APP_DIR/deploy/enhe-ai-tools/docker-compose.yml"
+ENV_FILE="${ENHE_ENV_FILE:-$APP_DIR/deploy/enhe-ai-tools/.env}"
 
+test -f "$ENV_FILE" || { echo "Missing env file: $ENV_FILE" >&2; exit 1; }
 cd "$APP_DIR"
-docker compose -f deploy/enhe-ai-tools/docker-compose.yml up -d --build
-docker compose -f deploy/enhe-ai-tools/docker-compose.yml ps
+docker compose --env-file "$ENV_FILE" -f "$COMPOSE_FILE" up -d
+docker compose --env-file "$ENV_FILE" -f "$COMPOSE_FILE" ps

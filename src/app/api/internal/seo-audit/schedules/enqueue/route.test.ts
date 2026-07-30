@@ -2,12 +2,16 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 const enqueueDueSeoAuditSchedules = vi.hoisted(() => vi.fn());
 const reapSeoAuditArtifactUploads = vi.hoisted(() => vi.fn());
+const runSeoAuditNotificationMaintenance = vi.hoisted(() => vi.fn());
 
 vi.mock("@/lib/seo-audit/entitlements", () => ({
   enqueueDueSeoAuditSchedules,
 }));
 vi.mock("@/lib/seo-audit/jobs", () => ({
   reapSeoAuditArtifactUploads,
+}));
+vi.mock("@/lib/seo-audit/notification-maintenance", () => ({
+  runSeoAuditNotificationMaintenance,
 }));
 
 import { POST, runtime } from "./route";
@@ -59,6 +63,12 @@ describe("POST /api/internal/seo-audit/schedules/enqueue", () => {
 
     reapSeoAuditArtifactUploads.mockResolvedValueOnce({ cleaned: 1, failed: 0 });
     enqueueDueSeoAuditSchedules.mockResolvedValueOnce({ enqueued: 2 });
+    runSeoAuditNotificationMaintenance.mockResolvedValueOnce({
+      pendingCompletions: "completed",
+      pendingFinalFailures: "completed",
+      subscriptionExpirations: "completed",
+      emailOutbox: "completed",
+    });
     const response = await POST(request({ limit: 10 }));
     expect(response.status).toBe(200);
     expect(await response.json()).toEqual({
@@ -66,9 +76,16 @@ describe("POST /api/internal/seo-audit/schedules/enqueue", () => {
       enqueued: 2,
       artifactUploadsCleaned: 1,
       artifactUploadCleanupFailed: 0,
+      notificationMaintenance: {
+        pendingCompletions: "completed",
+        pendingFinalFailures: "completed",
+        subscriptionExpirations: "completed",
+        emailOutbox: "completed",
+      },
     });
     expect(response.headers.get("cache-control")).toBe("no-store");
     expect(reapSeoAuditArtifactUploads).toHaveBeenCalledWith();
     expect(enqueueDueSeoAuditSchedules).toHaveBeenCalledWith({ limit: 10 });
+    expect(runSeoAuditNotificationMaintenance).toHaveBeenCalledWith();
   });
 });

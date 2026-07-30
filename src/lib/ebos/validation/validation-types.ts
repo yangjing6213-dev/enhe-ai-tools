@@ -12,9 +12,32 @@ export type EbosValidationSuccessStatus =
 export type EbosValidationDecisionRecommendation =
   | "continue"
   | "adjust"
+  | "pause"
   | "stop"
   | "scale"
   | "needs_more_data";
+
+export type EbosSeoAuditFirstWeekDecision = "continue" | "pause" | "stop" | "scale";
+
+export type EbosSeoAuditFirstWeekValidationInput = {
+  paidOrders?: number;
+  completedScans?: number;
+  channelSpend?: number;
+  totalValidationSpend?: number;
+  refundCount?: number;
+  factualErrorCount?: number;
+  factCheckedItems?: number;
+  undeliveredPaidOrders?: number;
+  pendingRefundOrders?: number;
+};
+
+export type EbosSeoAuditFirstWeekValidationResult = {
+  decision: EbosSeoAuditFirstWeekDecision;
+  cashCac?: number;
+  refundRate: number;
+  factualErrorRate: number;
+  reasons: string[];
+};
 
 export type EbosValidationWarning = {
   code: string;
@@ -67,6 +90,7 @@ export type EbosValidationChannelAttributionSummary = {
 
 export type EbosValidationChannelResult = {
   channel: string;
+  spend?: number;
   metricLabel?: string;
   metricValue?: number;
   ctaClicks?: number;
@@ -97,6 +121,13 @@ export type EbosValidationResultInput = {
   paidOrders?: number;
   revenue?: number;
   refundCount?: number;
+  completedScans?: number;
+  channelSpend?: number;
+  totalValidationSpend?: number;
+  factualErrorCount?: number;
+  factCheckedItems?: number;
+  undeliveredPaidOrders?: number;
+  pendingRefundOrders?: number;
   priceShown?: string;
   manualOutreachCount?: number;
   outreachCount?: number;
@@ -226,6 +257,7 @@ export type EbosValidationResultReport = {
   summary: string;
   continueDirections: string[];
   adjustDirections: string[];
+  pauseDirections?: string[];
   stopDirections: string[];
   scaleDirections: string[];
   codexTasks: string[];

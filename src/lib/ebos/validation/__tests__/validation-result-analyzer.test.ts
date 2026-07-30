@@ -2,7 +2,8 @@ import { describe, expect, test } from "vitest";
 import {
   analyzeSingleValidationPlan,
   analyzeValidationResults,
-  calculateValidationScore
+  calculateValidationScore,
+  evaluateSeoAuditFirstWeekValidation
 } from "../validation-result-analyzer";
 import type {
   EbosValidationPlanTracker,
@@ -59,18 +60,19 @@ describe("validation result analyzer", () => {
     expect(analyze({ paidOrders: 1 }).successStatus).toBe("success");
   });
 
-  test("revenue without refunds can become scale recommendation", () => {
+  test("revenue without a measured cash CAC cannot become a scale recommendation", () => {
     const analysis = analyze({ paidOrders: 2, revenue: 199, refundCount: 0 });
 
     expect(analysis.successStatus).toBe("success");
-    expect(analysis.decisionRecommendation).toBe("scale");
+    expect(analysis.decisionRecommendation).toBe("continue");
     expect(calculateValidationScore(plan(), analysis.resultInput)).toBeGreaterThanOrEqual(85);
   });
 
-  test("paid orders with high refunds are partial success with warning", () => {
+  test("paid orders with a refund rate above ten percent stop validation", () => {
     const analysis = analyze({ paidOrders: 2, revenue: 199, refundCount: 2 });
 
-    expect(analysis.successStatus).toBe("partial_success");
+    expect(analysis.successStatus).toBe("failed");
+    expect(analysis.decisionRecommendation).toBe("stop");
     expect(analysis.warnings.join(" ")).toContain("refund");
   });
 
@@ -124,9 +126,119 @@ describe("validation result analyzer", () => {
   test("paid orders with any refund are partial success", () => {
     const analysis = analyze({ paidOrders: 3, revenue: 99, refundCount: 1 });
 
-    expect(analysis.successStatus).toBe("partial_success");
-    expect(analysis.decisionRecommendation).toBe("adjust");
+    expect(analysis.successStatus).toBe("failed");
+    expect(analysis.decisionRecommendation).toBe("stop");
     expect(analysis.nextActions.join(" ")).toContain("refund");
+  });
+
+  test("enforces first-week budget, scan, refund, factual-error, delivery, and CAC gates", () => {
+    expect(evaluateSeoAuditFirstWeekValidation({
+      paidOrders: 2,
+      completedScans: 50,
+      channelSpend: 20,
+      totalValidationSpend: 20,
+      refundCount: 0,
+      factualErrorCount: 0,
+      factCheckedItems: 20,
+      undeliveredPaidOrders: 0,
+      pendingRefundOrders: 0
+    }).decision).toBe("pause");
+
+    expect(evaluateSeoAuditFirstWeekValidation({
+      paidOrders: 3,
+      completedScans: 40,
+      channelSpend: 151,
+      totalValidationSpend: 151,
+      refundCount: 0,
+      factualErrorCount: 0,
+      factCheckedItems: 20,
+      undeliveredPaidOrders: 0,
+      pendingRefundOrders: 0
+    }).decision).toBe("pause");
+
+    expect(evaluateSeoAuditFirstWeekValidation({
+      paidOrders: 3,
+      completedScans: 40,
+      channelSpend: 20,
+      totalValidationSpend: 501,
+      refundCount: 0,
+      factualErrorCount: 0,
+      factCheckedItems: 20,
+      undeliveredPaidOrders: 0,
+      pendingRefundOrders: 0
+    }).decision).toBe("stop");
+
+    expect(evaluateSeoAuditFirstWeekValidation({
+      paidOrders: 8,
+      completedScans: 40,
+      channelSpend: 30,
+      totalValidationSpend: 30,
+      refundCount: 1,
+      factualErrorCount: 0,
+      factCheckedItems: 20,
+      undeliveredPaidOrders: 0,
+      pendingRefundOrders: 0
+    }).decision).toBe("stop");
+
+    expect(evaluateSeoAuditFirstWeekValidation({
+      paidOrders: 3,
+      completedScans: 40,
+      channelSpend: 20,
+      totalValidationSpend: 20,
+      refundCount: 0,
+      factualErrorCount: 2,
+      factCheckedItems: 20,
+      undeliveredPaidOrders: 0,
+      pendingRefundOrders: 0
+    }).decision).toBe("stop");
+
+    expect(evaluateSeoAuditFirstWeekValidation({
+      paidOrders: 3,
+      completedScans: 40,
+      channelSpend: 20,
+      totalValidationSpend: 20,
+      refundCount: 0,
+      factualErrorCount: 0,
+      factCheckedItems: 20,
+      undeliveredPaidOrders: 1,
+      pendingRefundOrders: 0
+    }).decision).toBe("stop");
+
+    expect(evaluateSeoAuditFirstWeekValidation({
+      paidOrders: 3,
+      completedScans: 40,
+      channelSpend: 20,
+      totalValidationSpend: 20,
+      refundCount: 0,
+      factualErrorCount: 0,
+      factCheckedItems: 20,
+      undeliveredPaidOrders: 0,
+      pendingRefundOrders: 1
+    }).decision).toBe("stop");
+
+    expect(evaluateSeoAuditFirstWeekValidation({
+      paidOrders: 3,
+      completedScans: 40,
+      channelSpend: 21,
+      totalValidationSpend: 21,
+      refundCount: 0,
+      factualErrorCount: 0,
+      factCheckedItems: 20,
+      undeliveredPaidOrders: 0,
+      pendingRefundOrders: 0
+    })).toMatchObject({ decision: "scale", cashCac: 7 });
+
+    expect(evaluateSeoAuditFirstWeekValidation({
+      paidOrders: 3,
+      completedScans: 40,
+      channelSpend: 21.01,
+      totalValidationSpend: 21.01,
+      refundCount: 0,
+      factualErrorCount: 0,
+      factCheckedItems: 20,
+      undeliveredPaidOrders: 0,
+      pendingRefundOrders: 0
+    }).decision).toBe("continue");
   });
 
   test("builds aggregate result report buckets", () => {

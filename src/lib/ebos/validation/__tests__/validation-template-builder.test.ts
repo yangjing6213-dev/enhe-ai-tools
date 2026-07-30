@@ -70,6 +70,17 @@ describe("validation template builder", () => {
       status: "not_started"
     });
     expect(tracker.instructions.join(" ")).toContain("manual");
+    expect(tracker.manualInputSchema).toMatchObject({
+      numericFields: expect.arrayContaining([
+        "completedScans",
+        "channelSpend",
+        "totalValidationSpend",
+        "factualErrorCount",
+        "factCheckedItems",
+        "undeliveredPaidOrders",
+        "pendingRefundOrders"
+      ])
+    });
   });
 
   test("does not crash when no decision report exists", async () => {

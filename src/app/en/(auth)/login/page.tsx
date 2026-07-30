@@ -12,7 +12,7 @@ export function generateMetadata() {
 export default function EnglishLoginPage({
   searchParams
 }: {
-  searchParams: Promise<{ message?: string; payment?: string }>;
+  searchParams: Promise<{ message?: string; payment?: string; returnTo?: string }>;
 }) {
   return <LoginPageShell searchParams={searchParams} forceLocale="en" />;
 }

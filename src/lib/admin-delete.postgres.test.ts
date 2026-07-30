@@ -258,6 +258,8 @@ describePostgres("PostgreSQL admin hard-delete protection", () => {
         orderId: subscriptionOrder.id,
         serviceStartsAt: new Date("2026-07-01T00:00:00.000Z"),
         serviceEndsAt: new Date("2026-08-01T00:00:00.000Z"),
+        scheduledRunsGranted: 4,
+        manualRunsGranted: 1,
       },
     });
     const orderIds = [

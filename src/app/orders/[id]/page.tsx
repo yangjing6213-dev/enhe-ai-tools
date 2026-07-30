@@ -7,7 +7,11 @@ import { Container, SectionTitle } from "@/components/ui";
 import { requireUser } from "@/lib/auth";
 import { prisma } from "@/lib/db";
 import { getOrderBenefitExpiry } from "@/lib/order-view";
-import { canUserRequestRefundForOrder } from "@/lib/order-rules";
+import {
+  canUserRequestRefundForOrder,
+  getRefundBenefitUsageScopes,
+  hasExistingRefundAttempt
+} from "@/lib/order-rules";
 import { getPaymentProofImageSrc, isRenderablePaymentProofImage } from "@/lib/payment-proof-image";
 import { reviewCompletionNotice } from "@/lib/review-copy";
 import { getStatusLabel, orderStatusLabels, proofStatusLabels } from "@/lib/status-labels";
@@ -27,6 +31,7 @@ export default async function OrderDetailPage({ params, searchParams }: OrderDet
       plan: true,
       tool: true,
       paymentProof: true,
+      paymentTransaction: { select: { refundRecordId: true, refundState: true } },
       refundRecords: { orderBy: { createdAt: "desc" } }
     }
   });
@@ -38,25 +43,40 @@ export default async function OrderDetailPage({ params, searchParams }: OrderDet
     activatedAt: order.activatedAt,
     plan: order.plan
   });
-  const hasPendingRefundRequest = order.refundRecords.some((refund) => refund.status === "pending");
   const benefitStart = order.activatedAt ?? order.paidAt ?? order.createdAt;
-  const [downloadCount, usageCount] = await Promise.all([
-    prisma.downloadLog.count({
-      where: {
-        userId: user.id,
-        ...(order.orderType === "software_download" && order.toolId ? { toolId: order.toolId } : {}),
-        createdAt: { gte: benefitStart }
-      }
-    }),
-    prisma.toolUsageLog.count({
-      where: {
-        userId: user.id,
-        createdAt: { gte: benefitStart }
-      }
-    })
+  const benefitUsageScopes = getRefundBenefitUsageScopes({
+    orderType: order.orderType,
+    orderId: order.id,
+    userId: user.id,
+    toolId: order.toolId,
+    benefitStart
+  });
+  const [downloadCount, usageCount, seoAuditRunCount] = await Promise.all([
+    benefitUsageScopes.downloadLog
+      ? prisma.downloadLog.count({ where: benefitUsageScopes.downloadLog })
+      : 0,
+    benefitUsageScopes.toolUsageLog
+      ? prisma.toolUsageLog.count({ where: benefitUsageScopes.toolUsageLog })
+      : 0,
+    benefitUsageScopes.seoAuditRun
+      ? prisma.seoAuditRun.count({ where: benefitUsageScopes.seoAuditRun })
+      : 0
   ]);
-  const hasUsedBenefits = downloadCount > 0 || usageCount > 0;
-  const canRequestRefund = canUserRequestRefundForOrder(order.orderStatus, hasPendingRefundRequest, hasUsedBenefits);
+  const hasUsedBenefits = !benefitUsageScopes.isVerifiable
+    || downloadCount > 0
+    || usageCount > 0
+    || seoAuditRunCount > 0;
+  const hasRefundAttempt = hasExistingRefundAttempt({
+    refundRecordCount: order.refundRecords.length,
+    paymentRefundRecordId: order.paymentTransaction?.refundRecordId,
+    paymentRefundState: order.paymentTransaction?.refundState
+  });
+  const canRequestRefund = canUserRequestRefundForOrder(order.orderStatus, hasRefundAttempt, hasUsedBenefits);
+  const refundUnavailableMessage = !benefitUsageScopes.isVerifiable
+    ? "订单权益关联异常，暂不能在线申请退款，请联系人工客服核查。"
+    : hasUsedBenefits
+      ? "该订单权益已经使用，暂不支持在线退款申请。"
+      : "当前订单状态暂不支持提交售后/退款申请。";
 
   return (
     <Container className="py-14">
@@ -138,7 +158,7 @@ export default async function OrderDetailPage({ params, searchParams }: OrderDet
               <h2 className="font-semibold">售后/退款</h2>
               <p className="mt-2 text-sm text-[#8B95A7]">已支付或已开通订单可以提交售后/退款申请，后台会人工处理。{reviewCompletionNotice}</p>
             </div>
-            {hasPendingRefundRequest ? (
+            {order.refundRecords[0]?.status === "pending" ? (
               <span className="rounded-full border border-[var(--marketing-accent)]/30 px-3 py-1 text-xs text-[var(--marketing-accent)]">待处理</span>
             ) : null}
           </div>
@@ -165,8 +185,8 @@ export default async function OrderDetailPage({ params, searchParams }: OrderDet
                 提交售后/退款申请
               </FormSubmitButton>
             </form>
-          ) : !hasPendingRefundRequest && !order.refundRecords.length ? (
-            <p className="mt-4 text-sm text-[#8B95A7]">当前订单状态暂不支持提交售后/退款申请。</p>
+          ) : !hasRefundAttempt ? (
+            <p className="mt-4 text-sm text-[#8B95A7]">{refundUnavailableMessage}</p>
           ) : null}
         </div>
 

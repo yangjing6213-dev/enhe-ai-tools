@@ -86,12 +86,12 @@ describe("Google Search Console SEO source contract", () => {
     expect(nextConfig).toContain("redirects()");
     expect(nextConfig).toContain('source: "/online-tools"');
     expect(nextConfig).toContain('destination: "/account-services"');
-    expect(nextConfig).toContain('source: "/online-tools/:slug*"');
-    expect(nextConfig).toContain('destination: "/account-services/:slug*"');
+    expect(nextConfig).not.toContain('source: "/online-tools/:slug*"');
+    expect(nextConfig).not.toContain('destination: "/account-services/:slug*"');
     expect(nextConfig).toContain('source: "/en/online-tools"');
     expect(nextConfig).toContain('destination: "/en/account-services"');
-    expect(nextConfig).toContain('source: "/en/online-tools/:slug*"');
-    expect(nextConfig).toContain('destination: "/en/account-services/:slug*"');
+    expect(nextConfig).not.toContain('source: "/en/online-tools/:slug*"');
+    expect(nextConfig).not.toContain('destination: "/en/account-services/:slug*"');
     expect(nextConfig).toContain("statusCode: 301");
     expect(zhOnline).toContain("permanentRedirect");
     expect(zhOnline).toContain('"/account-services"');

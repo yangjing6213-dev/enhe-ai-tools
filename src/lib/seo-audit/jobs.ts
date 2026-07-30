@@ -4,7 +4,15 @@ import {
   timingSafeEqual,
 } from "node:crypto";
 import { Prisma } from "@prisma/client";
+import {
+  trackAnalyticsEvent,
+  type AnalyticsNetworkContext,
+} from "@/lib/analytics";
 import { prisma } from "@/lib/db";
+import {
+  notifySeoAuditRunCompletion,
+  notifySeoAuditRunFailure,
+} from "@/lib/email-seo-audit-notifications";
 import {
   assertPrivateSeoAuditArtifactKeys,
   assertSeoAuditReportMatchesRun,
@@ -57,11 +65,34 @@ type JobOptions = {
   leaseDurationMs?: number;
 };
 
+type SeoAuditLifecycleEventName =
+  | "seo_audit_completed"
+  | "seo_audit_failed";
+
+type SeoAuditLifecycleOptions = {
+  trackAnalyticsEvent?: (input: {
+    eventName: SeoAuditLifecycleEventName;
+    entityType: "seo_audit_run";
+    entityId: string;
+    metadata: { runId: string };
+    networkContext: AnalyticsNetworkContext;
+  }) => Promise<unknown>;
+  reportLifecycleError?: (
+    context: {
+      effect: "analytics" | "notification";
+      eventName: SeoAuditLifecycleEventName;
+      runId: string;
+    },
+    error: unknown,
+  ) => void;
+};
+
 type ClaimOptions = JobOptions & {
   randomBytes?: (size: number) => Buffer;
 };
 
-type CompleteOptions = JobOptions & {
+type CompleteOptions = JobOptions &
+  SeoAuditLifecycleOptions & {
   parseReport?: (reportGzipBase64: string) => Promise<ParsedSeoAuditReport>;
   storeArtifacts?: (input: {
     runId: string;
@@ -73,7 +104,13 @@ type CompleteOptions = JobOptions & {
   randomBytes?: (size: number) => Buffer;
   completionPollIntervalMs?: number;
   completionWaitTimeoutMs?: number;
+  notifyRunCompletion?: (runId: string) => Promise<unknown>;
 };
+
+type FailOptions = JobOptions &
+  SeoAuditLifecycleOptions & {
+    notifyRunFailure?: (runId: string) => Promise<unknown>;
+  };
 
 export type SeoAuditWorkerProgress = {
   phase: "prepare" | "crawl" | "report" | "upload" | "cancel";
@@ -91,6 +128,21 @@ type ClaimedRunRow = {
   attemptCount: number;
   engineVersion: string;
 };
+
+type ClaimCandidateRow = {
+  id: string;
+  sourceOrderId: string | null;
+  claimPriority: number;
+  availableAt: Date;
+  createdAt: Date;
+};
+
+type ClaimCandidateCursor = Pick<
+  ClaimCandidateRow,
+  "id" | "claimPriority" | "availableAt" | "createdAt"
+>;
+
+const CLAIM_CANDIDATE_BATCH_SIZE = 32;
 
 const failureMessages: Record<SeoAuditFailureCode, string> = {
   INVALID_TARGET: "The audit target is invalid.",
@@ -117,6 +169,53 @@ function resolveNow(value: Date | undefined) {
 function resolveLeaseDuration(value: number | undefined) {
   if (!Number.isSafeInteger(value) || Number(value) < 30_000) return 90_000;
   return Math.min(Number(value), 10 * 60_000);
+}
+
+async function runSeoAuditLifecycleEffects(input: {
+  eventName: SeoAuditLifecycleEventName;
+  runId: string;
+  track: NonNullable<SeoAuditLifecycleOptions["trackAnalyticsEvent"]>;
+  notify: (runId: string) => Promise<unknown>;
+  reportError?: SeoAuditLifecycleOptions["reportLifecycleError"];
+}) {
+  const effects = [
+    {
+      name: "analytics" as const,
+      run: () =>
+        input.track({
+          eventName: input.eventName,
+          entityType: "seo_audit_run",
+          entityId: input.runId,
+          metadata: { runId: input.runId },
+          networkContext: { ip: null, userAgent: null },
+        }),
+    },
+    {
+      name: "notification" as const,
+      run: () => input.notify(input.runId),
+    },
+  ];
+  const results = await Promise.allSettled(
+    effects.map((effect) => Promise.resolve().then(effect.run)),
+  );
+
+  results.forEach((result, index) => {
+    if (result.status === "fulfilled") return;
+    const context = {
+      effect: effects[index].name,
+      eventName: input.eventName,
+      runId: input.runId,
+    };
+    if (input.reportError) {
+      input.reportError(context, result.reason);
+      return;
+    }
+    console.error(
+      "[seo-audit-jobs] post-commit lifecycle effect failed",
+      context,
+      result.reason,
+    );
+  });
 }
 
 function hashLeaseToken(leaseToken: string) {
@@ -194,19 +293,33 @@ function staleLeaseRecoverySql(now: Date) {
   `;
 }
 
-function claimRunSql(input: {
+function claimCandidatesSql(input: {
   now: Date;
-  leaseTokenHash: string;
-  leaseExpiresAt: Date;
-  engineVersion: string;
+  after?: ClaimCandidateCursor;
 }) {
+  const after = input.after
+    ? Prisma.sql`
+        WHERE (
+          prioritized."claimPriority",
+          prioritized."availableAt",
+          prioritized."createdAt",
+          prioritized."id"
+        ) > (
+          ${input.after.claimPriority},
+          ${input.after.availableAt},
+          ${input.after.createdAt},
+          ${input.after.id}
+        )
+      `
+    : Prisma.empty;
+
   return Prisma.sql`
-    WITH candidate AS (
-      SELECT runs."id"
-      FROM "seo_audit_runs" AS runs
-      WHERE runs."status" = 'queued'
-        AND runs."available_at" <= ${input.now}
-      ORDER BY
+    WITH prioritized AS (
+      SELECT
+        runs."id" AS "id",
+        runs."source_order_id" AS "sourceOrderId",
+        runs."available_at" AS "availableAt",
+        runs."created_at" AS "createdAt",
         CASE
           WHEN runs."kind" IN ('professional', 'deep', 'recheck') THEN 0
           WHEN runs."kind" = 'scheduled' THEN GREATEST(
@@ -218,10 +331,81 @@ function claimRunSql(input: {
             2 - FLOOR(EXTRACT(EPOCH FROM (${input.now} - runs."available_at")) / 300)::INTEGER
           )
           ELSE 3
-        END,
-        runs."available_at" ASC,
-        runs."created_at" ASC
-      LIMIT 1
+        END AS "claimPriority"
+      FROM "seo_audit_runs" AS runs
+      WHERE runs."status" = 'queued'
+        AND runs."available_at" <= ${input.now}
+        AND (
+          runs."source_order_id" IS NULL
+          OR EXISTS (
+            SELECT 1
+            FROM "orders" AS funding_orders
+            WHERE funding_orders."id" = runs."source_order_id"
+              AND funding_orders."order_status" IN ('paid', 'activated')
+              AND NOT EXISTS (
+                SELECT 1
+                FROM "order_refund_records" AS refund_records
+                WHERE refund_records."order_id" = funding_orders."id"
+                  AND refund_records."status" = 'pending'
+              )
+          )
+        )
+    )
+    SELECT
+      prioritized."id",
+      prioritized."sourceOrderId",
+      prioritized."claimPriority",
+      prioritized."availableAt",
+      prioritized."createdAt"
+    FROM prioritized
+    ${after}
+    ORDER BY
+      prioritized."claimPriority" ASC,
+      prioritized."availableAt" ASC,
+      prioritized."createdAt" ASC,
+      prioritized."id" ASC
+    LIMIT ${CLAIM_CANDIDATE_BATCH_SIZE}
+  `;
+}
+
+function lockFundingOrderSql(orderId: string) {
+  return Prisma.sql`
+    SELECT "id"
+    FROM "orders"
+    WHERE "id" = ${orderId}
+    FOR UPDATE SKIP LOCKED
+  `;
+}
+
+function claimCandidateSql(input: {
+  runId: string;
+  now: Date;
+  leaseTokenHash: string;
+  leaseExpiresAt: Date;
+  engineVersion: string;
+}) {
+  return Prisma.sql`
+    WITH candidate AS (
+      SELECT runs."id"
+      FROM "seo_audit_runs" AS runs
+      WHERE runs."id" = ${input.runId}
+        AND runs."status" = 'queued'
+        AND runs."available_at" <= ${input.now}
+        AND (
+          runs."source_order_id" IS NULL
+          OR EXISTS (
+            SELECT 1
+            FROM "orders" AS funding_orders
+            WHERE funding_orders."id" = runs."source_order_id"
+              AND funding_orders."order_status" IN ('paid', 'activated')
+              AND NOT EXISTS (
+                SELECT 1
+                FROM "order_refund_records" AS refund_records
+                WHERE refund_records."order_id" = funding_orders."id"
+                  AND refund_records."status" = 'pending'
+            )
+          )
+        )
       FOR UPDATE SKIP LOCKED
     )
     UPDATE "seo_audit_runs" AS runs
@@ -265,17 +449,46 @@ export async function claimSeoAuditJob(
     now.getTime() + resolveLeaseDuration(options.leaseDurationMs),
   );
 
-  const claimed = await db.$transaction(async (tx) => {
+  await db.$transaction(async (tx) => {
     await tx.$executeRaw(staleLeaseRecoverySql(now));
-    const rows = await tx.$queryRaw<ClaimedRunRow[]>(
-      claimRunSql({
-        now,
-        leaseTokenHash,
-        leaseExpiresAt,
-        engineVersion: input.engineVersion,
-      }),
-    );
-    return rows[0] ?? null;
+  });
+
+  const claimed = await db.$transaction(async (tx) => {
+    let after: ClaimCandidateCursor | undefined;
+    while (true) {
+      const candidates = await tx.$queryRaw<ClaimCandidateRow[]>(
+        claimCandidatesSql({ now, after }),
+      );
+      if (candidates.length === 0) return null;
+
+      for (const candidate of candidates) {
+        if (candidate.sourceOrderId) {
+          const lockedOrders = await tx.$queryRaw<Array<{ id: string }>>(
+            lockFundingOrderSql(candidate.sourceOrderId),
+          );
+          if (!lockedOrders[0]) continue;
+        }
+        const rows = await tx.$queryRaw<ClaimedRunRow[]>(
+          claimCandidateSql({
+            runId: candidate.id,
+            now,
+            leaseTokenHash,
+            leaseExpiresAt,
+            engineVersion: input.engineVersion,
+          }),
+        );
+        if (rows[0]) return rows[0];
+      }
+
+      if (candidates.length < CLAIM_CANDIDATE_BATCH_SIZE) return null;
+      const last = candidates[candidates.length - 1];
+      after = {
+        id: last.id,
+        claimPriority: last.claimPriority,
+        availableAt: last.availableAt,
+        createdAt: last.createdAt,
+      };
+    }
   });
 
   if (!claimed) return null;
@@ -1110,6 +1323,17 @@ export async function completeSeoAuditJob(
       await cleanupUploadedArtifacts(stored, removeArtifacts);
       throw new SeoAuditJobError("JOB_CANCELLED");
     }
+    if (!result.alreadyCompleted) {
+      await runSeoAuditLifecycleEffects({
+        eventName: "seo_audit_completed",
+        runId: input.runId,
+        track: options.trackAnalyticsEvent ?? trackAnalyticsEvent,
+        notify:
+          options.notifyRunCompletion ??
+          ((runId) => notifySeoAuditRunCompletion(runId, { db })),
+        reportError: options.reportLifecycleError,
+      });
+    }
     return result;
   }
 
@@ -1122,13 +1346,13 @@ export async function failSeoAuditJob(
     leaseToken: string;
     failureCode: SeoAuditFailureCode;
   },
-  options: JobOptions = {},
+  options: FailOptions = {},
 ) {
   const db = options.db ?? prisma;
   const now = resolveNow(options.now);
   const leaseTokenHash = hashLeaseToken(input.leaseToken);
 
-  return db.$transaction(async (tx) => {
+  const result = await db.$transaction(async (tx) => {
     const locked = await tx.$queryRaw<Array<{ id: string }>>(Prisma.sql`
       SELECT "id"
       FROM "seo_audit_runs"
@@ -1213,6 +1437,19 @@ export async function failSeoAuditJob(
     }
     return { status: "failed" as const, alreadyFailed: false };
   });
+
+  if (result.status === "failed" && !result.alreadyFailed) {
+    await runSeoAuditLifecycleEffects({
+      eventName: "seo_audit_failed",
+      runId: input.runId,
+      track: options.trackAnalyticsEvent ?? trackAnalyticsEvent,
+      notify:
+        options.notifyRunFailure ??
+        ((runId) => notifySeoAuditRunFailure(runId, { db })),
+      reportError: options.reportLifecycleError,
+    });
+  }
+  return result;
 }
 
 export async function requestSeoAuditJobCancellation(

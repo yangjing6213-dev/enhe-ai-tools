@@ -1,6 +1,7 @@
 import { z } from "zod";
 import { enqueueDueSeoAuditSchedules } from "@/lib/seo-audit/entitlements";
 import { reapSeoAuditArtifactUploads } from "@/lib/seo-audit/jobs";
+import { runSeoAuditNotificationMaintenance } from "@/lib/seo-audit/notification-maintenance";
 import {
   handleWorkerRouteError,
   readBoundedJsonBody,
@@ -33,11 +34,13 @@ export async function POST(request: Request) {
 
     const cleanup = await reapSeoAuditArtifactUploads();
     const result = await enqueueDueSeoAuditSchedules(parsed.data);
+    const notificationMaintenance = await runSeoAuditNotificationMaintenance();
     return workerJsonResponse({
       ok: true,
       ...result,
       artifactUploadsCleaned: cleanup.cleaned,
       artifactUploadCleanupFailed: cleanup.failed,
+      notificationMaintenance,
     });
   } catch (error) {
     return handleWorkerRouteError(error);

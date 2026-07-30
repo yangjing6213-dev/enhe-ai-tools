@@ -1,4 +1,5 @@
 import type { EbosValidationInputFile, EbosValidationResultInput } from "../validation";
+import type { SeoAuditAnalyticsEventName } from "@/lib/analytics";
 
 export type EbosValidationCaptureWarning = {
   code: string;
@@ -24,7 +25,28 @@ export type EbosValidationAnalyticsSummary = {
   ctaClicksDetected: number;
   eventsByName: Record<string, number>;
   eventsByPath: Record<string, number>;
+  seoAuditFunnel?: EbosSeoAuditFunnelSummary;
   warnings: EbosValidationCaptureWarning[];
+};
+
+export type EbosSeoAuditFunnelChannel = {
+  source: string;
+  medium: string;
+  campaign?: string;
+  offerId?: string;
+  landingViews: number;
+  completedScans: number;
+  offerClicks: number;
+  ordersCreated: number;
+  paymentSucceeded: number;
+  reportsDelivered: number;
+  refunds: number;
+};
+
+export type EbosSeoAuditFunnelSummary = {
+  counts: Record<SeoAuditAnalyticsEventName, number>;
+  completedScans: number;
+  channels: EbosSeoAuditFunnelChannel[];
 };
 
 export type EbosValidationOrderRecord = {
@@ -37,7 +59,11 @@ export type EbosValidationOrderRecord = {
   paidAt?: string;
   createdAt?: string;
   refundCount: number;
+  pendingRefundCount?: number;
   refundedAmount: number;
+  isTestData?: boolean;
+  paymentSucceeded?: boolean;
+  delivered?: boolean;
 };
 
 export type EbosValidationOrderProductSummary = {
@@ -46,6 +72,8 @@ export type EbosValidationOrderProductSummary = {
   revenue: number;
   refundedAmount: number;
   refundCount: number;
+  pendingRefundOrders?: number;
+  undeliveredPaidOrders?: number;
 };
 
 export type EbosValidationOrderSummary = {
@@ -55,6 +83,9 @@ export type EbosValidationOrderSummary = {
   revenue: number;
   refundedAmount: number;
   refundCount: number;
+  pendingRefundOrders?: number;
+  undeliveredPaidOrders?: number;
+  testOrdersExcluded?: number;
   ordersByProductOrSlug: Record<string, EbosValidationOrderProductSummary>;
   warnings: EbosValidationCaptureWarning[];
 };

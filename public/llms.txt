@@ -28,6 +28,7 @@ Important pages:
 - [Build Your Own X Navigator](https://www.enhe-tech.com.cn/build-your-own-x)
 - [AI topic paths](https://www.enhe-tech.com.cn/ai-topics)
 - [AI software apps](https://www.enhe-tech.com.cn/software)
+- [Independent-site SEO/GEO Audit](https://www.enhe-tech.com.cn/online-tools/seo-geo-audit)
 - [AI account service guidance](https://www.enhe-tech.com.cn/account-services)
 - [AI skill learning](https://www.enhe-tech.com.cn/skill-learning)
 - [AI Prompt Management System](https://www.enhe-tech.com.cn/skill-learning/ai-prompt-management)

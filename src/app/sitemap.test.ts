@@ -83,14 +83,22 @@ describe("sitemap canonical URL contract", () => {
     expect(urls).toContain("https://www.enhe-tech.com.cn/en/product-paths/work-efficiency");
     expect(urls).toContain("https://www.enhe-tech.com.cn/en/product-paths/media-generation");
     expect(urls).toContain("https://www.enhe-tech.com.cn/en/product-paths/future-ai");
+    expect(urls).toContain("https://www.enhe-tech.com.cn/online-tools/seo-geo-audit");
+    expect(urls).toContain("https://www.enhe-tech.com.cn/en/online-tools/seo-geo-audit");
     expect(urls).toContain("https://www.enhe-tech.com.cn/software/ai-voice-generator-flexible-edition");
     expect(urls).toContain("https://www.enhe-tech.com.cn/account-services/chatgpt-support");
     expect(urls).toContain("https://www.enhe-tech.com.cn/skill-learning/prompt-course");
     expect(urls).toContain("https://www.enhe-tech.com.cn/ai-news/ai-agents-reshape-daily-workflows");
 
-    for (const forbidden of ["/admin", "/dashboard", "/user-center", "/login", "/register", "/checkout", "/orders", "/payment", "/api", "/online-tools", "/tools/"]) {
+    for (const forbidden of ["/admin", "/dashboard", "/user-center", "/login", "/register", "/checkout", "/orders", "/payment", "/api", "/tools/"]) {
       expect(urls.some((url) => url.includes(forbidden)), forbidden).toBe(false);
     }
+    expect(
+      urls.filter((url) => new URL(url).pathname.includes("/online-tools")),
+    ).toEqual([
+      "https://www.enhe-tech.com.cn/online-tools/seo-geo-audit",
+      "https://www.enhe-tech.com.cn/en/online-tools/seo-geo-audit",
+    ]);
 
     for (const machineReadable of [
       "/llms.txt",

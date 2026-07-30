@@ -68,4 +68,69 @@ describe("validation analytics reader", () => {
     expect(metrics["validation-product-1-faceswap-studio-ai"]?.productPageCtaClicks).toBe(1);
     expect(metrics["validation-product-2-local-ai-video-studio-for-creator-workflows"]?.productPageCtaClicks).toBe(1);
   });
+
+  it("computes the SEO audit funnel by trusted event and acquisition context", () => {
+    const summary = summarizeAnalyticsEvents([
+      {
+        eventName: "seo_audit_landing_view",
+        metadata: {
+          eventTrust: "client",
+          clientId: "client-1",
+          sessionId: "session-1",
+          source: "xiaohongshu",
+          medium: "organic_social",
+          campaign: "launch-week",
+          offerId: "seo-audit-professional"
+        }
+      },
+      {
+        eventName: "seo_audit_completed",
+        metadata: {
+          eventTrust: "server",
+          clientId: "client-1",
+          sessionId: "session-1",
+          source: "xiaohongshu",
+          medium: "organic_social",
+          campaign: "launch-week",
+          offerId: "seo-audit-professional"
+        }
+      },
+      {
+        eventName: "seo_audit_purchased",
+        metadata: {
+          eventTrust: "server",
+          clientId: "client-1",
+          sessionId: "session-1",
+          source: "xiaohongshu",
+          medium: "organic_social",
+          campaign: "launch-week",
+          offerId: "seo-audit-professional",
+          orderId: "order-1"
+        }
+      },
+      {
+        eventName: "seo_audit_purchased",
+        metadata: {
+          eventTrust: "client",
+          clientId: "attacker",
+          sessionId: "forged",
+          orderId: "forged-order"
+        }
+      }
+    ]);
+
+    expect(summary.seoAuditFunnel?.counts).toMatchObject({
+      seo_audit_landing_view: 1,
+      seo_audit_completed: 1,
+      seo_audit_purchased: 1
+    });
+    expect(summary.seoAuditFunnel?.completedScans).toBe(1);
+    expect(summary.seoAuditFunnel?.channels).toContainEqual(expect.objectContaining({
+      source: "xiaohongshu",
+      medium: "organic_social",
+      campaign: "launch-week",
+      offerId: "seo-audit-professional",
+      paymentSucceeded: 1
+    }));
+  });
 });

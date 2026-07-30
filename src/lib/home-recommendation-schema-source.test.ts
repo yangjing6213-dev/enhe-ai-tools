@@ -11,7 +11,7 @@ describe("homepage recommendation schema", () => {
     );
     const migration = existsSync(migrationPath) ? readFileSync(migrationPath, "utf8") : "";
 
-    expect(schema).toContain("isHomeRecommended Boolean");
+    expect(schema).toMatch(/isHomeRecommended\s+Boolean/);
     expect(schema).toContain('@map("is_home_recommended")');
     expect(schema).toContain("@@index([isHomeRecommended, status, sortOrder])");
     expect(migration).toContain('ADD COLUMN "is_home_recommended" BOOLEAN NOT NULL DEFAULT false');

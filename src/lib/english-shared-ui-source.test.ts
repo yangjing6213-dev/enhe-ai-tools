@@ -1,5 +1,6 @@
 import { readFileSync } from "node:fs";
 import { describe, expect, it } from "vitest";
+import { companyProfile } from "@/lib/company-profile";
 import { getDictionary } from "@/lib/dictionaries";
 
 describe("english shared UI source", () => {
@@ -25,6 +26,9 @@ describe("english shared UI source", () => {
 
     expect(footer).toContain("Fujian Public Security Record No. 35030302900035");
     expect(footer).toContain("ICP Filing: Min ICP No. 2025092404-2");
-    expect(footer).toContain("Shenzhen Longgang District Enhe Network Technology Studio");
+    expect(footer).toContain("companyProfile.name[locale]");
+    expect(companyProfile.name.en).toBe(
+      "Shenzhen Longgang District Enhe Network Technology Studio",
+    );
   });
 });

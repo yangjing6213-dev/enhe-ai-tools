@@ -9,6 +9,7 @@ import {
   normalizeZpayItemName,
   verifyZpayNotifyPayload
 } from "@/lib/zpay";
+import * as zpayConfigModule from "@/lib/zpay-config";
 import { loadZpayConfig } from "@/lib/zpay-config";
 
 const merchantKey = "test_secret_32_chars_1234567890";
@@ -70,7 +71,20 @@ describe("zpay config", () => {
     }
   });
 
-  it("loads process env first and falls back to zpay.env in the project root", () => {
+  it("defaults to disabled without requiring provider credentials", () => {
+    const config = loadZpayConfig({
+      env: { APP_URL: "https://www.enhe-tech.com.cn" },
+    });
+
+    expect(config).toMatchObject({
+      mode: "disabled",
+      pid: "",
+      key: "",
+      siteUrl: "https://www.enhe-tech.com.cn",
+    });
+  });
+
+  it("loads provider credentials only from process env or an explicit file", () => {
     tempDir = mkdtempSync(join(tmpdir(), "zpay-config-"));
     writeFileSync(
       join(tempDir, "zpay.env"),
@@ -87,11 +101,14 @@ describe("zpay config", () => {
     const config = loadZpayConfig({
       cwd: tempDir,
       env: {
+        ZPAY_MODE: "live",
+        ZPAY_ENV_FILE: join(tempDir, "zpay.env"),
         ZPAY_KEY: "from-env-key-1234567890123"
       }
     });
 
     expect(config).toMatchObject({
+      mode: "live",
       apiBase: "https://zpayz.cn",
       pid: "2026061115080760",
       key: "from-env-key-1234567890123",
@@ -99,6 +116,85 @@ describe("zpay config", () => {
       channelId: "18680",
       siteUrl: "https://www.enhe-tech.com.cn"
     });
+  });
+
+  it("exposes a one-use refund confirmation gate", () => {
+    expect(
+      typeof (zpayConfigModule as Record<string, unknown>)
+        .consumeZpayRefundConfirmation,
+    ).toBe("function");
+  });
+
+  it("consumes a valid live refund confirmation exactly once", () => {
+    tempDir = mkdtempSync(join(tmpdir(), "zpay-refund-confirmation-"));
+    const consume = (
+      zpayConfigModule as unknown as {
+        consumeZpayRefundConfirmation: (
+          input: { refundId: string; confirmationValue?: string | null },
+          env: Record<string, string | undefined>,
+        ) => void;
+      }
+    ).consumeZpayRefundConfirmation;
+    const env = {
+      ZPAY_MODE: "live",
+      ZPAY_REFUND_ENABLED: "true",
+      ZPAY_REFUND_CONFIRMATION_VALUE: "one-use-refund-token-1234567890",
+      ZPAY_REFUND_CONFIRMATION_STORE: tempDir,
+    };
+
+    expect(() =>
+      consume(
+        {
+          refundId: "refund-1",
+          confirmationValue: "one-use-refund-token-1234567890",
+        },
+        env,
+      ),
+    ).not.toThrow();
+    expect(() =>
+      consume(
+        {
+          refundId: "refund-2",
+          confirmationValue: "one-use-refund-token-1234567890",
+        },
+        env,
+      ),
+    ).toThrow("ZPAY_REFUND_CONFIRMATION_ALREADY_USED");
+  });
+
+  it("keeps provider refunds disabled without all three explicit gates", () => {
+    tempDir = mkdtempSync(join(tmpdir(), "zpay-refund-disabled-"));
+    const consume = (
+      zpayConfigModule as unknown as {
+        consumeZpayRefundConfirmation: (
+          input: { refundId: string; confirmationValue?: string | null },
+          env: Record<string, string | undefined>,
+        ) => void;
+      }
+    ).consumeZpayRefundConfirmation;
+    const base = {
+      ZPAY_REFUND_CONFIRMATION_VALUE: "one-use-refund-token-1234567890",
+      ZPAY_REFUND_CONFIRMATION_STORE: tempDir,
+    };
+
+    expect(() =>
+      consume(
+        { refundId: "refund-1", confirmationValue: base.ZPAY_REFUND_CONFIRMATION_VALUE },
+        { ...base, ZPAY_MODE: "disabled", ZPAY_REFUND_ENABLED: "true" },
+      ),
+    ).toThrow("ZPAY_PAYMENT_DISABLED");
+    expect(() =>
+      consume(
+        { refundId: "refund-1", confirmationValue: base.ZPAY_REFUND_CONFIRMATION_VALUE },
+        { ...base, ZPAY_MODE: "live", ZPAY_REFUND_ENABLED: "false" },
+      ),
+    ).toThrow("ZPAY_REFUND_DISABLED");
+    expect(() =>
+      consume(
+        { refundId: "refund-1", confirmationValue: "wrong-token-value-1234567890" },
+        { ...base, ZPAY_MODE: "live", ZPAY_REFUND_ENABLED: "true" },
+      ),
+    ).toThrow("ZPAY_REFUND_CONFIRMATION_INVALID");
   });
 });
 

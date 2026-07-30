@@ -4,6 +4,7 @@ import { revalidatePath } from "next/cache";
 import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 import { z } from "zod";
+import { Prisma } from "@prisma/client";
 import { parseAccountCredentials } from "@/lib/account-identity";
 import { writeAdminAuditLog } from "@/lib/admin-audit";
 import { trackAnalyticsEvent } from "@/lib/analytics";
@@ -35,22 +36,34 @@ import {
   buildRefundRequestNotification
 } from "@/lib/notification-messages";
 import { createUserNotification } from "@/lib/notifications";
-import { canUserCancelOrder, canUserRequestRefundForOrder, normalizeRefundRecordAmount } from "@/lib/order-rules";
+import {
+  canUserCancelOrder,
+  canUserRequestRefundForOrder,
+  getRefundBenefitUsageScopes,
+  hasExistingRefundAttempt,
+  normalizeRefundRecordAmount
+} from "@/lib/order-rules";
 import { validatePasswordChangeInput } from "@/lib/password";
 import { getCurrentLocale } from "@/lib/i18n";
 import { buildCanonicalToolPath } from "@/lib/public-slugs";
 import { buildLocalePath } from "@/lib/seo";
 import { resolveToolOrderPriceSpec } from "@/lib/tool-price-specs";
+import { resolveSafeReturnPath } from "@/lib/safe-return-path";
 
 export async function registerAction(formData: FormData) {
   const locale = await getCurrentLocale();
+  const defaultReturnTo = buildLocalePath("/user", locale);
+  const returnTo = resolveSafeReturnPath(formData.get("returnTo"), defaultReturnTo);
   await assertValidCsrfToken(formData.get("csrfToken"));
   const input = parseAccountCredentials({
     identifier: formData.get("email"),
     password: formData.get("password")
   });
   const exists = await prisma.user.findUnique({ where: { email: input.identifier } });
-  if (exists) redirect(`${buildLocalePath("/login", locale)}?message=account-exists`);
+  if (exists) {
+    const params = new URLSearchParams({ message: "account-exists", returnTo });
+    redirect(`${buildLocalePath("/login", locale)}?${params.toString()}`);
+  }
 
   const user = await prisma.user.create({
     data: {
@@ -60,11 +73,13 @@ export async function registerAction(formData: FormData) {
     }
   });
   await signInUser(user.id);
-  redirect(buildLocalePath("/user", locale));
+  redirect(returnTo);
 }
 
 export async function loginAction(formData: FormData) {
   const locale = await getCurrentLocale();
+  const defaultReturnTo = buildLocalePath("/user", locale);
+  const returnTo = resolveSafeReturnPath(formData.get("returnTo"), defaultReturnTo);
   await assertValidCsrfToken(formData.get("csrfToken"));
   const input = parseAccountCredentials({
     identifier: formData.get("email"),
@@ -74,14 +89,16 @@ export async function loginAction(formData: FormData) {
     await assertLoginNotLimited(input.identifier);
   } catch (e) {
     if (e instanceof Error && e.message === "LOGIN_LIMITED") {
-      redirect(`${buildLocalePath("/login", locale)}?message=login-limited`);
+      const params = new URLSearchParams({ message: "login-limited", returnTo });
+      redirect(`${buildLocalePath("/login", locale)}?${params.toString()}`);
     }
     throw e;
   }
   const user = await prisma.user.findUnique({ where: { email: input.identifier } });
   if (!user || user.status !== "active" || !(await verifyPassword(input.password, user.passwordHash))) {
     await recordLoginAttempt(input.identifier, false);
-    redirect(`${buildLocalePath("/login", locale)}?message=invalid`);
+    const params = new URLSearchParams({ message: "invalid", returnTo });
+    redirect(`${buildLocalePath("/login", locale)}?${params.toString()}`);
   }
   await recordLoginAttempt(input.identifier, true);
   await signInUser(user.id);
@@ -94,7 +111,7 @@ export async function loginAction(formData: FormData) {
       userAgent: requestInfo.userAgent
     });
   }
-  redirect(user.role === "admin" ? "/admin" : buildLocalePath("/user", locale));
+  redirect(user.role === "admin" ? "/admin" : returnTo);
 }
 
 export async function logoutAction() {
@@ -255,43 +272,81 @@ export async function createRefundRequestAction(formData: FormData) {
   const reason = z.string().min(2, "请填写售后/退款原因").max(500).parse(formData.get("reason"));
   const note = z.string().max(1000).optional().parse(String(formData.get("note") ?? "") || undefined);
   const refundReceiverQr = z.string().min(1, "请填写或粘贴退款收款码图片地址。").max(1000).parse(formData.get("refundReceiverQr"));
-  const order = await prisma.order.findFirst({
-    where: { id: orderId, userId: user.id },
-    include: { refundRecords: { where: { status: "pending" }, select: { id: true }, take: 1 } }
-  });
-  if (!order) throw new Error("订单不存在。");
-  const benefitStart = order.activatedAt ?? order.paidAt ?? order.createdAt;
-  const [downloadCount, usageCount] = await Promise.all([
-    prisma.downloadLog.count({
-      where: {
-        userId: user.id,
-        ...(order.orderType === "software_download" && order.toolId ? { toolId: order.toolId } : {}),
-        createdAt: { gte: benefitStart }
-      }
-    }),
-    prisma.toolUsageLog.count({
-      where: {
-        userId: user.id,
-        createdAt: { gte: benefitStart }
-      }
-    })
-  ]);
-  const hasUsedBenefits = downloadCount > 0 || usageCount > 0;
-  if (!canUserRequestRefundForOrder(order.orderStatus, order.refundRecords.length > 0, hasUsedBenefits)) {
-    throw new Error("当前订单状态不允许申请售后/退款，或已有待处理申请。");
-  }
+  const order = await prisma.$transaction(async (tx) => {
+    const lockedOrders = await tx.$queryRaw<Array<{ id: string }>>(Prisma.sql`
+      SELECT id
+      FROM orders
+      WHERE id = ${orderId}
+        AND user_id = ${user.id}
+      FOR UPDATE
+    `);
+    if (lockedOrders.length !== 1) throw new Error("订单不存在。");
 
-  const amount = normalizeRefundRecordAmount(order.amount.toString(), Number(order.amount));
-  await prisma.orderRefundRecord.create({
-    data: {
-      orderId: order.id,
-      requesterId: user.id,
-      amount,
-      status: "pending",
-      reason,
-      note,
-      refundReceiverQr
+    const currentOrder = await tx.order.findFirst({
+      where: { id: orderId, userId: user.id },
+      include: {
+        refundRecords: { select: { id: true }, take: 1 },
+        paymentTransaction: { select: { refundRecordId: true, refundState: true } },
+      }
+    });
+    if (!currentOrder) throw new Error("订单不存在。");
+
+    const benefitStart = currentOrder.activatedAt ?? currentOrder.paidAt ?? currentOrder.createdAt;
+    const benefitUsageScopes = getRefundBenefitUsageScopes({
+      orderType: currentOrder.orderType,
+      orderId: currentOrder.id,
+      userId: user.id,
+      toolId: currentOrder.toolId,
+      benefitStart
+    });
+    if (!benefitUsageScopes.isVerifiable) {
+      throw new Error("ORDER_ENTITLEMENT_SCOPE_INVALID");
     }
+    let downloadCount = 0;
+    let usageCount = 0;
+    let seoAuditRunCount = 0;
+    if (benefitUsageScopes.downloadLog) {
+      downloadCount = await tx.downloadLog.count({
+        where: benefitUsageScopes.downloadLog
+      });
+    }
+    if (benefitUsageScopes.toolUsageLog) {
+      usageCount = await tx.toolUsageLog.count({
+        where: benefitUsageScopes.toolUsageLog
+      });
+    }
+    if (benefitUsageScopes.seoAuditRun) {
+      seoAuditRunCount = await tx.seoAuditRun.count({
+        where: benefitUsageScopes.seoAuditRun
+      });
+    }
+
+    const hasUsedBenefits = downloadCount > 0 || usageCount > 0 || seoAuditRunCount > 0;
+    const hasExistingRefund = hasExistingRefundAttempt({
+      refundRecordCount: currentOrder.refundRecords.length,
+      paymentRefundRecordId: currentOrder.paymentTransaction?.refundRecordId,
+      paymentRefundState: currentOrder.paymentTransaction?.refundState
+    });
+    if (!canUserRequestRefundForOrder(currentOrder.orderStatus, hasExistingRefund, hasUsedBenefits)) {
+      throw new Error("当前订单状态不允许申请售后/退款，或已经提交过申请。");
+    }
+
+    const amount = normalizeRefundRecordAmount(
+      currentOrder.amount.toString(),
+      Number(currentOrder.amount),
+    );
+    await tx.orderRefundRecord.create({
+      data: {
+        orderId: currentOrder.id,
+        requesterId: user.id,
+        amount,
+        status: "pending",
+        reason,
+        note,
+        refundReceiverQr
+      }
+    });
+    return { id: currentOrder.id, orderNo: currentOrder.orderNo };
   });
   await trackAnalyticsEvent({
     eventName: "refund_request_submitted",

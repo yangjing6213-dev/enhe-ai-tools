@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import { SearchCheck } from "lucide-react";
 import { StructuredData } from "@/components/structured-data";
 import { Container, EmptyState, SectionTitle } from "@/components/ui";
 import { ToolCard } from "@/components/tool-card";
@@ -342,6 +343,7 @@ export async function SoftwarePageShell({
           title={t.listing.softwareTitle}
           intro={t.listing.softwareIntro}
         />
+        <SeoAuditProductEntry forceLocale={forceLocale} />
         <SoftwareUserAnswerCard forceLocale={forceLocale} />
         <ListingGuidanceFold forceLocale={forceLocale} />
         <FilterBar categories={categoryOptions} locale={forceLocale} />
@@ -366,6 +368,36 @@ export async function SoftwarePageShell({
         </ProductSeoDisclosure>
       </Container>
     </main>
+  );
+}
+
+function SeoAuditProductEntry({ forceLocale }: { forceLocale: Locale }) {
+  const en = forceLocale === "en";
+  return (
+    <section className="mt-8 border-y border-white/10 py-6">
+      <div className="flex flex-col gap-5 md:flex-row md:items-center md:justify-between">
+        <div className="max-w-3xl">
+          <p className="text-xs font-bold uppercase text-[var(--marketing-accent)]">
+            ENHE AI
+          </p>
+          <h2 className="mt-2 text-xl font-black text-[var(--marketing-text)] md:text-2xl">
+            {en ? "Independent-site SEO/GEO Audit" : "独立站 SEO/GEO 智能巡检"}
+          </h2>
+          <p className="mt-2 text-sm leading-7 text-[var(--marketing-muted)]">
+            {en
+              ? "Check public pages, review evidence-backed findings, and decide what to fix first."
+              : "巡检公开页面，查看有证据的问题，并确定优先整改项。"}
+          </p>
+        </div>
+        <Link
+          href={buildLocalePath("/online-tools/seo-geo-audit", forceLocale)}
+          className="inline-flex min-h-11 shrink-0 items-center justify-center gap-2 rounded-lg bg-[var(--marketing-accent)] px-5 py-3 text-sm font-black text-[#06120f] transition-opacity hover:opacity-90"
+        >
+          <SearchCheck aria-hidden="true" className="h-4 w-4" />
+          {en ? "Audit 10 pages free" : "免费巡检 10 页"}
+        </Link>
+      </div>
+    </section>
   );
 }
 
