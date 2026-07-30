@@ -23,9 +23,21 @@ describe("AI Skill module source contracts", () => {
   it("renders the AI Skill showcase after the product demo section", () => {
     const home = source("src/app/page-shell.tsx");
     expect(home).toContain("home-ai-skill-shell");
+    expect(home).toContain("适用于 Codex、OpenClaw、Claude Code、Cursor 等智能体的专业 Skill。");
+    expect(home).not.toContain("面向 Codex、OpenClaw、Claude Code、Cursor 等智能体的专业 Skill。");
+    expect(home).not.toContain("新的 AI Skill 发布后会显示在这里。");
+    expect(home).not.toContain("New AI Skills will appear here after publishing.");
     expect(home.indexOf("home-ai-skill-shell")).toBeGreaterThan(
       home.indexOf("home-product-demo-shell"),
     );
+  });
+
+  it("keeps both AI Skill listings inside the public site chrome", () => {
+    const zhListing = source("src/app/(zh-public)/ai-skills/page.tsx");
+    const enListing = source("src/app/en/ai-skills/page.tsx");
+
+    expect(zhListing).toContain('<PublicSiteChrome forceLocale="zh">');
+    expect(enListing).toContain('<PublicSiteChrome forceLocale="en">');
   });
 
   it("provides bilingual public and admin routes", () => {

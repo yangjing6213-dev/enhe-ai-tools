@@ -494,7 +494,7 @@ export async function HomePageShell({ forceLocale }: { forceLocale: Locale }) {
                 <p className="home-product-demo-intro mt-2">
                   {forceLocale === "en"
                     ? "Professional Skills for Codex, OpenClaw, Claude Code, Cursor, and other AI agents."
-                    : "面向 Codex、OpenClaw、Claude Code、Cursor 等智能体的专业 Skill。"}
+                    : "适用于 Codex、OpenClaw、Claude Code、Cursor 等智能体的专业 Skill。"}
                 </p>
               </div>
               <Link href={buildLocalePath("/ai-skills", forceLocale)} className="home-preview-link rounded-full border px-4 py-2 text-sm font-semibold">
@@ -508,11 +508,7 @@ export async function HomePageShell({ forceLocale }: { forceLocale: Locale }) {
                   <ToolCard key={tool.id} tool={tool} locale={forceLocale} variant="homeFeatured" />
                 ))}
               </div>
-            ) : (
-              <p className="mt-5 text-sm text-[var(--marketing-muted)]">
-                {forceLocale === "en" ? "New AI Skills will appear here after publishing." : "新的 AI Skill 发布后会显示在这里。"}
-              </p>
-            )}
+            ) : null}
           </div>
         </Container>
       </section>
