@@ -20,7 +20,7 @@ export type PricingCatalogTool = {
   slug: string;
   name: string;
   englishName: string | null;
-  type: "software" | "online" | "skill_learning";
+  type: "software" | "online" | "skill_learning" | "ai_skill";
   status: "draft" | "published" | "offline";
   shortDescription: string;
   content: string;
@@ -48,7 +48,7 @@ export type PricingOfferItem = {
   path: string;
   price: number;
   offers: PricingOffer[];
-  type: "software" | "account_service" | "course";
+  type: "software" | "account_service" | "course" | "ai_skill";
   localized: PricingOfferCopy;
 };
 
@@ -62,12 +62,14 @@ function toFinitePrice(value: unknown) {
 function getCatalogType(type: PricingCatalogTool["type"]): PricingOfferItem["type"] {
   if (type === "online") return "account_service";
   if (type === "skill_learning") return "course";
+  if (type === "ai_skill") return "ai_skill";
   return "software";
 }
 
 function getCatalogPath(type: PricingCatalogTool["type"], slug: string) {
   if (type === "online") return `/account-services/${slug}`;
   if (type === "skill_learning") return `/skill-learning/${slug}`;
+  if (type === "ai_skill") return `/ai-skills/${slug}`;
   return `/software/${slug}`;
 }
 
@@ -94,7 +96,8 @@ function buildOffers(tool: PricingCatalogTool, locale: Locale): PricingOffer[] {
     .filter((spec) => spec.status === "active" && toFinitePrice(spec.price) > 0)
     .sort((left, right) => left.sortOrder - right.sortOrder);
 
-  const usesPaidAccess = tool.type !== "software" || tool.isDownloadPaid;
+  const isDownloadProduct = tool.type === "software" || tool.type === "ai_skill";
+  const usesPaidAccess = !isDownloadProduct || tool.isDownloadPaid;
   if (usesPaidAccess && activeSpecs.length) {
     return activeSpecs.map((spec, index) => ({
       id: spec.id,
@@ -104,7 +107,7 @@ function buildOffers(tool: PricingCatalogTool, locale: Locale): PricingOffer[] {
   }
 
   const legacySoftwarePrice =
-    tool.type === "software" && tool.isDownloadPaid
+    isDownloadProduct && tool.isDownloadPaid
       ? toFinitePrice(tool.downloadPrice)
       : 0;
 
@@ -148,6 +151,9 @@ function buildAccurateDescription(
     if (tool.type === "skill_learning") {
       return `${name} is currently a paid AI skill course. Review the course access, lesson scope, and delivery notes before purchase.`;
     }
+    if (tool.type === "ai_skill") {
+      return `${name} is currently a paid AI Skill. Review supported agents, package access, and setup notes before purchase.`;
+    }
     return `${name} is currently a paid AI software app. Review the available download options, delivery notes, and system requirements before purchase.`;
   }
 
@@ -156,6 +162,9 @@ function buildAccurateDescription(
   }
   if (tool.type === "skill_learning") {
     return `${name} 当前为付费 AI 技能课程，请在购买前核对课程权限、学习范围和交付说明。`;
+  }
+  if (tool.type === "ai_skill") {
+    return `${name} 当前为付费 AI Skill，请在购买前核对支持智能体、ZIP 交付包和安装说明。`;
   }
   return `${name} 当前为付费 AI 软件，请在购买前核对下载方案、交付说明和系统要求。`;
 }
@@ -250,7 +259,7 @@ export async function loadPublicPricingCatalogTools(): Promise<
   return prisma.tool.findMany({
     where: {
       status: "published",
-      type: { in: ["software", "online", "skill_learning"] },
+      type: { in: ["software", "online", "skill_learning", "ai_skill"] },
     },
     select: {
       slug: true,

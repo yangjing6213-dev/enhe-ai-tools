@@ -44,6 +44,15 @@ const typeLabels = {
     sceneTitle: "课程模块台",
     scenario: ["方法学习", "案例练习", "模板复用"],
     specTitle: "课程内容"
+  },
+  ai_skill: {
+    label: "AI SKILL",
+    zh: "AI Skill",
+    coverMetric: "即装",
+    coverMetricLabel: "智能体扩展",
+    sceneTitle: "Skill 工作台",
+    scenario: ["任务增强", "流程复用", "智能体协作"],
+    specTitle: "Skill 参数"
   }
 } as const;
 

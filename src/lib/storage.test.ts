@@ -12,7 +12,8 @@ import {
   isUploadExtensionAllowed,
   parseCosFilePath,
   parseCosPublicUrl,
-  resolveDeletableLocalUploadPath
+  resolveDeletableLocalUploadPath,
+  resolvePrivateLocalUploadPath
 } from "@/lib/storage";
 import { resolveProductVideoSrc } from "@/lib/product-video";
 
@@ -157,6 +158,17 @@ describe("storage helpers", () => {
     expect(resolveDeletableLocalUploadPath("/uploads/app.zip", env, cwd)?.replace(/\\/g, "/")).toContain(
       "/public/uploads/app.zip"
     );
+  });
+
+  it("resolves private local uploads only from the configured private root", () => {
+    const cwd = process.cwd();
+    const env = { PRIVATE_UPLOAD_DIR: "private-uploads" };
+    expect(
+      resolvePrivateLocalUploadPath("private-uploads/ai-skills/skill.zip", env, cwd)?.replace(/\\/g, "/")
+    ).toContain("/private-uploads/ai-skills/skill.zip");
+    expect(resolvePrivateLocalUploadPath("public/uploads/skill.zip", env, cwd)).toBeNull();
+    expect(resolvePrivateLocalUploadPath("C:/Windows/System32/skill.zip", env, cwd)).toBeNull();
+    expect(resolvePrivateLocalUploadPath("cos://bucket/ai-skills/skill.zip", env, cwd)).toBeNull();
   });
 
   it("plans COS remote deletion and reports missing configuration", () => {

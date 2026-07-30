@@ -20,9 +20,11 @@ import { ASCIIHeroTitle } from "@/components/home/ascii-hero-title";
 import { HeroGradientSubtitle } from "@/components/home/hero-gradient-subtitle";
 import { HomeParticlesBackground } from "@/components/home/home-particles-background";
 import { ProductDemoCard } from "@/components/product-demo-card";
+import { ToolCard } from "@/components/tool-card";
 import { ButtonLink, Container } from "@/components/ui";
 import { getDictionary, type Locale } from "@/lib/dictionaries";
 import { getHomeProductDemos } from "@/lib/product-demos";
+import { getPublicToolListing } from "@/lib/public-content";
 import { enheOrganizationReference } from "@/lib/brand-entity";
 import {
   buildBreadcrumbSchema,
@@ -323,7 +325,11 @@ export async function generateHomePageMetadata(forceLocale: Locale): Promise<Met
 
 export async function HomePageShell({ forceLocale }: { forceLocale: Locale }) {
   await connection();
-  const homeProductDemos = await getHomeProductDemos();
+  const [homeProductDemos, aiSkillTools] = await Promise.all([
+    getHomeProductDemos(),
+    getPublicToolListing("ai_skill"),
+  ]);
+  const homeAiSkills = aiSkillTools.slice(0, 3);
   const t = getDictionary(forceLocale);
   const conversionCopy = homeConversionCopy[forceLocale];
   const heroTitle =
@@ -478,6 +484,38 @@ export async function HomePageShell({ forceLocale }: { forceLocale: Locale }) {
           </Container>
         </section>
       ) : null}
+
+      <section className="home-product-demo-shell home-ai-skill-shell" aria-label="AI Skill">
+        <Container className="home-hero-reference-frame">
+          <div className="home-product-preview home-product-demo-panel backdrop-blur-xl backdrop-saturate-150">
+            <div className="home-product-preview-header">
+              <div>
+                <h2 className="text-xl font-semibold text-[var(--marketing-text)]">AI Skill</h2>
+                <p className="home-product-demo-intro mt-2">
+                  {forceLocale === "en"
+                    ? "Professional Skills for Codex, OpenClaw, Claude Code, Cursor, and other AI agents."
+                    : "面向 Codex、OpenClaw、Claude Code、Cursor 等智能体的专业 Skill。"}
+                </p>
+              </div>
+              <Link href={buildLocalePath("/ai-skills", forceLocale)} className="home-preview-link rounded-full border px-4 py-2 text-sm font-semibold">
+                {forceLocale === "en" ? "View all Skills" : "查看全部 Skill"}
+                <ArrowUpRight size={15} aria-hidden="true" />
+              </Link>
+            </div>
+            {homeAiSkills.length ? (
+              <div className="home-product-demo-grid">
+                {homeAiSkills.map((tool) => (
+                  <ToolCard key={tool.id} tool={tool} locale={forceLocale} variant="homeFeatured" />
+                ))}
+              </div>
+            ) : (
+              <p className="mt-5 text-sm text-[var(--marketing-muted)]">
+                {forceLocale === "en" ? "New AI Skills will appear here after publishing." : "新的 AI Skill 发布后会显示在这里。"}
+              </p>
+            )}
+          </div>
+        </Container>
+      </section>
 
       <section
         className="home-decision-card-shell"

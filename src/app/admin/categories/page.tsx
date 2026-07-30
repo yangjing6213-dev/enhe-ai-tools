@@ -5,7 +5,7 @@ import { AdminSection, DangerButton, Field, inputClass, selectClass, SubmitButto
 export default async function AdminCategoriesPage() {
   const categories = await prisma.toolCategory.findMany({ orderBy: [{ type: "asc" }, { sortOrder: "asc" }] });
   return (
-    <AdminSection title="工具分类管理" intro="分类按 AI软件应用 / AI账号服务 区分，前台子分类筛选全部来自这里。">
+    <AdminSection title="工具分类管理" intro="分类按 AI软件应用 / AI Skill / AI账号服务 / AI技能学习区分，前台子分类筛选全部来自这里。">
       <form action={upsertCategoryAction} className="glass mb-8 grid gap-4 rounded-2xl p-6 md:grid-cols-2">
         <Field label="分类名称"><input name="name" required className={inputClass} /></Field>
         <Field label="类型">
@@ -13,6 +13,7 @@ export default async function AdminCategoriesPage() {
             <option value="software">AI软件应用</option>
             <option value="online">AI账号服务</option>
             <option value="skill_learning">AI技能学习</option>
+            <option value="ai_skill">AI Skill</option>
           </select>
         </Field>
         <Field label="排序"><input name="sortOrder" type="number" defaultValue={0} className={inputClass} /></Field>
@@ -36,6 +37,7 @@ export default async function AdminCategoriesPage() {
                   <option value="software">AI软件应用</option>
                   <option value="online">AI账号服务</option>
             <option value="skill_learning">AI技能学习</option>
+                  <option value="ai_skill">AI Skill</option>
                 </select>
               </Field>
               <Field label="状态">

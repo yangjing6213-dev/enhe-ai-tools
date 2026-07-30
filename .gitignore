@@ -9,7 +9,9 @@ coverage
 /uploads
 /deploy/enhe-ai-tools/logs/
 public/uploads
+/private-uploads
 test-results
+tmp-ebos-optimized-redeploy-test/
 playwright-report
 output/
 *.log

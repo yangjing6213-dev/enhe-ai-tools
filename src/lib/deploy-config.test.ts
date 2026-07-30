@@ -111,10 +111,18 @@ describe("server deployment compose config", () => {
     expect(deployScript).toContain("docker logs --tail=80 enhe-ai-tools-app");
   });
 
-  it("runs Prisma and seed commands from /app inside the app container", () => {
+  it("deploys migrations before replacing the app container", () => {
     const deployScript = readFileSync(resolve(root, "deploy.sh"), "utf8");
+    const migrationCommand =
+      "run --rm --no-deps --entrypoint sh app -lc 'cd /app && ./node_modules/.bin/prisma migrate deploy'";
+    const appStartCommand = "up -d app";
 
-    expect(deployScript).toContain("exec -T app sh -lc 'cd /app && ./node_modules/.bin/prisma migrate deploy'");
+    expect(deployScript).toContain("up -d db");
+    expect(deployScript).toContain("build app");
+    expect(deployScript).toContain(migrationCommand);
+    expect(deployScript.indexOf(migrationCommand)).toBeLessThan(
+      deployScript.indexOf(appStartCommand),
+    );
     expect(deployScript).toContain("exec -T app sh -lc 'cd /app && node prisma/seed-ai-news.cjs'");
   });
 

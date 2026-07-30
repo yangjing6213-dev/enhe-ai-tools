@@ -18,6 +18,7 @@ export type StoredUpload = {
 type SaveUploadOptions = {
   folder: string;
   maxBytes: number;
+  access?: "public" | "private";
   accept?: (file: File) => boolean;
   invalidTypeMessage?: string;
 };
@@ -124,6 +125,15 @@ export function derivePublicUploadUrlFromFilePath(filePath: string, env: Storage
   const relativePath = relative(uploadRoot, candidate).replace(/\\/g, "/");
   if (!relativePath || relativePath.startsWith("../") || relativePath === ".." || relativePath.startsWith("..\\")) return null;
   return `/uploads/${relativePath}`;
+}
+
+export function resolvePrivateLocalUploadPath(filePath: string, env: StorageEnv = process.env, cwd = process.cwd()) {
+  if (!filePath || parseCosFilePath(filePath)) return null;
+
+  const privateRoot = resolve(cwd, env.PRIVATE_UPLOAD_DIR ?? "private-uploads");
+  const candidate = resolve(cwd, filePath);
+  if (candidate === privateRoot || candidate.startsWith(`${privateRoot}${sep}`)) return candidate;
+  return null;
 }
 
 export async function deleteStoredLocalFileIfSafe(filePath: string, env: StorageEnv = process.env, cwd = process.cwd()) {
@@ -246,6 +256,26 @@ export async function saveUploadedFile(file: File, options: SaveUploadOptions): 
 
   if (isCosStorageConfigured()) {
     return saveToCos(file, buffer, objectKey, mimeType);
+  }
+
+  if (options.access === "private") {
+    const privateRoot = resolve(process.cwd(), process.env.PRIVATE_UPLOAD_DIR ?? "private-uploads");
+    const diskPath = resolve(privateRoot, objectKey);
+    if (diskPath !== privateRoot && !diskPath.startsWith(`${privateRoot}${sep}`)) {
+      throw new Error("Private upload path is invalid.");
+    }
+    await mkdir(dirname(diskPath), { recursive: true });
+    await writeFile(diskPath, buffer);
+
+    return {
+      fileName: file.name,
+      filePath: diskPath,
+      fileUrl: "",
+      fileSize: file.size,
+      mimeType,
+      storage: "local",
+      objectKey
+    };
   }
 
   const publicUrl = buildPublicUploadUrl(objectKey);

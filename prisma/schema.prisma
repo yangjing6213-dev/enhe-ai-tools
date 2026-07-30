@@ -32,6 +32,7 @@ enum ToolType {
   software
   online
   skill_learning
+  ai_skill
 }
 
 enum PublishStatus {
@@ -281,6 +282,7 @@ model Tool {
   videoDescription3 String?        @map("video_description_3")
   version           String?
   systemRequirement String?        @map("system_requirement")
+  supportedAgents   String[]       @default([]) @map("supported_agents")
   isVipRequired     Boolean        @default(true) @map("is_vip_required")
   isDownloadPaid    Boolean        @default(false) @map("is_download_paid")
   isDownloadLinkVipOnly Boolean    @default(true) @map("is_download_link_vip_only")

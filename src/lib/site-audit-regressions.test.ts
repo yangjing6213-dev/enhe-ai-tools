@@ -111,7 +111,7 @@ describe("site audit regression coverage", () => {
     expect(toolDetail).toContain("freeDownloadButtonLabel");
     expect(toolDetail).toContain("priceSpecHelpId");
     expect(toolDetail).toContain("paidSkillCourse && !hasDownloadPurchase");
-    expect(toolDetail).toContain('const priceFallback = tool.type === "software" ? tool.downloadPrice : 0;');
+    expect(toolDetail).toContain('const priceFallback = isDownloadProduct ? tool.downloadPrice : 0;');
     expect(toolDetail).not.toContain("isSkillLearning && !hasDownloadPurchase");
     expect(toolDetail).toContain("paymentMethodLabelId");
     expect(toolDetail).toContain('aria-describedby={priceSpecHelpId}');
@@ -128,8 +128,9 @@ describe("site audit regression coverage", () => {
     const adminActions = read("src/app/admin/actions.ts");
     const access = read("src/lib/access.ts");
 
-    expect(publicActions).toContain('const fallbackOrderAmount = tool.type === "software" ? tool.downloadPrice : 0;');
-    expect(adminActions).toContain('primaryPriceSpec?.price ?? (type === "software" ? parseNumberField(formData.get("downloadPrice"), 0) : 0)');
+    expect(publicActions).toContain('const fallbackOrderAmount = tool.type === "software" || tool.type === "ai_skill" ? tool.downloadPrice : 0;');
+    expect(adminActions).toContain('const isDownloadProduct = type === "software" || type === "ai_skill";');
+    expect(adminActions).toContain('primaryPriceSpec?.price ?? (isDownloadProduct ? parseNumberField(formData.get("downloadPrice"), 0) : 0)');
     expect(access).toContain("getPrimaryToolPrice(tool.priceSpecs, 0)");
   });
 
@@ -159,7 +160,7 @@ describe("site audit regression coverage", () => {
     expect(pricingOffers).toContain("loadPublicPricingCatalogTools");
     expect(pricingOffers).toContain('status: "published"');
     expect(pricingOffers).toContain(
-      'type: { in: ["software", "online", "skill_learning"] }',
+      'type: { in: ["software", "online", "skill_learning", "ai_skill"] }',
     );
     expect(pricingOffers).toContain("renderPricingMarkdown");
     expect(pricingMarkdownRoute).toContain('getPricingOfferItems("en")');

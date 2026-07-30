@@ -186,7 +186,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
           ),
         },
         changeFrequency: "weekly" as const,
-        priority: tool.type === "software" ? 0.85 : 0.8,
+        priority: tool.type === "software" || tool.type === "ai_skill" ? 0.85 : 0.8,
       }));
     }),
     ...newsArticles.flatMap((newsArticle) => {

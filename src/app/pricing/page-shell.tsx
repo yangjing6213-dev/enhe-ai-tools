@@ -32,8 +32,8 @@ export async function generatePricingPageMetadata(forceLocale: Locale): Promise<
   });
 }
 
-function getSchemaItemType(type: "software" | "account_service" | "course") {
-  if (type === "software") return "SoftwareApplication";
+function getSchemaItemType(type: "software" | "ai_skill" | "account_service" | "course") {
+  if (type === "software" || type === "ai_skill") return "SoftwareApplication";
   if (type === "course") return "Course";
   return "Service";
 }

@@ -20,6 +20,7 @@ export function middleware(request: NextRequest) {
     pathname === "/" ||
     [
       "/software",
+      "/ai-skills",
       "/account-services",
       "/online-tools",
       "/skill-learning",
@@ -31,6 +32,7 @@ export function middleware(request: NextRequest) {
       "/build-your-own-x",
     ].includes(pathname) ||
     pathname.startsWith("/software/") ||
+    pathname.startsWith("/ai-skills/") ||
     pathname.startsWith("/account-services/") ||
     pathname.startsWith("/skill-learning/") ||
     pathname.startsWith("/ai-news/") ||

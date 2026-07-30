@@ -22,7 +22,7 @@ type ToolCardProps = {
     name: string;
     englishName?: string | null;
     slug: string;
-    type: "software" | "online" | "skill_learning";
+    type: "software" | "online" | "skill_learning" | "ai_skill";
     shortDescription: string;
     coverImage?: string | null;
     isVipRequired: boolean;
@@ -31,6 +31,7 @@ type ToolCardProps = {
     isDownloadPaid?: boolean;
     downloadPrice?: unknown;
     priceSpecs?: { price: unknown; status: ToolPriceSpecStatus }[];
+    supportedAgents?: string[];
     category?: { name: string } | null;
   };
 };
@@ -64,18 +65,21 @@ export function ToolCard({
   );
   const highlights = showMarketingMeta ? buildCardHighlights(tool, locale) : [];
   const audience = showMarketingMeta ? localizedCategory || t.toolCard.defaultAudience : "";
-  const priceFallback = tool.type === "software" ? tool.downloadPrice : 0;
+  const isDownloadProduct = tool.type === "software" || tool.type === "ai_skill";
+  const priceFallback = isDownloadProduct ? tool.downloadPrice : 0;
   const servicePrice = getPrimaryToolPrice(tool.priceSpecs ?? [], priceFallback);
   const isPositivePrice = Number.isFinite(servicePrice) && servicePrice > 0;
   const showPrice =
     showMarketingMeta &&
-    ((tool.type === "software" && tool.isDownloadPaid && isPositivePrice) ||
+    ((isDownloadProduct && tool.isDownloadPaid && isPositivePrice) ||
       (tool.type === "online" && isPositivePrice) ||
       (tool.type === "skill_learning" && isPositivePrice));
   const commerceLabel = showPrice ? `¥${servicePrice.toFixed(2)}` : t.toolCard.free;
   const deliveryLabel =
     tool.type === "software"
       ? t.toolCard.deliveryDownload
+      : tool.type === "ai_skill"
+        ? t.toolCard.deliverySkill
       : tool.type === "online"
         ? t.toolCard.deliveryService
         : t.toolCard.deliveryCourse;
@@ -120,6 +124,13 @@ export function ToolCard({
             ) : null}
             <Heading className="text-xl font-bold text-[var(--marketing-text)]">{localizedTool.primaryName}</Heading>
             {shouldShowSecondaryName ? <p className="mt-1 text-sm font-medium text-[var(--marketing-accent)]">{localizedTool.secondaryName}</p> : null}
+            {tool.type === "ai_skill" && tool.supportedAgents?.length ? (
+              <div className="mt-3 flex flex-wrap gap-2" aria-label={t.toolDetail.supportedAgents}>
+                {tool.supportedAgents.map((agent) => (
+                  <Badge key={agent}>{agent}</Badge>
+                ))}
+              </div>
+            ) : null}
           </div>
           <ArrowUpRight className="text-[var(--marketing-muted)] transition-colors group-hover:text-[var(--marketing-accent)]" />
         </div>

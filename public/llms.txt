@@ -25,6 +25,7 @@ Important pages:
 - [ENHE AI home](https://www.enhe-tech.com.cn/)
 - [About ENHE AI](https://www.enhe-tech.com.cn/about)
 - [AI software apps](https://www.enhe-tech.com.cn/software)
+- [AI Skills for agents](https://www.enhe-tech.com.cn/ai-skills)
 - [AI account service guidance](https://www.enhe-tech.com.cn/account-services)
 - [AI skill learning](https://www.enhe-tech.com.cn/skill-learning)
 - [AI Prompt Management System](https://www.enhe-tech.com.cn/skill-learning/ai-prompt-management)

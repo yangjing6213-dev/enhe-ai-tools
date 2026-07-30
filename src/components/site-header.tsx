@@ -48,6 +48,10 @@ async function SiteHeaderContent({ forceLocale }: { forceLocale?: Locale }) {
         description: category.description[locale],
       })),
     },
+    {
+      label: t.nav.aiSkill,
+      href: buildLocalePath("/ai-skills", locale),
+    },
     { label: t.nav.aiNews, href: buildLocalePath("/ai-news", locale) },
     { label: t.nav.aiTrends, href: buildLocalePath("/ai-trends", locale) },
     {

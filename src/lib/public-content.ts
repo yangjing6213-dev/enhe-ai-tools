@@ -55,7 +55,7 @@ export function filterPublicNewsTags<
   return result;
 }
 
-type PublicToolType = "software" | "online" | "skill_learning";
+type PublicToolType = "software" | "online" | "skill_learning" | "ai_skill";
 
 export type PublicNewsListingFilters = {
   q?: string;
@@ -147,9 +147,9 @@ const getCachedPublicToolListing = unstable_cache(
             ? { tutorials: { some: { status: "active" } } }
             : {}),
           ...buildToolCategoryWhere(categoryId),
-          ...(type === "software" && paid === "paid"
+          ...((type === "software" || type === "ai_skill") && paid === "paid"
             ? { isDownloadPaid: true }
-            : type === "software" && paid === "free"
+            : (type === "software" || type === "ai_skill") && paid === "free"
               ? { isDownloadPaid: false }
               : {}),
           ...(keyword
@@ -175,7 +175,7 @@ const getCachedPublicToolListing = unstable_cache(
           },
         },
         orderBy:
-          type === "software"
+          type === "software" || type === "ai_skill"
             ? sort === "hot"
               ? { downloadCount: "desc" }
               : { createdAt: "desc" }

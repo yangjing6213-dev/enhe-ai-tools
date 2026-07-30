@@ -20,8 +20,8 @@
    return Number(downloadPrice ?? 0) > 0 ? downloadPrice : 0;
  }
 
- function buildToolPublicPath(tool: { slug: string; type: "software" | "online" | "skill_learning" }) {
-   const basePath = tool.type === "online" ? "/account-services" : tool.type === "skill_learning" ? "/skill-learning" : "/software";
+function buildToolPublicPath(tool: { slug: string; type: "software" | "online" | "skill_learning" | "ai_skill" }) {
+  const basePath = tool.type === "online" ? "/account-services" : tool.type === "skill_learning" ? "/skill-learning" : tool.type === "ai_skill" ? "/ai-skills" : "/software";
    return `${basePath}/${tool.slug}`;
  }
  
@@ -29,7 +29,7 @@
    name: string;
    englishName?: string | null;
    slug: string;
-   type: "software" | "online" | "skill_learning";
+  type: "software" | "online" | "skill_learning" | "ai_skill";
    shortDescription: string;
    content: string;
    priceSpecs: { price: unknown; status: string }[];

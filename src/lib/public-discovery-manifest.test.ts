@@ -24,7 +24,7 @@ describe("public discovery manifest", () => {
     const paths = publicDiscoveryRoutes.map((route) => route.path);
 
     expect(new Set(paths).size).toBe(paths.length);
-    for (const required of ["/", "/en", "/ai-news", "/ai-trends", "/software", "/skill-learning"]) {
+    for (const required of ["/", "/en", "/ai-news", "/ai-trends", "/software", "/ai-skills", "/en/ai-skills", "/skill-learning"]) {
       expect(paths).toContain(required);
     }
     for (const forbidden of ["/admin", "/user", "/checkout", "/orders", "/api"]) {

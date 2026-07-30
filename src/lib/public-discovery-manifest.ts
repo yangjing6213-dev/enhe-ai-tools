@@ -46,6 +46,12 @@ export const publicDiscoveryRoutes: readonly PublicDiscoveryRoute[] = [
   },
   { path: "/en/software", lastModified: "2026-06-17T00:00:00.000Z" },
   {
+    path: "/ai-skills",
+    lastModified: "2026-07-30T00:00:00.000Z",
+    llmsLabel: "AI Skills for agents",
+  },
+  { path: "/en/ai-skills", lastModified: "2026-07-30T00:00:00.000Z" },
+  {
     path: "/account-services",
     lastModified: "2026-06-17T00:00:00.000Z",
     llmsLabel: "AI account service guidance",

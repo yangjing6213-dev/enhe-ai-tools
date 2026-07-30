@@ -40,7 +40,7 @@ type ToolMetaDescriptionInput = {
   description?: string | null;
   brand?: string;
   locale?: Locale;
-  type?: "software" | "online" | "skill_learning";
+  type?: "software" | "online" | "skill_learning" | "ai_skill";
   maxLength?: number;
 };
 
@@ -726,7 +726,7 @@ function resolveToolTitleNames(
 function splitToolTypeFromName(name: string) {
   const normalized = normalizeWhitespace(name);
   const separatorMatch = normalized.match(
-    /^(.+?)\s[-|]\s(AI (?:Software App|Account Service|Skill Course))$/i,
+    /^(.+?)\s[-|]\s(AI (?:Software App|Account Service|Skill Course|Skill))$/i,
   );
 
   if (!separatorMatch) {
@@ -749,11 +749,13 @@ function resolveToolTypeLabel(
   if (locale === "en") {
     if (type === "online") return "AI account service";
     if (type === "skill_learning") return "AI skill course";
+    if (type === "ai_skill") return "AI Skill";
     return "AI software app";
   }
 
   if (type === "online") return "AI账号服务";
   if (type === "skill_learning") return "AI技能课程";
+  if (type === "ai_skill") return "AI Skill";
   return "AI软件应用";
 }
 

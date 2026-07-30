@@ -68,7 +68,7 @@ export function resolveToolDetailSchemaPrice({
   isDownloadPaid,
   servicePrice,
 }: {
-  toolType: "software" | "online" | "skill_learning";
+  toolType: "software" | "online" | "skill_learning" | "ai_skill";
   isDownloadPaid: boolean;
   servicePrice: number;
 }) {
@@ -80,7 +80,7 @@ export function resolveToolDetailSchemaPrice({
   ) {
     return 0;
   }
-  if (toolType === "software" && !isDownloadPaid) return 0;
+  if ((toolType === "software" || toolType === "ai_skill") && !isDownloadPaid) return 0;
   return null;
 }
 
@@ -158,6 +158,8 @@ export async function generateToolDetailPageMetadata(
           ? "online"
           : tool.type === "skill_learning"
             ? "skill_learning"
+            : tool.type === "ai_skill"
+              ? "ai_skill"
             : "software",
     }),
     path: canonical,
@@ -187,7 +189,7 @@ export async function ToolDetailPageShell({
 }: {
   slug: string;
   forceLocale: Locale;
-  expectedType?: "software" | "online" | "skill_learning";
+  expectedType?: "software" | "online" | "skill_learning" | "ai_skill";
 }) {
   const [user, slugMatch] = await Promise.all([
     getCurrentUser(),
@@ -280,6 +282,8 @@ export async function ToolDetailPageShell({
     .filter((comment) => Boolean(comment.localizedContent));
   const isAccountService = tool.type === "online";
   const isSkillLearning = tool.type === "skill_learning";
+  const isAiSkill = tool.type === "ai_skill";
+  const isDownloadProduct = tool.type === "software" || isAiSkill;
   const activePriceSpecs = tool.priceSpecs.filter(
     (spec) => Number(spec.price) > 0,
   );
@@ -296,7 +300,7 @@ export async function ToolDetailPageShell({
     tool.tagLinks,
     forceLocale,
   );
-  const priceFallback = tool.type === "software" ? tool.downloadPrice : 0;
+  const priceFallback = isDownloadProduct ? tool.downloadPrice : 0;
   const servicePrice = getPrimaryToolPrice(activePriceSpecs, priceFallback);
   const visibleToolMetrics = getVisibleToolMetrics({
     downloadCount: tool.downloadCount,
@@ -310,6 +314,8 @@ export async function ToolDetailPageShell({
   );
   const paidSoftware =
     tool.type === "software" && tool.isDownloadPaid && servicePrice > 0;
+  const paidAiSkill = isAiSkill && tool.isDownloadPaid && servicePrice > 0;
+  const paidDownloadProduct = paidSoftware || paidAiSkill;
   const isPurchasableAccountService = isAccountService && servicePrice > 0;
   const paidSkillCourse = isSkillLearning && servicePrice > 0;
   const isFreeSkillCourse = isSkillLearning && servicePrice <= 0;
@@ -346,15 +352,19 @@ export async function ToolDetailPageShell({
         .then(Boolean)
     : false;
   const shouldShowPurchaseForm =
-    (paidSoftware && !hasDownloadPurchase) ||
+    (paidDownloadProduct && !hasDownloadPurchase) ||
     (isPurchasableAccountService && !hasDownloadPurchase) ||
     (paidSkillCourse && !hasDownloadPurchase);
   const downloadLinkContent = getDownloadLinkContent(tool.downloadFile);
   const visibleDownloadLinkContent =
-    buildLocalizedToolOptionalText(downloadLinkContent, forceLocale) ||
-    (forceLocale === "en"
-      ? "Use the download button below to open the current delivery entry."
-      : downloadLinkContent);
+    isAiSkill
+      ? forceLocale === "en"
+        ? "Use the protected download button below to get the current Skill package."
+        : "请使用下方受保护的下载按钮获取当前 Skill 压缩包。"
+      : buildLocalizedToolOptionalText(downloadLinkContent, forceLocale) ||
+        (forceLocale === "en"
+          ? "Use the download button below to open the current delivery entry."
+          : downloadLinkContent);
   const visibleDownloadFileName =
     buildLocalizedToolOptionalText(
       tool.downloadFile?.fileName,
@@ -365,14 +375,15 @@ export async function ToolDetailPageShell({
   );
   const showDownloadLinkArea = canShowDownloadLinkArea({
     hasDownloadLink,
-    isDownloadPaid: paidSoftware,
+    isDownloadPaid: paidDownloadProduct,
     hasDownloadPurchase,
   });
-  const canOpenDownloadEntry =
-    canOpenProtectedDownloadEntry(downloadLinkContent);
+  const canOpenDownloadEntry = isAiSkill
+    ? hasDownloadLink
+    : canOpenProtectedDownloadEntry(downloadLinkContent);
   const publicDownloadHref = canOpenPublicDownloadEntry({
     content: downloadLinkContent,
-    isDownloadPaid: paidSoftware,
+    isDownloadPaid: paidDownloadProduct,
     hasDownloadPurchase,
   })
     ? downloadLinkContent
@@ -381,7 +392,7 @@ export async function ToolDetailPageShell({
   const softwareDownloadCtaHref = resolveSoftwareDownloadCtaHref({
     hasDownloadLink,
     showDownloadLinkArea,
-    isDownloadPaid: paidSoftware,
+    isDownloadPaid: paidDownloadProduct,
     hasDownloadPurchase,
     protectedDownloadHref,
     publicDownloadHref,
@@ -437,7 +448,7 @@ export async function ToolDetailPageShell({
     ? td.serviceProductImagesIntro
     : td.productImagesIntro;
   const schemaType =
-    tool.type === "software"
+    isDownloadProduct
       ? "SoftwareApplication"
       : tool.type === "online"
         ? "Service"
@@ -450,6 +461,8 @@ export async function ToolDetailPageShell({
   const baseListingPath =
     tool.type === "software"
       ? buildLocalePath("/software", forceLocale)
+      : tool.type === "ai_skill"
+        ? buildLocalePath("/ai-skills", forceLocale)
       : tool.type === "online"
         ? buildLocalePath("/account-services", forceLocale)
         : buildLocalePath("/skill-learning", forceLocale);
@@ -461,6 +474,8 @@ export async function ToolDetailPageShell({
         name:
           tool.type === "software"
             ? t.listing.softwareTitle
+            : tool.type === "ai_skill"
+              ? t.listing.aiSkillTitle
             : tool.type === "online"
               ? t.listing.onlineTitle
               : t.listing.skillLearningTitle,
@@ -497,6 +512,8 @@ export async function ToolDetailPageShell({
           ? "online"
           : tool.type === "skill_learning"
             ? "skill_learning"
+            : tool.type === "ai_skill"
+              ? "ai_skill"
             : "software",
     }),
     url: buildCanonicalToolPath(tool, forceLocale),
@@ -520,7 +537,7 @@ export async function ToolDetailPageShell({
           provider: enheOrganizationReference,
         };
   const rawProductStructuredData =
-    tool.type === "software"
+    isDownloadProduct
       ? buildProductStructuredData({
           name: localizedTool.primaryName,
           description: localizedSummary,
@@ -597,6 +614,8 @@ export async function ToolDetailPageShell({
                   <Badge>
                     {tool.type === "software"
                       ? td.software
+                      : tool.type === "ai_skill"
+                        ? td.aiSkill
                       : tool.type === "skill_learning"
                         ? td.skillLearning
                         : td.online}
@@ -604,7 +623,7 @@ export async function ToolDetailPageShell({
                   <Badge
                     className={
                       paidSkillCourse ||
-                      (tool.type === "software" && tool.isDownloadPaid) ||
+                      (isDownloadProduct && tool.isDownloadPaid) ||
                       (isAccountService && servicePrice > 0)
                         ? "text-[#FFB86B]"
                         : "text-[#5EF1C7]"
@@ -618,6 +637,10 @@ export async function ToolDetailPageShell({
                         ? forceLocale === "en"
                           ? "Paid software"
                           : "收费软件"
+                        : paidAiSkill
+                          ? forceLocale === "en"
+                            ? "Paid AI Skill"
+                            : "收费 AI Skill"
                         : isAccountService && servicePrice > 0
                           ? forceLocale === "en"
                             ? "Paid service"
@@ -683,6 +706,12 @@ export async function ToolDetailPageShell({
                         label={td.systemRequirement}
                         value={tool.systemRequirement ?? td.browser}
                       />
+                      {isAiSkill ? (
+                        <Info
+                          label={td.supportedAgents}
+                          value={tool.supportedAgents.length ? tool.supportedAgents.join(" / ") : "-"}
+                        />
+                      ) : null}
                       {visibleDownloadMetric ? (
                         <Info
                           label={td.downloadCount}
@@ -841,15 +870,15 @@ export async function ToolDetailPageShell({
                         </FormSubmitButton>
                       </div>
                     </form>
-                  ) : tool.type === "software" ? (
+                  ) : isDownloadProduct ? (
                     <ButtonLink
                       href={softwareDownloadCtaHref}
                       data-analytics-event={softwareDownloadCtaEvent}
                       data-analytics-entity-type="tool"
                       data-analytics-entity-id={tool.id}
                     >
-                      {paidSoftware && hasDownloadPurchase
-                        ? td.downloadSoftware
+                      {paidDownloadProduct && hasDownloadPurchase
+                        ? isAiSkill ? td.downloadSkill : td.downloadSoftware
                         : freeDownloadButtonLabel}
                     </ButtonLink>
                   ) : (
@@ -870,11 +899,15 @@ export async function ToolDetailPageShell({
                   )}
                 </div>
 
-                {tool.type === "software" && tool.isDownloadPaid ? (
+                {isDownloadProduct && tool.isDownloadPaid ? (
                   <p className="mt-4 text-sm leading-6 text-[#FFB86B]">
-                    {forceLocale === "en"
-                      ? "This software is a paid download. Successful payment automatically unlocks this tool's download-link content."
-                      : "该软件为收费下载，支付成功后系统会自动解锁该工具的下载链接内容。"}
+                    {isAiSkill
+                      ? forceLocale === "en"
+                        ? "This AI Skill is a paid ZIP package. Successful payment unlocks its protected download entry."
+                        : "该 AI Skill 为收费 ZIP 交付包，支付成功后系统会自动解锁受保护的下载入口。"
+                      : forceLocale === "en"
+                        ? "This software is a paid download. Successful payment automatically unlocks this tool's download-link content."
+                        : "该软件为收费下载，支付成功后系统会自动解锁该工具的下载链接内容。"}
                   </p>
                 ) : isPurchasableAccountService ? (
                   <p className="mt-4 text-sm leading-6 text-[#FFB86B]">

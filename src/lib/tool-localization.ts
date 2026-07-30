@@ -4,7 +4,7 @@ import {
   sanitizeAccountServiceCopy,
 } from "@/lib/seo";
 
-type ToolType = "software" | "online" | "skill_learning";
+type ToolType = "software" | "online" | "skill_learning" | "ai_skill";
 
 type LocalizedToolInput = {
   slug: string;
@@ -274,17 +274,20 @@ function getDefaultToolLabel(type: ToolType, locale: Locale) {
   if (locale === "en") {
     if (type === "online") return "AI Account Service";
     if (type === "skill_learning") return "AI Skill Course";
+    if (type === "ai_skill") return "AI Skill";
     return "AI Software App";
   }
 
   if (type === "online") return "AI账号服务";
   if (type === "skill_learning") return "AI技能课程";
+  if (type === "ai_skill") return "AI Skill";
   return "AI软件应用";
 }
 
 function getEnglishSentenceToolLabel(type: ToolType) {
   if (type === "online") return "AI account service";
   if (type === "skill_learning") return "AI skill course";
+  if (type === "ai_skill") return "AI Skill";
   return "AI software app";
 }
 
@@ -620,6 +623,10 @@ function buildEnglishToolSentence(tool: LocalizedToolInput) {
       return "Review learning access, lesson structure, and current availability for this AI skill course on ENHE AI.";
     }
 
+    if (tool.type === "ai_skill") {
+      return "Review supported agents, pricing, package access, and setup notes for this AI Skill on ENHE AI.";
+    }
+
     return "Review pricing, version details, and download access for this AI software app on ENHE AI.";
   }
 
@@ -637,6 +644,14 @@ function buildEnglishToolSentence(tool: LocalizedToolInput) {
     }
 
     return `${localizedTool.primaryName} is an AI skill course for ${categoryName.toLowerCase()}. Review learning access, lesson structure, and current availability on ENHE AI.`;
+  }
+
+  if (tool.type === "ai_skill") {
+    if (categoryIsGeneric) {
+      return `${localizedTool.primaryName} is an AI Skill. Review supported agents, pricing, package access, and setup notes on ENHE AI.`;
+    }
+
+    return `${localizedTool.primaryName} is an AI Skill for ${categoryName.toLowerCase()}. Review supported agents, pricing, package access, and setup notes on ENHE AI.`;
   }
 
   if (categoryIsGeneric) {
@@ -838,7 +853,7 @@ export function buildLocalizedToolOfferName(
   if (isEnglishLike(normalized, 1) && !hasCjk(normalized)) return normalized;
 
   if (type === "skill_learning") return `Course option ${index + 1}`;
-  if (type === "software") return `Download option ${index + 1}`;
+  if (type === "software" || type === "ai_skill") return `Download option ${index + 1}`;
   return `Service option ${index + 1}`;
 }
 
@@ -858,7 +873,7 @@ function buildEnglishFaqFallback(
       id: "localized-faq-access",
       question: "How do I access it after purchase?",
       answer:
-        tool.type === "software"
+        tool.type === "software" || tool.type === "ai_skill"
           ? "After payment review, the related download-link content becomes available in your account center."
           : tool.type === "skill_learning"
             ? "After purchase, the course content and practical learning materials become available in your account center."
@@ -1148,7 +1163,7 @@ function buildEnglishTutorialFallback(
 ): LocalizedTutorialInput[] {
   const summary = buildEnglishToolSentence(tool);
   const accessText =
-    tool.type === "software"
+    tool.type === "software" || tool.type === "ai_skill"
       ? "Check the version, system requirements, price, and download access before using it in your workflow."
       : tool.type === "skill_learning"
         ? "Check the course scope, purchase status, and lesson access before starting the learning path."
