@@ -49,7 +49,8 @@ describe("SEO and GEO priority fixes", () => {
 
     expect(aiNews).toContain("buildAiNewsSerpTitle");
     expect(detail).toContain("buildAiNewsSerpTitle");
-    expect(detail).toContain("maxLength: forceLocale === \"en\" ? 58 : 60");
+    expect(detail).toContain("const metadataTitleMaxLength = forceLocale === \"en\" ? 58 : 38");
+    expect(detail).toContain("maxLength: metadataPageTitleMaxLength");
   });
 
   it("improves English account-service semantics and compliance copy", () => {

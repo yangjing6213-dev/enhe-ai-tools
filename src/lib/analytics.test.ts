@@ -18,8 +18,10 @@ import {
   clientWritableAnalyticsEventNames,
   getPageViewEventName,
   isClientWritableAnalyticsEventName,
+  isClientAnalyticsEventName,
   isAnalyticsEventName,
   isMissingAnalyticsStorageError,
+  organicConversionFunnelSteps,
   seoAuditEventNames,
   seoAuditFunnelSteps,
   sanitizeClientAnalyticsMetadata,
@@ -65,8 +67,30 @@ describe("analytics funnel helpers", () => {
     expect(isAnalyticsEventName("validation_ai_prompt_kit_cta_click")).toBe(true);
     expect(isAnalyticsEventName("validation_faceswap_cta_click")).toBe(true);
     expect(isAnalyticsEventName("validation_ai_video_cta_click")).toBe(true);
+    expect(isAnalyticsEventName("content_to_product_click")).toBe(true);
+    expect(isAnalyticsEventName("product_purchase_cta_click")).toBe(true);
+    expect(isAnalyticsEventName("product_use_cta_click")).toBe(true);
+    expect(isAnalyticsEventName("begin_checkout")).toBe(true);
+    expect(isAnalyticsEventName("product_download_click")).toBe(true);
+    expect(isClientAnalyticsEventName("home_account_services_cta_click")).toBe(true);
+    expect(isClientAnalyticsEventName("home_task_outcome_click")).toBe(true);
+    expect(isClientAnalyticsEventName("payment_review_approved")).toBe(false);
     expect(seoAuditFunnelSteps.every(isAnalyticsEventName)).toBe(true);
     expect(isAnalyticsEventName("unknown_event")).toBe(false);
+  });
+
+  it("keeps the organic conversion funnel alongside the order funnel", () => {
+    expect(organicConversionFunnelSteps).toEqual([
+      "seo_landing_view",
+      "content_to_product_click",
+      "view_tool",
+      "product_purchase_cta_click",
+      "begin_checkout",
+      "create_order",
+      "payment_proof_submitted",
+      "payment_review_approved",
+    ]);
+    expect(analyticsFunnelSteps).toContain("view_tool");
   });
 
   it("defines the SEO audit funnel in commercial order", () => {

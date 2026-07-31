@@ -20,12 +20,14 @@ import { ASCIIHeroTitle } from "@/components/home/ascii-hero-title";
 import { HeroGradientSubtitle } from "@/components/home/hero-gradient-subtitle";
 import { HomeParticlesBackground } from "@/components/home/home-particles-background";
 import { ProductDemoCard } from "@/components/product-demo-card";
+import { ToolCard } from "@/components/tool-card";
 import { ButtonLink, Container } from "@/components/ui";
 import { getDictionary, type Locale } from "@/lib/dictionaries";
 import { getHomeProductDemos } from "@/lib/product-demos";
+import { getPublicToolListing } from "@/lib/public-content";
+import { enheOrganizationReference } from "@/lib/brand-entity";
 import {
   buildBreadcrumbSchema,
-  buildFaqSchema,
   buildHomeMetaDescription,
   buildHomeMetadataTitle,
   buildLocalePath,
@@ -37,43 +39,6 @@ import { publicPageCacheSeconds } from "@/lib/public-routes";
 import { getEffectiveLocalizedHomeHeroIntro, getSettingsMap } from "@/lib/settings";
 
 export const publicPageRevalidate = publicPageCacheSeconds;
-
-const homeFaqItems = {
-  zh: [
-    {
-      question: "恩禾 ENHE AI 是什么？",
-      answer:
-        "ENHE AI 帮助用户把 AI 用到真实任务里：更快完成工作、创作内容、整理资料、学习技能、解决工具选择和使用问题。在需要处理敏感素材、长期稳定流程或隐私边界时，提供更可控的AI工具和路径。",
-    },
-    {
-      question: "新用户应该从哪里开始使用 ENHE AI？",
-      answer:
-        "先从要完成的任务开始：提效、创作、整理资料、学习技能或处理敏感素材。任务明确后，再进入 AI软件应用、AI技能学习、AI前沿资讯或 AI账号服务页面选择合适路径。",
-    },
-    {
-      question: "ENHE AI 为什么强调安全、隐私和稳定？",
-      answer:
-        "普通用户使用 AI 时，常会处理客户资料、创作素材、账号信息、内部文档和课程文件。ENHE AI 会把本地或更可控的 AI 路径解释成安全、隐私和稳定收益，帮助用户减少盲目上传和反复试错。",
-    },
-  ],
-  en: [
-    {
-      question: "What is ENHE AI?",
-      answer:
-        "ENHE AI helps users apply AI to real tasks: work faster, create content, organize material, learn skills, and solve tool-selection and usage problems. When sensitive material, long-running workflows, or privacy boundaries matter, it provides more controllable AI tools and paths.",
-    },
-    {
-      question: "Where should new users start on ENHE AI?",
-      answer:
-        "Start from the task: productivity, content creation, material organization, skill learning, or sensitive-material handling. Then choose AI software apps, AI skill learning, AI news, or account-service guidance as the matching path.",
-    },
-    {
-      question: "Why does ENHE AI emphasize safety, privacy, and stability?",
-      answer:
-        "AI users often work with client files, creative assets, account information, internal documents, and course material. ENHE AI explains local or more controlled AI paths as safety, privacy, and stability benefits, not as abstract technical features.",
-    },
-  ],
-} as const;
 
 type HomeTrustSignal = {
   title: string;
@@ -360,7 +325,11 @@ export async function generateHomePageMetadata(forceLocale: Locale): Promise<Met
 
 export async function HomePageShell({ forceLocale }: { forceLocale: Locale }) {
   await connection();
-  const homeProductDemos = await getHomeProductDemos();
+  const [homeProductDemos, aiSkillTools] = await Promise.all([
+    getHomeProductDemos(),
+    getPublicToolListing("ai_skill"),
+  ]);
+  const homeAiSkills = aiSkillTools.slice(0, 3);
   const t = getDictionary(forceLocale);
   const conversionCopy = homeConversionCopy[forceLocale];
   const heroTitle =
@@ -379,7 +348,6 @@ export async function HomePageShell({ forceLocale }: { forceLocale: Locale }) {
     }),
     "@id": breadcrumbId,
   };
-  const faqSchema = buildFaqSchema({ items: homeFaqItems[forceLocale] });
   const webPageSchema = {
     "@context": "https://schema.org",
     "@type": "WebPage",
@@ -392,11 +360,7 @@ export async function HomePageShell({ forceLocale }: { forceLocale: Locale }) {
       "@type": "WebSite",
       "@id": absoluteUrl("/#website"),
     },
-    mainEntity: {
-      "@type": "Organization",
-      "@id": absoluteUrl("/#organization"),
-      name: "ENHE AI",
-    },
+    mainEntity: enheOrganizationReference,
     breadcrumb: { "@id": breadcrumbId },
     hasPart: { "@id": taskCollectionId },
   };
@@ -428,7 +392,7 @@ export async function HomePageShell({ forceLocale }: { forceLocale: Locale }) {
 
   return (
     <main className="home-page-shell">
-      <StructuredData data={[breadcrumbSchema, webPageSchema, taskCollectionSchema, taskItemListSchema, faqSchema]} />
+      <StructuredData data={[breadcrumbSchema, webPageSchema, taskCollectionSchema, taskItemListSchema]} />
       <div className="home-pointer-glow" aria-hidden="true" />
       <section className="home-hero-shell">
         <div className="home-hero-liquid-layer" aria-hidden="true">
@@ -520,6 +484,34 @@ export async function HomePageShell({ forceLocale }: { forceLocale: Locale }) {
           </Container>
         </section>
       ) : null}
+
+      <section className="home-product-demo-shell home-ai-skill-shell" aria-label="AI Skill">
+        <Container className="home-hero-reference-frame">
+          <div className="home-product-preview home-product-demo-panel backdrop-blur-xl backdrop-saturate-150">
+            <div className="home-product-preview-header">
+              <div>
+                <h2 className="text-xl font-semibold text-[var(--marketing-text)]">AI Skill</h2>
+                <p className="home-product-demo-intro mt-2">
+                  {forceLocale === "en"
+                    ? "Professional Skills for Codex, OpenClaw, Claude Code, Cursor, and other AI agents."
+                    : "适用于 Codex、OpenClaw、Claude Code、Cursor 等智能体的专业 Skill。"}
+                </p>
+              </div>
+              <Link href={buildLocalePath("/ai-skills", forceLocale)} className="home-preview-link rounded-full border px-4 py-2 text-sm font-semibold">
+                {forceLocale === "en" ? "View all Skills" : "查看全部 Skill"}
+                <ArrowUpRight size={15} aria-hidden="true" />
+              </Link>
+            </div>
+            {homeAiSkills.length ? (
+              <div className="home-product-demo-grid">
+                {homeAiSkills.map((tool) => (
+                  <ToolCard key={tool.id} tool={tool} locale={forceLocale} variant="homeFeatured" />
+                ))}
+              </div>
+            ) : null}
+          </div>
+        </Container>
+      </section>
 
       <section
         className="home-decision-card-shell"

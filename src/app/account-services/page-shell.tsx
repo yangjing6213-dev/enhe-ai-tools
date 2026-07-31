@@ -3,6 +3,7 @@ import Link from "next/link";
 import { StructuredData } from "@/components/structured-data";
 import { Container, EmptyState, SectionTitle } from "@/components/ui";
 import { ToolCard } from "@/components/tool-card";
+import { enheOrganizationReference } from "@/lib/brand-entity";
 import { getDictionary, type Locale } from "@/lib/dictionaries";
 import {
   getPublicToolCategories,
@@ -12,6 +13,7 @@ import { publicPageCacheSeconds } from "@/lib/public-routes";
 import { resolveLocalizedToolCategoryName } from "@/lib/tool-localization";
 import {
   absoluteUrl,
+  applyFilteredListingRobots,
   buildBreadcrumbSchema,
   buildFaqSchema,
   buildListingMetadataTitle,
@@ -126,10 +128,7 @@ function buildAccountServicesCollectionSchema(forceLocale: Locale) {
       serviceType: isEnglish
         ? "AI account subscription and usage guidance"
         : "AI工具订阅与账号使用支持",
-      provider: {
-        "@type": "Organization",
-        name: "ENHE AI",
-      },
+      provider: enheOrganizationReference,
       areaServed: "CN",
       url,
     },
@@ -138,15 +137,22 @@ function buildAccountServicesCollectionSchema(forceLocale: Locale) {
 
 export async function generateAccountServicesPageMetadata(
   forceLocale: Locale,
+  searchParams: Promise<Record<string, string | undefined>> = Promise.resolve({}),
 ): Promise<Metadata> {
   const t = getDictionary(forceLocale);
-  return buildPageMetadata({
+  const metadata = buildPageMetadata({
     title: buildListingMetadataTitle("account-services", forceLocale, t.brand),
     description: buildListingMetaDescription("account-services", forceLocale),
     path: "/account-services",
     locale: forceLocale === "en" ? "en_US" : "zh_CN",
     localeKey: forceLocale,
   });
+
+  return applyFilteredListingRobots(metadata, await searchParams, [
+    "q",
+    "category",
+    "sort",
+  ]);
 }
 
 export async function AccountServicesPageShell({
@@ -195,7 +201,7 @@ export async function AccountServicesPageShell({
         {tools.length ? (
           <div className="listing-grid mt-8 grid gap-5 md:grid-cols-3">
             {tools.map((tool) => (
-              <ToolCard key={tool.id} tool={tool} locale={forceLocale} />
+              <ToolCard key={tool.id} tool={tool} locale={forceLocale} headingLevel={2} />
             ))}
           </div>
         ) : (

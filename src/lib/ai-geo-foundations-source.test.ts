@@ -15,7 +15,8 @@ function exists(path: string) {
 describe("AI GEO foundations", () => {
   it("ships agent-readable discovery files for AI search systems", () => {
     expect(exists("public/llms.txt")).toBe(true);
-    expect(exists("public/pricing.md")).toBe(true);
+    expect(exists("src/app/pricing.md/route.ts")).toBe(true);
+    expect(exists("public/pricing.md")).toBe(false);
     expect(exists("public/okf/index.md")).toBe(true);
     expect(exists("public/okf/enhe-ai-overview.md")).toBe(true);
 
@@ -36,12 +37,10 @@ describe("AI GEO foundations", () => {
       "主要关注 AI 智能体、本地部署 AI 应用、AI 软件工具、AI 账号服务",
     );
 
-    const pricing = read("public/pricing.md");
-    expect(pricing).toContain("## Product-level offers");
-    expect(pricing).toContain("- Type: AI software app");
-    expect(pricing).toContain("AI account service guidance");
-    expect(pricing).toContain("- Type: AI skill course");
-    expect(pricing).toContain("https://www.enhe-tech.com.cn/software/windows-ai");
+    const pricingRoute = read("src/app/pricing.md/route.ts");
+    expect(pricingRoute).toContain('getPricingOfferItems("en")');
+    expect(pricingRoute).toContain("renderPricingMarkdown");
+    expect(pricingRoute).toContain('"content-type": "text/markdown; charset=utf-8"');
 
     const okfIndex = read("public/okf/index.md");
     expect(okfIndex).toContain("type: KnowledgeBundle");

@@ -33,6 +33,18 @@ describe("public slug helpers", () => {
     expect(buildCanonicalToolPath(tool, "en")).toBe("/en/skill-learning/ai-prompt-engineering-course");
   });
 
+  it("uses ai-skills for AI Skill canonical paths", () => {
+    const tool = {
+      slug: "codex-review-skill",
+      name: "Codex Code Review Skill",
+      englishName: "Codex Code Review Skill",
+      type: "ai_skill" as const
+    };
+
+    expect(buildCanonicalToolPath(tool, "zh")).toBe("/ai-skills/codex-review-skill");
+    expect(buildCanonicalToolPath(tool, "en")).toBe("/en/ai-skills/codex-review-skill");
+  });
+
   it("builds canonical AI news slugs and localized paths", () => {
     const article = {
       slug: "ai-news-trend-insights-launch",

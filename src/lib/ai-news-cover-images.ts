@@ -18,6 +18,9 @@ const unsplashImageHost = "images.unsplash.com";
 const unsplashImagePrefix = `https://${unsplashImageHost}/`;
 const coverImageParams = "?auto=format&fit=crop&w=1200&q=80";
 
+export const aiNewsFallbackCoverImage =
+  "/images/brand/enhe-ai-og-1200x630.png";
+
 const coverImagePools = {
   agent: [
     "photo-1485827404703-89b55fcc595e",
@@ -110,6 +113,21 @@ function toUnsplashImageUrl(photoId: string) {
   return `${unsplashImagePrefix}${photoId}${coverImageParams}`;
 }
 
+export function resolveAiNewsCoverImage(value?: string | null) {
+  const coverImage = String(value ?? "").trim();
+  if (!coverImage) return aiNewsFallbackCoverImage;
+
+  try {
+    if (new URL(coverImage).hostname.toLowerCase() === "source.unsplash.com") {
+      return aiNewsFallbackCoverImage;
+    }
+  } catch {
+    return coverImage;
+  }
+
+  return coverImage;
+}
+
 function rankCandidatePhotoIds(article: AiNewsCoverArticle) {
   const searchable = [article.title, article.keywords, article.description, article.summary].filter(Boolean).join(" ").toLowerCase();
   const matchedKeys = topicRules.filter((rule) => rule.terms.some((term) => searchable.includes(term.toLowerCase()))).map((rule) => rule.key);
@@ -173,5 +191,5 @@ export function buildReplacementAiNewsCoverImage({
     }
   }
 
-  return `https://source.unsplash.com/1200x630/?artificial-intelligence,technology&sig=${seed}`;
+  return aiNewsFallbackCoverImage;
 }

@@ -13,6 +13,8 @@ describe("back navigation", () => {
     expect(shouldShowBackNavigation("/software")).toBe(true);
     expect(shouldShowBackNavigation("/en/software")).toBe(true);
     expect(shouldShowBackNavigation("/ai-news")).toBe(true);
+    expect(shouldShowBackNavigation("/ai-skills")).toBe(true);
+    expect(shouldShowBackNavigation("/en/ai-skills")).toBe(true);
   });
 
   it("resolves top-level pages to their localized home pages", () => {
@@ -20,6 +22,8 @@ describe("back navigation", () => {
     expect(getBackNavigationParentHref("/en/software")).toBe("/en");
     expect(getBackNavigationParentHref("/login")).toBe("/");
     expect(getBackNavigationParentHref("/en/user")).toBe("/en");
+    expect(getBackNavigationParentHref("/ai-skills")).toBe("/");
+    expect(getBackNavigationParentHref("/en/ai-skills")).toBe("/en");
     expect(getBackNavigationParentHref("/admin")).toBe("/");
   });
 

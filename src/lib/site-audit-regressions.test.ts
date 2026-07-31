@@ -12,9 +12,12 @@ function read(path: string) {
 
 describe("site audit regression coverage", () => {
   it("keeps homepage and listing metadata broad enough for current SEO targets", () => {
-    expect(buildHomeMetadataTitle("zh", dictionaries.zh.brand)).toContain("让 AI 真正为每个人所用");
-    expect(buildHomeMetadataTitle("en", dictionaries.en.brand)).toContain("Real Tasks");
-    expect(buildHomeMetadataTitle("en", dictionaries.en.brand)).toContain("Safer AI");
+    expect(buildHomeMetadataTitle("zh", dictionaries.zh.brand)).toBe(
+      "恩禾 ENHE AI | AI工具、AI资讯、账号服务与技能课程",
+    );
+    expect(buildHomeMetadataTitle("en", dictionaries.en.brand)).toBe(
+      "ENHE AI | AI Tools, News, Account Services & Courses",
+    );
 
     expect(dictionaries.zh.listing.softwareIntro.length).toBeGreaterThanOrEqual(50);
     expect(dictionaries.zh.listing.onlineIntro.length).toBeGreaterThanOrEqual(50);
@@ -108,7 +111,7 @@ describe("site audit regression coverage", () => {
     expect(toolDetail).toContain("freeDownloadButtonLabel");
     expect(toolDetail).toContain("priceSpecHelpId");
     expect(toolDetail).toContain("paidSkillCourse && !hasDownloadPurchase");
-    expect(toolDetail).toContain('const priceFallback = tool.type === "software" ? tool.downloadPrice : 0;');
+    expect(toolDetail).toContain('const priceFallback = isDownloadProduct ? tool.downloadPrice : 0;');
     expect(toolDetail).not.toContain("isSkillLearning && !hasDownloadPurchase");
     expect(toolDetail).toContain("paymentMethodLabelId");
     expect(toolDetail).toContain('aria-describedby={priceSpecHelpId}');
@@ -125,8 +128,9 @@ describe("site audit regression coverage", () => {
     const adminActions = read("src/app/admin/actions.ts");
     const access = read("src/lib/access.ts");
 
-    expect(publicActions).toContain('const fallbackOrderAmount = tool.type === "software" ? tool.downloadPrice : 0;');
-    expect(adminActions).toContain('primaryPriceSpec?.price ?? (type === "software" ? parseNumberField(formData.get("downloadPrice"), 0) : 0)');
+    expect(publicActions).toContain('const fallbackOrderAmount = tool.type === "software" || tool.type === "ai_skill" ? tool.downloadPrice : 0;');
+    expect(adminActions).toContain('const isDownloadProduct = type === "software" || type === "ai_skill";');
+    expect(adminActions).toContain('primaryPriceSpec?.price ?? (isDownloadProduct ? parseNumberField(formData.get("downloadPrice"), 0) : 0)');
     expect(access).toContain("getPrimaryToolPrice(tool.priceSpecs, 0)");
   });
 
@@ -148,20 +152,20 @@ describe("site audit regression coverage", () => {
   it("adds an offer catalog schema to the pricing page", () => {
     const pricingPage = read("src/app/pricing/page-shell.tsx");
     const pricingOffers = read("src/lib/pricing-offers.ts");
-    const pricingMarkdown = read("public/pricing.md");
+    const pricingMarkdownRoute = read("src/app/pricing.md/route.ts");
 
     expect(pricingPage).toContain('"@type": "OfferCatalog"');
     expect(pricingPage).toContain("pricingOfferCatalogSchema");
     expect(pricingPage).toContain("pricingOfferItems");
-    expect(pricingOffers).toContain('path: "/software/windows-ai"');
-    expect(pricingOffers).toContain("price: 50");
-    expect(pricingOffers).toContain('path: "/account-services/gmail-google"');
-    expect(pricingOffers).toContain("price: 30.8");
+    expect(pricingOffers).toContain("loadPublicPricingCatalogTools");
+    expect(pricingOffers).toContain('status: "published"');
+    expect(pricingOffers).toContain(
+      'type: { in: ["software", "online", "skill_learning", "ai_skill"] }',
+    );
+    expect(pricingOffers).toContain("renderPricingMarkdown");
+    expect(pricingMarkdownRoute).toContain('getPricingOfferItems("en")');
+    expect(pricingMarkdownRoute).toContain("renderPricingMarkdown");
     expect(pricingPage).toContain("StructuredData data={[breadcrumbSchema, pricingOfferCatalogSchema]}");
-    expect(pricingMarkdown).toContain("https://www.enhe-tech.com.cn/software/windows-ai");
-    expect(pricingMarkdown).toContain("Price: CNY 50.00");
-    expect(pricingMarkdown).toContain("https://www.enhe-tech.com.cn/account-services/gmail-google");
-    expect(pricingMarkdown).toContain("Price: CNY 30.80");
   });
 
   it("keeps product demos in a single-column layout without horizontal scrolling", () => {

@@ -4,7 +4,7 @@ import {
   sanitizeAccountServiceCopy,
 } from "@/lib/seo";
 
-type ToolType = "software" | "online" | "skill_learning";
+type ToolType = "software" | "online" | "skill_learning" | "ai_skill";
 
 type LocalizedToolInput = {
   slug: string;
@@ -108,7 +108,7 @@ const userFirstToolCopyOverrides: Record<string, Partial<Record<Locale, string>>
     en: "A local video-generation workflow for creators who need text-to-video, image-to-video, and material management for drafts, courses, ads, and personal content.",
   },
   "faceswap-studio-ai": {
-    zh: "适合需要人物素材处理、换脸预览和创作草稿的用户，重点是降低素材外传顾虑，并把生成流程放进可重复的本地工作流。",
+    zh: "FaceSwap Studio 面向需要人物素材处理、换脸预览和创作草稿的用户，在本地完成素材导入、处理与结果检查，降低素材外传顾虑，并把常用步骤整理成可重复、可控制的创作工作流。",
     en: "A local workflow for face-swap previews and creator drafts, focused on reducing material upload concerns and making the process repeatable.",
   },
   "gmail-google": {
@@ -274,17 +274,20 @@ function getDefaultToolLabel(type: ToolType, locale: Locale) {
   if (locale === "en") {
     if (type === "online") return "AI Account Service";
     if (type === "skill_learning") return "AI Skill Course";
+    if (type === "ai_skill") return "AI Skill";
     return "AI Software App";
   }
 
   if (type === "online") return "AI账号服务";
   if (type === "skill_learning") return "AI技能课程";
+  if (type === "ai_skill") return "AI Skill";
   return "AI软件应用";
 }
 
 function getEnglishSentenceToolLabel(type: ToolType) {
   if (type === "online") return "AI account service";
   if (type === "skill_learning") return "AI skill course";
+  if (type === "ai_skill") return "AI Skill";
   return "AI software app";
 }
 
@@ -620,6 +623,10 @@ function buildEnglishToolSentence(tool: LocalizedToolInput) {
       return "Review learning access, lesson structure, and current availability for this AI skill course on ENHE AI.";
     }
 
+    if (tool.type === "ai_skill") {
+      return "Review supported agents, pricing, package access, and setup notes for this AI Skill on ENHE AI.";
+    }
+
     return "Review pricing, version details, and download access for this AI software app on ENHE AI.";
   }
 
@@ -637,6 +644,14 @@ function buildEnglishToolSentence(tool: LocalizedToolInput) {
     }
 
     return `${localizedTool.primaryName} is an AI skill course for ${categoryName.toLowerCase()}. Review learning access, lesson structure, and current availability on ENHE AI.`;
+  }
+
+  if (tool.type === "ai_skill") {
+    if (categoryIsGeneric) {
+      return `${localizedTool.primaryName} is an AI Skill. Review supported agents, pricing, package access, and setup notes on ENHE AI.`;
+    }
+
+    return `${localizedTool.primaryName} is an AI Skill for ${categoryName.toLowerCase()}. Review supported agents, pricing, package access, and setup notes on ENHE AI.`;
   }
 
   if (categoryIsGeneric) {
@@ -838,7 +853,7 @@ export function buildLocalizedToolOfferName(
   if (isEnglishLike(normalized, 1) && !hasCjk(normalized)) return normalized;
 
   if (type === "skill_learning") return `Course option ${index + 1}`;
-  if (type === "software") return `Download option ${index + 1}`;
+  if (type === "software" || type === "ai_skill") return `Download option ${index + 1}`;
   return `Service option ${index + 1}`;
 }
 
@@ -858,7 +873,7 @@ function buildEnglishFaqFallback(
       id: "localized-faq-access",
       question: "How do I access it after purchase?",
       answer:
-        tool.type === "software"
+        tool.type === "software" || tool.type === "ai_skill"
           ? "After payment review, the related download-link content becomes available in your account center."
           : tool.type === "skill_learning"
             ? "After purchase, the course content and practical learning materials become available in your account center."
@@ -1148,7 +1163,7 @@ function buildEnglishTutorialFallback(
 ): LocalizedTutorialInput[] {
   const summary = buildEnglishToolSentence(tool);
   const accessText =
-    tool.type === "software"
+    tool.type === "software" || tool.type === "ai_skill"
       ? "Check the version, system requirements, price, and download access before using it in your workflow."
       : tool.type === "skill_learning"
         ? "Check the course scope, purchase status, and lesson access before starting the learning path."

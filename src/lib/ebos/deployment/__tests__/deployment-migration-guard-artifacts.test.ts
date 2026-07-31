@@ -15,7 +15,10 @@ describe("deployment migration guard artifacts", () => {
     const source = await readFile(join(process.cwd(), "deploy.sh"), "utf8");
     const backupIndex = source.indexOf("enhe-backup-db.sh");
     const verifyIndex = source.indexOf("pg_restore --list");
-    const migrateIndex = source.indexOf("compose run --rm app");
+    const migrateIndex = source.indexOf(
+      "compose run --rm --no-deps app",
+      verifyIndex,
+    );
 
     expect(backupIndex).toBeGreaterThan(-1);
     expect(verifyIndex).toBeGreaterThan(backupIndex);

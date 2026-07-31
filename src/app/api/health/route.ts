@@ -7,6 +7,8 @@ export const dynamic = "force-dynamic";
 
 type RuntimeHeartbeat = {
   status?: unknown;
+  releaseRef?: unknown;
+  startedAt?: unknown;
   checkedAt?: unknown;
 };
 
@@ -23,26 +25,60 @@ function workerConfigurationStatus() {
     : "error";
 }
 
+function releaseConfiguration() {
+  const candidate = process.env.RELEASE_REF?.trim() ?? "";
+  if (!candidate) return { status: "missing", releaseRef: null } as const;
+  if (!/^[a-f0-9]{40}$/i.test(candidate)) {
+    return { status: "invalid", releaseRef: null } as const;
+  }
+  return { status: "ok", releaseRef: candidate.toLowerCase() } as const;
+}
+
 async function readRuntimeHeartbeat(
   path: string | undefined,
   staleAfterSeconds: number,
+  expectedReleaseRef: string,
 ) {
   if (!path?.trim()) {
     return { status: "not_configured", ageSeconds: null } as const;
   }
   try {
     const parsed = JSON.parse(await readFile(path, "utf8")) as RuntimeHeartbeat;
-    const checkedAt =
-      typeof parsed.checkedAt === "string" ? new Date(parsed.checkedAt) : null;
-    const ageSeconds = checkedAt && Number.isFinite(checkedAt.getTime())
-      ? Math.max(0, Math.floor((Date.now() - checkedAt.getTime()) / 1000))
-      : null;
+    const checkedAtMs = typeof parsed.checkedAt === "string"
+      ? Date.parse(parsed.checkedAt)
+      : Number.NaN;
+    const startedAtMs = typeof parsed.startedAt === "string"
+      ? Date.parse(parsed.startedAt)
+      : Number.NaN;
+    const now = Date.now();
+    const validTimestamps =
+      Number.isFinite(checkedAtMs) &&
+      Number.isFinite(startedAtMs) &&
+      checkedAtMs <= now &&
+      startedAtMs <= checkedAtMs;
+    if (!validTimestamps) {
+      return { status: "invalid", ageSeconds: null } as const;
+    }
+    const ageSeconds = Math.floor((now - checkedAtMs) / 1000);
+    const heartbeatReleaseRef =
+      typeof parsed.releaseRef === "string" &&
+      /^[a-f0-9]{40}$/i.test(parsed.releaseRef)
+        ? parsed.releaseRef.toLowerCase()
+        : null;
+    if (!heartbeatReleaseRef) {
+      return { status: "invalid", ageSeconds } as const;
+    }
+    if (heartbeatReleaseRef !== expectedReleaseRef) {
+      return { status: "version_mismatch", ageSeconds } as const;
+    }
     if (parsed.status === "blocked") {
       return { status: "blocked", ageSeconds } as const;
     }
+    if (parsed.status !== "ok") {
+      return { status: "invalid", ageSeconds } as const;
+    }
     return {
-      status:
-        ageSeconds !== null && ageSeconds <= staleAfterSeconds ? "ok" : "stale",
+      status: ageSeconds <= staleAfterSeconds ? "ok" : "stale",
       ageSeconds,
     } as const;
   } catch {
@@ -66,6 +102,7 @@ export async function GET(request: Request) {
     180,
   );
   const workerConfiguration = workerConfigurationStatus();
+  const release = releaseConfiguration();
 
   let database: "ok" | "error" = "ok";
   let readyCount = 0;
@@ -103,19 +140,30 @@ export async function GET(request: Request) {
         { status: "not_checked", ageSeconds: null } as const,
         { status: "not_checked", ageSeconds: null } as const,
       ]
-    : await Promise.all([
-        readRuntimeHeartbeat(
-          process.env.SEO_AUDIT_WORKER_HEARTBEAT_FILE,
-          workerStaleSeconds,
-        ),
-        readRuntimeHeartbeat(
-          process.env.SEO_AUDIT_SCHEDULER_HEARTBEAT_FILE,
-          schedulerStaleSeconds,
-        ),
-      ]);
+    : release.releaseRef
+      ? await Promise.all([
+          readRuntimeHeartbeat(
+            process.env.SEO_AUDIT_WORKER_HEARTBEAT_FILE,
+            workerStaleSeconds,
+            release.releaseRef,
+          ),
+          readRuntimeHeartbeat(
+            process.env.SEO_AUDIT_SCHEDULER_HEARTBEAT_FILE,
+            schedulerStaleSeconds,
+            release.releaseRef,
+          ),
+        ])
+      : [
+          { status: "release_unavailable", ageSeconds: null } as const,
+          { status: "release_unavailable", ageSeconds: null } as const,
+        ];
 
-  const appHealthy = database === "ok" && workerConfiguration === "ok";
+  const appHealthy =
+    database === "ok" &&
+    workerConfiguration === "ok" &&
+    (process.env.NODE_ENV !== "production" || release.status === "ok");
   const runtimeHealthy =
+    release.status === "ok" &&
     queueStatus === "ok" &&
     workerRuntime.status === "ok" &&
     schedulerRuntime.status === "ok";
@@ -128,6 +176,7 @@ export async function GET(request: Request) {
     checks: {
       app: appHealthy ? "ok" : "degraded",
       database,
+      releaseConfiguration: release.status,
       workerConfiguration,
       workerRuntime,
       schedulerRuntime,

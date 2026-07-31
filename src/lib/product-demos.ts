@@ -1,5 +1,6 @@
 import { unstable_cache } from "next/cache";
 import type { Prisma, ProductDemoCategory } from "@prisma/client";
+import { enheOrganizationReference } from "@/lib/brand-entity";
 import { prisma } from "@/lib/db";
 import type { Locale } from "@/lib/dictionaries";
 import { normalizeImageSrc } from "@/lib/media";
@@ -101,6 +102,50 @@ export function parseProductDemoFaq(value: unknown): ProductDemoFaqItem[] {
       return question && answer ? { question, answer } : null;
     })
     .filter((item): item is ProductDemoFaqItem => Boolean(item));
+}
+
+const windowsAiVideoStudioEnglishFaq: ProductDemoFaqItem[] = [
+  {
+    question: "Does this AI video generation app require internet access?",
+    answer:
+      "The software runs through a local deployment. After the models are installed, it can generate videos locally without uploading source material to the cloud, supporting a more private and stable workflow.",
+  },
+  {
+    question: "Which AI video generation features are supported?",
+    answer:
+      "It supports text-to-video, image-to-video, video enhancement, model management, task queues, and project management for common AI video creation workflows.",
+  },
+  {
+    question: "What is included after purchase?",
+    answer:
+      "The purchase includes the software installer, deployment environment, setup guide, usage instructions, and related documentation. Included models and configuration notes depend on the selected product version.",
+  },
+];
+
+export function getLocalizedProductDemoFaq(
+  demo: Pick<PublicProductDemo, "slug" | "faq">,
+  locale: Locale,
+) {
+  const faqItems = parseProductDemoFaq(demo.faq);
+  if (locale === "zh") return faqItems;
+
+  const localizedFaqItems = faqItems
+    .map((item) => ({
+      question: resolveLocalizedPlainCopy(item.question, "en"),
+      answer: resolveLocalizedPlainCopy(item.answer, "en"),
+    }))
+    .filter(
+      (item) =>
+        isReadableEnglish(item.question, 3) &&
+        isReadableEnglish(item.answer, 6),
+    );
+
+  if (localizedFaqItems.length) return localizedFaqItems;
+  if (demo.slug === "windows-ai-video-studio") {
+    return windowsAiVideoStudioEnglishFaq;
+  }
+
+  return [];
 }
 
 export function getProductDemoCoverImage(demo: Pick<PublicProductDemo, "coverImage">) {
@@ -334,11 +379,7 @@ export function buildProductDemoVideoObjectSchema(demo: PublicProductDemo, local
     uploadDate: getProductDemoSchemaUploadDate(demo),
     ...(demo.videoDuration ? { duration: demo.videoDuration } : {}),
     ...(contentUrl ? { contentUrl: absoluteUrl(contentUrl) } : {}),
-    publisher: {
-      "@type": "Organization",
-      name: "恩禾ENHE AI",
-      url: absoluteUrl("/"),
-    },
+    publisher: enheOrganizationReference,
     url: absoluteUrl(demoPath),
     inLanguage: locale === "en" ? "en-US" : "zh-CN",
   };

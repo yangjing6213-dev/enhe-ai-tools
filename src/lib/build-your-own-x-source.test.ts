@@ -12,24 +12,24 @@ describe("Build Your Own X public SEO surfaces", () => {
     expect(enRoute).toContain('<BuildYourOwnXPageShell forceLocale="en" />');
   });
 
-  it("exposes public routes in the sitemap and keeps GEO files outside the Google sitemap", () => {
+  it("keeps the public route in sitemap discovery without adding it to llms recommendations", () => {
     const sitemap = readFileSync("src/app/sitemap.ts", "utf8");
     const discovery = readFileSync("src/lib/public-discovery-manifest.ts", "utf8");
     const llms = readFileSync("public/llms.txt", "utf8");
     const okf = readFileSync("public/okf/build-your-own-x/index.md", "utf8");
 
-    expect(sitemap).toContain("publicDiscoveryRoutes");
+    expect(sitemap).toContain("sitemapExcludedPaths");
+    expect(sitemap).toContain("publicDiscoveryRoutes.filter");
     expect(discovery).toContain('path: "/build-your-own-x"');
     expect(discovery).toContain('path: "/en/build-your-own-x"');
     expect(sitemap).not.toContain('"/okf/build-your-own-x/index.md"');
-    expect(llms).toContain("https://www.enhe-tech.com.cn/build-your-own-x");
-    expect(llms).toContain("https://www.enhe-tech.com.cn/okf/build-your-own-x/index.md");
+    expect(llms).not.toContain("https://www.enhe-tech.com.cn/build-your-own-x");
+    expect(llms).not.toContain("https://www.enhe-tech.com.cn/okf/build-your-own-x/index.md");
     expect(okf).toContain("Source repository: https://github.com/codecrafters-io/build-your-own-x");
     expect(okf).toContain("适合新手的 Build Your Own X 项目有哪些？");
     expect(okf).toContain("适合后端作品集的项目有哪些？");
     expect(okf).toContain("如何把 GitHub 教程变成 7 天或 14 天计划？");
     expect(okf).toContain("https://www.enhe-tech.com.cn/software");
-    expect(llms).toContain("technical interview project planning");
   });
 
   it("keeps the Build Your Own X page optimized for conversion and AI extraction", () => {

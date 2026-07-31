@@ -2,11 +2,27 @@ import { spawn } from "node:child_process";
 import { createHash } from "node:crypto";
 import { promises as fs } from "node:fs";
 import { tmpdir } from "node:os";
-import { dirname, join } from "node:path";
+import { join } from "node:path";
 import { gzipSync } from "node:zlib";
+import {
+  loadRuntimeHeartbeatIdentity,
+  writeRuntimeHeartbeat
+} from "./runtime-heartbeat.mjs";
 
 const MAX_BUNDLE_BYTES = 32 * 1024 * 1024;
 const MAX_COMPRESSED_BYTES = 6 * 1024 * 1024;
+const ENGINE_ENVIRONMENT_KEYS = [
+  "HOME",
+  "LANG",
+  "LC_ALL",
+  "LC_CTYPE",
+  "PATH",
+  "SYSTEMROOT",
+  "TEMP",
+  "TMP",
+  "TMPDIR",
+  "WINDIR"
+];
 const severityPenalty = { critical: 25, high: 15, medium: 7, low: 3, info: 0 };
 let activeChild = null;
 let stopping = false;
@@ -46,19 +62,9 @@ function loadConfig() {
     engineVersion: process.env.SEO_AUDIT_ENGINE_VERSION?.trim() || "1.4.8",
     workerId,
     heartbeatFile: required("SEO_AUDIT_WORKER_HEARTBEAT_FILE"),
+    heartbeatIdentity: loadRuntimeHeartbeatIdentity(),
     pollMs: positiveInteger("SEO_AUDIT_WORKER_POLL_MS", 5_000, 1_000, 60_000)
   };
-}
-
-async function writeHeartbeat(path, payload) {
-  await fs.mkdir(dirname(path), { recursive: true });
-  const temporary = `${path}.${process.pid}.tmp`;
-  await fs.writeFile(
-    temporary,
-    JSON.stringify({ ...payload, checkedAt: new Date().toISOString() }),
-    { encoding: "utf8", mode: 0o600 }
-  );
-  await fs.rename(temporary, path);
 }
 
 async function verifyEngine(config) {
@@ -105,7 +111,7 @@ async function claimJob(config) {
 }
 
 async function sendJobHeartbeat(config, job, phase, pagesProcessed = 0) {
-  return postJson(
+  const result = await postJson(
     config,
     `/api/internal/seo-audit/jobs/${encodeURIComponent(job.id)}/heartbeat`,
     {
@@ -115,6 +121,11 @@ async function sendJobHeartbeat(config, job, phase, pagesProcessed = 0) {
       progress: { phase, pagesProcessed, pageLimit: job.pageLimit }
     }
   );
+  await writeRuntimeHeartbeat(config.heartbeatFile, config.heartbeatIdentity, {
+    status: "ok",
+    currentRunId: job.id
+  });
+  return result;
 }
 
 async function completeJob(config, job, reportGzipBase64, summary) {
@@ -137,7 +148,7 @@ async function failJob(config, job, failureCode) {
   }
 }
 
-function isClaimedJob(job) {
+function isClaimedJob(job, engineVersion) {
   return Boolean(
     job &&
       typeof job.id === "string" &&
@@ -146,7 +157,7 @@ function isClaimedJob(job) {
       Number.isSafeInteger(job.pageLimit) &&
       Number.isSafeInteger(job.requestTimeoutSeconds) &&
       Number.isSafeInteger(job.totalTimeoutSeconds) &&
-      job.engineVersion === "1.4.8"
+      job.engineVersion === engineVersion
   );
 }
 
@@ -194,6 +205,14 @@ function terminateChild(child) {
   force.unref();
 }
 
+function buildEngineEnvironment() {
+  const environment = { PYTHONDONTWRITEBYTECODE: "1" };
+  for (const name of ENGINE_ENVIRONMENT_KEYS) {
+    if (process.env[name] !== undefined) environment[name] = process.env[name];
+  }
+  return environment;
+}
+
 async function runEngine(config, job, jsonPath, markdownPath) {
   const child = spawn(
     "python3",
@@ -210,7 +229,7 @@ async function runEngine(config, job, jsonPath, markdownPath) {
       markdownPath
     ],
     {
-      env: { ...process.env, PYTHONDONTWRITEBYTECODE: "1" },
+      env: buildEngineEnvironment(),
       stdio: ["ignore", "ignore", "ignore"]
     }
   );
@@ -329,28 +348,42 @@ async function main() {
   try {
     await verifyEngine(config);
   } catch {
-    await writeHeartbeat(config.heartbeatFile, { status: "blocked" });
+    await writeRuntimeHeartbeat(
+      config.heartbeatFile,
+      config.heartbeatIdentity,
+      { status: "blocked" }
+    );
     throw new Error("SEO audit engine verification failed");
   }
 
-  await writeHeartbeat(config.heartbeatFile, { status: "ok", currentRunId: null });
+  await writeRuntimeHeartbeat(config.heartbeatFile, config.heartbeatIdentity, {
+    status: "ok",
+    currentRunId: null
+  });
   while (!stopping) {
     try {
       const job = await claimJob(config);
-      if (job && !isClaimedJob(job)) throw new Error("INVALID_JOB_DTO");
+      if (job && !isClaimedJob(job, config.engineVersion)) {
+        throw new Error("INVALID_JOB_DTO");
+      }
       if (job) {
-        await writeHeartbeat(config.heartbeatFile, {
-          status: "ok",
-          currentRunId: job.id
-        });
+        await writeRuntimeHeartbeat(
+          config.heartbeatFile,
+          config.heartbeatIdentity,
+          { status: "ok", currentRunId: job.id }
+        );
         await processJob(config, job);
       }
-      await writeHeartbeat(config.heartbeatFile, {
+      await writeRuntimeHeartbeat(config.heartbeatFile, config.heartbeatIdentity, {
         status: "ok",
         currentRunId: null
       });
     } catch {
-      await writeHeartbeat(config.heartbeatFile, { status: "blocked" });
+      await writeRuntimeHeartbeat(
+        config.heartbeatFile,
+        config.heartbeatIdentity,
+        { status: "blocked" }
+      );
     }
     if (!stopping) await sleep(config.pollMs);
   }

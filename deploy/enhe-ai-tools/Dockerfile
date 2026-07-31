@@ -19,6 +19,8 @@ RUN npm run build
 
 FROM node:24-alpine AS runner
 WORKDIR /app
+ARG RELEASE_REF=local
+LABEL org.opencontainers.image.revision=$RELEASE_REF
 ENV NODE_ENV=production
 ENV NEXT_TELEMETRY_DISABLED=1
 RUN apk add --no-cache python3

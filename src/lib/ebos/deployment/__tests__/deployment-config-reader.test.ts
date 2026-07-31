@@ -122,6 +122,29 @@ describe("deployment config reader", () => {
     expect(guard.defaultMigrationBehavior).toBe("runs_by_default");
   });
 
+  test("detects a verified one-shot migration outside app startup", async () => {
+    const rootDir = await fixtureRoot();
+    await mkdir(join(rootDir, "deploy", "enhe-ai-tools", "scripts"), { recursive: true });
+    await writeFile(
+      join(rootDir, "deploy", "enhe-ai-tools", "scripts", "app-entrypoint.sh"),
+      "#!/bin/sh\nexec node server.js\n",
+      "utf8",
+    );
+    await writeFile(join(rootDir, "deploy.sh"), [
+      "BACKUP_FILE=\"$(sh deploy/enhe-ai-tools/scripts/enhe-backup-db.sh)\"",
+      "compose exec -T db pg_restore --list < \"$BACKUP_FILE\" > /dev/null",
+      "compose run --rm --no-deps app sh -lc \\",
+      "  'cd /app && ./node_modules/.bin/prisma migrate deploy'",
+    ].join("\n"), "utf8");
+
+    const guard = await detectMigrationGuard(rootDir);
+
+    expect(guard.migrationGuardDetected).toBe(true);
+    expect(guard.guardVariable).toBe("none");
+    expect(guard.defaultMigrationBehavior).toBe("skip_unless_explicit");
+    expect(guard.evidence.join("\n")).toContain("one-shot app container");
+  });
+
   test("detectNextConfig and detectDeployDocs return warnings when files are absent", async () => {
     const rootDir = await fixtureRoot();
     const next = await detectNextConfig(rootDir);

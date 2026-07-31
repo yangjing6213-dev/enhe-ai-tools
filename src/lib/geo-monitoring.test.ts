@@ -2,7 +2,12 @@ import { describe, expect, it } from "vitest";
 import {
   GEO_MONITORING_PROVIDERS,
   GEO_MONITORING_QUERIES,
-  buildGeoMonitoringReport
+  GEO_MINIMUM_VALID_SAMPLE_SIZE,
+  buildGeoMonitoringReport,
+  isConfiguredGeoProvider,
+  isConfiguredGeoQuery,
+  isOfficialEnheCitationUrl,
+  resolveGeoVisibilityStatus
 } from "@/lib/geo-monitoring";
 
 describe("GEO monitoring rules", () => {
@@ -90,5 +95,328 @@ describe("GEO monitoring rules", () => {
     const chinaQueries = GEO_MONITORING_QUERIES.filter((item) => item.locale === "zh");
     expect(chinaQueries.filter((item) => item.tags.includes("普通AI用户")).length).toBeGreaterThanOrEqual(8);
     expect(chinaQueries.filter((item) => item.targetPath === "/software").length).toBeGreaterThanOrEqual(5);
+  });
+
+  it("excludes uncollected and unavailable checks from citation-rate denominators", () => {
+    const report = buildGeoMonitoringReport({
+      queryResults: [
+        {
+          query: "AI Agent tools for workflow automation",
+          providerId: "perplexity",
+          isBrandMentioned: true,
+          isDomainCited: true,
+          citedUrls: ["https://www.enhe-tech.com.cn/software"],
+          answerSummary: "ENHE AI is cited as an official source.",
+          competitors: []
+        },
+        {
+          query: "best AI productivity tools for creators",
+          providerId: "chatgpt-search",
+          isBrandMentioned: true,
+          isDomainCited: false,
+          citedUrls: [],
+          competitors: []
+        },
+        {
+          query: "AI工具隐私安全吗",
+          providerId: "doubao",
+          isBrandMentioned: false,
+          isDomainCited: false,
+          citedUrls: [],
+          competitors: []
+        },
+        {
+          query: "generative AI search optimization",
+          providerId: "claude-search",
+          collectionStatus: "unavailable",
+          isBrandMentioned: false,
+          isDomainCited: false,
+          citedUrls: [],
+          competitors: []
+        }
+      ]
+    });
+
+    expect(report.summary.recordedResults).toBe(4);
+    expect(report.summary.reviewedResults).toBe(3);
+    expect(report.summary.domainCitationRate).toBe(33);
+    expect(report.summary.brandMentionRate).toBe(67);
+    expect(report.summary.unavailableResults).toBe(1);
+    expect(report.summary.openGaps).toBe(2);
+  });
+
+  it("does not create content recommendations from missing collection data", () => {
+    const result = {
+      query: "AI Agent tools for workflow automation",
+      providerId: "chatgpt-search",
+      collectionStatus: "uncollected" as const,
+      isBrandMentioned: false,
+      isDomainCited: false,
+      citedUrls: [],
+      competitors: []
+    };
+    const report = buildGeoMonitoringReport({ queryResults: [result] });
+
+    expect(resolveGeoVisibilityStatus(result)).toBe("uncollected");
+    expect(report.summary.reviewedResults).toBe(0);
+    expect(report.recommendations).toEqual([]);
+  });
+
+  it("requires an official citation URL plus answer or screenshot evidence", () => {
+    const baseResult = {
+      query: "AI Agent tools for workflow automation",
+      providerId: "perplexity",
+      collectionStatus: "collected" as const,
+      isBrandMentioned: false,
+      isDomainCited: true,
+      competitors: []
+    };
+
+    expect(resolveGeoVisibilityStatus({
+      ...baseResult,
+      citedUrls: [],
+      answerSummary: "The checkbox alone must not count."
+    })).toBe("absent");
+    expect(resolveGeoVisibilityStatus({
+      ...baseResult,
+      citedUrls: ["https://www.enhe-tech.com.cn/software"]
+    })).toBe("absent");
+    expect(resolveGeoVisibilityStatus({
+      ...baseResult,
+      citedUrls: ["https://www.enhe-tech.com.cn/software"],
+      answerSummary: "The answer cites ENHE AI."
+    })).toBe("cited");
+    expect(resolveGeoVisibilityStatus({
+      ...baseResult,
+      citedUrls: ["https://enhe-tech.com.cn/ai-news/example"],
+      screenshotUrl: "https://evidence.example/geo-check.png"
+    })).toBe("cited");
+  });
+
+  it("recognizes only the official ENHE hostnames", () => {
+    expect(isOfficialEnheCitationUrl("https://enhe-tech.com.cn/software")).toBe(true);
+    expect(isOfficialEnheCitationUrl("https://www.enhe-tech.com.cn/ai-news/example")).toBe(true);
+    expect(isOfficialEnheCitationUrl("https://enhe-tech.com.cn.evil.example/path")).toBe(false);
+    expect(isOfficialEnheCitationUrl("https://evil.example/?url=enhe-tech.com.cn")).toBe(false);
+    expect(isOfficialEnheCitationUrl("not a URL containing enhe-tech.com.cn")).toBe(false);
+  });
+
+  it("uses only the latest result for each query and provider", () => {
+    const report = buildGeoMonitoringReport({
+      queryResults: [
+        {
+          query: "AI Agent tools for workflow automation",
+          providerId: "perplexity",
+          checkedAt: "2026-07-01T09:00:00.000Z",
+          isBrandMentioned: false,
+          isDomainCited: false,
+          citedUrls: [],
+          competitors: ["old competitor"]
+        },
+        {
+          query: "AI Agent tools for workflow automation",
+          providerId: "perplexity",
+          checkedAt: "2026-07-02T09:00:00.000Z",
+          isBrandMentioned: true,
+          isDomainCited: true,
+          citedUrls: ["https://www.enhe-tech.com.cn/software"],
+          answerSummary: "The latest answer cites ENHE AI.",
+          competitors: []
+        }
+      ]
+    });
+
+    expect(report.summary.recordedResults).toBe(1);
+    expect(report.summary.reviewedResults).toBe(1);
+    expect(report.summary.citedResults).toBe(1);
+    expect(report.summary.absentResults).toBe(0);
+    expect(report.summary.domainCitationRate).toBeNull();
+    expect(report.recommendations).toEqual([]);
+  });
+
+  it("does not reuse an old absent result when the latest check is unavailable", () => {
+    const report = buildGeoMonitoringReport({
+      queryResults: [
+        {
+          query: "best AI productivity tools for creators",
+          providerId: "chatgpt-search",
+          checkedAt: "2026-07-01T09:00:00.000Z",
+          isBrandMentioned: false,
+          isDomainCited: false,
+          citedUrls: [],
+          competitors: []
+        },
+        {
+          query: "best AI productivity tools for creators",
+          providerId: "chatgpt-search",
+          checkedAt: "2026-07-02T09:00:00.000Z",
+          collectionStatus: "unavailable",
+          isBrandMentioned: false,
+          isDomainCited: false,
+          citedUrls: [],
+          competitors: []
+        }
+      ]
+    });
+
+    expect(report.summary.recordedResults).toBe(1);
+    expect(report.summary.reviewedResults).toBe(0);
+    expect(report.summary.unavailableResults).toBe(1);
+    expect(report.summary.evidenceStatus).toBe("insufficient");
+    expect(report.summary.firstCheckedAt).toBe("2026-07-02T09:00:00.000Z");
+    expect(report.summary.lastCheckedAt).toBe("2026-07-02T09:00:00.000Z");
+    expect(report.summary.openGaps).toBe(0);
+    expect(report.recommendations).toEqual([]);
+  });
+
+  it("requires a minimum sample before displaying visibility percentages", () => {
+    const report = buildGeoMonitoringReport({
+      queryResults: [
+        {
+          query: "AI Agent tools for workflow automation",
+          providerId: "perplexity",
+          isBrandMentioned: true,
+          isDomainCited: true,
+          citedUrls: ["https://www.enhe-tech.com.cn/software"],
+          answerSummary: "The answer cites ENHE AI.",
+          competitors: []
+        }
+      ]
+    });
+
+    expect(GEO_MINIMUM_VALID_SAMPLE_SIZE).toBe(3);
+    expect(report.summary.validSampleCount).toBe(1);
+    expect(report.summary.hasSufficientSample).toBe(false);
+    expect(report.summary.evidenceStatus).toBe("insufficient");
+    expect(report.summary.brandMentionRate).toBeNull();
+    expect(report.summary.domainCitationRate).toBeNull();
+  });
+
+  it("keeps an empty report free of fabricated dates and percentages", () => {
+    const report = buildGeoMonitoringReport();
+
+    expect(report.summary.recordedResults).toBe(0);
+    expect(report.summary.validSampleCount).toBe(0);
+    expect(report.summary.evidenceStatus).toBe("no_records");
+    expect(report.summary.brandMentionRate).toBeNull();
+    expect(report.summary.domainCitationRate).toBeNull();
+    expect(report.summary.targetCoverageRate).toBeNull();
+    expect(report.summary.firstCheckedAt).toBeNull();
+    expect(report.summary.lastCheckedAt).toBeNull();
+    expect(report.recommendations).toEqual([]);
+  });
+
+  it("reports target coverage, date range, and the latest manual check", () => {
+    const queryResults = [
+      ["AI Agent tools for workflow automation", "perplexity", "2026-07-01T01:00:00.000Z"],
+      ["AI工具隐私安全吗", "doubao", "2026-07-02T01:00:00.000Z"],
+      ["AI提示词怎么学", "chatgpt-search", "2026-07-03T01:00:00.000Z"]
+    ].map(([query, providerId, checkedAt]) => ({
+      query,
+      providerId,
+      checkedAt,
+      isBrandMentioned: false,
+      isDomainCited: false,
+      citedUrls: [],
+      competitors: []
+    }));
+    const report = buildGeoMonitoringReport({ queryResults });
+
+    expect(report.summary.validSampleCount).toBe(3);
+    expect(report.summary.targetSampleCount).toBe(
+      GEO_MONITORING_QUERIES.length * report.summary.eligibleProviders,
+    );
+    expect(report.summary.targetCoverageRate).toBe(1);
+    expect(report.summary.evidenceStatus).toBe("sufficient");
+    expect(report.summary.firstCheckedAt).toBe("2026-07-01T01:00:00.000Z");
+    expect(report.summary.lastCheckedAt).toBe("2026-07-03T01:00:00.000Z");
+  });
+
+  it("excludes search performance providers from AI rates and recommendations", () => {
+    const report = buildGeoMonitoringReport({
+      queryResults: [
+        {
+          query: "AI Agent tools for workflow automation",
+          providerId: "google-search-console",
+          isBrandMentioned: true,
+          isDomainCited: true,
+          citedUrls: ["https://www.enhe-tech.com.cn/software"],
+          answerSummary: "Search Console reported an impression.",
+          competitors: []
+        },
+        {
+          query: "best local AI deployment tools",
+          providerId: "bing-copilot",
+          isBrandMentioned: false,
+          isDomainCited: false,
+          citedUrls: [],
+          competitors: ["Competitor"]
+        },
+        {
+          query: "AI工具隐私安全吗",
+          providerId: "doubao",
+          isBrandMentioned: false,
+          isDomainCited: false,
+          citedUrls: [],
+          competitors: ["Competitor"]
+        },
+        {
+          query: "AI提示词怎么学",
+          providerId: "perplexity",
+          isBrandMentioned: false,
+          isDomainCited: false,
+          citedUrls: [],
+          competitors: []
+        },
+        {
+          query: "AI账号服务安全吗",
+          providerId: "chatgpt-search",
+          isBrandMentioned: false,
+          isDomainCited: false,
+          citedUrls: [],
+          competitors: []
+        }
+      ]
+    });
+
+    expect(report.summary.recordedResults).toBe(5);
+    expect(report.summary.excludedResults).toBe(2);
+    expect(report.summary.validSampleCount).toBe(3);
+    expect(report.summary.domainCitationRate).toBe(0);
+    expect(report.recommendations.every((item) => item.query !== "AI Agent tools for workflow automation")).toBe(true);
+    expect(report.recommendations.every((item) => item.query !== "best local AI deployment tools")).toBe(true);
+  });
+
+  it("uses a deterministic winner when same-time results conflict", () => {
+    const result = {
+      query: "AI Agent tools for workflow automation",
+      providerId: "perplexity",
+      checkedAt: "2026-07-02T09:00:00.000Z",
+      isBrandMentioned: true,
+      isDomainCited: true,
+      citedUrls: ["https://www.enhe-tech.com.cn/software"],
+      answerSummary: "The answer cites ENHE AI.",
+      competitors: []
+    };
+    const conflicting = {
+      ...result,
+      isBrandMentioned: false,
+      isDomainCited: false,
+      citedUrls: [],
+      answerSummary: null
+    };
+
+    const first = buildGeoMonitoringReport({ queryResults: [result, conflicting] });
+    const second = buildGeoMonitoringReport({ queryResults: [conflicting, result] });
+
+    expect(second.summary).toEqual(first.summary);
+    expect(second.recommendations).toEqual(first.recommendations);
+  });
+
+  it("only recognizes configured query and provider values", () => {
+    expect(isConfiguredGeoQuery("AI Agent tools for workflow automation")).toBe(true);
+    expect(isConfiguredGeoQuery("arbitrary query")).toBe(false);
+    expect(isConfiguredGeoProvider("perplexity")).toBe(true);
+    expect(isConfiguredGeoProvider("arbitrary-provider")).toBe(false);
   });
 });

@@ -1474,6 +1474,32 @@ select option:disabled {
   color: var(--marketing-text);
 }
 
+.mobile-nav-children {
+  display: grid;
+  gap: 4px;
+  margin: 0 0 6px 12px;
+  border-left: 1px solid rgba(255, 255, 255, 0.12);
+  padding-left: 10px;
+}
+
+.mobile-nav-child-link {
+  display: flex;
+  min-height: 38px;
+  align-items: center;
+  border-radius: 10px;
+  color: var(--marketing-muted);
+  font-size: 13px;
+  font-weight: 700;
+  line-height: 1.2;
+  padding: 9px 10px;
+  text-decoration: none;
+}
+
+.mobile-nav-child-link:hover {
+  background: rgba(240, 90, 53, 0.08);
+  color: var(--marketing-text);
+}
+
 .mobile-nav-user-center {
   margin-top: 4px;
   background: var(--marketing-button);
@@ -3138,6 +3164,15 @@ select option:disabled {
   gap: 16px;
 }
 
+.product-demo-list-item {
+  min-width: 0;
+  min-height: 100%;
+}
+
+.product-demo-list-item > .product-demo-card {
+  height: 100%;
+}
+
 .home-product-demo-grid .product-demo-card {
   min-height: 0;
   border: 1px solid rgba(255, 255, 255, 0.1);
@@ -3182,12 +3217,23 @@ select option:disabled {
   height: 100%;
   object-fit: cover;
   opacity: 0.9;
-  transition: opacity 220ms ease, transform 360ms ease;
+  transition: opacity 220ms ease;
 }
 
-.product-demo-card:hover .product-demo-card-media img {
+.product-demo-card:is(:hover, :focus-within) .product-demo-card-media img {
   opacity: 1;
-  transform: scale(1.035);
+}
+
+@media (hover: hover) and (pointer: fine) and (prefers-reduced-motion: no-preference) {
+  .product-demo-card:is(:hover, :focus-within) .product-demo-card-media img,
+  .product-demo-card:is(:hover, :focus-within) .product-demo-card-placeholder,
+  .product-demo-card:is(:hover, :focus-within) .product-demo-card-play,
+  .product-demo-card:is(:hover, :focus-within) .product-demo-card-body > h3,
+  .product-demo-card:is(:hover, :focus-within) .product-demo-card-body > p,
+  .product-demo-card:is(:hover, :focus-within) .product-demo-card-tags,
+  .product-demo-card:is(:hover, :focus-within) .product-demo-card-actions {
+    will-change: transform;
+  }
 }
 
 .product-demo-card-placeholder {

@@ -16,7 +16,10 @@ output
 # Local environment and secrets
 .env
 .env.*
+**/.env
+**/.env.*
 !.env.example
+!**/.env.example
 zpay.env
 *.pem
 *.key
@@ -24,12 +27,20 @@ zpay.env
 
 # Logs and local runtime artifacts
 *.log
+backups
+**/backups
+runtime
+**/runtime
 logs
+**/logs
 .codex-logs
 .dev-logs
 web-access
 uploads
+**/uploads
 public/uploads
+secrets
+**/secrets
 tmp
 temp
 *.tmp

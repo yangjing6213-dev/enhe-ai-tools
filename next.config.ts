@@ -52,6 +52,7 @@ const securityHeaders = [
 
 const nextConfig: NextConfig = {
   output: "standalone",
+  htmlLimitedBots: /.*/,
   async redirects() {
     return [
       { source: "/enhe-ai", destination: "/about", statusCode: 301 },
@@ -87,6 +88,7 @@ const nextConfig: NextConfig = {
       { source: "/skill-learning-3", destination: "/skill-learning", statusCode: 301 },
       { source: "/uploads/1780672763703-tool-product-tool-mq12l5w6-chatgpt-image-2026-6-4-22-18-45-2-.png-2", destination: "/uploads/1780672763703-tool-product-tool-mq12l5w6-chatgpt-image-2026-6-4-22-18-45-2-.png", statusCode: 301 },
       { source: "/uploads/1781369296949-tool-product-gemini-12-20-80-chatgpt-image-2026-6-13-14-15-46.png-0", destination: "/uploads/1781369296949-tool-product-gemini-12-20-80-chatgpt-image-2026-6-13-14-15-46.png", statusCode: 301 },
+      { source: "/uploads/1781699117927-tool-product-faceswap-studio-ai-chatgpt-image-2026-6-17-20-24-09-5-.png-5", destination: "/uploads/1781699117927-tool-product-faceswap-studio-ai-chatgpt-image-2026-6-17-20-24-09-5-.png", statusCode: 301 },
       { source: "/okf", destination: "/okf/index.md", statusCode: 308 },
       { source: "/okf/", destination: "/okf/index.md", statusCode: 308 },
       { source: "/online-tools", destination: "/account-services", statusCode: 301 },
@@ -121,13 +123,27 @@ const nextConfig: NextConfig = {
         value: "public, s-maxage=300, stale-while-revalidate=86400"
       }
     ];
+    const pricingAssetCacheHeaders = [
+      {
+        key: "Cache-Control",
+        value: "public, s-maxage=300, stale-while-revalidate=300"
+      }
+    ];
+    const zhPricingCacheHeaders = [
+      ...pricingAssetCacheHeaders,
+      { key: "Content-Language", value: "zh-CN" }
+    ];
+    const enPricingCacheHeaders = [
+      ...pricingAssetCacheHeaders,
+      { key: "Content-Language", value: "en-US" }
+    ];
 
     return [
       { source: "/:path*", headers: securityHeaders },
       { source: "/robots.txt", headers: publicAssetCacheHeaders },
       { source: "/sitemap.xml", headers: publicAssetCacheHeaders },
       { source: "/llms.txt", headers: publicAssetCacheHeaders },
-      { source: "/pricing.md", headers: publicAssetCacheHeaders },
+      { source: "/pricing.md", headers: pricingAssetCacheHeaders },
       { source: "/okf/index.md", headers: publicAssetCacheHeaders },
       { source: "/okf/enhe-ai-overview.md", headers: publicAssetCacheHeaders },
       { source: "/okf/ai-news/index.md", headers: publicAssetCacheHeaders },
@@ -145,12 +161,14 @@ const nextConfig: NextConfig = {
       { source: "/en/ai-topics", headers: enPublicCacheHeaders },
       { source: "/software", headers: zhPublicCacheHeaders },
       { source: "/en/software", headers: enPublicCacheHeaders },
+      { source: "/ai-skills", headers: zhPublicCacheHeaders },
+      { source: "/en/ai-skills", headers: enPublicCacheHeaders },
       { source: "/account-services", headers: zhPublicCacheHeaders },
       { source: "/en/account-services", headers: enPublicCacheHeaders },
       { source: "/skill-learning", headers: zhPublicCacheHeaders },
       { source: "/en/skill-learning", headers: enPublicCacheHeaders },
-      { source: "/pricing", headers: zhPublicCacheHeaders },
-      { source: "/en/pricing", headers: enPublicCacheHeaders },
+      { source: "/pricing", headers: zhPricingCacheHeaders },
+      { source: "/en/pricing", headers: enPricingCacheHeaders },
       { source: "/tutorials", headers: zhPublicCacheHeaders },
       { source: "/en/tutorials", headers: enPublicCacheHeaders },
       { source: "/ai-news", headers: zhPublicCacheHeaders },
@@ -165,6 +183,8 @@ const nextConfig: NextConfig = {
       { source: "/en/legal/:slug*", headers: enPublicCacheHeaders },
       { source: "/software/:slug*", headers: zhPublicCacheHeaders },
       { source: "/en/software/:slug*", headers: enPublicCacheHeaders },
+      { source: "/ai-skills/:slug*", headers: zhPublicCacheHeaders },
+      { source: "/en/ai-skills/:slug*", headers: enPublicCacheHeaders },
       { source: "/account-services/:slug*", headers: zhPublicCacheHeaders },
       { source: "/en/account-services/:slug*", headers: enPublicCacheHeaders },
       { source: "/skill-learning/:slug*", headers: zhPublicCacheHeaders },

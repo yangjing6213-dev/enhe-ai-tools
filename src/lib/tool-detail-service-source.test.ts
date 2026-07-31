@@ -28,6 +28,14 @@ describe("tool detail service purchase source", () => {
     expect(dictionary).toContain('buyService: "Consult and buy service"');
   });
 
+  it("uses the free acquisition CTA for zero-price courses", () => {
+    const source = readFileSync(join(process.cwd(), "src/app/tools/[slug]/page-shell.tsx"), "utf8");
+
+    expect(source).toContain("isSkillLearning && servicePrice <= 0");
+    expect(source).toContain("t.toolCard.getFreeTool");
+    expect(source).toContain("paidSkillCourse");
+  });
+
   it("does not render product screenshots inside black image frames", () => {
     const source = readFileSync(join(process.cwd(), "src/app/tools/[slug]/page-shell.tsx"), "utf8");
 

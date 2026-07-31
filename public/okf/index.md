@@ -14,7 +14,6 @@ This Open Knowledge Format bundle helps AI systems understand ENHE AI from the u
 ## Files
 <!-- PUBLIC_DISCOVERY_OKF_FILES:START -->
 - [ENHE AI overview](./enhe-ai-overview.md)
-- [Build Your Own X Navigator](./build-your-own-x/index.md)
 - [AI software apps](./software/index.md)
 - [AI account service guidance](./account-services/index.md)
 - [AI skill courses](./skill-learning/index.md)
@@ -25,7 +24,6 @@ This Open Knowledge Format bundle helps AI systems understand ENHE AI from the u
 ## Canonical Public Sections
 <!-- PUBLIC_DISCOVERY_OKF_SECTIONS:START -->
 - ENHE AI overview: https://www.enhe-tech.com.cn/about
-- Build Your Own X Navigator: https://www.enhe-tech.com.cn/build-your-own-x
 - AI software apps: https://www.enhe-tech.com.cn/software
 - AI account service guidance: https://www.enhe-tech.com.cn/account-services
 - AI skill courses: https://www.enhe-tech.com.cn/skill-learning

@@ -64,6 +64,58 @@ describe("POST /api/analytics", () => {
     },
   );
 
+  it.each([
+    "product_purchase_cta_click",
+    "home_account_services_cta_click",
+    "home_skill_learning_cta_click",
+    "home_task_outcome_click",
+    "home_tool_finder_cta_click",
+    "home_practical_ai_learning_click",
+  ])("accepts the main-site client event %s", async (eventName) => {
+    const response = await POST(request({ eventName, path: "/software/demo" }));
+
+    expect(response.status).toBe(200);
+    expect(createEventMock).toHaveBeenCalledOnce();
+  });
+
+  it("stores bounded first-touch attribution without referrer query data", async () => {
+    const response = await POST(request({
+      eventName: "seo_landing_view",
+      path: "/ai-news/guide",
+      metadata: {
+        sessionId: "session-1",
+        landingId: "landing-1",
+        firstLandingPath: "/ai-news/guide",
+        source: "google",
+        trafficMedium: "organic_search",
+        referrer: "https://www.google.com/search?q=private#results",
+        attribution: {
+          sessionId: "session-1",
+          landingId: "landing-1",
+          firstLandingPath: "/ai-news/guide",
+          landingPath: "/ai-news/guide",
+          contentType: "ai_news_article",
+          source: "google",
+          trafficMedium: "organic_search",
+          locale: "zh",
+          createdAt: 1,
+          lastSeenAt: 1,
+          attributionVersion: 2,
+        },
+      },
+    }));
+
+    expect(response.status).toBe(200);
+    expect(createEventMock).toHaveBeenCalledWith({
+      data: expect.objectContaining({
+        metadata: expect.objectContaining({
+          referrer: "https://www.google.com",
+          attribution: expect.objectContaining({ landingId: "landing-1" }),
+        }),
+      }),
+    });
+  });
+
   it("persists only allowlisted scalar metadata and bounded client context", async () => {
     const response = await POST(
       request({

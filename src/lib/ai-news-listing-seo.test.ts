@@ -1,5 +1,10 @@
 import type { Metadata } from "next";
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, vi } from "vitest";
+
+vi.mock("@/lib/public-content", () => ({
+  getPublicNewsListing: vi.fn(async () => ({ articles: [], total: 60 })),
+}));
+
 import { generateAiNewsPageMetadata } from "@/app/ai-news/page-shell";
 
 type GenerateListingMetadata = (
@@ -37,10 +42,10 @@ describe("AI news listing SEO state", () => {
 
     expect(metadata.robots).toBeUndefined();
     expect(metadata.alternates?.canonical).toBe(
-      "https://www.enhe-tech.com.cn/ai-news?page=6",
+      "https://www.enhe-tech.com.cn/ai-news/page/6",
     );
     expect(metadata.alternates?.languages?.["en-US"]).toBe(
-      "https://www.enhe-tech.com.cn/en/ai-news?page=6",
+      "https://www.enhe-tech.com.cn/en/ai-news/page/6",
     );
   });
 });

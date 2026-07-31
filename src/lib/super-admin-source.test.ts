@@ -23,6 +23,9 @@ describe("super admin provisioning", () => {
     expect(entrypoint).toContain("cd /app");
     expect(entrypoint).not.toContain("node prisma/ensure-super-admin.js");
     expect(initAdmin).toContain("ADMIN_BOOTSTRAP_CONFIRM");
-    expect(initAdmin).toContain("app node prisma/ensure-super-admin.js");
+    expect(initAdmin).toContain("docker exec -i");
+    expect(initAdmin).toContain("-e ADMIN_BOOTSTRAP_PASSWORD");
+    expect(initAdmin).toContain('"$APP_CONTAINER" node prisma/ensure-super-admin.js');
+    expect(initAdmin).not.toMatch(/^\s*(?:\.|source)\s+/m);
   });
 });

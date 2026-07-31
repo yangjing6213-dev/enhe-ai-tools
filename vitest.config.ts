@@ -5,7 +5,12 @@ export default defineConfig({
   test: {
     environment: "node",
     globals: false,
-    exclude: [...configDefaults.exclude, "tests/e2e/**", ".worktrees/**"]
+    exclude: [
+      ...configDefaults.exclude,
+      "tests/e2e/**",
+      ".next/**",
+      ".worktrees/**",
+    ],
   },
   resolve: {
     alias: {

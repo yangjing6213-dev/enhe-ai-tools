@@ -23,7 +23,7 @@ test("opens, answers an FAQ, and closes the Chinese support widget", async ({ pa
 
 test("renders English support copy", async ({ page }) => {
   await page.goto("/en");
-  await page.getByRole("button", { name: "Customer support", exact: true }).click();
+  await page.getByRole("button", { name: "Chat", exact: true }).click();
 
   await expect(page.getByRole("dialog")).toContainText("What is ENHE AI?");
   await expect(page.getByRole("dialog")).toContainText("Common questions");

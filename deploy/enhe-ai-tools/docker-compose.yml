@@ -28,61 +28,24 @@ services:
       args:
         APP_URL: ${APP_URL}
         NEXT_PUBLIC_APP_URL: ${NEXT_PUBLIC_APP_URL}
-    image: enhe-ai-tools:${RELEASE_REF:-local}
+        RELEASE_REF: ${RELEASE_REF:-local}
+    image: enhe-ai-tools:${APP_IMAGE_TAG:-${RELEASE_REF:-local}}
     container_name: enhe-ai-tools-app
     restart: unless-stopped
     depends_on:
       db:
         condition: service_healthy
+    env_file:
+      - .env
+      - ../../zpay.env
     environment:
+      HOSTNAME: 0.0.0.0
       DATABASE_URL: postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@db:5432/${POSTGRES_DB}?schema=public
-      APP_URL: ${APP_URL}
-      NEXT_PUBLIC_APP_URL: ${NEXT_PUBLIC_APP_URL}
-      NEXT_PUBLIC_SITE_URL: ${NEXT_PUBLIC_SITE_URL:-${NEXT_PUBLIC_APP_URL}}
-      AUTH_COOKIE_NAME: ${AUTH_COOKIE_NAME}
-      AUTH_SECRET: ${AUTH_SECRET}
-      ADMIN_ALERT_EMAILS: ${ADMIN_ALERT_EMAILS:-}
-      ADMIN_EMAIL_NOTIFICATIONS_ENABLED: ${ADMIN_EMAIL_NOTIFICATIONS_ENABLED:-false}
-      SMTP_HOST: ${SMTP_HOST:-}
-      SMTP_PORT: ${SMTP_PORT:-}
-      SMTP_SECURE: ${SMTP_SECURE:-false}
-      SMTP_USER: ${SMTP_USER:-}
-      SMTP_PASSWORD: ${SMTP_PASSWORD:-}
-      SMTP_FROM: ${SMTP_FROM:-}
-      SMTP_CONNECTION_TIMEOUT_MS: ${SMTP_CONNECTION_TIMEOUT_MS:-8000}
-      SMTP_GREETING_TIMEOUT_MS: ${SMTP_GREETING_TIMEOUT_MS:-8000}
-      SMTP_SOCKET_TIMEOUT_MS: ${SMTP_SOCKET_TIMEOUT_MS:-12000}
-      AUDIT_WORKER_TOKEN_CURRENT: ${AUDIT_WORKER_TOKEN_CURRENT}
-      AUDIT_WORKER_TOKEN_PREVIOUS: ${AUDIT_WORKER_TOKEN_PREVIOUS:-}
-      SEO_AUDIT_ANONYMOUS_HMAC_SECRET: ${SEO_AUDIT_ANONYMOUS_HMAC_SECRET}
-      SEO_AUDIT_MONITORING_SALES_ENABLED: ${SEO_AUDIT_MONITORING_SALES_ENABLED:-false}
+      RELEASE_REF: ${RELEASE_REF:?RELEASE_REF is required}
       SEO_AUDIT_WORKER_HEARTBEAT_FILE: /app/runtime/seo-audit-worker-heartbeat.json
       SEO_AUDIT_SCHEDULER_HEARTBEAT_FILE: /app/runtime/seo-audit-scheduler-heartbeat.json
-      SEO_AUDIT_QUEUE_STALE_SECONDS: ${SEO_AUDIT_QUEUE_STALE_SECONDS:-300}
-      SEO_AUDIT_WORKER_STALE_SECONDS: ${SEO_AUDIT_WORKER_STALE_SECONDS:-120}
-      SEO_AUDIT_SCHEDULER_STALE_SECONDS: ${SEO_AUDIT_SCHEDULER_STALE_SECONDS:-180}
-      ZPAY_MODE: ${ZPAY_MODE:-disabled}
-      ZPAY_API_BASE: ${ZPAY_API_BASE:-https://zpayz.cn}
-      ZPAY_PID: ${ZPAY_PID:-}
-      ZPAY_KEY: ${ZPAY_KEY:-}
-      ZPAY_DEFAULT_TYPE: ${ZPAY_DEFAULT_TYPE:-alipay}
-      ZPAY_CHANNEL_ID: ${ZPAY_CHANNEL_ID:-}
-      ZPAY_REFUND_ENABLED: ${ZPAY_REFUND_ENABLED:-false}
-      ZPAY_REFUND_CONFIRMATION_VALUE: ${ZPAY_REFUND_CONFIRMATION_VALUE:-}
       ZPAY_REFUND_CONFIRMATION_STORE: /app/runtime/zpay-refund-confirmations
-      CSP_REPORT_LOG_PATH: ${CSP_REPORT_LOG_PATH:-/app/logs/csp-report.jsonl}
-      AI_TRENDS_REVALIDATE_TOKEN: ${AI_TRENDS_REVALIDATE_TOKEN:-}
       UPLOAD_DIR: /app/public/uploads
-      FACE_SWAP_LICENSE_SECRET: ${FACE_SWAP_LICENSE_SECRET:-}
-      LUMI_LICENSE_PRIVATE_KEY: ${LUMI_LICENSE_PRIVATE_KEY:-}
-      LUMI_LICENSE_PRIVATE_KEY_FILE: ${LUMI_LICENSE_PRIVATE_KEY_FILE:-/app/secrets/lumi-license-private-key.pem}
-      BAIDU_PUSH_TOKEN: ${BAIDU_PUSH_TOKEN:-}
-      BAIDU_PUSH_SITE_URL: ${BAIDU_PUSH_SITE_URL:-https://www.enhe-tech.com.cn}
-      TENCENT_COS_SECRET_ID: ${TENCENT_COS_SECRET_ID:-}
-      TENCENT_COS_SECRET_KEY: ${TENCENT_COS_SECRET_KEY:-}
-      TENCENT_COS_BUCKET: ${TENCENT_COS_BUCKET:-}
-      TENCENT_COS_REGION: ${TENCENT_COS_REGION:-}
-      TENCENT_COS_SIGNED_URL_EXPIRES_SECONDS: ${TENCENT_COS_SIGNED_URL_EXPIRES_SECONDS:-600}
     ports:
       - "127.0.0.1:3001:3000"
     volumes:
@@ -100,7 +63,7 @@ services:
       - enhe-ai-tools-net
 
   seo-audit-worker:
-    image: enhe-ai-tools:${RELEASE_REF:-local}
+    image: enhe-ai-tools:${APP_IMAGE_TAG:-${RELEASE_REF:-local}}
     container_name: enhe-ai-tools-seo-audit-worker
     restart: unless-stopped
     init: true
@@ -109,6 +72,7 @@ services:
         condition: service_healthy
     command: ["node", "deploy/enhe-ai-tools/scripts/seo-audit-worker.mjs"]
     environment:
+      RELEASE_REF: ${RELEASE_REF:?RELEASE_REF is required}
       SEO_AUDIT_INTERNAL_BASE_URL: http://app:3000
       AUDIT_WORKER_TOKEN_CURRENT: ${AUDIT_WORKER_TOKEN_CURRENT}
       SEO_AUDIT_ENGINE_PATH: /app/audit-engine/site_audit.py
@@ -121,7 +85,7 @@ services:
       - ${SEO_AUDIT_ENGINE_HOST_PATH}:/app/audit-engine/site_audit.py:ro
       - ./runtime:/app/runtime
     healthcheck:
-      test: ["CMD-SHELL", "node -e \"const f=require('fs');const p=JSON.parse(f.readFileSync('/app/runtime/seo-audit-worker-heartbeat.json'));if(p.status!=='ok'||Date.now()-Date.parse(p.checkedAt)>120000)process.exit(1)\""]
+      test: ["CMD-SHELL", "node -e \"const f=require('fs');const p=JSON.parse(f.readFileSync('/app/runtime/seo-audit-worker-heartbeat.json'));const releaseMatches=/^[0-9a-fA-F]{40}$/.test(p.releaseRef)&&p.releaseRef===process.env.RELEASE_REF;if(!releaseMatches||p.status!=='ok'||Date.now()-Date.parse(p.checkedAt)>120000)process.exit(1)\""]
       interval: 20s
       timeout: 5s
       retries: 4
@@ -130,7 +94,7 @@ services:
       - enhe-ai-tools-net
 
   seo-audit-scheduler:
-    image: enhe-ai-tools:${RELEASE_REF:-local}
+    image: enhe-ai-tools:${APP_IMAGE_TAG:-${RELEASE_REF:-local}}
     container_name: enhe-ai-tools-seo-audit-scheduler
     restart: unless-stopped
     init: true
@@ -139,6 +103,7 @@ services:
         condition: service_healthy
     command: ["node", "deploy/enhe-ai-tools/scripts/seo-audit-scheduler.mjs"]
     environment:
+      RELEASE_REF: ${RELEASE_REF:?RELEASE_REF is required}
       SEO_AUDIT_INTERNAL_BASE_URL: http://app:3000
       AUDIT_WORKER_TOKEN_CURRENT: ${AUDIT_WORKER_TOKEN_CURRENT}
       SEO_AUDIT_SCHEDULER_HEARTBEAT_FILE: /app/runtime/seo-audit-scheduler-heartbeat.json
@@ -146,7 +111,7 @@ services:
     volumes:
       - ./runtime:/app/runtime
     healthcheck:
-      test: ["CMD-SHELL", "node -e \"const f=require('fs');const p=JSON.parse(f.readFileSync('/app/runtime/seo-audit-scheduler-heartbeat.json'));if(p.status!=='ok'||Date.now()-Date.parse(p.checkedAt)>180000)process.exit(1)\""]
+      test: ["CMD-SHELL", "node -e \"const f=require('fs');const p=JSON.parse(f.readFileSync('/app/runtime/seo-audit-scheduler-heartbeat.json'));const releaseMatches=/^[0-9a-fA-F]{40}$/.test(p.releaseRef)&&p.releaseRef===process.env.RELEASE_REF;if(!releaseMatches||p.status!=='ok'||Date.now()-Date.parse(p.checkedAt)>180000)process.exit(1)\""]
       interval: 30s
       timeout: 5s
       retries: 4
@@ -156,6 +121,8 @@ services:
 
 volumes:
   enhe-ai-tools-postgres-data:
+    external: true
+    name: enhe-ai-tools_enhe-ai-tools-postgres-data
 
 networks:
   enhe-ai-tools-net:

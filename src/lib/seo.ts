@@ -40,7 +40,7 @@ type ToolMetaDescriptionInput = {
   description?: string | null;
   brand?: string;
   locale?: Locale;
-  type?: "software" | "online" | "skill_learning";
+  type?: "software" | "online" | "skill_learning" | "ai_skill";
   maxLength?: number;
 };
 
@@ -79,6 +79,7 @@ type OrganizationSchemaInput = {
     contactType?: string;
     availableLanguage?: string[];
   } | null;
+  returnPolicyPath?: string;
   schemaType?: "Organization";
 };
 
@@ -147,6 +148,21 @@ type ProductStructuredDataInput = {
   currency?: string;
   priceSpecs?: OfferSpecInput[];
 };
+
+export function buildMerchantReturnPolicyReference(path = "/") {
+  const refundPath =
+    path === "/en" || path.startsWith("/en/")
+      ? "/en/legal/membership-refund"
+      : "/legal/membership-refund";
+
+  return {
+    "@type": "MerchantReturnPolicy",
+    applicableCountry: "CN",
+    returnPolicyCategory:
+      "https://schema.org/MerchantReturnNotPermitted",
+    merchantReturnLink: absoluteUrl(refundPath),
+  } as const;
+}
 
 export function getSiteBaseUrl() {
   return (
@@ -225,6 +241,8 @@ export function isLocalizedPublicPath(path: string) {
 
 export function buildLanguageSwitcherHref(path: string, locale: Locale) {
   const normalized = stripLocalePrefix(path);
+  const isEnglishPath = path === "/en" || path.startsWith("/en/");
+  const aiNewsPageMatch = normalized.match(/^\/ai-news\/page\/(\d+)$/);
   const withLocaleSwitch = (href: string) =>
     `${href}${href.includes("?") ? "&" : "?"}${localeSwitchQueryName}=${locale}`;
 
@@ -234,6 +252,15 @@ export function buildLanguageSwitcherHref(path: string, locale: Locale) {
 
   if (!isLocalizedPublicPath(path)) {
     return withLocaleSwitch(buildLocalePath("/", locale));
+  }
+
+  if (
+    locale === "en" &&
+    !isEnglishPath &&
+    aiNewsPageMatch &&
+    Number.parseInt(aiNewsPageMatch[1], 10) > 1
+  ) {
+    return buildLocalePath("/ai-news", locale);
   }
 
   return buildLocalePath(path, locale);
@@ -265,6 +292,22 @@ export function buildAvailableLanguageAlternates(
 
 export function normalizeWhitespace(value: string) {
   return value.replace(/\s+/g, " ").trim();
+}
+
+export function applyFilteredListingRobots(
+  metadata: Metadata,
+  searchParams: Record<string, string | undefined>,
+  filterParamNames: readonly string[],
+) {
+  const hasActiveFilter = filterParamNames.some((name) =>
+    Boolean(String(searchParams[name] ?? "").trim()),
+  );
+
+  if (hasActiveFilter) {
+    metadata.robots = { index: false, follow: true };
+  }
+
+  return metadata;
 }
 
 export function truncateText(value: string, maxLength: number) {
@@ -388,8 +431,8 @@ export function buildListingMetadataTitle(
 export function buildHomeMetadataTitle(locale: Locale, brand = siteName) {
   const scope =
     locale === "en"
-      ? "Real Tasks, Safer AI Workflows"
-      : "让 AI 真正为每个人所用，把复杂变简单，把效率变价值。";
+      ? "AI Tools, News, Account Services & Courses"
+      : "AI工具、AI资讯、账号服务与技能课程";
   return truncateText(
     `${normalizeWhitespace(brand)} | ${scope}`,
     locale === "en" ? 62 : 64,
@@ -402,10 +445,15 @@ export function buildHomeMetaDescription(
 ) {
   const intro = normalizeWhitespace(customIntro ?? "");
   const defaultBrandSentence = normalizeWhitespace(defaultSiteDescription);
+  const hasExplicitBrand = /enhe/i.test(intro) || (locale === "zh" && intro.includes("恩禾"));
+  const hasExplicitCategory =
+    locale === "en" ? /\bAI (?:tools?|software|apps?)\b/i.test(intro) : /AI\s*(?:工具|软件|应用)/i.test(intro);
   const shouldUseTemplate =
     !intro ||
     intro === defaultBrandSentence ||
-    intro.length < (locale === "en" ? 100 : 50);
+    intro.length < (locale === "en" ? 100 : 50) ||
+    !hasExplicitBrand ||
+    !hasExplicitCategory;
 
   if (!shouldUseTemplate) {
     return buildMetaDescription(
@@ -419,7 +467,60 @@ export function buildHomeMetaDescription(
     return "ENHE AI helps users apply AI to real tasks: work faster, create content, organize material, learn skills, choose tools, and keep privacy clearer.";
   }
 
-  return "ENHE AI 帮助用户把 AI 用到真实任务里：更快完成工作、创作内容、整理资料、学习技能和解决工具选择问题；需要处理敏感素材、长期流程或隐私边界时，优先提供安全、隐私和稳定的可控 AI 路径。";
+  return "ENHE AI 帮助用户把 AI 工具用到真实任务里：更快完成工作、创作内容、整理资料、学习技能和解决工具选择问题；需要处理敏感素材、长期流程或隐私边界时，优先提供安全、隐私和稳定的可控路径。";
+}
+
+const revenuePageSeoTitles = {
+  "ultimate-edition-ai-video-generation-suite": {
+    zh: "Ultimate Edition 本地AI视频生成",
+    en: "Ultimate Edition Local AI Video Generator",
+  },
+  "infinitetalk-ai": {
+    zh: "InfiniteTalk AI数字人口播",
+    en: "InfiniteTalk AI Talking Avatar Generator",
+  },
+  "ai-prompt-management-system-418-bilingual-prompts-for-writing-seo-and-ai-creation": {
+    zh: "418双语提示词 AI提示词管理工具",
+    en: "418 Bilingual AI Prompt Management Tool",
+  },
+  "ai-prompt-management": {
+    zh: "AI提示词管理教程",
+    en: "AI Prompt Management Guide",
+  },
+  "high-frequency-ai-prompts-for-work-learning-and-teaching": {
+    zh: "高频AI提示词模板",
+    en: "AI Prompt Templates for Work and Learning",
+  },
+  "chatgpt-plus-100": {
+    zh: "ChatGPT Plus订阅指南",
+    en: "ChatGPT Plus Subscription Guide",
+  },
+  "chatgpt-codex-dalle": {
+    zh: "ChatGPT Codex与DALL-E指南",
+    en: "ChatGPT Codex and DALL-E Guide",
+  },
+  "ai-monetization-side-hustle-course": {
+    zh: "AI副业课程",
+    en: "AI Side Hustle Course",
+  },
+  "local-ai-voice-generator-for-voiceover-materials": {
+    zh: "本地AI配音工具",
+    en: "Local AI Voice Generator",
+  },
+  "faceswap-studio-ai": {
+    zh: "FaceSwap Studio 本地AI人像合成",
+    en: "FaceSwap Studio Local AI Portrait Tool",
+  },
+  "windows-ai": {
+    zh: "Windows AI桌面助手",
+    en: "Windows AI Desktop Assistant",
+  },
+} as const;
+
+export function getRevenuePageSeoTitle(slug: string, locale: Locale) {
+  return revenuePageSeoTitles[
+    slug as keyof typeof revenuePageSeoTitles
+  ]?.[locale];
 }
 
 export function buildListingMetaDescription(
@@ -625,7 +726,7 @@ function resolveToolTitleNames(
 function splitToolTypeFromName(name: string) {
   const normalized = normalizeWhitespace(name);
   const separatorMatch = normalized.match(
-    /^(.+?)\s[-|]\s(AI (?:Software App|Account Service|Skill Course))$/i,
+    /^(.+?)\s[-|]\s(AI (?:Software App|Account Service|Skill Course|Skill))$/i,
   );
 
   if (!separatorMatch) {
@@ -648,11 +749,13 @@ function resolveToolTypeLabel(
   if (locale === "en") {
     if (type === "online") return "AI account service";
     if (type === "skill_learning") return "AI skill course";
+    if (type === "ai_skill") return "AI Skill";
     return "AI software app";
   }
 
   if (type === "online") return "AI账号服务";
   if (type === "skill_learning") return "AI技能课程";
+  if (type === "ai_skill") return "AI Skill";
   return "AI软件应用";
 }
 
@@ -671,7 +774,13 @@ function buildControlledAiWorkflowDescription(
     return `${primaryName} helps users build safer, more private, stable, and controlled AI workflows. Review pricing, tutorials, delivery scope, and system requirements on ${brand} before use.`;
   }
 
-  return `${primaryName}适合需要安全、隐私、稳定、可控 AI 流程的用户。购买前在 ${brand} 确认价格、教程、交付方式、设备要求和隐私边界。`;
+  return `${primaryName}，适合需要安全、隐私、稳定、可控 AI 流程的用户。购买前在 ${brand} 确认价格、教程、交付方式、设备要求和隐私边界。`;
+}
+
+function ensureChineseSentence(value: string) {
+  const normalized = normalizeWhitespace(value);
+  if (!normalized || /[。！？!?；;.]$/u.test(normalized)) return normalized;
+  return `${normalized.replace(/[，,：:\s]+$/u, "")}。`;
 }
 
 export function buildToolMetadataTitle({
@@ -681,7 +790,7 @@ export function buildToolMetadataTitle({
   maxLength,
   locale = "zh",
 }: BuildTitleInput) {
-  const targetMaxLength = maxLength ?? (locale === "en" ? 58 : 62);
+  const targetMaxLength = maxLength ?? (locale === "en" ? 58 : 42);
   const { primaryName, secondaryName } = resolveToolTitleNames(
     name,
     englishName,
@@ -750,7 +859,7 @@ export function buildToolMetaDescription({
       : normalizeWhitespace(description ?? "");
   const { primaryName } = resolveToolTitleNames(name, englishName, locale);
   const typeLabel = resolveToolTypeLabel(type, locale);
-  const targetMaxLength = Math.min(maxLength, locale === "en" ? 135 : 145);
+  const targetMaxLength = Math.min(maxLength, locale === "en" ? 135 : 120);
   const shortDescriptionLimit = locale === "en" ? 95 : 90;
   const shouldNameGenericAccountServiceCopy =
     type === "online" &&
@@ -811,14 +920,11 @@ export function buildToolMetaDescription({
       );
     }
 
-    const brandLower = normalizeWhitespace(brand).toLowerCase();
-    const descriptionLower = normalizedDescription.toLowerCase();
+    const naturalDescription = ensureChineseSentence(normalizedDescription);
     const compactDescription =
-      normalizedDescription.length < shortDescriptionLimit
-        ? `${normalizedDescription} 在 ${brand} 查看${primaryName}价格、教程、交付方式、隐私边界和适用任务，判断是否适合当前创作或效率工作流。`
-        : descriptionLower.includes(brandLower)
-          ? normalizedDescription
-          : `${normalizedDescription} 在 ${brand} 查看使用建议。`;
+      normalizedDescription.length < 48
+        ? `${naturalDescription}相关价格、教程、交付方式、隐私边界与适用任务可在 ${brand} 核对，便于购买前判断是否符合当前创作或效率工作流。`
+        : naturalDescription;
 
     return buildMetaDescription(
       compactDescription,
@@ -828,7 +934,7 @@ export function buildToolMetaDescription({
   }
 
   return buildMetaDescription(
-    `在 ${brand} 查看 ${primaryName} 的价格、教程、交付方式、使用边界和适用任务，判断这款${typeLabel}是否值得使用。`,
+    `了解${primaryName}的价格、教程、交付方式、使用边界与适用任务，并结合当前需求判断这款${typeLabel}是否适合；相关信息可在 ${brand} 核对。`,
     defaultSiteDescription,
     targetMaxLength,
   );
@@ -900,18 +1006,31 @@ export function buildOrganizationSchema({
   knowsAbout = [],
   subjectOf = [],
   contactPoint,
+  returnPolicyPath = "/",
   schemaType = "Organization",
 }: OrganizationSchemaInput) {
+  const organizationId = absoluteUrl("/#organization");
+  const siteHost = new URL(getSiteBaseUrl()).hostname.replace(/^www\./, "");
+  const externalSameAs = sameAs.filter((profileUrl) => {
+    try {
+      const profileHost = new URL(profileUrl).hostname.replace(/^www\./, "");
+      return profileHost !== siteHost;
+    } catch {
+      return false;
+    }
+  });
+
   return {
     "@context": "https://schema.org",
     "@type": schemaType,
-    ...(id ? { "@id": id } : {}),
+    "@id": id ?? organizationId,
     name,
     ...(alternateName.length ? { alternateName } : {}),
     url,
+    hasMerchantReturnPolicy: buildMerchantReturnPolicyReference(returnPolicyPath),
     ...(description ? { description: buildMetaDescription(description) } : {}),
     ...(logo ? { logo: absoluteUrl(logo) } : {}),
-    ...(sameAs.length ? { sameAs } : {}),
+    ...(externalSameAs.length ? { sameAs: externalSameAs } : {}),
     ...(knowsAbout.length ? { knowsAbout } : {}),
     ...(subjectOf.length
       ? {
@@ -961,7 +1080,7 @@ export function buildWebsiteSchema({
     inLanguage,
     publisher: {
       "@type": "Organization",
-      ...(publisherId ? { "@id": publisherId } : {}),
+      "@id": publisherId ?? absoluteUrl("/#organization"),
       name,
     },
     ...(searchPathTemplate
@@ -1033,6 +1152,7 @@ function buildOfferData(
         priceCurrency: currency,
         availability: "https://schema.org/InStock",
         url: absoluteUrl(url),
+        hasMerchantReturnPolicy: buildMerchantReturnPolicyReference(url),
       },
     };
   }
@@ -1048,6 +1168,7 @@ function buildOfferData(
       priceCurrency: currency,
       availability: "https://schema.org/InStock",
       url: absoluteUrl(url),
+      hasMerchantReturnPolicy: buildMerchantReturnPolicyReference(url),
     },
   };
 }
@@ -1107,6 +1228,7 @@ export function buildToolStructuredData({
             priceCurrency: currency,
             availability: "https://schema.org/InStock",
             url: absoluteUrl(url),
+            hasMerchantReturnPolicy: buildMerchantReturnPolicyReference(url),
           },
         }
       : {};
@@ -1149,6 +1271,7 @@ export function buildToolStructuredData({
                 priceCurrency: currency,
                 availability: "https://schema.org/InStock",
                 url: absoluteUrl(url),
+                hasMerchantReturnPolicy: buildMerchantReturnPolicyReference(url),
               })),
             },
           }
@@ -1203,6 +1326,7 @@ export function buildProductStructuredData({
             priceCurrency: currency,
             availability: "https://schema.org/InStock",
             url: absoluteUrl(url),
+            hasMerchantReturnPolicy: buildMerchantReturnPolicyReference(url),
           },
         }
       : {};

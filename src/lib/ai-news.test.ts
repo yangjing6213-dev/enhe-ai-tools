@@ -1,21 +1,46 @@
 import { describe, expect, it } from "vitest";
 import {
+  buildAiNewsDescriptionFallback,
   buildAiNewsRelatedKeywords,
+  buildAiNewsSerpTitle,
+  truncateAiNewsMetaDescription,
+  getNewsPageCount,
+  hasActiveNewsFilters,
   mergeAiNewsRelatedItems,
   extractNewsTableOfContents,
+  isUsableEnglishNewsText,
   isEnglishNewsArticleIndexable,
+  maxEnglishNewsHanCharacterRatio,
+  maxIncidentalEnglishNewsHanCharacters,
   parseNewsRelationIds,
   parseNewsSearchParams,
   renderNewsContentBlocks,
   resolveLocalizedNewsContent,
+  resolveAiNewsMetadataTitle,
   resolveAiNewsMetaDescription,
   resolveNewsVideo,
   resolveAiNewsCanonicalSlug,
   resolveNewsSlug,
   toNewsIsoDate,
 } from "@/lib/ai-news";
+import { buildMetadataTitle } from "@/lib/seo";
 
 describe("AI news helpers", () => {
+  it("calculates stable pagination and detects filtered result pages", () => {
+    expect(getNewsPageCount(0)).toBe(1);
+    expect(getNewsPageCount(9)).toBe(1);
+    expect(getNewsPageCount(10)).toBe(2);
+    expect(
+      hasActiveNewsFilters({ sort: "latest" }),
+    ).toBe(false);
+    expect(
+      hasActiveNewsFilters({ q: "agent", sort: "latest" }),
+    ).toBe(true);
+    expect(
+      hasActiveNewsFilters({ sort: "hot" }),
+    ).toBe(true);
+  });
+
   it("resolves clean slugs with a stable fallback", () => {
     expect(
       resolveNewsSlug({
@@ -252,6 +277,75 @@ describe("AI news helpers", () => {
     ).toBe(false);
   });
 
+  it("allows Chinese brand names in otherwise valid English news content", () => {
+    expect(
+      isEnglishNewsArticleIndexable({
+        englishTitle: "Alibaba \u901a\u4e49\u5343\u95ee releases a practical model update",
+        englishSummary:
+          "The Alibaba model update changes workflow choices for English readers and gives teams concrete compatibility checks.",
+        englishContent:
+          "The \u901a\u4e49\u5343\u95ee update matters because teams need to compare supported models, review account and data boundaries, test one representative workflow, record the result, and decide whether an upgrade is appropriate. ".repeat(
+            3,
+          ),
+      }),
+    ).toBe(true);
+  });
+
+  it("allows quoted Chinese source names in otherwise complete English articles", () => {
+    expect(
+      isEnglishNewsArticleIndexable({
+        englishTitle: "Global AI agent trust and interoperability initiative",
+        englishSummary:
+          "The initiative explains identity, discovery, privacy, security, and cross-platform execution for AI agents.",
+        englishContent: `${"This English analysis explains the source facts, workflow impact, governance boundaries, and practical checks for users. ".repeat(8)} Official source: 推动全球智能体互信互联互通合作倡议.`,
+      }),
+    ).toBe(true);
+  });
+
+  it("allows dispersed short Han brand names but rejects a continuous nine-character run", () => {
+    expect(maxIncidentalEnglishNewsHanCharacters).toBe(8);
+    expect(maxEnglishNewsHanCharacterRatio).toBe(0.05);
+    expect(
+      isUsableEnglishNewsText(
+        "OpenAI model workflow update \u901a\u4e49\u5343\u95ee\u6587\u5fc3\u4e00\u8a00",
+        4,
+      ),
+    ).toBe(true);
+    expect(
+      isUsableEnglishNewsText(
+        "OpenAI model workflow update \u901a\u4e49\u5343\u95ee\u6587\u5fc3\u4e00\u8a00\u4e91",
+        4,
+      ),
+    ).toBe(false);
+    expect(
+      isUsableEnglishNewsText(
+        `${"This English workflow context remains detailed and actionable. ".repeat(8)}\u901a\u4e49\u5343\u95ee, \u6587\u5fc3\u4e00\u8a00, \u817e\u8baf\u6df7\u5143`,
+        40,
+      ),
+    ).toBe(true);
+    expect(
+      isUsableEnglishNewsText(
+        `${"This English workflow context remains detailed and actionable. ".repeat(8)}\u901a\u4e49\u5343\u95ee\u6587\u5fc3\u4e00\u8a00\u4e91`,
+        40,
+      ),
+    ).toBe(false);
+    expect(
+      isUsableEnglishNewsText(
+        `${"This English workflow context remains detailed and actionable. ".repeat(8)}${"\u4e2d".repeat(40)}`,
+        40,
+      ),
+    ).toBe(false);
+  });
+
+  it("still rejects a substantial untranslated Chinese block", () => {
+    expect(
+      isUsableEnglishNewsText(
+        `${"This English introduction explains the workflow impact and next steps. ".repeat(8)}\u8fd9\u662f\u4e00\u6bb5\u660e\u663e\u672a\u7ffb\u8bd1\u7684\u4e2d\u6587\u6b63\u6587\u5185\u5bb9\u5e76\u4e14\u4e0d\u5e94\u51fa\u73b0\u5728\u82f1\u6587\u9875\u9762`,
+        45,
+      ),
+    ).toBe(false);
+  });
+
   it("uses available English body content even when its layout differs from Chinese", () => {
     const chineseContent =
       "## 事实概述\n\n这是一段中文正文。\n\n![中文图](https://images.unsplash.com/photo-cn \"中文说明\")";
@@ -294,16 +388,533 @@ describe("AI news helpers", () => {
     ).toBe("");
   });
 
-  it("extends short but valid AI news descriptions with the fallback context", () => {
+  it("keeps a short valid AI news description without template padding", () => {
+    const summary =
+      "这是一条面向普通用户的AI资讯摘要，说明事件影响和下一步行动。";
     const description = resolveAiNewsMetaDescription(
-      ["这是一条面向普通用户的AI资讯摘要，说明事件影响和下一步行动。"],
+      [summary],
       "阅读 ENHE AI 对“AI智能体安全边界”的资讯解读，了解发生了什么、为什么重要、对普通AI用户的实际影响、相关工具教程、来源线索、风险边界和下一步落地建议。",
     );
 
-    expect(description.length).toBeGreaterThanOrEqual(70);
+    expect(description).toBe(summary);
+    expect(description).not.toContain("阅读 ENHE AI 对");
+  });
+
+  it("recognizes the current English fallback template without padding a valid summary", () => {
+    const summary =
+      "This update changes how creators plan AI workflows, review risks, and choose their next practical step.";
+    const fallback = buildAiNewsDescriptionFallback({
+      title: "OpenAI workspace agents connect team workflows",
+      categoryName: "AI Agent",
+      locale: "en",
+    });
+
+    expect(resolveAiNewsMetaDescription([summary], fallback)).toBe(summary);
+  });
+
+  it("prefers the locale-specific CMS SEO title", () => {
+    expect(
+      resolveAiNewsMetadataTitle({
+        seoTitle: "涓枃 SEO 鏍囬",
+        englishSeoTitle: "English CMS SEO title",
+        localizedTitle: "Localized article title",
+        locale: "en",
+      }),
+    ).toBe("English CMS SEO title");
+    expect(
+      resolveAiNewsMetadataTitle({
+        seoTitle: "涓枃 SEO 鏍囬",
+        englishSeoTitle: null,
+        localizedTitle: "Localized article title",
+        locale: "zh",
+      }),
+    ).toBe("涓枃 SEO 鏍囬");
+  });
+
+  it("does not repeat a full article title through the generated description fallback", () => {
+    const title =
+      "OpenAI 发布 GPT-5.6：面向创作者的多模态工作流与自动化能力全面升级";
+    const summary =
+      "这次更新重点影响内容创作效率、工具选择和工作流迁移。";
+    const fallback = buildAiNewsDescriptionFallback({
+      title,
+      categoryName: "AI前沿资讯",
+      locale: "zh",
+    });
+    const description = resolveAiNewsMetaDescription([summary], fallback);
+
+    expect(description).toBe(summary);
+    expect(description).not.toContain(title);
+    expect(description).not.toContain("阅读 ENHE AI 对");
+  });
+
+  it("keeps an article-specific English fallback concise when no summary is usable", () => {
+    const title =
+      "OpenAI workspace agents connect ChatGPT with team workflows";
+    const fallback = buildAiNewsDescriptionFallback({
+      title,
+      categoryName: "AI Agent",
+      locale: "en",
+    });
+
+    expect(fallback).toContain(title);
+    expect(fallback).toContain("ENHE AI");
+    expect(fallback).not.toContain("Read ENHE AI's analysis of");
+    expect(fallback.length).toBeGreaterThanOrEqual(80);
+    expect(fallback.length).toBeLessThanOrEqual(135);
+  });
+
+  it("removes generic English news prefixes and analysis suffixes from SERP titles", () => {
+    const titles = [
+      "How ENHE AI Helps Users Understand Claude-Style AI Workflows",
+      "How ENHE AI Helps Users Understand Claude Science and AI Workbenches",
+      "How ENHE AI Helps Users Understand Claude Code and AI Code Security Governance",
+      "How ENHE AI Helps Users Understand Claude Reflect and AI Skill Reflection",
+      "How ENHE AI Helps Users Understand Claude and Physical AI Workflows",
+      "How ENHE AI Helps Users Understand Copilot, BYOK, and AI Credit Governance",
+      "How ENHE AI Helps Users Understand Copilot App and Desktop AI Agents",
+      "How ENHE AI Helps Users Understand Copilot OTel and Agent Governance",
+    ];
+    const serpTitles = titles.map((title) =>
+      buildAiNewsSerpTitle({
+        title,
+        categoryName: "AI News",
+        locale: "en",
+        maxLength: 48,
+      }),
+    );
+
+    expect(serpTitles[0]).toBe("Claude-Style AI Workflows");
+    expect(serpTitles.every((title) => !/Impact Analysis$/i.test(title))).toBe(
+      true,
+    );
+    expect(new Set(serpTitles).size).toBe(titles.length);
+  });
+
+  it("keeps composed Chinese and English news titles within their final brand budgets", () => {
+    const cases = [
+      {
+        locale: "zh" as const,
+        brand: "恩禾 ENHE AI",
+        maxLength: 38,
+        title:
+          "OpenAI 发布 GPT-5.6：面向创作者的多模态工作流与自动化能力全面升级",
+      },
+      {
+        locale: "en" as const,
+        brand: "ENHE AI",
+        maxLength: 58,
+        title:
+          "How ENHE AI Helps Users Understand OpenAI GPT-5.6 Creator Workflow Automation",
+      },
+    ];
+
+    for (const item of cases) {
+      const contentBudget = item.maxLength - ` | ${item.brand}`.length;
+      const title = buildMetadataTitle({
+        pageTitle: buildAiNewsSerpTitle({
+          title: item.title,
+          categoryName: "AI News",
+          locale: item.locale,
+          maxLength: contentBudget,
+        }),
+        brand: item.brand,
+        maxLength: item.maxLength,
+      });
+
+      expect(title.length).toBeLessThanOrEqual(item.maxLength);
+      expect(title).toContain(item.brand);
+      expect(title).not.toMatch(/影响解读|Impact Analysis/i);
+      expect(title).not.toMatch(/[|｜]\s*[|｜]/);
+      expect(title).not.toMatch(/[：、，；。！？,:;.!?\-/]\s*\|/);
+    }
+  });
+
+  it("truncates Chinese titles at natural punctuation without splitting English tokens", () => {
+    expect(
+      buildAiNewsSerpTitle({
+        title:
+          "OpenAI 发布 GPT-5.6：面向创作者的多模态工作流与自动化能力全面升级",
+        locale: "zh",
+        maxLength: 25,
+      }),
+    ).toBe("OpenAI 发布 GPT-5.6");
+
+    expect(
+      buildAiNewsSerpTitle({
+        title: "本地部署 SuperLongModelVersion2026PreviewEdition 带来创作升级",
+        locale: "zh",
+        maxLength: 25,
+      }),
+    ).toBe("本地部署");
+  });
+
+  it("cleans repeated separators and dangling punctuation", () => {
+    expect(
+      buildAiNewsSerpTitle({
+        title: "AI 视频工具 | | ：，",
+        categoryName: "AI News",
+        locale: "zh",
+        maxLength: 25,
+      }),
+    ).toBe("AI 视频工具");
+  });
+
+  it("uses one ASCII token boundary rule for titles and descriptions", () => {
+    const value =
+      "ENHE AI workflow safeguards for Alpha@BetaSuperLongModelVersion2026PreviewEdition updates";
+    const title = buildAiNewsSerpTitle({
+      title: value,
+      categoryName: "AI News",
+      locale: "en",
+      maxLength: 38,
+    });
+    const description = truncateAiNewsMetaDescription(value, 58);
+
+    expect(title).not.toMatch(/Alpha@$/);
+    expect(description).not.toMatch(/Alpha@$/);
+    expect(title).not.toContain("Alpha@");
+    expect(description).not.toContain("Alpha@");
+  });
+
+  it("removes dangling English stopwords after title and description truncation", () => {
+    const value =
+      "OpenAI agents coordinate workflows with secure model tools for creators";
+    const title = buildAiNewsSerpTitle({
+      title: value,
+      categoryName: "AI News",
+      locale: "en",
+      maxLength: 43,
+    });
+    const description = truncateAiNewsMetaDescription(value, 43);
+
+    expect(title).toBe("OpenAI agents coordinate workflows");
+    expect(description).toBe("OpenAI agents coordinate workflows");
+    expect(title).not.toMatch(/\b(?:and|for|of|the|to|with)$/i);
+    expect(description).not.toMatch(/\b(?:and|for|of|the|to|with)$/i);
+  });
+
+  it("removes dangling Chinese conjunctions and English prepositions from SERP titles", () => {
+    expect(
+      buildAiNewsSerpTitle({
+        title: "Kimi K3与下一代AI创作工作流升级",
+        categoryName: "AI资讯",
+        locale: "zh",
+        maxLength: 8,
+      }),
+    ).toBe("Kimi K3");
+
+    expect(
+      buildAiNewsSerpTitle({
+        title: "OpenAI agents coordinate workflows via secure tools for creators",
+        categoryName: "AI News",
+        locale: "en",
+        maxLength: 38,
+      }),
+    ).toBe("OpenAI agents coordinate workflows");
+  });
+
+  it("cleans dangling words even when the source title is already within the limit", () => {
+    expect(
+      buildAiNewsSerpTitle({
+        title: "Kimi K3与",
+        categoryName: "AI璧勮",
+        locale: "zh",
+        maxLength: 20,
+      }),
+    ).toBe("Kimi K3");
+    expect(
+      buildAiNewsSerpTitle({
+        title: "OpenAI workflows via",
+        categoryName: "AI News",
+        locale: "en",
+        maxLength: 30,
+      }),
+    ).toBe("OpenAI workflows");
+  });
+
+  it("does not expose an incomplete possessive ASCII token in a SERP title", () => {
+    expect(
+      buildAiNewsSerpTitle({
+        title: "California's Anthropic deal changes AI governance",
+        categoryName: "AI News",
+        locale: "en",
+        maxLength: 10,
+      }),
+    ).toBe("AI News");
+  });
+
+  it("prefers a complete phrase before natural punctuation for English titles", () => {
+    expect(
+      buildAiNewsSerpTitle({
+        title: "OpenAI releases GPT-5.6: creators get faster multimodal workflows",
+        categoryName: "AI News",
+        locale: "en",
+        maxLength: 40,
+      }),
+    ).toBe("OpenAI releases GPT-5.6");
+  });
+
+  it("keeps the audited Claude and Copilot Chinese SERP titles distinct", () => {
+    const titles = [
+      "恩禾ENHE AI如何帮助用户理解Copilot CLI、BYOK、AI credit与GitHub Models退役？",
+      "恩禾ENHE AI如何帮助中文用户理解GitHub Copilot App与桌面AI智能体？",
+      "恩禾ENHE AI如何帮助中文用户理解Copilot OTel与智能体治理？",
+      "恩禾ENHE AI如何帮助中文用户理解Copilot安全审查、CodeQL与代码安全治理？",
+      "恩禾ENHE AI如何帮助中文用户理解Claude Science、AI工作台与可审计产物？",
+      "恩禾ENHE AI如何帮助中文用户理解Claude Code与AI代码安全治理？",
+      "恩禾ENHE AI如何帮助中文用户理解Claude Reflect和AI技能复盘？",
+    ].map((title) =>
+      buildAiNewsSerpTitle({
+        title,
+        categoryName: "AI资讯",
+        locale: "zh",
+        maxLength: 23,
+      }),
+    );
+
+    expect(new Set(titles).size).toBe(titles.length);
+    expect(titles).toEqual(
+      expect.arrayContaining([
+        expect.stringContaining("Copilot CLI"),
+        expect.stringContaining("Copilot App"),
+        expect.stringContaining("Claude Science"),
+        expect.stringContaining("Claude Code"),
+      ]),
+    );
+  });
+
+  it.each([
+    [
+      "English",
+      [
+        "## Table of Contents",
+        "## Key Takeaways",
+        "## Related Tools and Tutorials",
+        "## Sources",
+        "## FAQ",
+        "## Summary",
+      ].join("\n\nBody\n\n"),
+    ],
+    [
+      "Chinese",
+      [
+        "## 文章目录",
+        "## 本文核心看点",
+        "## 相关工具/教程",
+        "## 参考来源",
+        "## 常见问题",
+        "## 总结",
+      ].join("\n\n正文\n\n"),
+    ],
+  ])("detects %s body headings that replace detail templates", async (_, content) => {
+    const aiNews = (await import("@/lib/ai-news")) as Record<string, unknown>;
+    const detect = aiNews.detectAiNewsEmbeddedSections as
+      | ((value: string) => Record<string, boolean>)
+      | undefined;
+
+    expect(detect).toBeTypeOf("function");
+    expect(detect?.(content)).toEqual({
+      faq: true,
+      keyTakeaways: true,
+      relatedTools: true,
+      relatedTutorials: true,
+      sources: true,
+      summary: true,
+      tableOfContents: true,
+    });
+  });
+
+  it("detects descriptive Chinese related-content and summary headings", async () => {
+    const aiNews = (await import("@/lib/ai-news")) as Record<string, unknown>;
+    const detect = aiNews.detectAiNewsEmbeddedSections as
+      | ((value: string) => Record<string, boolean>)
+      | undefined;
+
+    expect(detect).toBeTypeOf("function");
+    expect(
+      detect?.(
+        "## 有哪些相关工具或教程？\n\n正文\n\n## 总结：下一步该如何行动？\n\n正文",
+      ),
+    ).toEqual({
+      faq: false,
+      keyTakeaways: false,
+      relatedTools: true,
+      relatedTutorials: true,
+      sources: false,
+      summary: true,
+      tableOfContents: false,
+    });
+  });
+
+  it("does not treat section words in body prose as embedded template headings", async () => {
+    const aiNews = (await import("@/lib/ai-news")) as Record<string, unknown>;
+    const detect = aiNews.detectAiNewsEmbeddedSections as
+      | ((value: string) => Record<string, boolean>)
+      | undefined;
+
+    expect(detect).toBeTypeOf("function");
+    expect(
+      detect?.(
+        "This paragraph mentions FAQ, sources, summary, and related tools without adding headings.",
+      ),
+    ).toEqual({
+      faq: false,
+      keyTakeaways: false,
+      relatedTools: false,
+      relatedTutorials: false,
+      sources: false,
+      summary: false,
+      tableOfContents: false,
+    });
+  });
+
+  it("keeps a 110+ character candidate even when the fallback contains it", () => {
+    const candidate =
+      `Candidate priority ${"verified workflow context ".repeat(4)}`.trim();
+    const fallback = `${candidate} Additional fallback context that should not replace it.`;
+
+    expect(candidate.length).toBeGreaterThanOrEqual(110);
+    expect(resolveAiNewsMetaDescription([candidate], fallback)).toBe(candidate);
+  });
+
+  it("skips an oversized leading URL and keeps the following prose", () => {
+    const url =
+      `https://example.com/resource?token=${"opaque".repeat(40)}&mode=review`;
+    const prose =
+      "This source reference is followed by useful prose about workflow scope, practical limits, and next steps.";
+    const description = truncateAiNewsMetaDescription(
+      `${url} ${prose}`,
+      150,
+    );
+
+    expect(url.length).toBeGreaterThan(200);
+    expect(description).toBe(prose);
     expect(description.length).toBeLessThanOrEqual(150);
-    expect(description).toContain("普通用户");
-    expect(description).toContain("ENHE AI");
+    expect(description).not.toContain(url.slice(0, 24));
+  });
+
+  it("uses a stable bounded reference for a single opaque token", () => {
+    const token = `opaque${"segment".repeat(30)}`;
+    const first = truncateAiNewsMetaDescription(token, 150);
+    const second = truncateAiNewsMetaDescription(token, 150);
+
+    expect(first).toBe(second);
+    expect(first).toMatch(/^Reference [a-z0-9]{6}$/);
+    expect(first.length).toBeLessThanOrEqual(150);
+    expect(first).not.toContain(token.slice(0, 24));
+  });
+
+  it.each([
+    { maxLength: 1, expected: "" },
+    { maxLength: 2, expected: "AI" },
+    { maxLength: 3, expected: "AI" },
+    { maxLength: 4, expected: "AI" },
+    { maxLength: 5, expected: "AI" },
+  ])(
+    "returns a bounded marker for a $maxLength character title budget",
+    ({ maxLength, expected }) => {
+      const title = buildAiNewsSerpTitle({
+        title: "OpaqueSingleTokenThatCannotFit",
+        categoryName: "AI News",
+        locale: "en",
+        maxLength,
+      });
+
+      expect(title).toBe(expected);
+      expect(title.length).toBeLessThanOrEqual(maxLength);
+    },
+  );
+
+  it("keeps oversized single-token titles distinct without raw token fragments", () => {
+    const tokens = [
+      "supercalifragilisticexpialidocious@BetaEnterpriseWorkflow20260726PreviewEdition",
+      "xqzvbnmlkjhgfdspoiuytrewqazxcvbnmlkjhgfdsa",
+      "mnbvcxzlkjhgfdsapoiuytrewqzxcvbnmasdfghjkl",
+    ];
+    const titles = tokens.map((token) =>
+      buildAiNewsSerpTitle({
+        title: token,
+        categoryName: "AI News",
+        locale: "en",
+        maxLength: 24,
+      }),
+    );
+
+    expect(new Set(titles).size).toBe(tokens.length);
+    expect(titles[0]).toBe("Beta Enterprise Workflow");
+    for (const [index, title] of titles.entries()) {
+      expect(title.length).toBeLessThanOrEqual(24);
+      expect(title).not.toBe("AI");
+      expect(title).not.toBe("AI News");
+      expect(title).not.toMatch(/[@._+#/|,:;\-–—]$/);
+      expect(tokens[index].startsWith(title)).toBe(false);
+      expect(title).not.toContain(tokens[index].slice(0, 8));
+    }
+  });
+
+  it.each([
+    {
+      name: "no candidate",
+      candidates: [null, "2026-07-26", "Too short"],
+      fallback: `No candidate fallback ${"workflow context ".repeat(7)}Alpha@Boundary${"Segment".repeat(24)} next steps`,
+      marker: "No candidate fallback",
+      rawPrefix: "Alpha",
+    },
+    {
+      name: "candidate preferred",
+      candidates: [
+        `Priority candidate ${"workflow context ".repeat(7)}Bravo@Boundary${"Segment".repeat(24)} next steps`,
+      ],
+      fallback: "A valid fallback summary with enough practical context.",
+      marker: "Priority candidate",
+      rawPrefix: "Bravo",
+    },
+    {
+      name: "fallback contains candidate",
+      candidates: ["Focused candidate context for practical AI workflows."],
+      fallback: `Focused candidate context for practical AI workflows. Expanded fallback ${"workflow context ".repeat(4)}Charlie@Boundary${"Segment".repeat(24)} next steps`,
+      marker: "Expanded fallback",
+      rawPrefix: "Charlie",
+    },
+    {
+      name: "candidate contains fallback",
+      candidates: [
+        `Reusable fallback context for AI teams. Candidate expansion ${"workflow context ".repeat(5)}Delta@Boundary${"Segment".repeat(24)} next steps`,
+      ],
+      fallback: "Reusable fallback context for AI teams.",
+      marker: "Candidate expansion",
+      rawPrefix: "Delta",
+    },
+    {
+      name: "candidate and fallback are concatenated",
+      candidates: ["Distinct candidate context for AI teams."],
+      fallback: `Separate fallback ${"workflow context ".repeat(5)}Echo@Boundary${"Segment".repeat(24)} next steps`,
+      marker: "Separate fallback",
+      rawPrefix: "Echo",
+    },
+  ])(
+    "truncates $name descriptions without broken ASCII tokens",
+    ({ candidates, fallback, marker, rawPrefix }) => {
+      const description = resolveAiNewsMetaDescription(candidates, fallback);
+
+      expect(description.length).toBeLessThanOrEqual(150);
+      expect(description).toContain(marker);
+      expect(description).not.toContain(rawPrefix);
+      expect(description).not.toMatch(/[@._+#/|,:;\-–—]$/);
+    },
+  );
+
+  it("keeps Chinese description truncation on natural punctuation", () => {
+    const description = truncateAiNewsMetaDescription(
+      `恩禾 AI 说明这项更新的实际影响、适用范围和后续步骤，${"完整中文说明".repeat(20)}`,
+      50,
+    );
+
+    expect(description.length).toBeLessThanOrEqual(50);
+    expect(description).toContain("实际影响、适用范围和后续步骤");
+    expect(description).toContain("完整中文说明");
+    expect(description).not.toMatch(/[、，；：]$/);
   });
 
   it("parses relation ids from comma and newline separated fields", () => {

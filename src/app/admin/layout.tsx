@@ -23,6 +23,7 @@ const adminNav = [
   ["paymentCodes", "/admin/payment-codes"],
   ["refunds", "/admin/refunds"],
   ["software", "/admin/software"],
+  ["aiSkills", "/admin/ai-skills"],
   ["onlineTools", "/admin/online-tools"],
   ["skillLearning", "/admin/skill-learning"],
   ["productDemos", "/admin/product-demos"],

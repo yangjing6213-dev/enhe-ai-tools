@@ -65,4 +65,28 @@ describe("getToolPublishIssues", () => {
     const issues = getToolPublishIssues(baseCourse);
     expect(issues).not.toContain("未填写下载链接");
   });
+
+  it("requires an AI Skill package before publishing", () => {
+    const issues = getToolPublishIssues({
+      ...baseTool,
+      type: "ai_skill",
+      downloadFileId: null,
+      downloadFile: null
+    });
+
+    expect(issues).toContain("未上传 Skill ZIP 包");
+  });
+
+  it("accepts an uploaded AI Skill package", () => {
+    const issues = getToolPublishIssues({
+      ...baseTool,
+      type: "ai_skill",
+      downloadFile: {
+        filePath: "cos://enhe-bucket/ai-skills/code-review.zip",
+        fileUrl: null
+      }
+    });
+
+    expect(issues).toEqual([]);
+  });
 });

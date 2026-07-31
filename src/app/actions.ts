@@ -165,18 +165,19 @@ export async function createSoftwareDownloadOrderAction(formData: FormData) {
   const requestedPriceSpecId = String(formData.get("priceSpecId") ?? "").trim() || null;
   const paymentMethod = z.enum(["alipay", "wechat"]).parse(formData.get("paymentMethod") ?? "alipay");
   const tool = await prisma.tool.findFirst({
-    where: { id: toolId, type: { in: ["software", "online", "skill_learning"] }, status: "published" },
+    where: { id: toolId, type: { in: ["software", "online", "skill_learning", "ai_skill"] }, status: "published" },
     include: { priceSpecs: { where: { status: "active" }, orderBy: [{ sortOrder: "asc" }, { createdAt: "asc" }] } }
   });
   if (!tool) throw new Error("工具或服务不存在，或尚未发布");
   const selectedPriceSpec = resolveToolOrderPriceSpec(tool.priceSpecs, requestedPriceSpecId);
-  const fallbackOrderAmount = tool.type === "software" ? tool.downloadPrice : 0;
+  const fallbackOrderAmount = tool.type === "software" || tool.type === "ai_skill" ? tool.downloadPrice : 0;
   const orderAmount = selectedPriceSpec?.price ?? fallbackOrderAmount;
   const redirectTarget = `/api/tools/${tool.id}/download`;
   const isPaidSoftware = tool.type === "software" && tool.isDownloadPaid && Number(orderAmount) > 0;
+  const isPaidAiSkill = tool.type === "ai_skill" && tool.isDownloadPaid && Number(orderAmount) > 0;
   const isPaidAccountService = tool.type === "online" && Number(orderAmount) > 0;
   const isPaidCourse = tool.type === "skill_learning" && Number(orderAmount) > 0;
-  if (!isPaidSoftware && !isPaidAccountService && !isPaidCourse) {
+  if (!isPaidSoftware && !isPaidAiSkill && !isPaidAccountService && !isPaidCourse) {
     redirect(redirectTarget);
   }
 

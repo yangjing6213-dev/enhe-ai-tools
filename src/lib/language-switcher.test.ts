@@ -37,6 +37,21 @@ describe("buildLanguageSwitcherHref", () => {
     expect(buildLanguageSwitcherHref("/en/user", "zh")).toBe("/user");
     expect(buildLanguageSwitcherHref("/relay", "zh")).toBe("/?locale=zh");
   });
+
+  it("falls back to the English news index for Chinese pagination URLs", () => {
+    expect(buildLanguageSwitcherHref("/ai-news/page/20", "en")).toBe(
+      "/en/ai-news",
+    );
+    expect(buildLanguageSwitcherHref("/ai-news/page/10", "en")).toBe(
+      "/en/ai-news",
+    );
+    expect(buildLanguageSwitcherHref("/ai-news/page/37", "en")).toBe(
+      "/en/ai-news",
+    );
+    expect(buildLanguageSwitcherHref("/en/ai-news/page/2", "zh")).toBe(
+      "/ai-news/page/2",
+    );
+  });
 });
 
 describe("buildLocalePath", () => {

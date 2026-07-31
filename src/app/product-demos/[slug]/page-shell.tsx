@@ -12,6 +12,7 @@ import {
   buildProductDemoPath,
   buildProductDemoVideoObjectSchema,
   getLocalizedProductDemoDescription,
+  getLocalizedProductDemoFaq,
   getLocalizedProductDemoProductType,
   getLocalizedProductDemoTags,
   getLocalizedProductDemoTitle,
@@ -20,7 +21,6 @@ import {
   getProductDemoRelatedProductHref,
   getProductDemoVideoUrl,
   getPublicProductDemoBySlug,
-  parseProductDemoFaq,
 } from "@/lib/product-demos";
 import {
   buildBreadcrumbSchema,
@@ -30,6 +30,13 @@ import {
   buildProductStructuredData,
   buildToolStructuredData,
 } from "@/lib/seo";
+import {
+  buildLocalizedToolOfferName,
+  buildLocalizedToolPreviewText,
+  buildLocalizedToolTutorialItems,
+  resolveLocalizedToolCategoryName,
+  resolveLocalizedToolIdentity,
+} from "@/lib/tool-localization";
 import { getPrimaryToolPrice } from "@/lib/tool-price-specs";
 
 export const productDemoDetailPageRevalidate = 300;
@@ -116,10 +123,55 @@ export async function ProductDemoDetailPageShell({ slug, forceLocale }: ProductD
   const localizedDescription = getLocalizedProductDemoDescription(demo, forceLocale);
   const localizedProductType = getLocalizedProductDemoProductType(demo, forceLocale);
   const localizedTags = getLocalizedProductDemoTags(demo, forceLocale);
-  const faqItems = parseProductDemoFaq(demo.faq);
+  const faqItems = getLocalizedProductDemoFaq(demo, forceLocale);
   const relatedProductHref = getProductDemoRelatedProductHref(demo, forceLocale);
   const relatedProduct = demo.relatedProduct;
-  const relatedTutorials = relatedProduct?.tutorials ?? [];
+  const localizedRelatedProductName = relatedProduct
+    ? resolveLocalizedToolIdentity(relatedProduct, forceLocale).primaryName
+    : "";
+  const relatedProductLocalizationInput = relatedProduct
+    ? {
+        slug: relatedProduct.slug,
+        name: relatedProduct.name,
+        englishName: relatedProduct.englishName,
+        shortDescription: relatedProduct.shortDescription,
+        content: relatedProduct.content,
+        type: relatedProduct.type,
+        categoryName: relatedProduct.category?.name,
+      }
+    : null;
+  const localizedRelatedProductDescription = relatedProductLocalizationInput
+    ? buildLocalizedToolPreviewText(
+        relatedProductLocalizationInput,
+        forceLocale,
+      )
+    : localizedDescription;
+  const localizedRelatedProductCategory = relatedProduct
+    ? resolveLocalizedToolCategoryName(
+        relatedProduct.category?.name,
+        relatedProduct.type,
+        forceLocale,
+      )
+    : "";
+  const localizedRelatedProductPriceSpecs = relatedProduct
+    ? relatedProduct.priceSpecs.map((spec, index) => ({
+        name: buildLocalizedToolOfferName(
+          spec.name,
+          relatedProduct.type,
+          forceLocale,
+          index,
+        ),
+        price: Number(spec.price),
+      }))
+    : [];
+  const localizedRelatedTutorials =
+    relatedProduct && relatedProductLocalizationInput
+      ? buildLocalizedToolTutorialItems(
+          relatedProduct.tutorials,
+          relatedProductLocalizationInput,
+          forceLocale,
+        )
+      : [];
   const productPrice = relatedProduct
     ? getPrimaryToolPrice(relatedProduct.priceSpecs, relatedProduct.downloadPrice)
     : 0;
@@ -131,29 +183,23 @@ export async function ProductDemoDetailPageShell({ slug, forceLocale }: ProductD
   const relatedProductSchema = relatedProduct
     ? relatedProduct.type === "software"
       ? buildProductStructuredData({
-          name: relatedProduct.name,
-          description: relatedProduct.shortDescription,
+          name: localizedRelatedProductName,
+          description: localizedRelatedProductDescription,
           url: relatedProductHref,
           image: relatedProduct.coverImage,
-          category: relatedProduct.category?.name,
+          category: localizedRelatedProductCategory,
           price: productPrice > 0 ? productPrice : null,
-          priceSpecs: relatedProduct.priceSpecs.map((spec) => ({
-            name: spec.name,
-            price: Number(spec.price),
-          })),
+          priceSpecs: localizedRelatedProductPriceSpecs,
         })
       : buildToolStructuredData({
           schemaType: relatedProduct.type === "online" ? "Service" : "Course",
-          name: relatedProduct.name,
-          description: relatedProduct.shortDescription,
+          name: localizedRelatedProductName,
+          description: localizedRelatedProductDescription,
           url: relatedProductHref,
           image: relatedProduct.coverImage,
-          category: relatedProduct.category?.name,
+          category: localizedRelatedProductCategory,
           price: productPrice > 0 ? productPrice : null,
-          priceSpecs: relatedProduct.priceSpecs.map((spec) => ({
-            name: spec.name,
-            price: Number(spec.price),
-          })),
+          priceSpecs: localizedRelatedProductPriceSpecs,
         })
     : null;
   const functionItems = [
@@ -268,7 +314,7 @@ export async function ProductDemoDetailPageShell({ slug, forceLocale }: ProductD
             <aside className="product-demo-sidebar">
               <section className="product-demo-detail-section">
                 <h2>{copy.relatedProduct}</h2>
-                <p>{relatedProduct?.shortDescription ?? localizedDescription}</p>
+                <p>{localizedRelatedProductDescription}</p>
                 <div className="mt-4 flex flex-wrap gap-3">
                   <ButtonLink href={relatedProductHref} className="product-demo-primary-link">
                     {copy.viewProduct}
@@ -278,11 +324,11 @@ export async function ProductDemoDetailPageShell({ slug, forceLocale }: ProductD
                   </ButtonLink>
                 </div>
               </section>
-              {relatedTutorials.length ? (
+              {localizedRelatedTutorials.length ? (
                 <section className="product-demo-detail-section">
                   <h2>{copy.relatedTutorials}</h2>
                   <div className="mt-4 grid gap-3">
-                    {relatedTutorials.slice(0, 4).map((tutorial) => (
+                    {localizedRelatedTutorials.slice(0, 4).map((tutorial) => (
                       <Link key={tutorial.id} href={`${relatedProductHref}#tool-tutorials`} className="inline-flex items-center gap-2 text-sm font-bold text-[var(--marketing-accent)] hover:text-white">
                         {tutorial.title}
                         <ArrowUpRight size={14} aria-hidden="true" />

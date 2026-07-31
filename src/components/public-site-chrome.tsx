@@ -3,17 +3,17 @@ import { CustomerSupportWidget } from "@/components/customer-support-widget";
 import { SiteFooter } from "@/components/site-footer";
 import { SiteHeader } from "@/components/site-header";
 import { getCustomerSupportFaqs } from "@/lib/customer-support";
+import { buildEnheOrganizationSchema } from "@/lib/brand-entity";
 import { getDictionary, type Locale } from "@/lib/dictionaries";
 import {
   absoluteUrl,
   buildLanguageAlternates,
   buildLocalePath,
-  buildOrganizationSchema,
-  buildWebsiteSchema
+  buildWebsiteSchema,
+  siteName
 } from "@/lib/seo";
 import {
   getEffectiveLocalizedHomeHeroIntro,
-  getEffectiveLocalizedSiteName,
   getEffectiveSiteLogo,
   getSettingsMap
 } from "@/lib/settings";
@@ -25,8 +25,6 @@ export async function PublicSiteChrome({
   const settings = await getSettingsMap();
   const t = getDictionary(forceLocale);
   const languageAlternates = buildLanguageAlternates("/");
-  const inLanguage = forceLocale === "en" ? "en-US" : "zh-CN";
-  const siteDisplayName = getEffectiveLocalizedSiteName(settings, forceLocale, t.footer.siteName);
   const siteLogo = getEffectiveSiteLogo(settings, "/images/brand/enhe-icon-gradient-white-bg-cropped.png");
   const siteDescription = getEffectiveLocalizedHomeHeroIntro(settings, forceLocale, t.home.intro);
   const organizationId = absoluteUrl("/#organization");
@@ -36,41 +34,18 @@ export async function PublicSiteChrome({
   const websiteSchema = buildWebsiteSchema({
     schemaType: "WebSite",
     id: websiteId,
-    name: siteDisplayName,
+    name: siteName,
     description: siteDescription,
-    url: languageAlternates[inLanguage],
+    url: absoluteUrl("/"),
     inLanguage: forceLocale === "en" ? "en-US" : "zh-CN",
     searchPathTemplate: buildLocalePath("/search?q={search_term_string}", forceLocale),
     publisherId: organizationId
   });
-  const organizationSchema = buildOrganizationSchema({
-    schemaType: "Organization",
-    id: organizationId,
-    name: siteDisplayName,
-    alternateName: ["恩禾 ENHE AI", "恩禾AI"],
+  const organizationSchema = buildEnheOrganizationSchema({
     description: siteDescription,
     logo: siteLogo,
-    url: absoluteUrl("/"),
-    sameAs: ["https://github.com/hqwzhu/enhe-ai-tools"],
-    knowsAbout: [
-      "AI tools",
-      "AI productivity workflows",
-      "AI skill learning",
-      "local AI deployment",
-      "AI account service guidance"
-    ],
-    subjectOf: [
-      {
-        name: "ENHE AI brand profile",
-        url: absoluteUrl("/about"),
-        encodingFormat: "text/html"
-      },
-      {
-        name: "ENHE AI LLM guidance",
-        url: absoluteUrl("/llms.txt"),
-        encodingFormat: "text/plain"
-      }
-    ],
+    url: languageAlternates["x-default"],
+    returnPolicyPath: buildLocalePath("/legal/membership-refund", forceLocale),
     contactPoint: {
       email: "ENHEAI.life@protonmail.com",
       contactType: "customer support",

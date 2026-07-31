@@ -76,7 +76,7 @@ describe("SEO follow-up source contracts", () => {
     expect(newsDetail).toContain(
       'hasIndexableEnglishPage ? ["zh", "en"] : ["zh"]',
     );
-    expect(publicContent).not.toContain('filters.locale === "en"');
-    expect(publicContent).not.toContain("isEnglishNewsArticleIndexable");
+    expect(publicContent).toContain("isEnglishNewsArticleIndexable");
+    expect(publicContent).toContain("const indexableArticles = candidateArticles.filter");
   });
 });

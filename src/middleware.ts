@@ -28,6 +28,7 @@ export function middleware(request: NextRequest) {
     pathname === "/" ||
     [
       "/software",
+      "/ai-skills",
       "/account-services",
       "/online-tools",
       "/skill-learning",
@@ -39,6 +40,7 @@ export function middleware(request: NextRequest) {
       "/build-your-own-x",
     ].includes(pathname) ||
     pathname.startsWith("/software/") ||
+    pathname.startsWith("/ai-skills/") ||
     pathname.startsWith("/account-services/") ||
     pathname.startsWith("/skill-learning/") ||
     pathname.startsWith("/ai-news/") ||
@@ -102,7 +104,20 @@ export function middleware(request: NextRequest) {
       headers: requestHeaders
     }
   });
-  response.headers.set("Content-Language", htmlLocale === "en" ? "en-US" : "zh-CN");
+  const isLanguageNeutralMachinePath =
+    pathname === "/robots.txt" || pathname === "/sitemap.xml";
+  const contentLanguage =
+    pathname === "/pricing.md" || pathname.startsWith("/okf/")
+      ? "en-US"
+      : pathname === "/llms.txt"
+        ? "zh-CN, en-US"
+        : htmlLocale === "en"
+          ? "en-US"
+          : "zh-CN";
+
+  if (!isLanguageNeutralMachinePath) {
+    response.headers.set("Content-Language", contentLanguage);
+  }
 
   if (isEnglishPath && cookieLocale !== "en") {
     response.cookies.set(localeCookieName, "en", {

@@ -1,222 +1,232 @@
-import { expect, test } from "@playwright/test";
+import { expect, test, type Page } from "@playwright/test";
 import { PrismaClient } from "@prisma/client";
 import bcrypt from "bcryptjs";
-import { writeFile, mkdir } from "node:fs/promises";
+import { mkdir, rm, writeFile } from "node:fs/promises";
 import { join } from "node:path";
 
 const prisma = new PrismaClient();
 const suffix = `${Date.now()}-${Math.floor(Math.random() * 1000)}`;
-const userEmail = `e2e-user-${suffix}@enhe.test`;
-const adminEmail = `e2e-admin-${suffix}@enhe.test`;
+const userEmail = `e2e-paid-${suffix}@enhe.test`;
 const password = "E2ePass123!";
+const softwareSlug = `e2e-paid-software-${suffix}`;
 
 let userId = "";
-let adminId = "";
-let planId = "";
-let softwareCategoryId = "";
-let onlineCategoryId = "";
+let categoryId = "";
 let softwareToolId = "";
-let onlineToolId = "";
 let downloadFileId = "";
-let uploadProofPath = "";
+let downloadFilePath = "";
 
 test.describe.configure({ mode: "serial" });
 
 test.beforeAll(async () => {
-  const passwordHash = await bcrypt.hash(password, 12);
-  const [user, admin] = await Promise.all([
-    prisma.user.create({
-      data: { email: userEmail, passwordHash, nickname: "E2E 用户" }
-    }),
-    prisma.user.create({
-      data: { email: adminEmail, passwordHash, nickname: "E2E 管理员", role: "admin" }
-    })
-  ]);
-  userId = user.id;
-  adminId = admin.id;
+  if (process.env.ZPAY_MODE?.trim() !== "disabled") {
+    throw new Error(
+      "This spec requires explicit ZPAY_MODE=disabled to prevent real payment requests.",
+    );
+  }
 
-  const plan = await prisma.vipPlan.create({
+  const passwordHash = await bcrypt.hash(password, 12);
+  const user = await prisma.user.create({
     data: {
-      name: `E2E 7天VIP ${suffix}`,
-      durationDays: 7,
-      price: "1.00",
-      originalPrice: "9.00",
-      description: "E2E 测试套餐",
-      status: "active",
-      sortOrder: -100
-    }
+      email: userEmail,
+      passwordHash,
+      nickname: "E2E paid software user",
+      isTestData: true,
+    },
   });
-  planId = plan.id;
+  userId = user.id;
 
   const category = await prisma.toolCategory.create({
-    data: { name: `E2E 分类 ${suffix}`, type: "software", status: "active", sortOrder: -100 }
+    data: {
+      name: `E2E paid software ${suffix}`,
+      type: "software",
+      status: "active",
+      sortOrder: -100,
+    },
   });
-  softwareCategoryId = category.id;
-  const onlineCategory = await prisma.toolCategory.create({
-    data: { name: `E2E 在线分类 ${suffix}`, type: "online", status: "active", sortOrder: -99 }
-  });
-  onlineCategoryId = onlineCategory.id;
+  categoryId = category.id;
 
   const uploadDir = join(process.cwd(), "public", "uploads");
   await mkdir(uploadDir, { recursive: true });
   const downloadFileName = `e2e-download-${suffix}.txt`;
-  await writeFile(join(uploadDir, downloadFileName), "e2e download");
+  downloadFilePath = join(uploadDir, downloadFileName);
+  await writeFile(downloadFilePath, "e2e download");
 
   const file = await prisma.file.create({
     data: {
       fileName: downloadFileName,
-      filePath: join(uploadDir, downloadFileName),
+      filePath: downloadFilePath,
       fileUrl: `/uploads/${downloadFileName}`,
       fileSize: BigInt(12),
-      mimeType: "text/plain"
-    }
+      mimeType: "text/plain",
+    },
   });
   downloadFileId = file.id;
 
   const software = await prisma.tool.create({
     data: {
-      name: `E2E VIP 软件 ${suffix}`,
-      slug: `e2e-vip-software-${suffix}`,
+      name: `E2E Paid Software ${suffix}`,
+      englishName: `E2E Paid Software ${suffix}`,
+      slug: softwareSlug,
       type: "software",
-      categoryId: category.id,
-      shortDescription: "E2E VIP 下载拦截",
-      content: "E2E VIP 下载拦截",
-      isVipRequired: true,
-      isDownloadPaid: false,
-      downloadFileId: file.id,
+      categoryId,
+      shortDescription: "E2E paid software purchase check",
+      content: "E2E paid software purchase and delivery check",
+      isVipRequired: false,
+      isDownloadPaid: true,
+      downloadPrice: "1.00",
+      downloadFileId,
       status: "published",
-      sortOrder: -100
-    }
+      sortOrder: -100,
+    },
   });
   softwareToolId = software.id;
-
-  const online = await prisma.tool.create({
-    data: {
-      name: `E2E VIP 在线工具 ${suffix}`,
-      slug: `e2e-vip-online-${suffix}`,
-      type: "online",
-      categoryId: onlineCategory.id,
-      shortDescription: "E2E 在线工具拦截",
-      content: "E2E 在线工具拦截",
-      onlineUrl: "/legal/user-agreement",
-      isVipRequired: true,
-      status: "published",
-      sortOrder: -99
-    }
-  });
-  onlineToolId = online.id;
-
-  const proofDir = join(process.cwd(), "test-results", "e2e");
-  uploadProofPath = join(proofDir, `proof-${suffix}.png`);
-  await mkdir(proofDir, { recursive: true });
-  await writeFile(uploadProofPath, Buffer.from("iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+/p9sAAAAASUVORK5CYII=", "base64"));
 });
 
 test.afterAll(async () => {
-  const userIds = [userId, adminId].filter(Boolean);
-  const toolIds = [softwareToolId, onlineToolId].filter(Boolean);
-  const categoryIds = [softwareCategoryId, onlineCategoryId].filter(Boolean);
+  try {
+    const orders = userId
+      ? await prisma.order.findMany({
+          where: { userId },
+          select: { id: true },
+        })
+      : [];
+    const orderIds = orders.map((order) => order.id);
 
-  await prisma.downloadLog.deleteMany({ where: { toolId: { in: toolIds } } });
-  await prisma.toolUsageLog.deleteMany({ where: { toolId: { in: toolIds } } });
-  await prisma.comment.deleteMany({ where: { toolId: { in: toolIds } } });
-  await prisma.tutorial.deleteMany({ where: { toolId: { in: toolIds } } });
-  await prisma.toolFaq.deleteMany({ where: { toolId: { in: toolIds } } });
-  await prisma.toolChangelog.deleteMany({ where: { toolId: { in: toolIds } } });
-  await prisma.toolTagLink.deleteMany({ where: { toolId: { in: toolIds } } });
-  await prisma.paymentProof.deleteMany({ where: { userId: { in: [userId, adminId].filter(Boolean) } } });
-  await prisma.toolPurchase.deleteMany({ where: { userId: { in: userIds } } });
-  await prisma.order.deleteMany({ where: { userId: { in: userIds } } });
-  await prisma.membership.deleteMany({ where: { userId: { in: userIds } } });
-  await prisma.session.deleteMany({ where: { userId: { in: userIds } } });
-  await prisma.loginAttempt.deleteMany({ where: { identifier: { in: [userEmail, adminEmail] } } });
-  await prisma.tool.updateMany({ where: { id: { in: toolIds } }, data: { downloadFileId: null, categoryId: null } });
-  await prisma.tool.deleteMany({ where: { id: { in: toolIds } } });
-  await prisma.file.deleteMany({ where: { id: downloadFileId || "__none__" } });
-  await prisma.toolCategory.deleteMany({ where: { id: { in: categoryIds } } });
-  await prisma.vipPlan.deleteMany({ where: { id: planId || "__none__" } });
-  await prisma.user.deleteMany({ where: { id: { in: userIds } } });
-  await prisma.$disconnect();
+    if (orderIds.length) {
+      await prisma.adminAuditLog.deleteMany({
+        where: { targetId: { in: orderIds } },
+      });
+      await prisma.paymentTransaction.deleteMany({
+        where: { orderId: { in: orderIds } },
+      });
+      await prisma.paymentProof.deleteMany({
+        where: { orderId: { in: orderIds } },
+      });
+      await prisma.orderRefundRecord.deleteMany({
+        where: { orderId: { in: orderIds } },
+      });
+      await prisma.toolPurchase.deleteMany({
+        where: { orderId: { in: orderIds } },
+      });
+      await prisma.order.deleteMany({ where: { id: { in: orderIds } } });
+    }
+
+    if (userId) {
+      await prisma.analyticsEvent.deleteMany({ where: { userId } });
+      await prisma.session.deleteMany({ where: { userId } });
+      await prisma.loginAttempt.deleteMany({
+        where: { identifier: userEmail },
+      });
+    }
+    if (softwareToolId) {
+      await prisma.downloadLog.deleteMany({
+        where: { toolId: softwareToolId },
+      });
+      await prisma.toolUsageLog.deleteMany({
+        where: { toolId: softwareToolId },
+      });
+      await prisma.tool.update({
+        where: { id: softwareToolId },
+        data: { downloadFileId: null, categoryId: null },
+      });
+      await prisma.tool.delete({ where: { id: softwareToolId } });
+    }
+    if (downloadFileId) {
+      await prisma.file.deleteMany({ where: { id: downloadFileId } });
+    }
+    if (categoryId) {
+      await prisma.toolCategory.deleteMany({ where: { id: categoryId } });
+    }
+    if (userId) {
+      await prisma.user.deleteMany({ where: { id: userId } });
+    }
+  } finally {
+    await prisma.$disconnect();
+    if (downloadFilePath) await rm(downloadFilePath, { force: true });
+  }
 });
 
 test.beforeEach(async ({ context }) => {
   await context.clearCookies();
 });
 
-async function login(page: import("@playwright/test").Page, email: string) {
+async function login(page: Page) {
   await page.goto("/login");
-  await page.locator('input[name="email"]').fill(email);
+  await page.locator('input[name="email"]').fill(userEmail);
   await page.locator('input[name="password"]').fill(password);
-  await page.getByRole("button", { name: /登录|Log in|Login/i }).click();
+  await page.locator('button[type="submit"]').click();
+  await expect(page).toHaveURL(/\/user(?:[/?#]|$)/, { timeout: 15_000 });
 }
 
-test("user uploads a VIP order proof and admin approval activates membership", async ({ page }) => {
-  await login(page, userEmail);
-  await expect(page).toHaveURL(/\/user/);
+test("a pending paid software order reaches disabled ZPAY", async ({
+  page,
+}) => {
+  await page.route("**/api/analytics", (route) =>
+    route.fulfill({ status: 204 }),
+  );
+  await login(page);
 
-  await page.goto("/pricing");
-  const planCard = page.locator("form").filter({ hasText: `E2E 7天VIP ${suffix}` });
-  await planCard.getByRole("button").click();
-  await expect(page).toHaveURL(/\/orders\/.+\/pay/);
-
-  await page.locator('input[name="file"]').setInputFiles(uploadProofPath);
-  await page.getByRole("button", { name: /上传并提交审核/ }).click();
-  await expect(page).toHaveURL(/\/orders\/.+uploaded=1/);
-  await expect(page.getByText("上传成功，订单已进入待审核状态。")).toBeVisible();
-
-  const order = await prisma.order.findFirstOrThrow({
-    where: { userId, planId },
-    orderBy: { createdAt: "desc" }
+  const order = await prisma.order.create({
+    data: {
+      orderNo: `E2E-SOFTWARE-PENDING-${suffix}`,
+      userId,
+      toolId: softwareToolId,
+      orderType: "software_download",
+      amount: "1.00",
+      paymentMethod: "wechat",
+      orderStatus: "pending_payment",
+      isTestData: true,
+    },
   });
-  expect(order.orderStatus).toBe("pending_review");
+  const payResponse = await page.goto(`/orders/${order.id}/pay`);
 
-  await page.goto("/user");
-  await page.getByRole("button", { name: /退出|Logout/i }).click();
-  await login(page, adminEmail);
-  await expect(page).toHaveURL(/\/admin/);
+  expect(payResponse?.ok()).toBe(true);
+  await expect(page).toHaveURL(/\/orders\/[A-Za-z0-9_-]+\/pay$/);
+  await expect(
+    page.getByText("ZPAY_PAYMENT_DISABLED", { exact: true }),
+  ).toBeVisible();
 
-  await page.goto("/admin/payments");
-  const proofRow = page.getByRole("link", { name: order.orderNo }).locator("xpath=..");
-  await proofRow.locator('a[href^="/admin/payments/"]').click();
-  await expect(page).toHaveURL(/\/admin\/payments\/.+/);
-  await page.locator('button[name="decision"][value="approved"]').click();
-
-  await expect.poll(async () => {
-    const refreshed = await prisma.order.findUnique({ where: { id: order.id } });
-    return refreshed?.orderStatus;
-  }).toBe("activated");
-
-  await expect.poll(async () => {
-    const membership = await prisma.membership.findFirst({ where: { userId, status: "active" } });
-    return Boolean(membership);
-  }).toBe(true);
+  expect(order.orderType).toBe("software_download");
+  expect(order.orderStatus).toBe("pending_payment");
+  expect(order.amount.toString()).toBe("1");
 });
 
-test("VIP gates block ordinary users and allow active VIP users", async ({ page }) => {
-  await login(page, userEmail);
-  await expect(page).toHaveURL(/\/user/);
+test("paid software stays locked until a purchase is activated", async ({
+  page,
+}) => {
+  await login(page);
 
-  await prisma.membership.deleteMany({ where: { userId } });
   await page.goto(`/api/tools/${softwareToolId}/download`);
-  await expect(page).toHaveURL(/\/pricing/);
+  await expect(page).toHaveURL(
+    new RegExp(`/software/${softwareSlug}\\?download=pay-required$`),
+  );
 
-  await page.goto(`/api/tools/${onlineToolId}/use`);
-  await expect(page).toHaveURL(/\/pricing/);
-
-  await prisma.membership.create({
+  const order = await prisma.order.create({
+    data: {
+      orderNo: `E2E-SOFTWARE-${suffix}`,
+      userId,
+      toolId: softwareToolId,
+      orderType: "software_download",
+      amount: "1.00",
+      paymentMethod: "wechat",
+      orderStatus: "activated",
+      paidAt: new Date(),
+      activatedAt: new Date(),
+      isTestData: true,
+    },
+  });
+  await prisma.toolPurchase.create({
     data: {
       userId,
-      planId,
-      vipType: "E2E VIP",
-      startTime: new Date(),
-      endTime: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
-      status: "active"
-    }
+      toolId: softwareToolId,
+      orderId: order.id,
+      amount: "1.00",
+    },
   });
 
   await page.goto(`/api/tools/${softwareToolId}/download`);
-  await expect(page).toHaveURL(new RegExp(`/uploads/e2e-download-${suffix}\\.txt`));
-
-  await page.goto(`/api/tools/${onlineToolId}/use`);
-  await expect(page).toHaveURL(/\/legal\/user-agreement/);
+  await expect(page).toHaveURL(
+    new RegExp(`/uploads/e2e-download-${suffix}\\.txt$`),
+  );
 });

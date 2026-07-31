@@ -101,7 +101,7 @@ describe("technical seo phase one source", () => {
     expect(siteFooter).not.toContain('export const dynamic = "force-dynamic"');
     expect(publicChrome).toContain("StructuredData");
     expect(publicChrome).toContain("buildWebsiteSchema");
-    expect(publicChrome).toContain("buildOrganizationSchema");
+    expect(publicChrome).toContain("buildEnheOrganizationSchema");
     expect(publicChrome).toContain('forceLocale === "en" ? "en-US" : "zh-CN"');
     expect(publicContent).toContain("publicContentRevalidate = 300");
     expect(sharedLayout).not.toContain("buildWebsiteSchema");

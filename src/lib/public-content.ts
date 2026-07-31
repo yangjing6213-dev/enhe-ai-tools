@@ -8,6 +8,8 @@ import {
   type AiNewsKeywordCandidate,
   type AiNewsKeywordInterventionRule,
 } from "@/lib/ai-news-discovery";
+import { isEnglishNewsArticleIndexable } from "@/lib/ai-news";
+import { resolveLocalizedNewsTagName } from "@/lib/ai-news-localization";
 import { prisma } from "@/lib/db";
 import {
   getCanonicalAiNewsSlug,
@@ -17,7 +19,43 @@ import { parseVirtualToolCategoryId } from "@/lib/tool-category-groups";
 
 const publicContentRevalidate = 300;
 
-type PublicToolType = "software" | "online" | "skill_learning";
+export const publicNewsTagLimit = 48;
+
+export function filterPublicNewsTags<
+  T extends { slug: string; name: string },
+>(tags: readonly T[], locale: "zh" | "en"): T[] {
+  if (locale === "zh") return tags.slice(0, publicNewsTagLimit);
+
+  const seenNames = new Set<string>();
+  const result: T[] = [];
+
+  for (const tag of tags) {
+    const normalizedName = tag.name.replace(/\s+/g, " ").trim();
+    const localizedName =
+      resolveLocalizedNewsTagName(normalizedName, "en") ||
+      (!/[\u3040-\u30ff\u3400-\u9fff\uf900-\ufaff]/u.test(normalizedName) &&
+      /[A-Za-z]/.test(normalizedName)
+        ? normalizedName
+        : "");
+    const normalizedKey = localizedName.toLowerCase();
+
+    if (
+      !localizedName ||
+      /[\u3040-\u30ff\u3400-\u9fff\uf900-\ufaff]/u.test(localizedName) ||
+      seenNames.has(normalizedKey)
+    ) {
+      continue;
+    }
+
+    seenNames.add(normalizedKey);
+    result.push({ ...tag, name: localizedName });
+    if (result.length === publicNewsTagLimit) break;
+  }
+
+  return result;
+}
+
+type PublicToolType = "software" | "online" | "skill_learning" | "ai_skill";
 
 export type PublicNewsListingFilters = {
   q?: string;
@@ -109,9 +147,9 @@ const getCachedPublicToolListing = unstable_cache(
             ? { tutorials: { some: { status: "active" } } }
             : {}),
           ...buildToolCategoryWhere(categoryId),
-          ...(type === "software" && paid === "paid"
+          ...((type === "software" || type === "ai_skill") && paid === "paid"
             ? { isDownloadPaid: true }
-            : type === "software" && paid === "free"
+            : (type === "software" || type === "ai_skill") && paid === "free"
               ? { isDownloadPaid: false }
               : {}),
           ...(keyword
@@ -137,7 +175,7 @@ const getCachedPublicToolListing = unstable_cache(
           },
         },
         orderBy:
-          type === "software"
+          type === "software" || type === "ai_skill"
             ? sort === "hot"
               ? { downloadCount: "desc" }
               : { createdAt: "desc" }
@@ -292,6 +330,24 @@ const getCachedPublicNewsListing = unstable_cache(
                 { publishedAt: "desc" },
               ]
             : [{ isPinned: "desc" }, { publishedAt: "desc" }];
+      if (filters.locale === "en") {
+        const candidateArticles = await prisma.newsArticle.findMany({
+          where,
+          include: { category: true, tagLinks: { include: { tag: true } } },
+          orderBy,
+        });
+        const indexableArticles = candidateArticles.filter(
+          isEnglishNewsArticleIndexable,
+        );
+        const skip = filters.skip ?? 0;
+        const take = filters.take ?? 9;
+
+        return {
+          articles: indexableArticles.slice(skip, skip + take),
+          total: indexableArticles.length,
+        };
+      }
+
       const [articles, total] = await Promise.all([
         prisma.newsArticle.findMany({
           where,
@@ -766,8 +822,8 @@ export async function getPublicNewsCategories() {
   return getCachedPublicNewsCategories();
 }
 
-export async function getPublicNewsTags() {
-  return getCachedPublicNewsTags();
+export async function getPublicNewsTags(locale: "zh" | "en" = "zh") {
+  return filterPublicNewsTags(await getCachedPublicNewsTags(), locale);
 }
 
 export async function getPublicNewsArticleBySlug(slug: string) {

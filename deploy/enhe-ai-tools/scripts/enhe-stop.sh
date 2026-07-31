@@ -2,9 +2,18 @@
 set -eu
 
 APP_DIR="${APP_DIR:-/opt/enhe-ai-tools}"
-COMPOSE_FILE="$APP_DIR/deploy/enhe-ai-tools/docker-compose.yml"
-ENV_FILE="${ENHE_ENV_FILE:-$APP_DIR/deploy/enhe-ai-tools/.env}"
+LOCK_HELPER="$APP_DIR/deploy/enhe-ai-tools/scripts/enhe-operation-lock.sh"
 
-test -f "$ENV_FILE" || { echo "Missing env file: $ENV_FILE" >&2; exit 1; }
-cd "$APP_DIR"
-docker compose --env-file "$ENV_FILE" -f "$COMPOSE_FILE" down
+test -f "$LOCK_HELPER" || { echo "Operation lock helper not found: $LOCK_HELPER" >&2; exit 1; }
+. "$LOCK_HELPER"
+acquire_enhe_operation_lock
+
+for container in \
+  enhe-ai-tools-seo-audit-worker \
+  enhe-ai-tools-seo-audit-scheduler \
+  enhe-ai-tools-app \
+  enhe-ai-tools-db; do
+  if docker container inspect "$container" >/dev/null 2>&1; then
+    docker stop "$container" >/dev/null
+  fi
+done

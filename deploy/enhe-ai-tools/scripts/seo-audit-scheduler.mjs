@@ -1,5 +1,7 @@
-import { promises as fs } from "node:fs";
-import { dirname } from "node:path";
+import {
+  loadRuntimeHeartbeatIdentity,
+  writeRuntimeHeartbeat
+} from "./runtime-heartbeat.mjs";
 
 let stopping = false;
 
@@ -26,19 +28,9 @@ function loadConfig() {
     baseUrl: baseUrl.toString().replace(/\/$/, ""),
     token: required("AUDIT_WORKER_TOKEN_CURRENT"),
     heartbeatFile: required("SEO_AUDIT_SCHEDULER_HEARTBEAT_FILE"),
+    heartbeatIdentity: loadRuntimeHeartbeatIdentity(),
     intervalMs: positiveInteger("SEO_AUDIT_SCHEDULER_INTERVAL_MS", 60_000, 1_000)
   };
-}
-
-async function writeHeartbeat(path, status) {
-  await fs.mkdir(dirname(path), { recursive: true });
-  const temporary = `${path}.${process.pid}.tmp`;
-  await fs.writeFile(
-    temporary,
-    JSON.stringify({ status, checkedAt: new Date().toISOString() }),
-    { encoding: "utf8", mode: 0o600 }
-  );
-  await fs.rename(temporary, path);
 }
 
 async function enqueue(config) {
@@ -75,9 +67,17 @@ async function main() {
   while (!stopping) {
     try {
       await enqueue(config);
-      await writeHeartbeat(config.heartbeatFile, "ok");
+      await writeRuntimeHeartbeat(
+        config.heartbeatFile,
+        config.heartbeatIdentity,
+        { status: "ok" }
+      );
     } catch {
-      await writeHeartbeat(config.heartbeatFile, "blocked");
+      await writeRuntimeHeartbeat(
+        config.heartbeatFile,
+        config.heartbeatIdentity,
+        { status: "blocked" }
+      );
     }
     if (!stopping) await sleep(config.intervalMs);
   }

@@ -11,6 +11,8 @@ param(
   [ValidatePattern('^[A-Za-z0-9._/-]+$')]
   [string]$Branch = "main",
   [string]$TestDatabaseUrl = $env:SEO_AUDIT_TEST_DATABASE_URL,
+  [ValidateRange(1024, 65535)]
+  [int]$E2ePort = 3107,
   [switch]$NoDeploy
 )
 
@@ -76,13 +78,15 @@ function Assert-LocalTestDatabaseUrl {
 
 Assert-RequiredCommand git
 Assert-RequiredCommand npm
+Assert-RequiredCommand node
+Assert-RequiredCommand docker
 Assert-RequiredCommand ssh
 Assert-LocalTestDatabaseUrl $TestDatabaseUrl
 
 $repoRoot = (Resolve-Path (Join-Path $PSScriptRoot "..")).Path
 Set-Location $repoRoot
 
-$worktreeStatus = & git status --porcelain
+$worktreeStatus = & git status --porcelain --untracked-files=all
 if ($LASTEXITCODE -ne 0) {
   throw "Unable to inspect the Git worktree."
 }
@@ -98,6 +102,22 @@ if (
 ) {
   throw "ReleaseRef must identify the current HEAD commit."
 }
+$ReleaseRef = $resolvedRef.ToLowerInvariant()
+
+Invoke-Native -FilePath git -Arguments @("fetch", "origin", $Branch)
+& git merge-base --is-ancestor "origin/$Branch" $ReleaseRef
+if ($LASTEXITCODE -ne 0) {
+  throw "ReleaseRef must descend from the current origin/$Branch before release."
+}
+
+Invoke-Native -FilePath node -Arguments @("scripts/test-migration-paths.mjs")
+$releaseShellMount = "type=bind,source=$repoRoot,target=/repo,readonly"
+Invoke-Native -FilePath docker -Arguments @(
+  "run", "--rm",
+  "--mount", $releaseShellMount,
+  "postgres:16-alpine",
+  "sh", "/repo/scripts/test-release-shell-behavior.sh", "/repo"
+)
 
 $env:SEO_AUDIT_TEST_DATABASE_URL = $TestDatabaseUrl
 $env:DATABASE_URL = $TestDatabaseUrl
@@ -106,9 +126,69 @@ Invoke-Native -FilePath npm -Arguments @("run", "typecheck")
 Invoke-Native -FilePath npm -Arguments @("run", "lint")
 Invoke-Native -FilePath npm -Arguments @("run", "build")
 
-$worktreeStatus = & git status --porcelain
+$previousPlaywrightProduction = $env:PLAYWRIGHT_USE_PRODUCTION_SERVER
+$previousPlaywrightBaseUrl = $env:PLAYWRIGHT_BASE_URL
+$previousPort = $env:PORT
+$previousAuthSecret = $env:AUTH_SECRET
+$previousAppUrl = $env:APP_URL
+$previousPublicAppUrl = $env:NEXT_PUBLIC_APP_URL
+$previousPublicSiteUrl = $env:NEXT_PUBLIC_SITE_URL
+$previousZpayMode = $env:ZPAY_MODE
+$previousMonitoringSales = $env:SEO_AUDIT_MONITORING_SALES_ENABLED
+try {
+  $localBaseUrl = "http://localhost:$E2ePort"
+  $env:PLAYWRIGHT_USE_PRODUCTION_SERVER = "1"
+  $env:PLAYWRIGHT_BASE_URL = $localBaseUrl
+  $env:PORT = "$E2ePort"
+  $env:AUTH_SECRET = "enhe-release-e2e-secret-2026-07-31"
+  $env:APP_URL = $localBaseUrl
+  $env:NEXT_PUBLIC_APP_URL = $localBaseUrl
+  $env:NEXT_PUBLIC_SITE_URL = $localBaseUrl
+  $env:ZPAY_MODE = "disabled"
+  $env:SEO_AUDIT_MONITORING_SALES_ENABLED = "false"
+  Invoke-Native -FilePath npm -Arguments @("run", "test:e2e")
+} finally {
+  $env:PLAYWRIGHT_USE_PRODUCTION_SERVER = $previousPlaywrightProduction
+  $env:PLAYWRIGHT_BASE_URL = $previousPlaywrightBaseUrl
+  $env:PORT = $previousPort
+  $env:AUTH_SECRET = $previousAuthSecret
+  $env:APP_URL = $previousAppUrl
+  $env:NEXT_PUBLIC_APP_URL = $previousPublicAppUrl
+  $env:NEXT_PUBLIC_SITE_URL = $previousPublicSiteUrl
+  $env:ZPAY_MODE = $previousZpayMode
+  $env:SEO_AUDIT_MONITORING_SALES_ENABLED = $previousMonitoringSales
+}
+
+$worktreeStatus = & git status --porcelain --untracked-files=all
 if ($LASTEXITCODE -ne 0 -or $worktreeStatus) {
   throw "Checks changed the worktree; refusing to release an unreproducible ref."
+}
+
+$resolvedKey = ""
+$remoteLockFile = "$RemoteProjectDir/deploy/enhe-ai-tools/runtime/enhe-operation.lock"
+if (-not $NoDeploy) {
+  $resolvedKey = Resolve-SshKey $SshKeyPath
+  $prePushRemoteCommand = @(
+    "set -eu"
+    "remote_lock_file='$remoteLockFile'"
+    'mkdir -p "$(dirname "$remote_lock_file")"'
+    'remote_lock_dir="$(cd "$(dirname "$remote_lock_file")" && pwd -P)"'
+    'remote_lock_file="$remote_lock_dir/$(basename "$remote_lock_file")"'
+    'exec 9>"$remote_lock_file"'
+    'if ! flock -n 9; then echo "Another ENHE production operation is running." >&2; exit 75; fi'
+    'export ENHE_OPERATION_LOCK_HELD=1'
+    'export ENHE_OPERATION_LOCK_FILE="$remote_lock_file"'
+    "cd '$RemoteProjectDir'"
+    'test -z "$(git status --porcelain --untracked-files=all)"'
+  ) -join "; "
+
+  Invoke-Native -FilePath ssh -Arguments @(
+    "-i", $resolvedKey,
+    "-p", "$SshPort",
+    "-o", "StrictHostKeyChecking=accept-new",
+    "$ServerUser@$ServerHost",
+    $prePushRemoteCommand
+  )
 }
 
 Invoke-Native -FilePath git -Arguments @("push", "origin", "${ReleaseRef}:refs/heads/$Branch")
@@ -118,8 +198,24 @@ if ($NoDeploy) {
   exit 0
 }
 
-$resolvedKey = Resolve-SshKey $SshKeyPath
-$remoteCommand = "set -eu; cd '$RemoteProjectDir'; git diff --quiet; git diff --cached --quiet; git fetch --depth=1 origin '$Branch'; test `"`$(git rev-parse FETCH_HEAD)`" = '$ReleaseRef'; git checkout --detach '$ReleaseRef'; chmod +x deploy.sh deploy/enhe-ai-tools/scripts/*.sh; RELEASE_REF='$ReleaseRef' ./deploy.sh"
+$remoteCommand = @(
+  "set -eu"
+  "remote_lock_file='$remoteLockFile'"
+  'mkdir -p "$(dirname "$remote_lock_file")"'
+  'remote_lock_dir="$(cd "$(dirname "$remote_lock_file")" && pwd -P)"'
+  'remote_lock_file="$remote_lock_dir/$(basename "$remote_lock_file")"'
+  'exec 9>"$remote_lock_file"'
+  'if ! flock -n 9; then echo "Another ENHE production operation is running." >&2; exit 75; fi'
+  'export ENHE_OPERATION_LOCK_HELD=1'
+  'export ENHE_OPERATION_LOCK_FILE="$remote_lock_file"'
+  "cd '$RemoteProjectDir'"
+  'test -z "$(git status --porcelain --untracked-files=all)"'
+  'previous_release_ref="$(git rev-parse HEAD)"'
+  "git fetch --depth=1 origin '$Branch'"
+  "test `"`$(git rev-parse FETCH_HEAD)`" = '$ReleaseRef'"
+  "git checkout --detach '$ReleaseRef'"
+  "PREVIOUS_RELEASE_REF=`"`$previous_release_ref`" RELEASE_REF='$ReleaseRef' sh ./deploy.sh"
+) -join "; "
 
 Invoke-Native -FilePath ssh -Arguments @(
   "-i", $resolvedKey,

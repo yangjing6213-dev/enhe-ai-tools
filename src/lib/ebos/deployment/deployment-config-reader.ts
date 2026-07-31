@@ -166,7 +166,7 @@ export async function detectMigrationGuard(rootDir: string): Promise<{
   const backupIndex = deployScriptSource.indexOf("enhe-backup-db.sh");
   const backupVerificationIndex = deployScriptSource.indexOf("pg_restore --list");
   const deployMigrationIndex = deployScriptSource.search(/\bprisma\s+migrate\s+deploy\b/i);
-  const oneShotMigrationDetected = /\bcompose\s+run\s+--rm\s+app\b[^\r\n]*\bprisma\s+migrate\s+deploy\b/i.test(
+  const oneShotMigrationDetected = /\bcompose\s+run\s+--rm(?:\s+--no-deps)?\s+app\b[\s\S]{0,300}?\b(?:\.\/node_modules\/\.bin\/)?prisma\s+migrate\s+deploy\b/i.test(
     deployScriptSource,
   );
   const isolatedDeploymentMigrationDetected = Boolean(

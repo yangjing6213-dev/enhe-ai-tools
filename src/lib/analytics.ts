@@ -5,6 +5,12 @@ import {
   getPageViewEventName,
   isClientWritableAnalyticsEventName,
 } from "@/lib/analytics-client";
+import {
+  parseAnalyticsAttribution,
+  parseAnalyticsAttributionCookieValue,
+  sanitizeAnalyticsClientPayload,
+  type AnalyticsAttributionPayload,
+} from "@/lib/analytics-client-payload";
 import { prisma } from "@/lib/db";
 
 export {
@@ -12,6 +18,8 @@ export {
   getPageViewEventName,
   isClientWritableAnalyticsEventName,
 };
+
+export const clientAnalyticsEventNames = clientWritableAnalyticsEventNames;
 
 export const analyticsFunnelSteps = [
   "visit_home",
@@ -21,6 +29,25 @@ export const analyticsFunnelSteps = [
   "payment_proof_submitted",
   "payment_review_approved",
   "refund_request_submitted",
+] as const;
+
+export const organicConversionFunnelSteps = [
+  "seo_landing_view",
+  "content_to_product_click",
+  "view_tool",
+  "product_purchase_cta_click",
+  "begin_checkout",
+  "create_order",
+  "payment_proof_submitted",
+  "payment_review_approved",
+] as const;
+
+export const productEngagementEventNames = [
+  "content_to_product_click",
+  "product_purchase_cta_click",
+  "product_use_cta_click",
+  "begin_checkout",
+  "product_download_click",
 ] as const;
 
 export const seoAuditEventNames = [
@@ -51,23 +78,37 @@ export const seoAuditFunnelSteps = [
   "seo_audit_report_downloaded",
 ] as const;
 
-export const analyticsEventNames = [
-  ...analyticsFunnelSteps,
-  ...seoAuditEventNames,
-  "view_pricing",
-  "view_user_center",
+const seoAuditServerEventNames = [
+  "seo_audit_submitted",
+  "seo_audit_completed",
+  "seo_audit_failed",
+  "seo_audit_checkout_started",
+  "seo_audit_purchased",
+  "seo_audit_report_downloaded",
+  "seo_audit_recheck_started",
+  "seo_audit_monitoring_purchased",
+  "seo_audit_schedule_enabled",
+  "seo_audit_schedule_paused",
+] as const;
+
+export const serverOnlyAnalyticsEventNames = [
+  "create_order",
+  "payment_proof_submitted",
+  "payment_review_approved",
   "payment_review_rejected",
   "order_receipt_submitted",
-  "search_ai_news",
-  "seo_landing_view",
-  "home_free_claim_cta_click",
-  "home_hot_ai_tools_cta_click",
-  "validation_ai_prompt_kit_cta_click",
-  "validation_faceswap_cta_click",
-  "validation_ai_video_cta_click",
+  "refund_request_submitted",
+] as const;
+
+export const analyticsEventNames = [
+  ...clientAnalyticsEventNames,
+  ...serverOnlyAnalyticsEventNames,
+  ...seoAuditServerEventNames,
 ] as const;
 
 export type AnalyticsEventName = (typeof analyticsEventNames)[number];
+export type ClientAnalyticsEventName =
+  (typeof clientAnalyticsEventNames)[number];
 export type SeoAuditAnalyticsEventName = (typeof seoAuditEventNames)[number];
 export type SeoAuditFunnelEventName = (typeof seoAuditFunnelSteps)[number];
 
@@ -183,14 +224,39 @@ export function isClientWritableAnalyticsEvent(
   );
 }
 
+export function isClientAnalyticsEventName(
+  value: unknown,
+): value is ClientAnalyticsEventName {
+  return isClientWritableAnalyticsEventName(value);
+}
+
 export function sanitizeClientAnalyticsMetadata(
   eventName: AnalyticsEventName,
   metadata: Record<string, unknown> | null | undefined,
 ) {
+  const globallySanitized =
+    sanitizeAnalyticsClientPayload({ eventName, metadata: metadata ?? undefined })
+      .metadata ?? {};
   const rules = clientMetadataRules[eventName];
-  if (!rules || !metadata) return {};
+  if (!rules) return globallySanitized;
+  if (!metadata) return {};
 
-  const sanitized: Record<string, string | number> = {};
+  const sanitized: Record<string, unknown> = {};
+  const globallyPreservedKeys = eventName === "search_ai_news"
+    ? Object.keys(globallySanitized)
+    : [
+        "sessionId",
+        "landingId",
+        "firstLandingPath",
+        "referrer",
+        "referrerHost",
+        "attribution",
+      ];
+  for (const key of globallyPreservedKeys) {
+    if (globallySanitized[key] !== undefined) {
+      sanitized[key] = globallySanitized[key];
+    }
+  }
   for (const [key, rule] of Object.entries(rules).slice(
     0,
     clientMetadataMaxKeys,
@@ -218,10 +284,6 @@ export function buildAnalyticsEventMetadata(input: {
     "eventTrust",
     "product",
     "clientId",
-    "sessionId",
-    "source",
-    "medium",
-    "campaign",
     "offerId",
     "orderId",
   ]) {
@@ -235,9 +297,8 @@ export function buildAnalyticsEventMetadata(input: {
   return {
     ...metadata,
     ...(isSeoAuditAnalyticsEventName(input.eventName)
-      ? { product: "seo_geo_audit" }
+      ? { product: "seo_geo_audit", eventTrust: input.trust }
       : {}),
-    eventTrust: input.trust,
     ...context,
   };
 }
@@ -291,6 +352,8 @@ export async function trackAnalyticsEvent(input: {
     input.networkContext,
   );
   try {
+    const attribution = await resolveServerAnalyticsAttribution(input);
+    const metadata = mergeAnalyticsAttribution(input.metadata, attribution);
     await prisma.analyticsEvent.create({
       data: {
         eventName: input.eventName,
@@ -302,7 +365,7 @@ export async function trackAnalyticsEvent(input: {
           buildAnalyticsEventMetadata({
             eventName: input.eventName,
             trust: "server",
-            metadata: input.metadata,
+            metadata,
             context: input.context,
           }),
         ),
@@ -319,6 +382,108 @@ export async function trackAnalyticsEvent(input: {
     }
     console.error("[analytics] failed to track event", error);
   }
+}
+
+const attributionCookieName = "enhe_analytics_attribution";
+const orderAttributionEventNames = [
+  "create_order",
+  "payment_proof_submitted",
+  "payment_review_approved",
+  "payment_review_rejected",
+  "order_receipt_submitted",
+  "refund_request_submitted",
+] as const;
+
+async function resolveServerAnalyticsAttribution(input: {
+  eventName: AnalyticsEventName;
+  entityType?: string | null;
+  entityId?: string | null;
+  networkContext?: AnalyticsNetworkContext;
+}) {
+  const previousOrderAttribution = await findPreviousOrderAttribution(input);
+  if (previousOrderAttribution || isPaymentReviewEvent(input.eventName)) {
+    return previousOrderAttribution;
+  }
+  if (input.networkContext !== undefined) return null;
+  try {
+    const headerStore = await headers();
+    return parseAttributionCookie(headerStore.get("cookie"));
+  } catch {
+    return null;
+  }
+}
+
+async function findPreviousOrderAttribution(input: {
+  eventName: AnalyticsEventName;
+  entityType?: string | null;
+  entityId?: string | null;
+}) {
+  if (
+    input.entityType !== "order" ||
+    !input.entityId ||
+    input.eventName === "create_order"
+  ) {
+    return null;
+  }
+  const previous = await prisma.analyticsEvent.findMany({
+    where: {
+      entityType: "order",
+      entityId: input.entityId,
+      eventName: { in: [...orderAttributionEventNames] },
+    },
+    select: { metadata: true },
+    orderBy: { createdAt: "desc" },
+    take: 50,
+  });
+  for (const event of previous) {
+    const attribution = extractAnalyticsAttribution(event.metadata);
+    if (attribution) return attribution;
+  }
+  return null;
+}
+
+function isPaymentReviewEvent(eventName: AnalyticsEventName) {
+  return eventName === "payment_review_approved" ||
+    eventName === "payment_review_rejected";
+}
+
+function parseAttributionCookie(cookieHeader: string | null) {
+  if (!cookieHeader) return null;
+  const prefix = `${attributionCookieName}=`;
+  const value = cookieHeader
+    .split(";")
+    .map((part) => part.trim())
+    .find((part) => part.startsWith(prefix))
+    ?.slice(prefix.length);
+  return parseAnalyticsAttributionCookieValue(value);
+}
+
+function mergeAnalyticsAttribution(
+  metadata: Record<string, unknown> | null | undefined,
+  attribution: AnalyticsAttributionPayload | null,
+) {
+  if (!attribution) return metadata;
+  return {
+    ...metadata,
+    sessionId: attribution.sessionId,
+    landingId: attribution.landingId,
+    firstLandingPath: attribution.firstLandingPath,
+    attribution,
+  };
+}
+
+function extractAnalyticsAttribution(
+  value: unknown,
+): AnalyticsAttributionPayload | null {
+  const metadata = getRecord(value);
+  const nested = getRecord(metadata.attribution);
+  return Object.keys(nested).length ? parseAnalyticsAttribution(nested) : null;
+}
+
+function getRecord(value: unknown): Record<string, unknown> {
+  return value && typeof value === "object" && !Array.isArray(value)
+    ? (value as Record<string, unknown>)
+    : {};
 }
 
 export function toPrismaJson(

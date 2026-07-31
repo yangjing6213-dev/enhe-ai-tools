@@ -146,7 +146,7 @@ describe("payment refund state machine schema contract", () => {
         'refundLastErrorDetail String? @map("refund_last_error_detail")',
         "refundRecord OrderRefundRecord? @relation(fields: [refundRecordId], references: [id], onDelete: Restrict)",
         "@@unique([provider, refundProviderReference])",
-        "@@index([refundState, refundDispatchStartedAt])",
+        '@@index([refundState, refundDispatchStartedAt], map: "payment_transactions_refund_state_refund_dispatch_started_at_id")',
       ]),
     );
     expect(getPrismaBlock("model", "OrderRefundRecord")).toEqual(

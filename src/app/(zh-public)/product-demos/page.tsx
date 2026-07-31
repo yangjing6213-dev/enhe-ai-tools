@@ -3,8 +3,12 @@ import { PublicSiteChrome } from "@/components/public-site-chrome";
 
 export const revalidate = 300;
 
-export async function generateMetadata() {
-  return generateProductDemoListingMetadata("zh");
+export async function generateMetadata({
+  searchParams,
+}: {
+  searchParams: Promise<Record<string, string | undefined>>;
+}) {
+  return generateProductDemoListingMetadata("zh", searchParams);
 }
 
 export default async function ProductDemosPage({

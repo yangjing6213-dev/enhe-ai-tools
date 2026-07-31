@@ -11,6 +11,20 @@ describe("SEO insights admin wiring", () => {
     expect(dictionary).toContain("seoInsights");
     expect(page).toContain("buildSeoInsightReport");
     expect(page).toContain("SEO 数据跟踪与行动建议");
+    expect(page).toContain("seoConversionFunnelSteps");
+    expect(page).toContain("搜索到转化会话归因");
+    expect(page).toContain("匿名浏览器会话");
+    expect(page).toContain("SEO_ATTRIBUTION_WINDOW_DAYS");
+    expect(page).toContain("SEO_INSIGHTS_EVENT_BATCH_SIZE");
+    expect(page).toContain("loadSeoInsightEvents");
+    expect(page).toContain("cursor: { id: cursor }");
+    expect(page).toContain("不截断 landing 与后续转化链路");
+    expect(page).toContain("内容落地路径");
+    expect(page).toContain("产品页直达路径");
+    expect(page).toContain("report.conversionFunnels.content");
+    expect(page).toContain("report.conversionFunnels.direct");
+    expect(page).toContain("不推算或展示收入金额");
+    expect(page).not.toContain("eventLimitReached");
   });
 
   it("tracks SEO landing views from the global analytics tracker", () => {
@@ -21,5 +35,9 @@ describe("SEO insights admin wiring", () => {
     expect(tracker).toContain('eventName: "seo_landing_view"');
     expect(tracker).toContain("getSeoLandingMetadata");
     expect(tracker).toContain("trafficMedium");
+    expect(tracker).toContain("sessionStorage");
+    expect(tracker).toContain("enhe_analytics_attribution");
+    expect(tracker).toContain("ANALYTICS_SESSION_IDLE_TIMEOUT_MS");
+    expect(tracker).toContain("lastSeenAt");
   });
 });

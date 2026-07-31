@@ -5,6 +5,8 @@ import { DangerButton, Field, inputClass, selectClass, SubmitButton, textareaCla
 import { ToolMediaUploadGuard } from "@/app/admin/tool-media-upload-guard";
 import { ToolProductImageManager } from "@/app/admin/tool-product-image-manager";
 import { ToolVideoUploadField } from "@/app/admin/tool-video-upload-field";
+import { AiSkillPackageUploadField } from "@/app/admin/ai-skill-package-upload-field";
+import { supportedAiAgentOptions } from "@/lib/ai-skill";
 import { getAdminToolBasePath, getAdminToolEditPath, getAdminToolNewPath } from "@/lib/admin-tool-routes";
 import { decideAdminToolHardDelete } from "@/lib/admin-delete-protection";
 import type { Locale } from "@/lib/i18n";
@@ -12,7 +14,7 @@ import { normalizeImageSrc } from "@/lib/media";
 import { getPrimaryToolPrice, type ToolPriceSpecStatus } from "@/lib/tool-price-specs";
 import { getToolPublishIssues } from "@/lib/tool-publish-check";
 
-type AdminToolType = "software" | "online" | "skill_learning";
+type AdminToolType = "software" | "online" | "skill_learning" | "ai_skill";
 
 type ToolItem = {
   id: string;
@@ -37,6 +39,7 @@ type ToolItem = {
   videoDescription3: string | null;
   version: string | null;
   systemRequirement: string | null;
+  supportedAgents: string[];
   isVipRequired: boolean;
   isDownloadPaid: boolean;
   isDownloadLinkVipOnly: boolean;
@@ -44,7 +47,7 @@ type ToolItem = {
   downloadPrice: unknown;
   onlineUrl: string | null;
   downloadFileId: string | null;
-  downloadFile?: { filePath: string; fileUrl: string | null } | null;
+  downloadFile?: { fileName: string; filePath: string; fileUrl: string | null; fileSize: bigint | null } | null;
   priceSpecs?: ToolPriceSpecItem[];
   categoryId: string | null;
   category?: { name: string } | null;
@@ -164,6 +167,7 @@ export function ToolAdminList({
   const matchingCategories = categories.filter((category) => category.type === type);
   const isAccountService = type === "online";
   const isSkillLearning = type === "skill_learning";
+  const isAiSkill = type === "ai_skill";
 
   return (
     <div>
@@ -171,11 +175,11 @@ export function ToolAdminList({
         <div>
           <h1 className="text-3xl font-semibold">{title}</h1>
           <p className="mt-3 max-w-3xl text-sm leading-6 text-[#8B95A7]">
-            {isSkillLearning ? copy.courseListIntro : isAccountService ? copy.serviceListIntro : copy.listIntro}
+            {isAiSkill ? copy.aiSkillListIntro : isSkillLearning ? copy.courseListIntro : isAccountService ? copy.serviceListIntro : copy.listIntro}
           </p>
         </div>
         <Link href={getAdminToolNewPath(type)} className="rounded-full bg-[var(--marketing-accent)] px-5 py-3 text-sm font-semibold text-white transition hover:bg-[#56bfd0]">
-          {isSkillLearning ? copy.newCourse : isAccountService ? copy.newService : copy.newTool}
+          {isAiSkill ? copy.newAiSkill : isSkillLearning ? copy.newCourse : isAccountService ? copy.newService : copy.newTool}
         </Link>
       </div>
 
@@ -318,6 +322,7 @@ export function ToolEditor({
   const directDownloadUrl = getDirectDownloadUrl(tool);
   const isAccountService = type === "online";
   const isSkillLearning = type === "skill_learning";
+  const isAiSkill = type === "ai_skill";
   const priceSpecRows = buildEditorPriceSpecRows(tool);
   const priceSpecProtectedCounts = (tool?.priceSpecs ?? []).reduce(
     (counts, priceSpec) => ({
@@ -339,7 +344,7 @@ export function ToolEditor({
         <div>
           <h1 className="text-3xl font-semibold">{title}</h1>
           <p className="mt-3 max-w-3xl text-sm leading-6 text-[#8B95A7]">
-            {isSkillLearning ? copy.courseEditorIntro : isAccountService ? copy.serviceEditorIntro : copy.editorIntro}
+            {isAiSkill ? copy.aiSkillEditorIntro : isSkillLearning ? copy.courseEditorIntro : isAccountService ? copy.serviceEditorIntro : copy.editorIntro}
           </p>
         </div>
         <Link href={listPath} className="rounded-full border border-white/15 px-5 py-3 text-sm font-semibold text-[#E8EEF8] transition hover:border-[var(--marketing-accent)]/50 hover:text-[var(--marketing-accent)]">
@@ -354,7 +359,7 @@ export function ToolEditor({
         <input type="hidden" name="type" value={type} />
         <input type="hidden" name="returnTo" value={editorPath} />
         <input type="hidden" name="coverImage" value={tool?.coverImage ?? ""} />
-        <input type="hidden" name="downloadFileId" value={tool?.downloadFileId ?? ""} />
+        {!isAiSkill ? <input type="hidden" name="downloadFileId" value={tool?.downloadFileId ?? ""} /> : null}
         <input type="hidden" name="downloadPrice" value="0" />
 
         <EditorSection title={copy.basicSection} intro={isAccountService ? copy.basicServiceIntro : isSkillLearning ? copy.basicCourseIntro : copy.basicToolIntro}>
@@ -409,6 +414,20 @@ export function ToolEditor({
                   <input name="systemRequirement" defaultValue={tool?.systemRequirement ?? ""} className={inputClass} />
                 </Field>
               </>
+            ) : null}
+            {isAiSkill ? (
+              <fieldset className="md:col-span-2 rounded-2xl border border-white/10 bg-white/6 p-4">
+                <legend className="px-1 text-sm font-semibold text-[#F6FAFF]">{copy.supportedAgents}</legend>
+                <p className="mt-1 text-xs leading-5 text-[#8B95A7]">{copy.supportedAgentsHint}</p>
+                <div className="mt-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-5">
+                  {supportedAiAgentOptions.map((agent) => (
+                    <label key={agent} className="flex min-h-12 items-center gap-3 rounded-xl border border-white/10 bg-white/6 px-4 py-3 text-sm text-[#F6FAFF]">
+                      <input name="supportedAgents" type="checkbox" value={agent} defaultChecked={tool?.supportedAgents.includes(agent) ?? false} />
+                      {agent}
+                    </label>
+                  ))}
+                </div>
+              </fieldset>
             ) : null}
           </div>
         </EditorSection>
@@ -564,6 +583,20 @@ export function ToolEditor({
                   <p className="mt-3 text-sm text-[#FFB86B]">{copy.saveBeforeContent}</p>
                 )}
               </div>
+            ) : isAiSkill ? (
+              <AiSkillPackageUploadField
+                currentFileId={tool?.downloadFileId}
+                currentFileName={tool?.downloadFile?.fileName}
+                labels={{
+                  title: copy.aiSkillPackage,
+                  hint: copy.aiSkillPackageHint,
+                  choose: copy.aiSkillPackageChoose,
+                  uploading: copy.aiSkillPackageUploading,
+                  uploaded: copy.aiSkillPackageUploaded,
+                  remove: copy.aiSkillPackageRemove,
+                  failed: copy.aiSkillPackageFailed,
+                }}
+              />
             ) : !isAccountService ? (
               <Field label={copy.downloadFileUrl}>
                 <textarea
@@ -625,8 +658,10 @@ const toolAdminCopy = {
     failed: "操作失败",
     listIntro: "以清单模式管理已保存工具，点击查看/编辑进入单独详情页后再修改、上下架或删除。",
     serviceListIntro: "以清单模式管理 AI 账号服务，点击查看/编辑进入单独详情页后再修改服务信息、价格、上下架或删除。",
+    aiSkillListIntro: "管理可出售的 AI Skill、支持智能体、价格和 ZIP 交付包。",
     newTool: "新增工具",
     newService: "新增服务",
+    newAiSkill: "新增 AI Skill",
     searchPlaceholder: "搜索工具名称、Slug、简介",
     serviceSearchPlaceholder: "搜索服务名称、Slug、简介",
     allStatus: "全部状态",
@@ -650,6 +685,7 @@ const toolAdminCopy = {
     viewEdit: "查看/编辑",
     editorIntro: "在单独详情页编辑工具基础信息、权限、封面、商品图、下载文件和下载链接。",
     serviceEditorIntro: "在单独详情页编辑 AI 账号服务的基础信息、服务价格、封面、商品图、简介和详细介绍。",
+    aiSkillEditorIntro: "编辑 AI Skill 的商品信息、支持智能体、价格和购买后可下载的 ZIP 交付包。",
     basicSection: "基础信息",
     basicToolIntro: "维护 AI 软件应用名称、分类、状态和排序。",
     basicServiceIntro: "维护 AI 账号服务名称、分类、状态和排序。",
@@ -679,6 +715,15 @@ const toolAdminCopy = {
     coverHint: "建议尺寸 1200x675 或 16:9，JPG/PNG/WebP，8MB 以内。上传后会自动覆盖封面图地址。",
     version: "版本",
     systemRequirement: "系统要求",
+    supportedAgents: "支持智能体",
+    supportedAgentsHint: "选择该 Skill 已适配并经过验证的智能体。",
+    aiSkillPackage: "Skill ZIP 交付包",
+    aiSkillPackageHint: "仅支持 ZIP，最大 100MB。上传成功后还需保存本页，才能绑定到该商品。",
+    aiSkillPackageChoose: "选择并上传 ZIP",
+    aiSkillPackageUploading: "正在上传...",
+    aiSkillPackageUploaded: "已上传",
+    aiSkillPackageRemove: "移除当前交付包",
+    aiSkillPackageFailed: "上传失败",
     downloadFile: "下载文件",
     downloadFileUrl: "下载链接",
     downloadFileUrlPlaceholder: "可填写网盘链接、提取码、下载说明、中文备注等任意内容",
@@ -739,8 +784,10 @@ const toolAdminCopy = {
     failed: "Operation failed",
     listIntro: "Manage saved tools in list mode. Open View/Edit to update details, publish status, or delete a tool.",
     serviceListIntro: "Manage AI account services in list mode. Open View/Edit to update service details, price, publish status, or delete a service.",
+    aiSkillListIntro: "Manage sellable AI Skills, supported agents, pricing, and ZIP delivery packages.",
     newTool: "New tool",
     newService: "New service",
+    newAiSkill: "New AI Skill",
     searchPlaceholder: "Search name, slug, or description",
     serviceSearchPlaceholder: "Search service name, slug, or description",
     allStatus: "All statuses",
@@ -764,6 +811,7 @@ const toolAdminCopy = {
     viewEdit: "View/Edit",
     editorIntro: "Edit tool basics, permissions, cover image, product images, download file, and download-link content on this detail page.",
     serviceEditorIntro: "Edit AI account service basics, service price, cover image, product images, short description, and detailed introduction.",
+    aiSkillEditorIntro: "Edit AI Skill product details, supported agents, pricing, and the ZIP package unlocked after purchase.",
     basicSection: "Basic information",
     basicToolIntro: "Maintain AI software app name, category, status, and display order.",
     basicServiceIntro: "Maintain AI account service name, category, status, and display order.",
@@ -793,6 +841,15 @@ const toolAdminCopy = {
     coverHint: "Recommended size: 1200x675 or 16:9, JPG/PNG/WebP, under 8MB. Uploading will replace the cover image URL.",
     version: "Version",
     systemRequirement: "System requirement",
+    supportedAgents: "Supported agents",
+    supportedAgentsHint: "Select the agents this Skill has been adapted and tested for.",
+    aiSkillPackage: "Skill ZIP package",
+    aiSkillPackageHint: "ZIP only, up to 100MB. Save this page after upload to bind the package to the product.",
+    aiSkillPackageChoose: "Choose and upload ZIP",
+    aiSkillPackageUploading: "Uploading...",
+    aiSkillPackageUploaded: "Uploaded",
+    aiSkillPackageRemove: "Remove current package",
+    aiSkillPackageFailed: "Upload failed",
     downloadFile: "Download file",
     downloadFileUrl: "Download link",
     downloadFileUrlPlaceholder: "Enter any download link, extraction code, instructions, notes, or plain text",

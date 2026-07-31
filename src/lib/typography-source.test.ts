@@ -4,6 +4,7 @@ import { describe, expect, it } from "vitest";
 
 const projectRoot = join(__dirname, "..", "..");
 const cssPath = join(projectRoot, "src", "app", "globals.css");
+const rootLayoutPath = join(projectRoot, "src", "app", "root-layout-shared.tsx");
 const publicFontsPath = join(projectRoot, "public", "fonts");
 
 describe("ENHE typography source contract", () => {
@@ -41,5 +42,12 @@ describe("ENHE typography source contract", () => {
     expect(css).toContain("font-family: var(--font-heading-zh)");
     expect(css).toContain("html[lang='en-US'] :is(h1, h2, h3, .home-hero-title)");
     expect(css).toContain("font-family: var(--font-heading-en)");
+  });
+
+  it("does not preload unused Montserrat 800 and 900 font files in the shared document head", () => {
+    const rootLayout = readFileSync(rootLayoutPath, "utf8");
+
+    expect(rootLayout).not.toContain("montserrat-latin-800-normal.woff2");
+    expect(rootLayout).not.toContain("montserrat-latin-900-normal.woff2");
   });
 });

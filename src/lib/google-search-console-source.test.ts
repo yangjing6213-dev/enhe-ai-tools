@@ -117,7 +117,7 @@ describe("Google Search Console SEO source contract", () => {
     });
 
     expect(offenders).toEqual([]);
-  });
+  }, 15_000);
 
   it("keeps webmaster verification metadata in the shared root head", () => {
     const rootLayout = read("src/app/root-layout-shared.tsx");

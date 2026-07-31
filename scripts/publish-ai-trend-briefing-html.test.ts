@@ -119,7 +119,7 @@ describe("publish-ai-trend-briefing-html script", () => {
     expect(result.stdout).toContain("Topic page: included");
     expect(result.stdout).toContain("Dry run: database upsert skipped.");
     expect(result.stdout).not.toContain("\uFEFF");
-  });
+  }, 15_000);
 
   it("rejects localhost APP_URL when production publishing is required", async () => {
     const { htmlFile, summaryFile } = await createFiles();

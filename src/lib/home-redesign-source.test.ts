@@ -2,6 +2,14 @@ import { readFileSync } from "node:fs";
 import { describe, expect, it } from "vitest";
 
 describe("homepage SaaS redesign source", () => {
+  it("does not emit FAQPage schema when the homepage has no visible FAQ section", () => {
+    const page = readFileSync(new URL("../app/page-shell.tsx", import.meta.url), "utf8");
+
+    expect(page).not.toContain("homeFaqItems");
+    expect(page).not.toContain("buildFaqSchema");
+    expect(page).not.toContain("faqSchema");
+  });
+
   it("uses a simplified task-first homepage without recommended cards while keeping SEO support links", () => {
     const page = readFileSync(new URL("../app/page-shell.tsx", import.meta.url), "utf8");
     const header = readFileSync(new URL("../components/site-header.tsx", import.meta.url), "utf8");
@@ -65,7 +73,8 @@ describe("homepage SaaS redesign source", () => {
     expect(page).not.toContain("take: 40");
     expect(page).not.toContain("recommendedTools.slice(previewTools.length)");
     expect(page).not.toContain("getHomeRecommendedTools");
-    expect(page).not.toContain("ToolCard");
+    expect(page).toContain('getPublicToolListing("ai_skill")');
+    expect(page).toContain("const homeAiSkills = aiSkillTools.slice(0, 3);");
     expect(page).toContain("getEffectiveLocalizedHomeHeroIntro(settings, forceLocale, t.home.intro)");
     expect(page).not.toContain('href="/account-services" variant="ghost" className="home-preview-link"');
     expect(page).toContain('href: "/product-paths/work-efficiency"');
@@ -260,11 +269,12 @@ describe("homepage SaaS redesign source", () => {
     expect(heroSubtitle).toContain('className="enhe-hero-subtitle-static"');
   });
 
-  it("removes homepage featured cards without changing the reusable tool card contract", () => {
+  it("keeps homepage product cards limited to the requested AI Skill showcase", () => {
     const page = readFileSync(new URL("../app/page-shell.tsx", import.meta.url), "utf8");
     const toolCard = readFileSync(new URL("../components/tool-card.tsx", import.meta.url), "utf8");
 
-    expect(page).not.toContain('<ToolCard key={tool.id} tool={tool} locale={forceLocale} variant="homeFeatured" />');
+    expect(page.match(/<ToolCard /g)).toHaveLength(1);
+    expect(page).toContain('<ToolCard key={tool.id} tool={tool} locale={forceLocale} variant="homeFeatured" />');
     expect(toolCard).toContain('variant?: "default" | "homeFeatured"');
     expect(toolCard).toContain('variant = "default"');
     expect(toolCard).toContain('const showMarketingMeta = variant !== "homeFeatured"');
@@ -363,7 +373,7 @@ describe("homepage SaaS redesign source", () => {
 
     expect(page).toContain("generateHomePageMetadata");
     expect(publicChrome).toContain("buildWebsiteSchema");
-    expect(publicChrome).toContain("buildOrganizationSchema");
+    expect(publicChrome).toContain("buildEnheOrganizationSchema");
     expect(css).not.toContain(".home-hero-background");
     expect(css).not.toContain("home-hero-unicorn-remix");
   });

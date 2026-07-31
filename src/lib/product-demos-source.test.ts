@@ -68,10 +68,11 @@ describe("product demo feature source contract", () => {
     expect(editor).toContain('name="relatedProductId"');
   });
 
-  it("keeps product demo public routes indexable and structured for SEO/GEO", () => {
+  it("keeps audited product demo routes structured and discoverable in the sitemap", () => {
     const listing = readFileSync(new URL("../app/product-demos/page-shell.tsx", import.meta.url), "utf8");
     const detail = readFileSync(new URL("../app/product-demos/[slug]/page-shell.tsx", import.meta.url), "utf8");
     const sitemap = readFileSync(new URL("../app/sitemap.ts", import.meta.url), "utf8");
+    const discovery = readFileSync(new URL("./public-discovery-manifest.ts", import.meta.url), "utf8");
     const robots = readFileSync(new URL("../app/robots.ts", import.meta.url), "utf8");
     const seo = readFileSync(new URL("./seo.ts", import.meta.url), "utf8");
 
@@ -83,11 +84,29 @@ describe("product demo feature source contract", () => {
     expect(detail).toContain('preload="metadata"');
     expect(detail).not.toContain("customCanonicalUrl");
     expect(detail).not.toContain("demo.canonicalUrl ? absoluteUrl");
-    expect(sitemap).toContain("prisma.productDemo");
-    expect(sitemap).toContain('where: { status: "published" }');
+    expect(sitemap).toContain("sitemapExcludedPaths");
+    expect(sitemap).toContain("publicDiscoveryRoutes.filter");
+    expect(discovery).toContain('path: "/product-demos"');
+    expect(discovery).toContain('path: "/en/product-demos"');
     expect(robots).toContain('"/product-demos"');
     expect(seo).toContain("^\\/product-demos$");
     expect(seo).toContain("^\\/product-demos\\/.+$");
+  });
+
+  it("uses localized FAQ and related-product names on English demo pages", () => {
+    const detail = readFileSync(new URL("../app/product-demos/[slug]/page-shell.tsx", import.meta.url), "utf8");
+
+    expect(detail).toContain("getLocalizedProductDemoFaq");
+    expect(detail).toContain("resolveLocalizedToolIdentity");
+    expect(detail).toContain("buildLocalizedToolPreviewText");
+    expect(detail).toContain("resolveLocalizedToolCategoryName");
+    expect(detail).toContain("buildLocalizedToolOfferName");
+    expect(detail).toContain("buildLocalizedToolTutorialItems");
+    expect(detail).toContain("name: localizedRelatedProductName");
+    expect(detail).toContain("description: localizedRelatedProductDescription");
+    expect(detail).toContain("category: localizedRelatedProductCategory");
+    expect(detail).toContain("priceSpecs: localizedRelatedProductPriceSpecs");
+    expect(detail).not.toContain("const faqItems = parseProductDemoFaq(demo.faq)");
   });
 
   it("keeps product demo cards localized and avoids back-navigation overlap", () => {

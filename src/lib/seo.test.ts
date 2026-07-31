@@ -4,6 +4,8 @@ import {
   buildHomeMetadataTitle,
   buildListingMetadataTitle,
   buildListingMetaDescription,
+  buildOrganizationSchema,
+  getRevenuePageSeoTitle,
   buildMetaDescription,
   buildMetadataTitle,
   buildPageMetadata,
@@ -146,10 +148,66 @@ describe("seo helpers", () => {
   });
 
   it("builds homepage titles as brand plus business scope", () => {
-    expect(buildHomeMetadataTitle("en", "ENHE AI")).toBe("ENHE AI | Real Tasks, Safer AI Workflows");
-    expect(buildHomeMetadataTitle("zh", "恩禾 ENHE AI")).toBe(
-      "恩禾 ENHE AI | 让 AI 真正为每个人所用，把复杂变简单，把效率变价值。",
+    expect(buildHomeMetadataTitle("en", "ENHE AI")).toBe(
+      "ENHE AI | AI Tools, News, Account Services & Courses",
     );
+    expect(buildHomeMetadataTitle("zh", "恩禾 ENHE AI")).toBe(
+      "恩禾 ENHE AI | AI工具、AI资讯、账号服务与技能课程",
+    );
+
+    const chineseDescription = buildHomeMetaDescription("zh");
+    const englishDescription = buildHomeMetaDescription("en");
+    expect(chineseDescription).toContain("真实任务");
+    expect(chineseDescription).toContain("AI 工具");
+    expect(chineseDescription.length).toBeLessThanOrEqual(150);
+    expect(englishDescription).toContain("real tasks");
+    expect(englishDescription).toContain("AI");
+    expect(englishDescription.length).toBeLessThanOrEqual(155);
+    expect(
+      buildHomeMetaDescription(
+        "en",
+        "Live in symbiosis with artificial intelligence, awaken in this era, and define a more productive future through thoughtful creation and collaboration.",
+      ),
+    ).toContain("real tasks");
+  });
+
+  it("assigns one explicit primary search title to verified revenue pages", () => {
+    expect(
+      getRevenuePageSeoTitle("infinitetalk-ai", "zh"),
+    ).toBe("InfiniteTalk AI数字人口播");
+    expect(
+      getRevenuePageSeoTitle("ai-prompt-management", "zh"),
+    ).toBe("AI提示词管理教程");
+    expect(
+      getRevenuePageSeoTitle(
+        "ai-prompt-management-system-418-bilingual-prompts-for-writing-seo-and-ai-creation",
+        "zh",
+      ),
+    ).toBe("418双语提示词 AI提示词管理工具");
+    const mappedTitle = buildToolMetadataTitle({
+      name: getRevenuePageSeoTitle("infinitetalk-ai", "zh") ?? "",
+      brand: "恩禾 ENHE AI",
+      locale: "zh",
+      maxLength: 38,
+    });
+    expect(mappedTitle.length).toBeLessThanOrEqual(38);
+    expect(mappedTitle).toContain("InfiniteTalk");
+    expect(mappedTitle).toContain("AI数字人口播");
+    expect(getRevenuePageSeoTitle("unknown-product", "zh")).toBeUndefined();
+  });
+
+  it("uses one stable ENHE AI organization entity and rejects internal sameAs URLs", () => {
+    const schema = buildOrganizationSchema({
+      name: "ENHE AI",
+      sameAs: [
+        "https://www.enhe-tech.com.cn/about",
+        "https://example.com/enhe-ai",
+      ],
+    });
+
+    expect(schema["@id"]).toBe("https://www.enhe-tech.com.cn/#organization");
+    expect(schema.name).toBe("ENHE AI");
+    expect(schema.sameAs).toEqual(["https://example.com/enhe-ai"]);
   });
 
   it("builds stronger meta descriptions for core public pages", () => {
@@ -244,6 +302,56 @@ describe("seo helpers", () => {
     expect(englishDescription.length).toBeGreaterThanOrEqual(95);
     expect(englishDescription).toContain("pricing");
     expect(englishDescription).toContain("ENHE AI");
+  });
+
+  it("turns short Chinese commercial descriptions into natural bounded sentences", () => {
+    const description = buildToolMetaDescription({
+      name: "聊天截图素材制作｜无需代码",
+      englishName: "No-Code Chat Screenshot Maker",
+      description: "快速制作可编辑的手机聊天截图素材，适合剧情、课程和原型",
+      brand: "恩禾 ENHE AI",
+      locale: "zh",
+      type: "software",
+    });
+
+    expect(description).toMatch(/^快速制作可编辑的手机聊天截图素材，适合剧情、课程和原型。/);
+    expect(description).not.toContain("原型 在");
+    expect(description).not.toContain("在 恩禾 ENHE AI 查看");
+    expect(description).not.toMatch(/查看[^。]*价格/);
+    expect(description).toContain("价格");
+    expect(description).toContain("教程");
+    expect(description).toContain("恩禾 ENHE AI");
+    expect(description).toMatch(/[。！？]$/);
+    expect(description.length).toBeLessThanOrEqual(120);
+  });
+
+  it("keeps longer Chinese commercial facts without appending a long template", () => {
+    const description = buildToolMetaDescription({
+      name: "FaceSwap Studio｜本地人像合成研究工具",
+      description:
+        "FaceSwap Studio 面向需要人物素材处理、换脸预览和创作草稿的用户，在本地完成素材导入、处理与结果检查，降低素材外传顾虑，并把常用步骤整理成可重复、可控制的创作工作流。",
+      brand: "恩禾 ENHE AI",
+      locale: "zh",
+      type: "software",
+    });
+
+    expect(description).toContain("降低素材外传顾虑");
+    expect(description).not.toContain("在 恩禾 ENHE AI 查看");
+    expect(description.length).toBeGreaterThanOrEqual(70);
+    expect(description.length).toBeLessThanOrEqual(120);
+  });
+
+  it("punctuates controlled-workflow product descriptions naturally", () => {
+    const description = buildToolMetaDescription({
+      name: "InfiniteTalk：本地 AI 数字人口播视频生成工具",
+      description: "一张图片即可生成数字人视频，本地部署处理素材",
+      brand: "恩禾 ENHE AI",
+      locale: "zh",
+      type: "software",
+    });
+
+    expect(description).toContain("生成工具，适合");
+    expect(description.length).toBeLessThanOrEqual(120);
   });
 
   it("keeps account-service detail descriptions long enough when generic safe copy is used", () => {

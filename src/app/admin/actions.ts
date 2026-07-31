@@ -25,6 +25,7 @@ import {
   resolveToolSlug
 } from "@/lib/admin-form";
 import { parseNewsRelationIds, resolveAiNewsCanonicalSlug, resolveNewsSlug } from "@/lib/ai-news";
+import { normalizeSupportedAgents } from "@/lib/ai-skill";
 import { hashPassword, requireAdmin } from "@/lib/auth";
 import {
   createRefundRecordForAdmin,
@@ -144,9 +145,13 @@ function getRefundServiceActionErrorCode(error: unknown) {
   }
 }
 
-async function syncToolPriceSpecs(toolId: string, specs: ToolPriceSpecDraft[]) {
+async function syncToolPriceSpecs(
+  tx: Prisma.TransactionClient,
+  toolId: string,
+  specs: ToolPriceSpecDraft[],
+) {
   const incomingIds = specs.map((spec) => spec.id).filter((id): id is string => Boolean(id));
-  await prisma.toolPriceSpec.updateMany({
+  await tx.toolPriceSpec.updateMany({
     where: {
       toolId,
       ...(incomingIds.length ? { id: { notIn: incomingIds } } : {})
@@ -156,7 +161,7 @@ async function syncToolPriceSpecs(toolId: string, specs: ToolPriceSpecDraft[]) {
 
   for (const spec of specs) {
     if (spec.id) {
-      await prisma.toolPriceSpec.updateMany({
+      await tx.toolPriceSpec.updateMany({
         where: { id: spec.id, toolId },
         data: {
           name: spec.name,
@@ -168,7 +173,7 @@ async function syncToolPriceSpecs(toolId: string, specs: ToolPriceSpecDraft[]) {
       continue;
     }
 
-    await prisma.toolPriceSpec.create({
+    await tx.toolPriceSpec.create({
       data: {
         toolId,
         name: spec.name,
@@ -178,6 +183,15 @@ async function syncToolPriceSpecs(toolId: string, specs: ToolPriceSpecDraft[]) {
       }
     });
   }
+}
+
+function revalidatePublicToolCatalog() {
+  revalidateTag("public-tools");
+  revalidatePath("/ai-skills");
+  revalidatePath("/en/ai-skills");
+  revalidatePath("/pricing");
+  revalidatePath("/en/pricing");
+  revalidatePath("/pricing.md");
 }
 
 function normalizeUploadActionError(error: unknown) {
@@ -227,8 +241,9 @@ function parseDownloadFileUrl(value: FormDataEntryValue | null) {
   return parseOptionalString(value);
 }
 
-function getToolListingPath(type: "software" | "online" | "skill_learning") {
+function getToolListingPath(type: "software" | "online" | "skill_learning" | "ai_skill") {
   if (type === "skill_learning") return "/skill-learning";
+  if (type === "ai_skill") return "/ai-skills";
   if (type === "software") return "/software";
   return "/account-services";
 }
@@ -1049,7 +1064,7 @@ export async function upsertCategoryAction(formData: FormData) {
   const id = parseOptionalString(formData.get("id"));
   const data = {
     name: z.string().min(1).parse(formData.get("name")),
-    type: z.enum(["software", "online", "skill_learning"]).parse(formData.get("type")),
+    type: z.enum(["software", "online", "skill_learning", "ai_skill"]).parse(formData.get("type")),
     description: parseOptionalString(formData.get("description")),
     sortOrder: parseNumberField(formData.get("sortOrder"), 0),
     status: z.enum(["active", "disabled"]).parse(formData.get("status") ?? "active")
@@ -1234,13 +1249,14 @@ export async function deleteFileAdminAction(formData: FormData) {
   revalidatePath("/admin/files");
   revalidatePath("/admin/software");
   revalidatePath("/admin/online-tools");
+  revalidatePath("/admin/ai-skills");
   const warningQuery = warning ? `&warning=${encodeURIComponent(`文件记录已删除，但远程/物理文件清理失败：${warning}`)}` : "";
   redirect(`/admin/files?deleted=1${warningQuery}`);
 }
 
 export async function upsertToolAction(formData: FormData) {
   const admin = await requireAdmin();
-  const type = z.enum(["software", "online", "skill_learning"]).parse(formData.get("type"));
+  const type = z.enum(["software", "online", "skill_learning", "ai_skill"]).parse(formData.get("type"));
   const adminPath = getAdminToolBasePath(type);
   let savedToolId = parseOptionalString(formData.get("id"));
 
@@ -1272,7 +1288,8 @@ export async function upsertToolAction(formData: FormData) {
     const selectedDownloadFileId = parseOptionalString(formData.get("downloadFileId"));
     const priceSpecs = parseToolPriceSpecsFromFormData(formData);
     const primaryPriceSpec = getPrimaryToolPriceSpec(priceSpecs);
-    const resolvedPurchasePrice = primaryPriceSpec?.price ?? (type === "software" ? parseNumberField(formData.get("downloadPrice"), 0) : 0);
+    const isDownloadProduct = type === "software" || type === "ai_skill";
+    const resolvedPurchasePrice = primaryPriceSpec?.price ?? (isDownloadProduct ? parseNumberField(formData.get("downloadPrice"), 0) : 0);
     const existingProductImages = formData
       .getAll("existingScreenshots")
       .map((value) => String(value ?? ""))
@@ -1299,9 +1316,10 @@ export async function upsertToolAction(formData: FormData) {
       videoDescription3: parseOptionalString(formData.get("videoDescription3")),
       version: parseOptionalString(formData.get("version")),
       systemRequirement: parseOptionalString(formData.get("systemRequirement")),
+      supportedAgents: type === "ai_skill" ? normalizeSupportedAgents(formData.getAll("supportedAgents").map(String)) : [],
       isVipRequired: parseBooleanField(formData.get("isVipRequired")),
-      isDownloadPaid: type === "software" && resolvedPurchasePrice > 0,
-      isDownloadLinkVipOnly: type === "software" && resolvedPurchasePrice > 0,
+      isDownloadPaid: isDownloadProduct && resolvedPurchasePrice > 0,
+      isDownloadLinkVipOnly: isDownloadProduct && resolvedPurchasePrice > 0,
       isHomeRecommended: parseBooleanField(formData.get("isHomeRecommended")),
       downloadPrice: resolvedPurchasePrice,
       onlineUrl: parseOptionalString(formData.get("onlineUrl")),
@@ -1310,15 +1328,13 @@ export async function upsertToolAction(formData: FormData) {
       sortOrder: parseNumberField(formData.get("sortOrder"), 0)
     };
 
-    if (id) {
-      await prisma.tool.update({ where: { id }, data });
-      savedToolId = id;
-    } else {
-      const created = await prisma.tool.create({ data });
-      savedToolId = created.id;
-    }
-    if (!savedToolId) throw new Error("Tool save failed.");
-    await syncToolPriceSpecs(savedToolId, priceSpecs);
+    savedToolId = await prisma.$transaction(async (tx) => {
+      const transactionToolId = id
+        ? (await tx.tool.update({ where: { id }, data })).id
+        : (await tx.tool.create({ data })).id;
+      await syncToolPriceSpecs(tx, transactionToolId, priceSpecs);
+      return transactionToolId;
+    });
     if (downloadFileUrl && savedToolId) {
       const directDownloadFileId = await upsertDirectDownloadFileForTool({
         toolId: savedToolId,
@@ -1340,7 +1356,7 @@ export async function upsertToolAction(formData: FormData) {
     });
     revalidatePath(adminPath);
     revalidatePath("/admin/files");
-    revalidateTag("public-tools");
+    revalidatePublicToolCatalog();
     revalidatePath("/");
     const listingPath = getToolListingPath(type);
     const canonicalToolPath = buildCanonicalToolPath(
@@ -1428,12 +1444,13 @@ export async function updateToolTagsAction(formData: FormData) {
   revalidatePath("/admin/tags");
   revalidatePath("/admin/software");
   revalidatePath("/admin/online-tools");
+  revalidatePath("/admin/ai-skills");
 }
 
 export async function deleteToolAction(formData: FormData) {
   const admin = await requireAdmin();
   const id = idSchema.parse(formData.get("id"));
-  const type = z.enum(["software", "online", "skill_learning"]).parse(formData.get("type"));
+  const type = z.enum(["software", "online", "skill_learning", "ai_skill"]).parse(formData.get("type"));
   const adminPath = getAdminToolBasePath(type);
   const result = await deleteToolForAdmin({
     db: prisma,
@@ -1450,6 +1467,7 @@ export async function deleteToolAction(formData: FormData) {
   }
   revalidatePath(adminPath);
   revalidatePath("/");
+  revalidatePublicToolCatalog();
   redirect(`${adminPath}?deleted=1`);
 }
 
@@ -1487,6 +1505,7 @@ export async function upsertTutorialAction(formData: FormData) {
   });
   revalidatePath("/admin/tutorials");
   revalidatePath("/tutorials");
+  revalidatePublicToolCatalog();
   if (data.status === "active") {
     const tool = await prisma.tool.findFirst({
       where: { id: toolId, status: "published" },
@@ -1513,6 +1532,7 @@ export async function deleteTutorialAction(formData: FormData) {
   });
   revalidatePath("/admin/tutorials");
   revalidatePath("/tutorials");
+  revalidatePublicToolCatalog();
   redirect("/admin/tutorials?deleted=1");
 }
 

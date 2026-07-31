@@ -4,6 +4,7 @@ import {
   buildProductDemoVideoObjectSchema,
   getLocalizedProductDemoCoverAlt,
   getLocalizedProductDemoDescription,
+  getLocalizedProductDemoFaq,
   getLocalizedProductDemoProductType,
   getLocalizedProductDemoTags,
   getLocalizedProductDemoTitle,
@@ -11,6 +12,7 @@ import {
   getProductDemoVideoUrl,
   type PublicProductDemo,
 } from "@/lib/product-demos";
+import { enheOrganizationReference } from "@/lib/brand-entity";
 
 function makeDemo(overrides: Partial<PublicProductDemo> = {}) {
   return {
@@ -71,6 +73,7 @@ describe("product demo localization and schema helpers", () => {
       "@type": "VideoObject",
       uploadDate: "2026-06-01T10:20:00.000Z",
       inLanguage: "en-US",
+      publisher: enheOrganizationReference,
     });
   });
 
@@ -125,5 +128,50 @@ describe("product demo localization and schema helpers", () => {
 
     expect(title).toContain("FaceSwap Studio AI");
     expect(title).not.toMatch(/[\u3400-\u9fff]/);
+  });
+
+  it("uses fully English FAQ copy for the Windows AI video studio demo", () => {
+    const faq = getLocalizedProductDemoFaq(
+      makeDemo({
+        slug: "windows-ai-video-studio",
+        faq: [
+          {
+            question: "这个 AI 视频生成应用需要联网吗？",
+            answer: "软件采用本地部署方式运行，模型安装完成后即可在本地生成视频。",
+          },
+        ],
+      }),
+      "en",
+    );
+
+    expect(faq).toHaveLength(3);
+    expect(faq[0].question).toBe("Does this AI video generation app require internet access?");
+    expect(faq[0].answer).toContain("without uploading source material to the cloud");
+    expect(JSON.stringify(faq)).not.toMatch(/[\u3400-\u9fff]/);
+  });
+
+  it("prefers bilingual FAQ copy maintained in admin over the fallback", () => {
+    const faq = getLocalizedProductDemoFaq(
+      {
+        slug: "windows-ai-video-studio",
+        faq: [
+          {
+            question:
+              "[[zh]]杩欎釜婕旂ず鏈夊摢浜涘姛鑳斤紵[[/zh]][[en]]Which workflows are included in this demo?[[/en]]",
+            answer:
+              "[[zh]]灞曠ず瑙嗛鐢熸垚宸ヤ綔娴併€俒[/zh]][[en]]It shows the practical video generation workflow, setup boundary, and product fit.[[/en]]",
+          },
+        ],
+      },
+      "en",
+    );
+
+    expect(faq).toEqual([
+      {
+        question: "Which workflows are included in this demo?",
+        answer:
+          "It shows the practical video generation workflow, setup boundary, and product fit.",
+      },
+    ]);
   });
 });
