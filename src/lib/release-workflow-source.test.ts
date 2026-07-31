@@ -179,6 +179,11 @@ describe("production release workflow", () => {
     expect(drillIndex).toBeGreaterThan(backupIndex);
     expect(migrateIndex).toBeGreaterThan(drillIndex);
     expect(drill).toContain("pg_restore --exit-on-error");
+    expect(drill).toContain("psql -v ON_ERROR_STOP=1");
+    expect(drill).toContain('-Atqc "SELECT 1"');
+    expect(drill).not.toContain(
+      'pg_isready -U "$db_user" -d "$db_name"',
+    );
     expect(drill).toContain("prisma migrate deploy");
     expect(drill).toContain("/api/health?scope=app");
     expect(drill).toContain("AUDIT_WORKER_TOKEN_CURRENT=rollback-compatibility-");

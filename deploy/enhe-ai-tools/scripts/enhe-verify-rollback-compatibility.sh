@@ -103,7 +103,7 @@ docker run -d \
   postgres:16-alpine >/dev/null
 
 attempt=1
-while ! docker exec "$db_container" pg_isready -U "$db_user" -d "$db_name" >/dev/null 2>&1; do
+while ! docker exec "$db_container" psql -v ON_ERROR_STOP=1 -U "$db_user" -d "$db_name" -Atqc "SELECT 1" >/dev/null 2>&1; do
   if [ "$attempt" -ge 45 ]; then
     echo "Rollback compatibility database did not become ready." >&2
     exit 1
