@@ -23,7 +23,8 @@ ARG RELEASE_REF=local
 LABEL org.opencontainers.image.revision=$RELEASE_REF
 ENV NODE_ENV=production
 ENV NEXT_TELEMETRY_DISABLED=1
-RUN apk add --no-cache python3
+RUN sed -i 's#dl-cdn.alpinelinux.org#mirrors.aliyun.com#g' /etc/apk/repositories \
+    && apk add --no-cache python3
 
 COPY --from=deps /app/node_modules ./node_modules
 COPY --from=builder /app/package.json ./package.json
