@@ -11,7 +11,7 @@ describe("admin product image storage", () => {
 
     expect(helper).toContain("saveUploadedFile(file");
     expect(helper).toContain("folder: prefix");
-    expect(helper).toContain("return stored.fileUrl");
+    expect(helper).toContain('return stored.storage === "cos" ? stored.filePath : stored.fileUrl');
     expect(helper).not.toContain("writeFile(");
   });
 });

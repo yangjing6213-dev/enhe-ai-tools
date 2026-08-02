@@ -205,7 +205,7 @@ async function saveAdminImageUpload(file: FormDataEntryValue | null, prefix: str
     accept: isLikelyUploadableImage,
     invalidTypeMessage: "请上传图片格式的封面图。"
   });
-  return stored.fileUrl;
+  return stored.storage === "cos" ? stored.filePath : stored.fileUrl;
 }
 
 async function saveAdminImageUploads(files: FormDataEntryValue[], prefix: string) {

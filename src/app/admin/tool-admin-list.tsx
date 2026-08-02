@@ -10,7 +10,7 @@ import { supportedAiAgentOptions } from "@/lib/ai-skill";
 import { getAdminToolBasePath, getAdminToolEditPath, getAdminToolNewPath } from "@/lib/admin-tool-routes";
 import { decideAdminToolHardDelete } from "@/lib/admin-delete-protection";
 import type { Locale } from "@/lib/i18n";
-import { normalizeImageSrc } from "@/lib/media";
+import { resolveToolImageSrc } from "@/lib/tool-image";
 import { getPrimaryToolPrice, type ToolPriceSpecStatus } from "@/lib/tool-price-specs";
 import { getToolPublishIssues } from "@/lib/tool-publish-check";
 
@@ -242,7 +242,7 @@ export function ToolAdminList({
           <div className="min-w-[1080px] divide-y divide-white/10">
             {tools.map((tool) => {
               const publishIssues = getToolPublishIssues(tool);
-              const coverImage = normalizeImageSrc(tool.coverImage);
+              const coverImage = resolveToolImageSrc(tool.coverImage);
               const displayPrice = getToolDisplayPrice(tool);
 
               return (

@@ -3,7 +3,7 @@
 import Image from "next/image";
 import { ArrowDown, ArrowUp } from "lucide-react";
 import { useState } from "react";
-import { normalizeImageSrc } from "@/lib/media";
+import { resolveToolImageSrc } from "@/lib/tool-image";
 
 type ProductImageCopy = {
   productImageAlt: string;
@@ -58,7 +58,7 @@ export function ToolProductImageManager({
   return (
     <div className="mt-5 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
       {images.map((image, index) => {
-        const imageSrc = normalizeImageSrc(image.src);
+        const imageSrc = resolveToolImageSrc(image.src);
         const positionText = copy.productImagePosition.replace("{position}", String(index + 1));
 
         return (

@@ -3,7 +3,7 @@ import { ArrowUpRight, Check, Download, MousePointer2, UserRound } from "lucide-
 import { PrefetchLink } from "@/components/prefetch-link";
 import { Badge } from "@/components/ui";
 import { getDictionary, type Locale } from "@/lib/i18n";
-import { normalizeImageSrc } from "@/lib/media";
+import { resolveToolImageSrc } from "@/lib/tool-image";
 import { buildCanonicalToolPath } from "@/lib/public-slugs";
 import { buildToolCardHighlights } from "@/lib/tool-card-highlights";
 import {
@@ -44,7 +44,7 @@ export function ToolCard({
 }: ToolCardProps) {
   const t = getDictionary(locale);
   const Heading = headingLevel === 2 ? "h2" : "h3";
-  const coverImage = normalizeImageSrc(tool.coverImage);
+  const coverImage = resolveToolImageSrc(tool.coverImage);
   const localizedTool = resolveLocalizedToolIdentity(tool, locale);
   const localizedCategory = resolveLocalizedToolCategoryName(tool.category?.name, tool.type, locale);
   const showMarketingMeta = variant !== "homeFeatured";

@@ -3,7 +3,7 @@ import type { Prisma, ProductDemoCategory } from "@prisma/client";
 import { enheOrganizationReference } from "@/lib/brand-entity";
 import { prisma } from "@/lib/db";
 import type { Locale } from "@/lib/dictionaries";
-import { normalizeImageSrc } from "@/lib/media";
+import { resolveToolImageSrc } from "@/lib/tool-image";
 import { resolveProductVideoSrc } from "@/lib/product-video";
 import { buildCanonicalToolPath } from "@/lib/public-slugs";
 import {
@@ -149,7 +149,7 @@ export function getLocalizedProductDemoFaq(
 }
 
 export function getProductDemoCoverImage(demo: Pick<PublicProductDemo, "coverImage">) {
-  return normalizeImageSrc(demo.coverImage);
+  return resolveToolImageSrc(demo.coverImage);
 }
 
 export function getProductDemoVideoUrl(demo: Pick<PublicProductDemo, "videoUrl">) {

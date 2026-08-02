@@ -16,7 +16,7 @@ import { getCurrentUser } from "@/lib/auth";
 import { enheOrganizationReference } from "@/lib/brand-entity";
 import { prisma } from "@/lib/db";
 import { getDictionary, type Locale } from "@/lib/dictionaries";
-import { normalizeImageSrc } from "@/lib/media";
+import { resolveToolImageSrc } from "@/lib/tool-image";
 import { resolveProductVideos } from "@/lib/product-video";
 import {
   buildCanonicalToolPath,
@@ -163,7 +163,7 @@ export async function generateToolDetailPageMetadata(
             : "software",
     }),
     path: canonical,
-    image: normalizeImageSrc(tool.coverImage),
+    image: resolveToolImageSrc(tool.coverImage),
     locale: forceLocale === "en" ? "en_US" : "zh_CN",
     localeKey: forceLocale,
     languageAlternates: buildAvailableLanguageAlternates(
@@ -319,7 +319,7 @@ export async function ToolDetailPageShell({
   const isPurchasableAccountService = isAccountService && servicePrice > 0;
   const paidSkillCourse = isSkillLearning && servicePrice > 0;
   const isFreeSkillCourse = isSkillLearning && servicePrice <= 0;
-  const coverImage = normalizeImageSrc(tool.coverImage);
+  const coverImage = resolveToolImageSrc(tool.coverImage);
   const productVideos = resolveProductVideos([
     {
       url: tool.videoUrl,
@@ -1110,7 +1110,7 @@ export async function ToolDetailPageShell({
               {tool.screenshots.length ? (
                 <div className="tool-detail-product-gallery grid gap-5">
                   {tool.screenshots.map((screenshot, index) => {
-                    const imageSrc = normalizeImageSrc(screenshot);
+                    const imageSrc = resolveToolImageSrc(screenshot);
                     return (
                       <div
                         key={`${screenshot}-${index}`}
