@@ -586,7 +586,7 @@ export async function ToolDetailPageShell({
         ]}
       />
       <main>
-        {isSkillLearning ? (
+        {isSkillLearning || isAiSkill ? (
           <div className="mb-5">
             <ButtonLink href={baseListingPath} variant="ghost">
               <span aria-hidden="true">←</span>
