@@ -1,7 +1,5 @@
 "use server";
 
-import { mkdir, writeFile } from "node:fs/promises";
-import { join } from "node:path";
 import { revalidatePath, revalidateTag } from "next/cache";
 import { redirect } from "next/navigation";
 import { z } from "zod";
@@ -21,7 +19,6 @@ import {
   parseBooleanField,
   parseNumberField,
   parseOptionalString,
-  buildPublicUploadUrl,
   resolveToolSlug
 } from "@/lib/admin-form";
 import { parseNewsRelationIds, resolveAiNewsCanonicalSlug, resolveNewsSlug } from "@/lib/ai-news";
@@ -65,7 +62,6 @@ import { getPrimaryToolPriceSpec, parseToolPriceSpecsFromFormData, type ToolPric
 import { mergeToolProductImages } from "@/lib/tool-product-images";
 import { buildCanonicalAiNewsPath, buildCanonicalToolPath } from "@/lib/public-slugs";
 import { parseTopicDelimitedRows } from "@/lib/ai-news-topic-config";
-import { getUploadDiskPath } from "@/lib/upload-path";
 import { adminFileUploadMaxBytes } from "@/lib/upload-limits";
 import { generateAiNewsEnglishDraft } from "@/lib/ai-news-translation";
 import { buildProductDemoPath } from "@/lib/product-demos";
@@ -203,15 +199,13 @@ function normalizeUploadActionError(error: unknown) {
 
 async function saveAdminImageUpload(file: FormDataEntryValue | null, prefix: string) {
   if (!(file instanceof File) || file.size === 0) return null;
-  if (!isLikelyUploadableImage(file)) throw new Error("请上传图片格式的封面图。");
-  if (file.size > maxCoverImageBytes) throw new Error("封面图不能超过 8MB。");
-
-  const publicUrl = buildPublicUploadUrl(`${prefix}-${file.name}`);
-  const uploadDir = process.env.UPLOAD_DIR ?? join(process.cwd(), "public", "uploads");
-  const diskPath = getUploadDiskPath(publicUrl, process.cwd(), process.env.UPLOAD_DIR);
-  await mkdir(uploadDir, { recursive: true });
-  await writeFile(diskPath, Buffer.from(await file.arrayBuffer()));
-  return publicUrl;
+  const stored = await saveUploadedFile(file, {
+    folder: prefix,
+    maxBytes: maxCoverImageBytes,
+    accept: isLikelyUploadableImage,
+    invalidTypeMessage: "请上传图片格式的封面图。"
+  });
+  return stored.fileUrl;
 }
 
 async function saveAdminImageUploads(files: FormDataEntryValue[], prefix: string) {

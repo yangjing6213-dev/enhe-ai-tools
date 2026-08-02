@@ -39,6 +39,8 @@ web-access
 uploads
 **/uploads
 public/uploads
+!src/app/api/uploads/
+!src/app/api/uploads/**
 secrets
 **/secrets
 tmp

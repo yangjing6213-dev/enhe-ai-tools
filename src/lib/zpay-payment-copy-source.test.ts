@@ -38,6 +38,23 @@ describe("zpay payment page copy", () => {
     expect(payPage).toContain("order.seoAuditOffer?.name");
   });
 
+  it("uses payment-method-specific scan guidance instead of hardcoding WeChat", () => {
+    const payPage = readFileSync(resolve(root, "src/app/orders/[id]/pay/page.tsx"), "utf8");
+
+    expect(payPage).toContain("paymentChannelCopy");
+    expect(payPage).toContain('zpayPayment.transaction.paymentType === "wxpay"');
+    expect(payPage).toContain("请使用支付宝扫码或打开收银台完成支付");
+    expect(payPage).toContain("<p>{paymentChannelCopy.guide}</p>");
+    expect(payPage).not.toContain("<p>请使用微信扫码完成支付");
+  });
+
+  it("defaults new purchases to WeChat while keeping Alipay selectable", () => {
+    const toolPage = readFileSync(resolve(root, "src/app/tools/[slug]/page-shell.tsx"), "utf8");
+
+    expect(toolPage).toContain('defaultValue="wechat"');
+    expect(toolPage).toContain('<option value="alipay">{td.alipay}</option>');
+  });
+
   it("shows a purchase success hint when mobile payment returns to login", () => {
     const loginPage = readFileSync(resolve(root, "src/app/(auth)/login/page-shell.tsx"), "utf8");
 

@@ -586,6 +586,14 @@ export async function ToolDetailPageShell({
         ]}
       />
       <main>
+        {isSkillLearning ? (
+          <div className="mb-5">
+            <ButtonLink href={baseListingPath} variant="ghost">
+              <span aria-hidden="true">←</span>
+              {forceLocale === "en" ? "Back to AI Skills" : "返回 AI Skill 分类"}
+            </ButtonLink>
+          </div>
+        ) : null}
         <section className="glass overflow-hidden rounded-[2rem] p-4 md:p-6 lg:p-8">
           <div className="tool-detail-hero-stack flex flex-col gap-8">
             <div className="tool-detail-cover-frame relative overflow-hidden rounded-[1.75rem] border border-[rgba(210,230,255,0.16)] bg-[#07101E]">

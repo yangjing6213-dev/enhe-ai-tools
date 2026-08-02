@@ -64,6 +64,21 @@ export default async function PayPage({ params }: PayPageProps) {
     };
   }
 
+  const isWechatPayment = zpayPayment
+    ? zpayPayment.transaction.paymentType === "wxpay"
+    : order.paymentMethod === "wechat";
+  const paymentChannelCopy = isWechatPayment
+    ? {
+        methodLabel: "微信支付",
+        guide: "请使用微信扫码完成支付，付款后页面会自动更新。",
+        checkoutLabel: "打开收银台"
+      }
+    : {
+        methodLabel: "支付宝",
+        guide: "请使用支付宝扫码或打开收银台完成支付，付款后页面会自动更新。",
+        checkoutLabel: "打开支付宝收银台"
+      };
+
   return (
     <Container className="py-14">
       <SectionTitle
@@ -82,7 +97,7 @@ export default async function PayPage({ params }: PayPageProps) {
             <Info label="类型" value={presentation.typeLabel} />
             <Info label="金额" value={formatCurrency(order.amount.toString())} />
             <Info label="订单状态" value={order.orderStatus} />
-            <Info label="支付方式" value={order.paymentMethod === "wechat" ? "微信支付" : "支付宝"} />
+            <Info label="支付方式" value={paymentChannelCopy.methodLabel} />
           </div>
         </div>
 
@@ -150,7 +165,7 @@ export default async function PayPage({ params }: PayPageProps) {
                 <div className="flex flex-col justify-between gap-5">
                   <div className="space-y-3 text-sm leading-6 text-[#8B95A7]">
                     <p>{presentation.paymentCompletionText}</p>
-                    <p>请使用微信扫码完成支付，付款后页面会自动更新。</p>
+                    <p>{paymentChannelCopy.guide}</p>
                     {zpayPayment.transaction.providerTradeNo ? (
                       <p className="break-all">支付订单号：{zpayPayment.transaction.providerTradeNo}</p>
                     ) : null}
@@ -164,7 +179,7 @@ export default async function PayPage({ params }: PayPageProps) {
                         rel="nofollow noopener noreferrer"
                         className="rounded-full bg-[#050505] px-5 py-3 text-sm font-semibold text-white"
                       >
-                        打开收银台
+                        {paymentChannelCopy.checkoutLabel}
                       </a>
                     ) : null}
                     <Link href={`/orders/${order.id}`} className="rounded-full border border-white/12 px-5 py-3 text-sm">

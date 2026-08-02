@@ -3,6 +3,7 @@ import { stat } from "node:fs/promises";
 import { extname } from "node:path";
 import { Readable } from "node:stream";
 import { NextResponse } from "next/server";
+import { getLegacyProductImageFallback } from "@/lib/legacy-product-images";
 import { getUploadDiskPath } from "@/lib/upload-path";
 
 const uploadMimeTypes: Record<string, string> = {
@@ -108,6 +109,8 @@ export async function GET(request: Request, { params }: { params: Promise<{ file
     });
   } catch (error) {
     if ((error as NodeJS.ErrnoException).code === "ENOENT") {
+      const fallback = getLegacyProductImageFallback(uploadPath);
+      if (fallback) return NextResponse.redirect(new URL(fallback, request.url), 307);
       return NextResponse.json({ message: "Upload file not found." }, { status: 404 });
     }
     throw error;
