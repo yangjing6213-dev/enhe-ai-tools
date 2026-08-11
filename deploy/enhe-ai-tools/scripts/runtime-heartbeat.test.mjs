@@ -251,9 +251,12 @@ afterEach(async () => {
 
 describe("SEO audit runtime heartbeat identity", () => {
   it("writes worker release identity and a stable process start time", async () => {
-    const env = await workerEnvironment();
+    const env = await workerEnvironment({ baseUrl: await startSchedulerServer() });
     const child = startScript("seo-audit-worker.mjs", env);
-    const heartbeat = await waitForJsonFile(env.SEO_AUDIT_WORKER_HEARTBEAT_FILE);
+    const heartbeat = await waitForJsonFileMatching(
+      env.SEO_AUDIT_WORKER_HEARTBEAT_FILE,
+      (value) => value.status === "ok" && value.releaseRef === releaseRef
+    );
 
     expect(heartbeat).toMatchObject({ releaseRef, status: "ok" });
     expect(Date.parse(heartbeat.startedAt)).not.toBeNaN();
@@ -321,7 +324,10 @@ describe("SEO audit runtime heartbeat identity", () => {
     server.releaseCrawlResponse();
     const refreshed = await waitForJsonFileMatching(
       env.SEO_AUDIT_WORKER_HEARTBEAT_FILE,
-      (heartbeat) => Date.parse(heartbeat.checkedAt) > Date.parse(staleCheckedAt),
+      (heartbeat) =>
+        heartbeat.status === "ok" &&
+        heartbeat.currentRunId === "long-running-job" &&
+        Date.parse(heartbeat.checkedAt) > Date.parse(staleCheckedAt),
       2_000
     );
 
