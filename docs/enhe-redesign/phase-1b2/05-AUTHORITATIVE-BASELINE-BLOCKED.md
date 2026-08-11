@@ -1,0 +1,88 @@
+# Phase 1B.2.2R 权威基线阻塞记录
+
+## 状态
+
+```text
+PHASE_1B_2_RESUME_STATUS=BLOCKED
+AUTHORITATIVE_BASELINE_STATUS=BLOCKED
+FAILED_GATE=FULL_TESTS
+REASON=AUTHORITATIVE_BASELINE_HAS_NON_PRISMA_TEST_FAILURES
+PHASE_1B_PUBLIC_SHELL_STATUS=NOT_READY
+PHASE_1B_PRODUCT_DETAIL_STATUS=NOT_READY
+PHASE_1B_COMMERCE_STATUS=NOT_READY
+R008_STATUS=OPEN
+```
+
+## 工作区与 Seed 门禁
+
+```text
+BRANCH=codex/enhe-phase1b-integration-3497d170
+START_HEAD=e20b275467ef36871129d0926703e4f5a147357f
+PRISMA_BOOTSTRAP_COMMIT=2ffbca7d2667cb2469d2c4c843a8a5302aa63a96
+SEED_DIFF_EXIT=0
+SEED_HEAD_BLOB=14db43f7aef16cb5a1a546a8d27b66e837552a60
+SEED_WORKTREE_CLEAN_BLOB=14db43f7aef16cb5a1a546a8d27b66e837552a60
+SEED_GIT_EQUIVALENCE=PASS
+PACKAGE_LOCK_DIFF=NONE
+SCHEMA_DIFF=NONE
+ROOT_EBOS_TEMP_EXISTS=NO
+```
+
+## 已完成验证
+
+```text
+DIRECT_PRISMA_GENERATE_EXIT=0
+MANUAL_TYPECHECK_AFTER_DIRECT_GENERATE=PASS
+PRISMA_BOOTSTRAP_RED_STATUS=EXPECTED_FAIL
+PRISMA_BOOTSTRAP_GREEN_STATUS=PASS
+TYPECHECK_AUTO_BOOTSTRAP=PASS
+BASELINE_LINT=PASS
+BASELINE_TYPECHECK=PASS
+BASELINE_PRISMA_BOOTSTRAP_TEST=PASS
+BASELINE_R008_FOCUSED_TESTS=PASS (6 tests)
+BASELINE_EBOS_FOCUSED_TESTS=PASS (3 tests)
+```
+
+## 完整测试阻塞证据
+
+命令：
+
+```text
+npm test
+```
+
+结果：
+
+```text
+TEST_FILES_PASSED=433
+TEST_FILES_FAILED=2
+TEST_FILES_SKIPPED=9
+TESTS_PASSED=2086
+TESTS_FAILED=2
+TESTS_SKIPPED=90
+```
+
+失败文件及原因：
+
+1. `src/lib/deploy-config.test.ts`：部署配置测试找不到预期的 `env_file` 片段。
+2. `src/lib/seo-audit/public-api.test.ts`：`loadOwnedSeoAuditRecheckSource` 返回 `SEO_AUDIT_RECHECK_UNAVAILABLE`。
+
+两项均不是 Prisma Client bootstrap 错误。按照 Phase 1B.2.2R 第 15 节，本阶段不得逐项修复这些业务/部署测试，也不得继续 EBOS 或 R-008 修改。
+
+## EBOS 与 R-008 状态
+
+当前 EBOS focused 测试已经使用系统临时目录、唯一 `mkdtemp` 路径和 `finally` 递归清理；运行后仓库根不存在 `tmp-ebos-optimized-redeploy-test/`。因此没有可靠 RED 证据，也没有实施冗余修改或创建 EBOS 提交。
+
+R-008 尚未修改。现有 ByteDance loader 测试仍为批准的旧行为断言；由于完整基线失败，未开始 R-008 RED-GREEN 周期。
+
+## 未执行项
+
+```text
+BASELINE_BUILD=NOT_RUN
+EBOS_TEST_HYGIENE_COMMIT=NOT_CREATED
+R008_COMMIT=NOT_CREATED
+PUBLIC_SHELL_PLAN=NOT_CREATED
+RESULT_ZIP=CREATED_AFTER_DOCS_ONLY_BLOCKING_COMMIT
+```
+
+未读取或输出 Seed 正文、secret 或 `.env` 正文；未创建或修改 `.env`；未连接或修改数据库；未执行 migrate、db push 或 seed；未调用真实支付、退款或 OAuth；未修改 `prisma/schema.prisma`、Seed Git canonical 内容或 `package-lock.json`；未修改生产环境、remote，未 push。

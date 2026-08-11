@@ -1,0 +1,41 @@
+# Phase 1B.2.2R Git 换行门禁修正
+
+## 结论
+
+```text
+SEED_GIT_EQUIVALENCE=PASS
+SEED_LOGICAL_CONTENT_CHANGED=NO
+SEED_RAW_SHA_EQUALITY_REQUIRED=NO
+SEED_RAW_SHA_DIFFERENCE_REASON=CORE_AUTOCRLF_CHECKOUT_TRANSFORM
+CORE_AUTOCRLF=true
+```
+
+## 原始字节法证记录
+
+HEAD 中的 `prisma/seed-ai-news-topics-data.cjs`：
+
+```text
+EOL=LF
+SIZE=28393
+SHA256=1F8B1EBB218C54E39495FB8A65D0B1D5EDE216EC7A3A0B460399C8B6C89FE1AC
+```
+
+Windows 工作区检出文件：
+
+```text
+EOL=CRLF
+SIZE=29053
+SHA256=A411D35E0A84151E9BEF95555C4B3E8E24B45084F780B1B37F4653919CE196BB
+```
+
+## Git canonical 等价性
+
+```text
+SEED_DIFF_EXIT=0
+SEED_STATUS_COUNT=0
+SEED_EOL_INFO=i/lf w/crlf attr/
+SEED_HEAD_BLOB=14db43f7aef16cb5a1a546a8d27b66e837552a60
+SEED_WORKTREE_CLEAN_BLOB=14db43f7aef16cb5a1a546a8d27b66e837552a60
+```
+
+raw SHA-256 仅用于法证记录。Git clean-filter Blob 用于判断受跟踪内容是否等价；启用 `core.autocrlf` 时，checkout 的换行转换会使 raw SHA-256 不同，但不表示 Git canonical 源代码发生变化。后续所有 Seed 门禁均使用 Git canonical 等价性，不再要求工作区 raw SHA-256 等于 HEAD raw SHA-256。
