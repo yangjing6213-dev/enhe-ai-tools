@@ -1,0 +1,7 @@
+﻿"path","exists","sha256","git_tracked","git_status_category","observed_at"
+"src/app/root-layout-shared.tsx","YES","6ddd97a3963ec4898d64ff953aa07867481b528da34c1236a85bfaa375ccf366","YES","CLEAN_TRACKED","2026-08-11T04:36:54Z"
+"src/components/product-video-player.tsx","YES","3687f1f0bbb53004814dbe91363cd8f8ead78bd7b20709c6a3a223da6eafc60b","YES","CLEAN_TRACKED","2026-08-11T04:36:54Z"
+"src/lib/tool-category-groups.ts","YES","24f100f5b991ae23d63ef29a2f30baddc1f3fa65e4dab22c6aea442a533baec6","YES","CLEAN_TRACKED","2026-08-11T04:36:54Z"
+"src/lib/media.ts","YES","42b97b617d33f1827ffc8125db3842db0d1eac4af2db2cf133b766d5b7eba6d4","YES","CLEAN_TRACKED","2026-08-11T04:36:54Z"
+"skills/ebos/skill-registry.json","YES","162042634d19ac8dfa6b057e07d4cee087ff912db7828a720fd2c156603ffd13","YES","CLEAN_TRACKED","2026-08-11T04:36:54Z"
+"src/lib/ebos/post-launch/__tests__/optimized-page-redeploy-checker.test.ts","YES","4a76a45c72f780eb559e8ad1ad193f25ca860877fecd076b7428b46649e9afbf","YES","CLEAN_TRACKED","2026-08-11T04:36:54Z"

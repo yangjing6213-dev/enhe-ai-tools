@@ -1,0 +1,79 @@
+[
+  {
+    "productName": "无所不能版｜AI生成视频应用 / Ultimate Edition | AI Video Generation Suite",
+    "usage": "Homepage product stage; software new releases; software all products",
+    "sourceType": "Public ENHE website image",
+    "sourcePathOrUrl": "https://www.enhe-tech.com.cn/api/uploads/1783100811343-tool-cover-ai-video-studio-ai-ai-video-studio-ai-ultimate-ai-video-cover-1672x941.png",
+    "localPath": "prototype/assets/product-media/ultimate-edition.png",
+    "sha256": "3999F505428FB8B1DDE77B8A1D0E9A1660F7CCC9DEA7D327D2B4115FAF7661E0",
+    "publicAsset": true,
+    "containsDeliveryData": false,
+    "notes": "Public 1672x941 ENHE product cover copied locally on 2026-08-10; no delivery URL or private file field was read."
+  },
+  {
+    "productName": "InfiniteTalk",
+    "usage": "Homepage product stage; software new releases; software all products",
+    "sourceType": "Public ENHE website image",
+    "sourcePathOrUrl": "https://www.enhe-tech.com.cn/api/uploads/1784038998590-tool-cover-infinitetalk-ai-chatgpt-image-2026-7-14-20-18-23.png",
+    "localPath": "prototype/assets/product-media/infinitetalk.png",
+    "sha256": "221FC48890B7073A9325581C43E0168E11EAD8DDE3A7C4224523381AF46ED55E",
+    "publicAsset": true,
+    "containsDeliveryData": false,
+    "notes": "Public 1672x941 ENHE product cover copied locally on 2026-08-10; no delivery URL or private file field was read."
+  },
+  {
+    "productName": "AI语音生成 / Local AI Voice Generator",
+    "usage": "Homepage product stage; software new releases; software all products",
+    "sourceType": "Public ENHE website image",
+    "sourcePathOrUrl": "https://www.enhe-tech.com.cn/api/uploads/1782230665915-tool-cover-ai-ai-chatgpt-image-2026-6-23-23-50-43-4-.png",
+    "localPath": "prototype/assets/product-media/ai-voice.png",
+    "sha256": "3AB6C5740F7FFB7124730760D6195B3365C43390C4655384EABC0C49185C7A04",
+    "publicAsset": true,
+    "containsDeliveryData": false,
+    "notes": "Public 1672x941 ENHE product cover copied locally on 2026-08-10; no delivery URL or private file field was read."
+  },
+  {
+    "productName": "Lumi-OS / LumiOS Personal AI Operating Companion",
+    "usage": "Homepage product stage; software new releases; software all products",
+    "sourceType": "Public ENHE website image",
+    "sourcePathOrUrl": "https://www.enhe-tech.com.cn/api/uploads/1783007262227-tool-cover-windows-ai-lumios-windows-ai-cover-1672x941.png",
+    "localPath": "prototype/assets/product-media/lumi-os.png",
+    "sha256": "B5214D584E148F7E5E7E33A405BD440B6EFC6A0B8EAA1A4FA878736B630FF888",
+    "publicAsset": true,
+    "containsDeliveryData": false,
+    "notes": "Public 1672x941 ENHE product cover copied locally on 2026-08-10; no delivery URL or private file field was read."
+  },
+  {
+    "productName": "FaceSwap Studio",
+    "usage": "Homepage product stage; software featured products; software all products",
+    "sourceType": "Public ENHE website image",
+    "sourcePathOrUrl": "https://www.enhe-tech.com.cn/api/uploads/1782924134779-tool-cover-faceswap-studio-ai-faceswap-studio-ai-cover-1672x941.png",
+    "localPath": "prototype/assets/product-media/faceswap-studio.png",
+    "sha256": "069FDE5F1C96836B8C9E5737982FBC7063F38E08531A487E7A826C2A8AEE07C7",
+    "publicAsset": true,
+    "containsDeliveryData": false,
+    "notes": "Public 1672x941 ENHE product cover copied locally on 2026-08-10; no delivery URL or private file field was read."
+  },
+  {
+    "productName": "AI提示词管理系统 / AI Prompt Management System",
+    "usage": "Software featured products; software all products",
+    "sourceType": "Public ENHE website image",
+    "sourcePathOrUrl": "https://www.enhe-tech.com.cn/api/uploads/1784128582916-tool-cover-ai-prompt-ai-prompt-management-enhe-cover-bilingual-v2.png",
+    "localPath": "prototype/assets/product-media/prompt-management.png",
+    "sha256": "CFFDF018E7A010F3B4C39A396BCA7068FBD56F3A106E5BB52656CDD3B41B3D8B",
+    "publicAsset": true,
+    "containsDeliveryData": false,
+    "notes": "Public 1672x941 ENHE product cover copied locally on 2026-08-10; no delivery URL or private file field was read."
+  },
+  {
+    "productName": "高频AI提示词 / High-Frequency AI Prompts",
+    "usage": "Software featured products; software all-products chat and prompt cards",
+    "sourceType": "Public ENHE website image",
+    "sourcePathOrUrl": "https://www.enhe-tech.com.cn/api/uploads/1782230711458-tool-cover-tool-mq12l5w6-chatgpt-image-2026-6-23-23-50-42-1-.png",
+    "localPath": "prototype/assets/product-media/chat-screenshot.png",
+    "sha256": "D9610AA949B140C3FFAD037F0CB5915A0D48FE00CF8F22266CBEABBB487269C7",
+    "publicAsset": true,
+    "containsDeliveryData": false,
+    "notes": "Public 1672x941 ENHE catalog image copied locally on 2026-08-10; no delivery URL or private file field was read."
+  }
+]

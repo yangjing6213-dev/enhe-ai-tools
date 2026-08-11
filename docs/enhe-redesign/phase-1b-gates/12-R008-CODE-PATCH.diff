@@ -1,0 +1,49 @@
+# R-008 handoff patch, not applied on this redesign branch.
+# The redesign branch baseline never contained the loader; its root-layout blob
+# is byte-identical to START_HEAD. The main-branch deletion is therefore shown
+# only as a redacted, illustrative handoff note and is intentionally not an
+# executable patch. No loader query value is retained.
+# MAIN_INTEGRATION_NOTE=REMOVE_NEXT_SCRIPT_BYTEDANCE_BEFOREINTERACTIVE
+# MAIN_LOADER_PATH=src/app/root-layout-shared.tsx
+# MAIN_LOADER_URL=https://lf1-cdn-tos.bytegoofy.com/goofy/ttzz/push.js?[query-redacted]
+# CURRENT_REDESIGN_ROOT_LAYOUT_HUNK=NONE
+# PATCH_APPLYABLE=NO_ROOT_HUNK_ON_REDESIGN_BRANCH
+
+REGRESSION_TEST=src/lib/r008-external-script-source.test.ts
+
+diff --git a/src/lib/r008-external-script-source.test.ts b/src/lib/r008-external-script-source.test.ts
+new file mode 100644
+index 0000000..49929cc
+--- /dev/null
++++ b/src/lib/r008-external-script-source.test.ts
+@@ -0,0 +1,30 @@
++import { execFileSync } from "node:child_process";
++import { readdirSync, readFileSync } from "node:fs";
++import { join } from "node:path";
++import { fileURLToPath } from "node:url";
++import { describe, expect, it } from "vitest";
++
++const appDirectory = fileURLToPath(new URL("../app/", import.meta.url));
++
++function readLayoutSources(directory: string): string[] {
++  return readdirSync(directory, { withFileTypes: true }).flatMap((entry) => {
++    const path = join(directory, entry.name);
++    if (entry.isDirectory()) return readLayoutSources(path);
++    return entry.name === "layout.tsx" ? [readFileSync(path, "utf8")] : [];
++  });
++}
++
++describe("R-008 global external script source contract", () => {
++  it("keeps the ByteDance loader out of every layout and preserves AnalyticsTracker", () => {
++    const sourceRef = process.env.R008_SOURCE_REF;
++    const sharedRoot = sourceRef
++      ? execFileSync("git", ["show", `${sourceRef}:src/app/root-layout-shared.tsx`], { encoding: "utf8" })
++      : readFileSync(new URL("../app/root-layout-shared.tsx", import.meta.url), "utf8");
++    const layoutSources = [sharedRoot, ...readLayoutSources(appDirectory)].join("\n");
++
++    expect(layoutSources.includes("https://lf1-cdn-tos.bytegoofy.com/goofy/ttzz/push.js")).toBe(false);
++    expect(layoutSources.includes("beforeInteractive")).toBe(false);
++    expect(layoutSources.includes("ttzz-push-loader")).toBe(false);
++    expect(sharedRoot.includes("<AnalyticsTracker />")).toBe(true);
++  });
++});
