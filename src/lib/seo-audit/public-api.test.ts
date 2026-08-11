@@ -246,11 +246,12 @@ describe("SEO audit public API helpers", () => {
       sourceOrder: { orderStatus: "activated", refundRecords: [] },
     });
     const db = { seoAuditRun: { findFirst } };
+    const now = new Date("2026-07-27T00:00:00.000Z");
 
     await expect(
       loadOwnedSeoAuditRecheckSource("run-1", "user-1", {
         db,
-        now: new Date("2026-07-27T00:00:00.000Z"),
+        now,
       }),
     ).resolves.toEqual({
       creditId: "credit-1",
@@ -278,7 +279,7 @@ describe("SEO audit public API helpers", () => {
       },
     });
     await expect(
-      loadOwnedSeoAuditRecheckSource("run-1", "user-1", { db }),
+      loadOwnedSeoAuditRecheckSource("run-1", "user-1", { db, now }),
     ).resolves.toEqual({
       creditId: "credit-1",
       kind: "professional",
@@ -305,7 +306,7 @@ describe("SEO audit public API helpers", () => {
       },
     });
     await expect(
-      loadOwnedSeoAuditRecheckSource("run-1", "user-1", { db }),
+      loadOwnedSeoAuditRecheckSource("run-1", "user-1", { db, now }),
     ).rejects.toThrow("SEO_AUDIT_RECHECK_UNAVAILABLE");
   });
 
