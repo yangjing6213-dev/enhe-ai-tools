@@ -1,0 +1,31 @@
+diff --git a/src/lib/seo-audit/public-api.test.ts b/src/lib/seo-audit/public-api.test.ts
+index 32508fc..32c466b 100644
+--- a/src/lib/seo-audit/public-api.test.ts
++++ b/src/lib/seo-audit/public-api.test.ts
+@@ -246,3 +246,4 @@ describe("SEO audit public API helpers", () => {
+       sourceOrder: { orderStatus: "activated", refundRecords: [] },
+     });
+     const db = { seoAuditRun: { findFirst } };
++    const now = new Date("2026-07-27T00:00:00.000Z");
+@@ -251,3 +252,3 @@ describe("SEO audit public API helpers", () => {
+       loadOwnedSeoAuditRecheckSource("run-1", "user-1", {
+         db,
+-        now: new Date("2026-07-27T00:00:00.000Z"),
++        now,
+@@ -278,7 +279,7 @@ describe("SEO audit public API helpers", () => {
+       },
+     });
+     await expect(
+-      loadOwnedSeoAuditRecheckSource("run-1", "user-1", { db }),
++      loadOwnedSeoAuditRecheckSource("run-1", "user-1", { db, now }),
+     ).resolves.toEqual({
+       creditId: "credit-1",
+       kind: "professional",
+@@ -305,6 +306,6 @@ describe("SEO audit public API helpers", () => {
+       },
+     });
+     await expect(
+-      loadOwnedSeoAuditRecheckSource("run-1", "user-1", { db }),
++      loadOwnedSeoAuditRecheckSource("run-1", "user-1", { db, now }),
+     ).rejects.toThrow("SEO_AUDIT_RECHECK_UNAVAILABLE");
+   });
