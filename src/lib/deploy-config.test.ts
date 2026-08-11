@@ -20,7 +20,8 @@ describe("isolated launch deployment contract", () => {
   it("injects the complete app runtime environment from required env files", () => {
     const compose = read("deploy/enhe-ai-tools/docker-compose.yml");
     const example = read("deploy/enhe-ai-tools/.env.example");
-    const app = compose.match(/  app:\n[\s\S]*?(?=\n  seo-audit-worker:)/)?.[0] ?? "";
+    const app =
+      compose.match(/  app:\r?\n[\s\S]*?(?=\r?\n  seo-audit-worker:)/)?.[0] ?? "";
 
     expect(app).toMatch(
       /env_file:\s*\n\s+- \.env\s*\n\s+- \.\.\/\.\.\/zpay\.env/,
