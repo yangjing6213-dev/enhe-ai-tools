@@ -89,15 +89,35 @@ describe("ENHE redesign public shell candidate", () => {
     expect(footer).not.toContain("内部预览");
   });
 
-  it("keeps the preview local-only and noindex", () => {
-    const layout = readCandidate("app/__redesign-preview/shell/layout.tsx");
-    const page = readCandidate("app/__redesign-preview/shell/page.tsx");
+  it("exposes only the routable preview directory and keeps the old private folder absent", () => {
+    const oldLayoutPath = join(root, "app/__redesign-preview/shell/layout.tsx");
+    const newLayoutPath = join(root, "app/redesign-preview/shell/layout.tsx");
+    const oldPagePath = join(root, "app/__redesign-preview/shell/page.tsx");
+    const newPagePath = join(root, "app/redesign-preview/shell/page.tsx");
 
-    expect(layout).toContain('robots: "noindex, nofollow"');
+    expect(existsSync(oldLayoutPath)).toBe(false);
+    expect(existsSync(oldPagePath)).toBe(false);
+    expect(existsSync(newLayoutPath)).toBe(true);
+    expect(existsSync(newPagePath)).toBe(true);
+  });
+
+  it("keeps the preview local-only, guarded, and fully excluded from indexing", () => {
+    const layout = readCandidate("app/redesign-preview/shell/layout.tsx");
+    const page = readCandidate("app/redesign-preview/shell/page.tsx");
+    const sitemap = readCandidate("app/sitemap.ts");
+    const navigation = readCandidate("components/redesign/navigation.ts");
+
+    expect(layout).toContain("index: false");
+    expect(layout).toContain("follow: false");
+    expect(layout).toContain("noarchive: true");
+    expect(layout).toContain("noimageindex: true");
     expect(page).toContain("notFound");
     expect(page).toContain('process.env.NODE_ENV === "production"');
     expect(page).toContain("EnheRedesignHeader");
     expect(page).toContain("EnheRedesignFooter");
+    expect(sitemap).not.toContain("redesign-preview");
+    expect(navigation).not.toContain("redesign-preview");
+    expect(page).not.toMatch(/File\.file(?:Url|Path)|https?:\/\/|orders|payment|download/i);
     expect(page).not.toContain("secret");
     expect(page).not.toContain("git");
   });
