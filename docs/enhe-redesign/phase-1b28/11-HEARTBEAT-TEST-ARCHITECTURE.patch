@@ -1,0 +1,9 @@
+# Phase 1B.2.8 blocked architecture record
+#
+# No implementation patch is emitted. The RED gate failed before any
+# production or test architecture implementation could be accepted:
+# runtime-heartbeat.mjs has no injectable Heartbeat core export.
+#
+# Production implementation changes: none.
+# Test/helper implementation changes retained in worktree: none.
+# See 03-HEARTBEAT-CONTRACT-EVIDENCE.md and 10-FINAL-RECEIPT.md.
