@@ -1,0 +1,5 @@
+# R-008 patch: NOT GENERATED
+#
+# R-008 was not started because the required disposable PostgreSQL build was
+# blocked by an unavailable Docker daemon. The target remains unchanged and
+# R-008 remains OPEN.

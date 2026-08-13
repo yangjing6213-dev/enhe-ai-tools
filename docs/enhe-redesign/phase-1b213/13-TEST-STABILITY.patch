@@ -1,0 +1,6 @@
+# No new Phase 1B.2.13 test-stability patch.
+#
+# Existing GSC test-only fix retained from Phase 1B.2.12:
+# 7acebac2062c150e76e46b73c5a94921acda043c
+#
+# Final architecture focused and full-suite gates passed without further edits.
