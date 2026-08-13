@@ -1,0 +1,24 @@
+ENHE Phase 2A.1 allowed candidate paths
+
+src/styles/redesign/tokens.css
+src/styles/redesign/shell.css
+src/components/redesign/types.ts
+src/components/redesign/navigation.ts
+src/components/redesign/enhe-brand-lockup.tsx
+src/components/redesign/enhe-redesign-language-switch.tsx
+src/components/redesign/enhe-redesign-mobile-menu.tsx
+src/components/redesign/enhe-redesign-header.tsx
+src/components/redesign/enhe-redesign-footer.tsx
+src/components/redesign/public-shell-candidate.test.ts
+src/app/redesign-preview/shell/layout.tsx
+src/app/redesign-preview/shell/page.tsx
+docs/enhe-redesign/phase-2a1/review-report.md
+docs/enhe-redesign/phase-2a1/submission-checklist.md
+docs/enhe-redesign/phase-2a1/allowed-paths.txt
+docs/enhe-redesign/phase-2a1/screenshots/zh-shell-1440.png
+docs/enhe-redesign/phase-2a1/screenshots/zh-shell-390.png
+docs/enhe-redesign/phase-2a1/screenshots/en-shell-1440.png
+docs/enhe-redesign/phase-2a1/screenshots/en-shell-390.png
+
+Forbidden for this candidate:
+production route replacement, production navigation, sitemap, robots, root layout, production header/footer, globals, package files, lockfiles, Prisma schema/migrations, Heartbeat/R-008, source archives, node_modules, .next, .env, database dumps, secrets, private URLs, and Git credentials.
