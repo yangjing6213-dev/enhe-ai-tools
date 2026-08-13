@@ -1,0 +1,206 @@
+diff --git a/deploy/enhe-ai-tools/scripts/runtime-heartbeat-state-store.test.mjs b/deploy/enhe-ai-tools/scripts/runtime-heartbeat-state-store.test.mjs
+new file mode 100644
+index 0000000..5ce0207
+--- /dev/null
++++ b/deploy/enhe-ai-tools/scripts/runtime-heartbeat-state-store.test.mjs
+@@ -0,0 +1,128 @@
++import { promises as fs } from "node:fs";
++import { tmpdir } from "node:os";
++import { join } from "node:path";
++import { expect, it } from "vitest";
++import { writeRuntimeHeartbeat } from "./runtime-heartbeat.mjs";
++
++it("serializes 20 concurrent same-target writes and preserves the final invocation", async () => {
++  const directory = await fs.mkdtemp(join(tmpdir(), "enhe-runtime-heartbeat-state-store-"));
++  const targetPath = join(directory, "heartbeat.json");
++  const identity = {
++    releaseRef: "a".repeat(40),
++    startedAt: "2026-08-13T00:00:00.000Z"
++  };
++
++  try {
++    const writes = Array.from({ length: 20 }, (_, invocation) =>
++      writeRuntimeHeartbeat(targetPath, identity, {
++        status: "ok",
++        invocation,
++        currentRunId: `run-${invocation}`
++      })
++    );
++
++    await expect(Promise.all(writes)).resolves.toHaveLength(20);
++
++    const finalHeartbeat = JSON.parse(await fs.readFile(targetPath, "utf8"));
++    expect(finalHeartbeat).toMatchObject({
++      releaseRef: identity.releaseRef,
++      status: "ok",
++      invocation: 19,
++      currentRunId: "run-19"
++    });
++    expect((await fs.readdir(directory)).filter((name) => name !== "heartbeat.json")).toEqual([]);
++  } finally {
++    await fs.rm(directory, { recursive: true, force: true });
++  }
++});
++
++it("keeps concurrent writes to 10 targets independent", async () => {
++  const directory = await fs.mkdtemp(join(tmpdir(), "enhe-runtime-heartbeat-state-store-"));
++  const identity = {
++    releaseRef: "b".repeat(40),
++    startedAt: "2026-08-13T00:00:00.000Z"
++  };
++
++  try {
++    const writes = Array.from({ length: 10 }, (_, target) =>
++      Array.from({ length: 5 }, (_, invocation) =>
++        writeRuntimeHeartbeat(join(directory, `heartbeat-${target}.json`), identity, {
++          status: "ok",
++          target,
++          invocation
++        })
++      )
++    ).flat();
++
++    await expect(Promise.all(writes)).resolves.toHaveLength(50);
++
++    for (let target = 0; target < 10; target++) {
++      const heartbeat = JSON.parse(
++        await fs.readFile(join(directory, `heartbeat-${target}.json`), "utf8")
++      );
++      expect(heartbeat).toMatchObject({ releaseRef: identity.releaseRef, target, invocation: 4 });
++    }
++    expect((await fs.readdir(directory)).filter((name) => name.endsWith(".tmp"))).toEqual([]);
++  } finally {
++    await fs.rm(directory, { recursive: true, force: true });
++  }
++});
++
++it("preserves sequential start, running, and stopped states", async () => {
++  const directory = await fs.mkdtemp(join(tmpdir(), "enhe-runtime-heartbeat-state-store-"));
++  const targetPath = join(directory, "heartbeat.json");
++  const identity = { releaseRef: null, startedAt: "2026-08-13T00:00:00.000Z" };
++
++  try {
++    await writeRuntimeHeartbeat(targetPath, identity, { status: "start" });
++    await writeRuntimeHeartbeat(targetPath, identity, { status: "running" });
++    await writeRuntimeHeartbeat(targetPath, identity, { status: "stopped" });
++
++    expect(JSON.parse(await fs.readFile(targetPath, "utf8"))).toMatchObject({
++      releaseRef: null,
++      status: "stopped"
++    });
++  } finally {
++    await fs.rm(directory, { recursive: true, force: true });
++  }
++});
++
++it("cleans its temporary file when the final rename fails", async () => {
++  const directory = await fs.mkdtemp(join(tmpdir(), "enhe-runtime-heartbeat-state-store-"));
++  const targetPath = join(directory, "heartbeat.json");
++  const identity = { releaseRef: null, startedAt: "2026-08-13T00:00:00.000Z" };
++
++  try {
++    await fs.mkdir(targetPath);
++    await expect(
++      writeRuntimeHeartbeat(targetPath, identity, { status: "blocked" })
++    ).rejects.toBeDefined();
++    expect((await fs.readdir(directory)).filter((name) => name.endsWith(".tmp"))).toEqual([]);
++  } finally {
++    await fs.rm(directory, { recursive: true, force: true });
++  }
++});
++
++it("continues with a later write after a prior write fails", async () => {
++  const directory = await fs.mkdtemp(join(tmpdir(), "enhe-runtime-heartbeat-state-store-"));
++  const targetPath = join(directory, "heartbeat.json");
++  const identity = { releaseRef: null, startedAt: "2026-08-13T00:00:00.000Z" };
++
++  try {
++    await fs.mkdir(targetPath);
++    await expect(
++      writeRuntimeHeartbeat(targetPath, identity, { status: "blocked" })
++    ).rejects.toBeDefined();
++    await fs.rm(targetPath, { recursive: true, force: true });
++
++    await expect(
++      writeRuntimeHeartbeat(targetPath, identity, { status: "recovered" })
++    ).resolves.toBeUndefined();
++    expect(JSON.parse(await fs.readFile(targetPath, "utf8"))).toMatchObject({
++      releaseRef: null,
++      status: "recovered"
++    });
++  } finally {
++    await fs.rm(directory, { recursive: true, force: true });
++  }
++});
+diff --git a/deploy/enhe-ai-tools/scripts/runtime-heartbeat.mjs b/deploy/enhe-ai-tools/scripts/runtime-heartbeat.mjs
+index 59a01ff..4d3ed30 100644
+--- a/deploy/enhe-ai-tools/scripts/runtime-heartbeat.mjs
++++ b/deploy/enhe-ai-tools/scripts/runtime-heartbeat.mjs
+@@ -1,7 +1,34 @@
++import { randomUUID } from "node:crypto";
+ import { promises as fs } from "node:fs";
+-import { dirname } from "node:path";
++import { dirname, resolve } from "node:path";
+ 
+ const startedAt = new Date(Date.now() - process.uptime() * 1_000).toISOString();
++const runtimeHeartbeatWriteQueues = new Map();
++
++function runtimeHeartbeatQueueKey(path) {
++  const absolutePath = resolve(path);
++  return process.platform === "win32" ? absolutePath.toLowerCase() : absolutePath;
++}
++
++async function writeRuntimeHeartbeatFile(path, identity, payload) {
++  const temporary = `${path}.${process.pid}.${randomUUID()}.tmp`;
++  try {
++    await fs.mkdir(dirname(path), { recursive: true });
++    await fs.writeFile(
++      temporary,
++      JSON.stringify({
++        ...payload,
++        releaseRef: identity.releaseRef,
++        startedAt: identity.startedAt,
++        checkedAt: new Date().toISOString()
++      }),
++      { encoding: "utf8", mode: 0o600 }
++    );
++    await fs.rename(temporary, path);
++  } finally {
++    await fs.rm(temporary, { force: true }).catch(() => {});
++  }
++}
+ 
+ export function loadRuntimeHeartbeatIdentity(env = process.env) {
+   const candidate = env.RELEASE_REF?.trim() ?? "";
+@@ -15,17 +42,18 @@ export function loadRuntimeHeartbeatIdentity(env = process.env) {
+ }
+ 
+ export async function writeRuntimeHeartbeat(path, identity, payload) {
+-  await fs.mkdir(dirname(path), { recursive: true });
+-  const temporary = `${path}.${process.pid}.tmp`;
+-  await fs.writeFile(
+-    temporary,
+-    JSON.stringify({
+-      ...payload,
+-      releaseRef: identity.releaseRef,
+-      startedAt: identity.startedAt,
+-      checkedAt: new Date().toISOString()
+-    }),
+-    { encoding: "utf8", mode: 0o600 }
+-  );
+-  await fs.rename(temporary, path);
++  const key = runtimeHeartbeatQueueKey(path);
++  const previous = runtimeHeartbeatWriteQueues.get(key) ?? Promise.resolve();
++  const current = previous
++    .catch(() => {})
++    .then(() => writeRuntimeHeartbeatFile(path, identity, payload));
++  runtimeHeartbeatWriteQueues.set(key, current);
++
++  try {
++    await current;
++  } finally {
++    if (runtimeHeartbeatWriteQueues.get(key) === current) {
++      runtimeHeartbeatWriteQueues.delete(key);
++    }
++  }
+ }
