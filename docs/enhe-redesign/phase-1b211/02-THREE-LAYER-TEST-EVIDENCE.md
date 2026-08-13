@@ -16,7 +16,7 @@ CORE_CONTRACT_STRESS_PASSED=100
 The existing Phase 1B.2.10 five tests were retained. The second commit also retained the real production Writer path and its failure-recovery behavior.
 
 ```text
-STATE_STORE_FOCUSED_TESTS=5/5
+STATE_STORE_FOCUSED_TESTS=6/6
 STATE_STORE_STRESS_RUNS=100
 STATE_STORE_STRESS_PASSED=100
 STATE_STORE_ENOENT_COUNT=0
