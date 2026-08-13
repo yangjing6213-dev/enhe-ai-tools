@@ -1,5 +1,57 @@
-# R-008 patch: NOT GENERATED
-#
-# R-008 was not started because the required disposable PostgreSQL build was
-# blocked by an unavailable Docker daemon. The target remains unchanged and
-# R-008 remains OPEN.
+# R-008 patch
+# Commit: 1175061304ee9fda9968cc1b9e932ee5a919d93d
+# Message: fix(layout): remove global ByteDance loader
+
+diff --git a/src/app/root-layout-shared.tsx b/src/app/root-layout-shared.tsx
+--- a/src/app/root-layout-shared.tsx
++++ b/src/app/root-layout-shared.tsx
+@@
+ import type { Metadata } from "next";
+-import Script from "next/script";
+ import { AnalyticsTracker } from "@/components/analytics-tracker";
+@@
+-        <Script id="ttzz-push-loader" strategy="beforeInteractive">
+-          {`(function(){
+-var el = document.createElement("script");
+-el.src = "https://lf1-cdn-tos.bytegoofy.com/goofy/ttzz/push.js?652842526127c7f5c8a21cd07be103ebd207b2db5502593c3b7f249e75721c9545f9b46c8c41e6235de98982cdddb9785e566c8c06b0b36aec55fccc04fff972a6c09517809143b97aad1198018b8352";
+-el.id = "ttzz";
+-var s = document.getElementsByTagName("script")[0];
+-s.parentNode.insertBefore(el, s);
+-})(window);`}
+-        </Script>
+       </head>
+
+diff --git a/src/lib/geo-brand-profile-source.test.ts b/src/lib/geo-brand-profile-source.test.ts
+--- a/src/lib/geo-brand-profile-source.test.ts
++++ b/src/lib/geo-brand-profile-source.test.ts
+@@
+-import { existsSync, readFileSync } from "node:fs";
++import { existsSync, readdirSync, readFileSync } from "node:fs";
+@@
++function findLayoutFiles(directory: string): string[] {
++  return readdirSync(directory, { withFileTypes: true }).flatMap((entry) => {
++    const path = join(directory, entry.name);
++    if (entry.isDirectory()) return findLayoutFiles(path);
++    return entry.name === "layout.tsx" ? [path] : [];
++  });
++}
+@@
+-  it("injects the ByteDance push script loader in the root head", () => {
++  it("removes the global ByteDance loader from every app layout", () => {
+     const rootLayout = read("src/app/root-layout-shared.tsx");
++    const layoutSources = findLayoutFiles(join(root, "src", "app")).map((path) =>
++      readFileSync(path, "utf8"),
++    );
+-    expect(rootLayout).toContain("ttzz-push-loader");
+-    expect(rootLayout).toContain("strategy=\"beforeInteractive\"");
+-    expect(rootLayout).toContain("lf1-cdn-tos.bytegoofy.com/goofy/ttzz/push.js");
+-    expect(rootLayout).toContain("el.id = \"ttzz\"");
++    expect(rootLayout).not.toContain("ttzz-push-loader");
++    expect(rootLayout).not.toContain("strategy=\"beforeInteractive\"");
++    expect(rootLayout).not.toContain("lf1-cdn-tos.bytegoofy.com/goofy/ttzz/push.js");
++    expect(rootLayout).not.toContain("el.id = \"ttzz\"");
++    expect(rootLayout).not.toContain('from "next/script"');
++    expect(rootLayout).toContain("<AnalyticsTracker />");
++    expect(layoutSources.join("\n")).not.toContain("lf1-cdn-tos.bytegoofy.com/goofy/ttzz/push.js");
++    expect(layoutSources.join("\n")).not.toContain("strategy=\"beforeInteractive\"");
+   });
