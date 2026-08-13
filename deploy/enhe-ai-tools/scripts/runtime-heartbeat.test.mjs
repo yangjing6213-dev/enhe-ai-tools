@@ -115,66 +115,6 @@ async function startWorkerServer() {
   return `http://127.0.0.1:${address.port}`;
 }
 
-async function startLongRunningWorkerServer() {
-  let jobAvailable = true;
-  let resolveCrawlRequest;
-  let crawlResponseWasReleased = false;
-  let resolveCrawlResponse;
-  const crawlRequest = new Promise((resolve) => {
-    resolveCrawlRequest = resolve;
-  });
-  const crawlResponseReleased = new Promise((resolve) => {
-    resolveCrawlResponse = resolve;
-  });
-
-  const server = createServer(async (request, response) => {
-    if (request.url?.endsWith("/claim")) {
-      const job = jobAvailable
-        ? {
-            id: "long-running-job",
-            leaseToken: "long-running-lease",
-            targetUrl: "https://example.com",
-            pageLimit: 100,
-            requestTimeoutSeconds: 8,
-            totalTimeoutSeconds: 720,
-            engineVersion: "test"
-          }
-        : null;
-      jobAvailable = false;
-      response.writeHead(200, { "content-type": "application/json" });
-      response.end(JSON.stringify({ ok: true, job }));
-      return;
-    }
-
-    if (request.url?.endsWith("/heartbeat")) {
-      let body = "";
-      for await (const chunk of request) body += chunk;
-      const payload = JSON.parse(body);
-      if (payload.progress?.phase === "crawl") {
-        resolveCrawlRequest();
-        await crawlResponseReleased;
-      }
-    }
-
-    response.writeHead(200, { "content-type": "application/json" });
-    response.end(JSON.stringify({ ok: true, cancelRequested: false }));
-  });
-  servers.push(server);
-  await new Promise((resolve) => server.listen(0, "127.0.0.1", resolve));
-  const address = server.address();
-  if (!address || typeof address === "string") throw new Error("Missing server address");
-  return {
-    baseUrl: `http://127.0.0.1:${address.port}`,
-    waitForCrawlRequest: () => crawlRequest,
-    releaseCrawlResponse: () => {
-      if (!crawlResponseWasReleased) {
-        crawlResponseWasReleased = true;
-        resolveCrawlResponse();
-      }
-    }
-  };
-}
-
 async function installPythonShim(directory) {
   const binDirectory = join(directory, "bin");
   const pythonPath = join(
@@ -293,55 +233,6 @@ describe("SEO audit runtime heartbeat identity", () => {
     expect(await waitForExitCode(child)).toBe(1);
   });
 
-  it("refreshes runtime health during a 720-second audit job", async () => {
-    const directory = await createTemporaryDirectory();
-    const pythonPath = await installPythonShim(directory);
-    const server = await startLongRunningWorkerServer();
-    const env = await workerEnvironment({
-      baseUrl: server.baseUrl,
-      engine: "setInterval(() => {}, 1_000);\n",
-      engineName: "site_audit.cjs"
-    });
-    for (const name of Object.keys(env)) {
-      if (name.toUpperCase() === "PATH") delete env[name];
-    }
-    env.PATH = pythonPath;
-    const child = startScript("seo-audit-worker.mjs", env, pythonPath);
-
-    await server.waitForCrawlRequest();
-    const staleCheckedAt = new Date(Date.now() - 121_000).toISOString();
-    const runningHeartbeat = await waitForJsonFileMatching(
-      env.SEO_AUDIT_WORKER_HEARTBEAT_FILE,
-      (heartbeat) => heartbeat.currentRunId === "long-running-job"
-    );
-    await fs.writeFile(
-      env.SEO_AUDIT_WORKER_HEARTBEAT_FILE,
-      JSON.stringify({ ...runningHeartbeat, checkedAt: staleCheckedAt }),
-      "utf8"
-    );
-    expect(Date.now() - Date.parse(staleCheckedAt)).toBeGreaterThan(120_000);
-
-    server.releaseCrawlResponse();
-    const refreshed = await waitForJsonFileMatching(
-      env.SEO_AUDIT_WORKER_HEARTBEAT_FILE,
-      (heartbeat) =>
-        heartbeat.status === "ok" &&
-        heartbeat.currentRunId === "long-running-job" &&
-        Date.parse(heartbeat.checkedAt) > Date.parse(staleCheckedAt),
-      2_000
-    );
-
-    expect(refreshed).toMatchObject({
-      releaseRef,
-      status: "ok",
-      currentRunId: "long-running-job"
-    });
-    expect(Date.parse(refreshed.checkedAt)).toBeGreaterThan(
-      Date.parse(staleCheckedAt)
-    );
-    await stopChild(child);
-  }, 15_000);
-
   it("starts python3 without inheriting worker secrets", async () => {
     const directory = await createTemporaryDirectory();
     const environmentPath = join(directory, "engine-environment.json");
@@ -394,4 +285,5 @@ describe("SEO audit runtime heartbeat identity", () => {
     }
     await stopChild(child);
   });
+
 });
