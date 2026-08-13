@@ -1,0 +1,9 @@
+source_sha,source_subject,integration_sha,allowed_scope_result
+767ebc4c8b77e4629f3dc883f050eda52fa2e5ef,"feat(ui): add ENHE redesign tokens",5f087dbe2e1c6f5589bef6a44cffec38b97f30e0,PASS
+fa3878c275d9e3cffe4a50b976298ca33e0e057a,"feat(ui): add isolated redesigned public header",b3c59687be3d894542ddbc87a4342b64d3634d71,PASS
+b786f468fc11032bea55ae16d4ad7f6e830d37a4,"feat(ui): add isolated redesigned public footer",cdc65cc7dddfc7c0183371baa190c99da2a8fabd,PASS
+6e413a3f41f89dd8109a11281ed9f3b2163fbc79,"test(ui): add public shell candidate preview and regression",c47d0869da110dd779214f13cd4f653693877b26,PASS
+538af4255a91f9c5dc04ef113f91b2a55347b33e,"fix(preview): expose guarded redesign preview route",be1470b0428a9ec58234df4c38fc868338dc4b31,PASS
+7052ce8afac9dc950b7e47ba1b9ce2089ad3873,"docs(ui): complete phase 2A public shell candidate review",aade297f5d84aa7b283b067241b0467e4007b74f,PASS
+1defa1544d939fce16688b5d3038528aef35855c,"fix(ui): localize redesigned footer specimen",739184f1f4f3cb5509effdd8c88c72825f8ec561,PASS
+878a4bb4411bf603f79eb982a2f2cacd270b8b28,"docs(ui): finalize bilingual public shell candidate review",616b8520d28bfee1c5ec1ab8ff7969b796437af7,PASS
