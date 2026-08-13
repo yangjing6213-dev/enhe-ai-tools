@@ -60,6 +60,7 @@ export default function RedesignShellPreviewPage() {
             menuCloseLabel="关闭导航菜单"
           />
           <p className="redesign-preview-copy">普通用户状态：头像菜单只显示个人中心。</p>
+          <EnheRedesignFooter locale="zh" />
         </section>
 
         <section id="en" className="redesign-preview-section" aria-labelledby="en-preview-title">
@@ -91,15 +92,9 @@ export default function RedesignShellPreviewPage() {
             menuCloseLabel="Close navigation menu"
           />
           <p className="redesign-preview-copy">Administrator state: the confirmed admin prop exposes the entry inside the avatar menu.</p>
+          <EnheRedesignFooter locale="en" />
         </section>
       </main>
-
-      <EnheRedesignFooter
-        locale="zh"
-        brandLine="ENHE AI"
-        tagline="一站式AI平台"
-        copyright="© ENHE AI"
-      />
     </>
   );
 }

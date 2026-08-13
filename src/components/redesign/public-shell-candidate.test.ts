@@ -89,6 +89,86 @@ describe("ENHE redesign public shell candidate", () => {
     expect(footer).not.toContain("内部预览");
   });
 
+  it("provides complete typed Chinese and English footer copy without language leakage", () => {
+    const footer = readCandidate("components/redesign/enhe-redesign-footer.tsx");
+    const chineseCopy = footer.slice(footer.indexOf("zh: {"), footer.indexOf("en: {"));
+    const englishCopy = footer.slice(footer.indexOf("en: {"));
+
+    for (const label of [
+      "帮助与服务",
+      "帮助支持",
+      "使用教程",
+      "购买与下载",
+      "产品更新",
+      "合规条款",
+      "用户协议",
+      "隐私政策",
+      "退款规则",
+      "版权投诉",
+      "未成年人保护",
+      "公司信息",
+      "品牌档案",
+      "联系邮箱",
+      "ICP备案 · 公安备案",
+      "网站页脚",
+    ]) {
+      expect(chineseCopy).toContain(label);
+    }
+
+    for (const label of [
+      "Help & Support",
+      "Help Center",
+      "Tutorials",
+      "Purchase & Download",
+      "Product Updates",
+      "Legal",
+      "Terms of Use",
+      "Privacy Policy",
+      "Refund Policy",
+      "Copyright Complaints",
+      "Protection of Minors",
+      "Company",
+      "Brand Profile",
+      "Contact Email",
+      "ICP filing · Public-security filing",
+      "Site footer",
+    ]) {
+      expect(englishCopy).toContain(label);
+    }
+
+    for (const label of ["帮助与服务", "合规条款", "公司信息", "用户协议", "隐私政策"]) {
+      expect(englishCopy).not.toContain(label);
+    }
+    for (const label of ["Help & Support", "Legal", "Company", "Terms of Use", "Privacy Policy"]) {
+      expect(chineseCopy).not.toContain(label);
+    }
+  });
+
+  it("keeps the preview header and footer on the same explicit locale specimen", () => {
+    const page = readCandidate("app/redesign-preview/shell/page.tsx");
+    const zhSection = page.slice(page.indexOf('<section id="zh"'), page.indexOf('<section id="en"'));
+    const enSection = page.slice(page.indexOf('<section id="en"'));
+
+    expect(zhSection).toContain('locale="zh"');
+    expect(zhSection).toContain('<EnheRedesignFooter locale="zh" />');
+    expect(enSection).toContain('locale="en"');
+    expect(enSection).toContain('<EnheRedesignFooter locale="en" />');
+    expect(page).not.toContain('<EnheRedesignFooter\n        locale="zh"');
+  });
+
+  it("keeps footer links accessible and exposes filing copy without language controls", () => {
+    const footer = readCandidate("components/redesign/enhe-redesign-footer.tsx");
+
+    expect(footer).toContain('aria-label={copy.ariaLabel}');
+    expect(footer).toContain("{link.label}");
+    expect(footer).toContain("{copy.filingLabel}");
+    expect(footer).not.toContain("language-switch");
+    expect(footer).not.toContain("AI tools");
+    expect(footer).not.toContain("AI Skill");
+    expect(footer).not.toContain("AI news");
+    expect(footer).not.toContain("AI trends");
+  });
+
   it("exposes only the routable preview directory and keeps the old private folder absent", () => {
     const oldLayoutPath = join(root, "app/__redesign-preview/shell/layout.tsx");
     const newLayoutPath = join(root, "app/redesign-preview/shell/layout.tsx");

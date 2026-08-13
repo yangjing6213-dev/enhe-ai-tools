@@ -32,3 +32,12 @@ export type RedesignFooterColumn = {
   title: string;
   links: ReadonlyArray<RedesignFooterLink>;
 };
+
+export type RedesignFooterCopy = {
+  ariaLabel: string;
+  brandLine: string;
+  brandIntro: ReadonlyArray<string>;
+  columns: ReadonlyArray<RedesignFooterColumn>;
+  copyright: string;
+  filingLabel: string;
+};
