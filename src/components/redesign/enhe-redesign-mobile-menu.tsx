@@ -28,6 +28,7 @@ export function EnheRedesignMobileMenu({
   useEffect(() => {
     if (!open) return;
 
+    const mountedTrigger = triggerRef.current;
     const firstFocusable = panelRef.current?.querySelector<HTMLElement>(
       "a, button, [tabindex]:not([tabindex='-1'])",
     );
@@ -65,7 +66,7 @@ export function EnheRedesignMobileMenu({
     return () => {
       document.removeEventListener("keydown", onKeyDown);
       document.body.style.overflow = previousOverflow;
-      const returnTarget = previouslyFocusedElement.current ?? triggerRef.current;
+      const returnTarget = previouslyFocusedElement.current ?? mountedTrigger;
       requestAnimationFrame(() => returnTarget?.focus());
     };
   }, [close, open]);
