@@ -2,6 +2,9 @@ import {
   loadRuntimeHeartbeatIdentity,
   writeRuntimeHeartbeat
 } from "./runtime-heartbeat.mjs";
+import { createRuntimeHeartbeatLifecycle } from "./runtime-heartbeat-lifecycle.mjs";
+import { resolve } from "node:path";
+import { fileURLToPath } from "node:url";
 
 let stopping = false;
 
@@ -64,32 +67,31 @@ function sleep(milliseconds) {
 
 async function main() {
   const config = loadConfig();
+  const heartbeat = createRuntimeHeartbeatLifecycle({
+    path: config.heartbeatFile,
+    identity: config.heartbeatIdentity,
+    writer: writeRuntimeHeartbeat
+  });
   while (!stopping) {
     try {
       await enqueue(config);
-      await writeRuntimeHeartbeat(
-        config.heartbeatFile,
-        config.heartbeatIdentity,
-        { status: "ok" }
-      );
+      await heartbeat.write({ status: "ok" });
     } catch {
-      await writeRuntimeHeartbeat(
-        config.heartbeatFile,
-        config.heartbeatIdentity,
-        { status: "blocked" }
-      );
+      await heartbeat.write({ status: "blocked" });
     }
     if (!stopping) await sleep(config.intervalMs);
   }
 }
 
-for (const signal of ["SIGINT", "SIGTERM"]) {
-  process.on(signal, () => {
-    stopping = true;
+if (process.argv[1] && resolve(process.argv[1]) === fileURLToPath(import.meta.url)) {
+  for (const signal of ["SIGINT", "SIGTERM"]) {
+    process.on(signal, () => {
+      stopping = true;
+    });
+  }
+
+  main().catch(() => {
+    console.error("[seo-audit-scheduler] startup failed");
+    process.exitCode = 1;
   });
 }
-
-main().catch(() => {
-  console.error("[seo-audit-scheduler] startup failed");
-  process.exitCode = 1;
-});
