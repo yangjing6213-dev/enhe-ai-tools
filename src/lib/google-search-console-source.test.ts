@@ -9,11 +9,30 @@ function read(path: string) {
   return readFileSync(join(root, path), "utf8");
 }
 
-function trackedSourceFiles() {
-  return execFileSync("git", ["ls-files"], { cwd: root, encoding: "utf8" })
-    .split(/\r?\n/)
-    .filter((file) => /\.(cjs|css|js|json|md|mjs|prisma|sql|ts|tsx|txt|yml|yaml)$/.test(file))
-    .filter((file) => existsSync(join(root, file)));
+function sourceFilesContaining(origin: string) {
+  try {
+    return execFileSync(
+      "git",
+      [
+        "grep",
+        "-I",
+        "-l",
+        "--fixed-strings",
+        origin,
+        "--",
+        ".",
+        ":(exclude)src/lib/redirect-url.test.ts"
+      ],
+      { cwd: root, encoding: "utf8" }
+    )
+      .split(/\r?\n/)
+      .filter(Boolean)
+      .filter((file) => /\.(cjs|css|js|json|md|mjs|prisma|sql|ts|tsx|txt|yml|yaml)$/.test(file))
+      .filter((file) => existsSync(join(root, file)));
+  } catch (error) {
+    if ((error as { status?: number }).status === 1) return [];
+    throw error;
+  }
 }
 
 describe("Google Search Console SEO source contract", () => {
@@ -110,11 +129,7 @@ describe("Google Search Console SEO source contract", () => {
 
   it("does not ship hardcoded HTTP production links in tracked source files", () => {
     const productionHttpOrigin = "http://" + "www.enhe-tech.com.cn";
-    const offenders = trackedSourceFiles().filter((file) => {
-      if (file === "src/lib/redirect-url.test.ts") return false;
-      const source = read(file);
-      return source.includes(productionHttpOrigin);
-    });
+    const offenders = sourceFilesContaining(productionHttpOrigin);
 
     expect(offenders).toEqual([]);
   }, 15_000);
