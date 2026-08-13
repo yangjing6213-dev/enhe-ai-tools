@@ -1,0 +1,109 @@
+.redesign-home {
+  background-color: #fdfcf7;
+  color: var(--enhe-text, #080808);
+  font-family: var(--enhe-font-zh, "Microsoft YaHei", system-ui, sans-serif);
+}
+
+.redesign-home[data-locale="en"] {
+  font-family: var(--enhe-font-en, Inter, Arial, sans-serif);
+}
+
+.redesign-home .redesign-home-hero-inner {
+  box-sizing: border-box;
+  margin-inline: auto;
+  max-width: 960px;
+  padding: clamp(96px, 15vw, 184px) 24px clamp(112px, 16vw, 176px);
+  text-align: center;
+}
+
+.redesign-home .redesign-home-mobile-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 9px;
+  margin: 0 0 28px;
+  color: var(--enhe-action, #527e54);
+  font-size: 0.875rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+}
+
+.redesign-home .redesign-home-mobile-label::before {
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  background-color: var(--enhe-yellow, #ffd60a);
+  content: "";
+}
+
+.redesign-home .redesign-home-hero-inner h1 {
+  max-width: 860px;
+  margin: 0 auto;
+  color: var(--enhe-text, #080808);
+  font-size: clamp(3rem, 8vw, 7rem);
+  font-weight: 800;
+  letter-spacing: -0.06em;
+  line-height: 0.98;
+}
+
+.redesign-home .redesign-home-subtitle {
+  max-width: 700px;
+  margin: 32px auto 0;
+  color: var(--enhe-text-muted, #5f665f);
+  font-size: clamp(1rem, 1.8vw, 1.25rem);
+  line-height: 1.65;
+}
+
+.redesign-home .redesign-home-cta {
+  display: inline-flex;
+  min-height: 48px;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
+  margin-top: 40px;
+  padding: 12px 24px;
+  border: 2px solid var(--enhe-action, #527e54);
+  border-radius: var(--enhe-button-r, 4px);
+  background-color: var(--enhe-action, #527e54);
+  color: #fff;
+  font-size: 1rem;
+  font-weight: 700;
+  line-height: 1.2;
+  text-decoration: none;
+}
+
+.redesign-home .redesign-home-cta:hover {
+  border-color: var(--enhe-action-hover, #416a44);
+  background-color: var(--enhe-action-hover, #416a44);
+}
+
+.redesign-home .redesign-home-cta:focus-visible {
+  outline: 3px solid var(--enhe-focus, #ffd60a);
+  outline-offset: 4px;
+}
+
+@media (max-width: 767px) {
+  .redesign-home .redesign-home-hero-inner {
+    padding: 72px 20px 96px;
+  }
+
+  .redesign-home .redesign-home-mobile-label {
+    margin-bottom: 22px;
+    font-size: 0.8125rem;
+  }
+
+  .redesign-home .redesign-home-hero-inner h1 {
+    font-size: clamp(2.75rem, 15vw, 4.5rem);
+    letter-spacing: -0.055em;
+  }
+
+  .redesign-home .redesign-home-subtitle {
+    margin-top: 24px;
+    font-size: 1rem;
+    line-height: 1.7;
+  }
+
+  .redesign-home .redesign-home-cta {
+    width: min(100%, 280px);
+    margin-top: 32px;
+  }
+}
