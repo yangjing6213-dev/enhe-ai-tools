@@ -1,24 +1,26 @@
-# Phase 2A.1 submission checklist
+# Phase 2A.1.1 submission checklist
 
 ## Required artifacts
 
-- [x] Isolated worktree and branch preserved.
-- [x] Routable dev-only preview route added under `src/app/redesign-preview`.
-- [x] Old `src/app/__redesign-preview` directory removed by route move.
-- [x] Production guard and noindex metadata present.
-- [x] Four visual-review screenshots captured.
-- [x] Lint, typecheck, candidate tests, and full test suite run.
-- [x] Build result and Docker/database gate recorded.
-- [x] No source tree, `node_modules`, `.next`, `.env`, database dump, secret, private URL, or Git credential included in the results ZIP.
+- [x] Baseline `7052ce8` verified before work.
+- [x] Candidate Footer uses one typed `zh`/`en` dictionary.
+- [x] Preview pairs Header and Footer under the same explicit locale specimen.
+- [x] RED test observed before implementation; GREEN test observed after implementation.
+- [x] Four full-page screenshots regenerated and visually inspected.
+- [x] English screenshots contain English Footer; Chinese screenshots contain Chinese Footer.
+- [x] Lint, typecheck, candidate tests, and full test suite passed.
+- [x] Route, noindex, sitemap, navigation, privacy, and browser regressions checked.
+- [x] Build and Docker gate recorded without fake database configuration.
+- [x] No source tree, `node_modules`, `.next`, `.env`, database dump, secret, private URL, or Git credential included in the ZIP.
 
 ## Exact commits
 
 ```text
-538af42 fix(preview): expose guarded redesign preview route
-docs(ui): complete phase 2A public shell candidate review
+1defa15 fix(ui): localize redesigned footer specimen
+docs(ui): finalize bilingual public shell candidate review
 ```
 
-The second commit is restricted to this review document directory and its four PNG screenshots.
+The first commit contains only Footer localization, Preview specimen pairing, types, and candidate tests. The second commit is restricted to this review directory and the four screenshots.
 
 ## Explicitly unchanged production surfaces
 
@@ -30,8 +32,9 @@ The second commit is restricted to this review document directory and its four P
 - `package.json`
 - `package-lock.json`
 - `prisma/**`
-- Heartbeat and R-008 files
+- Runtime Heartbeat and R-008 files
+- product detail, download, payment, OAuth, database, remote, and production environment
 
 ## Results ZIP contents
 
-The ZIP contains only `docs/enhe-redesign/phase-2a1/**`, including this checklist, the review report, the allowed-path list, and four screenshots.
+Only `docs/enhe-redesign/phase-2a1/**` is included: this checklist, the review report, the allowed-path list, and four screenshots.
