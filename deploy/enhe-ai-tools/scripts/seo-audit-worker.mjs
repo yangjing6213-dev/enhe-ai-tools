@@ -2,12 +2,14 @@ import { spawn } from "node:child_process";
 import { createHash } from "node:crypto";
 import { promises as fs } from "node:fs";
 import { tmpdir } from "node:os";
-import { join } from "node:path";
+import { join, resolve } from "node:path";
+import { fileURLToPath } from "node:url";
 import { gzipSync } from "node:zlib";
 import {
   loadRuntimeHeartbeatIdentity,
   writeRuntimeHeartbeat
 } from "./runtime-heartbeat.mjs";
+import { createRuntimeHeartbeatLifecycle } from "./runtime-heartbeat-lifecycle.mjs";
 
 const MAX_BUNDLE_BYTES = 32 * 1024 * 1024;
 const MAX_COMPRESSED_BYTES = 6 * 1024 * 1024;
@@ -110,8 +112,8 @@ async function claimJob(config) {
   return result.job ?? null;
 }
 
-async function sendJobHeartbeat(config, job, phase, pagesProcessed = 0) {
-  const result = await postJson(
+async function postJobHeartbeat(config, job, phase, pagesProcessed = 0) {
+  return postJson(
     config,
     `/api/internal/seo-audit/jobs/${encodeURIComponent(job.id)}/heartbeat`,
     {
@@ -121,7 +123,12 @@ async function sendJobHeartbeat(config, job, phase, pagesProcessed = 0) {
       progress: { phase, pagesProcessed, pageLimit: job.pageLimit }
     }
   );
-  await writeRuntimeHeartbeat(config.heartbeatFile, config.heartbeatIdentity, {
+}
+
+async function sendJobHeartbeat(config, job, phase, pagesProcessed = 0, run = null) {
+  const result = await postJobHeartbeat(config, job, phase, pagesProcessed);
+  if (run) await run.recordPulse();
+  else await writeRuntimeHeartbeat(config.heartbeatFile, config.heartbeatIdentity, {
     status: "ok",
     currentRunId: job.id
   });
@@ -213,7 +220,7 @@ function buildEngineEnvironment() {
   return environment;
 }
 
-async function runEngine(config, job, jsonPath, markdownPath) {
+async function runEngine(config, job, jsonPath, markdownPath, runState) {
   const child = spawn(
     "python3",
     [
@@ -234,26 +241,7 @@ async function runEngine(config, job, jsonPath, markdownPath) {
     }
   );
   activeChild = child;
-  let cancelled = false;
-  let heartbeatFailed = false;
   let timedOut = false;
-  let heartbeatPromise = Promise.resolve();
-
-  const heartbeatTimer = setInterval(() => {
-    heartbeatPromise = heartbeatPromise
-      .then(() => sendJobHeartbeat(config, job, "crawl"))
-      .then((result) => {
-        if (result.cancelRequested) {
-          cancelled = true;
-          terminateChild(child);
-        }
-      })
-      .catch(() => {
-        heartbeatFailed = true;
-        terminateChild(child);
-      });
-  }, Math.min(30_000, Math.max(5_000, config.pollMs)));
-  heartbeatTimer.unref();
 
   const totalTimeout = setTimeout(() => {
     timedOut = true;
@@ -265,14 +253,12 @@ async function runEngine(config, job, jsonPath, markdownPath) {
     child.once("error", () => resolve({ code: null, spawnFailed: true }));
     child.once("exit", (code) => resolve({ code, spawnFailed: false }));
   });
-  clearInterval(heartbeatTimer);
   clearTimeout(totalTimeout);
-  await heartbeatPromise.catch(() => undefined);
   activeChild = null;
 
-  if (cancelled) return { cancelled: true, failureCode: null };
+  if (runState.cancelled) return { cancelled: true, failureCode: null };
   if (timedOut) return { cancelled: false, failureCode: "SYSTEM_TIMEOUT" };
-  if (heartbeatFailed) return { cancelled: false, failureCode: "SYSTEM_NETWORK" };
+  if (runState.heartbeatFailed) return { cancelled: false, failureCode: "SYSTEM_NETWORK" };
   if (result.spawnFailed || result.code !== 0) {
     return { cancelled: false, failureCode: "SYSTEM_INTERNAL" };
   }
@@ -297,28 +283,29 @@ async function buildReportBundle(jsonPath, markdownPath) {
   };
 }
 
-async function processJob(config, job) {
+async function processJob(config, job, run, runState) {
   const directory = await fs.mkdtemp(join(tmpdir(), "enhe-seo-audit-"));
   const jsonPath = join(directory, "audit.json");
   const markdownPath = join(directory, "report.md");
   try {
-    const prepared = await sendJobHeartbeat(config, job, "prepare");
+    const prepared = await sendJobHeartbeat(config, job, "prepare", 0, run);
     if (prepared.cancelRequested) return;
-    const execution = await runEngine(config, job, jsonPath, markdownPath);
+    const execution = await runEngine(config, job, jsonPath, markdownPath, runState);
     if (execution.cancelled) return;
     if (execution.failureCode) {
       await failJob(config, job, execution.failureCode);
       return;
     }
 
-    const reporting = await sendJobHeartbeat(config, job, "report");
+    const reporting = await sendJobHeartbeat(config, job, "report", 0, run);
     if (reporting.cancelRequested) return;
     const bundle = await buildReportBundle(jsonPath, markdownPath);
     const uploading = await sendJobHeartbeat(
       config,
       job,
       "upload",
-      bundle.summary.pageCount
+      bundle.summary.pageCount,
+      run
     );
     if (uploading.cancelRequested) return;
     await completeJob(
@@ -345,58 +332,67 @@ function sleep(milliseconds) {
 
 async function main() {
   const config = loadConfig();
+  const heartbeat = createRuntimeHeartbeatLifecycle({
+    path: config.heartbeatFile,
+    identity: config.heartbeatIdentity,
+    writer: writeRuntimeHeartbeat,
+    intervalMs: Math.min(30_000, Math.max(5_000, config.pollMs))
+  });
   try {
     await verifyEngine(config);
   } catch {
-    await writeRuntimeHeartbeat(
-      config.heartbeatFile,
-      config.heartbeatIdentity,
-      { status: "blocked" }
-    );
+    await heartbeat.write({ status: "blocked" });
     throw new Error("SEO audit engine verification failed");
   }
 
-  await writeRuntimeHeartbeat(config.heartbeatFile, config.heartbeatIdentity, {
-    status: "ok",
-    currentRunId: null
-  });
+  await heartbeat.write({ status: "ok", currentRunId: null });
   while (!stopping) {
+    let run = null;
+    const runState = { cancelled: false, heartbeatFailed: false };
     try {
       const job = await claimJob(config);
       if (job && !isClaimedJob(job, config.engineVersion)) {
         throw new Error("INVALID_JOB_DTO");
       }
       if (job) {
-        await writeRuntimeHeartbeat(
-          config.heartbeatFile,
-          config.heartbeatIdentity,
-          { status: "ok", currentRunId: job.id }
-        );
-        await processJob(config, job);
+        run = heartbeat.beginRun(job.id, {
+          pulse: () => postJobHeartbeat(config, job, "crawl"),
+          onPulseResult: (result) => {
+            if (result?.cancelRequested) {
+              runState.cancelled = true;
+              if (activeChild) terminateChild(activeChild);
+            }
+          },
+          onError: () => {
+            runState.heartbeatFailed = true;
+            if (activeChild) terminateChild(activeChild);
+          }
+        });
+        await run.start();
+        await processJob(config, job, run, runState);
+        await run.stop();
+        run = null;
+      } else {
+        await heartbeat.write({ status: "ok", currentRunId: null });
       }
-      await writeRuntimeHeartbeat(config.heartbeatFile, config.heartbeatIdentity, {
-        status: "ok",
-        currentRunId: null
-      });
     } catch {
-      await writeRuntimeHeartbeat(
-        config.heartbeatFile,
-        config.heartbeatIdentity,
-        { status: "blocked" }
-      );
+      if (run) await run.stop().catch(() => undefined);
+      await heartbeat.write({ status: "blocked" });
     }
     if (!stopping) await sleep(config.pollMs);
   }
 }
 
-for (const signal of ["SIGINT", "SIGTERM"]) {
-  process.on(signal, () => {
-    stopping = true;
-    if (activeChild) terminateChild(activeChild);
+if (process.argv[1] && resolve(process.argv[1]) === fileURLToPath(import.meta.url)) {
+  for (const signal of ["SIGINT", "SIGTERM"]) {
+    process.on(signal, () => {
+      stopping = true;
+      if (activeChild) terminateChild(activeChild);
+    });
+  }
+
+  main().catch(() => {
+    console.error("[seo-audit-worker] startup failed");
+    process.exitCode = 1;
   });
 }
-
-main().catch(() => {
-  console.error("[seo-audit-worker] startup failed");
-  process.exitCode = 1;
-});
