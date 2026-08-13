@@ -1,6 +1,6 @@
 import { promises as fs } from "node:fs";
 import { tmpdir } from "node:os";
-import { join } from "node:path";
+import { join, relative } from "node:path";
 import { expect, it } from "vitest";
 import { writeRuntimeHeartbeat } from "./runtime-heartbeat.mjs";
 
@@ -121,6 +121,29 @@ it("continues with a later write after a prior write fails", async () => {
     expect(JSON.parse(await fs.readFile(targetPath, "utf8"))).toMatchObject({
       releaseRef: null,
       status: "recovered"
+    });
+  } finally {
+    await fs.rm(directory, { recursive: true, force: true });
+  }
+});
+
+it("serializes relative and absolute aliases of the same target", async () => {
+  const directory = await fs.mkdtemp(join(tmpdir(), "enhe-runtime-heartbeat-state-store-"));
+  const targetPath = join(directory, "heartbeat.json");
+  const relativePath = relative(process.cwd(), targetPath);
+  const identity = { releaseRef: null, startedAt: "2026-08-13T00:00:00.000Z" };
+
+  try {
+    await expect(
+      Promise.all([
+        writeRuntimeHeartbeat(relativePath, identity, { status: "relative", invocation: 0 }),
+        writeRuntimeHeartbeat(targetPath, identity, { status: "absolute", invocation: 1 })
+      ])
+    ).resolves.toHaveLength(2);
+
+    expect(JSON.parse(await fs.readFile(targetPath, "utf8"))).toMatchObject({
+      status: "absolute",
+      invocation: 1
     });
   } finally {
     await fs.rm(directory, { recursive: true, force: true });
