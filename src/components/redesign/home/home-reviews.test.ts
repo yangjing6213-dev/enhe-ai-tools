@@ -102,6 +102,10 @@ describe("homepage experience review candidate", () => {
     expect(REVIEW_MANUAL_RESUME_MS).toBe(6000);
   });
 
+  it("hides inactive review articles from assistive technology only", () => {
+    expect(reviewSource).toMatch(/const isActive = offset === 0;[\s\S]*aria-hidden=\{!isActive\}/);
+  });
+
   it("clears a pending manual resume before explicit pause and continue", () => {
     const togglePauseSource = reviewSource.slice(
       reviewSource.indexOf("const togglePause"),

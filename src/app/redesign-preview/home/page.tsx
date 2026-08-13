@@ -1,10 +1,12 @@
 import { notFound } from "next/navigation";
+import { headers } from "next/headers";
 import { EnheRedesignFooter } from "@/components/redesign/enhe-redesign-footer";
 import { EnheRedesignHeader } from "@/components/redesign/enhe-redesign-header";
 import { REDESIGN_EN_NAV_ITEMS, REDESIGN_ZH_NAV_ITEMS } from "@/components/redesign/navigation";
 import type { RedesignLocale } from "@/components/redesign/types";
 import { EnheRedesignHome } from "@/components/redesign/home/EnheRedesignHome";
 import { HOME_COPY } from "@/lib/redesign/home/home-copy";
+import { resolveRedesignPreviewLocale } from "@/lib/redesign/home/home-preview-locale";
 
 const HEADER_COPY = {
   zh: {
@@ -43,12 +45,10 @@ export default async function RedesignHomePreviewPage({
   if (process.env.NODE_ENV === "production") notFound();
 
   const params = await searchParams;
-  const requestedLocale = Array.isArray(params.locale)
-    ? params.locale.length === 1
-      ? params.locale[0]
-      : undefined
-    : params.locale;
-  const locale: RedesignLocale = requestedLocale === "en" || requestedLocale === "zh" ? requestedLocale : "zh";
+  const locale = resolveRedesignPreviewLocale(
+    params,
+    (await headers()).get("x-enhe-locale"),
+  );
   const copy = HEADER_COPY[locale];
   const currentHref = `/redesign-preview/home?locale=${locale}`;
   const alternateHref = locale === "en"

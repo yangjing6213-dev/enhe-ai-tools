@@ -14,5 +14,9 @@ export const metadata: Metadata = {
 };
 
 export default function RedesignHomePreviewLayout({ children }: { children: React.ReactNode }) {
-  return children;
+  return (
+    <html>
+      <body>{children}</body>
+    </html>
+  );
 }

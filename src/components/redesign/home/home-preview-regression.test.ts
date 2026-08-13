@@ -1,6 +1,19 @@
 import { existsSync, readFileSync } from "node:fs";
 import { join } from "node:path";
-import { describe, expect, it } from "vitest";
+import * as React from "react";
+import { describe, expect, it, vi } from "vitest";
+import RedesignHomePreviewPage from "@/app/redesign-preview/home/page";
+import { resolveRedesignPreviewLocale } from "@/lib/redesign/home/home-preview-locale";
+
+const { requestHeaders } = vi.hoisted(() => ({
+  requestHeaders: new Headers(),
+}));
+
+vi.mock("next/headers", () => ({
+  headers: async () => requestHeaders,
+}));
+
+(globalThis as typeof globalThis & { React: typeof React }).React = React;
 
 const root = join(process.cwd(), "src");
 
@@ -10,6 +23,62 @@ function readCandidate(relativePath: string) {
 }
 
 describe("bilingual homepage candidate preview", () => {
+  it("lets a valid query override the middleware header in both directions", async () => {
+    requestHeaders.set("x-enhe-locale", "zh");
+    const english = (await RedesignHomePreviewPage({
+      searchParams: Promise.resolve({ locale: "en" }),
+    })) as { props: { lang: string } };
+
+    requestHeaders.set("x-enhe-locale", "en");
+    const chinese = (await RedesignHomePreviewPage({
+      searchParams: Promise.resolve({ locale: "zh" }),
+    })) as { props: { lang: string } };
+
+    expect(english.props.lang).toBe("en");
+    expect(chinese.props.lang).toBe("zh");
+  });
+
+  it("matches URLSearchParams.get for duplicate locale values", async () => {
+    requestHeaders.set("x-enhe-locale", "zh");
+    expect(resolveRedesignPreviewLocale({ locale: ["en", "fr"] }, "zh")).toBe("en");
+    expect(resolveRedesignPreviewLocale({ locale: ["zh", "en"] }, "en")).toBe("zh");
+    expect(resolveRedesignPreviewLocale({ locale: ["fr", "en"] }, "en")).toBe("zh");
+
+    const rendered = (await RedesignHomePreviewPage({
+      searchParams: Promise.resolve({ locale: ["en", "fr"] }),
+    })) as { props: { lang: string } };
+
+    expect(rendered.props.lang).toBe("en");
+  });
+
+  it("keeps the middleware-normalized locale after the query redirect", async () => {
+    requestHeaders.set("x-enhe-locale", "en");
+
+    const rendered = (await RedesignHomePreviewPage({
+      searchParams: Promise.resolve({}),
+    })) as {
+      props: {
+        lang: string;
+        children: Array<{ props: { locale?: string } }>;
+      };
+    };
+
+    expect(rendered.props.lang).toBe("en");
+    expect(rendered.props.children[0]?.props.locale).toBe("en");
+    expect(rendered.props.children[2]?.props.locale).toBe("en");
+    expect(rendered.props.children[3]?.props.locale).toBe("en");
+  });
+
+  it("falls back to Chinese for invalid query and invalid middleware locale", async () => {
+    requestHeaders.set("x-enhe-locale", "fr");
+
+    const rendered = (await RedesignHomePreviewPage({
+      searchParams: Promise.resolve({ locale: "fr" }),
+    })) as { props: { lang: string } };
+
+    expect(rendered.props.lang).toBe("zh");
+  });
+
   it("uses the public home route and removes the old private home folder", () => {
     expect(existsSync(join(root, "app/__redesign-preview/home/page.tsx"))).toBe(false);
     expect(existsSync(join(root, "app/__redesign-preview/home/layout.tsx"))).toBe(false);
@@ -20,14 +89,15 @@ describe("bilingual homepage candidate preview", () => {
   it("guards the route and excludes it from indexing without a production canonical", () => {
     const page = readCandidate("app/redesign-preview/home/page.tsx");
     const layout = readCandidate("app/redesign-preview/home/layout.tsx");
+    const locale = readCandidate("lib/redesign/home/home-preview-locale.ts");
 
     expect(page).toMatch(/searchParams\s*:\s*Promise<\{\s*locale\?:\s*string\s*\|\s*string\[\]\s*\}>/);
     expect(page).toContain("await searchParams");
     expect(page).toContain("notFound");
     expect(page).toContain('process.env.NODE_ENV === "production"');
     expect(page).toContain('locale === "en"');
-    expect(page).toContain('requestedLocale === "zh"');
-    expect(page).toContain(': "zh"');
+    expect(locale).toContain('requestedLocale === "zh"');
+    expect(locale).toContain(': "zh"');
     expect(layout).toContain('import "@/styles/redesign/tokens.css"');
     expect(layout).toContain('import "@/styles/redesign/shell.css"');
     expect(layout).toContain('import "@/styles/redesign/home.css"');
@@ -36,6 +106,13 @@ describe("bilingual homepage candidate preview", () => {
     expect(layout).toContain("noarchive: true");
     expect(layout).toContain("noimageindex: true");
     expect(layout).not.toMatch(/canonical|alternates/i);
+  });
+
+  it("provides a standalone document wrapper for the guarded preview route", () => {
+    const layout = readCandidate("app/redesign-preview/home/layout.tsx");
+
+    expect(layout).toContain("<html");
+    expect(layout).toContain("<body>");
   });
 
   it("propagates one resolved locale through header, home, footer, and root lang", () => {

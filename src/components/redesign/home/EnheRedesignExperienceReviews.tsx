@@ -267,6 +267,7 @@ export function EnheRedesignExperienceReviews({ locale }: { locale: RedesignLoca
                   className="redesign-home-review-card"
                   data-active={isActive}
                   data-position={offset}
+                  aria-hidden={!isActive}
                   aria-label={`${review.productLabel[locale]} — ${review.exampleLabel[locale]}`}
                 >
                   <div className="redesign-home-review-top">

@@ -1,0 +1,6 @@
+src/components/redesign/home/**
+src/lib/redesign/home/**
+src/styles/redesign/**
+src/app/redesign-preview/home/**
+public/redesign/home/**
+docs/enhe-redesign/phase-2a2/**
