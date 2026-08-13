@@ -89,6 +89,13 @@ describe("ENHE redesign public shell candidate", () => {
     expect(footer).not.toContain("内部预览");
   });
 
+  it("keeps the standalone preview as a valid root layout", () => {
+    const layout = readCandidate("app/redesign-preview/shell/layout.tsx");
+
+    expect(layout).toContain("<html lang=\"zh-CN\">");
+    expect(layout).toContain("<body>");
+  });
+
   it("provides complete typed Chinese and English footer copy without language leakage", () => {
     const footer = readCandidate("components/redesign/enhe-redesign-footer.tsx");
     const chineseCopy = footer.slice(footer.indexOf("zh: {"), footer.indexOf("en: {"));

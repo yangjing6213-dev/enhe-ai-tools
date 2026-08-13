@@ -13,5 +13,11 @@ export const metadata: Metadata = {
 };
 
 export default function RedesignPreviewLayout({ children }: { children: React.ReactNode }) {
-  return <div className="enhe-redesign-preview">{children}</div>;
+  return (
+    <html lang="zh-CN">
+      <body>
+        <div className="enhe-redesign-preview">{children}</div>
+      </body>
+    </html>
+  );
 }
