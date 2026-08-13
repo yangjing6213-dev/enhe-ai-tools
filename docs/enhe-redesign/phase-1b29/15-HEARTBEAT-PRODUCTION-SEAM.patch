@@ -1,0 +1,8 @@
+# Phase 1B.2.9 blocked production seam record
+#
+# No production seam patch was emitted. The mandatory real writer test failed
+# before seam design: 4/20 same-path concurrent writes passed and 16/20 failed
+# with ENOENT. The phase explicitly forbids repairing the writer here.
+#
+# Production changes: none.
+# Test/helper changes: none.
