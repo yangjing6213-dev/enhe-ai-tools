@@ -1,0 +1,6 @@
+# Heartbeat Seam reapply patch: NOT GENERATED
+#
+# Phase 1B.2.12 is BLOCKED before the seam reapply gate. No cherry-pick of
+# b50ad52 or fd3e4c1 was executed, so there is no legitimate reapply diff.
+# This file is retained as an explicit negative receipt and must not be
+# interpreted as a successful Heartbeat Seam restoration.
