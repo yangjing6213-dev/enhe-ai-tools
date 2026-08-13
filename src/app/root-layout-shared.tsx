@@ -1,5 +1,4 @@
 import type { Metadata } from "next";
-import Script from "next/script";
 import { AnalyticsTracker } from "@/components/analytics-tracker";
 import { BorderGlowController } from "@/components/border-glow-controller";
 import { CursorGlow } from "@/components/cursor-glow";
@@ -56,15 +55,6 @@ export function RootDocument({
           href="/okf/index.md"
           title="ENHE AI Open Knowledge Format"
         />
-        <Script id="ttzz-push-loader" strategy="beforeInteractive">
-          {`(function(){
-var el = document.createElement("script");
-el.src = "https://lf1-cdn-tos.bytegoofy.com/goofy/ttzz/push.js?652842526127c7f5c8a21cd07be103ebd207b2db5502593c3b7f249e75721c9545f9b46c8c41e6235de98982cdddb9785e566c8c06b0b36aec55fccc04fff972a6c09517809143b97aad1198018b8352";
-el.id = "ttzz";
-var s = document.getElementsByTagName("script")[0];
-s.parentNode.insertBefore(el, s);
-})(window);`}
-        </Script>
       </head>
       <body>
         <InteractiveBackground />

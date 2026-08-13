@@ -1,4 +1,4 @@
-import { existsSync, readFileSync } from "node:fs";
+import { existsSync, readdirSync, readFileSync } from "node:fs";
 import { join } from "node:path";
 import { describe, expect, it } from "vitest";
 
@@ -10,6 +10,14 @@ function read(path: string) {
 
 function exists(path: string) {
   return existsSync(join(root, path));
+}
+
+function findLayoutFiles(directory: string): string[] {
+  return readdirSync(directory, { withFileTypes: true }).flatMap((entry) => {
+    const path = join(directory, entry.name);
+    if (entry.isDirectory()) return findLayoutFiles(path);
+    return entry.name === "layout.tsx" ? [path] : [];
+  });
 }
 
 describe("GEO brand profile source contracts", () => {
@@ -47,13 +55,20 @@ describe("GEO brand profile source contracts", () => {
     expect(footer).toContain("恩禾ENHE AI 品牌档案");
   });
 
-  it("injects the ByteDance push script loader in the root head", () => {
+  it("removes the global ByteDance loader from every app layout", () => {
     const rootLayout = read("src/app/root-layout-shared.tsx");
+    const layoutSources = findLayoutFiles(join(root, "src", "app")).map((path) =>
+      readFileSync(path, "utf8"),
+    );
 
-    expect(rootLayout).toContain("ttzz-push-loader");
-    expect(rootLayout).toContain("strategy=\"beforeInteractive\"");
-    expect(rootLayout).toContain("lf1-cdn-tos.bytegoofy.com/goofy/ttzz/push.js");
-    expect(rootLayout).toContain("el.id = \"ttzz\"");
+    expect(rootLayout).not.toContain("ttzz-push-loader");
+    expect(rootLayout).not.toContain("strategy=\"beforeInteractive\"");
+    expect(rootLayout).not.toContain("lf1-cdn-tos.bytegoofy.com/goofy/ttzz/push.js");
+    expect(rootLayout).not.toContain("el.id = \"ttzz\"");
+    expect(rootLayout).not.toContain('from "next/script"');
+    expect(rootLayout).toContain("<AnalyticsTracker />");
+    expect(layoutSources.join("\n")).not.toContain("lf1-cdn-tos.bytegoofy.com/goofy/ttzz/push.js");
+    expect(layoutSources.join("\n")).not.toContain("strategy=\"beforeInteractive\"");
   });
 
   it("states the homepage positioning from user needs while keeping GEO context secondary", () => {
