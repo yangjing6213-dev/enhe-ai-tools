@@ -1,5 +1,12 @@
+import { readFileSync } from "node:fs";
+import { join } from "node:path";
 import { describe, expect, it } from "vitest";
 import { HOME_COPY } from "@/lib/redesign/home/home-copy";
+
+const heroSource = readFileSync(
+  join(process.cwd(), "src/components/redesign/home/EnheRedesignHero.tsx"),
+  "utf8",
+);
 
 describe("homepage approved copy", () => {
   it("keeps the exact bilingual hero and value contract", () => {
@@ -25,5 +32,13 @@ describe("homepage approved copy", () => {
     expect(HOME_COPY.en.review).toEqual({ heading: "Experience feedback", exampleLabel: "Example experience feedback" });
     expect(HOME_COPY.zh.value.cta).toEqual({ label: "探索 AI 工具", href: "/software" });
     expect(HOME_COPY.en.value.cta).toEqual({ label: "Explore AI tools", href: "/en/software" });
+  });
+
+  it("keeps the hero server-rendered and semantically minimal", () => {
+    expect(heroSource.match(/<h1\b/g)).toHaveLength(1);
+    expect(heroSource).toContain('<p className="redesign-home-subtitle">');
+    expect(heroSource).toContain("href={copy.cta.href}");
+    expect(heroSource).not.toContain('"use client"');
+    expect(heroSource).not.toMatch(/prisma|database|fetch\(|\/api\//i);
   });
 });
