@@ -102,6 +102,45 @@ describe("homepage experience review candidate", () => {
     expect(REVIEW_MANUAL_RESUME_MS).toBe(6000);
   });
 
+  it("clears a pending manual resume before explicit pause and continue", () => {
+    const togglePauseSource = reviewSource.slice(
+      reviewSource.indexOf("const togglePause"),
+      reviewSource.indexOf("\n\n  useEffect"),
+    );
+
+    expect(togglePauseSource).toContain("clearPendingResume");
+    expect(togglePauseSource).toMatch(/if \(nextPaused\) \{[\s\S]*clearPendingResume\(\)[\s\S]*pause\(\)/);
+    expect(togglePauseSource).toMatch(/else \{[\s\S]*clearPendingResume\(\)[\s\S]*resume\(\)/);
+  });
+
+  it("keeps horizontal pointer drags directional and manually resumed", () => {
+    const pointerDownSource = reviewSource.slice(
+      reviewSource.indexOf("const handlePointerDown"),
+      reviewSource.indexOf("const handleVisibilityChange"),
+    );
+    const pointerUpSource = reviewSource.slice(
+      reviewSource.indexOf("const handlePointerUp"),
+      reviewSource.indexOf("const handleVisibilityChange"),
+    );
+    const pointerCancelSource = reviewSource.slice(
+      reviewSource.indexOf("const handlePointerCancel"),
+      reviewSource.indexOf("const handleReducedMotionChange"),
+    );
+
+    expect(reviewSource).toContain("REVIEW_DRAG_THRESHOLD_PX");
+    expect(pointerDownSource).toContain("pointerStartX = event.clientX");
+    expect(pointerDownSource).toContain("pause()");
+    expect(pointerUpSource).toContain("event.clientX");
+    expect(pointerUpSource).toContain("Math.abs(deltaX) > REVIEW_DRAG_THRESHOLD_PX");
+    expect(pointerUpSource).toContain("deltaX > 0 ? -1 : 1");
+    expect(pointerUpSource).toContain("setIndex");
+    expect(pointerUpSource).toContain("scheduleManualResume");
+    expect(pointerUpSource).toMatch(/scheduleManualResume\(\)[\s\S]*resume\(\)/);
+    expect(pointerCancelSource).toContain("pointerStartX = null");
+    expect(pointerCancelSource).toContain("hasPointer = false");
+    expect(pointerCancelSource).toContain("resume()");
+  });
+
   it("keeps the review island accessible and timer-controlled", () => {
     expect(reviewSource).toContain('"use client"');
     expect(reviewSource).toContain("useEffect");

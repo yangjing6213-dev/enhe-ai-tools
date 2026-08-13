@@ -81,6 +81,54 @@
   outline-offset: 4px;
 }
 
+.redesign-home-brand-value {
+  border-top: 1px solid var(--enhe-border, #dfe5df);
+  background: var(--enhe-footer, #071512);
+  color: #fff;
+}
+
+.redesign-home-brand-value-inner {
+  box-sizing: border-box;
+  width: min(100%, 960px);
+  margin-inline: auto;
+  padding: clamp(80px, 12vw, 144px) 24px clamp(88px, 13vw, 160px);
+  text-align: center;
+}
+
+.redesign-home-brand-value-inner h2 {
+  max-width: 760px;
+  margin: 0 auto;
+  color: #fff;
+  font-size: clamp(2.25rem, 6vw, 5rem);
+  letter-spacing: -0.055em;
+  line-height: 1.02;
+}
+
+.redesign-home-brand-value-cta {
+  display: inline-flex;
+  min-height: 48px;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
+  margin-top: 40px;
+  padding: 12px 24px;
+  border: 2px solid var(--enhe-yellow, #ffd60a);
+  border-radius: var(--enhe-button-r, 4px);
+  background: var(--enhe-yellow, #ffd60a);
+  color: var(--enhe-text, #080808);
+  font-weight: 800;
+}
+
+.redesign-home-brand-value-cta:hover {
+  background: #fff;
+  border-color: #fff;
+}
+
+.redesign-home-brand-value-cta:focus-visible {
+  outline: 3px solid var(--enhe-focus, #ffd60a);
+  outline-offset: 4px;
+}
+
 @media (max-width: 767px) {
   .redesign-home .redesign-home-hero-inner {
     padding: 72px 20px 96px;
@@ -104,6 +152,15 @@
   }
 
   .redesign-home .redesign-home-cta {
+    width: min(100%, 280px);
+    margin-top: 32px;
+  }
+
+  .redesign-home-brand-value-inner {
+    padding-inline: 20px;
+  }
+
+  .redesign-home-brand-value-cta {
     width: min(100%, 280px);
     margin-top: 32px;
   }

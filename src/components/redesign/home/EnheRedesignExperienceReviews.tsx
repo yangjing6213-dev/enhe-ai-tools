@@ -31,10 +31,13 @@ const REVIEW_COPY = {
 } satisfies Record<RedesignLocale, { heading: string; previous: string; next: string; pause: string; resume: string; stars: (count: number) => string }>;
 
 type ReviewTimerActions = {
+  clearPendingResume: () => void;
   pause: () => void;
   resume: () => void;
   scheduleManualResume: () => void;
 };
+
+const REVIEW_DRAG_THRESHOLD_PX = 35;
 
 function getReviewOffset(index: number, activeIndex: number) {
   const count = HOME_REVIEWS.length;
@@ -75,8 +78,10 @@ export function EnheRedesignExperienceReviews({ locale }: { locale: RedesignLoca
     userPausedRef.current = nextPaused;
     setIsPaused(nextPaused);
     if (nextPaused) {
+      timerActionsRef.current?.clearPendingResume();
       timerActionsRef.current?.pause();
     } else {
+      timerActionsRef.current?.clearPendingResume();
       timerActionsRef.current?.resume();
     }
   };
@@ -90,6 +95,7 @@ export function EnheRedesignExperienceReviews({ locale }: { locale: RedesignLoca
     let isHovered = false;
     let hasFocus = false;
     let hasPointer = false;
+    let pointerStartX: number | null = null;
     let reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
     const clearAutoInterval = () => {
@@ -159,11 +165,29 @@ export function EnheRedesignExperienceReviews({ locale }: { locale: RedesignLoca
         resume();
       }
     };
-    const handlePointerDown = () => {
+    const handlePointerDown = (event: PointerEvent) => {
       hasPointer = true;
+      pointerStartX = event.clientX;
       pause();
     };
-    const handlePointerUp = () => {
+    const handlePointerUp = (event: PointerEvent) => {
+      const startX = pointerStartX;
+      pointerStartX = null;
+      hasPointer = false;
+
+      if (startX !== null) {
+        const deltaX = event.clientX - startX;
+        if (Math.abs(deltaX) > REVIEW_DRAG_THRESHOLD_PX) {
+          const direction: -1 | 1 = deltaX > 0 ? -1 : 1;
+          setIndex((current) => (current + direction + HOME_REVIEWS.length) % HOME_REVIEWS.length);
+          scheduleManualResume();
+        }
+      }
+
+      resume();
+    };
+    const handlePointerCancel = () => {
+      pointerStartX = null;
       hasPointer = false;
       resume();
     };
@@ -185,14 +209,19 @@ export function EnheRedesignExperienceReviews({ locale }: { locale: RedesignLoca
       }
     };
 
-    timerActionsRef.current = { pause, resume, scheduleManualResume };
+    timerActionsRef.current = {
+      clearPendingResume: clearResumeTimeout,
+      pause,
+      resume,
+      scheduleManualResume,
+    };
     section.addEventListener("mouseenter", handleMouseEnter);
     section.addEventListener("mouseleave", handleMouseLeave);
     section.addEventListener("focusin", handleFocusIn);
     section.addEventListener("focusout", handleFocusOut);
     section.addEventListener("pointerdown", handlePointerDown);
     section.addEventListener("pointerup", handlePointerUp);
-    section.addEventListener("pointercancel", handlePointerUp);
+    section.addEventListener("pointercancel", handlePointerCancel);
     document.addEventListener("visibilitychange", handleVisibilityChange);
 
     const mediaQuery = window.matchMedia("(prefers-reduced-motion: reduce)");
@@ -209,7 +238,7 @@ export function EnheRedesignExperienceReviews({ locale }: { locale: RedesignLoca
       section.removeEventListener("focusout", handleFocusOut);
       section.removeEventListener("pointerdown", handlePointerDown);
       section.removeEventListener("pointerup", handlePointerUp);
-      section.removeEventListener("pointercancel", handlePointerUp);
+      section.removeEventListener("pointercancel", handlePointerCancel);
       document.removeEventListener("visibilitychange", handleVisibilityChange);
       mediaQuery.removeEventListener("change", handleReducedMotionChange);
     };
