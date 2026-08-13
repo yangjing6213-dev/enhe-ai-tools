@@ -263,6 +263,10 @@
 }
 
 .redesign-home-product-detail a {
+  min-height: 44px;
+  display: inline-flex;
+  align-items: center;
+  padding: 8px 0;
   color: var(--enhe-text, #080808);
   font-weight: 700;
   text-decoration-thickness: 2px;
@@ -288,8 +292,23 @@
   }
 
   .redesign-home-product-stage {
-    grid-template-columns: 44px minmax(0, 1fr) 44px;
+    grid-template-columns: minmax(0, 1fr) 44px 44px minmax(0, 1fr);
+    grid-template-areas:
+      "content content content content"
+      ". previous next .";
     gap: 8px;
+  }
+
+  .redesign-home-product-control:first-child {
+    grid-area: previous;
+  }
+
+  .redesign-home-product-content {
+    grid-area: content;
+  }
+
+  .redesign-home-product-control:last-child {
+    grid-area: next;
   }
 
   .redesign-home-product-detail {
@@ -299,5 +318,213 @@
 
   .redesign-home-product-detail a {
     justify-self: start;
+  }
+}
+
+.redesign-home-reviews {
+  overflow: hidden;
+  border-top: 1px solid var(--enhe-border, #dfe5df);
+}
+
+.redesign-home-reviews-inner {
+  box-sizing: border-box;
+  width: min(100%, 1180px);
+  margin-inline: auto;
+  padding: clamp(72px, 10vw, 128px) 24px clamp(88px, 12vw, 144px);
+}
+
+.redesign-home-reviews-inner h2 {
+  margin: 0 0 40px;
+  color: var(--enhe-text, #080808);
+  font-size: clamp(2rem, 5vw, 4.5rem);
+  letter-spacing: -0.05em;
+  line-height: 1;
+  text-align: center;
+}
+
+.redesign-home-reviews-window {
+  position: relative;
+  min-height: 352px;
+  overflow: hidden;
+  mask-image: linear-gradient(to right, transparent 0, #000 12%, #000 88%, transparent 100%);
+  -webkit-mask-image: linear-gradient(to right, transparent 0, #000 12%, #000 88%, transparent 100%);
+}
+
+.redesign-home-reviews-track {
+  position: relative;
+  min-height: inherit;
+}
+
+.redesign-home-review-card {
+  position: absolute;
+  top: 0;
+  left: 50%;
+  box-sizing: border-box;
+  width: min(78vw, 680px);
+  min-height: 320px;
+  padding: 28px;
+  border: 1px solid var(--enhe-border, #dfe5df);
+  border-radius: var(--enhe-card-r, 12px);
+  background: #fff;
+  opacity: 0.12;
+  pointer-events: none;
+  transform: translateX(calc(-50% - 164%)) scale(0.9);
+  transition: transform 240ms ease, opacity 240ms ease;
+  will-change: transform, opacity;
+}
+
+.redesign-home-review-card[data-position="-1"] {
+  z-index: 1;
+  opacity: 0.36;
+  transform: translateX(calc(-50% - 84%)) scale(0.94);
+}
+
+.redesign-home-review-card[data-position="0"] {
+  z-index: 2;
+  opacity: 1;
+  transform: translateX(-50%) scale(1);
+}
+
+.redesign-home-review-card[data-position="1"] {
+  z-index: 1;
+  opacity: 0.36;
+  transform: translateX(calc(-50% + 84%)) scale(0.94);
+}
+
+.redesign-home-review-card[data-position="2"] {
+  transform: translateX(calc(-50% + 164%)) scale(0.9);
+}
+
+.redesign-home-review-top {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin-bottom: 20px;
+}
+
+.redesign-home-review-avatar {
+  flex: 0 0 56px;
+  border-radius: 50%;
+}
+
+.redesign-home-review-person {
+  min-width: 0;
+}
+
+.redesign-home-review-person strong,
+.redesign-home-review-person span {
+  display: block;
+}
+
+.redesign-home-review-person strong {
+  color: var(--enhe-text, #080808);
+}
+
+.redesign-home-review-person span {
+  overflow: hidden;
+  color: var(--enhe-text-muted, #5f665f);
+  font-size: 0.875rem;
+  line-height: 1.4;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.redesign-home-review-stars {
+  margin-left: auto;
+  color: var(--enhe-yellow, #ffd60a);
+  letter-spacing: 2px;
+  white-space: nowrap;
+}
+
+.redesign-home-review-example-label {
+  margin: 0 0 14px;
+  color: var(--enhe-action, #527e54);
+  font-size: 0.8125rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+}
+
+.redesign-home-review-card blockquote {
+  margin: 0;
+  color: var(--enhe-text, #080808);
+  font-size: clamp(1rem, 1.8vw, 1.125rem);
+  line-height: 1.75;
+}
+
+.redesign-home-reviews-controls {
+  display: flex;
+  justify-content: center;
+  gap: 12px;
+  margin-top: 28px;
+}
+
+.redesign-home-reviews-control {
+  display: inline-flex;
+  width: 44px;
+  min-width: 44px;
+  height: 44px;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  border: 1px solid var(--enhe-text, #080808);
+  border-radius: 50%;
+  background: transparent;
+  color: var(--enhe-text, #080808);
+  cursor: pointer;
+}
+
+.redesign-home-reviews-control:hover {
+  background: var(--enhe-text, #080808);
+  color: #fff;
+}
+
+.redesign-home-reviews-control:focus-visible {
+  outline: 3px solid var(--enhe-focus, #ffd60a);
+  outline-offset: 3px;
+}
+
+@media screen and (max-width: 767px) {
+  .redesign-home-reviews-inner {
+    padding-inline: 20px;
+  }
+
+  .redesign-home-reviews-inner h2 {
+    margin-bottom: 28px;
+  }
+
+  .redesign-home-reviews-window {
+    min-height: 440px;
+    mask-image: none;
+    -webkit-mask-image: none;
+  }
+
+  .redesign-home-review-card {
+    width: 92%;
+    min-height: 408px;
+    padding: 22px;
+  }
+
+  .redesign-home-review-top {
+    align-items: flex-start;
+    flex-wrap: wrap;
+  }
+
+  .redesign-home-review-stars {
+    flex-basis: 100%;
+    margin-left: 0;
+  }
+
+  .redesign-home-review-card[data-position="-1"] {
+    transform: translateX(calc(-50% - 88%)) scale(0.94);
+  }
+
+  .redesign-home-review-card[data-position="1"] {
+    transform: translateX(calc(-50% + 88%)) scale(0.94);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .redesign-home-review-card {
+    transition-duration: 1ms;
   }
 }

@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import { useState, type KeyboardEvent } from "react";
 import { ArrowLeft, ArrowRight } from "lucide-react";
 import type { RedesignLocale } from "@/components/redesign/types";
@@ -8,6 +9,26 @@ import {
   HOME_PRODUCT_DEFAULT_INDEX,
   HOME_PRODUCTS,
 } from "@/lib/redesign/home/home-products";
+import type { RedesignProductId } from "@/lib/redesign/home/home-products";
+
+export type ProductMediaStatus = "loading" | "ready" | "error";
+export type ProductMediaState = Record<RedesignProductId, ProductMediaStatus>;
+
+export function getWrappedProductIndex(index: number, delta: -1 | 1) {
+  return (index + delta + HOME_PRODUCT_COUNT) % HOME_PRODUCT_COUNT;
+}
+
+export function updateProductMediaState(
+  state: Readonly<ProductMediaState>,
+  productId: RedesignProductId,
+  status: ProductMediaStatus,
+): ProductMediaState {
+  return { ...state, [productId]: status };
+}
+
+const INITIAL_MEDIA_STATE = Object.fromEntries(
+  HOME_PRODUCTS.map(({ id }) => [id, "loading" as const]),
+) as ProductMediaState;
 
 const SHOWCASE_COPY = {
   zh: {
@@ -43,14 +64,16 @@ const SHOWCASE_COPY = {
 
 export function EnheRedesignProductShowcase({ locale }: { locale: RedesignLocale }) {
   const [index, setIndex] = useState(HOME_PRODUCT_DEFAULT_INDEX);
-  const [mediaStatus, setMediaStatus] = useState<"loading" | "ready" | "error">("loading");
+  const [mediaState, setMediaState] = useState<ProductMediaState>(INITIAL_MEDIA_STATE);
   const copy = SHOWCASE_COPY[locale];
   const product = HOME_PRODUCTS[index];
+  const mediaStatus = mediaState[product.id];
   const counter = `${String(index + 1).padStart(2, "0")} / ${String(HOME_PRODUCT_COUNT).padStart(2, "0")}`;
 
   const move = (delta: -1 | 1) => {
-    setMediaStatus("loading");
-    setIndex((current) => (current + delta + HOME_PRODUCT_COUNT) % HOME_PRODUCT_COUNT);
+    const nextIndex = getWrappedProductIndex(index, delta);
+    setIndex(nextIndex);
+    setMediaState((current) => updateProductMediaState(current, HOME_PRODUCTS[nextIndex].id, "loading"));
   };
 
   const handleKeyDown = (event: KeyboardEvent<HTMLDivElement>) => {
@@ -85,6 +108,7 @@ export function EnheRedesignProductShowcase({ locale }: { locale: RedesignLocale
           className="redesign-home-product-stage"
           tabIndex={0}
           onKeyDown={handleKeyDown}
+          role="region"
           aria-label={locale === "zh" ? "产品展示，可使用左右方向键切换" : "Product showcase, use left and right arrow keys to switch"}
         >
           <button type="button" className="redesign-home-product-control" onClick={() => move(-1)} aria-label={copy.previous}>
@@ -104,15 +128,20 @@ export function EnheRedesignProductShowcase({ locale }: { locale: RedesignLocale
                       {copy.loading}
                     </p>
                   )}
-                  <img
+                  <Image
+                    key={product.id}
                     className="redesign-home-product-media"
                     data-media-status={mediaStatus}
                     src={product.mediaSrc}
                     alt={product.alt[locale]}
                     width={product.width}
                     height={product.height}
-                    onLoad={() => setMediaStatus("ready")}
-                    onError={() => setMediaStatus("error")}
+                    onLoad={() =>
+                      setMediaState((current) => updateProductMediaState(current, product.id, "ready"))
+                    }
+                    onError={() =>
+                      setMediaState((current) => updateProductMediaState(current, product.id, "error"))
+                    }
                   />
                 </>
               )}

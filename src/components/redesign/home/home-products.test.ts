@@ -1,6 +1,11 @@
-import { readFileSync } from "node:fs";
-import { join } from "node:path";
+import { createHash } from "node:crypto";
+import { existsSync, readFileSync } from "node:fs";
+import { basename, join } from "node:path";
 import { describe, expect, it } from "vitest";
+import {
+  getWrappedProductIndex,
+  updateProductMediaState,
+} from "@/components/redesign/home/EnheRedesignProductShowcase";
 import {
   HOME_PRODUCT_COUNT,
   HOME_PRODUCT_DEFAULT_INDEX,
@@ -11,6 +16,13 @@ const showcaseSource = readFileSync(
   join(process.cwd(), "src/components/redesign/home/EnheRedesignProductShowcase.tsx"),
   "utf8",
 );
+const homeStyles = readFileSync(join(process.cwd(), "src/styles/redesign/home.css"), "utf8");
+const phaseOneMediaManifest = JSON.parse(
+  readFileSync(
+    join(process.cwd(), "docs/enhe-redesign/phase-1a/prototype/assets/product-media-manifest.json"),
+    "utf8",
+  ),
+) as Array<{ localPath: string; sha256: string }>;
 
 describe("homepage approved product showcase", () => {
   it("keeps the five approved products in the prototype order", () => {
@@ -24,6 +36,26 @@ describe("homepage approved product showcase", () => {
       "faceswap-studio",
     ]);
     expect(HOME_PRODUCTS).toHaveLength(5);
+  });
+
+  it("wraps product navigation at both ends", () => {
+    expect(getWrappedProductIndex(0, -1)).toBe(4);
+    expect(getWrappedProductIndex(4, 1)).toBe(0);
+  });
+
+  it("updates media status by product ID without changing another product", () => {
+    const state = {
+      "ultimate-edition": "ready",
+      infinitetalk: "loading",
+      "ai-voice": "loading",
+      "lumi-os": "loading",
+      "faceswap-studio": "loading",
+    } as const;
+
+    const nextState = updateProductMediaState(state, "ultimate-edition", "error");
+
+    expect(nextState["ultimate-edition"]).toBe("error");
+    expect(nextState.infinitetalk).toBe("loading");
   });
 
   it("keeps bilingual content, public links, and fixed media dimensions", () => {
@@ -50,7 +82,7 @@ describe("homepage approved product showcase", () => {
     expect(HOME_PRODUCTS.every((product) => product.description.zh && product.description.en)).toBe(true);
   });
 
-  it("keeps the showcase manual, keyboard accessible, and single-index driven", () => {
+  it("keeps the showcase manual, keyboard accessible, and product-state driven", () => {
     expect(showcaseSource).toContain('"use client"');
     expect(showcaseSource).toContain("ArrowLeft");
     expect(showcaseSource).toContain("ArrowRight");
@@ -58,7 +90,41 @@ describe("homepage approved product showcase", () => {
     expect(showcaseSource).toContain("onKeyDown");
     expect(showcaseSource).toContain("HOME_PRODUCTS[index]");
     expect(showcaseSource).toContain("role=\"status\"");
+    expect(showcaseSource).toContain("role=\"region\"");
+    expect(showcaseSource).toContain("key={product.id}");
+    expect(showcaseSource).toContain('from \"next/image\"');
+    expect(showcaseSource).toContain("setMediaState");
     expect(showcaseSource).toContain("onError");
     expect(showcaseSource).not.toMatch(/setInterval|setTimeout|autoplay|Audio\(|fetch\(|prisma|database|delivery/i);
+  });
+
+  it("keeps product detail links touchable and mobile controls below full-width media", () => {
+    const mobileStyles = homeStyles.slice(homeStyles.lastIndexOf("@media (max-width: 767px)"));
+
+    expect(homeStyles).toMatch(
+      /\.redesign-home-product-detail a\s*\{[\s\S]*?min-height:\s*44px[\s\S]*?display:\s*inline-flex[\s\S]*?align-items:\s*center[\s\S]*?padding:/,
+    );
+    expect(mobileStyles).toContain("grid-template-areas:");
+    expect(mobileStyles).toContain('"content content content content"');
+    expect(mobileStyles).toContain('". previous next ."');
+  });
+
+  it("keeps all five public media files present and matching the Phase 1A manifest", () => {
+    expect(HOME_PRODUCTS).toHaveLength(5);
+
+    for (const product of HOME_PRODUCTS) {
+      const filename = basename(product.mediaSrc);
+      const manifestEntry = phaseOneMediaManifest.find((entry) => basename(entry.localPath) === filename);
+      const assetPath = join(process.cwd(), "public", product.mediaSrc.replace(/^\/+/, ""));
+
+      expect(manifestEntry).toBeDefined();
+      expect(existsSync(assetPath)).toBe(true);
+      if (!manifestEntry) {
+        throw new Error(`Missing Phase 1A manifest entry for ${filename}`);
+      }
+      expect(createHash("sha256").update(readFileSync(assetPath)).digest("hex").toUpperCase()).toBe(
+        manifestEntry.sha256,
+      );
+    }
   });
 });
