@@ -38,8 +38,13 @@ export const sharedRootMetadata: Metadata = {
 
 export function RootDocument({
   lang,
-  children
-}: Readonly<{ lang: "zh-CN" | "en-US"; children: React.ReactNode }>) {
+  children,
+  disableLegacyVisualEffects = false
+}: Readonly<{
+  lang: "zh-CN" | "en-US";
+  children: React.ReactNode;
+  disableLegacyVisualEffects?: boolean;
+}>) {
   return (
     <html lang={lang}>
       <head>
@@ -57,9 +62,13 @@ export function RootDocument({
         />
       </head>
       <body>
-        <InteractiveBackground />
-        <CursorGlow />
-        <BorderGlowController />
+        {!disableLegacyVisualEffects ? (
+          <>
+            <InteractiveBackground />
+            <CursorGlow />
+            <BorderGlowController />
+          </>
+        ) : null}
         <AnalyticsTracker />
         {children}
       </body>
