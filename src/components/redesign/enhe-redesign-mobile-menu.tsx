@@ -97,12 +97,27 @@ export function EnheRedesignMobileMenu({
               <span aria-hidden="true">×</span>
             </button>
             <nav className="redesign-mobile-nav" aria-label={triggerLabel}>
-              {navItems.map((item) => (
-                <a key={item.href} href={item.href}>
-                  {item.kind === "search" ? <span className="redesign-search-icon" aria-hidden="true" /> : null}
-                  <span>{item.label}</span>
-                </a>
-              ))}
+              {navItems.map((item) =>
+                item.children?.length ? (
+                  <details key={item.href} className="redesign-mobile-nav-dropdown">
+                    <summary>
+                      <span>{item.label}</span>
+                    </summary>
+                    <div>
+                      {item.children.map((child) => (
+                        <a key={child.href} href={child.href}>
+                          {child.label}
+                        </a>
+                      ))}
+                    </div>
+                  </details>
+                ) : (
+                  <a key={item.href} href={item.href}>
+                    {item.kind === "search" ? <span className="redesign-search-icon" aria-hidden="true" /> : null}
+                    <span>{item.label}</span>
+                  </a>
+                ),
+              )}
             </nav>
             <div className="redesign-mobile-account">
               {account.status === "guest" ? (

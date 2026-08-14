@@ -4,6 +4,12 @@ export type RedesignNavItem = {
   label: string;
   href: string;
   kind?: "link" | "search";
+  children?: ReadonlyArray<RedesignNavChild>;
+};
+
+export type RedesignNavChild = {
+  label: string;
+  href: string;
 };
 
 export type RedesignAccount =

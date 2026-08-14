@@ -44,12 +44,27 @@ export function EnheRedesignHeader({
           <span className="redesign-brand-label">{brandLabel}</span>
         </div>
         <nav className="redesign-desktop-nav" aria-label={locale === "en" ? "Primary navigation" : "主导航"}>
-          {navItems.map((item) => (
-            <a key={item.href} className="redesign-nav-link" href={item.href}>
-              {item.kind === "search" ? <span className="redesign-search-icon" aria-hidden="true" /> : null}
-              <span>{item.label}</span>
-            </a>
-          ))}
+          {navItems.map((item) =>
+            item.children?.length ? (
+              <details key={item.href} className="redesign-nav-dropdown">
+                <summary className="redesign-nav-link">
+                  <span>{item.label}</span>
+                </summary>
+                <div className="redesign-nav-dropdown-panel">
+                  {item.children.map((child) => (
+                    <a key={child.href} href={child.href}>
+                      {child.label}
+                    </a>
+                  ))}
+                </div>
+              </details>
+            ) : (
+              <a key={item.href} className="redesign-nav-link" href={item.href}>
+                {item.kind === "search" ? <span className="redesign-search-icon" aria-hidden="true" /> : null}
+                <span>{item.label}</span>
+              </a>
+            ),
+          )}
           <EnheRedesignLanguageSwitch
             currentHref={currentHref}
             alternateHref={alternateHref}

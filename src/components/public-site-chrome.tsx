@@ -1,7 +1,9 @@
 import { StructuredData } from "@/components/structured-data";
 import { CustomerSupportWidget } from "@/components/customer-support-widget";
-import { SiteFooter } from "@/components/site-footer";
-import { SiteHeader } from "@/components/site-header";
+import {
+  EnheRedesignPublicFooter,
+  EnheRedesignPublicHeader,
+} from "@/components/redesign/enhe-production-public-shell";
 import { getCustomerSupportFaqs } from "@/lib/customer-support";
 import { buildEnheOrganizationSchema } from "@/lib/brand-entity";
 import { getDictionary, type Locale } from "@/lib/dictionaries";
@@ -56,10 +58,10 @@ export async function PublicSiteChrome({
   return (
     <>
       <StructuredData data={[websiteSchema, organizationSchema]} />
-      <SiteHeader forceLocale={forceLocale} />
+      <EnheRedesignPublicHeader locale={forceLocale} />
       <div className="fade-in">{children}</div>
       <CustomerSupportWidget locale={forceLocale} faqs={getCustomerSupportFaqs(forceLocale)} />
-      <SiteFooter forceLocale={forceLocale} />
+      <EnheRedesignPublicFooter locale={forceLocale} />
     </>
   );
 }

@@ -98,6 +98,7 @@ export function middleware(request: NextRequest) {
 
   requestHeaders.set("x-enhe-locale", resolvedLocale);
   requestHeaders.set("x-enhe-html-locale", htmlLocale);
+  requestHeaders.set("x-enhe-pathname", pathname);
 
   const response = NextResponse.next({
     request: {
