@@ -93,6 +93,8 @@ describe("homepage approved product showcase", () => {
     expect(showcaseSource).toContain("role=\"region\"");
     expect(showcaseSource).toContain("key={product.id}");
     expect(showcaseSource).toContain('from \"next/image\"');
+    expect(showcaseSource).toContain('loading=\"eager\"');
+    expect(showcaseSource).toContain('unoptimized');
     expect(showcaseSource).toContain("setMediaState");
     expect(showcaseSource).toContain("onError");
     expect(showcaseSource).not.toMatch(/setInterval|setTimeout|autoplay|Audio\(|fetch\(|prisma|database|delivery/i);

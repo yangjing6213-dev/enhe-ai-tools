@@ -136,6 +136,8 @@ export function EnheRedesignProductShowcase({ locale }: { locale: RedesignLocale
                     alt={product.alt[locale]}
                     width={product.width}
                     height={product.height}
+                    loading="eager"
+                    unoptimized
                     onLoad={() =>
                       setMediaState((current) => updateProductMediaState(current, product.id, "ready"))
                     }
