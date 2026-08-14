@@ -1,0 +1,7 @@
+source_commit,source_subject,integration_commit,integration_subject,order
+bf74792f8ef13747050669c4e4261471d1a27d0c,"feat(home): add isolated approved hero candidate",3b522bb22c317a269a63500986ba0002aafbadf8,"feat(home): add isolated approved hero candidate",1
+c533b4fed9256faace7e91df6a9ee1aeb395ead5,"feat(home): add manual five-product showcase candidate",4bca21645ac627fe931ef3534eb7ef78392cc816,"feat(home): add manual five-product showcase candidate",2
+0ed0e4fc205b4f0cd82683b7842e1f6313d83c8a,"feat(home): add accessible experience review carousel candidate",c673c177b78eb404643a5ec268f5bb13248f642d,"feat(home): add accessible experience review carousel candidate",3
+6a7c4703eae8d228de1aa983a67164cd106e1db3,"test(home): add bilingual homepage candidate regression",d65b63e0dc45a61277982500462d9dccaa855328,"test(home): add bilingual homepage candidate regression",4
+596dae4c4ca6eba867feeaab947bfafb51bd5130,"docs(home): record phase 2A.2 homepage candidate review",a3b418eeb1631361b8ba920f75277b4039cfdc4c,"docs(home): record phase 2A.2 homepage candidate review",5
+
