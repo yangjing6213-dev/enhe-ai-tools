@@ -1,5 +1,6 @@
-import { generateHomePageMetadata, HomePageShell } from "@/app/page-shell";
+import { generateHomePageMetadata } from "@/app/page-shell";
 import { PublicSiteChrome } from "@/components/public-site-chrome";
+import { EnheRedesignHome } from "@/components/redesign/home/EnheRedesignHome";
 
 export const revalidate = 300;
 
@@ -10,7 +11,7 @@ export async function generateMetadata() {
 export default async function EnglishHomePage() {
   return (
     <PublicSiteChrome forceLocale="en">
-      <HomePageShell forceLocale="en" />
+      <EnheRedesignHome locale="en" />
     </PublicSiteChrome>
   );
 }
