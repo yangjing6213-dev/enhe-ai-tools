@@ -11,6 +11,7 @@ import {
 import { EnheRedesignSoftwareCategorySelector } from "./EnheRedesignSoftwareCategorySelector";
 import { EnheRedesignSoftwareCard } from "./EnheRedesignSoftwareCard";
 import { EnheRedesignSoftwareLoadMore } from "./EnheRedesignSoftwareLoadMore";
+import { EnheRedesignSoftwareRail } from "./EnheRedesignSoftwareRail";
 
 const INITIAL_VISIBLE_ALL_PRODUCTS = 9;
 const SOFTWARE_CATALOG_ROOT_ID = "redesign-software-catalog";
@@ -69,7 +70,11 @@ export function EnheRedesignSoftwareCatalog({ locale }: { locale: RedesignLocale
           <h2>{copy.sections.newReleases.heading}</h2>
           <p>{copy.sections.newReleases.description}</p>
         </header>
-        <div className="redesign-software-grid redesign-software-grid-new">
+        <EnheRedesignSoftwareRail
+          ariaLabel={copy.sections.newReleases.heading}
+          data-horizontal-cards="new"
+          className="redesign-software-grid redesign-software-grid-new redesign-software-rail"
+        >
           {newReleaseProducts.map((product) => (
             <EnheRedesignSoftwareCard
               key={`new-${product.id}`}
@@ -80,7 +85,7 @@ export function EnheRedesignSoftwareCatalog({ locale }: { locale: RedesignLocale
               sectionId="new-releases"
             />
           ))}
-        </div>
+        </EnheRedesignSoftwareRail>
       </section>
 
       <section className="redesign-software-section" data-section="featured-products">
@@ -88,7 +93,11 @@ export function EnheRedesignSoftwareCatalog({ locale }: { locale: RedesignLocale
           <h2>{copy.sections.featuredProducts.heading}</h2>
           <p>{copy.sections.featuredProducts.description}</p>
         </header>
-        <div className="redesign-software-grid redesign-software-grid-featured">
+        <EnheRedesignSoftwareRail
+          ariaLabel={copy.sections.featuredProducts.heading}
+          data-horizontal-cards="featured"
+          className="redesign-software-grid redesign-software-grid-featured redesign-software-rail"
+        >
           {featuredProducts.map((product) => (
             <EnheRedesignSoftwareCard
               key={`featured-${product.id}`}
@@ -99,7 +108,7 @@ export function EnheRedesignSoftwareCatalog({ locale }: { locale: RedesignLocale
               sectionId="featured-products"
             />
           ))}
-        </div>
+        </EnheRedesignSoftwareRail>
       </section>
 
       <section className="redesign-software-section" data-section="all-products">

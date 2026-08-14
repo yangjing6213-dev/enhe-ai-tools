@@ -13,6 +13,7 @@
   width: min(100%, 1180px);
   margin-inline: auto;
   padding: 48px 24px 120px;
+  min-width: 0;
 }
 
 .redesign-software-hero {
@@ -115,6 +116,7 @@
 .redesign-software-section {
   padding-top: 40px;
   border-top: 1px solid var(--enhe-border, #dfe5df);
+  min-width: 0;
 }
 
 .redesign-software-section + .redesign-software-section {
@@ -146,11 +148,18 @@
   display: grid;
   gap: 20px;
   grid-template-columns: repeat(4, minmax(0, 1fr));
+  min-width: 0;
 }
 
-@media (max-width: 1199px) {
+@media (max-width: 1024px) {
   .redesign-software-grid {
     grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 768px) {
+  .redesign-software-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 }
 
@@ -302,14 +311,16 @@
 .redesign-software-category-button:focus-visible,
 .redesign-software-load-more-button:focus-visible,
 .redesign-software-next-link:focus-visible,
-.redesign-software-card-link:focus-visible {
+.redesign-software-card-link:focus-visible,
+.redesign-software-rail:focus-visible {
   outline: 3px solid var(--enhe-focus, #ffd60a);
   outline-offset: 4px;
 }
 
 @media (max-width: 767px) {
   .redesign-software-page {
-    padding-inline: 20px;
+    --redesign-software-mobile-page-padding: 20px;
+    padding-inline: var(--redesign-software-mobile-page-padding);
   }
 
   .redesign-software-category-panel {
@@ -317,6 +328,37 @@
     inset: auto 0 0;
     width: auto;
     border-radius: 24px 24px 0 0;
+  }
+
+  .redesign-software-rail {
+    box-sizing: border-box;
+    display: flex;
+    gap: 18px;
+    width: 100vw;
+    margin-inline: calc(50% - 50vw);
+    padding-inline: var(--redesign-software-mobile-page-padding);
+    overflow-x: auto;
+    overscroll-behavior-x: contain;
+    scroll-padding-inline: var(--redesign-software-mobile-page-padding);
+    scroll-snap-type: x mandatory;
+    scrollbar-width: thin;
+  }
+
+  .redesign-software-rail .redesign-software-card {
+    min-width: 0;
+    scroll-snap-align: start;
+  }
+
+  .redesign-software-rail[data-horizontal-cards="new"] .redesign-software-card {
+    flex: 0 0 80vw;
+  }
+
+  .redesign-software-rail[data-horizontal-cards="featured"] .redesign-software-card {
+    flex: 0 0 84vw;
+  }
+
+  .redesign-software-grid-all {
+    grid-template-columns: 1fr;
   }
 }
 
