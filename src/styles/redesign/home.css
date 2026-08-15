@@ -4,6 +4,15 @@
   font-family: var(--enhe-font-zh, "Microsoft YaHei", system-ui, sans-serif);
 }
 
+.enhe-redesign-production .redesign-home-page {
+  background-color: var(--enhe-page-bg);
+  color: var(--enhe-text);
+}
+
+.enhe-redesign-production .redesign-home-page[data-locale="en"] {
+  font-family: var(--enhe-font-en);
+}
+
 .redesign-home[data-locale="en"] {
   font-family: var(--enhe-font-en, Inter, Arial, sans-serif);
 }
@@ -383,6 +392,11 @@
   border-top: 1px solid var(--enhe-border, #dfe5df);
 }
 
+.enhe-redesign-production .redesign-home-reviews {
+  background: var(--enhe-page-bg);
+  color: var(--enhe-text);
+}
+
 .redesign-home-reviews-inner {
   box-sizing: border-box;
   width: min(100%, 1180px);
@@ -528,6 +542,10 @@
   background: transparent;
   color: var(--enhe-text, #080808);
   cursor: pointer;
+}
+
+.enhe-redesign-production .redesign-home-reviews-control {
+  color: var(--enhe-text);
 }
 
 .redesign-home-reviews-control:hover {

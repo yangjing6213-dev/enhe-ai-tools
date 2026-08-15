@@ -56,12 +56,12 @@ export async function PublicSiteChrome({
   });
 
   return (
-    <>
+    <div className="enhe-redesign-production" lang={forceLocale}>
       <StructuredData data={[websiteSchema, organizationSchema]} />
       <EnheRedesignPublicHeader locale={forceLocale} />
       <div className="fade-in">{children}</div>
       <CustomerSupportWidget locale={forceLocale} faqs={getCustomerSupportFaqs(forceLocale)} />
       <EnheRedesignPublicFooter locale={forceLocale} />
-    </>
+    </div>
   );
 }
