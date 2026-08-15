@@ -1,6 +1,6 @@
 # ENHE Phase 2A.3 AI Tools Catalog Candidate Design
 
-Status: approved design, pending implementation
+Status: approved candidate design, implementation verified pending final handoff
 
 Baseline: `596dae4` on `codex/enhe-public-shell-candidate-v1`
 
@@ -79,4 +79,4 @@ The implementation keeps exactly these five commits, in order:
 4. `test(catalog): add bilingual AI tools candidate regression`
 5. `docs(catalog): record phase 2A.3 AI tools candidate review`
 
-The design document is included in the required Phase 2A.3 documentation scope and will not create a sixth commit. No push, amend, reset, restore, clean, stash, checkout, switch, merge, rebase, fetch, or pull is permitted.
+The design document is included in the required Phase 2A.3 documentation scope and does not create a sixth commit. No push, reset, restore, clean, stash, checkout, switch, merge, rebase, fetch, or pull is permitted; if independent review finds a release-blocking candidate defect, the fifth documentation commit may be amended while retaining the five-commit message/order contract.
