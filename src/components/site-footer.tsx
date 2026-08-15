@@ -6,6 +6,7 @@ import { companyProfile } from "@/lib/company-profile";
 import { getDictionary, type Locale } from "@/lib/dictionaries";
 import { getCurrentLocale } from "@/lib/i18n";
 import { legalPages } from "@/lib/legal";
+import { PRODUCTION_FILING } from "@/lib/production-filing";
 import { buildLocalePath } from "@/lib/seo";
 import { getEffectiveFooterCopyright, getEffectiveLocalizedSiteName, getSettingsMap } from "@/lib/settings";
 
@@ -25,18 +26,7 @@ export async function SiteFooter({ forceLocale }: { forceLocale?: Locale }) {
     locale === "en"
       ? { company: "Company", address: "Address", phone: "Phone", email: "Email" }
       : { company: "公司名称", address: "地址", phone: "电话", email: "邮箱" };
-  const filingCopy =
-    locale === "en"
-      ? {
-          publicSecurityAlt: "Public security filing icon",
-          publicSecurity: "Fujian Public Security Record No. 35030302900035",
-          icp: "ICP Filing: Min ICP No. 2025092404-2"
-        }
-      : {
-          publicSecurityAlt: "备案图标",
-          publicSecurity: "闽公网安备 35030302900035号",
-          icp: "闽ICP备2025092404号-2"
-        };
+  const filing = PRODUCTION_FILING[locale];
   const companyName = companyProfile.name[locale];
   const companyAddress = companyProfile.address[locale];
   const footerGroups = [
@@ -180,16 +170,16 @@ export async function SiteFooter({ forceLocale }: { forceLocale?: Locale }) {
           <p>{copyright}</p>
           <div className="site-footer-filings">
             <a
-              href="https://beian.mps.gov.cn/#/query/webSearch?code=35030302900035"
+              href={filing.publicSecurity.href}
               target="_blank"
               rel="noreferrer"
               className="site-footer-filing-link cursor-target"
             >
-              <Image src="/images/beian-icon.png" alt={filingCopy.publicSecurityAlt} width={18} height={20} unoptimized />
-              <span>{filingCopy.publicSecurity}</span>
+              <Image src="/images/beian-icon.png" alt={filing.publicSecurityAlt} width={18} height={20} unoptimized />
+              <span>{filing.publicSecurity.label}</span>
             </a>
-            <a href="https://beian.miit.gov.cn/" target="_blank" rel="noreferrer" className="site-footer-filing-link cursor-target">
-              {filingCopy.icp}
+            <a href={filing.icp.href} target="_blank" rel="noreferrer" className="site-footer-filing-link cursor-target">
+              {filing.icp.label}
             </a>
           </div>
         </div>

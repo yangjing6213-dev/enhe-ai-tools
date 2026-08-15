@@ -1,3 +1,5 @@
+import { Fragment } from "react";
+import type { ProductionFiling } from "@/lib/production-filing";
 import type { RedesignFooterCopy, RedesignLocale } from "./types";
 
 const FOOTER_COPY: Record<RedesignLocale, RedesignFooterCopy> = {
@@ -34,7 +36,6 @@ const FOOTER_COPY: Record<RedesignLocale, RedesignFooterCopy> = {
       },
     ],
     copyright: "© ENHE AI",
-    filingLabel: "ICP备案 · 公安备案",
   },
   en: {
     ariaLabel: "Site footer",
@@ -69,12 +70,20 @@ const FOOTER_COPY: Record<RedesignLocale, RedesignFooterCopy> = {
       },
     ],
     copyright: "© ENHE AI",
-    filingLabel: "ICP filing · Public-security filing",
   },
 };
 
-export function EnheRedesignFooter({ locale }: { locale: RedesignLocale }) {
+export function EnheRedesignFooter({
+  locale,
+  filing,
+}: {
+  locale: RedesignLocale;
+  filing?: ProductionFiling;
+}) {
   const copy = FOOTER_COPY[locale];
+  const filingEntries = [filing?.icp, filing?.publicSecurity].filter(
+    (entry): entry is NonNullable<ProductionFiling["icp"]> => Boolean(entry),
+  );
 
   return (
     <footer className="redesign-footer" aria-label={copy.ariaLabel}>
@@ -99,7 +108,22 @@ export function EnheRedesignFooter({ locale }: { locale: RedesignLocale }) {
         </div>
         <div className="footer-bottom">
           <p>{copy.copyright}</p>
-          <p>{copy.filingLabel}</p>
+          {filingEntries.length ? (
+            <p>
+              {filingEntries.map((entry, index) => (
+                <Fragment key={`${entry.label}:${entry.href ?? "text"}`}>
+                  {index ? " · " : null}
+                  {entry.href ? (
+                    <a href={entry.href} target="_blank" rel="noreferrer">
+                      {entry.label}
+                    </a>
+                  ) : (
+                    entry.label
+                  )}
+                </Fragment>
+              ))}
+            </p>
+          ) : null}
         </div>
       </div>
     </footer>

@@ -95,7 +95,7 @@ describe("bilingual homepage candidate preview", () => {
     expect(page).toContain("await searchParams");
     expect(page).toContain("notFound");
     expect(page).toContain('process.env.NODE_ENV === "production"');
-    expect(page).toContain('locale === "en"');
+    expect(page).toContain("languageHrefs[locale]");
     expect(locale).toContain('requestedLocale === "zh"');
     expect(locale).toContain(': "zh"');
     expect(layout).toContain('import "@/styles/redesign/tokens.css"');
@@ -125,9 +125,9 @@ describe("bilingual homepage candidate preview", () => {
     expect(page).toContain("EnheRedesignFooter");
     expect(page.match(/locale=\{locale\}/g)).toHaveLength(3);
     expect(page).toContain("lang={locale}");
-    expect(page).toContain('REDESIGN_ZH_NAV_ITEMS');
-    expect(page).toContain('REDESIGN_EN_NAV_ITEMS');
-    expect(page).toContain('alternateHref');
+    expect(page).toContain("REDESIGN_NAV_ITEMS[locale]");
+    expect(page).toContain("REDESIGN_PREVIEW_FILING[locale]");
+    expect(page).toContain("languageHrefs={languageHrefs}");
     expect(page).toContain('/redesign-preview/home?locale=en');
     expect(page).toContain('/redesign-preview/home?locale=zh');
     const render = home.slice(home.indexOf("return ("));

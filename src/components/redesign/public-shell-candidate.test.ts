@@ -53,11 +53,14 @@ describe("ENHE redesign public shell candidate", () => {
     expect(header).not.toContain("File.filePath");
   });
 
-  it("uses an explicit alternateHref for the language switch", () => {
+  it("uses explicit typed locale hrefs for the language switch", () => {
     const languageSwitch = readCandidate("components/redesign/enhe-redesign-language-switch.tsx");
 
-    expect(languageSwitch).toContain("alternateHref");
-    expect(languageSwitch).toContain("href={alternateHref}");
+    expect(languageSwitch).toContain("RedesignLanguageHrefs");
+    expect(languageSwitch).toContain("href={localeHrefs.zh}");
+    expect(languageSwitch).toContain("href={localeHrefs.en}");
+    expect(languageSwitch).toContain("中文");
+    expect(languageSwitch).toContain("EN");
     expect(languageSwitch).not.toContain("window.location");
     expect(languageSwitch).not.toContain("pathname");
   });
@@ -98,6 +101,7 @@ describe("ENHE redesign public shell candidate", () => {
 
   it("provides complete typed Chinese and English footer copy without language leakage", () => {
     const footer = readCandidate("components/redesign/enhe-redesign-footer.tsx");
+    const previewFiling = readCandidate("components/redesign/preview-filing.ts");
     const chineseCopy = footer.slice(footer.indexOf("zh: {"), footer.indexOf("en: {"));
     const englishCopy = footer.slice(footer.indexOf("en: {"));
 
@@ -116,7 +120,6 @@ describe("ENHE redesign public shell candidate", () => {
       "公司信息",
       "品牌档案",
       "联系邮箱",
-      "ICP备案 · 公安备案",
       "网站页脚",
     ]) {
       expect(chineseCopy).toContain(label);
@@ -137,7 +140,6 @@ describe("ENHE redesign public shell candidate", () => {
       "Company",
       "Brand Profile",
       "Contact Email",
-      "ICP filing · Public-security filing",
       "Site footer",
     ]) {
       expect(englishCopy).toContain(label);
@@ -149,6 +151,10 @@ describe("ENHE redesign public shell candidate", () => {
     for (const label of ["Help & Support", "Legal", "Company", "Terms of Use", "Privacy Policy"]) {
       expect(chineseCopy).not.toContain(label);
     }
+    expect(footer).not.toContain("ICP备案 · 公安备案");
+    expect(footer).not.toContain("ICP filing · Public-security filing");
+    expect(previewFiling).toContain("ICP备案");
+    expect(previewFiling).toContain("Public-security filing");
   });
 
   it("keeps the preview header and footer on the same explicit locale specimen", () => {
@@ -157,18 +163,19 @@ describe("ENHE redesign public shell candidate", () => {
     const enSection = page.slice(page.indexOf('<section id="en"'));
 
     expect(zhSection).toContain('locale="zh"');
-    expect(zhSection).toContain('<EnheRedesignFooter locale="zh" />');
+    expect(zhSection).toContain('<EnheRedesignFooter locale="zh" filing={REDESIGN_PREVIEW_FILING.zh} />');
     expect(enSection).toContain('locale="en"');
-    expect(enSection).toContain('<EnheRedesignFooter locale="en" />');
+    expect(enSection).toContain('<EnheRedesignFooter locale="en" filing={REDESIGN_PREVIEW_FILING.en} />');
     expect(page).not.toContain('<EnheRedesignFooter\n        locale="zh"');
   });
 
-  it("keeps footer links accessible and exposes filing copy without language controls", () => {
+  it("keeps footer links accessible and renders filing only when supplied", () => {
     const footer = readCandidate("components/redesign/enhe-redesign-footer.tsx");
 
     expect(footer).toContain('aria-label={copy.ariaLabel}');
     expect(footer).toContain("{link.label}");
-    expect(footer).toContain("{copy.filingLabel}");
+    expect(footer).toContain("filingEntries.length");
+    expect(footer).toContain("{entry.label}");
     expect(footer).not.toContain("language-switch");
     expect(footer).not.toContain("AI tools");
     expect(footer).not.toContain("AI Skill");

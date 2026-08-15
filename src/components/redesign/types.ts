@@ -1,5 +1,7 @@
 export type RedesignLocale = "zh" | "en";
 
+export type RedesignLanguageHrefs = Readonly<Record<RedesignLocale, string>>;
+
 export type RedesignNavItem = {
   label: string;
   href: string;
@@ -45,5 +47,4 @@ export type RedesignFooterCopy = {
   brandIntro: ReadonlyArray<string>;
   columns: ReadonlyArray<RedesignFooterColumn>;
   copyright: string;
-  filingLabel: string;
 };

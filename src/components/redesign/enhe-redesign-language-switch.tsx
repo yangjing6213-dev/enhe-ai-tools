@@ -1,32 +1,34 @@
-import type { RedesignLocale } from "./types";
+import type { RedesignLanguageHrefs, RedesignLocale } from "./types";
 
 export function EnheRedesignLanguageSwitch({
-  currentHref,
-  alternateHref,
-  currentLabel,
-  alternateLabel,
+  localeHrefs,
   currentLocale,
-  alternateLocale,
   ariaLabel,
 }: {
-  currentHref: string;
-  alternateHref: string;
-  currentLabel: string;
-  alternateLabel: string;
+  localeHrefs: RedesignLanguageHrefs;
   currentLocale: RedesignLocale;
-  alternateLocale: RedesignLocale;
   ariaLabel: string;
 }) {
   return (
     <span className="redesign-language-switch" aria-label={ariaLabel}>
-      <a className="redesign-language-link" href={currentHref} aria-current="page" lang={currentLocale}>
-        {currentLabel}
+      <a
+        className="redesign-language-link"
+        href={localeHrefs.zh}
+        aria-current={currentLocale === "zh" ? "page" : undefined}
+        lang="zh"
+      >
+        中文
       </a>
       <span className="redesign-language-separator" aria-hidden="true">
         /
       </span>
-      <a className="redesign-language-link" href={alternateHref} lang={alternateLocale}>
-        {alternateLabel}
+      <a
+        className="redesign-language-link"
+        href={localeHrefs.en}
+        aria-current={currentLocale === "en" ? "page" : undefined}
+        lang="en"
+      >
+        EN
       </a>
     </span>
   );

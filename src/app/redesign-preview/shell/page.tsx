@@ -1,7 +1,8 @@
 import { notFound } from "next/navigation";
 import { EnheRedesignFooter } from "@/components/redesign/enhe-redesign-footer";
 import { EnheRedesignHeader } from "@/components/redesign/enhe-redesign-header";
-import { REDESIGN_EN_NAV_ITEMS, REDESIGN_ZH_NAV_ITEMS } from "@/components/redesign/navigation";
+import { REDESIGN_NAV_ITEMS } from "@/components/redesign/navigation";
+import { REDESIGN_PREVIEW_FILING } from "@/components/redesign/preview-filing";
 
 export default function RedesignShellPreviewPage() {
   if (process.env.NODE_ENV === "production") notFound();
@@ -23,11 +24,8 @@ export default function RedesignShellPreviewPage() {
             locale="zh"
             homeHref="#zh"
             brandLabel="给人生加一个 AI 外挂"
-            navItems={REDESIGN_ZH_NAV_ITEMS}
-            currentHref="#zh"
-            alternateHref="#en"
-            currentLocaleLabel="中文"
-            alternateLocaleLabel="EN"
+            navItems={REDESIGN_NAV_ITEMS.zh}
+            languageHrefs={{ zh: "#zh", en: "#en" }}
             account={{ status: "guest", loginLabel: "登录", loginHref: "#zh-login" }}
             userMenuLabel="用户菜单"
             menuId="redesign-zh-guest-menu"
@@ -39,11 +37,8 @@ export default function RedesignShellPreviewPage() {
             locale="zh"
             homeHref="#zh"
             brandLabel="给人生加一个 AI 外挂"
-            navItems={REDESIGN_ZH_NAV_ITEMS}
-            currentHref="#zh"
-            alternateHref="#en"
-            currentLocaleLabel="中文"
-            alternateLocaleLabel="EN"
+            navItems={REDESIGN_NAV_ITEMS.zh}
+            languageHrefs={{ zh: "#zh", en: "#en" }}
             account={{
               status: "authenticated",
               displayName: "普通用户",
@@ -60,7 +55,7 @@ export default function RedesignShellPreviewPage() {
             menuCloseLabel="关闭导航菜单"
           />
           <p className="redesign-preview-copy">普通用户状态：头像菜单只显示个人中心。</p>
-          <EnheRedesignFooter locale="zh" />
+          <EnheRedesignFooter locale="zh" filing={REDESIGN_PREVIEW_FILING.zh} />
         </section>
 
         <section id="en" className="redesign-preview-section" aria-labelledby="en-preview-title">
@@ -69,11 +64,8 @@ export default function RedesignShellPreviewPage() {
             locale="en"
             homeHref="#en"
             brandLabel="An AI upgrade for everyday life"
-            navItems={REDESIGN_EN_NAV_ITEMS}
-            currentHref="#en"
-            alternateHref="#zh"
-            currentLocaleLabel="EN"
-            alternateLocaleLabel="中文"
+            navItems={REDESIGN_NAV_ITEMS.en}
+            languageHrefs={{ zh: "#zh", en: "#en" }}
             languageAriaLabel="Language switch"
             account={{
               status: "authenticated",
@@ -92,7 +84,7 @@ export default function RedesignShellPreviewPage() {
             menuCloseLabel="Close navigation menu"
           />
           <p className="redesign-preview-copy">Administrator state: the confirmed admin prop exposes the entry inside the avatar menu.</p>
-          <EnheRedesignFooter locale="en" />
+          <EnheRedesignFooter locale="en" filing={REDESIGN_PREVIEW_FILING.en} />
         </section>
       </main>
     </>

@@ -1,17 +1,14 @@
 import { EnheBrandLockup } from "./enhe-brand-lockup";
 import { EnheRedesignLanguageSwitch } from "./enhe-redesign-language-switch";
 import { EnheRedesignMobileMenu } from "./enhe-redesign-mobile-menu";
-import type { RedesignAccount, RedesignLocale, RedesignNavItem } from "./types";
+import type { RedesignAccount, RedesignLanguageHrefs, RedesignLocale, RedesignNavItem } from "./types";
 
 export function EnheRedesignHeader({
   locale,
   homeHref,
   brandLabel,
   navItems,
-  currentHref,
-  alternateHref,
-  currentLocaleLabel,
-  alternateLocaleLabel,
+  languageHrefs,
   languageAriaLabel = "中文 / EN",
   account,
   userMenuLabel,
@@ -24,10 +21,7 @@ export function EnheRedesignHeader({
   homeHref: string;
   brandLabel: string;
   navItems: ReadonlyArray<RedesignNavItem>;
-  currentHref: string;
-  alternateHref: string;
-  currentLocaleLabel: string;
-  alternateLocaleLabel: string;
+  languageHrefs: RedesignLanguageHrefs;
   languageAriaLabel?: string;
   account: RedesignAccount;
   userMenuLabel: string;
@@ -66,12 +60,8 @@ export function EnheRedesignHeader({
             ),
           )}
           <EnheRedesignLanguageSwitch
-            currentHref={currentHref}
-            alternateHref={alternateHref}
-            currentLabel={currentLocaleLabel}
-            alternateLabel={alternateLocaleLabel}
+            localeHrefs={languageHrefs}
             currentLocale={locale}
-            alternateLocale={locale === "en" ? "zh" : "en"}
             ariaLabel={languageAriaLabel}
           />
           {account.status === "guest" ? (
@@ -94,12 +84,8 @@ export function EnheRedesignHeader({
         </nav>
         <div className="redesign-mobile-actions">
           <EnheRedesignLanguageSwitch
-            currentHref={currentHref}
-            alternateHref={alternateHref}
-            currentLabel={currentLocaleLabel}
-            alternateLabel={alternateLocaleLabel}
+            localeHrefs={languageHrefs}
             currentLocale={locale}
-            alternateLocale={locale === "en" ? "zh" : "en"}
             ariaLabel={languageAriaLabel}
           />
           <EnheRedesignMobileMenu
