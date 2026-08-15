@@ -195,6 +195,59 @@ const getCachedPublicToolListing = unstable_cache(
   { revalidate: publicContentRevalidate, tags: ["public-tools"] },
 );
 
+const getCachedPublicSoftwareCatalogRows = unstable_cache(
+  async () => {
+    try {
+      return await prisma.tool.findMany({
+        where: {
+          status: "published",
+          OR: [
+            { type: { in: ["software", "online", "ai_skill"] } },
+            {
+              type: "skill_learning",
+              tutorials: { some: { status: "active" } },
+            },
+          ],
+        },
+        select: {
+          id: true,
+          slug: true,
+          name: true,
+          englishName: true,
+          type: true,
+          shortDescription: true,
+          content: true,
+          coverImage: true,
+          isDownloadPaid: true,
+          downloadPrice: true,
+          isHomeRecommended: true,
+          sortOrder: true,
+          createdAt: true,
+          category: { select: { name: true } },
+          priceSpecs: {
+            where: { status: "active" },
+            select: { price: true, status: true, sortOrder: true },
+            orderBy: [{ sortOrder: "asc" }, { createdAt: "asc" }],
+          },
+        },
+        orderBy: [
+          { sortOrder: "asc" },
+          { createdAt: "desc" },
+          { id: "asc" },
+        ],
+      });
+    } catch (error) {
+      if (isRecoverablePublicReadError(error)) {
+        return [];
+      }
+
+      throw error;
+    }
+  },
+  ["public-software-catalog-rows"],
+  { revalidate: publicContentRevalidate, tags: ["public-tools"] },
+);
+
 const getCachedPublicToolsByCategoryNames = unstable_cache(
   async (categoryNames: string[]) => {
     const normalizedCategoryNames = categoryNames
@@ -800,6 +853,10 @@ export async function getPublicToolListing(
   sort?: string,
 ) {
   return getCachedPublicToolListing(type, categoryId, keyword, paid, sort);
+}
+
+export async function getPublicSoftwareCatalogRows() {
+  return getCachedPublicSoftwareCatalogRows();
 }
 
 export async function getPublicToolsByCategoryNames(categoryNames: string[]) {
