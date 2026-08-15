@@ -44,7 +44,9 @@ describe("SEO follow-up source contracts", () => {
   });
 
   it("keeps public listing and tool detail content inside semantic main landmarks", () => {
-    const software = read("src/app/software/page-shell.tsx");
+    const software = read(
+      "src/components/redesign/software/EnheRedesignSoftwareCatalog.tsx",
+    );
     const accountServices = read("src/app/account-services/page-shell.tsx");
     const skillLearning = read("src/app/skill-learning/page-shell.tsx");
     const aiNews = read("src/app/ai-news/page-shell.tsx");

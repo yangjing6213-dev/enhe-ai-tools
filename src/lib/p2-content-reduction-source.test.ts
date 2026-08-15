@@ -7,25 +7,34 @@ function read(path: string) {
 }
 
 describe("P2 content reduction source contracts", () => {
-  it("folds listing guidance while keeping product discovery visible", () => {
+  it("keeps the approved catalog compact while folding legacy listing guidance", () => {
     const software = read("src/app/software/page-shell.tsx");
+    const softwareCatalog = read(
+      "src/components/redesign/software/EnheRedesignSoftwareCatalog.tsx",
+    );
     const accountServices = read("src/app/account-services/page-shell.tsx");
     const css = read("src/app/globals.css");
 
-    for (const source of [software, accountServices]) {
-      expect(source).toContain("<ListingGuidanceFold forceLocale={forceLocale} />");
-      expect(source).toContain('className="content-fold listing-guidance-fold"');
-      expect(source).toContain("<ListingDecisionStrip forceLocale={forceLocale} />");
-      expect(source).toContain("<ListingTrustNote forceLocale={forceLocale} />");
-      expect(source).toContain("buildFaqSchema");
+    expect(software).toContain("EnheRedesignSoftwareCatalog");
+    expect(softwareCatalog).toContain("<EnheRedesignSoftwareCategorySelector");
+    expect(softwareCatalog).toContain('data-section="all-products"');
+    expect(softwareCatalog.indexOf("<EnheRedesignSoftwareCategorySelector")).toBeLessThan(
+      softwareCatalog.indexOf('data-section="all-products"'),
+    );
+    expect(softwareCatalog).not.toContain("ListingGuidanceFold");
+    expect(softwareCatalog).not.toContain("FilterBar");
 
-      expect(source.indexOf("<ListingGuidanceFold")).toBeLessThan(
-        source.indexOf("<FilterBar"),
-      );
-      expect(source.indexOf("<FilterBar")).toBeLessThan(
-        source.indexOf("<ToolCard key={tool.id}"),
-      );
-    }
+    expect(accountServices).toContain("<ListingGuidanceFold forceLocale={forceLocale} />");
+    expect(accountServices).toContain('className="content-fold listing-guidance-fold"');
+    expect(accountServices).toContain("<ListingDecisionStrip forceLocale={forceLocale} />");
+    expect(accountServices).toContain("<ListingTrustNote forceLocale={forceLocale} />");
+    expect(accountServices).toContain("buildFaqSchema");
+    expect(accountServices.indexOf("<ListingGuidanceFold")).toBeLessThan(
+      accountServices.indexOf("<FilterBar"),
+    );
+    expect(accountServices.indexOf("<FilterBar")).toBeLessThan(
+      accountServices.indexOf("<ToolCard key={tool.id}"),
+    );
 
     expect(css).toContain(".listing-guidance-fold");
   });

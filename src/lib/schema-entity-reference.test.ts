@@ -3,6 +3,10 @@ import { join } from "node:path";
 import { describe, expect, it } from "vitest";
 import { enheOrganizationReference } from "@/lib/brand-entity";
 import { buildPricingOfferCatalogSchema } from "@/app/pricing/page-shell";
+import {
+  buildFreeToolDetailOffer,
+  resolveToolDetailSchemaPrice,
+} from "@/app/tools/[slug]/page-shell";
 
 describe("shared ENHE structured-data entity references", () => {
   it("uses the canonical organization reference for pricing offers", () => {
@@ -53,52 +57,40 @@ describe("shared ENHE structured-data entity references", () => {
     expect(detail).toContain('"@id": url');
   });
 
-  it("emits zero-price offers only for confirmed free course and software details", async () => {
-    const detailModule = (await import(
-      "@/app/tools/[slug]/page-shell"
-    )) as Record<string, unknown>;
-    const resolveSchemaPrice = detailModule.resolveToolDetailSchemaPrice as
-      | ((input: {
-          toolType: "software" | "online" | "skill_learning";
-          isDownloadPaid: boolean;
-          servicePrice: number;
-        }) => number | null)
-      | undefined;
-    const buildFreeOffer = detailModule.buildFreeToolDetailOffer as
-      | ((url: string) => Record<string, string>)
-      | undefined;
-
-    expect(resolveSchemaPrice).toBeTypeOf("function");
-    expect(buildFreeOffer).toBeTypeOf("function");
+  it("emits zero-price offers only for confirmed free course and software details", () => {
+    expect(resolveToolDetailSchemaPrice).toBeTypeOf("function");
+    expect(buildFreeToolDetailOffer).toBeTypeOf("function");
     expect(
-      resolveSchemaPrice?.({
+      resolveToolDetailSchemaPrice({
         toolType: "skill_learning",
         isDownloadPaid: false,
         servicePrice: 0,
       }),
     ).toBe(0);
     expect(
-      resolveSchemaPrice?.({
+      resolveToolDetailSchemaPrice({
         toolType: "software",
         isDownloadPaid: false,
         servicePrice: 0,
       }),
     ).toBe(0);
     expect(
-      resolveSchemaPrice?.({
+      resolveToolDetailSchemaPrice({
         toolType: "online",
         isDownloadPaid: false,
         servicePrice: 0,
       }),
     ).toBeNull();
     expect(
-      resolveSchemaPrice?.({
+      resolveToolDetailSchemaPrice({
         toolType: "software",
         isDownloadPaid: true,
         servicePrice: 0,
       }),
     ).toBeNull();
-    expect(buildFreeOffer?.("https://www.enhe-tech.com.cn/software/codex-api")).toEqual({
+    expect(
+      buildFreeToolDetailOffer("https://www.enhe-tech.com.cn/software/codex-api"),
+    ).toEqual({
       "@type": "Offer",
       price: "0.00",
       priceCurrency: "CNY",

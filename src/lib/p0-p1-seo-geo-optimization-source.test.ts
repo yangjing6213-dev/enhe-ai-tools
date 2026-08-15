@@ -14,12 +14,11 @@ function summaryBlocks(source: string) {
 
 describe("P0 and P1 SEO/GEO optimization contracts", () => {
   it("keeps one compact user-first answer visible before filters on core commercial pages", () => {
+    const softwareCatalog = read(
+      "src/components/redesign/software/EnheRedesignSoftwareCatalog.tsx",
+    );
+    const softwareCopy = read("src/lib/redesign/software/software-copy.ts");
     const pages = [
-      {
-        source: read("src/app/software/page-shell.tsx"),
-        component: "<SoftwareUserAnswerCard forceLocale={forceLocale} />",
-        before: "<ListingGuidanceFold forceLocale={forceLocale} />",
-      },
       {
         source: read("src/app/account-services/page-shell.tsx"),
         component: "<AccountServicesUserAnswerCard forceLocale={forceLocale} />",
@@ -44,6 +43,17 @@ describe("P0 and P1 SEO/GEO optimization contracts", () => {
         page.source.indexOf(page.before),
       );
     }
+
+    expect(softwareCatalog).toContain("copy.page.intro");
+    expect(softwareCatalog.indexOf("copy.page.intro")).toBeLessThan(
+      softwareCatalog.indexOf("<EnheRedesignSoftwareCategorySelector"),
+    );
+    expect(softwareCopy).toContain(
+      "按真实任务找到已公开的 ENHE AI 工具、课程和效率入口",
+    );
+    expect(softwareCopy).toContain(
+      "Find public ENHE AI tools, courses, and a free audit by task",
+    );
   });
 
   it("keeps folded summaries out of the heading tree to reduce rendered structure noise", () => {

@@ -121,9 +121,13 @@ describe("site header navigation", () => {
     expect(css).not.toContain(".site-nav-dropdown[open] .site-nav-dropdown-trigger");
   });
 
-  it("resolves software categoryName query values to category ids", () => {
+  it("keeps legacy categoryName URLs noindex while using fixed catalog keys", () => {
     const pageSource = readFileSync(
       new URL("../app/software/page-shell.tsx", import.meta.url),
+      "utf8",
+    );
+    const productionSource = readFileSync(
+      new URL("../lib/redesign/software/software-production.ts", import.meta.url),
       "utf8",
     );
     const categorySource = readFileSync(
@@ -132,8 +136,10 @@ describe("site header navigation", () => {
     );
 
     expect(pageSource).toContain("categoryName");
-    expect(pageSource).toContain("resolveSoftwareCategoryIdByName");
-    expect(pageSource).toContain("resolvedCategoryId");
+    expect(pageSource).toContain("hasUnsupportedLegacyFilter");
+    expect(pageSource).not.toContain("resolveSoftwareCategoryIdByName");
+    expect(productionSource).toContain("searchParams.category");
+    expect(productionSource).toContain("leafCategoryIds");
     expect(categorySource).toContain("resolveSoftwareCategoryIdByName");
     expect(categorySource).toContain("resolveLocalizedToolCategoryName");
   });

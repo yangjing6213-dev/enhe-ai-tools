@@ -90,7 +90,9 @@ describe("seo phase two source contracts", () => {
     const discovery = read("src/lib/public-discovery-manifest.ts");
     const seo = read("src/lib/seo.ts");
     const home = read("src/app/page-shell.tsx");
-    const software = read("src/app/software/page-shell.tsx");
+    const softwareCard = read(
+      "src/components/redesign/software/EnheRedesignSoftwareCard.tsx",
+    );
     const skillLearning = read("src/app/skill-learning/page-shell.tsx");
     const accountServices = read("src/app/account-services/page-shell.tsx");
 
@@ -103,8 +105,7 @@ describe("seo phase two source contracts", () => {
     expect(seo).toContain("/^\\/ai-topics$/");
     expect(seo).toContain("/^\\/ai-topics\\/.+$/");
     expect(home).toContain('"/ai-topics"');
-    expect(software).toContain('"/ai-topics/ai-content-creation-tools"');
-    expect(software).toContain('"/ai-topics/local-ai-deployment"');
+    expect(softwareCard).toContain("href={product.detailHref}");
     expect(skillLearning).toContain('"/ai-topics/ai-skill-learning-path"');
     expect(accountServices).toContain(
       '"/ai-topics/ai-account-service-compliance"',

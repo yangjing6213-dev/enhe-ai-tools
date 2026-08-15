@@ -19,11 +19,16 @@ import {
   getEffectiveSiteLogo,
   getSettingsMap
 } from "@/lib/settings";
+import type { RedesignLanguageHrefs } from "@/components/redesign/types";
 
 export async function PublicSiteChrome({
   children,
-  forceLocale
-}: React.PropsWithChildren<{ forceLocale: Locale }>) {
+  forceLocale,
+  languageHrefs,
+}: React.PropsWithChildren<{
+  forceLocale: Locale;
+  languageHrefs?: RedesignLanguageHrefs;
+}>) {
   const settings = await getSettingsMap();
   const t = getDictionary(forceLocale);
   const languageAlternates = buildLanguageAlternates("/");
@@ -58,7 +63,10 @@ export async function PublicSiteChrome({
   return (
     <div className="enhe-redesign-production" lang={forceLocale}>
       <StructuredData data={[websiteSchema, organizationSchema]} />
-      <EnheRedesignPublicHeader locale={forceLocale} />
+      <EnheRedesignPublicHeader
+        locale={forceLocale}
+        languageHrefs={languageHrefs}
+      />
       <div className="fade-in">{children}</div>
       <CustomerSupportWidget locale={forceLocale} faqs={getCustomerSupportFaqs(forceLocale)} />
       <EnheRedesignPublicFooter locale={forceLocale} />

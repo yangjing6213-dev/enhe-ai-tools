@@ -79,6 +79,7 @@ export function EnheRedesignSoftwareCategorySelector({
     ),
   );
   const [selectedIndex, setSelectedIndex] = useState(initialSelectedIndex);
+  const [focusedIndex, setFocusedIndex] = useState(initialSelectedIndex);
   const [open, setOpen] = useState(false);
   const buttonRef = useRef<HTMLButtonElement>(null);
   const layerRef = useRef<HTMLDivElement>(null);
@@ -98,8 +99,8 @@ export function EnheRedesignSoftwareCategorySelector({
     buttonRef.current?.focus();
   };
 
-  const moveSelection = (direction: -1 | 1) => {
-    setSelectedIndex((currentIndex) => {
+  const moveFocus = (direction: -1 | 1) => {
+    setFocusedIndex((currentIndex) => {
       const nextIndex =
         (currentIndex + direction + SOFTWARE_CATEGORIES.length) % SOFTWARE_CATEGORIES.length;
 
@@ -112,7 +113,9 @@ export function EnheRedesignSoftwareCategorySelector({
     const nextIndex = SOFTWARE_CATEGORIES.findIndex(
       (category) => category.id === selectedCategoryId,
     );
-    setSelectedIndex(Math.max(0, nextIndex));
+    const normalizedIndex = Math.max(0, nextIndex);
+    setSelectedIndex(normalizedIndex);
+    setFocusedIndex(normalizedIndex);
   }, [selectedCategoryId]);
 
   useEffect(() => {
@@ -157,9 +160,9 @@ export function EnheRedesignSoftwareCategorySelector({
 
   useEffect(() => {
     if (open) {
-      categoryButtonRefs.current[selectedIndex]?.focus();
+      categoryButtonRefs.current[focusedIndex]?.focus();
     }
-  }, [open, selectedIndex]);
+  }, [focusedIndex, open]);
 
   useEffect(() => {
     if (!open) {
@@ -173,15 +176,21 @@ export function EnheRedesignSoftwareCategorySelector({
         return;
       }
 
+      if (event.key === "Enter" || event.key === " ") {
+        event.preventDefault();
+        categoryButtonRefs.current[focusedIndex]?.click();
+        return;
+      }
+
       if (event.key === "ArrowDown") {
         event.preventDefault();
-        moveSelection(1);
+        moveFocus(1);
         return;
       }
 
       if (event.key === "ArrowUp") {
         event.preventDefault();
-        moveSelection(-1);
+        moveFocus(-1);
       }
     };
 
@@ -205,7 +214,7 @@ export function EnheRedesignSoftwareCategorySelector({
       document.removeEventListener("keydown", handleKeyDown);
       document.removeEventListener("pointerdown", handlePointerDown);
     };
-  }, [open, selectedIndex]);
+  }, [focusedIndex, open]);
 
   return (
     <div className="redesign-software-category-layer" data-open={open ? "true" : "false"}>
@@ -216,7 +225,10 @@ export function EnheRedesignSoftwareCategorySelector({
         className="redesign-software-category-trigger"
         aria-expanded={open}
         aria-controls={panelId}
-        onClick={() => setOpen((currentOpen) => !currentOpen)}
+        onClick={() => {
+          setFocusedIndex(selectedIndex);
+          setOpen((currentOpen) => !currentOpen);
+        }}
       >
         <span>{triggerLabel}</span>
         <span aria-hidden="true">▾</span>
@@ -269,6 +281,7 @@ export function EnheRedesignSoftwareCategorySelector({
                 data-selected={selectedIndex === index ? "true" : "false"}
                 onClick={() => {
                   setSelectedIndex(index);
+                  setFocusedIndex(index);
                   close();
                 }}
               >

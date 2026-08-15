@@ -49,4 +49,26 @@ describe("production software public query", () => {
       /fileUrl|filePath|files|downloadFile|onlineUrl|orders|purchases|objectKey/i,
     );
   });
+
+  it("does not turn a database outage into a cached empty catalog", async () => {
+    const outage = Object.assign(new Error("Can't reach database server"), {
+      code: "P1001",
+    });
+    db.toolFindMany.mockRejectedValue(outage);
+    const { getPublicSoftwareCatalogRows } = await import("@/lib/public-content");
+
+    await expect(getPublicSoftwareCatalogRows()).rejects.toBe(outage);
+  });
+
+  it("uses a lightweight cached projection for public catalog covers", async () => {
+    db.toolFindMany.mockResolvedValue([]);
+    const { getPublicSoftwareCatalogCovers } = await import("@/lib/public-content");
+
+    await getPublicSoftwareCatalogCovers();
+
+    expect(db.toolFindMany).toHaveBeenCalledOnce();
+    const query = db.toolFindMany.mock.calls[0]?.[0];
+    expect(query.where).toMatchObject({ status: "published" });
+    expect(query.select).toEqual({ id: true, coverImage: true });
+  });
 });

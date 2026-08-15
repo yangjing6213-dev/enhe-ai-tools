@@ -1,6 +1,6 @@
 import type { RedesignLocale } from "@/components/redesign/types";
 import { buildCanonicalToolPath } from "@/lib/public-slugs";
-import { resolveToolImageSrc } from "@/lib/tool-image";
+import { resolvePublicToolImageSrc } from "@/lib/tool-image";
 import {
   buildLocalizedToolPreviewText,
   resolveLocalizedToolIdentity,
@@ -29,7 +29,7 @@ export type PublicSoftwareCatalogRow = {
   downloadPrice: unknown;
   isHomeRecommended: boolean;
   sortOrder: number;
-  createdAt: Date;
+  createdAt: Date | string;
   category: { name: string } | null;
   priceSpecs: Array<{
     price: unknown;
@@ -183,6 +183,53 @@ export async function getProductionSoftwareCatalog({
   return buildSoftwareCatalogPage({ rows, locale, category, page });
 }
 
+export async function getProductionSoftwareRouteData({
+  locale,
+  searchParams,
+}: {
+  locale: RedesignLocale;
+  searchParams: SoftwareCatalogSearchParams;
+}) {
+  const request = parseSoftwareCatalogSearchParams(searchParams);
+  if (!request) return null;
+
+  const { getPublicSoftwareCatalogRows } = await import("@/lib/public-content");
+  const rows = await getPublicSoftwareCatalogRows();
+  const listing = buildSoftwareCatalogPage({ rows, locale, ...request });
+  if (!listing) return null;
+
+  return {
+    listing,
+    languageHrefs: buildSoftwareCatalogLanguageHrefs(
+      rows,
+      request.category,
+      request.page,
+    ),
+  };
+}
+
+export function buildSoftwareCatalogLanguageHrefs(
+  rows: PublicSoftwareCatalogRow[],
+  category: SoftwareLeafCategoryId | undefined,
+  page: number,
+) {
+  return Object.fromEntries(
+    (["zh", "en"] as const).map((locale) => {
+      const targetPage = buildSoftwareCatalogPage({
+        rows,
+        locale,
+        category,
+        page,
+      });
+
+      return [
+        locale,
+        buildCatalogHref(locale, category, targetPage ? page : 1),
+      ];
+    }),
+  ) as Record<RedesignLocale, string>;
+}
+
 function isVisibleInLocale(
   row: PublicSoftwareCatalogRow,
   locale: RedesignLocale,
@@ -250,7 +297,7 @@ function compareCatalogRows(
 ) {
   return (
     left.row.sortOrder - right.row.sortOrder ||
-    right.row.createdAt.getTime() - left.row.createdAt.getTime() ||
+    getCreatedAtTime(right.row.createdAt) - getCreatedAtTime(left.row.createdAt) ||
     left.row.id.localeCompare(right.row.id)
   );
 }
@@ -260,10 +307,14 @@ function compareNewReleaseRows(
   right: { row: PublicSoftwareCatalogRow },
 ) {
   return (
-    right.row.createdAt.getTime() - left.row.createdAt.getTime() ||
+    getCreatedAtTime(right.row.createdAt) - getCreatedAtTime(left.row.createdAt) ||
     left.row.sortOrder - right.row.sortOrder ||
     left.row.id.localeCompare(right.row.id)
   );
+}
+
+function getCreatedAtTime(value: Date | string) {
+  return value instanceof Date ? value.getTime() : Date.parse(value);
 }
 
 function buildCatalogItem(
@@ -278,14 +329,16 @@ function buildCatalogItem(
   );
   const primaryPrice = getPrimaryToolPrice(
     row.priceSpecs,
-    row.downloadPrice,
+    row.type === "software" || row.type === "ai_skill"
+      ? row.downloadPrice
+      : 0,
   );
   const isPaid =
     primaryPrice > 0 &&
     (row.type === "software" || row.type === "ai_skill"
       ? row.isDownloadPaid
       : true);
-  const mediaSrc = resolveToolImageSrc(row.coverImage);
+  const mediaSrc = resolvePublicToolImageSrc(row.id, row.coverImage);
 
   return {
     id: row.id,

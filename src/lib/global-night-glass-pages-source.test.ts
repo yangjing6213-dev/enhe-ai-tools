@@ -3,7 +3,7 @@ import { describe, expect, it } from "vitest";
 
 describe("global night glass page adoption source contract", () => {
   it("uses shared filter and form classes on public listing pages", () => {
-    for (const pagePath of ["../app/software/page-shell.tsx", "../app/online-tools/page-shell.tsx", "../app/skill-learning/page-shell.tsx"]) {
+    for (const pagePath of ["../app/online-tools/page-shell.tsx", "../app/skill-learning/page-shell.tsx"]) {
       const page = readFileSync(new URL(pagePath, import.meta.url), "utf8");
       expect(page).toContain("filter-surface");
       expect(page).toContain("form-control-dark");
@@ -11,6 +11,32 @@ describe("global night glass page adoption source contract", () => {
       expect(page).not.toContain("bg-[#7AA7FF]");
       expect(page).not.toContain("focus:border-[#7AA7FF]");
     }
+  });
+
+  it("uses the approved catalog surface and focus styles on the software listing", () => {
+    const page = readFileSync(
+      new URL("../app/software/page-shell.tsx", import.meta.url),
+      "utf8",
+    );
+    const catalog = readFileSync(
+      new URL(
+        "../components/redesign/software/EnheRedesignSoftwareCatalog.tsx",
+        import.meta.url,
+      ),
+      "utf8",
+    );
+    const styles = readFileSync(
+      new URL("../styles/redesign/software.css", import.meta.url),
+      "utf8",
+    );
+
+    expect(page).toContain('import "@/styles/redesign/software.css"');
+    expect(page).toContain("<EnheRedesignSoftwareCatalog");
+    expect(catalog).toContain("redesign-software-category-trigger");
+    expect(styles).toContain(".redesign-software-category-trigger");
+    expect(styles).toContain(":focus-visible");
+    expect(page).not.toContain("bg-[#7AA7FF]");
+    expect(page).not.toContain("focus:border-[#7AA7FF]");
   });
 
   it("uses shared surface and form classes on auth pages", () => {

@@ -12,7 +12,7 @@ import { SOFTWARE_CATEGORIES } from "@/lib/redesign/software/software-categories
 import { SOFTWARE_COPY } from "@/lib/redesign/software/software-copy";
 import { SOFTWARE_PRODUCTS } from "@/lib/redesign/software/software-products";
 
-import { EnheRedesignSoftwareCatalog } from "./EnheRedesignSoftwareCatalog";
+import { EnheRedesignSoftwarePreviewCatalog } from "./EnheRedesignSoftwarePreviewCatalog";
 
 Object.assign(globalThis, { React });
 
@@ -25,7 +25,9 @@ function readCandidate(relativePath: string) {
 }
 
 function renderCatalog(locale: RedesignLocale) {
-  return renderToStaticMarkup(React.createElement(EnheRedesignSoftwareCatalog, { locale }));
+  return renderToStaticMarkup(
+    React.createElement(EnheRedesignSoftwarePreviewCatalog, { locale }),
+  );
 }
 
 function countMatches(value: string, pattern: RegExp) {
@@ -124,7 +126,7 @@ describe("AI tools candidate bilingual preview regression", () => {
     expect(page).toContain("resolveRedesignPreviewLocale");
     expect(page).toContain("x-enhe-locale");
     expect(page).toContain("<EnheRedesignHeader");
-    expect(page).toContain("<EnheRedesignSoftwareCatalog locale={locale} />");
+    expect(page).toContain("<EnheRedesignSoftwarePreviewCatalog locale={locale} />");
     expect(page).toContain("<EnheRedesignFooter locale={locale} />");
     expect(page).toContain(`${PREVIEW_ROUTE}?locale=en`);
     expect(page).toContain(`${PREVIEW_ROUTE}?locale=zh`);
@@ -195,6 +197,12 @@ describe("AI tools candidate bilingual preview regression", () => {
       ([, href]) => href,
     );
     const imageSources = [...html.matchAll(/<img[^>]*src="([^"]+)"/g)].map(([, src]) => src);
+    const resolvedImageSources = imageSources.map((src) => {
+      const normalized = src.replaceAll("&amp;", "&");
+      return normalized.startsWith("/_next/image?")
+        ? new URL(normalized, "https://www.enhe-tech.com.cn").searchParams.get("url") ?? ""
+        : normalized;
+    });
     const expectedMediaSources = [
       ...new Set(
         SOFTWARE_PRODUCTS.flatMap((product) => (product.media ? [product.media.src] : [])),
@@ -212,9 +220,9 @@ describe("AI tools candidate bilingual preview regression", () => {
     expect(SOFTWARE_PRODUCTS.every((product) => !/^https?:/i.test(product.detailHref.zh))).toBe(true);
     expect(SOFTWARE_PRODUCTS.every((product) => !/^https?:/i.test(product.detailHref.en))).toBe(true);
 
-    expect([...new Set(preloadHrefs)].sort()).toEqual(expectedMediaSources);
-    expect([...new Set(imageSources)].sort()).toEqual(expectedMediaSources);
-    expect([...preloadHrefs, ...imageSources].every((value) => value.startsWith("/"))).toBe(true);
+    expect(preloadHrefs).toEqual([]);
+    expect([...new Set(resolvedImageSources)].sort()).toEqual(expectedMediaSources);
+    expect(resolvedImageSources.every((value) => value.startsWith("/"))).toBe(true);
     expect(html).not.toMatch(forbiddenClaimsPattern);
   });
 

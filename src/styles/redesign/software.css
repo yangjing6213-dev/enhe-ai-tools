@@ -4,6 +4,10 @@
   font-family: var(--enhe-font-zh, "Microsoft YaHei", system-ui, sans-serif);
 }
 
+.enhe-redesign-production > .fade-in:has(.redesign-software) {
+  animation-name: redesign-software-fade-in;
+}
+
 .redesign-software[data-locale="en"] {
   font-family: var(--enhe-font-en, Inter, Arial, sans-serif);
 }
@@ -369,5 +373,15 @@
   .redesign-software-category-trigger,
   .redesign-software-category-button {
     transition: none;
+  }
+}
+
+@keyframes redesign-software-fade-in {
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
   }
 }

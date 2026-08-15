@@ -2,8 +2,10 @@ import { describe, expect, it } from "vitest";
 
 import {
   SOFTWARE_CATALOG_PAGE_SIZE,
+  buildSoftwareCatalogLanguageHrefs,
   buildSoftwareCatalogPage,
   parseSoftwareCatalogSearchParams,
+  type PublicSoftwareCatalogRow,
 } from "@/lib/redesign/software/software-production";
 
 function buildRows(count: number) {
@@ -116,6 +118,109 @@ describe("production software catalog adapter", () => {
       "tool-2",
       "tool-3",
     ]);
+  });
+
+  it("accepts cache-hit rows after a JSON round trip", () => {
+    const cachedRows = JSON.parse(
+      JSON.stringify(buildRows(2)),
+    ) as PublicSoftwareCatalogRow[];
+
+    expect(
+      buildSoftwareCatalogPage({ rows: cachedRows, locale: "zh", page: 1 })
+        ?.items,
+    ).toHaveLength(2);
+  });
+
+  it("uses downloadPrice fallback only for downloadable product types", () => {
+    const base = buildRows(1)[0];
+    const page = buildSoftwareCatalogPage({
+      rows: [
+        {
+          ...base,
+          id: "online-fallback",
+          slug: "online-fallback",
+          type: "online",
+          downloadPrice: 99,
+          priceSpecs: [],
+        },
+        {
+          ...base,
+          id: "online-spec",
+          slug: "online-spec",
+          type: "online",
+          downloadPrice: 99,
+          priceSpecs: [{ price: 8, status: "active", sortOrder: 0 }],
+        },
+        {
+          ...base,
+          id: "software-fallback",
+          slug: "software-fallback",
+          type: "software",
+          isDownloadPaid: true,
+          downloadPrice: 19,
+          priceSpecs: [],
+        },
+      ],
+      locale: "zh",
+      page: 1,
+    });
+    const prices = Object.fromEntries(
+      page?.items.map((item) => [item.id, item.price]) ?? [],
+    );
+
+    expect(prices).toMatchObject({
+      "online-fallback": "免费",
+      "online-spec": "¥8.00",
+      "software-fallback": "¥19.00",
+    });
+  });
+
+  it("uses opaque same-origin media URLs and rejects arbitrary external images", () => {
+    const base = buildRows(1)[0];
+    const page = buildSoftwareCatalogPage({
+      rows: [
+        {
+          ...base,
+          id: "cos-cover",
+          slug: "cos-cover",
+          coverImage:
+            "https://enhe-ai-tools-1303691623.cos.ap-shanghai.myqcloud.com/tool-cover-a-skill/cover.png",
+        },
+        {
+          ...base,
+          id: "external-cover",
+          slug: "external-cover",
+          coverImage: "https://tracker.example/cover.png",
+        },
+      ],
+      locale: "zh",
+      page: 1,
+    });
+
+    expect(page?.items.find((item) => item.id === "cos-cover")?.media?.src).toBe(
+      "/api/tool-images?id=cos-cover",
+    );
+    expect(page?.items.find((item) => item.id === "external-cover")?.media).toBeNull();
+    expect(JSON.stringify(page)).not.toContain("myqcloud.com");
+  });
+
+  it("falls language switching back to page one when the peer locale lacks that page", () => {
+    const rows: PublicSoftwareCatalogRow[] = buildRows(13);
+    rows[12] = {
+      ...rows[12],
+      englishName: null,
+      shortDescription: "[[zh]]仅中文公开说明。[[/zh]]",
+      content: "[[zh]]仅中文公开内容。[[/zh]]",
+    };
+
+    expect(buildSoftwareCatalogLanguageHrefs(rows, undefined, 2)).toEqual({
+      zh: "/software?page=2",
+      en: "/en/software",
+    });
+    expect(buildSoftwareCatalogLanguageHrefs(rows, "video", 1)).toEqual({
+      zh: "/software?category=video",
+      en: "/en/software?category=video",
+    });
   });
 
   it("maps the approved category parameter to a server-filtered result and preserves it in pagination", () => {

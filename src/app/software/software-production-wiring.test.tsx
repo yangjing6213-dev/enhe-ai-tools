@@ -19,22 +19,35 @@ describe("production software route wiring", () => {
     const zhRoute = readSource("../(zh-public)/software/page.tsx");
     const enRoute = readSource("../en/software/page.tsx");
     const preview = readSource("../redesign-preview/software/page.tsx");
+    const catalog = readSource(
+      "../../components/redesign/software/EnheRedesignSoftwareCatalog.tsx",
+    );
+    const previewCatalog = readSource(
+      "../../components/redesign/software/EnheRedesignSoftwarePreviewCatalog.tsx",
+    );
 
     expect(shell).toContain("EnheRedesignSoftwareCatalog");
     expect(shell).toContain("getProductionSoftwareCatalog");
     expect(shell).not.toContain("SOFTWARE_PRODUCTS");
+    expect(catalog).not.toContain("SOFTWARE_PRODUCTS");
+    expect(catalog).not.toContain("NEW_RELEASE_IDS");
+    expect(catalog).not.toContain("FEATURED_PRODUCT_IDS");
     expect(shell).not.toMatch(/Candidate|LOCAL CANDIDATE|Preview/);
     expect(zhRoute).toContain("PublicSiteChrome");
     expect(zhRoute).toContain('forceLocale="zh"');
     expect(enRoute).toContain("PublicSiteChrome");
     expect(enRoute).toContain('forceLocale="en"');
-    expect(preview).toContain("EnheRedesignSoftwareCatalog");
+    expect(preview).toContain("EnheRedesignSoftwarePreviewCatalog");
+    expect(previewCatalog).toContain("SOFTWARE_PRODUCTS");
     expect(preview).toContain("LOCAL CANDIDATE");
   });
 
-  it("keeps explicit media dimensions and a failure fallback in the shared card", () => {
+  it("uses next/image with explicit dimensions and a failure fallback in the shared card", () => {
     const card = readSource("../../components/redesign/software/EnheRedesignSoftwareCard.tsx");
 
+    expect(card).toContain('from "next/image"');
+    expect(card).toContain("<Image");
+    expect(card).not.toContain("<img");
     expect(card).toContain("width=");
     expect(card).toContain("height=");
     expect(card).toContain("alt=");
@@ -111,11 +124,20 @@ describe("production software route wiring", () => {
       "zh",
       Promise.resolve({ category: "video" }),
     );
+    const allCategory = await generateSoftwarePageMetadata(
+      "zh",
+      Promise.resolve({ category: "all" }),
+    );
 
     expect(String(first.alternates?.canonical)).toMatch(/\/software$/);
     expect(String(second.alternates?.canonical)).toMatch(/\/software\?page=2$/);
     expect(String(englishSecond.alternates?.canonical)).toMatch(/\/en\/software\?page=2$/);
     expect(String(category.alternates?.canonical)).toMatch(/\/software$/);
     expect(category.robots).toMatchObject({ index: false, follow: true });
+    expect(allCategory.robots).toMatchObject({ index: false, follow: true });
+    expect(second.alternates?.languages).toHaveProperty("zh-CN");
+    expect(second.alternates?.languages).not.toHaveProperty("en-US");
+    expect(englishSecond.alternates?.languages).toHaveProperty("en-US");
+    expect(englishSecond.alternates?.languages).not.toHaveProperty("zh-CN");
   });
 });

@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import { useState } from "react";
 
 import type { RedesignLocale } from "@/components/redesign/types";
@@ -38,12 +39,14 @@ export function EnheRedesignSoftwareCard({
     >
       <div className="redesign-software-card-frame">
         {product.media && !showTextCover ? (
-          <img
+          <Image
             className="redesign-software-card-media"
             src={product.media.src}
             alt={product.media.alt}
             width={product.media.width}
             height={product.media.height}
+            sizes="(min-width: 1025px) 280px, (min-width: 768px) 33vw, 84vw"
+            unoptimized={product.media.src.startsWith("/api/tool-images?")}
             onError={() => setMediaFailed(true)}
           />
         ) : null}

@@ -57,6 +57,17 @@ export function filterPublicNewsTags<
 
 type PublicToolType = "software" | "online" | "skill_learning" | "ai_skill";
 
+const publicSoftwareCatalogWhere = {
+  status: "published",
+  OR: [
+    { type: { in: ["software", "online", "ai_skill"] } },
+    {
+      type: "skill_learning",
+      tutorials: { some: { status: "active" } },
+    },
+  ],
+} satisfies Prisma.ToolWhereInput;
+
 export type PublicNewsListingFilters = {
   q?: string;
   category?: string;
@@ -196,19 +207,9 @@ const getCachedPublicToolListing = unstable_cache(
 );
 
 const getCachedPublicSoftwareCatalogRows = unstable_cache(
-  async () => {
-    try {
-      return await prisma.tool.findMany({
-        where: {
-          status: "published",
-          OR: [
-            { type: { in: ["software", "online", "ai_skill"] } },
-            {
-              type: "skill_learning",
-              tutorials: { some: { status: "active" } },
-            },
-          ],
-        },
+  async () =>
+    prisma.tool.findMany({
+        where: publicSoftwareCatalogWhere,
         select: {
           id: true,
           slug: true,
@@ -235,16 +236,18 @@ const getCachedPublicSoftwareCatalogRows = unstable_cache(
           { createdAt: "desc" },
           { id: "asc" },
         ],
-      });
-    } catch (error) {
-      if (isRecoverablePublicReadError(error)) {
-        return [];
-      }
-
-      throw error;
-    }
-  },
+    }),
   ["public-software-catalog-rows"],
+  { revalidate: publicContentRevalidate, tags: ["public-tools"] },
+);
+
+const getCachedPublicSoftwareCatalogCovers = unstable_cache(
+  async () =>
+    prisma.tool.findMany({
+      where: publicSoftwareCatalogWhere,
+      select: { id: true, coverImage: true },
+    }),
+  ["public-software-catalog-covers"],
   { revalidate: publicContentRevalidate, tags: ["public-tools"] },
 );
 
@@ -857,6 +860,10 @@ export async function getPublicToolListing(
 
 export async function getPublicSoftwareCatalogRows() {
   return getCachedPublicSoftwareCatalogRows();
+}
+
+export async function getPublicSoftwareCatalogCovers() {
+  return getCachedPublicSoftwareCatalogCovers();
 }
 
 export async function getPublicToolsByCategoryNames(categoryNames: string[]) {

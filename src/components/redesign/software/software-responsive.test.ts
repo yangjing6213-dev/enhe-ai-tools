@@ -62,4 +62,16 @@ describe("AI tools candidate responsive browsing", () => {
 
     expect(css).not.toMatch(/overflow-x:\s*hidden/);
   });
+
+  it("keeps the mobile sheet viewport-anchored outside transformed fade animation", () => {
+    const css = readCandidate("styles/redesign/software.css");
+
+    expect(css).toContain(
+      ".enhe-redesign-production > .fade-in:has(.redesign-software)",
+    );
+    expect(css).toContain("animation-name: redesign-software-fade-in");
+    expect(css).toMatch(
+      /@keyframes redesign-software-fade-in\s*{[\s\S]*?opacity:\s*0[\s\S]*?opacity:\s*1[\s\S]*?}/,
+    );
+  });
 });

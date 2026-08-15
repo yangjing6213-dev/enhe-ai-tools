@@ -4,7 +4,7 @@ import { notFound } from "next/navigation";
 import { EnheRedesignFooter } from "@/components/redesign/enhe-redesign-footer";
 import { EnheRedesignHeader } from "@/components/redesign/enhe-redesign-header";
 import { REDESIGN_EN_NAV_ITEMS, REDESIGN_ZH_NAV_ITEMS } from "@/components/redesign/navigation";
-import { EnheRedesignSoftwareCatalog } from "@/components/redesign/software/EnheRedesignSoftwareCatalog";
+import { EnheRedesignSoftwarePreviewCatalog } from "@/components/redesign/software/EnheRedesignSoftwarePreviewCatalog";
 import type { RedesignLocale } from "@/components/redesign/types";
 import { resolveRedesignPreviewLocale } from "@/lib/redesign/home/home-preview-locale";
 import { SOFTWARE_COPY } from "@/lib/redesign/software/software-copy";
@@ -70,7 +70,7 @@ export default async function RedesignSoftwarePreviewPage({
         menuCloseLabel={copy.menuCloseLabel}
       />
       <p className="redesign-preview-state-label">LOCAL CANDIDATE</p>
-      <EnheRedesignSoftwareCatalog locale={locale} />
+      <EnheRedesignSoftwarePreviewCatalog locale={locale} />
       <EnheRedesignFooter locale={locale} />
     </div>
   );

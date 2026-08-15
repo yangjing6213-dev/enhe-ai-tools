@@ -67,6 +67,9 @@ describe("AI tools candidate catalog", () => {
 
   it("keeps one H1, three ordered sections, and the exact 4/3/12 section contract", () => {
     const catalog = readCandidate("components/redesign/software/EnheRedesignSoftwareCatalog.tsx");
+    const previewCatalog = readCandidate(
+      "components/redesign/software/EnheRedesignSoftwarePreviewCatalog.tsx",
+    );
 
     const sectionOrder = [
       'sectionId="new-releases"',
@@ -82,9 +85,9 @@ describe("AI tools candidate catalog", () => {
     }
 
     expect(catalog).toContain("<h1>");
-    expect(catalog).toContain("NEW_RELEASE_IDS");
-    expect(catalog).toContain("FEATURED_PRODUCT_IDS");
-    expect(catalog).toContain("SOFTWARE_PRODUCTS");
+    expect(previewCatalog).toContain("NEW_RELEASE_IDS");
+    expect(previewCatalog).toContain("FEATURED_PRODUCT_IDS");
+    expect(previewCatalog).toContain("SOFTWARE_PRODUCTS");
     expect(NEW_RELEASE_IDS).toHaveLength(4);
     expect(FEATURED_PRODUCT_IDS).toHaveLength(3);
     expect(SOFTWARE_PRODUCTS).toHaveLength(12);
@@ -118,6 +121,9 @@ describe("AI tools candidate catalog", () => {
     expect(selector).toContain("data-selected-category");
     expect(selector).toContain("ArrowUp");
     expect(selector).toContain("ArrowDown");
+    expect(selector).toContain('event.key === " "');
+    expect(selector).toContain("focusedIndex");
+    expect(selector).toContain("?.click()");
     expect(selector).toMatch(/focus\(\)/);
     expect(selector).toContain("software-catalog:visibility-change");
     expect(loadMore).toMatch(/SOFTWARE_CATALOG_VISIBILITY_EVENT|software-catalog:visibility-change/);

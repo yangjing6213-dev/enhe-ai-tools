@@ -29,6 +29,39 @@ export function resolveToolImageSrc(value?: string | null) {
   return normalizeImageSrc(source);
 }
 
+export function resolvePublicToolImageSrc(
+  toolId: string,
+  value?: string | null,
+) {
+  const source = value?.trim();
+  if (!source) return null;
+  if (isToolImageSource(source)) {
+    return `/api/tool-images?id=${encodeURIComponent(toolId)}`;
+  }
+  if (/^[a-z][a-z\d+.-]*:\/\//i.test(source)) return null;
+
+  const normalized = normalizeImageSrc(source);
+  if (
+    !normalized ||
+    normalized.startsWith("//") ||
+    normalized.includes("\\")
+  ) {
+    return null;
+  }
+
+  const localOrigin = "https://public-media.invalid";
+  const localUrl = new URL(normalized, localOrigin);
+  if (
+    localUrl.origin !== localOrigin ||
+    (!localUrl.pathname.startsWith("/images/") &&
+      !localUrl.pathname.startsWith("/api/uploads/"))
+  ) {
+    return null;
+  }
+
+  return `${localUrl.pathname}${localUrl.search}`;
+}
+
 function isToolImageKey(key: string) {
   return (
     toolImageKeyPattern.test(key) &&

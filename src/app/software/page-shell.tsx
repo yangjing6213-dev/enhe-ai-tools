@@ -14,6 +14,7 @@ import {
 } from "@/lib/redesign/software/software-production";
 import {
   absoluteUrl,
+  buildAvailableLanguageAlternates,
   buildBreadcrumbSchema,
   buildListingMetadataTitle,
   buildListingMetaDescription,
@@ -32,6 +33,7 @@ export async function generateSoftwarePageMetadata(
   const hasUnsupportedLegacyFilter = unsupportedLegacyFilterKeys.some(
     (key) => Boolean(params[key]),
   );
+  const hasCategoryParameter = params.category !== undefined;
   const canonicalPath =
     request && !request.category && request.page > 1
       ? `/software?page=${request.page}`
@@ -43,9 +45,13 @@ export async function generateSoftwarePageMetadata(
     path: canonicalPath,
     locale: forceLocale === "en" ? "en_US" : "zh_CN",
     localeKey: forceLocale,
+    languageAlternates:
+      request && !request.category && request.page > 1
+        ? buildAvailableLanguageAlternates(canonicalPath, [forceLocale])
+        : undefined,
   });
 
-  if (!request || request.category || hasUnsupportedLegacyFilter) {
+  if (!request || hasCategoryParameter || hasUnsupportedLegacyFilter) {
     return {
       ...metadata,
       robots: { index: false, follow: true },
@@ -58,18 +64,22 @@ export async function generateSoftwarePageMetadata(
 export async function SoftwarePageShell({
   searchParams,
   forceLocale,
+  preloadedListing,
 }: {
   searchParams: Promise<SoftwareCatalogSearchParams>;
   forceLocale: Locale;
+  preloadedListing?: SoftwareCatalogPage;
 }) {
   const request = parseSoftwareCatalogSearchParams(await searchParams);
   if (!request) notFound();
 
-  const listing = await getProductionSoftwareCatalog({
-    locale: forceLocale,
-    category: request.category,
-    page: request.page,
-  });
+  const listing =
+    preloadedListing ??
+    (await getProductionSoftwareCatalog({
+      locale: forceLocale,
+      category: request.category,
+      page: request.page,
+    }));
   if (!listing) notFound();
 
   const t = getDictionary(forceLocale);

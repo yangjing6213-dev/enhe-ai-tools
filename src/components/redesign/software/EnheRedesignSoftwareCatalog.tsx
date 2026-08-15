@@ -5,12 +5,9 @@ import {
   type SoftwareLeafCategoryId,
 } from "@/lib/redesign/software/software-categories";
 import { SOFTWARE_COPY } from "@/lib/redesign/software/software-copy";
-import {
-  FEATURED_PRODUCT_IDS,
-  NEW_RELEASE_IDS,
-  SOFTWARE_PRODUCTS,
-  type RedesignSoftwareProductId,
-  type SoftwareProduct,
+import type {
+  RedesignSoftwareProductId,
+  SoftwareProduct,
 } from "@/lib/redesign/software/software-products";
 import type {
   SoftwareCatalogItem,
@@ -37,11 +34,17 @@ type ProductionCatalogProps = {
 
 type PreviewCatalogProps = {
   locale: RedesignLocale;
-  mode?: "preview";
+  mode: "preview";
+  products: ReadonlyArray<SoftwareProduct>;
+  newReleaseIds: ReadonlyArray<RedesignSoftwareProductId>;
+  featuredProductIds: ReadonlyArray<RedesignSoftwareProductId>;
 };
 
-function getProduct(productId: RedesignSoftwareProductId) {
-  const product = SOFTWARE_PRODUCTS.find((candidate) => candidate.id === productId);
+function getProduct(
+  products: ReadonlyArray<SoftwareProduct>,
+  productId: RedesignSoftwareProductId,
+) {
+  const product = products.find((candidate) => candidate.id === productId);
 
   if (!product) {
     throw new Error(`Missing software product: ${productId}`);
@@ -67,7 +70,7 @@ export function EnheRedesignSoftwareCatalog(
     return renderProductionCatalog(props);
   }
 
-  return renderPreviewCatalog(props.locale);
+  return renderPreviewCatalog(props);
 }
 
 function renderProductionCatalog({
@@ -246,15 +249,20 @@ function CatalogSection({
   );
 }
 
-function renderPreviewCatalog(locale: RedesignLocale) {
+function renderPreviewCatalog({
+  locale,
+  products,
+  newReleaseIds,
+  featuredProductIds,
+}: PreviewCatalogProps) {
   const copy = SOFTWARE_COPY[locale];
-  const newReleaseProducts = NEW_RELEASE_IDS.map(getProduct).map((product) =>
-    localizePreviewProduct(product, locale),
-  );
-  const featuredProducts = FEATURED_PRODUCT_IDS.map(getProduct).map((product) =>
-    localizePreviewProduct(product, locale),
-  );
-  const allProducts = SOFTWARE_PRODUCTS.map((product) =>
+  const newReleaseProducts = newReleaseIds
+    .map((productId) => getProduct(products, productId))
+    .map((product) => localizePreviewProduct(product, locale));
+  const featuredProducts = featuredProductIds
+    .map((productId) => getProduct(products, productId))
+    .map((product) => localizePreviewProduct(product, locale));
+  const allProducts = products.map((product) =>
     localizePreviewProduct(product, locale),
   );
 

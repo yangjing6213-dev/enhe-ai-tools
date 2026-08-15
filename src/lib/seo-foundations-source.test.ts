@@ -13,6 +13,9 @@ describe("SEO foundations source contract", () => {
     const homeShell = read("src/app/page-shell.tsx");
     const ui = read("src/components/ui.tsx");
     const software = read("src/app/software/page-shell.tsx");
+    const softwareCatalog = read(
+      "src/components/redesign/software/EnheRedesignSoftwareCatalog.tsx",
+    );
     const onlineTools = read("src/app/online-tools/page-shell.tsx");
     const skillLearning = read("src/app/skill-learning/page-shell.tsx");
     const pricing = read("src/app/pricing/page-shell.tsx");
@@ -24,7 +27,10 @@ describe("SEO foundations source contract", () => {
     expect(homeShell).toContain('locale: forceLocale === "en" ? "en_US" : "zh_CN"');
     expect(homeShell).toContain("buildHomeMetadataTitle");
 
-    for (const page of [software, onlineTools, skillLearning, pricing, tutorials]) {
+    expect(software).toContain("buildListingMetadataTitle");
+    expect(softwareCatalog).toContain("<h1>");
+
+    for (const page of [onlineTools, skillLearning, pricing, tutorials]) {
       expect(page).toContain('as="h1"');
       expect(page).toMatch(/build(?:Listing)?MetadataTitle/);
     }

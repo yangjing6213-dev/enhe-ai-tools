@@ -120,8 +120,13 @@ describe("SEO and GEO closure regressions", () => {
 
   it("keeps primary product listings on a valid heading hierarchy", () => {
     const card = read("src/components/tool-card.tsx");
+    const softwareCard = read(
+      "src/components/redesign/software/EnheRedesignSoftwareCard.tsx",
+    );
+    const softwareCatalog = read(
+      "src/components/redesign/software/EnheRedesignSoftwareCatalog.tsx",
+    );
     const listingPages = [
-      read("src/app/software/page-shell.tsx"),
       read("src/app/account-services/page-shell.tsx"),
       read("src/app/skill-learning/page-shell.tsx"),
       read("src/app/online-tools/page-shell.tsx"),
@@ -132,5 +137,8 @@ describe("SEO and GEO closure regressions", () => {
     for (const page of listingPages) {
       expect(page).toContain("headingLevel={2}");
     }
+    expect(softwareCatalog).toContain("<h1>");
+    expect(softwareCatalog).toContain("<h2>");
+    expect(softwareCard).toContain("<h3 id={headingId}");
   });
 });

@@ -7,13 +7,19 @@ import { HOME_COPY } from "@/lib/redesign/home/home-copy";
 import { EnheRedesignFooter } from "./enhe-redesign-footer";
 import { EnheRedesignHeader } from "./enhe-redesign-header";
 import { REDESIGN_NAV_ITEMS } from "./navigation";
-import type { RedesignAccount } from "./types";
+import type { RedesignAccount, RedesignLanguageHrefs } from "./types";
 
 function toRedesignLocale(locale: Locale) {
   return locale === "en" ? "en" : "zh";
 }
 
-export async function EnheRedesignPublicHeader({ locale }: { locale: Locale }) {
+export async function EnheRedesignPublicHeader({
+  locale,
+  languageHrefs,
+}: {
+  locale: Locale;
+  languageHrefs?: RedesignLanguageHrefs;
+}) {
   const [requestHeaders, user] = await Promise.all([headers(), getHeaderUserSnapshot()]);
   const redesignLocale = toRedesignLocale(locale);
   const pathname = requestHeaders.get("x-enhe-pathname") ?? buildLocalePath("/", locale);
@@ -41,10 +47,12 @@ export async function EnheRedesignPublicHeader({ locale }: { locale: Locale }) {
       homeHref={buildLocalePath("/", locale)}
       brandLabel={HOME_COPY[redesignLocale].label}
       navItems={REDESIGN_NAV_ITEMS[redesignLocale]}
-      languageHrefs={{
-        zh: buildLanguageSwitcherHref(pathname, "zh"),
-        en: buildLanguageSwitcherHref(pathname, "en"),
-      }}
+      languageHrefs={
+        languageHrefs ?? {
+          zh: buildLanguageSwitcherHref(pathname, "zh"),
+          en: buildLanguageSwitcherHref(pathname, "en"),
+        }
+      }
       account={account}
       userMenuLabel={t.nav.user}
       sticky={false}

@@ -104,26 +104,35 @@ describe("AI GEO foundations", () => {
 
   it("adds answer-style GEO sections and internal links to core listing pages", () => {
     const software = read("src/app/software/page-shell.tsx");
+    const softwareCatalog = read(
+      "src/components/redesign/software/EnheRedesignSoftwareCatalog.tsx",
+    );
+    const softwareCard = read(
+      "src/components/redesign/software/EnheRedesignSoftwareCard.tsx",
+    );
+    const softwareCopy = read("src/lib/redesign/software/software-copy.ts");
+    const softwareAdapter = read(
+      "src/lib/redesign/software/software-production.ts",
+    );
     const accountServices = read("src/app/account-services/page-shell.tsx");
     const aiNews = read("src/app/ai-news/page-shell.tsx");
     const aiTrends = read("src/app/ai-trends/page-shell.tsx");
     const skillLearning = read("src/app/skill-learning/page-shell.tsx");
 
-    expect(software).toContain("softwareGeoSections");
-    expect(software).toContain("softwareAnswerBlock");
-    expect(software).toContain("softwareFaqItems");
-    expect(software).toContain("softwareComparisonRows");
-    expect(software).toContain("softwareSourceLinks");
+    expect(software).toContain("getProductionSoftwareCatalog");
     expect(software).toContain("buildSoftwareCollectionSchema");
-    expect(software).toContain("buildFaqSchema");
-    expect(software).toContain("最热门AI工具：先按工作任务筛选产品分类");
     expect(software).toContain('"@type": "ItemList"');
-    expect(software).toContain("citation:");
-    expect(software).toContain("先看热门工具场景");
-    expect(software).toContain(
-      'buildLocalePath("/skill-learning", forceLocale)',
+    expect(softwareCatalog).toContain("copy.page.intro");
+    expect(softwareCatalog).toContain("listing.newReleases");
+    expect(softwareCatalog).toContain("listing.featuredProducts");
+    expect(softwareCatalog).toContain("listing.items");
+    expect(softwareCard).toContain("href={product.detailHref}");
+    expect(softwareAdapter).toContain("buildCanonicalToolPath");
+    expect(softwareCopy).toContain(
+      "按真实任务找到已公开的 ENHE AI 工具、课程和效率入口",
     );
-    expect(software).toContain('buildLocalePath("/ai-news", forceLocale)');
+    expect(software).not.toContain("softwareGeoSections");
+    expect(software).not.toContain("softwareFaqItems");
 
     expect(accountServices).toContain("accountServicesGeoSections");
     expect(accountServices).toContain("先确认访问需求");
