@@ -6,12 +6,12 @@ export const revalidate = 300;
 export async function generateMetadata({
   searchParams,
 }: {
-  searchParams: Promise<Record<string, string | undefined>>;
+  searchParams: Promise<Record<string, string | string[] | undefined>>;
 }) {
   return generateSoftwarePageMetadata("zh", searchParams);
 }
 
-export default async function SoftwarePage({ searchParams }: { searchParams: Promise<Record<string, string | undefined>> }) {
+export default async function SoftwarePage({ searchParams }: { searchParams: Promise<Record<string, string | string[] | undefined>> }) {
   return (
     <PublicSiteChrome forceLocale="zh">
       <SoftwarePageShell searchParams={searchParams} forceLocale="zh" />

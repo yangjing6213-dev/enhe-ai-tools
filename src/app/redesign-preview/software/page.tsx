@@ -11,8 +11,6 @@ import { SOFTWARE_COPY } from "@/lib/redesign/software/software-copy";
 
 const HEADER_COPY = {
   zh: {
-    currentLocaleLabel: "中文",
-    alternateLocaleLabel: "EN",
     languageAriaLabel: "中文 / EN",
     loginLabel: "登录",
     menuTriggerLabel: "打开导航菜单",
@@ -20,8 +18,6 @@ const HEADER_COPY = {
     userMenuLabel: "用户菜单",
   },
   en: {
-    currentLocaleLabel: "EN",
-    alternateLocaleLabel: "中文",
     languageAriaLabel: "English / 中文",
     loginLabel: "Log in",
     menuTriggerLabel: "Open navigation menu",
@@ -31,8 +27,6 @@ const HEADER_COPY = {
 } satisfies Record<
   RedesignLocale,
   {
-    currentLocaleLabel: string;
-    alternateLocaleLabel: string;
     languageAriaLabel: string;
     loginLabel: string;
     menuTriggerLabel: string;
@@ -55,10 +49,10 @@ export default async function RedesignSoftwarePreviewPage({
   const copy = HEADER_COPY[locale];
   const brandLabel = SOFTWARE_COPY[locale].page.label;
   const currentHref = `/redesign-preview/software?locale=${locale}`;
-  const alternateHref =
-    locale === "en"
-      ? "/redesign-preview/software?locale=zh"
-      : "/redesign-preview/software?locale=en";
+  const languageHrefs = {
+    zh: "/redesign-preview/software?locale=zh",
+    en: "/redesign-preview/software?locale=en",
+  } as const;
 
   return (
     <div className="enhe-redesign-preview">
@@ -67,10 +61,7 @@ export default async function RedesignSoftwarePreviewPage({
         homeHref={currentHref}
         brandLabel={brandLabel}
         navItems={locale === "en" ? REDESIGN_EN_NAV_ITEMS : REDESIGN_ZH_NAV_ITEMS}
-        currentHref={currentHref}
-        alternateHref={alternateHref}
-        currentLocaleLabel={copy.currentLocaleLabel}
-        alternateLocaleLabel={copy.alternateLocaleLabel}
+        languageHrefs={languageHrefs}
         languageAriaLabel={copy.languageAriaLabel}
         account={{ status: "guest", loginLabel: copy.loginLabel, loginHref: "#login" }}
         userMenuLabel={copy.userMenuLabel}

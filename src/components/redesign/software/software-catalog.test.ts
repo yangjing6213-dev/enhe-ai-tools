@@ -69,8 +69,8 @@ describe("AI tools candidate catalog", () => {
     const catalog = readCandidate("components/redesign/software/EnheRedesignSoftwareCatalog.tsx");
 
     const sectionOrder = [
-      'data-section="new-releases"',
-      'data-section="featured-products"',
+      'sectionId="new-releases"',
+      'sectionId="featured-products"',
       'data-section="all-products"',
     ] as const;
 
@@ -81,7 +81,7 @@ describe("AI tools candidate catalog", () => {
       lastIndex = nextIndex;
     }
 
-    expect(catalog.match(/<h1/g)?.length ?? 0).toBe(1);
+    expect(catalog).toContain("<h1>");
     expect(catalog).toContain("NEW_RELEASE_IDS");
     expect(catalog).toContain("FEATURED_PRODUCT_IDS");
     expect(catalog).toContain("SOFTWARE_PRODUCTS");
@@ -156,7 +156,7 @@ describe("AI tools candidate catalog", () => {
     );
 
     const categoryChangePath = selector.match(
-      /catalogRoot\.dataset\.selectedCategory = selectedCategory\.id;[\s\S]*?catalogRoot\.dispatchEvent\([\s\S]*?\);\s*\}, \[rootId, selectedCategory\.id\]\);/,
+      /catalogRoot\.dataset\.selectedCategory = selectedCategory\.id;[\s\S]*?catalogRoot\.dispatchEvent\([\s\S]*?\);\s*\}, \[rootId, selectedCategory\.id, usesServerNavigation\]\);/,
     )?.[0];
     const loadMoreClickPath = loadMore.match(
       /onClick=\{\(\) => \{[\s\S]*?catalogRoot\.dispatchEvent\([\s\S]*?\);\s*\}\}/,

@@ -14,12 +14,13 @@ describe("public content cache contract", () => {
     expect(source).toContain("getHomeRecommendedTools");
     expect(source).toContain("getPublicToolCategories");
     expect(source).toContain("getPublicToolListing");
+    expect(source).toContain("getPublicSoftwareCatalogRows");
     expect(source).toContain("getPublicTutorials");
 
     expect(home).not.toContain("getHomeRecommendedTools");
     expect(home).toContain("getHomeProductDemos");
-    expect(software).toContain("getPublicToolCategories");
-    expect(software).toContain("getPublicToolListing");
+    expect(software).toContain("getProductionSoftwareCatalog");
+    expect(software).not.toContain("getPublicToolListing");
     expect(onlineTools).toContain("getPublicToolCategories");
     expect(onlineTools).toContain("getPublicToolListing");
     expect(skillLearning).toContain("getPublicToolCategories");

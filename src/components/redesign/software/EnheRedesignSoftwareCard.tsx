@@ -3,7 +3,7 @@
 import { useState } from "react";
 
 import type { RedesignLocale } from "@/components/redesign/types";
-import type { SoftwareProduct } from "@/lib/redesign/software/software-products";
+import type { SoftwareCatalogItem } from "@/lib/redesign/software/software-production";
 
 export function EnheRedesignSoftwareCard({
   locale,
@@ -14,7 +14,7 @@ export function EnheRedesignSoftwareCard({
   extraHidden = false,
 }: {
   locale: RedesignLocale;
-  product: SoftwareProduct;
+  product: SoftwareCatalogItem;
   categoryLabel: string;
   detailLabel: string;
   sectionId: "new-releases" | "featured-products" | "all-products";
@@ -41,7 +41,7 @@ export function EnheRedesignSoftwareCard({
           <img
             className="redesign-software-card-media"
             src={product.media.src}
-            alt={product.media.alt[locale]}
+            alt={product.media.alt}
             width={product.media.width}
             height={product.media.height}
             onError={() => setMediaFailed(true)}
@@ -50,15 +50,15 @@ export function EnheRedesignSoftwareCard({
         {showTextCover ? (
           <div className="redesign-software-card-cover" aria-hidden="true">
             <span>ENHE AI</span>
-            <strong>{product.name[locale]}</strong>
+            <strong>{product.name}</strong>
           </div>
         ) : null}
       </div>
       <div className="redesign-software-card-body">
         <p className="redesign-software-card-category">{categoryLabel}</p>
-        <h3 id={headingId}>{product.name[locale]}</h3>
+        <h3 id={headingId}>{product.name}</h3>
         <p id={descriptionId} className="redesign-software-card-description">
-          {product.description[locale]}
+          {product.description}
         </p>
         <dl className="redesign-software-card-meta">
           <div>
@@ -67,10 +67,10 @@ export function EnheRedesignSoftwareCard({
           </div>
           <div>
             <dt>{locale === "en" ? "Price" : "价格"}</dt>
-            <dd>{product.price[locale]}</dd>
+            <dd>{product.price}</dd>
           </div>
         </dl>
-        <a className="redesign-software-card-link" href={product.detailHref[locale]}>
+        <a className="redesign-software-card-link" href={product.detailHref}>
           {detailLabel}
         </a>
       </div>

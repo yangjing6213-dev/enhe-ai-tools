@@ -62,18 +62,31 @@ export function EnheRedesignSoftwareCategorySelector({
   rootId,
   triggerId,
   panelId,
+  selectedCategoryId = "all",
+  categoryHrefs,
 }: {
   locale: RedesignLocale;
   rootId: string;
   triggerId: string;
   panelId: string;
+  selectedCategoryId?: SoftwareCategoryId;
+  categoryHrefs?: Partial<Record<SoftwareCategoryId, string>>;
 }) {
-  const [selectedIndex, setSelectedIndex] = useState(0);
+  const initialSelectedIndex = Math.max(
+    0,
+    SOFTWARE_CATEGORIES.findIndex(
+      (category) => category.id === selectedCategoryId,
+    ),
+  );
+  const [selectedIndex, setSelectedIndex] = useState(initialSelectedIndex);
   const [open, setOpen] = useState(false);
   const buttonRef = useRef<HTMLButtonElement>(null);
   const layerRef = useRef<HTMLDivElement>(null);
-  const categoryButtonRefs = useRef<Array<HTMLButtonElement | null>>([]);
+  const categoryButtonRefs = useRef<
+    Array<HTMLButtonElement | HTMLAnchorElement | null>
+  >([]);
   const touchStartYRef = useRef<number | null>(null);
+  const usesServerNavigation = Boolean(categoryHrefs);
   const selectedCategory = SOFTWARE_CATEGORIES[selectedIndex];
   const triggerLabel = useMemo(
     () => selectedCategory.label[locale],
@@ -96,6 +109,15 @@ export function EnheRedesignSoftwareCategorySelector({
   };
 
   useEffect(() => {
+    const nextIndex = SOFTWARE_CATEGORIES.findIndex(
+      (category) => category.id === selectedCategoryId,
+    );
+    setSelectedIndex(Math.max(0, nextIndex));
+  }, [selectedCategoryId]);
+
+  useEffect(() => {
+    if (usesServerNavigation) return;
+
     const catalogRoot = getSoftwareCatalogRoot(rootId);
 
     if (!catalogRoot) {
@@ -117,9 +139,11 @@ export function EnheRedesignSoftwareCategorySelector({
         handleVisibilityChange as EventListener,
       );
     };
-  }, [rootId]);
+  }, [rootId, usesServerNavigation]);
 
   useEffect(() => {
+    if (usesServerNavigation) return;
+
     const catalogRoot = getSoftwareCatalogRoot(rootId);
 
     if (!catalogRoot) {
@@ -129,7 +153,7 @@ export function EnheRedesignSoftwareCategorySelector({
     catalogRoot.dataset.selectedCategory = selectedCategory.id;
     catalogRoot.setAttribute("data-selected-category", selectedCategory.id);
     catalogRoot.dispatchEvent(new CustomEvent(SOFTWARE_CATALOG_VISIBILITY_EVENT, { bubbles: true }));
-  }, [rootId, selectedCategory.id]);
+  }, [rootId, selectedCategory.id, usesServerNavigation]);
 
   useEffect(() => {
     if (open) {
@@ -219,22 +243,38 @@ export function EnheRedesignSoftwareCategorySelector({
       >
         <div className="redesign-software-category-buttons" role="group" aria-labelledby={triggerId}>
           {SOFTWARE_CATEGORIES.map((category, index) => (
-            <button
-              key={category.id}
-              ref={(element) => {
-                categoryButtonRefs.current[index] = element;
-              }}
-              type="button"
-              className="redesign-software-category-button"
-              aria-pressed={selectedIndex === index}
-              data-selected={selectedIndex === index ? "true" : "false"}
-              onClick={() => {
-                setSelectedIndex(index);
-                close();
-              }}
-            >
-              {category.label[locale]}
-            </button>
+            categoryHrefs?.[category.id] ? (
+              <a
+                key={category.id}
+                ref={(element) => {
+                  categoryButtonRefs.current[index] = element;
+                }}
+                href={categoryHrefs[category.id]}
+                className="redesign-software-category-button"
+                aria-current={selectedCategoryId === category.id ? "page" : undefined}
+                data-selected={selectedCategoryId === category.id ? "true" : "false"}
+                onClick={close}
+              >
+                {category.label[locale]}
+              </a>
+            ) : (
+              <button
+                key={category.id}
+                ref={(element) => {
+                  categoryButtonRefs.current[index] = element;
+                }}
+                type="button"
+                className="redesign-software-category-button"
+                aria-pressed={selectedIndex === index}
+                data-selected={selectedIndex === index ? "true" : "false"}
+                onClick={() => {
+                  setSelectedIndex(index);
+                  close();
+                }}
+              >
+                {category.label[locale]}
+              </button>
+            )
           ))}
         </div>
       </div>

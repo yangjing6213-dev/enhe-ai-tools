@@ -236,9 +236,9 @@ describe("AI tools candidate bilingual preview regression", () => {
     expect(css).toContain("scroll-padding-inline");
     expect(css).toContain("min-width: 0");
 
-    expect(catalog).toContain('data-horizontal-cards="new"');
-    expect(catalog).toContain('data-horizontal-cards="featured"');
-    expect(catalog).not.toContain('data-horizontal-cards="all"');
+    expect(catalog).toContain('rail="new"');
+    expect(catalog).toContain('rail="featured"');
+    expect(catalog).not.toContain('rail="all"');
   });
 
   it("keeps the preview isolated from sitemap, robots, and public navigation surfaces", () => {

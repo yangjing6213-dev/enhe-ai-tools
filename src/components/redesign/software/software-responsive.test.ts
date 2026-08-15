@@ -37,9 +37,9 @@ describe("AI tools candidate responsive browsing", () => {
     const catalog = readCandidate("components/redesign/software/EnheRedesignSoftwareCatalog.tsx");
 
     expect(catalog).toContain("EnheRedesignSoftwareRail");
-    expect(catalog).toContain('data-horizontal-cards="new"');
-    expect(catalog).toContain('data-horizontal-cards="featured"');
-    expect(catalog).not.toContain('data-horizontal-cards="all"');
+    expect(catalog).toContain('rail="new"');
+    expect(catalog).toContain('rail="featured"');
+    expect(catalog).not.toContain('rail="all"');
   });
 
   it("keeps the rail keyboard-focusable without timers or automatic motion", () => {

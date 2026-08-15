@@ -57,13 +57,14 @@ describe("public navigation and search source contract", () => {
     const publicContent = readSource("public-content.ts");
     const trendData = readSource("ai-trends.ts");
 
-    expect(software).toMatch(/getPublicToolListing\(\s*"software"/);
+    expect(software).toContain("getProductionSoftwareCatalog");
     expect(news).toContain("getPublicNewsListing");
     expect(trends).toContain("getAiTrendBriefingSummaries");
     expect(tutorials).toMatch(/getPublicToolListing\(\s*"skill_learning"/);
     expect(publicContent).toContain('where: { status: "active", tool: { status: "published" } }');
     expect(publicContent).toContain('tutorials: { some: { status: "active" } }');
     expect(publicContent).toContain('type,\n          status: "published"');
+    expect(publicContent).toContain('{ type: { in: ["software", "online", "ai_skill"] } }');
     expect(trendData).toContain('status: "published" as const');
     expect(trendData).toContain('publishedAt: { not: null }');
   });

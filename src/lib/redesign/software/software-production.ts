@@ -67,7 +67,7 @@ export type SoftwareCatalogPage = {
   nextHref: string | null;
 };
 
-type SoftwareCatalogSearchParams = Record<
+export type SoftwareCatalogSearchParams = Record<
   string,
   string | string[] | undefined
 >;
