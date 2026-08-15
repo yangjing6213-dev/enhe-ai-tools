@@ -1,0 +1,23 @@
+surface,candidate_or_current_source,production_target,decision,verification
+public_shell,src/components/public-site-chrome.tsx,PublicSiteChrome with Phase 2C.1.2 header and footer,reuse unchanged,source and browser assertions
+zh_route,src/app/(zh-public)/software/page.tsx,/software,wire redesigned catalog through shared server page shell,route source test and HTTP 200
+en_route,src/app/en/software/page.tsx,/en/software,wire redesigned catalog through shared server page shell,route source test and HTTP 200
+visual_catalog,src/components/redesign/software/EnheRedesignSoftwareCatalog.tsx,formal bilingual catalog,extend one shared component for server supplied products; do not duplicate,test and browser matrix
+preview_fixture,src/lib/redesign/software/software-products.ts,/redesign-preview/software,retain static 12-item candidate data for preview only,production source rejects SOFTWARE_PRODUCTS import
+production_data,src/lib/public-content.ts,server-only catalog adapter,query published Tool rows with an explicit public-field select,adapter tests inspect query and result shape
+locale,src/lib/tool-localization.ts,localized catalog adapter,exclude items that cannot be displayed in the requested locale,zh and en fixture tests
+categories,src/lib/redesign/software/software-categories.ts,category query parameter,keep the approved seven options and map each to tracked server filters,category tests and browser navigation
+pagination,static 9-plus-3 hidden behavior,server pagination,replace with pageSize 12 and independent page batches,25-item fixture yields 12 12 1
+new_releases,NEW_RELEASE_IDS,production sort order,at most four published items using createdAt then stable tie breakers,adapter tests
+featured,FEATURED_PRODUCT_IDS,tracked featured slug allowlist,at most three published items selected from the approved allowlist,adapter tests
+card,EnheRedesignSoftwareCard,server supplied public card view model,show cover type localized name natural description real price or free one tag and detail href,SSR semantic tests
+media,plain img in EnheRedesignSoftwareCard,next/image with fallback,preserve dimensions aspect ratio alt and failure fallback,lint and media tests
+detail_links,static bilingual hrefs,canonical per-type public paths,derive zh and en hrefs from published Tool identity,adapter link tests
+page_one_url,static preview state,/software and /en/software,omit page parameter for page one,canonical tests
+later_page_url,static page-two link,?page=N,self canonical and ordinary crawlable prev next links,pagination and metadata tests
+category_seo,client-only filtering,?category=approved-id,noindex follow and base-locale canonical,metadata tests
+invalid_input,no defined production handling,notFound,hard 404 for invalid page out-of-range page and invalid category,route tests and browser HTTP checks
+sitemap,current production discovery,current production discovery,do not add category or page parameter URLs,manifest regression test
+structured_data,current legacy listing schema,redesigned SSR listing,retain truthful breadcrumb and ItemList semantics without AggregateRating,HTML and source assertions
+restricted_fields,legacy broad Tool include,explicit public select,never query or return fileUrl filePath object keys orders deliveries or permanent download URLs,query-shape and source tests
+deployment,none,none,source wiring only; no deploy push remote or production database access,final scope audit

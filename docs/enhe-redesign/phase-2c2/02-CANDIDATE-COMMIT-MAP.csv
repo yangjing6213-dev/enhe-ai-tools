@@ -1,0 +1,6 @@
+sequence,source_commit,target_commit,subject,scope,status
+1,bbfe441c60c74c34117a5f40d6e3150b6323c53e,1e8240c767a11ccdea9cec4f704e5cb055b602f1,feat(catalog): add typed bilingual AI tools candidate data,candidate data media and the one authorized design document,PASS
+2,reviewed Blob from 3a747330929930d461ff5e9ff012241286c4e35d,dd00cfddc8c878a4b8ca6cb3af4c5ffe997ee6d7,docs(catalog): sync phase 2A.3 design to reviewed boundary,docs/enhe-redesign/phase-2a3/design.md only,PASS
+3,43407ba308e7503ccf2e1f75178113425d55e84a,5157a102140de568f796ca28013ae997582ed6be,feat(catalog): add category selector and three-section layout,candidate visual components and styles,PASS
+4,711db6f13f8bf1559d8244f3fcf3ae2c438f8079,ce00305a9fc40dd3e148d11bb7a212663e6473e5,feat(catalog): add responsive mobile product browsing,candidate responsive behavior,PASS
+5,243581a02864e6214aa516e96b0e461dc05cd9ba,239becc10c9e37dd983808e3066f3f2bebb61f84,test(catalog): add bilingual AI tools candidate regression,candidate tests,PASS
