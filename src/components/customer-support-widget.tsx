@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { ChevronLeft, ChevronRight, LoaderCircle, MessageCircle, Send, X } from "lucide-react";
-import { useRef, useState, type FormEvent } from "react";
+import { useRef, useState, type FormEvent, type KeyboardEvent } from "react";
 import type {
   CustomerSupportFaq,
   CustomerSupportLocale
@@ -62,6 +62,8 @@ export function CustomerSupportWidget({
 }) {
   const copy = widgetCopy[locale];
   const honeypotRef = useRef<HTMLInputElement>(null);
+  const launcherRef = useRef<HTMLButtonElement>(null);
+  const panelRef = useRef<HTMLElement>(null);
   const [isOpen, setIsOpen] = useState(false);
   const [selectedFaqId, setSelectedFaqId] = useState<string | null>(null);
   const [showMessageForm, setShowMessageForm] = useState(false);
@@ -75,12 +77,50 @@ export function CustomerSupportWidget({
     setSelectedFaqId(null);
     setShowMessageForm(false);
     setStatus("idle");
+    launcherRef.current?.focus();
+  }
+
+  function focusPanelStart() {
+    requestAnimationFrame(() => {
+      panelRef.current
+        ?.querySelector<HTMLElement>(
+          'button:not([disabled]), a[href], input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])',
+        )
+        ?.focus();
+    });
+  }
+
+  function handlePanelKeyDown(event: KeyboardEvent<HTMLElement>) {
+    if (event.key === "Escape") {
+      event.preventDefault();
+      closePanel();
+      return;
+    }
+    if (event.key !== "Tab") return;
+
+    const focusable = Array.from(
+      event.currentTarget.querySelectorAll<HTMLElement>(
+        'a[href], button:not([disabled]), input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])',
+      ),
+    ).filter((element) => element.getClientRects().length > 0);
+    const first = focusable[0];
+    const last = focusable.at(-1);
+    if (!first || !last) return;
+
+    if (event.shiftKey && document.activeElement === first) {
+      event.preventDefault();
+      last.focus();
+    } else if (!event.shiftKey && document.activeElement === last) {
+      event.preventDefault();
+      first.focus();
+    }
   }
 
   function showQuestions() {
     setSelectedFaqId(null);
     setShowMessageForm(false);
     setStatus("idle");
+    focusPanelStart();
   }
 
   function selectFaq(faq: CustomerSupportFaq) {
@@ -88,11 +128,18 @@ export function CustomerSupportWidget({
     if (faq.id === "leave-message") {
       setSelectedFaqId(null);
       setShowMessageForm(true);
+      focusPanelStart();
       return;
     }
 
     setSelectedFaqId(faq.id);
     setShowMessageForm(false);
+    focusPanelStart();
+  }
+
+  function openMessageForm() {
+    setShowMessageForm(true);
+    focusPanelStart();
   }
 
   async function submitMessage(event: FormEvent<HTMLFormElement>) {
@@ -122,6 +169,7 @@ export function CustomerSupportWidget({
         setMessage("");
         setEmail("");
         setStatus("success");
+        focusPanelStart();
         return;
       }
 
@@ -132,12 +180,17 @@ export function CustomerSupportWidget({
   }
 
   return (
-    <div className="fixed bottom-4 right-4 z-[70] flex w-[calc(100vw-2rem)] max-w-[360px] flex-col items-end sm:bottom-6 sm:right-6">
+    <div
+      className="customer-support-widget fixed bottom-4 right-4 z-[70] flex w-[calc(100vw-2rem)] max-w-[360px] flex-col items-end sm:bottom-6 sm:right-6"
+      data-support-open={isOpen ? "true" : "false"}
+    >
       {isOpen ? (
         <section
+          ref={panelRef}
           id="customer-support-panel"
           role="dialog"
           aria-labelledby="customer-support-title"
+          onKeyDown={handlePanelKeyDown}
           className="w-full max-h-[calc(100dvh-5rem)] overflow-y-auto rounded-2xl border border-[var(--marketing-border-strong)] bg-[#101821]/96 p-4 text-[var(--marketing-text)] shadow-[0_24px_70px_rgba(0,8,14,0.5)] backdrop-blur-xl sm:p-5"
         >
           <div className="flex items-start justify-between gap-4">
@@ -148,6 +201,7 @@ export function CustomerSupportWidget({
               <p className="mt-2 text-sm leading-6 text-[var(--marketing-muted)]">{copy.greeting}</p>
             </div>
             <button
+              autoFocus
               type="button"
               onClick={closePanel}
               aria-label={copy.closeLabel}
@@ -284,7 +338,7 @@ export function CustomerSupportWidget({
               </div>
               <button
                 type="button"
-                onClick={() => setShowMessageForm(true)}
+                onClick={openMessageForm}
               className="mt-3 inline-flex w-full items-center justify-center gap-2 rounded-full border border-white/14 bg-white/7 px-4 py-3 text-sm font-black text-[var(--marketing-soft-text)] transition-[border-color,color] hover:border-[var(--marketing-accent)] hover:text-[var(--marketing-accent)]"
               >
                 <MessageCircle size={16} aria-hidden="true" />
@@ -310,18 +364,24 @@ export function CustomerSupportWidget({
             </div>
           )}
         </section>
-      ) : (
-        <button
-          type="button"
-          onClick={() => setIsOpen(true)}
-          aria-expanded="false"
-          aria-controls="customer-support-panel"
-        className="inline-flex items-center gap-2 rounded-full border border-[var(--marketing-accent)]/35 bg-[#101821]/95 px-4 py-3 text-sm font-black text-[var(--marketing-text)] shadow-[0_14px_38px_rgba(0,8,14,0.42)] backdrop-blur-xl transition-[border-color,transform] hover:-translate-y-0.5 hover:border-[var(--marketing-accent)]"
-        >
-          <MessageCircle size={18} className="text-[var(--marketing-accent)]" aria-hidden="true" />
-          <span>{copy.launcherLabel}</span>
-        </button>
-      )}
+      ) : null}
+      <button
+        ref={launcherRef}
+        type="button"
+        onClick={() => setIsOpen(true)}
+        aria-label={copy.launcherLabel}
+        aria-expanded={isOpen}
+        aria-controls="customer-support-panel"
+        tabIndex={isOpen ? -1 : 0}
+        className={
+          isOpen
+            ? "sr-only"
+            : "customer-support-launcher inline-flex items-center gap-2 rounded-full border border-[var(--marketing-accent)]/35 bg-[#101821]/95 px-4 py-3 text-sm font-black text-[var(--marketing-text)] shadow-[0_14px_38px_rgba(0,8,14,0.42)] backdrop-blur-xl transition-[border-color,transform] hover:-translate-y-0.5 hover:border-[var(--marketing-accent)]"
+        }
+      >
+        <MessageCircle size={18} className="text-[var(--marketing-accent)]" aria-hidden="true" />
+        <span className="customer-support-launcher-label">{copy.launcherLabel}</span>
+      </button>
     </div>
   );
 }

@@ -138,7 +138,7 @@
   outline-offset: 4px;
 }
 
-@media (max-width: 767px) {
+@media (width < 768px) {
   .redesign-home .redesign-home-hero-inner {
     padding: 72px 20px 96px;
   }
@@ -172,6 +172,11 @@
   .redesign-home-brand-value-cta {
     width: min(100%, 280px);
     margin-top: 32px;
+  }
+
+  .redesign-home-brand-value-cta[data-support-exclusion="home-brand-cta"] {
+    max-inline-size: calc(100% - var(--support-exclusion-applied));
+    margin-inline-end: var(--support-exclusion-applied);
   }
 }
 
@@ -345,7 +350,7 @@
   outline-offset: 4px;
 }
 
-@media (max-width: 767px) {
+@media (width < 768px) {
   .redesign-home-products-inner {
     padding-inline: 20px;
   }
@@ -558,7 +563,7 @@
   outline-offset: 3px;
 }
 
-@media screen and (max-width: 767px) {
+@media screen and (width < 768px) {
   .redesign-home-reviews-inner {
     padding-inline: 20px;
   }

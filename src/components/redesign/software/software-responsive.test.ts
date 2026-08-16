@@ -17,7 +17,8 @@ describe("AI tools candidate responsive browsing", () => {
     expect(css).toMatch(/grid-template-columns:\s*repeat\(4,\s*minmax\(0,\s*1fr\)\)/);
     expect(css).toMatch(/max-width:\s*1024px/);
     expect(css).toMatch(/max-width:\s*768px/);
-    expect(css).toMatch(/max-width:\s*767px/);
+    expect(css).toMatch(/width\s*<\s*768px/);
+    expect(css).not.toMatch(/max-width:\s*767px/);
     expect(css).toContain("overflow-x: auto");
     expect(css).toContain("scroll-snap-type: x mandatory");
     expect(css).toContain("scroll-snap-align: start");

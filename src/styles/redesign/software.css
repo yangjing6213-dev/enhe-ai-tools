@@ -279,6 +279,10 @@
   text-underline-offset: 5px;
 }
 
+.redesign-software-card-link[data-support-exclusion] {
+  min-height: var(--support-trigger-icon-size);
+}
+
 .redesign-software-load-row {
   display: flex;
   flex-wrap: wrap;
@@ -321,7 +325,7 @@
   outline-offset: 4px;
 }
 
-@media (max-width: 767px) {
+@media (width < 768px) {
   .redesign-software-page {
     --redesign-software-mobile-page-padding: 20px;
     padding-inline: var(--redesign-software-mobile-page-padding);
@@ -329,6 +333,7 @@
 
   .redesign-software-category-panel {
     position: fixed;
+    z-index: 21;
     inset: auto 0 0;
     width: auto;
     border-radius: 24px 24px 0 0;
@@ -363,6 +368,66 @@
 
   .redesign-software-grid-all {
     grid-template-columns: 1fr;
+  }
+
+  .redesign-software-category-overlay {
+    z-index: 20;
+  }
+}
+
+@media (width < 768px) {
+  .enhe-redesign-production
+    > .fade-in:has(.redesign-software-category-panel:not([hidden])) {
+    position: relative;
+    z-index: 20;
+  }
+
+  .redesign-software-rail
+    .redesign-software-card-link:is(
+      [data-support-exclusion="new-releases"],
+      [data-support-exclusion="featured-products"]
+    ) {
+    margin-inline: var(--support-exclusion-applied);
+  }
+
+  .redesign-software-grid-all
+    .redesign-software-card-link[data-support-exclusion="all-products"] {
+    margin-inline-end: var(--support-exclusion-applied);
+  }
+
+  .redesign-software-load-row {
+    margin-inline-end: var(--support-exclusion-applied);
+  }
+}
+
+@media (481px <= width < 768px) {
+  .redesign-software-rail
+    .redesign-software-card-link[data-support-exclusion="new-releases"] {
+    margin-inline-start: calc(var(--support-exclusion-applied) + 36px);
+  }
+}
+
+@media (min-width: 768px) and (max-width: 768px) {
+  .redesign-software-grid
+    > [data-catalog-card]:nth-child(2n)
+    .redesign-software-card-link[data-support-exclusion] {
+    margin-inline-end: var(--support-exclusion-applied);
+  }
+}
+
+@media (768px < width <= 1024px) {
+  .redesign-software-grid
+    > [data-catalog-card]:nth-child(3n)
+    .redesign-software-card-link[data-support-exclusion] {
+    margin-inline-end: var(--support-exclusion-applied);
+  }
+}
+
+@media (width > 1024px) {
+  .redesign-software-grid
+    > [data-catalog-card]:nth-child(4n)
+    .redesign-software-card-link[data-support-exclusion] {
+    margin-inline-end: var(--support-exclusion-applied);
   }
 }
 

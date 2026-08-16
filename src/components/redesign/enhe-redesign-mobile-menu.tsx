@@ -67,13 +67,20 @@ export function EnheRedesignMobileMenu({
       document.removeEventListener("keydown", onKeyDown);
       document.body.style.overflow = previousOverflow;
       const returnTarget = previouslyFocusedElement.current ?? mountedTrigger;
+      previouslyFocusedElement.current = null;
       requestAnimationFrame(() => returnTarget?.focus());
     };
   }, [close, open]);
 
   const openMenu = () => {
-    previouslyFocusedElement.current = document.activeElement instanceof HTMLElement ? document.activeElement : null;
+    previouslyFocusedElement.current ??=
+      document.activeElement instanceof HTMLElement ? document.activeElement : null;
     setOpen(true);
+  };
+
+  const rememberPointerFocus = () => {
+    previouslyFocusedElement.current =
+      document.activeElement instanceof HTMLElement ? document.activeElement : null;
   };
 
   return (
@@ -85,6 +92,7 @@ export function EnheRedesignMobileMenu({
         aria-label={triggerLabel}
         aria-expanded={open}
         aria-controls={menuId}
+        onPointerDown={open ? undefined : rememberPointerFocus}
         onClick={open ? close : openMenu}
       >
         <span className="redesign-menu-bars" aria-hidden="true" />

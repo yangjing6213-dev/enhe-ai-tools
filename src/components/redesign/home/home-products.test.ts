@@ -101,7 +101,7 @@ describe("homepage approved product showcase", () => {
   });
 
   it("keeps product detail links touchable and mobile controls below full-width media", () => {
-    const mobileStyles = homeStyles.slice(homeStyles.lastIndexOf("@media (max-width: 767px)"));
+    const mobileStyles = homeStyles.slice(homeStyles.lastIndexOf("@media (width < 768px)"));
 
     expect(homeStyles).toMatch(
       /\.redesign-home-product-detail a\s*\{[\s\S]*?min-height:\s*44px[\s\S]*?display:\s*inline-flex[\s\S]*?align-items:\s*center[\s\S]*?padding:/,

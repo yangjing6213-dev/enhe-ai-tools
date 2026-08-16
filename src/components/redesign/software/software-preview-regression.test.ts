@@ -233,7 +233,7 @@ describe("AI tools candidate bilingual preview regression", () => {
     expect(css).toMatch(/grid-template-columns:\s*repeat\(4,\s*minmax\(0,\s*1fr\)\)/);
     expect(css).toMatch(/@media\s*\(max-width:\s*1024px\)[\s\S]*repeat\(3,\s*minmax\(0,\s*1fr\)\)/);
     expect(css).toMatch(/@media\s*\(max-width:\s*768px\)[\s\S]*repeat\(2,\s*minmax\(0,\s*1fr\)\)/);
-    expect(css).toMatch(/@media\s*\(max-width:\s*767px\)[\s\S]*grid-template-columns:\s*1fr/);
+    expect(css).toMatch(/@media\s*\(width\s*<\s*768px\)[\s\S]*grid-template-columns:\s*1fr/);
     expect(css).toContain("gap: 18px");
     expect(css).toContain("scroll-snap-type: x mandatory");
     expect(css).toContain("overflow-x: auto");

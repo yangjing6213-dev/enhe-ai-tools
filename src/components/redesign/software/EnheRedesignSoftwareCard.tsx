@@ -73,7 +73,11 @@ export function EnheRedesignSoftwareCard({
             <dd>{product.price}</dd>
           </div>
         </dl>
-        <a className="redesign-software-card-link" href={product.detailHref}>
+        <a
+          className="redesign-software-card-link"
+          data-support-exclusion={sectionId}
+          href={product.detailHref}
+        >
           {detailLabel}
         </a>
       </div>
