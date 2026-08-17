@@ -54,8 +54,10 @@ export function EnheRedesignExperienceReviews({ locale }: { locale: RedesignLoca
   const reviewSectionRef = useRef<HTMLElement | null>(null);
   const timerActionsRef = useRef<ReviewTimerActions | null>(null);
   const userPausedRef = useRef(false);
+  const focusPausedRef = useRef(false);
   const [index, setIndex] = useState(REVIEW_INITIAL_INDEX);
   const [isPaused, setIsPaused] = useState(false);
+  const [isAutoRotating, setIsAutoRotating] = useState(true);
 
   const move = (delta: -1 | 1) => {
     setIndex((current) => (current + delta + HOME_REVIEWS.length) % HOME_REVIEWS.length);
@@ -74,13 +76,14 @@ export function EnheRedesignExperienceReviews({ locale }: { locale: RedesignLoca
   };
 
   const togglePause = () => {
-    const nextPaused = !userPausedRef.current;
+    const nextPaused = !isPaused;
     userPausedRef.current = nextPaused;
     setIsPaused(nextPaused);
     if (nextPaused) {
       timerActionsRef.current?.clearPendingResume();
       timerActionsRef.current?.pause();
     } else {
+      focusPausedRef.current = false;
       timerActionsRef.current?.clearPendingResume();
       timerActionsRef.current?.resume();
     }
@@ -92,17 +95,22 @@ export function EnheRedesignExperienceReviews({ locale }: { locale: RedesignLoca
 
     let intervalId: number | null = null;
     let resumeTimeoutId: number | null = null;
+    let isMounted = true;
     let isHovered = false;
-    let hasFocus = false;
     let hasPointer = false;
     let pointerStartX: number | null = null;
     let reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+    const setAutoRotationState = (nextValue: boolean) => {
+      if (isMounted) setIsAutoRotating(nextValue);
+    };
 
     const clearAutoInterval = () => {
       if (intervalId !== null) {
         window.clearInterval(intervalId);
         intervalId = null;
       }
+      setAutoRotationState(false);
     };
 
     const clearResumeTimeout = () => {
@@ -116,16 +124,24 @@ export function EnheRedesignExperienceReviews({ locale }: { locale: RedesignLoca
       !reducedMotion &&
       !document.hidden &&
       !isHovered &&
-      !hasFocus &&
+      !focusPausedRef.current &&
       !hasPointer &&
       !userPausedRef.current &&
       resumeTimeoutId === null;
 
     const startAutoInterval = () => {
-      if (!canRunAutomatically() || intervalId !== null) return;
+      if (!canRunAutomatically()) {
+        setAutoRotationState(false);
+        return;
+      }
+      if (intervalId !== null) {
+        setAutoRotationState(true);
+        return;
+      }
       intervalId = window.setInterval(() => {
         setIndex((current) => (current + 1) % HOME_REVIEWS.length);
       }, REVIEW_AUTO_INTERVAL_MS);
+      setAutoRotationState(true);
     };
 
     const pause = () => {
@@ -139,7 +155,14 @@ export function EnheRedesignExperienceReviews({ locale }: { locale: RedesignLoca
     const scheduleManualResume = () => {
       clearAutoInterval();
       clearResumeTimeout();
-      if (reducedMotion) return;
+      if (
+        reducedMotion ||
+        document.hidden ||
+        focusPausedRef.current ||
+        userPausedRef.current
+      ) {
+        return;
+      }
       resumeTimeoutId = window.setTimeout(() => {
         resumeTimeoutId = null;
         startAutoInterval();
@@ -155,15 +178,10 @@ export function EnheRedesignExperienceReviews({ locale }: { locale: RedesignLoca
       resume();
     };
     const handleFocusIn = () => {
-      hasFocus = true;
+      focusPausedRef.current = true;
+      clearResumeTimeout();
+      setIsPaused(true);
       pause();
-    };
-    const handleFocusOut = (event: FocusEvent) => {
-      const nextTarget = event.relatedTarget;
-      if (!nextTarget || !section.contains(nextTarget as Node)) {
-        hasFocus = false;
-        resume();
-      }
     };
     const handlePointerDown = (event: PointerEvent) => {
       hasPointer = true;
@@ -218,7 +236,6 @@ export function EnheRedesignExperienceReviews({ locale }: { locale: RedesignLoca
     section.addEventListener("mouseenter", handleMouseEnter);
     section.addEventListener("mouseleave", handleMouseLeave);
     section.addEventListener("focusin", handleFocusIn);
-    section.addEventListener("focusout", handleFocusOut);
     section.addEventListener("pointerdown", handlePointerDown);
     section.addEventListener("pointerup", handlePointerUp);
     section.addEventListener("pointercancel", handlePointerCancel);
@@ -229,13 +246,13 @@ export function EnheRedesignExperienceReviews({ locale }: { locale: RedesignLoca
     startAutoInterval();
 
     return () => {
+      isMounted = false;
       clearAutoInterval();
       clearResumeTimeout();
       timerActionsRef.current = null;
       section.removeEventListener("mouseenter", handleMouseEnter);
       section.removeEventListener("mouseleave", handleMouseLeave);
       section.removeEventListener("focusin", handleFocusIn);
-      section.removeEventListener("focusout", handleFocusOut);
       section.removeEventListener("pointerdown", handlePointerDown);
       section.removeEventListener("pointerup", handlePointerUp);
       section.removeEventListener("pointercancel", handlePointerCancel);
@@ -256,7 +273,10 @@ export function EnheRedesignExperienceReviews({ locale }: { locale: RedesignLoca
       <div className="redesign-home-reviews-inner">
         <h2 id="redesign-home-reviews-heading">{copy.heading}</h2>
         <div className="redesign-home-reviews-window">
-          <div className="redesign-home-reviews-track" aria-live="polite">
+          <div
+            className="redesign-home-reviews-track"
+            aria-live={isAutoRotating ? "off" : "polite"}
+          >
             {HOME_REVIEWS.map((review, reviewIndex) => {
               const offset = getReviewOffset(reviewIndex, index);
               const isActive = offset === 0;

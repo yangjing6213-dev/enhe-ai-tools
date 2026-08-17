@@ -117,6 +117,33 @@ describe("homepage experience review candidate", () => {
     expect(togglePauseSource).toMatch(/else \{[\s\S]*clearPendingResume\(\)[\s\S]*resume\(\)/);
   });
 
+  it("latches focus pauses until explicit continue and limits live announcements", () => {
+    const focusSource = reviewSource.slice(
+      reviewSource.indexOf("const handleFocusIn"),
+      reviewSource.indexOf("const handlePointerDown"),
+    );
+    const togglePauseSource = reviewSource.slice(
+      reviewSource.indexOf("const togglePause"),
+      reviewSource.indexOf("\n\n  useEffect"),
+    );
+
+    expect(reviewSource).toContain("const focusPausedRef = useRef(false)");
+    expect(reviewSource).toContain(
+      "const [isAutoRotating, setIsAutoRotating] = useState(true)",
+    );
+    expect(focusSource).toContain("focusPausedRef.current = true");
+    expect(focusSource).toContain("clearResumeTimeout()");
+    expect(focusSource).toContain("setIsPaused(true)");
+    expect(focusSource).toContain("pause()");
+    expect(reviewSource).not.toContain('section.addEventListener("focusout"');
+    expect(togglePauseSource).toMatch(
+      /else \{[\s\S]*focusPausedRef\.current = false[\s\S]*clearPendingResume\(\)[\s\S]*resume\(\)/,
+    );
+    expect(reviewSource).toContain(
+      'aria-live={isAutoRotating ? "off" : "polite"}',
+    );
+  });
+
   it("keeps horizontal pointer drags directional and manually resumed", () => {
     const pointerDownSource = reviewSource.slice(
       reviewSource.indexOf("const handlePointerDown"),
