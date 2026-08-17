@@ -67,7 +67,7 @@ export async function PublicSiteChrome({
         locale={forceLocale}
         languageHrefs={languageHrefs}
       />
-      <div className="fade-in">{children}</div>
+      {children}
       <CustomerSupportWidget locale={forceLocale} faqs={getCustomerSupportFaqs(forceLocale)} />
       <EnheRedesignPublicFooter locale={forceLocale} />
     </div>

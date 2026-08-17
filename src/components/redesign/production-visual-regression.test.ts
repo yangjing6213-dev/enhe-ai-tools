@@ -12,9 +12,13 @@ function read(relativePath: string) {
 describe("production public shell visual boundary", () => {
   it("provides a production root and removes the legacy empty top spacer", () => {
     const chrome = read("components/public-site-chrome.tsx");
+    const globals = read("app/globals.css");
     const shell = read("styles/redesign/shell.css");
 
     expect(chrome).toContain('className="enhe-redesign-production"');
+    expect(chrome).not.toContain('<div className="fade-in">{children}</div>');
+    expect(chrome).toMatch(/<EnheRedesignPublicHeader[\s\S]*?\/>\s*\{children\}/);
+    expect(globals).toMatch(/\.fade-in\s*\{\s*animation:\s*fade-in\s+0\.45s/);
     expect(shell).toContain(".enhe-redesign-production");
     expect(shell).toContain(".enhe-redesign-production > .fade-in");
     expect(shell).toMatch(/\.enhe-redesign-production\s*>\s*\.fade-in[^{]*\{[^}]*padding-top:\s*0/);
