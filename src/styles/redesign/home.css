@@ -445,8 +445,9 @@
   opacity: 0.12;
   pointer-events: none;
   transform: translateX(calc(-50% - 164%)) scale(0.9);
-  transition: transform 240ms ease, opacity 240ms ease;
-  will-change: transform, opacity;
+  transition:
+    transform var(--enhe-motion-standard) var(--enhe-ease-ui-move),
+    opacity var(--enhe-motion-standard) var(--enhe-ease-ui-move);
 }
 
 .redesign-home-review-card[data-position="-1"] {
@@ -604,6 +605,15 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
+  .redesign-home-product-media {
+    transform: none;
+    transition: opacity 1ms linear;
+  }
+
+  .redesign-home-product-media[data-media-status="loading"] {
+    transform: none;
+  }
+
   .redesign-home-review-card {
     transition-duration: 1ms;
   }

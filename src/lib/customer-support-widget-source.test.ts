@@ -69,6 +69,30 @@ describe("customer support widget source", () => {
     expect(shell).not.toContain("@media (max-width: 480px)");
   });
 
+  it("keeps support feedback visible without filter motion and stops decorative reduced motion", () => {
+    const widget = readFileSync(
+      new URL("../components/customer-support-widget.tsx", import.meta.url),
+      "utf8",
+    );
+    const shell = readFileSync(
+      new URL("../styles/redesign/shell.css", import.meta.url),
+      "utf8",
+    );
+    const reducedMotion = shell.slice(
+      shell.lastIndexOf("@media (prefers-reduced-motion: reduce)"),
+    );
+
+    expect(widget).not.toContain("transition-[filter,opacity]");
+    expect(widget).not.toContain("hover:brightness-110");
+    expect(widget).toContain("transition-opacity");
+    expect(widget).toContain("hover:opacity-90");
+    expect(reducedMotion).toContain(".enhe-redesign-production .customer-support-launcher");
+    expect(reducedMotion).toContain("transition-property: border-color");
+    expect(reducedMotion).toContain("transform: none");
+    expect(reducedMotion).toContain("#customer-support-panel .animate-spin");
+    expect(reducedMotion).toContain("animation: none");
+  });
+
   it("scopes the shared exclusion to approved product, footer, and home targets", () => {
     const card = readFileSync(
       new URL(

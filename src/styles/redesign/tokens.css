@@ -32,6 +32,8 @@
   --enhe-shadow-panel: 0 24px 64px rgba(7, 21, 18, 0.18);
   --enhe-motion-fast: 170ms;
   --enhe-motion-panel: 200ms;
+  --enhe-motion-standard: 240ms;
+  --enhe-ease-ui-move: cubic-bezier(0.4, 0, 0.2, 1);
   --enhe-z-header: 20;
   --enhe-z-layer: 40;
   --enhe-z-focus: 60;

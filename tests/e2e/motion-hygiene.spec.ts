@@ -171,3 +171,77 @@ test("review explicit pause and manual navigation obey timer priority", async ({
   await page.clock.fastForward(5_000);
   await expect(activeReview).not.toHaveAttribute("aria-label", manuallySelectedReview ?? "");
 });
+
+test("reduced motion keeps product, review, and support controls functional", async ({ page }) => {
+  await page.emulateMedia({ reducedMotion: "reduce" });
+  await page.clock.install();
+  await openFormalRoute(page, "/");
+
+  const media = page.locator(".redesign-home-product-media");
+  await media.evaluate((element) => {
+    element.setAttribute("data-media-status", "loading");
+  });
+  const productMotion = await media.evaluate((element) => {
+    const style = getComputedStyle(element);
+    return {
+      transform: style.transform,
+      transitionDuration: style.transitionDuration,
+      transitionProperty: style.transitionProperty,
+    };
+  });
+  expect(productMotion).toEqual({
+    transform: "none",
+    transitionDuration: "0.001s",
+    transitionProperty: "opacity",
+  });
+
+  const track = page.locator(".redesign-home-reviews-track");
+  const activeReview = page.locator('.redesign-home-review-card[data-active="true"]');
+  await expect(track).toHaveAttribute("aria-live", "polite");
+  const initialReview = await activeReview.getAttribute("aria-label");
+  await page.clock.fastForward(12_000);
+  await expect(activeReview).toHaveAttribute("aria-label", initialReview ?? "");
+  await page
+    .getByRole("button", { name: "下一条评价" })
+    .evaluate((button: HTMLButtonElement) => button.click());
+  await expect(activeReview).not.toHaveAttribute("aria-label", initialReview ?? "");
+
+  const launcher = page.locator(".customer-support-launcher");
+  await launcher.hover();
+  const launcherMotion = await launcher.evaluate((element) => {
+    const style = getComputedStyle(element);
+    return {
+      transform: style.transform,
+      transitionProperty: style.transitionProperty,
+    };
+  });
+  expect(launcherMotion).toEqual({
+    transform: "none",
+    transitionProperty: "border-color",
+  });
+
+  let releaseSupportResponse = () => {};
+  const supportResponseGate = new Promise<void>((resolve) => {
+    releaseSupportResponse = resolve;
+  });
+  await page.route("**/api/support", async (route) => {
+    await supportResponseGate;
+    await route.fulfill({ status: 200, json: {} });
+  });
+
+  await launcher.click();
+  await page.getByRole("button", { name: "没有找到答案，提交留言" }).click();
+  await page.getByLabel("问题内容（必填）").fill("Reduced-motion loading check");
+  await page.getByRole("button", { name: "发送留言" }).click();
+
+  const submittingButton = page.getByRole("button", { name: "正在发送" });
+  await expect(submittingButton).toBeDisabled();
+  await expect(submittingButton).toContainText("正在发送");
+  const spinnerAnimation = await submittingButton
+    .locator(".animate-spin")
+    .evaluate((element) => getComputedStyle(element).animationName);
+  expect(spinnerAnimation).toBe("none");
+
+  releaseSupportResponse();
+  await expect(page.getByText("留言已发送，我们会尽快处理。")).toBeVisible();
+});

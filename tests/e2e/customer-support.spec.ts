@@ -53,7 +53,7 @@ test("submits a message through the mocked support API", async ({ page }) => {
   await page.getByLabel("联系邮箱（可选）").fill("visitor@example.com");
   await page.getByRole("button", { name: "发送留言" }).click();
 
-  await expect(page.getByRole("status")).toContainText("留言已发送");
+  await expect(page.getByRole("dialog").getByRole("status")).toContainText("留言已发送");
 });
 
 test("shows a localized rate limit message", async ({ page }) => {
@@ -71,7 +71,7 @@ test("shows a localized rate limit message", async ({ page }) => {
   await page.getByLabel("问题内容（必填）").fill("重复提交测试");
   await page.getByRole("button", { name: "发送留言" }).click();
 
-  await expect(page.getByRole("status")).toContainText("提交次数过多");
+  await expect(page.getByRole("dialog").getByRole("status")).toContainText("提交次数过多");
 });
 
 test("does not render on authentication or admin routes", async ({ page }) => {

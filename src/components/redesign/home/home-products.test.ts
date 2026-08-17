@@ -111,6 +111,19 @@ describe("homepage approved product showcase", () => {
     expect(mobileStyles).toContain('". previous next ."');
   });
 
+  it("removes product loading scale under reduced motion", () => {
+    const reducedMotionStyles = homeStyles.slice(
+      homeStyles.lastIndexOf("@media (prefers-reduced-motion: reduce)"),
+    );
+
+    expect(reducedMotionStyles).toMatch(
+      /\.redesign-home-product-media\s*\{[\s\S]*?transition:\s*opacity 1ms linear/,
+    );
+    expect(reducedMotionStyles).toMatch(
+      /\.redesign-home-product-media\[data-media-status="loading"\]\s*\{[\s\S]*?transform:\s*none/,
+    );
+  });
+
   it("keeps all five public media files present and matching the Phase 1A manifest", () => {
     expect(HOME_PRODUCTS).toHaveLength(5);
 

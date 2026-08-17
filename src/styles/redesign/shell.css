@@ -724,4 +724,16 @@
     scroll-behavior: auto;
     transition: none !important;
   }
+
+  .enhe-redesign-production .customer-support-launcher {
+    transition-property: border-color;
+  }
+
+  .enhe-redesign-production .customer-support-launcher:hover {
+    transform: none;
+  }
+
+  .enhe-redesign-production #customer-support-panel .animate-spin {
+    animation: none;
+  }
 }

@@ -12,6 +12,7 @@ const reviewSource = readFileSync(
   "utf8",
 );
 const homeStyles = readFileSync(join(process.cwd(), "src/styles/redesign/home.css"), "utf8");
+const tokenStyles = readFileSync(join(process.cwd(), "src/styles/redesign/tokens.css"), "utf8");
 
 describe("homepage experience review candidate", () => {
   it("keeps the approved five-record order and exact bilingual review content", () => {
@@ -170,6 +171,23 @@ describe("homepage experience review candidate", () => {
     expect(pointerCancelSource).toContain("pointerStartX = null");
     expect(pointerCancelSource).toContain("hasPointer = false");
     expect(pointerCancelSource).toContain("resume()");
+  });
+
+  it("uses shared review motion tokens without permanent compositor hints", () => {
+    const reviewCardRule = homeStyles.slice(
+      homeStyles.indexOf(".redesign-home-review-card {"),
+      homeStyles.indexOf('.redesign-home-review-card[data-position="-1"]'),
+    );
+
+    expect(tokenStyles).toContain("--enhe-motion-standard: 240ms");
+    expect(tokenStyles).toContain(
+      "--enhe-ease-ui-move: cubic-bezier(0.4, 0, 0.2, 1)",
+    );
+    expect(reviewCardRule).toContain("var(--enhe-motion-standard)");
+    expect(reviewCardRule).toContain("var(--enhe-ease-ui-move)");
+    expect(reviewCardRule).not.toContain("240ms");
+    expect(reviewCardRule).not.toMatch(/(?:^|\s)ease(?:\s|,|;)/m);
+    expect(reviewCardRule).not.toContain("will-change");
   });
 
   it("keeps the review island accessible and timer-controlled", () => {

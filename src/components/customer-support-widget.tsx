@@ -296,7 +296,7 @@ export function CustomerSupportWidget({
                   <button
                     type="submit"
                     disabled={status === "submitting"}
-            className="inline-flex w-full items-center justify-center gap-2 rounded-full bg-[var(--marketing-accent)] px-4 py-3 text-sm font-black text-[#071218] transition-[filter,opacity] hover:brightness-110 disabled:cursor-wait disabled:opacity-70"
+            className="inline-flex w-full items-center justify-center gap-2 rounded-full bg-[var(--marketing-accent)] px-4 py-3 text-sm font-black text-[#071218] transition-opacity hover:opacity-90 disabled:cursor-wait disabled:opacity-70"
                   >
                     {status === "submitting" ? (
                       <LoaderCircle className="animate-spin" size={17} aria-hidden="true" />
