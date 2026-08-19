@@ -1,0 +1,19 @@
+timestampUtc,attempt,source,eventType,classification,errorCode,causalRole
+2026-08-19T02:45:59.0453264Z,baseline,WSL system probe,probe completed,WSL_HEALTHY,EXIT_0,exclusion evidence
+2026-08-19T02:47:55.1713018Z,1,collector,attempt started,START,n/a,boundary
+2026-08-19T02:47:55.8957771Z,1,Docker boot 0,backend running services,STARTED,n/a,pre-failure
+2026-08-19T02:47:55.9472261Z,1,Docker boot 0,optional cloud settings absent,OBSERVED_WARNING,FILE_NOT_FOUND,non-fatal
+2026-08-19T02:47:56.2073081Z,1,Docker boot 0,daemon load JSON NUL failure,FIRST_FATAL_FAILURE,JSON_INVALID_CHARACTER_NUL,root
+2026-08-19T02:48:55.9880412Z,1,Docker boot 0,module startup deadline,DOWNSTREAM_TIMEOUT,CONTEXT_DEADLINE_EXCEEDED,consequence
+2026-08-19T02:50:41.2292890Z,1,Docker boot 0,named pipe unavailable,DOWNSTREAM_IPC_FAILURE,NAMED_PIPE_UNAVAILABLE,consequence
+2026-08-19T02:52:13.4678345Z,1,collector,attempt ended,ENGINE_UNAVAILABLE,n/a,boundary
+2026-08-19T03:04:10.7621329Z,control,WSL shutdown control,shutdown completed,AUTHORIZED_CONTROL,EXIT_0,comparison boundary
+2026-08-19T03:04:29.0944390Z,2,collector,attempt started,START,n/a,boundary
+2026-08-19T03:04:30.4682540Z,2,Docker boot 0,backend running services,STARTED,n/a,pre-failure
+2026-08-19T03:04:30.5031571Z,2,Docker boot 0,optional cloud settings absent,OBSERVED_WARNING,FILE_NOT_FOUND,non-fatal
+2026-08-19T03:04:30.8370985Z,2,Docker boot 0,daemon load JSON NUL failure,FIRST_FATAL_FAILURE,JSON_INVALID_CHARACTER_NUL,root reproduction
+2026-08-19T03:05:30.5576098Z,2,Docker boot 0,module startup deadline,DOWNSTREAM_TIMEOUT,CONTEXT_DEADLINE_EXCEEDED,consequence
+2026-08-19T03:06:36.5127897Z,2,Docker boot 0,named pipe unavailable,DOWNSTREAM_IPC_FAILURE,NAMED_PIPE_UNAVAILABLE,consequence
+2026-08-19T03:08:49.0467189Z,2,collector,attempt ended,ENGINE_UNAVAILABLE,n/a,boundary
+2026-08-19T03:11:03.2624398Z,final,Docker process control,Docker-owned processes stopped,STOPPED,n/a,environment restored
+2026-08-19T03:11:15.3864709Z,final,Python hash comparison,host files unchanged,NO_STATE_DRIFT,n/a,integrity evidence
