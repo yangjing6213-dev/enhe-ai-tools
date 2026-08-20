@@ -1,0 +1,67 @@
+# Phase 2C.3B-D3 Final Receipt
+
+## Final status
+
+```text
+PHASE_2C_3B_D3_STATUS=BLOCKED
+PHASE_2C_3B_STATUS=BLOCKED_DOCKER_CONTAINER_GATE_NOT_COMPLETED
+REASON=SINGLE_START_CONSUMED_AFTER_OVERBROAD_ENV_TEMPLATE_GUARD
+PHASE_2C_3C_STATUS=NOT_AUTHORIZED
+```
+
+## Passed recovery facts
+
+```text
+D2_PROVENANCE_VALIDATION=PASS
+D2_ZIP_VALIDATION=PASS
+EXACT_STATE_FILE_IDENTITY=PASS
+EXACT_STATE_FILE_BACKUP_STATUS=PASS
+EXACT_STATE_FILE_QUARANTINE_STATUS=PASS
+CONTROLLED_START_INVOCATION_COUNT=1
+DOCKER_SERVER_CONNECTED_DURING_GATE=YES
+DOCKER_ENGINE_OSTYPE=linux
+DOCKER_CONTEXT=desktop-linux
+CURRENT_BOOT_TARGET_NUL_OR_JSON_ERROR_LINES=0
+WINDOWS_DAEMON_ACTIVE_FORM=DOCKER_REGENERATED_VALID_JSON
+REGENERATED_TOTAL_NUL_COUNT=0
+ORIGINAL_ALL_NUL_BACKUP_RETAINED=YES
+ORIGINAL_ALL_NUL_QUARANTINE_RETAINED=YES
+```
+
+## Unclosed mandatory gates
+
+```text
+DOCKER_RESOURCE_PRE_BASELINE=NOT_CAPTURED
+DOCKER_GATE_CONTAINER_COUNT_CREATED=0
+DOCKER_POSTGRES_GATE=BLOCKED_NOT_RUN
+DOCKER_MIGRATION_COUNT=0_NOT_RUN
+DOCKER_MIGRATION_DEPLOY=NOT_RUN
+DOCKER_MIGRATION_STATUS=NOT_RUN
+DOCKER_BUILD=NOT_RUN
+DOCKER_STANDALONE=NOT_RUN
+FORMAL_ROUTE_200_COUNT=0_NOT_RUN
+PREVIEW_ROUTE_404_COUNT=0_NOT_RUN
+PREEXISTING_CONTAINERS_UNCHANGED=UNKNOWN_NO_PRE_BASELINE
+PREEXISTING_VOLUMES_UNCHANGED=UNKNOWN_NO_PRE_BASELINE
+```
+
+## Cleanup and safety
+
+```text
+DOCKER_GATE_RESIDUAL_CONTAINER_COUNT=0
+TEMP_DATABASE_ENV_RESTORED=YES
+FINAL_DOCKER_DESKTOP_STATUS=STOPPED
+FINAL_DOCKER_OWNED_PROCESS_COUNT=0
+FINAL_DOCKER_ENGINE_CONNECTED=NO
+PRODUCTION_DATABASE_ACCESSED=NO
+PRODUCTION_MIGRATION_RUN=NO
+PRODUCTION_SEED_RUN=NO
+APPLICATION_SOURCE_CHANGED=NO
+DEPLOYED=NO
+REMOTE_CHANGED=NO
+PUSHED=NO
+```
+
+No state-file body or full active path is disclosed. No Docker configuration body, field, or value; secret; database credential; project environment-file body; Registry credential; context endpoint; container log; volume content; or database content is disclosed. `settings.dat` was only fingerprinted read-only. `daemon.json` was not modified. `settings-store.json` was not directly modified by Codex, but Docker's own runtime write was observed and is explicitly recorded rather than hidden.
+
+The Docker Engine recovery is real, but it is insufficient to close Phase 2C.3B because the required single-container, 49-migration, Build, and standalone gates did not run. The next recovery attempt needs explicit authority for another controlled start; until then, Phase 2C.3C must not begin.
