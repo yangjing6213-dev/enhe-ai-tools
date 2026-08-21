@@ -32,6 +32,7 @@ const selectorPath =
   "src/components/redesign/software/EnheRedesignSoftwareCategorySelector.tsx";
 const stylesPath =
   "src/components/redesign/software/EnheRedesignSoftwareCategoryMotion.module.css";
+const shellPath = "src/styles/redesign/shell.css";
 const motionPath = "src/lib/motion/category-layer-motion.ts";
 
 describe("production category origin-aware motion", () => {
@@ -135,6 +136,18 @@ describe("production category origin-aware motion", () => {
     expect(selector).toContain('data-category-close="true"');
     expect(styles).toMatch(/min-width:\s*44px/);
     expect(styles).toMatch(/min-height:\s*44px/);
+  });
+
+  it("suppresses only the closed support launcher for the full mobile sheet lifecycle", () => {
+    const selector = readProjectFile(selectorPath);
+    const shell = readProjectFile(shellPath);
+
+    expect(selector).toContain(
+      'data-layer-rendered={layerRendered ? "true" : "false"}',
+    );
+    expect(shell).toMatch(
+      /@media \(width < 768px\)[\s\S]*\.enhe-redesign-production:has\([\s\S]*\.redesign-software-category-layer\[data-layer-rendered="true"\][\s\S]*\)[\s\S]*\.customer-support-widget\[data-support-open="false"\]\s*\{[^}]*display:\s*none[^}]*\}/,
+    );
   });
 
   it("keeps the motion scoped, GPU-only, and free of prohibited patterns", () => {

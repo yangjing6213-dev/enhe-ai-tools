@@ -379,7 +379,11 @@ export function EnheRedesignSoftwareCategorySelector({
   }, [close, isMobile, moveFocus, open]);
 
   return (
-    <div className="redesign-software-category-layer" data-open={open ? "true" : "false"}>
+    <div
+      className="redesign-software-category-layer"
+      data-open={open ? "true" : "false"}
+      data-layer-rendered={layerRendered ? "true" : "false"}
+    >
       <button
         id={triggerId}
         ref={buttonRef}

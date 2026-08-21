@@ -73,6 +73,13 @@
     right: calc(16px + var(--support-safe-area-inline-end));
     bottom: calc(16px + var(--support-safe-area-block-end));
   }
+
+  .enhe-redesign-production:has(
+      .redesign-software-category-layer[data-layer-rendered="true"]
+    )
+    .customer-support-widget[data-support-open="false"] {
+    display: none;
+  }
 }
 
 @media (width < 484px) {
