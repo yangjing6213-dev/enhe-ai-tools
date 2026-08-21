@@ -1,0 +1,129 @@
+{
+  "schema_version": 1,
+  "rc_id": "ENHE-PHASE2C4-PUBLIC-RC1",
+  "phase_status": "PASS",
+  "public_surface_release_candidate_status": "PASS",
+  "scope": "public-surface-only",
+  "source": {
+    "branch": "codex/enhe-motion-final-correction-v1",
+    "head": "78357d74962276d3036975d2197e9c284eb053b1",
+    "tree": "5f488a621539ac2b70efa0dbe4797e3be689b4aa",
+    "production_source_sha256": "959ba31469cee929b70c66f9649d9029ded71f37985e3f0b8258ef1733a1dfab",
+    "production_source_path_list_sha256": "de863508d78d97a236fb6eb5994cb5fc5b2a7f95cd1a4327dd3206a8d5176a80",
+    "package_lock_sha256": "c61883c10346b28695eea52fbe6fcd8493783d141710aed8245f05398d296ca3",
+    "migration_tree_sha256": "3e30a6ea9e3210abf97fc377cde1b85afdf8684d1214ac63a9fe6826e804c8dc",
+    "migration_path_list_sha256": "524b09a97543a9d198831e9733320a46879cd772700263b508f684398d77d4b7"
+  },
+  "d4r_archive": {
+    "status": "PASS",
+    "size": 2917323,
+    "sha256": "efdd65f359a1cad8cf4aaf1189d7fd92d0055fa10bd4efe43b0e889adf086cc3",
+    "file_count": 36,
+    "bad_crc": 0,
+    "git_blob_byte_mismatches": 0,
+    "authoritative_source_checkout_byte_mismatches": 0,
+    "rc_checkout_byte_mismatches": 20,
+    "rc_checkout_markdown_eol_mismatches": 20
+  },
+  "staging": {
+    "dedicated_target_status": "NOT_PROVEN_IN_TRACKED_CONFIGURATION",
+    "acceptance_mode": "LOCAL_TRACED_STANDALONE_EQUIVALENT",
+    "deployment_started": false,
+    "local_equivalent_acceptance": "PASS"
+  },
+  "environment": {
+    "example_classification": "TRACKED_NON_ACTIVE_TEMPLATE",
+    "active_env_file_count": 0,
+    "temporary_process_values_restored": true
+  },
+  "surfaces": {
+    "public_header": "PASS",
+    "public_footer": "PASS",
+    "zh_home": "PASS",
+    "en_home": "PASS",
+    "zh_software": "PASS",
+    "en_software": "PASS",
+    "support_exclusion": "PASS",
+    "motion_system": "PASS"
+  },
+  "gates": {
+    "lint": "PASS",
+    "typecheck": "PASS",
+    "focused_tests": "PASS",
+    "default_full_suite": "2/2",
+    "shuffled_full_suite": "1/1",
+    "browser_matrix_cases": 120,
+    "browser_matrix_failed": 0,
+    "production_browser_cases_passed": 185,
+    "migration_count": 49,
+    "migration_deploy": "PASS",
+    "migration_status": "SCHEMA_UP_TO_DATE",
+    "build": "PASS",
+    "standalone": "PASS",
+    "build_id": "XW2sFw32Br7G9npwDuTIT",
+    "static_page_count": 119,
+    "build_duration_ms": 156598
+  },
+  "runtime": {
+    "formal_route_200_count": 6,
+    "preview_route_404_count": 4,
+    "console_error_count": 0,
+    "page_error_count": 0,
+    "hydration_error_count": 0,
+    "root_horizontal_overflow": 0,
+    "category_cls_delta": 0,
+    "product_stage_cls_delta": 0,
+    "mobile_nav_cls_delta": 0,
+    "ssr_fallback_cls_delta": 0
+  },
+  "media": {
+    "screenshot_count": 8,
+    "video_count": 2,
+    "bad_file_count": 0,
+    "duplicate_hash_count": 0,
+    "files": [
+      {"path": "screenshots/en-rc-home-1440.png", "size": 441612, "sha256": "19a99711c9c72cb98a40d9f0d5d8ac9f7fdf0536b0fa8eec18d43904949e5597"},
+      {"path": "screenshots/en-rc-home-390.png", "size": 173398, "sha256": "92f5d7d7f308f5f2a447e83a029e59bc90b0508e00cedf017102e141bb1c7489"},
+      {"path": "screenshots/en-rc-software-1440.png", "size": 229822, "sha256": "87ba7e14cab78070f7fa1359e66edac6e0ed0a046e5238d1f91e3b44e1977f00"},
+      {"path": "screenshots/en-rc-software-390.png", "size": 321147, "sha256": "2a765321ac8c14093aa4fa321a1b9addeeab9f681455fd1c62388d7421e7ef4d"},
+      {"path": "screenshots/zh-rc-home-1440.png", "size": 421440, "sha256": "9f9cc752515220564431d3d6269d6e02e5a4a5b0bb735cbf41889d5ab04c4563"},
+      {"path": "screenshots/zh-rc-home-390.png", "size": 169448, "sha256": "e9cb8cf90c47ad85bc616148cac2c991aaef89aa0a15a05ce9770fd18184969a"},
+      {"path": "screenshots/zh-rc-software-1440.png", "size": 214889, "sha256": "a4b42db2a8ac8c4fab28660a7f5d81ef5241fe66052c8e0767aa28c93e9a5ddb"},
+      {"path": "screenshots/zh-rc-software-390.png", "size": 301399, "sha256": "13ecc6d4602dacc6d0c68bb5fef42d7d3dca0dd5e47630df23b74924c3d30fe8"},
+      {"path": "videos/en-rc-mobile-flow-390.webm", "size": 313488, "sha256": "b9a4e8cb7fa00310adb4b917bd0c5c77fc3545c4f5411a0d11363aed786c66b5"},
+      {"path": "videos/zh-rc-mobile-flow-390.webm", "size": 271941, "sha256": "1b1bf112d95ab85f054ef94bd81a742d2e3dc76e558ffc6f4e7085b95035ecf0"}
+    ]
+  },
+  "package": {
+    "markdown_count": 17,
+    "json_count": 1,
+    "text_record_count": 18,
+    "media_count": 10,
+    "expected_total_file_count": 28
+  },
+  "changes": {
+    "production_application_source": false,
+    "production_style": false,
+    "deployment_source": false,
+    "package": false,
+    "lockfile": false,
+    "prisma": false,
+    "schema": false,
+    "migration": false,
+    "sitemap": false,
+    "robots": false,
+    "unauthorized_paths": 0
+  },
+  "operations": {
+    "production_database_accessed": false,
+    "production_deployment_started": false,
+    "dedicated_staging_connected": false,
+    "live_production_changed": false,
+    "pushed": false,
+    "remote_changed": false,
+    "tag_created": false
+  },
+  "test_commit": "NOT_REQUIRED_EXISTING_GATES_SUFFICIENT",
+  "docs_commit": "REPORTED_IN_EXTERNAL_HANDOFF",
+  "next_action": "PHASE_2C_5_DEDICATED_STAGING_DEPLOYMENT_APPROVAL"
+}
