@@ -1,0 +1,22 @@
+.viewport {
+  position: relative;
+  min-width: 0;
+  overflow: clip;
+  overflow-clip-margin: 8px;
+}
+
+.layer {
+  min-width: 0;
+}
+
+.previous {
+  position: absolute;
+  z-index: 0;
+  inset: 0;
+  pointer-events: none;
+}
+
+.current {
+  position: relative;
+  z-index: 1;
+}
