@@ -66,9 +66,14 @@ async function installPerformanceCapture(page: Page) {
     try {
       new PerformanceObserver((entries) => {
         for (const entry of entries.getEntries()) {
+          const layoutShift = entry as PerformanceEntry & {
+            hadRecentInput?: boolean;
+            value?: number;
+          };
+          if (layoutShift.hadRecentInput) continue;
           captureWindow.__enheFinalLayoutShift =
             (captureWindow.__enheFinalLayoutShift ?? 0) +
-            Number((entry as PerformanceEntry & { value?: number }).value ?? 0);
+            Number(layoutShift.value ?? 0);
         }
       }).observe({ type: "layout-shift", buffered: true });
     } catch {
@@ -310,9 +315,7 @@ test("standalone formal routes exclude prototype code and preview routes", async
     const response = await page.goto(route, { waitUntil: "domcontentloaded" });
     expect(response?.status(), route).toBe(200);
     if (route.endsWith(".txt") || route.endsWith(".xml")) {
-      expect(await page.locator("body").innerText()).not.toContain(
-        "redesign-preview",
-      );
+      expect(await response?.text()).not.toContain("redesign-preview");
       continue;
     }
     for (const source of await page.locator("script[src]").evaluateAll((scripts) =>

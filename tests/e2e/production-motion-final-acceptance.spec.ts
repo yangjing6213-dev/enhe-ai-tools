@@ -1,5 +1,7 @@
 import { expect, test, type Browser, type Locator, type Page } from "@playwright/test";
 
+import { HOME_PRODUCTS } from "@/lib/redesign/home/home-products";
+
 type Modality = "keyboard" | "pointer" | "reduced";
 type FormalRoute = {
   closeCategory?: string;
@@ -77,6 +79,44 @@ const productIds = [
   "faceswap-studio",
 ] as const;
 
+const homeSsrRoutes = [
+  {
+    path: "/",
+    locale: "zh",
+    h1: routes[0].h1,
+    cta: "查看产品 →",
+    next: "下一款产品",
+  },
+  {
+    path: "/en",
+    locale: "en",
+    h1: routes[1].h1,
+    cta: "View product →",
+    next: "Next product",
+  },
+] as const;
+
+const homeSsrViewports = [
+  { width: 320, height: 844 },
+  { width: 390, height: 844 },
+  { width: 768, height: 900 },
+  { width: 1440, height: 900 },
+] as const;
+
+const categorySupportRoutes = [
+  { path: "/software", otherPath: "/about", support: "客服" },
+  { path: "/en/software", otherPath: "/en/about", support: "Chat" },
+] as const;
+
+const categorySupportViewports = [
+  { width: 320, height: 844 },
+  { width: 390, height: 844 },
+  { width: 480, height: 900 },
+  { width: 483, height: 900 },
+  { width: 484, height: 900 },
+  { width: 767, height: 900 },
+] as const;
+
 function monitorErrors(page: Page) {
   const consoleErrors: string[] = [];
   const pageErrors: string[] = [];
@@ -85,6 +125,20 @@ function monitorErrors(page: Page) {
   });
   page.on("pageerror", (error) => pageErrors.push(error.message));
   return { consoleErrors, pageErrors };
+}
+
+function monitorHomeProductMediaRequests(page: Page) {
+  const productMediaRequests: string[] = [];
+  page.on("request", (request) => {
+    const pathname = new URL(request.url()).pathname;
+    if (
+      request.resourceType() === "image" &&
+      HOME_PRODUCTS.some((product) => product.mediaSrc === pathname)
+    ) {
+      productMediaRequests.push(pathname);
+    }
+  });
+  return productMediaRequests;
 }
 
 async function openFormalRoute(page: Page, route: string) {
@@ -138,6 +192,102 @@ function intersectionArea(
       Math.max(left.y, right.y),
   );
   return overlapX * overlapY;
+}
+
+type SupportBox = { x: number; y: number; width: number; height: number };
+
+async function captureSupportBaseline(
+  page: Page,
+  accessibleName: string,
+): Promise<SupportBox> {
+  const launcher = page.getByRole("button", {
+    name: accessibleName,
+    exact: true,
+  });
+  await expect(launcher).toBeVisible();
+  await expect(launcher).toHaveAttribute("tabindex", "0");
+  const box = await launcher.boundingBox();
+  expect(box).not.toBeNull();
+  return box ?? { x: 0, y: 0, width: 0, height: 0 };
+}
+
+async function expectSupportSuppressed(
+  page: Page,
+  accessibleName: string,
+  baseline: SupportBox,
+  panel: Locator,
+) {
+  const widget = page.locator('.customer-support-widget[data-support-open="false"]');
+  const launcher = page.locator(".customer-support-launcher");
+
+  await expect(widget).toHaveCSS("display", "none");
+  await expect(launcher).toBeHidden();
+  const supportBox = await launcher.boundingBox();
+  expect(supportBox).toBeNull();
+  await expect(
+    page.getByRole("button", { name: accessibleName, exact: true }),
+  ).toHaveCount(0);
+  await expect(
+    page.getByRole("button", {
+      name: accessibleName,
+      exact: true,
+      includeHidden: true,
+    }),
+  ).toHaveCount(1);
+  expect(
+    await launcher.evaluate((element) => {
+      (element as HTMLElement).focus();
+      return document.activeElement === element;
+    }),
+  ).toBe(false);
+
+  const panelBox = await panel.boundingBox();
+  expect(panelBox).not.toBeNull();
+  expect(
+    supportBox
+      ? intersectionArea(
+          supportBox,
+          panelBox ?? { x: 0, y: 0, width: 0, height: 0 },
+        )
+      : 0,
+  ).toBe(0);
+  expect(
+    await page.evaluate(({ x, y }) => {
+      const target = document.elementFromPoint(x, y);
+      return {
+        category: Boolean(
+          target?.closest(
+            ".redesign-software-category-overlay, .redesign-software-category-panel",
+          ),
+        ),
+        support: Boolean(target?.closest(".customer-support-widget")),
+      };
+    }, {
+      x: baseline.x + baseline.width / 2,
+      y: baseline.y + baseline.height / 2,
+    }),
+  ).toEqual({ category: true, support: false });
+}
+
+async function expectSupportRestored(
+  page: Page,
+  accessibleName: string,
+  baseline: SupportBox,
+) {
+  const launcher = page.getByRole("button", {
+    name: accessibleName,
+    exact: true,
+  });
+  await expect(launcher).toBeVisible();
+  await expect(launcher).toHaveAttribute("tabindex", "0");
+  const box = await launcher.boundingBox();
+  expect(box).not.toBeNull();
+  expect(box?.x).toBeCloseTo(baseline.x, 1);
+  expect(box?.y).toBeCloseTo(baseline.y, 1);
+  expect(box?.width).toBeCloseTo(baseline.width, 1);
+  expect(box?.height).toBeCloseTo(baseline.height, 1);
+  await launcher.focus();
+  await expect(launcher).toBeFocused();
 }
 
 async function expectSupportClearOf(
@@ -525,6 +675,138 @@ for (const route of routes) {
   });
 }
 
+for (const route of homeSsrRoutes) {
+  for (const viewport of homeSsrViewports) {
+    test(`home SSR fallback exposes canonical products on ${route.path} at ${viewport.width}px`, async ({
+      browser,
+    }) => {
+      const context = await browser.newContext({
+        javaScriptEnabled: false,
+        viewport,
+      });
+      const page = await context.newPage();
+      const productMediaRequests = monitorHomeProductMediaRequests(page);
+      await page.route("**/api/analytics", (request) =>
+        request.fulfill({ status: 204 }),
+      );
+      const response = await page.goto(route.path, {
+        waitUntil: "domcontentloaded",
+      });
+      expect(response?.status()).toBe(200);
+
+      await expect(
+        page.getByRole("heading", { level: 1, name: route.h1 }),
+      ).toBeVisible();
+      await expect(page.locator(".redesign-header")).toBeVisible();
+      await expect(page.locator(".redesign-footer")).toBeVisible();
+
+      const fallback = page.locator("noscript ol");
+      const items = fallback.locator("li[data-product-id]");
+      await expect(fallback).toBeVisible();
+      await expect(items).toHaveCount(HOME_PRODUCTS.length);
+      expect(await items.evaluateAll((elements) =>
+        elements.map((element) => element.getAttribute("data-product-id")),
+      )).toEqual(productIds);
+
+      for (const [index, product] of HOME_PRODUCTS.entries()) {
+        const item = items.nth(index);
+        await expect(item).toHaveAttribute("data-product-id", product.id);
+        await expect(
+          item.getByRole("heading", {
+            level: 3,
+            name: product.name[route.locale],
+            exact: true,
+          }),
+        ).toBeVisible();
+        await expect(
+          item.getByText(product.description[route.locale], { exact: true }),
+        ).toBeVisible();
+        const cta = item.getByRole("link", { name: route.cta, exact: true });
+        await expect(cta).toBeVisible();
+        await expect(cta).toHaveAttribute(
+          "href",
+          product.detailHref[route.locale],
+        );
+      }
+
+      await expect(fallback.locator("img, picture, source, video")).toHaveCount(0);
+      await expect(currentProduct(page)).toHaveCount(1);
+      await expect(currentProduct(page)).toHaveAttribute(
+        "data-product-id",
+        "ultimate-edition",
+      );
+      await expect(currentProduct(page)).toBeVisible();
+      await expect(currentProduct(page).getByRole("link")).toBeVisible();
+      await page.waitForLoadState("networkidle");
+      expect([...new Set(productMediaRequests)]).toEqual([
+        HOME_PRODUCTS[0].mediaSrc,
+      ]);
+      expect(
+        await page.locator("[id]").evaluateAll((elements) => {
+          const ids = elements.map((element) => element.id);
+          return ids.filter((id, index) => ids.indexOf(id) !== index);
+        }),
+      ).toEqual([]);
+      expect(await rootOverflow(page)).toBe(0);
+      await context.close();
+    });
+  }
+
+  test(`home hydration keeps one interactive product surface on ${route.path}`, async ({
+    page,
+  }) => {
+    const errors = monitorErrors(page);
+    const hydrationMessages: string[] = [];
+    const productMediaRequests = monitorHomeProductMediaRequests(page);
+    page.on("console", (message) => {
+      if (/hydration|hydrated|did not match/i.test(message.text())) {
+        hydrationMessages.push(message.text());
+      }
+    });
+    await page.setViewportSize({ width: 390, height: 844 });
+    await openFormalRoute(page, route.path);
+
+    await expect(page.locator("noscript li")).toHaveCount(0);
+    expect(
+      await page.locator("noscript").evaluate((element) => element.childElementCount),
+    ).toBe(0);
+    await expect(page.locator("[data-product-layer]:visible")).toHaveCount(1);
+    await expect(
+      page.locator(".redesign-home-product-stage a[href]:visible"),
+    ).toHaveCount(1);
+    await expect(currentProduct(page)).toHaveAttribute(
+      "data-product-id",
+      "ultimate-edition",
+    );
+    expect(
+      await currentProduct(page)
+        .locator(".redesign-home-product-media")
+        .evaluate((element) => new URL((element as HTMLImageElement).src).pathname),
+    ).toBe(HOME_PRODUCTS[0].mediaSrc);
+    await page.waitForLoadState("networkidle");
+    expect([...new Set(productMediaRequests)]).toEqual([
+      HOME_PRODUCTS[0].mediaSrc,
+    ]);
+
+    await page.getByRole("button", { name: route.next, exact: true }).click();
+    await expect(currentProduct(page)).toHaveAttribute(
+      "data-product-id",
+      "infinitetalk",
+    );
+    await waitForRelevantAnimations(page);
+    expect(
+      await page.locator("[id]").evaluateAll((elements) => {
+        const ids = elements.map((element) => element.id);
+        return ids.filter((id, index) => ids.indexOf(id) !== index);
+      }),
+    ).toEqual([]);
+    expect(await rootOverflow(page)).toBe(0);
+    expect(hydrationMessages).toEqual([]);
+    expect(errors.consoleErrors).toEqual([]);
+    expect(errors.pageErrors).toEqual([]);
+  });
+}
+
 async function installModalMonitor(page: Page) {
   await page.evaluate(() => {
     const state = { maxDialogs: 0 };
@@ -566,6 +848,136 @@ async function modalMonitorState(page: Page) {
         }
       ).__enheFinalModalState ?? { maxDialogs: 0 },
   );
+}
+
+async function categoryClosingSuppressionSnapshot(page: Page) {
+  return page.evaluate(() => {
+    const root = document.querySelector(".redesign-software-category-layer");
+    const widget = document.querySelector<HTMLElement>(
+      '.customer-support-widget[data-support-open="false"]',
+    );
+    const launcher = document.querySelector<HTMLElement>(
+      ".customer-support-launcher",
+    );
+    const rect = launcher?.getBoundingClientRect();
+    return {
+      layerRendered: root?.getAttribute("data-layer-rendered"),
+      widgetDisplay: widget ? getComputedStyle(widget).display : null,
+      launcherArea: rect ? rect.width * rect.height : 0,
+    };
+  });
+}
+
+for (const route of categorySupportRoutes) {
+  for (const viewport of categorySupportViewports) {
+    for (const modality of modalities) {
+      test(`category support matrix ${route.path} ${viewport.width}px ${modality}`, async ({
+        page,
+      }) => {
+        const errors = monitorErrors(page);
+        await page.emulateMedia({
+          reducedMotion: modality === "reduced" ? "reduce" : "no-preference",
+        });
+        await page.setViewportSize(viewport);
+        await openFormalRoute(page, route.path);
+        await installModalMonitor(page);
+
+        const root = page.locator(".redesign-software-category-layer");
+        const baseline = await captureSupportBaseline(page, route.support);
+        const first = await openCategory(page, modality, viewport.width);
+        await expect(root).toHaveAttribute("data-layer-rendered", "true");
+        await expectSupportSuppressed(
+          page,
+          route.support,
+          baseline,
+          first.panel,
+        );
+        await expectFocusTrap(page, first.panel);
+        expect(
+          await page.locator('[role="dialog"][aria-modal="true"]:visible').count(),
+        ).toBe(1);
+
+        await page
+          .locator(".redesign-software-category-overlay")
+          .dispatchEvent("click", { detail: 1 });
+        expect(await categoryClosingSuppressionSnapshot(page)).toEqual({
+          layerRendered: "true",
+          widgetDisplay: "none",
+          launcherArea: 0,
+        });
+        await expect(first.panel).toBeHidden();
+        await expect(root).toHaveAttribute("data-layer-rendered", "false");
+        await expect(first.trigger).toBeFocused();
+        await expectSupportRestored(page, route.support, baseline);
+
+        const reopened = await openCategory(page, modality, viewport.width);
+        await expectSupportSuppressed(
+          page,
+          route.support,
+          baseline,
+          reopened.panel,
+        );
+        await page.keyboard.press("Escape");
+        expect(await categoryClosingSuppressionSnapshot(page)).toEqual({
+          layerRendered: "true",
+          widgetDisplay: "none",
+          launcherArea: 0,
+        });
+        await expect(reopened.panel).toBeHidden();
+        await expect(root).toHaveAttribute("data-layer-rendered", "false");
+        await expect(reopened.trigger).toBeFocused();
+        await expectSupportRestored(page, route.support, baseline);
+
+        const beforeResize = await openCategory(page, modality, viewport.width);
+        await expectSupportSuppressed(
+          page,
+          route.support,
+          baseline,
+          beforeResize.panel,
+        );
+        await page.setViewportSize({ width: 768, height: 900 });
+        await expect(beforeResize.panel).toBeVisible();
+        await expect(beforeResize.panel).not.toHaveAttribute("aria-modal", "true");
+        const desktopSupport = await captureSupportBaseline(page, route.support);
+        expect(desktopSupport.width).toBeGreaterThan(44);
+        await expect
+          .poll(() => page.evaluate(() => document.body.style.overflow))
+          .toBe("");
+        await page.keyboard.press("Escape");
+        await expect(beforeResize.panel).toBeHidden();
+        await expect(root).toHaveAttribute("data-layer-rendered", "false");
+        await expectSupportRestored(page, route.support, desktopSupport);
+
+        expect((await modalMonitorState(page)).maxDialogs).toBeLessThanOrEqual(1);
+        expect(await rootOverflow(page)).toBe(0);
+        expect(errors.consoleErrors).toEqual([]);
+        expect(errors.pageErrors).toEqual([]);
+      });
+    }
+  }
+
+  test(`category support suppression cleans up on route unmount from ${route.path}`, async ({
+    page,
+  }) => {
+    const errors = monitorErrors(page);
+    await page.setViewportSize({ width: 390, height: 844 });
+    await openFormalRoute(page, route.path);
+    const baseline = await captureSupportBaseline(page, route.support);
+    const category = await openCategory(page, "keyboard", 390);
+    await expectSupportSuppressed(
+      page,
+      route.support,
+      baseline,
+      category.panel,
+    );
+
+    await openFormalRoute(page, route.otherPath);
+    await expect(page.locator(".redesign-software-category-layer")).toHaveCount(0);
+    await expectSupportRestored(page, route.support, baseline);
+    expect(await page.evaluate(() => document.body.style.overflow)).toBe("");
+    expect(errors.consoleErrors).toEqual([]);
+    expect(errors.pageErrors).toEqual([]);
+  });
 }
 
 test("home product stage and mobile navigation preserve latest state across navigation", async ({
@@ -671,38 +1083,24 @@ for (const locale of [
     await page.goBack({ waitUntil: "domcontentloaded" });
     await expect(page).toHaveURL(new RegExp(`${locale.path.replaceAll("/", "\\/")}$`));
 
+    const supportBaseline = await captureSupportBaseline(page, locale.support);
     const reopened = await openCategory(page, "keyboard", 390);
     await expectFocusTrap(page, reopened.panel);
-    const support = page.getByRole("button", {
-      name: locale.support,
-      exact: true,
-    });
-    const supportBox = await support.boundingBox();
-    expect(supportBox).not.toBeNull();
-    const categoryPanelBox = await reopened.panel.boundingBox();
-    expect(categoryPanelBox).not.toBeNull();
-    expect(
-      intersectionArea(
-        supportBox ?? { x: 0, y: 0, width: 0, height: 0 },
-        categoryPanelBox ?? { x: 0, y: 0, width: 0, height: 0 },
-      ),
-      `${locale.path} category panel/support intersection`,
-    ).toBe(0);
-    const layerOwnsSupportHit = await page.evaluate(({ x, y }) => {
-      const target = document.elementFromPoint(x, y);
-      return Boolean(
-        target?.closest(
-          ".redesign-software-category-overlay, .redesign-software-category-panel",
-        ),
-      );
-    }, {
-      x: (supportBox?.x ?? 0) + (supportBox?.width ?? 0) / 2,
-      y: (supportBox?.y ?? 0) + (supportBox?.height ?? 0) / 2,
-    });
-    expect(layerOwnsSupportHit).toBe(true);
+    await expectSupportSuppressed(
+      page,
+      locale.support,
+      supportBaseline,
+      reopened.panel,
+    );
     await page.keyboard.press("Escape");
+    expect(await categoryClosingSuppressionSnapshot(page)).toEqual({
+      layerRendered: "true",
+      widgetDisplay: "none",
+      launcherArea: 0,
+    });
     await expect(reopened.panel).toBeHidden();
     await expect(reopened.trigger).toBeFocused();
+    await expectSupportRestored(page, locale.support, supportBaseline);
     expect(await page.evaluate(() => document.body.style.overflow)).toBe("");
     expect(errors.consoleErrors).toEqual([]);
     expect(errors.pageErrors).toEqual([]);
@@ -715,10 +1113,12 @@ test("category layer survives 30 rapid interruption rounds", async ({ page }) =>
   await openFormalRoute(page, "/software");
   const trigger = page.locator(".redesign-software-category-trigger");
   const panel = page.locator(".redesign-software-category-panel");
+  const supportBaseline = await captureSupportBaseline(page, "客服");
 
   for (let run = 0; run < 30; run += 1) {
     await trigger.click();
     await expect(panel).toBeVisible();
+    await expectSupportSuppressed(page, "客服", supportBaseline, panel);
     if (run % 3 === 0) {
       await page.keyboard.press("Escape");
     } else if (run % 3 === 1) {
@@ -728,9 +1128,13 @@ test("category layer survives 30 rapid interruption rounds", async ({ page }) =>
     }
     await expect(panel).toBeHidden();
     await expect(trigger).toBeFocused();
+    await expectSupportRestored(page, "客服", supportBaseline);
   }
 
   await waitForRelevantAnimations(page);
+  await expect(
+    page.locator(".redesign-software-category-layer"),
+  ).toHaveAttribute("data-layer-rendered", "false");
   expect(await page.evaluate(() => document.body.style.overflow)).toBe("");
   expect(errors.consoleErrors).toEqual([]);
   expect(errors.pageErrors).toEqual([]);

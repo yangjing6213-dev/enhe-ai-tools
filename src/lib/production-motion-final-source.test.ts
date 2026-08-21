@@ -15,6 +15,7 @@ import { resolveProductStageMotion } from "@/lib/motion/product-stage-motion";
 const projectRoot = process.cwd();
 const preMotionBaseline = "ad603985e40f1142e3ddff821e984abc14ebc207";
 const finalProductionSource = "ac39487ecec451f2ef9408884fa17f8cffdf9ff3";
+const d4BlockedHead = "dfa5d8b8fe277129934c8d1ec13eda2851d3e970";
 
 const implementationCommits = [
   "5938b2f6da0c50a2dac08ea4d0bf31f367e169f3",
@@ -41,6 +42,20 @@ const finalAcceptanceTestPaths = new Set([
   "tests/e2e/production-motion-final-acceptance.spec.ts",
   "tests/e2e/production-motion-final-performance.spec.ts",
 ]);
+
+const targetedCorrectionProductionPaths = [
+  "src/components/redesign/home/EnheRedesignProductShowcase.tsx",
+  "src/components/redesign/software/EnheRedesignSoftwareCategorySelector.tsx",
+  "src/styles/redesign/shell.css",
+] as const;
+
+const targetedCorrectionTestPaths = [
+  "src/components/redesign/home/home-products.test.ts",
+  "src/lib/production-motion-final-source.test.ts",
+  "tests/category-motion.test.ts",
+  "tests/e2e/production-motion-final-acceptance.spec.ts",
+  "tests/e2e/production-motion-final-performance.spec.ts",
+] as const;
 
 function readProjectFile(relativePath: string) {
   return readFileSync(join(projectRoot, relativePath), "utf8");
@@ -115,29 +130,20 @@ describe("final production motion source contract", () => {
     ).toEqual([]);
   });
 
-  it("keeps the current D4 commit and worktree delta inside tests and final evidence", () => {
+  it("keeps the historical D4 blocked commits inside tests and final evidence", () => {
     expect(() =>
       execFileSync(
         "git",
-        ["merge-base", "--is-ancestor", finalProductionSource, "HEAD"],
+        ["merge-base", "--is-ancestor", d4BlockedHead, "HEAD"],
         { cwd: projectRoot, stdio: "ignore" },
       ),
     ).not.toThrow();
 
-    const committedPaths = gitLines([
+    const d4Paths = gitLines([
       "diff",
       "--name-only",
-      `${finalProductionSource}..HEAD`,
+      `${finalProductionSource}..${d4BlockedHead}`,
     ]);
-    const worktreePaths = gitLines([
-      "status",
-      "--porcelain=v1",
-      "--untracked-files=all",
-    ]).map((line) => {
-      const path = line.slice(3);
-      return path.includes(" -> ") ? path.split(" -> ").at(-1) ?? path : path;
-    });
-    const d4Paths = [...new Set([...committedPaths, ...worktreePaths])];
     const unauthorized = d4Paths.filter(
       (path) =>
         !finalAcceptanceTestPaths.has(path) &&
@@ -148,6 +154,68 @@ describe("final production motion source contract", () => {
     expect(d4Paths).toEqual(
       expect.arrayContaining([...finalAcceptanceTestPaths]),
     );
+  });
+
+  it("limits D4R to the exact targeted production, test, and new evidence paths", () => {
+    const committedPaths = gitLines([
+      "diff",
+      "--name-only",
+      `${d4BlockedHead}..HEAD`,
+    ]);
+    const worktreePaths = gitLines([
+      "status",
+      "--porcelain=v1",
+      "--untracked-files=all",
+    ]).map((line) => {
+      const path = line.slice(3);
+      return path.includes(" -> ") ? path.split(" -> ").at(-1) ?? path : path;
+    });
+    const d4rPaths = [...new Set([...committedPaths, ...worktreePaths])];
+    const approvedPaths = new Set<string>([
+      ...targetedCorrectionProductionPaths,
+      ...targetedCorrectionTestPaths,
+    ]);
+    const unauthorized = d4rPaths.filter(
+      (path) =>
+        !approvedPaths.has(path) &&
+        !path.startsWith("docs/enhe-redesign/phase-2c3d-final-r1/"),
+    );
+    const changedProductionPaths = d4rPaths
+      .filter((path) =>
+        targetedCorrectionProductionPaths.includes(
+          path as (typeof targetedCorrectionProductionPaths)[number],
+        ),
+      )
+      .sort();
+
+    expect(unauthorized).toEqual([]);
+    expect(d4rPaths).toEqual(
+      expect.arrayContaining([
+        ...targetedCorrectionProductionPaths,
+        ...targetedCorrectionTestPaths,
+      ]),
+    );
+    expect(changedProductionPaths).toEqual(
+      [...targetedCorrectionProductionPaths].sort(),
+    );
+    expect(changedProductionPaths.length).toBeLessThanOrEqual(6);
+    expect(d4rPaths).not.toEqual(
+      expect.arrayContaining([
+        "package.json",
+        "package-lock.json",
+        "src/app/sitemap.ts",
+        "src/app/robots.ts",
+        "src/components/redesign/enhe-redesign-mobile-menu.tsx",
+        "src/lib/motion/category-layer-motion.ts",
+        "src/lib/motion/mobile-nav-motion.ts",
+        "src/lib/motion/product-stage-motion.ts",
+      ]),
+    );
+    expect(
+      d4rPaths.filter(
+        (path) => path.startsWith("prisma/") || path.startsWith("src/app/admin/"),
+      ),
+    ).toEqual([]);
   });
 
   it("locks the category, product-stage, and mobile-navigation motion profiles", () => {
@@ -266,9 +334,15 @@ describe("final production motion source contract", () => {
   });
 
   it("preserves the approved support exclusion and stacking contract", () => {
+    const category = readProjectFile(
+      "src/components/redesign/software/EnheRedesignSoftwareCategorySelector.tsx",
+    );
     const shell = readProjectFile("src/styles/redesign/shell.css");
     const tokens = readProjectFile("src/styles/redesign/tokens.css");
 
+    expect(category).toContain(
+      'data-layer-rendered={layerRendered ? "true" : "false"}',
+    );
     expect(shell).toContain("--support-trigger-icon-size: 44px");
     expect(shell).toContain("--support-exclusion-compact: 52px");
     expect(shell).toContain("--support-exclusion-expanded: 104px");
@@ -282,6 +356,9 @@ describe("final production motion source contract", () => {
     );
     expect(shell).toMatch(
       /\.customer-support-widget\s*{[\s\S]*?z-index:\s*10/,
+    );
+    expect(shell).toMatch(
+      /@media \(width < 768px\)[\s\S]*?\.enhe-redesign-production:has\(\s*\.redesign-software-category-layer\[data-layer-rendered="true"\]\s*\)\s*\.customer-support-widget\[data-support-open="false"\]\s*{[^}]*display:\s*none[^}]*}/,
     );
     expect(tokens).toContain("--enhe-z-layer: 40");
   });
