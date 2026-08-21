@@ -72,10 +72,23 @@ describe("ENHE redesign public shell candidate", () => {
     expect(menu).toContain("aria-controls={menuId}");
     expect(menu).toContain("Escape");
     expect(menu).toContain("focus()");
-    expect(menu).toContain("previouslyFocusedElement");
+    expect(menu).not.toContain("previouslyFocusedElement");
+    expect(menu).toContain("mountedTrigger");
     expect(menu).toContain("overflow");
-    expect(menu).toContain("onClick={close}");
+    expect(menu).toContain("close(getClickModality(event))");
     expect(menu).toContain("aria-label={triggerLabel}");
+    const redundantCloseGuard = menu.indexOf("if (!openRef.current) return;");
+    const closeIntentUpdate = menu.indexOf(
+      "openRef.current = false;",
+      redundantCloseGuard,
+    );
+    const animationFreeze = menu.indexOf(
+      "freezeActiveAnimations();",
+      redundantCloseGuard,
+    );
+    expect(redundantCloseGuard).toBeGreaterThan(-1);
+    expect(closeIntentUpdate).toBeGreaterThan(redundantCloseGuard);
+    expect(animationFreeze).toBeGreaterThan(closeIntentUpdate);
   });
 
   it("keeps the footer as four flat semantic columns without shell duplication", () => {
