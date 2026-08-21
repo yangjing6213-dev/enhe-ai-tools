@@ -1,8 +1,11 @@
 import { createHash } from "node:crypto";
 import { existsSync, readFileSync } from "node:fs";
 import { basename, join } from "node:path";
+import React, { createElement } from "react";
+import { renderToStaticMarkup } from "react-dom/server";
 import { describe, expect, it } from "vitest";
 import {
+  EnheRedesignProductShowcase,
   getWrappedProductIndex,
   updateProductMediaState,
 } from "@/components/redesign/home/EnheRedesignProductShowcase";
@@ -23,6 +26,8 @@ const phaseOneMediaManifest = JSON.parse(
     "utf8",
   ),
 ) as Array<{ localPath: string; sha256: string }>;
+
+Object.assign(globalThis, { React });
 
 describe("homepage approved product showcase", () => {
   it("keeps the five approved products in the prototype order", () => {
@@ -80,6 +85,32 @@ describe("homepage approved product showcase", () => {
     expect(HOME_PRODUCTS.every((product) => product.mediaSrc.startsWith("/redesign/home/"))).toBe(true);
     expect(HOME_PRODUCTS.every((product) => product.width === 1672 && product.height === 941)).toBe(true);
     expect(HOME_PRODUCTS.every((product) => product.description.zh && product.description.en)).toBe(true);
+  });
+
+  it.each([
+    ["zh", "查看产品 →"],
+    ["en", "View product →"],
+  ] as const)("renders all approved %s product content in a semantic no-script fallback", (locale, cta) => {
+    const html = renderToStaticMarkup(
+      createElement(EnheRedesignProductShowcase, { locale }),
+    );
+    const fallback = html.match(/<noscript>([\s\S]*?)<\/noscript>/)?.[1] ?? "";
+
+    expect(fallback).toContain("<ol");
+    expect(fallback.match(/<li\b/g) ?? []).toHaveLength(HOME_PRODUCT_COUNT);
+    expect(fallback.match(/<h3\b/g) ?? []).toHaveLength(HOME_PRODUCT_COUNT);
+    expect(fallback.match(/<a\b/g) ?? []).toHaveLength(HOME_PRODUCT_COUNT);
+
+    for (const product of HOME_PRODUCTS) {
+      expect(fallback).toContain(`data-product-id="${product.id}"`);
+      expect(fallback).toContain(`<h3>${product.name[locale]}</h3>`);
+      expect(fallback).toContain(`<p>${product.description[locale]}</p>`);
+      expect(fallback).toContain(`href="${product.detailHref[locale]}"`);
+      expect(fallback).toContain(`>${cta}</a>`);
+      expect(fallback).not.toContain(product.mediaSrc);
+    }
+
+    expect(fallback).not.toContain("<img");
   });
 
   it("keeps the showcase manual, keyboard accessible, and product-state driven", () => {

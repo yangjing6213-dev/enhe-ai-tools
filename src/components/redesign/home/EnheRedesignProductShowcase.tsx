@@ -437,6 +437,18 @@ export function EnheRedesignProductShowcase({
             <ArrowRight aria-hidden="true" />
           </button>
         </div>
+
+        <noscript>
+          <ol>
+            {HOME_PRODUCTS.map((fallbackProduct) => (
+              <li key={fallbackProduct.id} data-product-id={fallbackProduct.id}>
+                <h3>{fallbackProduct.name[locale]}</h3>
+                <p>{fallbackProduct.description[locale]}</p>
+                <a href={fallbackProduct.detailHref[locale]}>{copy.detail}</a>
+              </li>
+            ))}
+          </ol>
+        </noscript>
       </div>
     </section>
   );
