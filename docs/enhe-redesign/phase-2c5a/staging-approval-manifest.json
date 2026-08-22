@@ -1,0 +1,130 @@
+{
+  "schema_version": 1,
+  "phase": "PHASE_2C_5A_DEDICATED_STAGING_TARGET_AND_DEPLOYMENT_APPROVAL_PACKAGE",
+  "phase_status": "COMPLETE_WITH_INPUT_REQUIRED",
+  "scope": "PUBLIC_SURFACE_RELEASE_CANDIDATE",
+  "rc": {
+    "id": "ENHE-PHASE2C4-PUBLIC-RC1",
+    "public_surface_release_candidate_status": "PASS_UNCHANGED",
+    "evidence_branch": "codex/enhe-phase2c4-public-rc1",
+    "evidence_head": "f99017624fe81b33cd511f36ad17c85dd09cc864",
+    "evidence_tree": "815e169ba8bce943deb5e9cf6423c9c4fee2c9a8",
+    "runtime_source_head": "78357d74962276d3036975d2197e9c284eb053b1",
+    "runtime_source_tree": "5f488a621539ac2b70efa0dbe4797e3be689b4aa",
+    "production_source_sha256": "959ba31469cee929b70c66f9649d9029ded71f37985e3f0b8258ef1733a1dfab"
+  },
+  "rc_zip": {
+    "status": "PASS",
+    "size": 2646200,
+    "sha256": "b10d242d70893031a1c15790db5c6cce8e3d49cf2e77c53bde980ed4a5288ebe",
+    "file_count": 28,
+    "markdown_count": 17,
+    "json_count": 1,
+    "screenshot_count": 8,
+    "video_count": 2,
+    "bad_crc": 0,
+    "invalid_paths": 0,
+    "git_document_set_match": true,
+    "git_document_hash_match": true,
+    "git_document_mismatch_count": 0,
+    "media_hash_match": true,
+    "media_mismatch_count": 0
+  },
+  "production_exclusion": {
+    "connection_candidate_id": "415a2c4d69ae288959439f1f4f1b323f1365e6bd6054dc0814ce41799e32bcb1",
+    "host_fingerprint_hash": "NOT_AVAILABLE_NOT_TRACKED",
+    "runtime_sha": "3497d1709a80b9c5a69d8c1b9eab41af2832f50f",
+    "production_target_as_staging": "PRODUCTION_TARGET_REJECTED"
+  },
+  "discovery": {
+    "scanned_text_file_count": 205,
+    "scanned_byte_count": 964483,
+    "scanned_line_count": 20197,
+    "scan_sha256": "a88cbe692df03c8e69318cc81c935a445f5bf2d18a2302e901820e6361a1652c",
+    "candidate_count": 0,
+    "candidate_status": "NO_CANDIDATE",
+    "reference_status": "TRACKED_REFERENCE_INCOMPLETE",
+    "candidate_id": "NOT_AVAILABLE_NO_CANDIDATE",
+    "production_separation_status": "NOT_ESTABLISHED_NO_STAGING_CANDIDATE"
+  },
+  "target": {
+    "status": "NOT_PROVEN",
+    "required_type": "DEDICATED_HOST_OR_VM",
+    "host_isolation": "NOT_PROVEN",
+    "domain": "MISSING",
+    "database_isolation": "MISSING",
+    "storage_isolation": "MISSING",
+    "environment": "MISSING",
+    "https": "MISSING",
+    "access_control": "MISSING",
+    "logs": "MISSING",
+    "health_check": "MISSING",
+    "rollback": "MISSING_TARGET_INPUTS"
+  },
+  "contracts": {
+    "data_mode_recommendation": "SANITIZED_PUBLIC_FIXTURES",
+    "data_mode_approved": false,
+    "payment": "DISABLED_OR_SANDBOX_REQUIRES_USER_CONFIRMATION",
+    "oauth": "DISABLED_OR_DEDICATED_TEST_APP_REQUIRES_USER_CONFIRMATION",
+    "smtp": "DISABLED_OR_MAIL_SINK_REQUIRES_USER_CONFIRMATION",
+    "analytics": "DISABLED_OR_DEDICATED_STAGING_PROPERTY_REQUIRES_USER_CONFIRMATION",
+    "seo_privacy": "DEFINED_NOT_IMPLEMENTED"
+  },
+  "deployment": {
+    "existing_script_staging_safety": "REQUIRES_SEPARATE_STAGING_WRAPPER",
+    "recommended_model": "IMMUTABLE_IMAGE_STAGING_ONLY_REGISTRY",
+    "plan_sha256": "44cfb0ef4255baafa516914a0a047c4893369f9bb8f4cfe681985c85b9025f9f",
+    "rollback_plan_sha256": "a582f3116d95a321a8f97a6a96a0ca149708575b21365d4eebbbe0d61148629c",
+    "approval_ready": false,
+    "approval_phrase_status": "NOT_AVAILABLE_TARGET_INPUT_REQUIRED"
+  },
+  "inputs": {
+    "required": 84,
+    "proven": 0,
+    "missing": 84,
+    "not_applicable_with_justification": 0,
+    "rejected_production_resource": 0,
+    "production_reference_rejection": 1
+  },
+  "changes": {
+    "application_source": false,
+    "production_style": false,
+    "deployment_source": false,
+    "package": false,
+    "lockfile": false,
+    "prisma": false,
+    "schema": false,
+    "migration": false,
+    "unauthorized_paths": 0
+  },
+  "operations": {
+    "staging_connection_attempted": false,
+    "staging_deployment_started": false,
+    "production_connection_attempted": false,
+    "production_deployment_started": false,
+    "live_production_changed": false,
+    "pushed": false,
+    "remote_changed": false,
+    "tag_created": false
+  },
+  "package": {
+    "markdown_count": 16,
+    "json_count": 1,
+    "expected_total_file_count": 17
+  },
+  "docs_commit": "REPORTED_IN_EXTERNAL_HANDOFF",
+  "result_zip": {
+    "path": "C:\\Users\\HU\\Desktop\\ENHE-Phase2C.5A-Dedicated-Staging-Approval-Results.zip",
+    "size": "REPORTED_IN_EXTERNAL_HANDOFF",
+    "sha256": "REPORTED_IN_EXTERNAL_HANDOFF",
+    "expected_file_count": 17,
+    "file_count": "REPORTED_IN_EXTERNAL_HANDOFF",
+    "bad_crc": "REPORTED_IN_EXTERNAL_HANDOFF"
+  },
+  "next_action": "USER_PROVIDES_DEDICATED_STAGING_TARGET_INPUTS",
+  "phase_1b": {
+    "product_detail": "NOT_READY",
+    "commerce": "NOT_READY",
+    "overall": "NOT_READY"
+  }
+}
