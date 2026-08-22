@@ -1,0 +1,439 @@
+{
+  "schema_version": 2,
+  "phase": "PHASE_2C_5A_R3_CONTEXTUAL_SWAP_PRESSURE_POLICY",
+  "phase_status": "PASS_READY_FOR_USER_APPROVAL",
+  "statuses": {
+    "swap_pressure_gate_v2": "PASS",
+    "memory_pressure_evidence": "NO_SUSTAINED_MEMORY_PRESSURE_OBSERVED",
+    "same_host_ephemeral_rc_capacity": "PASS_CONTEXTUAL_SWAP_PRESSURE_GATE_V2",
+    "same_host_ephemeral_rc_isolation": "PASS_UNCHANGED",
+    "staging_deployment_approval_ready": true,
+    "approval_phrase_status": "AVAILABLE",
+    "public_surface_release_candidate": "PASS_UNCHANGED"
+  },
+  "source": {
+    "branch": "codex/enhe-phase2c5-same-host-rc-audit-r2",
+    "head": "fa94ac7b394c2cb63838e8456e56c4661efec973",
+    "tree": "67252addff00927146f2ebb88c23da2404c4cf81",
+    "start_head": "fa94ac7b394c2cb63838e8456e56c4661efec973",
+    "target_branch": "codex/enhe-phase2c5-same-host-rc-capacity-policy-r3",
+    "final_head": "EXTERNAL_POST_COMMIT_RECEIPT"
+  },
+  "authority": {
+    "path": "docs/enhe-redesign/phase-2c5a-r2/capacity-audit-v3-manifest.json",
+    "host_capacity_audit_sha256": "793580d056cee6c1f156bd9de47f2aa2630125270f1e38f68291b5654bb2ca09",
+    "numeric_input_source": "TRACKED_R2_JSON_ONLY",
+    "raw_capacity_evidence_reused": true,
+    "r2_capacity_data_changed": false,
+    "r2_protocol_changed": false,
+    "r2_manifest_changed": false
+  },
+  "previous_r2": {
+    "status": "COMPLETE_WITH_CAPACITY_REMEDIATION_REQUIRED_PRESERVED",
+    "capacity_gate": "HOST_SWAP_IN_TOTAL_EQUALS_ZERO",
+    "capacity_gate_result": "FAIL_16",
+    "evidence_modified": false,
+    "capacity_data_changed": false,
+    "capacity_gate_policy_superseded": true,
+    "raw_capacity_evidence_reused": true,
+    "historical_interpretation": "R2_CORRECTLY_EXECUTED_THEN_CURRENT_ZERO_SWAP_IN_CONTRACT"
+  },
+  "r2_archive": {
+    "status": "PASS",
+    "size": 20544,
+    "sha256": "f5b2822df702bcaa92856e9c99772daa595b4cf844aa0b7f6388fbf950117c46",
+    "file_count": 18,
+    "markdown_count": 17,
+    "json_count": 1,
+    "bad_crc": 0,
+    "invalid_path_count": 0,
+    "git_file_set_match": true,
+    "git_file_hash_match": true,
+    "git_mismatch_count": 0
+  },
+  "metric_semantics": {
+    "pswpin": "LINUX_KERNEL_CUMULATIVE_SWAP_IN_PAGE_COUNTER",
+    "sample_value": "ADJACENT_COUNTER_DELTA_OVER_10_SECONDS",
+    "unit": "PAGES",
+    "not_bytes": true,
+    "not_current_swap_usage": true,
+    "not_swap_out": true,
+    "not_oom": true,
+    "not_container_restart": true,
+    "not_sustained_pressure_by_itself": true,
+    "observation_limit": "EXISTING_60_SECOND_SAMPLE_AND_24_HOUR_COUNTS_ONLY",
+    "future_no_pressure_guarantee": false
+  },
+  "inputs": {
+    "host": {
+      "cpu_cores": 4,
+      "memory_total_bytes": 8058544128,
+      "root_disk_total_bytes": 190109507584,
+      "root_disk_free_bytes": 78999416832,
+      "root_disk_used_bps": 5431,
+      "root_inode_free_bps": 8137,
+      "swap_total_bytes": 2084564992,
+      "swap_used_bytes": 201179136
+    },
+    "docker": {
+      "root_disk_free_bytes": 78999416832,
+      "unhealthy_container_count": 0,
+      "restarting_container_count": 0,
+      "resource_set_changed_during_audit": false,
+      "restart_count_delta": 0
+    },
+    "sampling": {
+      "sample_interval_seconds": 10,
+      "sample_count": 6,
+      "observation_window_seconds": 60,
+      "cpu_idle_min_bps": 9774,
+      "memory_available_min_bytes": 5781549056,
+      "load5_max_milli": 330,
+      "swap_in_total": 16,
+      "swap_out_total": 0,
+      "samples": [
+        {"index": 1, "swap_in": 0, "swap_out": 0},
+        {"index": 2, "swap_in": 7, "swap_out": 0},
+        {"index": 3, "swap_in": 5, "swap_out": 0},
+        {"index": 4, "swap_in": 3, "swap_out": 0},
+        {"index": 5, "swap_in": 0, "swap_out": 0},
+        {"index": 6, "swap_in": 1, "swap_out": 0}
+      ]
+    },
+    "stability_24h": {
+      "oom_event_count": 0,
+      "filesystem_error_count": 0,
+      "docker_fatal_count": 0,
+      "kernel_fatal_count": 0
+    },
+    "conflicts": {
+      "loopback_port": 3101,
+      "loopback_port_free": true,
+      "existing_ephemeral_rc_project_count": 0,
+      "existing_rc_resource_count": 0
+    }
+  },
+  "policy": {
+    "swap_pressure_gate_version": 2,
+    "scope": "ENHE_PHASE_2C5B_PROJECT_SPECIFIC_NOT_LINUX_GENERAL_THRESHOLD",
+    "logic": "ALL_A_THROUGH_J_MUST_PASS",
+    "missing_or_invalid_input": "FAIL_CLOSED",
+    "arithmetic": {
+      "binary_floating_point_allowed": false,
+      "decision_mode": "EXACT_INTEGER_FRACTION_OR_ARBITRARY_PRECISION_DECIMAL",
+      "average_display_rounding": "ROUND_HALF_UP_10_DECIMAL_PLACES",
+      "upper_bound_ratio_gate_rounding": "ROUND_CEILING",
+      "lower_bound_ratio_gate_rounding": "ROUND_FLOOR"
+    },
+    "thresholds": {
+      "swap_out_total_max": 0,
+      "swap_in_average_pages_per_second_max": "1.0",
+      "swap_in_max_interval_pages_per_second_max": "1.0",
+      "swap_used_ratio_bps_max": 2500,
+      "memory_available_min_ratio_bps_min": 5000,
+      "post_rc_memory_headroom_bytes_min": 3221225472,
+      "rc_total_memory_limit_bytes": 2013265920,
+      "cpu_idle_min_bps_min": 5000,
+      "load5_max_milli_max": 2000,
+      "cpu_cores_min": 4,
+      "memory_total_bytes_min": 8053063680,
+      "root_total_bytes_min": 170000000000,
+      "root_free_bytes_min": 40000000000,
+      "root_used_bps_max": 7500,
+      "root_inode_free_bps_min": 2000,
+      "docker_root_free_bytes_min": 40000000000
+    }
+  },
+  "calculations": {
+    "swap_in_average_pages_per_second": {
+      "numerator": 16,
+      "denominator": 60,
+      "exact_fraction": "16/60",
+      "display": "0.2666666667",
+      "display_rounding": "ROUND_HALF_UP_10_DECIMAL_PLACES"
+    },
+    "swap_in_max_interval_pages_per_second": {
+      "max_interval_pages": 7,
+      "interval_seconds": 10,
+      "exact": "0.7"
+    },
+    "swap_used_ratio_bps": {
+      "numerator_swap_used_bytes": 201179136,
+      "denominator_swap_total_bytes": 2084564992,
+      "multiplier": 10000,
+      "exact": "965.08929571431659157403714088661045690246341813266",
+      "gate_value": 966,
+      "gate_rounding": "ROUND_CEILING"
+    },
+    "memory_available_min_ratio_bps": {
+      "numerator_memory_available_min_bytes": 5781549056,
+      "denominator_memory_total_bytes": 8058544128,
+      "multiplier": 10000,
+      "exact": "7174.4336993968744821893466462134635344395547870356",
+      "gate_value": 7174,
+      "gate_rounding": "ROUND_FLOOR"
+    },
+    "post_rc_memory_headroom_bytes": {
+      "memory_available_min_bytes": 5781549056,
+      "rc_total_memory_limit_bytes": 2013265920,
+      "value": 3768283136
+    }
+  },
+  "gate_v2": {
+    "conditions": {
+      "A": {
+        "name": "NO_SWAP_OUT",
+        "observed": 0,
+        "operator": "EQUALS",
+        "threshold": 0,
+        "result": "PASS"
+      },
+      "B": {
+        "name": "AVERAGE_SWAP_IN_RATE",
+        "observed_exact_fraction": "16/60",
+        "operator": "LESS_THAN_OR_EQUAL",
+        "threshold_exact": "1/1",
+        "result": "PASS"
+      },
+      "C": {
+        "name": "MAX_INTERVAL_SWAP_IN_RATE",
+        "observed_exact_fraction": "7/10",
+        "operator": "LESS_THAN_OR_EQUAL",
+        "threshold_exact": "1/1",
+        "result": "PASS"
+      },
+      "D": {
+        "name": "SWAP_USED_RATIO",
+        "observed_gate_bps": 966,
+        "operator": "LESS_THAN_OR_EQUAL",
+        "threshold_bps": 2500,
+        "result": "PASS"
+      },
+      "E": {
+        "name": "AVAILABLE_MEMORY_RATIO",
+        "observed_gate_bps": 7174,
+        "operator": "GREATER_THAN_OR_EQUAL",
+        "threshold_bps": 5000,
+        "result": "PASS"
+      },
+      "F": {
+        "name": "POST_RC_MEMORY_HEADROOM",
+        "observed_bytes": 3768283136,
+        "operator": "GREATER_THAN_OR_EQUAL",
+        "threshold_bytes": 3221225472,
+        "result": "PASS"
+      },
+      "G": {
+        "name": "CPU_AND_LOAD_MARGIN",
+        "cpu_idle_min_bps": 9774,
+        "cpu_idle_min_required_bps": 5000,
+        "load5_max_milli": 330,
+        "load5_max_allowed_milli": 2000,
+        "result": "PASS"
+      },
+      "H": {
+        "name": "NO_FATAL_EVENTS_24H",
+        "oom": 0,
+        "filesystem": 0,
+        "docker": 0,
+        "kernel": 0,
+        "result": "PASS"
+      },
+      "I": {
+        "name": "PRODUCTION_RUNTIME_STABILITY",
+        "unhealthy": 0,
+        "restarting": 0,
+        "resource_set_changed": false,
+        "restart_delta": 0,
+        "result": "PASS"
+      },
+      "J": {
+        "name": "ORIGINAL_HOST_DISK_PORT_AND_CONFLICT_THRESHOLDS",
+        "cpu_cores": 4,
+        "memory_total_bytes": 8058544128,
+        "root_total_bytes": 190109507584,
+        "root_free_bytes": 78999416832,
+        "root_used_bps": 5431,
+        "root_inode_free_bps": 8137,
+        "docker_root_free_bytes": 78999416832,
+        "loopback_port_3101_free": true,
+        "existing_ephemeral_rc_project_count": 0,
+        "existing_rc_resource_count": 0,
+        "result": "PASS"
+      }
+    },
+    "condition_count": 10,
+    "pass_count": 10,
+    "fail_count": 0,
+    "status": "PASS"
+  },
+  "runtime_protection_v2": {
+    "monitor_interval_seconds": 15,
+    "sample_interval_seconds": 15,
+    "max_sample_gap_seconds": 20,
+    "jitter_tolerance_seconds": 5,
+    "missed_full_sample_gap_approx_seconds": 30,
+    "clock_source": "MONOTONIC",
+    "scheduling_mode": "FIXED_RATE",
+    "sleep_after_sample_processing_allowed": false,
+    "pswpin_counter_unit": "PAGES",
+    "swap_in_delta_definition": "CURRENT_PSWPIN_COUNTER-PREVIOUS_VALID_15_SECOND_SAMPLE_PSWPIN_COUNTER",
+    "swap_in_nonzero_yes_iff": "RC_RUNTIME_SWAP_IN_DELTA>0",
+    "first_sample_action": "ESTABLISH_BASELINE_ONLY",
+    "first_sample_delta_evaluated": false,
+    "first_sample_warning_evaluated": false,
+    "telemetry_invalid_conditions": [
+      "PSWPIN_COUNTER_INVALID",
+      "PSWPIN_COUNTER_ROLLBACK_OR_RESET",
+      "RC_RUNTIME_SWAP_IN_DELTA<0",
+      "SAMPLE_MISSING",
+      "ELAPSED_MONOTONIC_GAP_SECONDS>20"
+    ],
+    "telemetry_gap_policy": "FAIL_CLOSED",
+    "telemetry_invalid_action": "STOP_IMMEDIATELY_AND_COMPLETE_CLEANUP",
+    "existing_immediate_stop_conditions": [
+      "HOST_MEMORY_AVAILABLE_BYTES<2147483648",
+      "HOST_LOAD5>3.0",
+      "PRODUCTION_UNHEALTHY_CONTAINER_COUNT>0",
+      "PRODUCTION_RESTART_COUNT_DELTA>0",
+      "ROOT_DISK_FREE_BYTES<30000000000",
+      "RC_APP_UNHEALTHY_SECONDS>120",
+      "RC_DB_UNHEALTHY_SECONDS>60"
+    ],
+    "new_immediate_stop_condition": "RC_RUNTIME_SWAP_OUT_DELTA>0",
+    "swap_in_alone_stops": false,
+    "warning_predicates": [
+      "RC_RUNTIME_SWAP_IN_DELTA>0",
+      "HOST_MEMORY_AVAILABLE_BYTES<3221225472"
+    ],
+    "warning_result": "RC_RUNTIME_MEMORY_PRESSURE_WARNING=YES",
+    "consecutive_warning_sample_limit": 2,
+    "warning_sample_seconds": 15,
+    "warning_samples_must_be_valid": true,
+    "warning_counter_reset_when": "VALID_15_SECOND_SAMPLE_DOES_NOT_SATISFY_BOTH_WARNING_PREDICATES",
+    "consecutive_warning_action": "STOP_IMMEDIATELY_AND_COMPLETE_CLEANUP",
+    "swap_modification_allowed": false,
+    "swappiness_modification_allowed": false
+  },
+  "contract_hashes": {
+    "same_host_rc_architecture_sha256": "da487aaf674e9df90f170f019784912e0fb40fb639f55c217bdeb171846e3a62",
+    "swap_pressure_policy_v2_sha256": "70eb24cb5d3c347d3d0f170829e72984d51ac174e2648148dba49fa796f663f2",
+    "rc_image_contract_sha256": "33f94c59e4a3210bd7f93be4eb2da937f11582161cf54d04956625ca97c20340",
+    "rc_compose_contract_sha256": "6e3098688c4e34b7e60d35bcc6947c1c96887a2f50db8fbef240d409db48936e",
+    "rc_zero_impact_gate_sha256": "db47c21c95a0505882b70fc6be9913644bc1209518f88fdff58567753677a605",
+    "rc_zero_impact_gate_status": "HISTORICAL_SUPERSEDED_NOT_AUTHORIZING",
+    "rc_zero_impact_gate_v2_sha256": "84bf446dbedc98e9c4dadb2fe1a0d207ae98f61636eb887be100a646135e7096",
+    "rc_cleanup_and_rollback_sha256": "af14c5013bdc07474ffe8a9a31c9b9ac5be141da9993f5e0eb9a837b0913dbf4",
+    "phase_2c5b_execution_plan_sha256": "bc199fac7f5df96a27fff2675ce0ded5fe488135c749de0fb90439134a85962d",
+    "phase_2c5b_execution_plan_status": "HISTORICAL_SUPERSEDED_NOT_AUTHORIZING",
+    "phase_2c5b_execution_plan_v2_sha256": "3987c0ab97b412069046603f4aeead38b3859842305f549743a7fc9b8a70fd53",
+    "markdown_normalization": "UTF8_CRLF_OR_CR_TO_LF_EXACTLY_ONE_FINAL_LF_SHA256_LOWERCASE_HEX"
+  },
+  "approval": {
+    "rc_id": "ENHE-PHASE2C4-PUBLIC-RC1",
+    "rc_runtime_source_head": "78357d74962276d3036975d2197e9c284eb053b1",
+    "same_host_rc_candidate_id": "255E85F9A06C58D800CAACB7A7516AF035F89F4B16573E02869BB78FC7600608",
+    "rc_data_mode": "SANITIZED_PUBLIC_FIXTURES",
+    "rc_access_mode": "SSH_TUNNEL_LOOPBACK_ONLY",
+    "rc_app_bind": "127.0.0.1:3101",
+    "rc_total_cpu_limit": "1.5",
+    "rc_total_memory_limit_mib": 1920,
+    "rc_total_memory_limit_bytes": 2013265920,
+    "rc_max_runtime_minutes": 90,
+    "approval_phrase_status": "AVAILABLE",
+    "current_execution_authorization": false,
+    "phrase": "我确认并授权仅按以下绑定执行同机临时 RC：RC_ID=ENHE-PHASE2C4-PUBLIC-RC1，RC_RUNTIME_SOURCE_HEAD=78357d74962276d3036975d2197e9c284eb053b1，SAME_HOST_RC_CANDIDATE_ID=255E85F9A06C58D800CAACB7A7516AF035F89F4B16573E02869BB78FC7600608，HOST_CAPACITY_AUDIT_SHA256=793580d056cee6c1f156bd9de47f2aa2630125270f1e38f68291b5654bb2ca09，SAME_HOST_RC_ARCHITECTURE_SHA256=da487aaf674e9df90f170f019784912e0fb40fb639f55c217bdeb171846e3a62，SWAP_PRESSURE_POLICY_V2_SHA256=70eb24cb5d3c347d3d0f170829e72984d51ac174e2648148dba49fa796f663f2，RC_IMAGE_CONTRACT_SHA256=33f94c59e4a3210bd7f93be4eb2da937f11582161cf54d04956625ca97c20340，RC_COMPOSE_CONTRACT_SHA256=6e3098688c4e34b7e60d35bcc6947c1c96887a2f50db8fbef240d409db48936e，RC_ZERO_IMPACT_GATE_V2_SHA256=84bf446dbedc98e9c4dadb2fe1a0d207ae98f61636eb887be100a646135e7096，RC_CLEANUP_AND_ROLLBACK_SHA256=af14c5013bdc07474ffe8a9a31c9b9ac5be141da9993f5e0eb9a837b0913dbf4，PHASE_2C5B_EXECUTION_PLAN_V2_SHA256=3987c0ab97b412069046603f4aeead38b3859842305f549743a7fc9b8a70fd53；仅绑定 127.0.0.1:3101、仅通过 SSH tunnel 访问、仅使用 SANITIZED_PUBLIC_FIXTURES，CPU 上限 1.5、内存上限 1920MiB、最长 90 分钟；清理时仅允许既有 cleanup 合同规定的唯一不可变 RC image 默认保留，其余临时 App、DB、网络、Secret、archive、script/process/log copy 等全部清理，且保留该镜像不代表 Phase 2C.6 获批；出现 RC_RUNTIME_SWAP_OUT_DELTA>0、任一既有 kill 条件、pswpin 计数器无效/回退/负 delta、样本缺失或 elapsed monotonic gap 超过 20 秒，或连续两个有效 nominal-cadence 15 秒 RC_RUNTIME_MEMORY_PRESSURE_WARNING=YES 样本时立即停止并完整清理；不得修改任何生产资源、不得升级原站、不得连接真实支付或 OAuth。",
+    "next_action": "USER_CONFIRMS_EXACT_PHASE_2C5B_SAME_HOST_RC_APPROVAL"
+  },
+  "source_changes": {
+    "application_source_changed": false,
+    "deployment_source_changed": false,
+    "package_changed": false,
+    "lockfile_changed": false,
+    "prisma_changed": false,
+    "schema_changed": false,
+    "migration_changed": false
+  },
+  "operations": {
+    "ssh_invocation_limit": 0,
+    "ssh_invocation_count": 0,
+    "network_access_count": 0,
+    "remote_file_created": false,
+    "remote_directory_created": false,
+    "remote_config_changed": false,
+    "remote_docker_mutation": false,
+    "remote_container_mutation": false,
+    "remote_volume_mutation": false,
+    "remote_network_mutation": false,
+    "remote_image_mutation": false,
+    "remote_port_bound": false,
+    "remote_database_accessed": false,
+    "remote_sql_executed": false,
+    "remote_object_storage_accessed": false,
+    "remote_cloud_api_accessed": false,
+    "nginx_changed": false,
+    "dns_changed": false,
+    "rc_deployment_started": false,
+    "production_deployment_started": false,
+    "production_site_upgrade_started": false,
+    "live_production_changed": false,
+    "pushed": false,
+    "remote_changed": false,
+    "tag_created": false
+  },
+  "package": {
+    "markdown_count": 15,
+    "json_count": 1,
+    "expected_total_file_count": 16,
+    "unauthorized_path_count": 0,
+    "files": [
+      "00-PHASE-2C5A-R3-MANIFEST.md",
+      "01-R2-CAPACITY-EVIDENCE-BASELINE.md",
+      "02-ZERO-SWAP-IN-GATE-ROOT-CAUSE.md",
+      "03-LINUX-SWAP-METRIC-SEMANTICS.md",
+      "04-SWAP-PRESSURE-POLICY-V2.md",
+      "05-CONTEXTUAL-CAPACITY-RECALCULATION.md",
+      "06-SAME-HOST-CAPACITY-GATE-V2.md",
+      "07-RC-RUNTIME-MEMORY-PROTECTION-V2.md",
+      "08-CONTRACT-HASH-VERSIONING.md",
+      "09-APPROVAL-READINESS.md",
+      "10-PHASE-2C5B-EXECUTION-PLAN-V2.md",
+      "11-DEPLOYMENT-APPROVAL-RECEIPT.md",
+      "12-SOURCE-SCOPE.md",
+      "13-COMMAND-LOG.md",
+      "14-FINAL-RECEIPT.md",
+      "capacity-policy-v2-manifest.json"
+    ],
+    "docs_commit": "EXTERNAL_POST_COMMIT_RECEIPT",
+    "worktree_path": "<LOCAL_WORKTREE>",
+    "worktree_name": "enhe-phase2c5-same-host-rc-capacity-policy-r3",
+    "worktree_actual_path": "EXTERNAL_POST_COMMIT_RECEIPT",
+    "worktree_clean": "VERIFY_AFTER_DOCS_COMMIT",
+    "result_zip_path": "EXTERNAL_POST_COMMIT_RECEIPT",
+    "result_zip_size": "EXTERNAL_POST_COMMIT_RECEIPT",
+    "result_zip_sha256": "EXTERNAL_POST_COMMIT_RECEIPT",
+    "result_zip_file_count": 16,
+    "result_zip_markdown_count": 15,
+    "result_zip_json_count": 1,
+    "zip_bad_crc": "EXTERNAL_POST_COMMIT_RECEIPT"
+  },
+  "validation": {
+    "r3_offline_document_validation_status": "PASS",
+    "prechange_vitest": {
+      "status": "PARTIAL",
+      "passed": 2244,
+      "skipped": 90,
+      "failed": 1,
+      "failed_file": "src/lib/production-motion-final-source.test.ts",
+      "failure_scope": "PRE_EXISTING_D4R_PATH_RANGE_ASSERTION"
+    },
+    "postchange_vitest": {
+      "status": "NOT_RUN",
+      "reason": "DOCS_ONLY_CHANGE_AND_CONTROLLER_INSTRUCTION"
+    },
+    "capacity_recomputed_from_authority_json": true,
+    "normalized_hashes_verified": true,
+    "source_hash_self_reference_count": 0,
+    "sensitive_or_connection_risk_count": 0
+  }
+}
