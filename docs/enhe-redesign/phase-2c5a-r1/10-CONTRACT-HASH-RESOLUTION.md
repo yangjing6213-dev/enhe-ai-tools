@@ -1,0 +1,16 @@
+# Contract Hash Resolution
+
+The existing Phase 2C.5A-R architecture, image, Compose, zero-impact, cleanup/rollback, and Phase 2C.5B plan documents were not modified in R1. Their authoritative contract hashes are therefore preserved unchanged.
+
+```text
+HOST_CAPACITY_AUDIT_SHA256=NOT_GENERATED_AUDIT_OUTPUT_REJECTED
+SAME_HOST_RC_ARCHITECTURE_SHA256=da487aaf674e9df90f170f019784912e0fb40fb639f55c217bdeb171846e3a62
+RC_IMAGE_CONTRACT_SHA256=33f94c59e4a3210bd7f93be4eb2da937f11582161cf54d04956625ca97c20340
+RC_COMPOSE_CONTRACT_SHA256=6e3098688c4e34b7e60d35bcc6947c1c96887a2f50db8fbef240d409db48936e
+RC_ZERO_IMPACT_GATE_SHA256=db47c21c95a0505882b70fc6be9913644bc1209518f88fdff58567753677a605
+RC_CLEANUP_AND_ROLLBACK_SHA256=af14c5013bdc07474ffe8a9a31c9b9ac5be141da9993f5e0eb9a837b0913dbf4
+PHASE_2C5B_EXECUTION_PLAN_SHA256=bc199fac7f5df96a27fff2675ce0ded5fe488135c749de0fb90439134a85962d
+CONTRACT_DOCUMENT_CONTENT_CHANGED=NO
+```
+
+No canonical host-capacity JSON is generated because the full audit output failed both the exit-code and forbidden-output gates. Hashing only the call receipt would mislabel transport metadata as accepted capacity evidence.

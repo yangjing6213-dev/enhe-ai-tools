@@ -1,0 +1,163 @@
+{
+  "schema_version": 1,
+  "phase": "PHASE_2C_5A_R1_READ_ONLY_CAPACITY_AUDIT_RESUME",
+  "phase_status": "BLOCKED",
+  "reason": "AUDIT_OUTPUT_CONTAINS_FORBIDDEN_CONNECTION_OR_SECRET_DATA",
+  "public_surface_release_candidate_status": "PASS_UNCHANGED",
+  "previous_phase_2c5a_r": {
+    "status": "COMPLETE_WITH_INPUT_REQUIRED_PRESERVED",
+    "evidence_modified": false,
+    "source_branch": "codex/enhe-phase2c5-same-host-rc-audit-v1",
+    "source_head": "f6cbfd35e24d6f0c3907c0b4d8cf4df9af76c64b",
+    "source_tree": "118b87728ad3e0ec7f91bf83161212009ebc6482",
+    "exit2_root_cause": "UNRESOLVED_INSUFFICIENT_RETAINED_EVIDENCE"
+  },
+  "previous_archive": {
+    "status": "PASS",
+    "size": 46378,
+    "sha256": "8ca2f69a9d5b6acb9bcfc99187e5f63c4976a72de1c0feb479c7fc1c38fb7234",
+    "file_count": 18,
+    "markdown_count": 17,
+    "json_count": 1,
+    "bad_crc": 0,
+    "invalid_paths": 0,
+    "git_file_set_match": true,
+    "git_file_hash_match": true,
+    "git_mismatch_count": 0
+  },
+  "target": {
+    "branch": "codex/enhe-phase2c5-same-host-rc-audit-r1",
+    "start_head": "f6cbfd35e24d6f0c3907c0b4d8cf4df9af76c64b",
+    "final_head": "FINAL_HEAD"
+  },
+  "connection": {
+    "candidate_count": 1,
+    "candidate_id": "415A2C4D69AE288959439F1F4F1B323F1365E6BD6054DC0814CE41799E32BCB1",
+    "identity_file_exists": true,
+    "identity_body_read": false,
+    "fingerprint_match": true
+  },
+  "authorization": {
+    "additional_read_only_capacity_audit_authorized": true,
+    "ssh_invocation_limit": 2,
+    "ssh_invocation_count": 2,
+    "limit_exceeded": false,
+    "retry_executed": false,
+    "third_call_executed": false
+  },
+  "execution_files": {
+    "remote_audit_script_sha256": "38abd13ca34a57ba853024369e72ae4ea460f68a25c9844d1bb88b80b8a26243",
+    "local_ssh_invoker_sha256": "7c5b99b28b43770203eab7e4804efdcb33408752738a9cea30193c847e18a4d6",
+    "utf8": true,
+    "bash_bom": false,
+    "lf_only": true,
+    "same_script_bytes_both_calls": true,
+    "deleted_after_execution": true
+  },
+  "ssh": {
+    "strict_host_key_check": "PASS",
+    "host_key_mismatch": false,
+    "call_1": {
+      "purpose": "REMOTE_BASH_SYNTAX_AND_TRANSPORT_PREFLIGHT",
+      "exit_code": 0,
+      "duration_ms": 1165,
+      "stdout_empty": true,
+      "stderr_empty": true,
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "call_2": {
+      "purpose": "FULL_READ_ONLY_CAPACITY_AUDIT",
+      "exit_code": 2,
+      "duration_ms": 89090,
+      "stdout_empty": false,
+      "stderr_empty": true,
+      "stdout_sha256": "91f404dc52c06efdda7cbad3c2117894d7bfd900a712c3a66ad2a837b4e137a9",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_category": "REMOTE_COMMAND_NONZERO",
+      "forbidden_output_findings": ["KNOWN_CONNECTION_VALUE"]
+    }
+  },
+  "audit_evidence": {
+    "output_status": "REJECTED",
+    "raw_output_written_to_git": false,
+    "raw_output_retained": false,
+    "protocol_version": "NOT_ACCEPTED_AUDIT_OUTPUT_REJECTED",
+    "audit_complete": "NOT_ACCEPTED_AUDIT_OUTPUT_REJECTED",
+    "core_metrics_complete": "NOT_ACCEPTED_AUDIT_OUTPUT_REJECTED",
+    "sample_count": "NOT_ACCEPTED_AUDIT_OUTPUT_REJECTED",
+    "live_host_capacity": "NOT_ACCEPTED_AUDIT_OUTPUT_REJECTED",
+    "docker_resource_fingerprint": "NOT_ACCEPTED_AUDIT_OUTPUT_REJECTED",
+    "sixty_second_sample": "NOT_ACCEPTED_AUDIT_OUTPUT_REJECTED",
+    "twenty_four_hour_stability": "NOT_ACCEPTED_AUDIT_OUTPUT_REJECTED",
+    "port_3101_free": "UNKNOWN_AUDIT_OUTPUT_REJECTED",
+    "existing_rc_conflict": "UNKNOWN_AUDIT_OUTPUT_REJECTED",
+    "production_resource_changed": "UNKNOWN_AUDIT_OUTPUT_REJECTED",
+    "production_restart_delta": "UNKNOWN_AUDIT_OUTPUT_REJECTED"
+  },
+  "capacity_gate": {
+    "status": "PARTIAL_EVIDENCE",
+    "hard_preflight_status": "UNKNOWN_AUDIT_OUTPUT_REJECTED",
+    "isolation_status": "PASS_UNCHANGED",
+    "host_capacity_audit_sha256": "NOT_GENERATED_AUDIT_OUTPUT_REJECTED",
+    "deployment_approval_ready": false,
+    "approval_phrase_status": "NOT_AVAILABLE_AUDIT_OUTPUT_REJECTED",
+    "next_action": "USER_REVIEWS_READ_ONLY_AUDIT_FAILURE_WITHOUT_AUTOMATIC_RETRY"
+  },
+  "contract_hashes": {
+    "same_host_rc_architecture_sha256": "da487aaf674e9df90f170f019784912e0fb40fb639f55c217bdeb171846e3a62",
+    "rc_image_contract_sha256": "33f94c59e4a3210bd7f93be4eb2da937f11582161cf54d04956625ca97c20340",
+    "rc_compose_contract_sha256": "6e3098688c4e34b7e60d35bcc6947c1c96887a2f50db8fbef240d409db48936e",
+    "rc_zero_impact_gate_sha256": "db47c21c95a0505882b70fc6be9913644bc1209518f88fdff58567753677a605",
+    "rc_cleanup_and_rollback_sha256": "af14c5013bdc07474ffe8a9a31c9b9ac5be141da9993f5e0eb9a837b0913dbf4",
+    "phase_2c5b_execution_plan_sha256": "bc199fac7f5df96a27fff2675ce0ded5fe488135c749de0fb90439134a85962d",
+    "documents_changed": false
+  },
+  "operations": {
+    "remote_file_created": false,
+    "remote_directory_created": false,
+    "remote_config_changed": false,
+    "remote_docker_mutation": false,
+    "remote_port_bound": false,
+    "remote_database_accessed": false,
+    "sql_executed": false,
+    "nginx_changed": false,
+    "dns_changed": false,
+    "rc_deployment_started": false,
+    "production_deployment_started": false,
+    "production_site_upgrade_started": false,
+    "application_source_changed": false,
+    "deployment_source_changed": false,
+    "package_changed": false,
+    "lockfile_changed": false,
+    "prisma_changed": false,
+    "migration_changed": false,
+    "pushed": false,
+    "remote_changed": false,
+    "tag_created": false
+  },
+  "package": {
+    "markdown_count": 16,
+    "json_count": 1,
+    "expected_total_file_count": 17,
+    "files": [
+      "00-PHASE-2C5A-R1-MANIFEST.md",
+      "01-PREVIOUS-EXIT2-EVIDENCE-AND-ROOT-CAUSE-BOUNDARY.md",
+      "02-ADDITIONAL-AUTHORIZATION-AND-SSH-CALL-BUDGET.md",
+      "03-REMOTE-AUDIT-PROTOCOL-V2.md",
+      "04-REMOTE-BASH-SYNTAX-PREFLIGHT.md",
+      "05-LIVE-HOST-CAPACITY.md",
+      "06-PRODUCTION-DOCKER-RESOURCE-FINGERPRINT.md",
+      "07-SIXTY-SECOND-CAPACITY-SAMPLING.md",
+      "08-TWENTY-FOUR-HOUR-STABILITY.md",
+      "09-SAME-HOST-CAPACITY-GATE.md",
+      "10-CONTRACT-HASH-RESOLUTION.md",
+      "11-SAME-HOST-RC-APPROVAL-READINESS.md",
+      "12-DEPLOYMENT-APPROVAL-RECEIPT.md",
+      "13-SOURCE-SCOPE.md",
+      "14-COMMAND-LOG.md",
+      "15-FINAL-RECEIPT.md",
+      "capacity-audit-manifest.json"
+    ]
+  }
+}
