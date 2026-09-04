@@ -32,6 +32,7 @@ COPY --from=builder /app/.next/standalone ./
 COPY --from=builder /app/.next/static ./.next/static
 COPY --from=builder /app/prisma ./prisma
 COPY --from=builder /app/scripts ./scripts
+COPY --from=builder /app/deploy/enhe-ai-tools/scripts ./deploy/enhe-ai-tools/scripts
 COPY deploy/enhe-ai-tools/scripts/app-entrypoint.sh ./app-entrypoint.sh
 RUN chmod +x ./app-entrypoint.sh
 
