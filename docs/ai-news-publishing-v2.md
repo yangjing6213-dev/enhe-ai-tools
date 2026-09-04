@@ -15,7 +15,7 @@
 - 快照另有 123 项 tracked 工作区变更和未跟踪文件；它们没有被覆盖，也没有混入本次改动。独立目录已补回构建所需的 3 个非敏感基线文件，并保留最小改动；**不得把这个干净提交基线直接当成最新生产部署基线。**
 - 之前位于 `enhe-company-os` 的 Python 自动化不属于官网，不能用于网站发布。本次复用官网实际 Next.js 导入接口和 Prisma 模型。
 - 已有本地提交；未执行数据库迁移、seed、超级管理员回填、生产密钥变更、生产调度启用、生产 CMS 写入或既有生产文章修改。
-- 2026-09-05 生产部署复核：通过本机系统 OpenSSH 将无历史凭据的干净基线推送到远程 `codex/ai-news-publishing-v2`（tip `9a7df2f`）。服务器新应用镜像 `enhe-ai-tools:5099842a0b405a117e18f025baa64035398962f0` 已启动且 `/api/health?scope=app` 返回 app/database `ok`；启动日志确认 migration、seed 和 super-admin upsert 均跳过。为避免生产 worker 脚本缺失，SEO worker/scheduler 保持旧镜像 `3497d170…`，其健康状态为 `blocked/unhealthy`，与关闭的生产功能开关一致；未声称全栈升级。当前没有真实 `production-candidate` manifest，因此未执行 CMS 写入或公开页面发布。
+- 2026-09-05 生产部署复核：通过本机系统 OpenSSH 将无历史凭据的干净基线推送到远程 `codex/ai-news-publishing-v2`（tip `4323977`）。新应用镜像 `enhe-ai-tools:5099842a0b405a117e18f025baa64035398962f0` 曾在独立 staging 配置下启动并通过 `/api/health?scope=app`；启动日志确认 migration、seed 和 super-admin upsert 均跳过。随后发现该恢复基线不含服务器既有 SEO 审计内部路由，旧 worker/scheduler 会因请求 404 进入 blocked。为避免线上回归，应用已恢复到原生产镜像 `3497d170…`，两个 worker/scheduler 重启后均 healthy；新镜像保留在 staging/本地，可在补齐兼容性后重新部署。当前没有真实 `production-candidate` manifest，因此未执行 CMS 写入或公开页面发布。
 
 ## 实际接口与状态
 
@@ -119,7 +119,7 @@ node --import tsx scripts/publish-ai-news-html.ts --manifest output/ai-news-v2/m
 ## 本次验证记录（2026-09-05）
 
 - PASS：61 个相关 Vitest 测试（11 个文件）；修改文件 ESLint；真实原 HTML validator 的完整 loopback 集成流程；全站 TypeScript 类型检查；种子脚本语法检查；Git diff 空白检查。自动审计替代 approval 文件并绑定 manifest、快照和 validator 摘要。原测试、validator、package-lock、Prisma schema 均未修改。
-- PARTIAL：未配置 `DATABASE_URL` 的裸构建会在既有页面数据读取时停止；配置回环占位后构建可完成，但本机没有 PostgreSQL，因此这只证明代码可编译和无生产连接，不证明数据库运行正确。服务器应用健康检查已通过，但未执行 V2 数据写入。
+- PARTIAL：未配置 `DATABASE_URL` 的裸构建会在既有页面数据读取时停止；配置回环占位后构建可完成，但本机没有 PostgreSQL，因此这只证明代码可编译和无生产连接，不证明数据库运行正确。生产回滚后的原应用与 SEO worker/scheduler 健康检查已通过，但未执行 V2 数据写入。
 - NOT_RUN：真实 PostgreSQL 的并发/事务回滚测试（本机未找到 postgres/psql/docker）、六篇真实选题及来源生成、生产快照、生产 CMS 写入、12 个真实生产公开页面验证。
 - PASS（静态复审）：完成独立静态复审；已移除种子脚本中的固定默认凭据，保留 P2002 重试和快照摘要复核。该复审不替代真实数据库或生产验证。
 - 无生产调度启用；Codex 现有任务 `enhe-ai-v2`（ENHE AI 前沿资讯 V2（本地离线审计））保留周一至周五 08:00 的本地 audit 安排。另已创建 `enhe-ai-v2-2`（ENHE AI 前沿资讯 V2 自动生成发布（待启用）），状态为 `PAUSED`，仅在生产开关、真实候选包和部署兼容性完成后再启用；当前不能调用 snapshot/stage/promote/verify。配置已回读确认。
