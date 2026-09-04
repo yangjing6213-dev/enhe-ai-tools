@@ -128,3 +128,4 @@ node --import tsx scripts/publish-ai-news-html.ts --manifest output/ai-news-v2/m
 可审阅的离线夹具保存在 `output/ai-news-v2-fixture/`：12 个 HTML、6 个来源证据文本、manifest、receipt 和 6 个 payload JSON。此目录是忽略的测试产物，实际 CMS 记录及生产公开页数量均为 0，不能用作真实新闻发布材料。
 
 验收结论：本地发布链路、自动审计和部署防写入开关已实现；GitHub SSH 已恢复，干净基线已推送，应用容器已部署并通过健康检查。生产发布目标尚未完成：当前无真实 `production-candidate` 包，V2 开关与发布定时任务均关闭，SEO worker/scheduler 仍为旧镜像且报告 blocked。真实文章包由自动化生成，不要求用户事先提供；不合格候选不得发布。下一步唯一需要明确的生产门禁是是否打开 V2 生产开关并启用 `enhe-ai-v2-2` 定时任务；打开前仍须先完成真实来源候选、生产快照和部署 worker 兼容性核验。
+
