@@ -6,7 +6,7 @@
 
 用户已授权部署及 V2 发布，继续禁止数据库迁移和修改既有文章。用户随后明确要求取消人工审批、自动生成并发布；这取代早期用户级人工审批约束。自动流程使用与 manifest、生产快照和固定 validator 绑定的机器审计凭据，不伪造人工身份；来源核验、去重、12 HTML/6 payload 验证、AI 标注和公开页核验仍须保留。
 
-2026-09-05 SSH 复核：两把私钥已由用户解锁并加入 ssh-agent。本机使用系统 OpenSSH 已通过 GitHub 账号认证，目标仓库 `yangjing6213-dev/enhe-ai-tools` 当前为空；服务器 SSH 只读会话成功，但服务器工作树为 detached HEAD、存在 4 项未提交改动，远端仍指向旧仓库，服务器没有 GitHub 私钥，不能作为推送中继。未读取服务器 `.env`，未修改服务器。部署配置 8 项测试、deploy.sh 与 app-entrypoint.sh 的 Bash 语法检查均通过。当前恢复计划见 docs/exec-plans/active/ai-news-v2-production.md。
+2026-09-05 SSH 复核：两把私钥已由用户解锁并加入 ssh-agent。本机使用系统 OpenSSH 已通过 GitHub 账号认证，目标仓库 `yangjing6213-dev/enhe-ai-tools` 当前为空；服务器 SSH 会话成功，但服务器原工作树仍为 detached HEAD、存在 4 项未提交改动，远端仍指向旧仓库，服务器没有 GitHub 私钥，不能作为推送中继。未读取服务器 `.env`。为避免覆盖原工作树，已在 `/opt/enhe-ai-tools-v2` 建立独立部署目录并使用显式 LF 归档构建新应用镜像；原目录未覆盖。部署配置 8 项测试、deploy.sh 与 app-entrypoint.sh 的 Bash 语法检查均通过。当前恢复计划见 docs/exec-plans/active/ai-news-v2-production.md。
 
 ## 仓库与边界
 
@@ -14,8 +14,8 @@
 - 来源：迁移快照 `03-projects/024-new_project_2` 的已提交版本 `bc66ea5032a414a1870bcb6890faeee1a8da08c1`。当前 Git origin 为用户指定的 SSH 地址 `git@github-enhe:yangjing6213-dev/enhe-ai-tools.git`，远程分支与写权限仍待认证后验证。
 - 快照另有 123 项 tracked 工作区变更和未跟踪文件；它们没有被覆盖，也没有混入本次改动。独立目录已补回构建所需的 3 个非敏感基线文件，并保留最小改动；**不得把这个干净提交基线直接当成最新生产部署基线。**
 - 之前位于 `enhe-company-os` 的 Python 自动化不属于官网，不能用于网站发布。本次复用官网实际 Next.js 导入接口和 Prisma 模型。
-- 已有本地提交；未 Push、未部署、未迁移、未改生产开关或密钥、未调用生产发布器、未修改既有生产文章。
-- 2026-09-05 生产部署预检：目标仓库仍为空，本机 SSH 已通过认证且 `git ls-remote` 可读；尚未 Push。服务器 `111.229.135.3:22` 可建立 SSH 会话，但基线不干净且没有 GitHub 私钥，不能安全覆盖或中继推送。当前没有生产环境变量或真实 `production-candidate` manifest，因此未执行服务器部署或 CMS 写入。
+- 已有本地提交；未执行数据库迁移、seed、超级管理员回填、生产密钥变更、生产调度启用、生产 CMS 写入或既有生产文章修改。
+- 2026-09-05 生产部署复核：通过本机系统 OpenSSH 将无历史凭据的干净基线推送到远程 `codex/ai-news-publishing-v2`（tip `9a7df2f`）。服务器新应用镜像 `enhe-ai-tools:5099842a0b405a117e18f025baa64035398962f0` 已启动且 `/api/health?scope=app` 返回 app/database `ok`；启动日志确认 migration、seed 和 super-admin upsert 均跳过。为避免生产 worker 脚本缺失，SEO worker/scheduler 保持旧镜像 `3497d170…`，其健康状态为 `blocked/unhealthy`，与关闭的生产功能开关一致；未声称全栈升级。当前没有真实 `production-candidate` manifest，因此未执行 CMS 写入或公开页面发布。
 
 ## 实际接口与状态
 
@@ -80,7 +80,7 @@ node --import tsx scripts/publish-ai-news-html.ts --manifest output/ai-news-v2/m
 
 ## 首次上线门禁与发布命令
 
-**以下命令仅为准备，生产未执行。** 完整代码基线已在独立目录恢复并通过本地编译；部署脚本默认跳过 migration、AI 资讯 seed 和超级管理员 upsert，相关写入只有显式设置对应环境变量才会执行。仍需可访问的部署仓库/服务器凭据、隔离测试数据库和真实 `production-candidate` manifest，才能继续生产 API 部署。不能把本地回环占位数据库的构建结果当成生产联调证据。
+**以下命令仅为准备，真实文章发布尚未执行。** 完整代码基线已在独立目录恢复并通过本地编译；部署脚本默认跳过 migration、AI 资讯 seed 和超级管理员 upsert，相关写入只有显式设置对应环境变量才会执行。当前服务器应用已部署，但 V2 开关仍关闭；仍需自动化生成真实 `production-candidate` manifest、获取生产快照并完成 12 页核验，才能执行 CMS 写入。不能把本地回环占位数据库或测试夹具当成生产联调证据。
 
 部署新代码时默认保留：
 
@@ -90,7 +90,7 @@ AI_NEWS_BATCH_V2_PUBLISH_ENABLED=false
 AI_NEWS_BATCH_VALIDATOR_SHA256=662e7cc573c626624674db29ca0d0d56f97b8e7a7087fb22499f94dce73bfc43
 ```
 
-生产 API 改动、总开关、发布开关和生产内容写入均须遵守用户的单独明确确认。沿用现有后端密钥注入方式；不要将密钥放入 manifest、审批文件、命令参数或仓库。现有导入 URL 为 `https://www.enhe-tech.com.cn/api/admin/ai-news/import`；客户端还接受明确配置的测试域名/loopback。禁止重定向、userinfo、查询参数、fragment 及远程明文 HTTP。
+生产 API 改动、总开关、发布开关和生产内容写入均须遵守相应生产门禁。当前总开关与发布开关保持 `false`；定时自动化保持暂停。沿用现有后端密钥注入方式；不要将密钥放入 manifest、审批文件、命令参数或仓库。现有导入 URL 为 `https://www.enhe-tech.com.cn/api/admin/ai-news/import`；客户端还接受明确配置的测试域名/loopback。禁止重定向、userinfo、查询参数、fragment 及远程明文 HTTP。
 
 授权并确认完整基线、服务开关和后端配置后，执行以下顺序。`AI_NEWS_IMPORT_URL` / `AI_NEWS_IMPORT_TOKEN` 由受信任发布进程环境提供，不与来源扫描进程共享。
 
@@ -119,11 +119,11 @@ node --import tsx scripts/publish-ai-news-html.ts --manifest output/ai-news-v2/m
 ## 本次验证记录（2026-09-05）
 
 - PASS：61 个相关 Vitest 测试（11 个文件）；修改文件 ESLint；真实原 HTML validator 的完整 loopback 集成流程；全站 TypeScript 类型检查；种子脚本语法检查；Git diff 空白检查。自动审计替代 approval 文件并绑定 manifest、快照和 validator 摘要。原测试、validator、package-lock、Prisma schema 均未修改。
-- PARTIAL：未配置 `DATABASE_URL` 的裸构建会在既有页面数据读取时停止；配置回环占位后构建可完成，但本机没有 PostgreSQL，因此这只证明代码可编译和无生产连接，不证明数据库运行正确。
+- PARTIAL：未配置 `DATABASE_URL` 的裸构建会在既有页面数据读取时停止；配置回环占位后构建可完成，但本机没有 PostgreSQL，因此这只证明代码可编译和无生产连接，不证明数据库运行正确。服务器应用健康检查已通过，但未执行 V2 数据写入。
 - NOT_RUN：真实 PostgreSQL 的并发/事务回滚测试（本机未找到 postgres/psql/docker）、六篇真实选题及来源生成、生产快照、生产 CMS 写入、12 个真实生产公开页面验证。
 - PASS（静态复审）：完成独立静态复审；已移除种子脚本中的固定默认凭据，保留 P2002 重试和快照摘要复核。该复审不替代真实数据库或生产验证。
-- 无生产调度启用；Codex 现有任务 `enhe-ai-v2`（ENHE AI 前沿资讯 V2（本地离线审计））已通过应用工具更新到本官网目录，保留周一至周五 08:00 的已有安排，仅运行本地验证和 audit，不能调用 snapshot/stage/promote/verify。配置已回读确认。
+- 无生产调度启用；Codex 现有任务 `enhe-ai-v2`（ENHE AI 前沿资讯 V2（本地离线审计））保留周一至周五 08:00 的本地 audit 安排。另已创建 `enhe-ai-v2-2`（ENHE AI 前沿资讯 V2 自动生成发布（待启用）），状态为 `PAUSED`，仅在生产开关、真实候选包和部署兼容性完成后再启用；当前不能调用 snapshot/stage/promote/verify。配置已回读确认。
 
 可审阅的离线夹具保存在 `output/ai-news-v2-fixture/`：12 个 HTML、6 个来源证据文本、manifest、receipt 和 6 个 payload JSON。此目录是忽略的测试产物，实际 CMS 记录及生产公开页数量均为 0，不能用作真实新闻发布材料。
 
-验收结论：本地发布链路、自动审计和部署防写入开关已实现；生产发布目标尚未完成。GitHub SSH 已恢复，但服务器基线不干净且无法作为推送中继；仍需在不覆盖服务器改动的前提下部署明确 ref，并由自动化生成真实 `production-candidate` 包后执行快照、暂存、发布和 12 页核验。真实文章包由自动化生成，不要求用户事先提供；不合格候选不得发布。
+验收结论：本地发布链路、自动审计和部署防写入开关已实现；GitHub SSH 已恢复，干净基线已推送，应用容器已部署并通过健康检查。生产发布目标尚未完成：当前无真实 `production-candidate` 包，V2 开关与发布定时任务均关闭，SEO worker/scheduler 仍为旧镜像且报告 blocked。真实文章包由自动化生成，不要求用户事先提供；不合格候选不得发布。下一步唯一需要明确的生产门禁是是否打开 V2 生产开关并启用 `enhe-ai-v2-2` 定时任务；打开前仍须先完成真实来源候选、生产快照和部署 worker 兼容性核验。
