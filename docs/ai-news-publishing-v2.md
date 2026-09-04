@@ -1,6 +1,6 @@
 # ENHE AI 前沿资讯 V2 发布交接
 
-状态：**PARTIAL / 未在生产启用**。本地代码包含离线审计、历史快照、批次暂存、批次发布和公开页核验。自动审计已替代人工 approval 文件；测试数据均为明确标注的 synthetic fixture，不是真实新闻，也没有向官网发送请求。
+状态：**PASS（一次性生产发布已完成；定时自动化仍暂停）**。本地代码包含离线审计、历史快照、批次暂存、批次发布和公开页核验。自动审计已替代人工 approval 文件；本次已通过独立发布容器完成 6 条 CMS 记录发布，并从官网公开域名核验 12 个双语页面。
 
 ## 当前授权与连接复核
 
@@ -14,8 +14,8 @@
 - 来源：迁移快照 `03-projects/024-new_project_2` 的已提交版本 `bc66ea5032a414a1870bcb6890faeee1a8da08c1`。当前 Git origin 为用户指定的 SSH 地址 `git@github-enhe:yangjing6213-dev/enhe-ai-tools.git`，远程分支与写权限仍待认证后验证。
 - 快照另有 123 项 tracked 工作区变更和未跟踪文件；它们没有被覆盖，也没有混入本次改动。独立目录已补回构建所需的 3 个非敏感基线文件，并保留最小改动；**不得把这个干净提交基线直接当成最新生产部署基线。**
 - 之前位于 `enhe-company-os` 的 Python 自动化不属于官网，不能用于网站发布。本次复用官网实际 Next.js 导入接口和 Prisma 模型。
-- 已有本地提交；未执行数据库迁移、seed、超级管理员回填、生产密钥变更、生产调度启用、生产 CMS 写入或既有生产文章修改。
-- 2026-09-05 生产部署复核：通过本机系统 OpenSSH 将无历史凭据的干净基线推送到远程 `codex/ai-news-publishing-v2`（tip `4323977`）。新应用镜像 `enhe-ai-tools:5099842a0b405a117e18f025baa64035398962f0` 曾在独立 staging 配置下启动并通过 `/api/health?scope=app`；启动日志确认 migration、seed 和 super-admin upsert 均跳过。随后发现该恢复基线不含服务器既有 SEO 审计内部路由，旧 worker/scheduler 会因请求 404 进入 blocked。为避免线上回归，应用已恢复到原生产镜像 `3497d170…`，两个 worker/scheduler 重启后均 healthy；新镜像保留在 staging/本地，可在补齐兼容性后重新部署。当前没有真实 `production-candidate` manifest，因此未执行 CMS 写入或公开页面发布。
+- 已有本地提交；未执行数据库迁移、seed、超级管理员回填、生产密钥变更或生产调度启用。一次性 V2 发布只新增本批次 6 条 CMS 记录，未修改既有文章。
+- 2026-09-05 生产部署复核：通过本机系统 OpenSSH 将无历史凭据的干净基线推送到远程 `codex/ai-news-publishing-v2`。新应用镜像 `enhe-ai-tools:5099842a0b405a117e18f025baa64035398962f0` 在独立 staging 配置下通过 `/api/health?scope=app`；启动日志确认 migration、seed 和 super-admin upsert 均跳过。该基线缺少服务器既有 SEO 审计内部路由，因此没有替换线上 app；线上 app、SEO worker、scheduler 已恢复为原镜像并保持 healthy。一次性发布使用同一新镜像启动的临时本机端口容器，写入前完成快照、机器审计和暂存，发布后立即移除临时容器。
 
 ## 实际接口与状态
 
@@ -80,7 +80,7 @@ node --import tsx scripts/publish-ai-news-html.ts --manifest output/ai-news-v2/m
 
 ## 首次上线门禁与发布命令
 
-**以下命令仅为准备，真实文章发布尚未执行。** 完整代码基线已在独立目录恢复并通过本地编译；部署脚本默认跳过 migration、AI 资讯 seed 和超级管理员 upsert，相关写入只有显式设置对应环境变量才会执行。当前服务器应用已部署，但 V2 开关仍关闭；仍需自动化生成真实 `production-candidate` manifest、获取生产快照并完成 12 页核验，才能执行 CMS 写入。不能把本地回环占位数据库或测试夹具当成生产联调证据。
+一次性生产发布已执行并完成公开页核验。完整代码基线已在独立目录恢复并通过本地编译；部署脚本默认跳过 migration、AI 资讯 seed 和超级管理员 upsert，相关写入只有显式设置对应环境变量才会执行。线上 app 仍保留原镜像，V2 定时任务保持暂停；后续定时发布须先补齐 SEO 内部路由兼容性并另行启用。
 
 部署新代码时默认保留：
 
@@ -90,7 +90,7 @@ AI_NEWS_BATCH_V2_PUBLISH_ENABLED=false
 AI_NEWS_BATCH_VALIDATOR_SHA256=662e7cc573c626624674db29ca0d0d56f97b8e7a7087fb22499f94dce73bfc43
 ```
 
-生产 API 改动、总开关、发布开关和生产内容写入均须遵守相应生产门禁。当前总开关与发布开关保持 `false`；定时自动化保持暂停。沿用现有后端密钥注入方式；不要将密钥放入 manifest、审批文件、命令参数或仓库。现有导入 URL 为 `https://www.enhe-tech.com.cn/api/admin/ai-news/import`；客户端还接受明确配置的测试域名/loopback。禁止重定向、userinfo、查询参数、fragment 及远程明文 HTTP。
+生产 API 改动、总开关、发布开关和生产内容写入均须遵守相应生产门禁。本次一次性发布由临时发布容器显式打开 V2 开关完成；线上 app 的总开关和定时自动化仍保持关闭。沿用现有后端密钥注入方式；不要将密钥放入 manifest、审批文件、命令参数或仓库。现有导入 URL 为 `https://www.enhe-tech.com.cn/api/admin/ai-news/import`；客户端还接受明确配置的测试域名/loopback。禁止重定向、userinfo、查询参数、fragment 及远程明文 HTTP。
 
 授权并确认完整基线、服务开关和后端配置后，执行以下顺序。`AI_NEWS_IMPORT_URL` / `AI_NEWS_IMPORT_TOKEN` 由受信任发布进程环境提供，不与来源扫描进程共享。
 
@@ -119,13 +119,14 @@ node --import tsx scripts/publish-ai-news-html.ts --manifest output/ai-news-v2/m
 ## 本次验证记录（2026-09-05）
 
 - PASS：61 个相关 Vitest 测试（11 个文件）；修改文件 ESLint；真实原 HTML validator 的完整 loopback 集成流程；全站 TypeScript 类型检查；种子脚本语法检查；Git diff 空白检查。自动审计替代 approval 文件并绑定 manifest、快照和 validator 摘要。原测试、validator、package-lock、Prisma schema 均未修改。
-- PARTIAL：未配置 `DATABASE_URL` 的裸构建会在既有页面数据读取时停止；配置回环占位后构建可完成，但本机没有 PostgreSQL，因此这只证明代码可编译和无生产连接，不证明数据库运行正确。生产回滚后的原应用与 SEO worker/scheduler 健康检查已通过，但未执行 V2 数据写入。
-- NOT_RUN：真实 PostgreSQL 的并发/事务回滚测试（本机未找到 postgres/psql/docker）、六篇真实选题及来源生成、生产快照、生产 CMS 写入、12 个真实生产公开页面验证。
+- PASS：真实生产快照返回 249 条既有资讯；候选包完成 5 个 FRESH_EVENT、1 个 DURABLE_TASK、12 个 HTML、6 个来源证据和 6 个 payload 审计；服务端暂存返回 6 条 draft；promote 返回 6 条 published，cacheRefresh 为 complete；官网公开域名逐页核验 12/12 通过。
+- PARTIAL：未配置 `DATABASE_URL` 的本地裸构建会在既有页面数据读取时停止；本机没有 PostgreSQL，因此本地不能替代生产事务测试。线上 app 未切换到新基线，以保留既有 SEO worker 路由兼容性；本次发布使用临时发布容器完成。
+- NOT_RUN：真实 PostgreSQL 的本地并发/事务回滚测试（本机未找到 postgres/psql/docker）；定时自动化启用；生产代码切换到新基线。
 - PASS（静态复审）：完成独立静态复审；已移除种子脚本中的固定默认凭据，保留 P2002 重试和快照摘要复核。该复审不替代真实数据库或生产验证。
-- PASS（候选包离线审计）：`output/ai-news-v2-production-candidate/` 已生成 5 个 FRESH_EVENT 与 1 个 DURABLE_TASK、12 个本地化 HTML、6 个官方来源证据文件和 6 个 draft payload；manifest digest 为 `89d86b6c…`，12 个 HTML 均通过固定 validator。该候选包尚未连接生产快照，不能跳过服务端去重或直接发布。
-- 无生产调度启用；Codex 现有任务 `enhe-ai-v2`（ENHE AI 前沿资讯 V2（本地离线审计））保留周一至周五 08:00 的本地 audit 安排。另已创建 `enhe-ai-v2-2`（ENHE AI 前沿资讯 V2 自动生成发布（待启用）），状态为 `PAUSED`，仅在生产开关、真实候选包和部署兼容性完成后再启用；当前不能调用 snapshot/stage/promote/verify。配置已回读确认。
+- PASS（候选包及发布回执）：`output/ai-news-v2-production-candidate/` 的 manifest digest 为 `d5734bcf0cec170e59c6dfaa6f6b18f993c150ce3ec1a82f01045ababe032961`；`receipt.json` 记录生产快照摘要、STAGED、PUBLISHED_AWAITING_PUBLIC_VERIFICATION 和 12 页验证回执。DURABLE_TASK 使用未与历史文章重复的 NIST AI 600-1 官方来源。
+- 无生产调度启用；Codex 现有任务 `enhe-ai-v2`（ENHE AI 前沿资讯 V2（本地离线审计））保留周一至周五 08:00 的本地 audit 安排。另已创建 `enhe-ai-v2-2`（ENHE AI 前沿资讯 V2 自动生成发布），状态为 `PAUSED`，不会自动调用 snapshot/stage/promote/verify，直到另行确认启用定时生产发布。配置已回读确认。
 
 可审阅的离线夹具保存在 `output/ai-news-v2-fixture/`：12 个 HTML、6 个来源证据文本、manifest、receipt 和 6 个 payload JSON。此目录是忽略的测试产物，实际 CMS 记录及生产公开页数量均为 0，不能用作真实新闻发布材料。
 
-验收结论：本地发布链路、自动审计和部署防写入开关已实现；GitHub SSH 已恢复，干净基线已推送，应用容器已部署并通过健康检查。生产发布目标尚未完成：当前无真实 `production-candidate` 包，V2 开关与发布定时任务均关闭，SEO worker/scheduler 仍为旧镜像且报告 blocked。真实文章包由自动化生成，不要求用户事先提供；不合格候选不得发布。下一步唯一需要明确的生产门禁是是否打开 V2 生产开关并启用 `enhe-ai-v2-2` 定时任务；打开前仍须先完成真实来源候选、生产快照和部署 worker 兼容性核验。
+验收结论：一次性 V2 文章发布已完成，6 条 CMS 记录和 12 个双语公开页面均已核验；未执行数据库迁移、未修改既有文章、未启用定时生产任务。后续若要自动定时发布，唯一剩余门禁是补齐新基线与现有 SEO 内部路由的兼容性，然后另行确认打开线上开关和 `enhe-ai-v2-2`。
 
