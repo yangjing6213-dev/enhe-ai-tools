@@ -6,12 +6,12 @@
 
 用户已授权部署及 V2 发布，继续禁止数据库迁移和修改既有文章。用户随后明确要求取消人工审批、自动生成并发布；这取代早期用户级人工审批约束。自动流程使用与 manifest、生产快照和固定 validator 绑定的机器审计凭据，不伪造人工身份；来源核验、去重、12 HTML/6 payload 验证、AI 标注和公开页核验仍须保留。
 
-2026-09-05 SSH 复核：两把私钥已由用户解锁并加入 ssh-agent。本机使用系统 OpenSSH 已通过 GitHub 账号认证，目标仓库 `yangjing6213-dev/enhe-ai-tools` 当前为空；服务器 SSH 会话成功，但服务器原工作树仍为 detached HEAD、存在 4 项未提交改动，远端仍指向旧仓库，服务器没有 GitHub 私钥，不能作为推送中继。未读取服务器 `.env`。为避免覆盖原工作树，已在 `/opt/enhe-ai-tools-v2` 建立独立部署目录并使用显式 LF 归档构建新应用镜像；原目录未覆盖。部署配置 8 项测试、deploy.sh 与 app-entrypoint.sh 的 Bash 语法检查均通过。当前恢复计划见 docs/exec-plans/active/ai-news-v2-production.md。
+2026-09-05 SSH 复核：两把私钥已由用户解锁并加入 ssh-agent。本机使用系统 OpenSSH 已通过 GitHub 账号认证，V2 基线及部署证据已推送到 `codex/ai-news-publishing-v2`；服务器 SSH 会话成功，但服务器原工作树仍为 detached HEAD、存在 4 项未提交改动，服务器没有 GitHub 私钥，不能作为推送中继。未读取服务器 `.env`。为避免覆盖原工作树，已在 `/opt/enhe-ai-tools-v2` 建立独立部署目录并使用显式 LF 归档构建新应用镜像；原目录未覆盖。部署配置 8 项测试、deploy.sh 与 app-entrypoint.sh 的 Bash 语法检查均通过。当前恢复计划见 docs/exec-plans/active/ai-news-v2-production.md。
 
 ## 仓库与边界
 
 - 实现目录：`F:\Projects\enhe-ai-website-v2`，分支 `codex/ai-news-publishing-v2`。
-- 来源：迁移快照 `03-projects/024-new_project_2` 的已提交版本 `bc66ea5032a414a1870bcb6890faeee1a8da08c1`。当前 Git origin 为用户指定的 SSH 地址 `git@github-enhe:yangjing6213-dev/enhe-ai-tools.git`，远程分支与写权限仍待认证后验证。
+- 来源：迁移快照 `03-projects/024-new_project_2` 的已提交版本 `bc66ea5032a414a1870bcb6890faeee1a8da08c1`。当前 Git origin 为用户指定的 SSH 地址 `git@github-enhe:yangjing6213-dev/enhe-ai-tools.git`，远程 `codex/ai-news-publishing-v2` 已验证可写。
 - 快照另有 123 项 tracked 工作区变更和未跟踪文件；它们没有被覆盖，也没有混入本次改动。独立目录已补回构建所需的 3 个非敏感基线文件，并保留最小改动；**不得把这个干净提交基线直接当成最新生产部署基线。**
 - 之前位于 `enhe-company-os` 的 Python 自动化不属于官网，不能用于网站发布。本次复用官网实际 Next.js 导入接口和 Prisma 模型。
 - 已有本地提交；未执行数据库迁移、seed、超级管理员回填、生产密钥变更或生产调度启用。一次性 V2 发布只新增本批次 6 条 CMS 记录，未修改既有文章。
