@@ -122,6 +122,7 @@ node --import tsx scripts/publish-ai-news-html.ts --manifest output/ai-news-v2/m
 - PARTIAL：未配置 `DATABASE_URL` 的裸构建会在既有页面数据读取时停止；配置回环占位后构建可完成，但本机没有 PostgreSQL，因此这只证明代码可编译和无生产连接，不证明数据库运行正确。生产回滚后的原应用与 SEO worker/scheduler 健康检查已通过，但未执行 V2 数据写入。
 - NOT_RUN：真实 PostgreSQL 的并发/事务回滚测试（本机未找到 postgres/psql/docker）、六篇真实选题及来源生成、生产快照、生产 CMS 写入、12 个真实生产公开页面验证。
 - PASS（静态复审）：完成独立静态复审；已移除种子脚本中的固定默认凭据，保留 P2002 重试和快照摘要复核。该复审不替代真实数据库或生产验证。
+- PASS（候选包离线审计）：`output/ai-news-v2-production-candidate/` 已生成 5 个 FRESH_EVENT 与 1 个 DURABLE_TASK、12 个本地化 HTML、6 个官方来源证据文件和 6 个 draft payload；manifest digest 为 `89d86b6c…`，12 个 HTML 均通过固定 validator。该候选包尚未连接生产快照，不能跳过服务端去重或直接发布。
 - 无生产调度启用；Codex 现有任务 `enhe-ai-v2`（ENHE AI 前沿资讯 V2（本地离线审计））保留周一至周五 08:00 的本地 audit 安排。另已创建 `enhe-ai-v2-2`（ENHE AI 前沿资讯 V2 自动生成发布（待启用）），状态为 `PAUSED`，仅在生产开关、真实候选包和部署兼容性完成后再启用；当前不能调用 snapshot/stage/promote/verify。配置已回读确认。
 
 可审阅的离线夹具保存在 `output/ai-news-v2-fixture/`：12 个 HTML、6 个来源证据文本、manifest、receipt 和 6 个 payload JSON。此目录是忽略的测试产物，实际 CMS 记录及生产公开页数量均为 0，不能用作真实新闻发布材料。

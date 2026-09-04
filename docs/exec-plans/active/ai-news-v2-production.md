@@ -33,7 +33,7 @@ Generate and publish exact 5 FRESH_EVENT + 1 DURABLE_TASK bilingual topics, with
 - After recovery, original app, SEO worker and scheduler image `3497d170…` are all running healthy. The new baseline remains staged for compatibility work and is not serving production traffic.
 
 ## Current Work
-Release and server compatibility audit completed, including a reversible app-only deployment test and recovery. Production content generation, CMS writes and public-page verification remain pending.
+Release and server compatibility audit completed, including a reversible app-only deployment test and recovery. A real-source six-topic candidate package now passes the local validator and machine audit; production snapshot, CMS writes and public-page verification remain pending.
 
 ## Evidence
 - ssh -o BatchMode=yes -o StrictHostKeyChecking=accept-new -T git@github-enhe: GitHub authentication succeeded (shell access intentionally unavailable).
@@ -46,7 +46,7 @@ Release and server compatibility audit completed, including a reversible app-onl
 ## Remaining Work / Open Risks
 Public repository history safety, production baseline compatibility, real PostgreSQL transaction verification, automatic article generation and publication are not yet verified.
 
-Independent release audit is PARTIAL: fixed default-account material was removed from tracked seed/admin provisioning code and seed-only values are now environment-required. Historical object scanning is still limited; no production credential leak has been established by this static inspection. The general deploy wrapper pulls main by default, so the deployment test used an explicitly verified release ref and a separate staging directory. Compatibility with the existing SEO audit routes remains unresolved; no production candidate manifest or CMS write has been executed.
+Independent release audit is PARTIAL: fixed default-account material was removed from tracked seed/admin provisioning code and seed-only values are now environment-required. Historical object scanning is still limited; no production credential leak has been established by this static inspection. The general deploy wrapper pulls main by default, so the deployment test used an explicitly verified release ref and a separate staging directory. Compatibility with the existing SEO audit routes remains unresolved. The local real-source candidate has 5 FRESH_EVENT, 1 DURABLE_TASK, 12 validated HTML files and 6 source evidence files, but no production snapshot or CMS write has been executed.
 
 ## Important Decisions
 The earlier claim that human review was an immutable platform requirement was incorrect. Respect the user's latest explicit instruction without weakening automated safeguards or inventing human approval.
