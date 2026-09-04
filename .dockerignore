@@ -1,0 +1,54 @@
+# Dependency and build output
+node_modules
+.next
+dist
+build
+coverage
+.turbo
+.cache
+
+# Test and browser artifacts
+test-results
+playwright-report
+.playwright-cli
+output
+
+# Local environment and secrets
+.env
+.env.*
+!.env.example
+zpay.env
+*.pem
+*.key
+*.crt
+
+# Logs and local runtime artifacts
+*.log
+logs
+.codex-logs
+.dev-logs
+web-access
+uploads
+public/uploads
+tmp
+temp
+*.tmp
+*.tsbuildinfo
+
+# Local deployment bundles
+tmp-enhe-deploy*.bundle
+
+# Git and local workspace metadata
+.git
+.gitignore
+.gitattributes
+.worktrees
+.superpowers
+.codex
+.agents
+
+# OS/editor noise
+.DS_Store
+Thumbs.db
+.idea
+.vscode

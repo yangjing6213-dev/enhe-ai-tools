@@ -1,0 +1,71 @@
+import type { EbosRevenueEvidence } from "./revenue-evidence-types";
+
+export function renderRevenueEvidenceMarkdown(evidence: EbosRevenueEvidence) {
+  return [
+    "# ENHE Revenue Evidence Report",
+    "",
+    `目标日期：${evidence.targetDate}`,
+    `周期：${evidence.periodStart} 至 ${evidence.periodEnd}`,
+    `生成时间：${evidence.generatedAt}`,
+    "",
+    "## 1. 收入验证总体评分",
+    `评分：${evidence.overallScore}`,
+    `置信度：${evidence.confidence}`,
+    evidence.revenueSummary.firstRevenueAchieved ? "已完成真实收入验证。" : "尚未完成真实收入验证。",
+    "",
+    "## 2. 收入摘要",
+    `币种：${evidence.currency}`,
+    `Gross revenue：${evidence.revenueSummary.grossRevenue}`,
+    `Net revenue：${evidence.revenueSummary.netRevenue}`,
+    `Refunded amount：${evidence.revenueSummary.refundedAmount}`,
+    `Average order value：${evidence.revenueSummary.averageOrderValue}`,
+    "",
+    "## 3. 订单摘要",
+    `总订单：${evidence.orderSummary.totalOrders}`,
+    `已支付订单：${evidence.orderSummary.paidOrders}`,
+    `待支付订单：${evidence.orderSummary.pendingOrders}`,
+    `取消/未支付订单：${evidence.orderSummary.cancelledOrders + evidence.orderSummary.unpaidOrders}`,
+    "",
+    "## 4. 退款摘要",
+    `退款数：${evidence.refundSummary.totalRefunds}`,
+    `周期内退款：${evidence.refundSummary.currentPeriodRefunds}`,
+    `退款金额：${evidence.refundSummary.refundedAmount}`,
+    `退款率：${evidence.refundSummary.refundRate}`,
+    list(evidence.refundSummary.refundRisks),
+    "",
+    "## 5. 产品收入归因",
+    list(evidence.productRevenueSummary.productMetrics.map((metric) => `${metric.productName ?? metric.productSlug ?? metric.productId ?? "unknown"}：net=${metric.netRevenue}, paidOrders=${metric.paidOrdersCount}, readiness=${metric.revenueReadinessScore}`)),
+    `未归因收入：${evidence.productRevenueSummary.unattributedRevenue.netRevenue}`,
+    "",
+    "## 6. 第一笔收入验证状态",
+    evidence.revenueSummary.firstRevenueAchieved
+      ? `已完成，第一笔支付时间：${evidence.revenueSummary.firstPaidOrderDate ?? "unknown"}`
+      : "尚未完成真实收入验证",
+    "",
+    "## 7. 高优先级收益验证产品",
+    list(evidence.productRevenueSummary.recommendedValidationProducts.map((metric) => `${metric.productName ?? metric.productSlug ?? metric.productId ?? "unknown"}：readiness=${metric.revenueReadinessScore}`)),
+    "",
+    "## 8. 主要风险",
+    list(evidence.risks),
+    "",
+    "## 9. 增长机会",
+    list(evidence.opportunities),
+    "",
+    "## 10. Codex 收益验证任务",
+    list(evidence.actionItems.map((item) => `[${item.priority}] ${item.title}: ${item.description}`)),
+    "",
+    "## 11. 数据库字段与口径说明",
+    `Order fields：${evidence.databaseSummary.orderFieldsDetected.join(", ") || "none"}`,
+    `Refund fields：${evidence.databaseSummary.refundFieldsDetected.join(", ") || "none"}`,
+    `Product fields：${evidence.databaseSummary.productFieldsDetected.join(", ") || "none"}`,
+    `Attribution fields：${evidence.databaseSummary.attributionFieldsDetected.join(", ") || "none"}`,
+    list(evidence.databaseSummary.warnings),
+    "",
+    "## 12. 数据缺口",
+    list(evidence.warnings.map((warning) => warning.message))
+  ].join("\n");
+}
+
+function list(items: string[]) {
+  return items.length ? items.map((item) => `- ${item}`).join("\n") : "- none";
+}

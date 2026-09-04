@@ -1,0 +1,77 @@
+{
+  "reportType": "deployment_guard_batch_manual_review",
+  "targetDate": "2026-07-03",
+  "generatedAt": "2026-07-07T17:31:01.5804680+08:00",
+  "reviewedFiles": [
+    "deploy/enhe-ai-tools/scripts/app-entrypoint.sh",
+    "deploy/enhe-ai-tools/docker-compose.yml",
+    "deploy/enhe-ai-tools/README.md"
+  ],
+  "approvedFiles": [
+    "deploy/enhe-ai-tools/scripts/app-entrypoint.sh",
+    "deploy/enhe-ai-tools/docker-compose.yml",
+    "deploy/enhe-ai-tools/README.md",
+    "reports/ebos/deployment/2026-07-03-deployment-guard-batch-manual-review.json",
+    "reports/ebos/deployment/2026-07-03-deployment-guard-batch-manual-review.md"
+  ],
+  "rejectedFiles": [
+    {
+      "path": "package.json",
+      "reason": "Forbidden for this batch."
+    },
+    {
+      "path": "package-lock.json",
+      "reason": "Forbidden for this batch."
+    },
+    {
+      "path": "prisma/**",
+      "reason": "Database schema and migration files are out of scope."
+    },
+    {
+      "path": "src/app/admin/**",
+      "reason": "Admin UI changes are out of scope."
+    },
+    {
+      "path": "src/app/api/**",
+      "reason": "API changes are out of scope."
+    },
+    {
+      "path": ".env",
+      "reason": "Secret-bearing environment files are forbidden."
+    },
+    {
+      "path": ".next/**",
+      "reason": "Build output is forbidden."
+    },
+    {
+      "path": "node_modules/**",
+      "reason": "Dependency output is forbidden."
+    },
+    {
+      "path": "unknown/unclassified files",
+      "reason": "Unrelated dirty files require separate review."
+    }
+  ],
+  "guardVariable": "RUN_PRISMA_MIGRATE",
+  "defaultBehavior": "skip_unless_explicit",
+  "migrationRequiresExplicitEnable": true,
+  "migrationExecutedThisStep": false,
+  "secretExposureRisk": false,
+  "databaseConfigChanged": false,
+  "destructiveCommandDetected": false,
+  "serverCommandsExecuted": false,
+  "dockerCommandsExecuted": false,
+  "nginxCommandsExecuted": false,
+  "gitAddDotUsed": false,
+  "safetyDecision": "approved_for_commit",
+  "warnings": [
+    "The main worktree contains broad unrelated dirty changes that remain excluded from this batch.",
+    "Git reports LF-to-CRLF working-copy warnings on edited deployment files; no functional line-ending policy change was made."
+  ],
+  "blockers": [],
+  "nextActions": [
+    "Stage only approved files with explicit git add paths.",
+    "Run EBOS tests, lint, typecheck, and build before commit.",
+    "After commit and push, regenerate weekly and monthly EBOS reports without enabling migration."
+  ]
+}

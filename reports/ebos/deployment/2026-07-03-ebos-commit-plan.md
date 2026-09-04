@@ -1,0 +1,419 @@
+# EBOS Commit Plan
+
+- planType: ebos_commit_plan
+- targetDate: 2026-07-03
+- generatedAt: 2026-07-07T02:00:30.868Z
+- mainProjectPath: C:\Users\HU\Documents\New project 2
+- defaultAction: no_git_add_no_commit_no_push
+- safeToCommitFilesCount: 636
+- excludedFilesCount: 445
+- needsSeparateAuditFilesCount: 445
+- packageDirtyDetected: true
+- prismaDirtyDetected: true
+- adminDirtyDetected: true
+
+## Commit Batches
+
+### EBOS validated system updates
+
+- id: batch-1-ebos-validated-system-updates
+- status: proposed
+- fileCount: 466
+
+Proposed command, not executed:
+
+```bash
+git add -- AGENTS.md src/lib/ebos scripts/*ebos*.ts docs/ebos src/components/validation-ai-prompt-kit-page.tsx src/app/(zh-public)/validation src/app/en/validation
+```
+
+- AGENTS.md
+- docs/ebos/00-EBOS-Project-Brief.md
+- docs/ebos/01-EBOS-v1-PRD.md
+- docs/ebos/02-Codex-Development-Playbook.md
+- docs/ebos/03-EBOS-Roadmap.md
+- docs/ebos/04-EBOS-Agent-Architecture.md
+- docs/ebos/05-EBOS-Skill-Library-Plan.md
+- docs/ebos/06-EBOS-Data-Source-Setup.md
+- docs/ebos/07-EBOS-Product-URL-Source-and-Route-Mapping.md
+- docs/ebos/08-EBOS-Evidence-JSON-Contract.md
+- docs/ebos/09-EBOS-Evidence-Catalog.md
+- docs/ebos/10-EBOS-Monthly-Strategy-Review.md
+- docs/ebos/11-EBOS-Codex-Skill-Library.md
+- docs/ebos/12-EBOS-SEO-Evidence.md
+- docs/ebos/13-EBOS-GEO-Evidence.md
+- docs/ebos/14-EBOS-Product-Evidence.md
+- docs/ebos/15-EBOS-Revenue-Evidence.md
+- docs/ebos/16-EBOS-Market-Evidence.md
+- docs/ebos/17-EBOS-Competitor-Evidence.md
+- docs/ebos/18-EBOS-Cross-Evidence-Prioritization.md
+- docs/ebos/19-EBOS-Validation-Result-Tracker.md
+- docs/ebos/20-EBOS-Validation-Execution-Input.md
+- docs/ebos/21-EBOS-First-Validation-Run.md
+- docs/ebos/22-EBOS-Validation-Data-Capture-Autofill.md
+- docs/ebos/23-EBOS-External-Channel-Data-Intake.md
+- docs/ebos/24-EBOS-Validation-Launch-Operator-Guide.md
+- docs/ebos/25-EBOS-Validation-Launch-Execution.md
+- docs/ebos/26-EBOS-Production-Deployment-Preflight.md
+- docs/ebos/27-EBOS-Production-Deployment-Approval-Gate.md
+- docs/ebos/28-EBOS-Deployment-Approval-Response-Parser.md
+- docs/ebos/29-EBOS-Deployment-Status-Aggregation-Fix.md
+- docs/ebos/30-EBOS-Production-Deployment-Operator-Checklist.md
+- docs/ebos/31-EBOS-Production-Deployment-Execution.md
+- docs/ebos/32-EBOS-Server-Deployment-Command-Pack.md
+- docs/ebos/33-EBOS-Post-Launch-Live-Check.md
+- docs/ebos/34-EBOS-External-Channel-Publishing-Data-Backfill.md
+- docs/ebos/35-EBOS-First-External-Publishing-Sprint.md
+- docs/ebos/36-EBOS-Synthetic-Failure-Scenario-Lab.md
+- docs/ebos/38-EBOS-Migration-Release-Mode.md
+- docs/ebos/validation-assets/2026-07-03-ai-prompt-kit-landing-copy.md
+- docs/ebos/validation-assets/2026-07-03-ai-prompt-kit-marketplace-listings.md
+- docs/ebos/validation-assets/2026-07-03-ai-prompt-kit-minimum-product.md
+- docs/ebos/validation-assets/2026-07-03-ai-prompt-kit-synthetic-optimized-copy.md
+- docs/ebos/validation-assets/2026-07-03-ai-video-studio-validation-copy.md
+- docs/ebos/validation-assets/2026-07-03-codex-operator-summary.md
+- docs/ebos/validation-assets/2026-07-03-faceswap-validation-copy.md
+- docs/ebos/validation-assets/2026-07-03-social-promotion-copy.md
+- docs/ebos/validation-assets/2026-07-03-three-day-validation-checklist.md
+- docs/ebos/validation-assets/2026-07-03-validation-input-fill-guide.md
+- scripts/analyze-ebos-synthetic-failure-scenario.ts
+- scripts/approve-ebos-deployment-execution.ts
+- scripts/audit-ebos-deployment-commands.ts
+- scripts/audit-ebos-migration-release-readiness.ts
+- scripts/autofill-ebos-validation-input.ts
+- scripts/backfill-ebos-external-channel-data.ts
+- scripts/capture-ebos-validation-data.ts
+- scripts/check-ebos-data-sources.ts
+- scripts/check-ebos-deployment-execution-status.ts
+- scripts/check-ebos-external-publish-results.ts
+- scripts/check-ebos-optimized-page-redeploy.ts
+- scripts/check-ebos-production-deployment-preflight.ts
+- scripts/check-ebos-server-deployment-result-input.ts
+- scripts/check-ebos-validation-input.ts
+- scripts/check-ebos-validation-launch-readiness.ts
+- scripts/check-ebos-validation-post-launch.ts
+- scripts/generate-ebos-competitor-evidence.ts
+- scripts/generate-ebos-decision-report.ts
+- scripts/generate-ebos-deployment-approval-gate.ts
+- scripts/generate-ebos-deployment-execution-runbook.ts
+- scripts/generate-ebos-deployment-operator-checklist.ts
+- scripts/generate-ebos-external-intake-template.ts
+- scripts/generate-ebos-external-publishing-pack.ts
+- scripts/generate-ebos-first-validation-runbook.ts
+- scripts/generate-ebos-geo-evidence.ts
+- scripts/generate-ebos-health-snapshot.ts
+- scripts/generate-ebos-market-evidence.ts
+- scripts/generate-ebos-migration-release-runbook.ts
+- scripts/generate-ebos-monthly-review.ts
+- scripts/generate-ebos-optimized-validation-page-redeploy-report.ts
+- scripts/generate-ebos-product-evidence.ts
+- scripts/generate-ebos-production-deployment-execution-report.ts
+- scripts/generate-ebos-production-deployment-plan.ts
+- scripts/generate-ebos-revenue-evidence.ts
+- scripts/generate-ebos-seo-evidence.ts
+- scripts/generate-ebos-server-deployment-command-pack.ts
+- scripts/generate-ebos-synthetic-failure-scenario.ts
+- scripts/generate-ebos-validation-execution-input.ts
+- scripts/generate-ebos-validation-launch-execution.ts
+- scripts/generate-ebos-validation-launch-runbook.ts
+- scripts/generate-ebos-validation-report.ts
+- scripts/generate-ebos-validation-template.ts
+- scripts/generate-ebos-weekly-report.ts
+- scripts/import-ebos-external-intake.ts
+- scripts/index-ebos-evidence.ts
+- scripts/parse-ebos-deployment-approval-response.ts
+- scripts/record-ebos-server-deployment-result.ts
+- scripts/run-ebos-post-launch-live-check.ts
+- scripts/start-ebos-production-deployment-execution.ts
+- scripts/verify-ebos-production-deployment.ts
+- src/app/(zh-public)/validation/ai-prompt-kit/page.tsx
+- ... 366 more
+
+### Deployment guard updates
+
+- id: batch-2-deployment-guard-updates
+- status: manual_review_required
+- fileCount: 2
+
+No staged command proposed.
+
+- deploy/enhe-ai-tools/.env.example
+- deploy/enhe-ai-tools/scripts/enhe-install-cron.sh
+
+### Generated EBOS reports only
+
+- id: batch-3-generated-ebos-reports-only
+- status: proposed
+- fileCount: 170
+
+Proposed command, not executed:
+
+```bash
+git add -- reports/ebos
+```
+
+- reports/ebos/competitor/.gitkeep
+- reports/ebos/competitor/2026-07-03-competitor-evidence.md
+- reports/ebos/data-sources/.gitkeep
+- reports/ebos/data-sources/2026-07-02-data-sources.json
+- reports/ebos/data-sources/2026-07-02-data-sources.md
+- reports/ebos/data-sources/2026-07-03-data-sources.json
+- reports/ebos/data-sources/2026-07-03-data-sources.md
+- reports/ebos/decision/.gitkeep
+- reports/ebos/decision/2026-07-03-decision-report.json
+- reports/ebos/decision/2026-07-03-decision-report.md
+- reports/ebos/deployment/.gitkeep
+- reports/ebos/deployment/2026-07-03-build-lock-recovery-report.md
+- reports/ebos/deployment/2026-07-03-ebos-commit-plan.json
+- reports/ebos/deployment/2026-07-03-ebos-commit-plan.md
+- reports/ebos/deployment/2026-07-03-main-worktree-dirty-state-audit.json
+- reports/ebos/deployment/2026-07-03-main-worktree-dirty-state-audit.md
+- reports/ebos/deployment/2026-07-03-prisma-build-lock-final-recovery.json
+- reports/ebos/deployment/2026-07-03-prisma-build-lock-final-recovery.md
+- reports/ebos/deployment/2026-07-03-production-deployment-plan.json
+- reports/ebos/deployment/2026-07-03-production-deployment-plan.md
+- reports/ebos/deployment/2026-07-03-production-deployment-preflight.json
+- reports/ebos/deployment/2026-07-03-production-deployment-preflight.md
+- reports/ebos/deployment/execution/approvals/.gitkeep
+- reports/ebos/deployment/execution/approvals/2026-07-03-deployment-approval-gate.json
+- reports/ebos/deployment/execution/approvals/2026-07-03-deployment-approval-gate.md
+- reports/ebos/deployment/execution/approvals/responses/.gitkeep
+- reports/ebos/deployment/execution/approvals/responses/2026-07-03-approval-response-audit.json
+- reports/ebos/deployment/execution/approvals/responses/2026-07-03-approval-response-audit.md
+- reports/ebos/deployment/execution/backups/.gitkeep
+- reports/ebos/deployment/execution/backups/2026-07-03-deployment-execution-status.before-approval.2026-07-04T15-33-18-303Z.json
+- reports/ebos/deployment/execution/backups/2026-07-03-deployment-execution-status.before-execution.2026-07-05T00-54-29-665Z.json
+- reports/ebos/deployment/execution/backups/2026-07-03-deployment-execution-status.before-execution.2026-07-05T00-57-11-503Z.json
+- reports/ebos/deployment/execution/backups/2026-07-03-deployment-execution-status.before-execution.2026-07-05T09-16-59-612Z.json
+- reports/ebos/deployment/execution/backups/2026-07-03-deployment-execution-status.before-verification.2026-07-05T09-59-53-960Z.json
+- reports/ebos/deployment/execution/command-results/.gitkeep
+- reports/ebos/deployment/execution/command-results/2026-07-03-local-command-results.json
+- reports/ebos/deployment/execution/command-results/2026-07-03-manual-server-command-package.json
+- reports/ebos/deployment/execution/command-results/2026-07-03-server-deployment-result.example.json
+- reports/ebos/deployment/execution/command-results/2026-07-03-server-deployment-result.json
+- reports/ebos/deployment/execution/live/.gitkeep
+- reports/ebos/deployment/execution/live/2026-07-03-production-deployment-execution-report.json
+- reports/ebos/deployment/execution/live/2026-07-03-production-deployment-execution-report.md
+- reports/ebos/deployment/execution/runbooks/.gitkeep
+- reports/ebos/deployment/execution/runbooks/2026-07-03-deployment-execution-runbook.json
+- reports/ebos/deployment/execution/runbooks/2026-07-03-deployment-execution-runbook.md
+- reports/ebos/deployment/execution/server-intake/.gitkeep
+- reports/ebos/deployment/execution/server-intake/2026-07-03-server-deployment-command-pack.json
+- reports/ebos/deployment/execution/server-intake/2026-07-03-server-deployment-command-pack.md
+- reports/ebos/deployment/execution/status/.gitkeep
+- reports/ebos/deployment/execution/status/2026-07-03-deployment-execution-status-summary.md
+- reports/ebos/deployment/execution/status/2026-07-03-deployment-execution-status.json
+- reports/ebos/deployment/migration-release/.gitkeep
+- reports/ebos/deployment/migration-release/2026-07-03-migration-release-risk-audit.json
+- reports/ebos/deployment/migration-release/2026-07-03-migration-release-risk-audit.md
+- reports/ebos/deployment/migration-release/2026-07-03-migration-release-runbook.json
+- reports/ebos/deployment/migration-release/2026-07-03-migration-release-runbook.md
+- reports/ebos/deployment/operator/.gitkeep
+- reports/ebos/deployment/operator/2026-07-03-deployment-command-audit.json
+- reports/ebos/deployment/operator/2026-07-03-deployment-command-audit.md
+- reports/ebos/deployment/operator/2026-07-03-deployment-operator-checklist.json
+- reports/ebos/deployment/operator/2026-07-03-deployment-operator-checklist.md
+- reports/ebos/deployment/post-launch/.gitkeep
+- reports/ebos/deployment/post-launch/2026-07-03-post-launch-live-check.json
+- reports/ebos/deployment/post-launch/2026-07-03-post-launch-live-check.md
+- reports/ebos/deployment/post-launch/2026-07-03-verified-transition.json
+- reports/ebos/deployment/post-launch/2026-07-03-verified-transition.md
+- reports/ebos/evidence/catalog/.gitkeep
+- reports/ebos/evidence/catalog/2026-07-03-evidence-catalog.json
+- reports/ebos/evidence/catalog/latest-evidence-catalog.json
+- reports/ebos/evidence/competitor_evidence/.gitkeep
+- reports/ebos/evidence/competitor_evidence/2026-07-03-competitor_evidence.json
+- reports/ebos/evidence/data_source_readiness/2026-07-03-data_source_readiness.json
+- reports/ebos/evidence/geo_evidence/.gitkeep
+- reports/ebos/evidence/geo_evidence/2026-07-03-geo_evidence.json
+- reports/ebos/evidence/health_snapshot/2026-07-03-health_snapshot.json
+- reports/ebos/evidence/market_evidence/.gitkeep
+- reports/ebos/evidence/market_evidence/2026-07-03-market_evidence.json
+- reports/ebos/evidence/monthly_review/.gitkeep
+- reports/ebos/evidence/monthly_review/2026-07-monthly_review.json
+- reports/ebos/evidence/product_evidence/.gitkeep
+- reports/ebos/evidence/product_evidence/2026-07-03-product_evidence.json
+- reports/ebos/evidence/revenue_evidence/.gitkeep
+- reports/ebos/evidence/revenue_evidence/2026-07-03-revenue_evidence.json
+- reports/ebos/evidence/seo_evidence/.gitkeep
+- reports/ebos/evidence/seo_evidence/2026-07-03-seo_evidence.json
+- reports/ebos/evidence/weekly_report/2026-06-29-weekly_report.json
+- reports/ebos/external-publishing/backups/.gitkeep
+- reports/ebos/external-publishing/checklists/2026-07-03-user-minimum-publishing-actions.md
+- reports/ebos/external-publishing/inputs/.gitkeep
+- reports/ebos/external-publishing/inputs/2026-07-03-external-publish-result-input.json
+- reports/ebos/external-publishing/inputs/2026-07-03-real-signal-collection-sheet.md
+- reports/ebos/external-publishing/packs/.gitkeep
+- reports/ebos/external-publishing/packs/2026-07-03-external-publishing-pack.json
+- reports/ebos/external-publishing/packs/2026-07-03-external-publishing-pack.md
+- reports/ebos/external-publishing/reports/.gitkeep
+- reports/ebos/external-publishing/reports/2026-07-03-external-data-backfill-report.json
+- reports/ebos/external-publishing/reports/2026-07-03-external-data-backfill-report.md
+- reports/ebos/external-publishing/simulations/.gitkeep
+- reports/ebos/external-publishing/simulations/2026-07-03-synthetic-failure-analysis.json
+- reports/ebos/external-publishing/simulations/2026-07-03-synthetic-failure-analysis.md
+- ... 70 more
+
+### Excluded / separate audit
+
+- id: excluded-separate-audit
+- status: blocked_for_ebos_commit
+- fileCount: 445
+
+No staged command proposed.
+
+- .env.example
+- .superpowers/brainstorm/ai-demand-morning-report-1781828085/content/access-model.html
+- .superpowers/brainstorm/ai-demand-morning-report-1781828085/content/ia-options.html
+- .superpowers/brainstorm/ai-demand-morning-report-1781828085/content/waiting.html
+- .superpowers/brainstorm/ai-demand-morning-report-1781828085/state/server-info
+- .superpowers/brainstorm/ai-demand-morning-report-1781828085/state/server.pid
+- content/ai-news/2026-06-20-adobe-creative-agent-firefly-creative-cloud.html
+- content/ai-news/2026-06-20-alibaba-model-studio-cli-ai-agent.html
+- content/ai-news/2026-06-20-github-agent-finder-ard-ai-tools.html
+- content/ai-news/2026-06-20-github-copilot-ai-credits-usage-metrics.html
+- content/ai-news/2026-06-20-google-a2a-collaborative-agents.html
+- content/ai-news/2026-06-20-huawei-cloud-agentic-infra-ai-agent.html
+- content/ai-news/2026-06-20-meta-business-agent-whatsapp-ai.html
+- content/ai-news/2026-06-20-microsoft-agent-365-agent-governance.html
+- content/ai-news/2026-06-21-agentscope-java-enterprise-ai-agent.html
+- content/ai-news/2026-06-21-alibaba-loongsuite-pilot-agent-observability.html
+- content/ai-news/2026-06-21-aws-bedrock-agentcore-knowledge-web-search.html
+- content/ai-news/2026-06-21-hpe-nvidia-private-cloud-ai-agent-production.html
+- content/ai-news/2026-06-21-openai-chatgpt-enterprise-spend-controls.html
+- content/ai-news/2026-06-21-paddleocr-local-deployment-document-ai.html
+- content/ai-news/2026-06-21-qwen-code-agent-team-ai-workflow.html
+- content/ai-news/2026-06-22-jetbrains-junie-ai-coding-agent.html
+- content/ai-news/2026-06-24-alibaba-agentrun-skill-mcp-tools.html
+- content/ai-news/2026-06-24-alibaba-aidbs-agent-ready-database.html
+- content/ai-news/2026-06-24-alibaba-anolisa-agentic-os.html
+- content/ai-news/2026-06-24-aliyun-sms-skill-ai-agent.html
+- content/ai-news/2026-06-24-github-copilot-cli-terminal-byok.html
+- content/ai-news/2026-06-24-google-agent-platform-ai-security.html
+- content/ai-news/2026-06-24-google-cloud-dict-public-sector-ai-agents.html
+- content/ai-news/2026-06-24-lumios-desktop-ai-operating-companion.html
+- content/ai-news/2026-06-24-m-files-custom-agents-context-aware-automation.html
+- content/ai-news/2026-06-24-nvidia-agent-toolkit-ai-agent.html
+- content/ai-news/2026-06-24-openai-patch-the-planet-open-source-security.html
+- content/ai-news/2026-06-25-choose-local-ai-tools-new-user.html
+- content/ai-news/2026-06-25-enhe-ai-tool-station-user-guide.html
+- content/ai-news/2026-06-25-how-to-choose-ai-tool-website.html
+- content/ai-news/2026-06-25-openai-broadcom-jalapeno-inference-chip.html
+- content/ai-news/2026-06-25-openai-codex-agent-work-report.html
+- content/ai-news/2026-06-25-what-is-ai-agent-vs-chatbot.html
+- content/ai-news/2026-06-25-what-is-enhe-ai-official-site.html
+- content/ai-news/2026-06-25-windows-local-ai-deployment-guide.html
+- content/ai-news/2026-06-26-agentic-overlay-ai-agents.html
+- content/ai-news/2026-06-26-ai-coding-assistant-multi-branch-workflow-tutorial.html
+- content/ai-news/2026-06-26-ai-video-generation-vs-online-video-editors.html
+- content/ai-news/2026-06-26-aws-agentic-overlay.html
+- content/ai-news/2026-06-26-chatgpt-gemini-claude-account-services-guide.html
+- content/ai-news/2026-06-26-choose-ai-code-review-tools.html
+- content/ai-news/2026-06-26-choose-ai-coding-desktop-tools.html
+- content/ai-news/2026-06-26-enhe-ai-learn-ai-coding-tools.html
+- content/ai-news/2026-06-26-enhe-ai-official-website-address.html
+- content/ai-news/2026-06-26-five-eyes-ai-cyber-risk-explained.html
+- content/ai-news/2026-06-26-github-copilot-code-review-analysis-depth.html
+- content/ai-news/2026-06-26-github-desktop-3-6-global-ai-coding-workflow-trend.html
+- content/ai-news/2026-06-26-github-desktop-3-6-worktrees-copilot-ai-workflow.html
+- content/ai-news/2026-06-26-private-ai-deployment-vs-local-ai.html
+- content/ai-news/2026-06-26-safe-ai-agent-trial.html
+- content/ai-news/2026-06-26-samsung-chatgpt-codex-enterprise-ai.html
+- content/ai-news/2026-06-26-what-can-enhe-ai-help-users-do.html
+- content/ai-news/2026-06-26-what-is-git-worktree-ai-coding-tools.html
+- content/ai-news/2026-06-28-choose-ai-agent-tools-permissions-logs-review.html
+- content/ai-news/2026-06-28-cisa-agentic-ai-adoption-security-governance.html
+- content/ai-news/2026-06-28-cisa-agentic-ai-global-security-operations-trend.html
+- content/ai-news/2026-06-28-enhe-ai-understand-ai-agent-security.html
+- content/ai-news/2026-06-28-safe-ai-agent-trial-read-only-review-logs.html
+- content/ai-news/2026-06-28-what-is-agentic-ai-security-boundary.html
+- content/ai-news/2026-06-29-choose-ai-coding-agent-permissions-review.html
+- content/ai-news/2026-06-29-enhe-ai-learn-ai-agent-workflows.html
+- content/ai-news/2026-06-29-openai-agentic-work-global-ai-task-entry.html
+- content/ai-news/2026-06-29-openai-codex-agentic-workflow-ai.html
+- content/ai-news/2026-06-29-safe-ai-coding-agent-trial.html
+- content/ai-news/2026-06-29-what-is-task-based-ai-agent.html
+- content/ai-news/2026-06-30-anthropic-claude-government-ai-global-workflow-trend.html
+- content/ai-news/2026-06-30-california-anthropic-claude-government-ai-workflow.html
+- content/ai-news/2026-06-30-choose-claude-ai-tools-account-permissions.html
+- content/ai-news/2026-06-30-enhe-ai-learn-claude-ai-workflows.html
+- content/ai-news/2026-06-30-test-claude-ai-workflow-safely.html
+- content/ai-news/2026-06-30-what-is-ai-workflow-governance-claude.html
+- content/ai-news/2026-07-01-choose-gemini-spark-ai-workflow-tools.html
+- content/ai-news/2026-07-01-enhe-ai-learn-gemini-spark-ai-workflows.html
+- content/ai-news/2026-07-01-google-gemini-spark-global-ai-workflow-trend.html
+- content/ai-news/2026-07-01-google-gemini-spark-mac-mcp-ai-workflow.html
+- content/ai-news/2026-07-01-test-gemini-spark-ai-workflow-safely.html
+- content/ai-news/2026-07-01-what-is-mcp-server-for-ai-assistants.html
+- content/ai-news/2026-07-03-ai-developer-tools-cost-governance-era.html
+- content/ai-news/2026-07-03-choose-copilot-cli-byok-local-models.html
+- content/ai-news/2026-07-03-enhe-ai-understand-copilot-byok-ai-credit.html
+- content/ai-news/2026-07-03-github-copilot-cli-ai-credit-governance.html
+- content/ai-news/2026-07-03-test-copilot-cli-automation-safely.html
+- content/ai-news/2026-07-03-what-is-ai-credit-session-limit.html
+- content/ai-news/2026-07-04-ai-competition-safety-governance.html
+- content/ai-news/2026-07-04-anthropic-fable-cyber-safeguards-ai.html
+- content/ai-news/2026-07-04-choose-safe-ai-agent-tools.html
+- content/ai-news/2026-07-04-enhe-ai-agent-safety-governance.html
+- content/ai-news/2026-07-04-test-ai-agent-safely.html
+- content/ai-news/2026-07-04-what-is-ai-jailbreak-severity.html
+- content/ai-news/2026-07-05-ai-tools-move-to-domain-workbenches.html
+- content/ai-news/2026-07-05-choose-ai-workbench-tools.html
+- content/ai-news/2026-07-05-claude-science-ai-workbench.html
+- content/ai-news/2026-07-05-enhe-ai-claude-science-workflows.html
+- content/ai-news/2026-07-05-test-ai-workbench-safely.html
+- ... 345 more
+
+## Safe Git Add Proposal
+
+Not executed.
+
+```bash
+git add --
+  AGENTS.md
+  src/lib/ebos
+  scripts/*ebos*.ts
+  docs/ebos
+  reports/ebos
+  src/components/validation-ai-prompt-kit-page.tsx
+  src/app/(zh-public)/validation
+  src/app/en/validation
+```
+
+## Commit Policy
+
+- gitAddExecuted: false
+- gitCommitExecuted: false
+- gitPushExecuted: false
+- broadGitAddAllowed: false
+- packageCommitAllowed: false
+- prismaCommitAllowed: false
+- adminCommitAllowed: false
+
+## Required Before Commit
+
+- Use precise git add paths only.
+- Verify git diff --cached --name-only excludes package.json, package-lock.json, prisma/**, src/app/admin/**, .env, .next/**, and node_modules/**.
+- Run EBOS tests, lint, typecheck, and build after staging if a commit is created.
+
+## Warnings
+
+- This audit is read-only and did not stage, commit, push, migrate, deploy, or run server/Docker/Nginx commands.
+- The main worktree contains broad non-EBOS dirty state; use precise git add paths only.
+- package.json or package-lock.json is dirty and must be audited separately.
+- Prisma files are dirty or untracked and must not be committed with EBOS reports.
+- src/app/admin changes are present and must not be committed with EBOS reports.
+- Deployment config changes exist; only migration guard files should be committed after review.
+
+## Blockers
+
+- package dirty state blocks any broad commit.
+- Prisma dirty state blocks any broad commit.
+- Admin dirty state blocks any broad commit.
+- Unclassified or non-EBOS files require separate audit before commit.
+
+## Next Actions
+
+- Keep this step as report-only unless the user explicitly approves staging.
+- If committing, start with Batch 1 EBOS validated system updates or Batch 3 generated reports only.
+- Audit package, Prisma, admin/core app, content/design/log/tmp changes separately before any broader commit.
+- Continue real external publishing only after a clean EBOS commit plan exists.

@@ -1,0 +1,646 @@
+{
+  "meta": {
+    "contractVersion": "ebos-evidence-v1",
+    "evidenceKind": "competitor_evidence",
+    "generatedAt": "2026-07-03T16:44:06.637Z",
+    "targetDate": "2026-07-03",
+    "periodStart": "2026-06-29",
+    "periodEnd": "2026-07-05",
+    "environment": "unknown",
+    "generator": "scripts/generate-ebos-competitor-evidence.ts",
+    "sourceFiles": [
+      "C:\\Users\\HU\\Documents\\New project 2\\reports\\ebos\\competitor\\2026-07-03-competitor-evidence.md"
+    ],
+    "schemaNotes": [
+      "Competitor seeds are observation targets only and do not represent a complete competitor list.",
+      "Public competitor page https://www.futurepedia.io/pricing could not be read; continuing without it. HTTP 404",
+      "Public competitor page https://theresanaiforthat.com/pricing could not be read; continuing without it. HTTP 403",
+      "Public competitor page https://www.toolify.ai/category could not be read; continuing without it. HTTP 403",
+      "Public competitor URL audit was enabled, but successful page coverage is too thin for complete competitor confidence."
+    ]
+  },
+  "quality": {
+    "score": 69,
+    "confidence": "partial",
+    "dataCompleteness": "partial",
+    "warningsCount": 5,
+    "errorsCount": 0,
+    "missingSources": [
+      "manual_input",
+      "market_research"
+    ]
+  },
+  "payload": {
+    "evidenceType": "competitor_evidence",
+    "targetDate": "2026-07-03",
+    "periodStart": "2026-06-29",
+    "periodEnd": "2026-07-05",
+    "generatedAt": "2026-07-03T16:44:06.637Z",
+    "overallScore": 69,
+    "confidence": "partial",
+    "competitorSummary": {
+      "competitorsCount": 3,
+      "competitorsAuditedCount": 3,
+      "pagesAuditedCount": 3,
+      "averageCompetitorPageScore": 99
+    },
+    "competitorAudits": [
+      {
+        "competitorId": "futurepedia",
+        "name": "Futurepedia",
+        "url": "https://www.futurepedia.io",
+        "category": "ai_tool_directory",
+        "pagesAudited": 1,
+        "averageScore": 96,
+        "positioningSummary": "directory, workflow, prompt, automation, creator, business",
+        "productTypes": [
+          "AI Video",
+          "Prompt Kit",
+          "Workflow Pack",
+          "Marketplace Listing",
+          "Tutorial Pack"
+        ],
+        "pricingSignals": [
+          "pro"
+        ],
+        "seoStrengths": [
+          "title",
+          "meta_description",
+          "h1",
+          "internal_links"
+        ],
+        "geoStrengths": [
+          "how-to",
+          "source"
+        ],
+        "funnelSignals": [
+          "CTA",
+          "newsletter_or_waitlist"
+        ],
+        "observedAdvantages": [
+          "Clear product/listing structure",
+          "Strong conversion CTA"
+        ],
+        "observedWeaknesses": [
+          "Pricing and monetization signals were not visible."
+        ],
+        "enheDifferentiationAngles": [
+          "Use focused product bundles instead of broad directory positioning.",
+          "Differentiate AI video workflows with productized delivery and bilingual SEO/GEO pages."
+        ],
+        "warnings": [
+          {
+            "code": "competitor_page_unavailable",
+            "severity": "warning",
+            "source": "market_research",
+            "message": "Public competitor page https://www.futurepedia.io/pricing could not be read; continuing without it. HTTP 404"
+          }
+        ]
+      },
+      {
+        "competitorId": "theres-an-ai-for-that",
+        "name": "There's An AI For That",
+        "url": "https://theresanaiforthat.com",
+        "category": "ai_tool_directory",
+        "pagesAudited": 1,
+        "averageScore": 100,
+        "positioningSummary": "marketplace, workflow, template, prompt, automation, developer, creator, business",
+        "productTypes": [
+          "AI Agent",
+          "AI Video",
+          "AI Voice",
+          "Prompt Kit",
+          "Workflow Pack",
+          "Template Pack",
+          "Local AI Tool",
+          "SEO Tool",
+          "GEO Tool",
+          "Marketplace Listing",
+          "Tutorial Pack",
+          "ComfyUI Workflow"
+        ],
+        "pricingSignals": [
+          "pricing",
+          "price",
+          "paid",
+          "pro",
+          "subscription",
+          "one-time",
+          "lifetime",
+          "license"
+        ],
+        "seoStrengths": [
+          "title",
+          "meta_description",
+          "internal_links"
+        ],
+        "geoStrengths": [
+          "summary",
+          "how-to",
+          "source",
+          "author"
+        ],
+        "funnelSignals": [
+          "CTA",
+          "newsletter_or_waitlist",
+          "affiliate"
+        ],
+        "observedAdvantages": [
+          "Clear product/listing structure",
+          "Visible pricing or monetization signal",
+          "FAQ supports answerability",
+          "Strong conversion CTA"
+        ],
+        "observedWeaknesses": [],
+        "enheDifferentiationAngles": [
+          "Use focused product bundles instead of broad directory positioning.",
+          "Package agent workflows as concrete ENHE validation offers.",
+          "Differentiate AI video workflows with productized delivery and bilingual SEO/GEO pages.",
+          "Match competitor answerability with stronger source, FAQ, how-to, and update-date blocks."
+        ],
+        "warnings": [
+          {
+            "code": "competitor_page_unavailable",
+            "severity": "warning",
+            "source": "market_research",
+            "message": "Public competitor page https://theresanaiforthat.com/pricing could not be read; continuing without it. HTTP 403"
+          }
+        ]
+      },
+      {
+        "competitorId": "toolify",
+        "name": "Toolify",
+        "url": "https://www.toolify.ai",
+        "category": "ai_tool_directory",
+        "pagesAudited": 1,
+        "averageScore": 100,
+        "positioningSummary": "directory, workflow, prompt, developer, creator, business",
+        "productTypes": [
+          "AI Agent",
+          "AI Video",
+          "Prompt Kit",
+          "Workflow Pack",
+          "Local AI Tool",
+          "GEO Tool",
+          "Marketplace Listing",
+          "Tutorial Pack"
+        ],
+        "pricingSignals": [
+          "pricing",
+          "pro",
+          "subscription"
+        ],
+        "seoStrengths": [
+          "title",
+          "meta_description",
+          "h1",
+          "internal_links"
+        ],
+        "geoStrengths": [
+          "how-to",
+          "source",
+          "date"
+        ],
+        "funnelSignals": [
+          "CTA",
+          "affiliate"
+        ],
+        "observedAdvantages": [
+          "Clear product/listing structure",
+          "Visible pricing or monetization signal",
+          "Strong conversion CTA"
+        ],
+        "observedWeaknesses": [],
+        "enheDifferentiationAngles": [
+          "Use focused product bundles instead of broad directory positioning.",
+          "Package agent workflows as concrete ENHE validation offers.",
+          "Differentiate AI video workflows with productized delivery and bilingual SEO/GEO pages.",
+          "Match competitor answerability with stronger source, FAQ, how-to, and update-date blocks."
+        ],
+        "warnings": [
+          {
+            "code": "competitor_page_unavailable",
+            "severity": "warning",
+            "source": "market_research",
+            "message": "Public competitor page https://www.toolify.ai/category could not be read; continuing without it. HTTP 403"
+          }
+        ]
+      }
+    ],
+    "categoryInsights": [
+      "ai_tool_directory: 3 observation targets."
+    ],
+    "pricingInsights": [
+      "Observed pricing terms: pro, pricing, price, paid, subscription, one-time, lifetime, license.",
+      "First revenue is not proven; prefer validation pricing, waitlist, presale, or manual payment tests."
+    ],
+    "seoInsights": [
+      "Observed SEO page structure signals: title, meta_description, h1, internal_links."
+    ],
+    "geoInsights": [
+      "Observed GEO answerability signals: how-to, source, summary, author, date."
+    ],
+    "productGapInsights": [
+      "Validate AI Prompt Kit differentiation: priority=72, action=validate_first",
+      "Validate SEO/GEO 自动化内容集群 differentiation: priority=68, action=validate_first",
+      "Validate AI Agent 工作流模板包 differentiation: priority=67, action=validate_first",
+      "Validate AI 视频工作流包 differentiation: priority=63, action=improve_existing_product",
+      "Create competitor-informed SEO/GEO comparison content: priority=61, action=create_content_first"
+    ],
+    "differentiationOpportunities": [
+      {
+        "id": "competitor-product-gap-4",
+        "title": "Validate AI Prompt Kit differentiation",
+        "description": "Use existing ENHE product readiness to validate a differentiated AI Prompt Kit offer against observed competitor positioning.",
+        "relatedCompetitors": [
+          "Futurepedia",
+          "There's An AI For That",
+          "Toolify"
+        ],
+        "relatedMarketDirections": [
+          "AI Prompt Kit"
+        ],
+        "opportunityType": "product_gap",
+        "enheFitScore": 24,
+        "difficultyScore": 3,
+        "riskScore": 4,
+        "suggestedCodexTasks": [
+          "Draft a one-page validation brief for AI Prompt Kit.",
+          "Create a differentiated landing page outline for AI Prompt Kit."
+        ],
+        "risks": [
+          "Competitor signals do not prove demand, traffic, or revenue."
+        ],
+        "priorityScore": 72,
+        "recommendedAction": "validate_first"
+      },
+      {
+        "id": "competitor-product-gap-3",
+        "title": "Validate SEO/GEO 自动化内容集群 differentiation",
+        "description": "Use existing ENHE product readiness to validate a differentiated SEO/GEO 自动化内容集群 offer against observed competitor positioning.",
+        "relatedCompetitors": [
+          "Futurepedia",
+          "There's An AI For That",
+          "Toolify"
+        ],
+        "relatedMarketDirections": [
+          "SEO/GEO 自动化内容集群"
+        ],
+        "opportunityType": "product_gap",
+        "enheFitScore": 22,
+        "difficultyScore": 3,
+        "riskScore": 6,
+        "suggestedCodexTasks": [
+          "Draft a one-page validation brief for SEO/GEO 自动化内容集群.",
+          "Create a differentiated landing page outline for SEO/GEO 自动化内容集群."
+        ],
+        "risks": [
+          "Competitor signals do not prove demand, traffic, or revenue."
+        ],
+        "priorityScore": 68,
+        "recommendedAction": "validate_first"
+      },
+      {
+        "id": "competitor-product-gap-1",
+        "title": "Validate AI Agent 工作流模板包 differentiation",
+        "description": "Use existing ENHE product readiness to validate a differentiated AI Agent 工作流模板包 offer against observed competitor positioning.",
+        "relatedCompetitors": [
+          "Futurepedia",
+          "There's An AI For That",
+          "Toolify"
+        ],
+        "relatedMarketDirections": [
+          "AI Agent 工作流模板包"
+        ],
+        "opportunityType": "product_gap",
+        "enheFitScore": 24,
+        "difficultyScore": 7,
+        "riskScore": 5,
+        "suggestedCodexTasks": [
+          "Draft a one-page validation brief for AI Agent 工作流模板包.",
+          "Create a differentiated landing page outline for AI Agent 工作流模板包."
+        ],
+        "risks": [
+          "Competitor signals do not prove demand, traffic, or revenue."
+        ],
+        "priorityScore": 67,
+        "recommendedAction": "validate_first"
+      },
+      {
+        "id": "competitor-product-gap-2",
+        "title": "Validate AI 视频工作流包 differentiation",
+        "description": "Use existing ENHE product readiness to validate a differentiated AI 视频工作流包 offer against observed competitor positioning.",
+        "relatedCompetitors": [
+          "Futurepedia",
+          "There's An AI For That",
+          "Toolify"
+        ],
+        "relatedMarketDirections": [
+          "AI 视频工作流包"
+        ],
+        "opportunityType": "product_gap",
+        "enheFitScore": 17,
+        "difficultyScore": 5,
+        "riskScore": 4,
+        "suggestedCodexTasks": [
+          "Draft a one-page validation brief for AI 视频工作流包.",
+          "Create a differentiated landing page outline for AI 视频工作流包."
+        ],
+        "risks": [
+          "Competitor signals do not prove demand, traffic, or revenue."
+        ],
+        "priorityScore": 63,
+        "recommendedAction": "improve_existing_product"
+      },
+      {
+        "id": "competitor-content-gap-answerability",
+        "title": "Create competitor-informed SEO/GEO comparison content",
+        "description": "Use observed FAQ, how-to, source/date, and author patterns to build ENHE pages that answer AI search questions more clearly.",
+        "relatedCompetitors": [
+          "Futurepedia",
+          "There's An AI For That",
+          "Toolify"
+        ],
+        "relatedMarketDirections": [],
+        "opportunityType": "content_gap",
+        "enheFitScore": 21,
+        "difficultyScore": 3,
+        "riskScore": 4,
+        "suggestedCodexTasks": [
+          "Create a comparison content brief for the top competitor category.",
+          "Add FAQ, how-to, source/date, and author blocks to the validation page."
+        ],
+        "risks": [
+          "Content structure improves discoverability but does not prove purchase intent by itself."
+        ],
+        "priorityScore": 61,
+        "recommendedAction": "create_content_first"
+      },
+      {
+        "id": "competitor-pricing-gap-validation-offer",
+        "title": "Test a low-friction ENHE validation offer",
+        "description": "Because first revenue is not yet proven, use competitor pricing signals to test a low-cost validation offer instead of a large build.",
+        "relatedCompetitors": [
+          "Futurepedia",
+          "There's An AI For That",
+          "Toolify"
+        ],
+        "relatedMarketDirections": [],
+        "opportunityType": "pricing_gap",
+        "enheFitScore": 20,
+        "difficultyScore": 2,
+        "riskScore": 4,
+        "suggestedCodexTasks": [
+          "Draft a validation price ladder and checkout path checklist.",
+          "Define success criteria for first paid intent: click, inquiry, presale, or paid order."
+        ],
+        "risks": [
+          "Competitor pricing visibility does not reveal sales volume or revenue."
+        ],
+        "priorityScore": 57,
+        "recommendedAction": "create_content_first"
+      }
+    ],
+    "risks": [
+      "Competitor evidence does not fabricate competitor sales, traffic, or revenue.",
+      "Competitor seeds are observation targets only and do not represent a complete competitor list.",
+      "Public competitor page https://www.futurepedia.io/pricing could not be read; continuing without it. HTTP 404",
+      "Public competitor page https://theresanaiforthat.com/pricing could not be read; continuing without it. HTTP 403",
+      "Public competitor page https://www.toolify.ai/category could not be read; continuing without it. HTTP 403",
+      "Public competitor URL audit was enabled, but successful page coverage is too thin for complete competitor confidence."
+    ],
+    "opportunities": [
+      "Use existing ENHE product readiness to validate a differentiated AI Prompt Kit offer against observed competitor positioning.",
+      "Use existing ENHE product readiness to validate a differentiated SEO/GEO 自动化内容集群 offer against observed competitor positioning.",
+      "Use existing ENHE product readiness to validate a differentiated AI Agent 工作流模板包 offer against observed competitor positioning.",
+      "Use existing ENHE product readiness to validate a differentiated AI 视频工作流包 offer against observed competitor positioning.",
+      "Use observed FAQ, how-to, source/date, and author patterns to build ENHE pages that answer AI search questions more clearly."
+    ],
+    "actionItems": [
+      {
+        "id": "competitor-action-1",
+        "title": "Validate AI Prompt Kit differentiation",
+        "description": "Draft a one-page validation brief for AI Prompt Kit. Create a differentiated landing page outline for AI Prompt Kit.",
+        "priority": "high",
+        "owner": "codex",
+        "relatedSection": "competitor",
+        "evidenceRefs": [
+          "Futurepedia",
+          "There's An AI For That",
+          "Toolify"
+        ],
+        "status": "open"
+      },
+      {
+        "id": "competitor-action-2",
+        "title": "Validate SEO/GEO 自动化内容集群 differentiation",
+        "description": "Draft a one-page validation brief for SEO/GEO 自动化内容集群. Create a differentiated landing page outline for SEO/GEO 自动化内容集群.",
+        "priority": "high",
+        "owner": "codex",
+        "relatedSection": "competitor",
+        "evidenceRefs": [
+          "Futurepedia",
+          "There's An AI For That",
+          "Toolify"
+        ],
+        "status": "open"
+      },
+      {
+        "id": "competitor-action-3",
+        "title": "Validate AI Agent 工作流模板包 differentiation",
+        "description": "Draft a one-page validation brief for AI Agent 工作流模板包. Create a differentiated landing page outline for AI Agent 工作流模板包.",
+        "priority": "high",
+        "owner": "codex",
+        "relatedSection": "competitor",
+        "evidenceRefs": [
+          "Futurepedia",
+          "There's An AI For That",
+          "Toolify"
+        ],
+        "status": "open"
+      },
+      {
+        "id": "competitor-action-4",
+        "title": "Validate AI 视频工作流包 differentiation",
+        "description": "Draft a one-page validation brief for AI 视频工作流包. Create a differentiated landing page outline for AI 视频工作流包.",
+        "priority": "medium",
+        "owner": "codex",
+        "relatedSection": "competitor",
+        "evidenceRefs": [
+          "Futurepedia",
+          "There's An AI For That",
+          "Toolify"
+        ],
+        "status": "open"
+      },
+      {
+        "id": "competitor-action-5",
+        "title": "Create competitor-informed SEO/GEO comparison content",
+        "description": "Create a comparison content brief for the top competitor category. Add FAQ, how-to, source/date, and author blocks to the validation page.",
+        "priority": "medium",
+        "owner": "codex",
+        "relatedSection": "competitor",
+        "evidenceRefs": [
+          "Futurepedia",
+          "There's An AI For That",
+          "Toolify"
+        ],
+        "status": "open"
+      }
+    ],
+    "warnings": [
+      {
+        "code": "default_competitor_seed",
+        "severity": "warning",
+        "source": "manual_input",
+        "message": "Competitor seeds are observation targets only and do not represent a complete competitor list."
+      },
+      {
+        "code": "competitor_page_unavailable",
+        "severity": "warning",
+        "source": "market_research",
+        "message": "Public competitor page https://www.futurepedia.io/pricing could not be read; continuing without it. HTTP 404"
+      },
+      {
+        "code": "competitor_page_unavailable",
+        "severity": "warning",
+        "source": "market_research",
+        "message": "Public competitor page https://theresanaiforthat.com/pricing could not be read; continuing without it. HTTP 403"
+      },
+      {
+        "code": "competitor_page_unavailable",
+        "severity": "warning",
+        "source": "market_research",
+        "message": "Public competitor page https://www.toolify.ai/category could not be read; continuing without it. HTTP 403"
+      },
+      {
+        "code": "competitor_public_audit_thin",
+        "severity": "warning",
+        "source": "market_research",
+        "message": "Public competitor URL audit was enabled, but successful page coverage is too thin for complete competitor confidence."
+      }
+    ],
+    "dataSourceSummary": {
+      "seedSources": [
+        "manual_input"
+      ],
+      "defaultSeedsCount": 9,
+      "manualSeedsCount": 9,
+      "networkSourcesEnabled": true,
+      "pagesAttempted": 6,
+      "pagesSucceeded": 3,
+      "pagesFailed": 3,
+      "warnings": [
+        "Competitor seeds are observation targets only and do not represent a complete competitor list.",
+        "Public competitor page https://www.futurepedia.io/pricing could not be read; continuing without it. HTTP 404",
+        "Public competitor page https://theresanaiforthat.com/pricing could not be read; continuing without it. HTTP 403",
+        "Public competitor page https://www.toolify.ai/category could not be read; continuing without it. HTTP 403",
+        "Public competitor URL audit was enabled, but successful page coverage is too thin for complete competitor confidence."
+      ]
+    }
+  },
+  "warnings": [
+    {
+      "code": "default_competitor_seed",
+      "severity": "warning",
+      "message": "Competitor seeds are observation targets only and do not represent a complete competitor list.",
+      "source": "manual_input"
+    },
+    {
+      "code": "competitor_page_unavailable",
+      "severity": "warning",
+      "message": "Public competitor page https://www.futurepedia.io/pricing could not be read; continuing without it. HTTP 404",
+      "source": "market_research"
+    },
+    {
+      "code": "competitor_page_unavailable",
+      "severity": "warning",
+      "message": "Public competitor page https://theresanaiforthat.com/pricing could not be read; continuing without it. HTTP 403",
+      "source": "market_research"
+    },
+    {
+      "code": "competitor_page_unavailable",
+      "severity": "warning",
+      "message": "Public competitor page https://www.toolify.ai/category could not be read; continuing without it. HTTP 403",
+      "source": "market_research"
+    },
+    {
+      "code": "competitor_public_audit_thin",
+      "severity": "warning",
+      "message": "Public competitor URL audit was enabled, but successful page coverage is too thin for complete competitor confidence.",
+      "source": "market_research"
+    }
+  ],
+  "actionItems": [
+    {
+      "id": "competitor-action-1",
+      "title": "Validate AI Prompt Kit differentiation",
+      "description": "Draft a one-page validation brief for AI Prompt Kit. Create a differentiated landing page outline for AI Prompt Kit.",
+      "priority": "high",
+      "owner": "codex",
+      "relatedSection": "competitor",
+      "evidenceRefs": [
+        "Futurepedia",
+        "There's An AI For That",
+        "Toolify"
+      ],
+      "status": "open"
+    },
+    {
+      "id": "competitor-action-2",
+      "title": "Validate SEO/GEO 自动化内容集群 differentiation",
+      "description": "Draft a one-page validation brief for SEO/GEO 自动化内容集群. Create a differentiated landing page outline for SEO/GEO 自动化内容集群.",
+      "priority": "high",
+      "owner": "codex",
+      "relatedSection": "competitor",
+      "evidenceRefs": [
+        "Futurepedia",
+        "There's An AI For That",
+        "Toolify"
+      ],
+      "status": "open"
+    },
+    {
+      "id": "competitor-action-3",
+      "title": "Validate AI Agent 工作流模板包 differentiation",
+      "description": "Draft a one-page validation brief for AI Agent 工作流模板包. Create a differentiated landing page outline for AI Agent 工作流模板包.",
+      "priority": "high",
+      "owner": "codex",
+      "relatedSection": "competitor",
+      "evidenceRefs": [
+        "Futurepedia",
+        "There's An AI For That",
+        "Toolify"
+      ],
+      "status": "open"
+    },
+    {
+      "id": "competitor-action-4",
+      "title": "Validate AI 视频工作流包 differentiation",
+      "description": "Draft a one-page validation brief for AI 视频工作流包. Create a differentiated landing page outline for AI 视频工作流包.",
+      "priority": "medium",
+      "owner": "codex",
+      "relatedSection": "competitor",
+      "evidenceRefs": [
+        "Futurepedia",
+        "There's An AI For That",
+        "Toolify"
+      ],
+      "status": "open"
+    },
+    {
+      "id": "competitor-action-5",
+      "title": "Create competitor-informed SEO/GEO comparison content",
+      "description": "Create a comparison content brief for the top competitor category. Add FAQ, how-to, source/date, and author blocks to the validation page.",
+      "priority": "medium",
+      "owner": "codex",
+      "relatedSection": "competitor",
+      "evidenceRefs": [
+        "Futurepedia",
+        "There's An AI For That",
+        "Toolify"
+      ],
+      "status": "open"
+    }
+  ]
+}

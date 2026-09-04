@@ -1,0 +1,16 @@
+<svg width="160" height="160" viewBox="0 0 160 160" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <g >
+    <path d="M34 52L50 34H90V52H34Z" fill="#f05a35"/>
+    <path d="M34 72H82V88H34V72Z" fill="#f05a35"/>
+    <path d="M34 108L50 126H90V108H34Z" fill="#f05a35"/>
+    <path d="M90 72H112V34H128V126H112V88H90V72Z" fill="#f05a35"/>
+    <path d="M34 52L50 34H90V52H34Z" stroke="#ff8a6a" stroke-width="2" stroke-linejoin="round"/>
+    <path d="M34 72H82V88H34V72Z" stroke="#ff8a6a" stroke-width="2" stroke-linejoin="round"/>
+    <path d="M34 108L50 126H90V108H34Z" stroke="#ff8a6a" stroke-width="2" stroke-linejoin="round"/>
+    <path d="M90 72H112V34H128V126H112V88H90V72Z" stroke="#ff8a6a" stroke-width="2" stroke-linejoin="round"/>
+  </g>
+  <path d="M44 49L53 40H85" stroke="#ff8a6a" stroke-opacity="0.7" stroke-width="1.8" stroke-linecap="round"/>
+  <path d="M43 77H76" stroke="#ff8a6a" stroke-opacity="0.52" stroke-width="1.8" stroke-linecap="round"/>
+  <path d="M44 113H85" stroke="#ff8a6a" stroke-opacity="0.5" stroke-width="1.8" stroke-linecap="round"/>
+  <path d="M114 40H123V118" stroke="#ff8a6a" stroke-opacity="0.42" stroke-width="1.8" stroke-linecap="round"/>
+</svg>

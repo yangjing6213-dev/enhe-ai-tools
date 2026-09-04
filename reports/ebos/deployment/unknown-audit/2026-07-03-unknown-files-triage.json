@@ -1,0 +1,159 @@
+{
+  "reportType": "unknown_files_triage",
+  "targetDate": "2026-07-03",
+  "generatedAt": "2026-07-07T14:58:31.157Z",
+  "unknownFileCount": 116,
+  "categories": [
+    {
+      "category": "risky unknown",
+      "fileCount": 53,
+      "representativeFiles": [
+        ".superpowers/",
+        "prisma/migrations/20260624013000_add_tool_video_fields/",
+        "prisma/migrations/20260624141000_add_baidu_push_queue/",
+        "prisma/migrations/20260630120000_add_ai_trend_briefing_video_fields/",
+        "prisma/seed-lumios.ts",
+        "remotion/",
+        "scripts/audit-public-a11y.mjs",
+        "scripts/audit-public-performance.mjs",
+        "scripts/generate-ai-trend-briefing-video.test.ts",
+        "scripts/generate-ai-trend-briefing-video.ts",
+        "scripts/generate-enhe-seo-geo-20260626-afternoon.mjs",
+        "scripts/generate-enhe-seo-geo-20260626-evening.mjs",
+        "scripts/generate-enhe-seo-geo-20260626.mjs",
+        "scripts/generate-enhe-seo-geo-20260628.mjs",
+        "scripts/generate-enhe-seo-geo-20260629.mjs",
+        "scripts/generate-enhe-seo-geo-20260630.mjs",
+        "scripts/generate-enhe-seo-geo-20260701.mjs",
+        "scripts/generate-enhe-seo-geo-20260703.mjs",
+        "scripts/generate-enhe-seo-geo-20260704.mjs",
+        "scripts/generate-enhe-seo-geo-20260705.mjs",
+        "scripts/generate-enhe-seo-geo-20260706.mjs",
+        "scripts/generate-enhe-seo-geo-20260707.mjs",
+        "scripts/generate-lumi-new-cover.ts",
+        "scripts/generate-lumios-assets.ts",
+        "scripts/promotion-check-publish-capability.ts"
+      ],
+      "riskLevel": "high",
+      "requiresUserConfirmation": true
+    },
+    {
+      "category": "product data",
+      "fileCount": 3,
+      "representativeFiles": [
+        "content/",
+        "public/okf/pricing/",
+        "public/okf/tutorials/"
+      ],
+      "riskLevel": "medium",
+      "requiresUserConfirmation": false
+    },
+    {
+      "category": "docs",
+      "fileCount": 25,
+      "representativeFiles": [
+        "docs/design/enhe-ai-wordmark-preview.html",
+        "docs/design/enhe-ai-wordmark-preview.png",
+        "docs/design/enhe-auros-spec-faithful-preview-v3-hero.png",
+        "docs/design/enhe-auros-spec-faithful-preview-v3.html",
+        "docs/design/enhe-auros-spec-faithful-preview-v3.png",
+        "docs/design/enhe-auros-ui-redesign-preview-v2-full.png",
+        "docs/design/enhe-auros-ui-redesign-preview-v2-hero.png",
+        "docs/design/enhe-auros-ui-redesign-preview-v2.html",
+        "docs/design/enhe-auros-ui-redesign-preview-v2.png",
+        "docs/design/enhe-auros-ui-redesign-preview.html",
+        "docs/design/enhe-auros-ui-redesign-preview.png",
+        "docs/design/enhe-cinematic-home-preview.html",
+        "docs/design/enhe-cinematic-home-preview.png",
+        "docs/design/enhe-current-layout-tone-font-preview-v2.png",
+        "docs/design/enhe-current-layout-tone-font-preview.png",
+        "docs/design/refero-runway-auros-contact-sheet.jpg",
+        "docs/design/refero-runway-auros/",
+        "docs/design/ui-audit-2026-06-23/",
+        "docs/design/ui-fix-2026-06-23/",
+        "docs/design/ux-audit-2026-06-26/",
+        "docs/promotion-manager/",
+        "docs/seo-submit/",
+        "docs/superpowers/plans/2026-06-18-ai-news-translation-and-account-services-implementation.md",
+        "docs/superpowers/plans/2026-06-30-ai-trends-video-automation.md",
+        "docs/superpowers/plans/2026-07-07-enhe-promotion-manager.md"
+      ],
+      "riskLevel": "medium",
+      "requiresUserConfirmation": false
+    },
+    {
+      "category": "generated/cache",
+      "fileCount": 24,
+      "representativeFiles": [
+        "logs/",
+        "tmp-ebos-optimized-redeploy-test/",
+        "tmp-enhe-deploy-0e20975.bundle",
+        "tmp-enhe-deploy-0f769b2.bundle",
+        "tmp-enhe-deploy-4ab8777.bundle",
+        "tmp-enhe-deploy-4da3069.bundle",
+        "tmp-enhe-deploy-4f5d7a3.bundle",
+        "tmp-enhe-deploy-5436561.bundle",
+        "tmp-enhe-deploy-56e7f48.bundle",
+        "tmp-enhe-deploy-5c62a82.bundle",
+        "tmp-enhe-deploy-5fbd00e.bundle",
+        "tmp-enhe-deploy-694ff70.bundle",
+        "tmp-enhe-deploy-6caa950.bundle",
+        "tmp-enhe-deploy-74f372a.bundle",
+        "tmp-enhe-deploy-7647bc5.bundle",
+        "tmp-enhe-deploy-77f6307.bundle",
+        "tmp-enhe-deploy-822ec25.bundle",
+        "tmp-enhe-deploy-82f4264.bundle",
+        "tmp-enhe-deploy-8a367f1.bundle",
+        "tmp-enhe-deploy-8d2dd4b.bundle",
+        "tmp-enhe-deploy-9df36df.bundle",
+        "tmp-enhe-deploy-d18ec5e.bundle",
+        "tmp-enhe-deploy-da11a54.bundle",
+        "tmp-enhe-deploy.bundle"
+      ],
+      "riskLevel": "low",
+      "requiresUserConfirmation": false
+    },
+    {
+      "category": "assets",
+      "fileCount": 3,
+      "representativeFiles": [
+        "public/images/ai-news/",
+        "public/images/products/enhe-visuals/lumi-new/",
+        "public/images/products/enhe-visuals/lumios-personal-ai-companion/"
+      ],
+      "riskLevel": "medium",
+      "requiresUserConfirmation": false
+    },
+    {
+      "category": "reports",
+      "fileCount": 8,
+      "representativeFiles": [
+        "reports/ebos/deployment/2026-07-03-ebos-safe-batch-commit.json",
+        "reports/ebos/deployment/2026-07-03-ebos-safe-batch-commit.md",
+        "reports/ebos/deployment/2026-07-03-package-prisma-handling-plan.json",
+        "reports/ebos/deployment/2026-07-03-package-prisma-handling-plan.md",
+        "reports/ebos/deployment/2026-07-03-package-prisma-separate-audit.json",
+        "reports/ebos/deployment/2026-07-03-package-prisma-separate-audit.md",
+        "reports/ebos/deployment/build-diagnostics/",
+        "reports/promotion-manager/"
+      ],
+      "riskLevel": "medium",
+      "requiresUserConfirmation": false
+    }
+  ],
+  "riskyUnknownCount": 53,
+  "unknownFilesMayBeCommitted": false,
+  "deletionExecuted": false,
+  "gitCommitExecuted": false,
+  "blockers": [
+    "Risky unknown files require user confirmation before any commit or deletion."
+  ],
+  "warnings": [
+    "Generated/cache files should be excluded from commit; this phase did not delete them."
+  ],
+  "nextActions": [
+    "Confirm ownership of risky unknown files.",
+    "Exclude generated/cache files from commits.",
+    "Create separate cleanup/commit batches only after approval."
+  ]
+}

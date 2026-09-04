@@ -1,0 +1,8 @@
+<svg width="240" height="240" viewBox="0 0 240 240" xmlns="http://www.w3.org/2000/svg">
+  <rect width="240" height="240" fill="#fff"/>
+  <rect x="24" y="24" width="64" height="64" fill="#16a34a"/>
+  <rect x="152" y="24" width="64" height="64" fill="#16a34a"/>
+  <rect x="24" y="152" width="64" height="64" fill="#16a34a"/>
+  <path d="M112 48h24v24h-24zM104 104h32v32h-32zM152 104h24v72h-24zM104 160h32v36h-32zM184 184h16v16h-16z" fill="#111827"/>
+  <text x="120" y="226" text-anchor="middle" font-size="14" fill="#111827">Wechat QR Placeholder</text>
+</svg>

@@ -1,0 +1,272 @@
+{
+  "reportType": "validation_capture_report",
+  "targetDate": "2026-07-03",
+  "generatedAt": "2026-07-04T02:11:24.409Z",
+  "periodStart": "2026-06-29",
+  "periodEnd": "2026-07-05",
+  "inputPath": "C:/Users/HU/Documents/New project 2/reports/ebos/validation/inputs/2026-07-03-validation-input.json",
+  "analyticsSummary": {
+    "analyticsAvailable": true,
+    "eventsDetected": 60,
+    "pageViewsDetected": 0,
+    "ctaClicksDetected": 0,
+    "eventsByName": {
+      "visit_home": 29,
+      "seo_landing_view": 31
+    },
+    "eventsByPath": {},
+    "warnings": []
+  },
+  "orderSummary": {
+    "ordersAvailable": true,
+    "totalOrders": 0,
+    "paidOrders": 0,
+    "revenue": 0,
+    "refundedAmount": 0,
+    "refundCount": 0,
+    "ordersByProductOrSlug": {},
+    "warnings": [
+      {
+        "code": "currency_inferred",
+        "severity": "warning",
+        "message": "Currency inferred as CNY because no explicit currency field was detected.",
+        "source": "internal_database"
+      }
+    ]
+  },
+  "autofillSummary": {
+    "candidateChanges": 0,
+    "applicableChanges": 0,
+    "skippedChanges": 0,
+    "appliedChanges": 0
+  },
+  "manualDataSlots": [
+    {
+      "planId": "validation-product-1-faceswap-studio-ai",
+      "field": "listingViews",
+      "label": "外部平台浏览量",
+      "description": "闲鱼、淘宝、Whop、小红书或微信等外部渠道的真实浏览数。",
+      "sourceHint": "闲鱼/淘宝/Whop/小红书/微信后台或页面可见统计",
+      "example": 0,
+      "requiredForDecision": false
+    },
+    {
+      "planId": "validation-product-1-faceswap-studio-ai",
+      "field": "messages",
+      "label": "外部平台咨询数",
+      "description": "外部渠道真实私信、评论咨询或购买前问题数量。",
+      "sourceHint": "平台私信、评论、微信群、微信私聊",
+      "example": 0,
+      "requiredForDecision": true
+    },
+    {
+      "planId": "validation-product-1-faceswap-studio-ai",
+      "field": "favorites",
+      "label": "外部平台收藏/想要数",
+      "description": "外部平台真实收藏、想要或类似意向动作数量。",
+      "sourceHint": "外部平台收藏/想要/点赞等公开或后台指标",
+      "example": 0,
+      "requiredForDecision": false
+    },
+    {
+      "planId": "validation-product-1-faceswap-studio-ai",
+      "field": "manualOutreachCount",
+      "label": "手动触达数量",
+      "description": "用户手动触达的人数或群数。",
+      "sourceHint": "用户手动记录",
+      "example": 0,
+      "requiredForDecision": false
+    },
+    {
+      "planId": "validation-product-1-faceswap-studio-ai",
+      "field": "positiveReplies",
+      "label": "正向回复数量",
+      "description": "明确表达兴趣、想看目录、想确认价格或交付的真实回复数。",
+      "sourceHint": "用户手动记录",
+      "example": 0,
+      "requiredForDecision": false
+    },
+    {
+      "planId": "validation-product-1-faceswap-studio-ai",
+      "field": "userFeedback",
+      "label": "用户真实反馈",
+      "description": "真实用户原话摘要，不能由 Codex 编造。",
+      "sourceHint": "用户真实聊天或评论摘要",
+      "example": [
+        "想先看目录再决定"
+      ],
+      "requiredForDecision": true
+    },
+    {
+      "planId": "validation-product-1-faceswap-studio-ai",
+      "field": "channelResults",
+      "label": "渠道结果明细",
+      "description": "每个外部渠道的链接、指标和备注。",
+      "sourceHint": "用户手动整理的渠道记录",
+      "example": [
+        {
+          "channel": "xiaohongshu",
+          "metricLabel": "messages",
+          "metricValue": 0,
+          "notes": ""
+        }
+      ],
+      "requiredForDecision": true
+    },
+    {
+      "planId": "validation-product-2-local-ai-video-studio-for-creator-workflows",
+      "field": "listingViews",
+      "label": "外部平台浏览量",
+      "description": "闲鱼、淘宝、Whop、小红书或微信等外部渠道的真实浏览数。",
+      "sourceHint": "闲鱼/淘宝/Whop/小红书/微信后台或页面可见统计",
+      "example": 0,
+      "requiredForDecision": false
+    },
+    {
+      "planId": "validation-product-2-local-ai-video-studio-for-creator-workflows",
+      "field": "messages",
+      "label": "外部平台咨询数",
+      "description": "外部渠道真实私信、评论咨询或购买前问题数量。",
+      "sourceHint": "平台私信、评论、微信群、微信私聊",
+      "example": 0,
+      "requiredForDecision": true
+    },
+    {
+      "planId": "validation-product-2-local-ai-video-studio-for-creator-workflows",
+      "field": "favorites",
+      "label": "外部平台收藏/想要数",
+      "description": "外部平台真实收藏、想要或类似意向动作数量。",
+      "sourceHint": "外部平台收藏/想要/点赞等公开或后台指标",
+      "example": 0,
+      "requiredForDecision": false
+    },
+    {
+      "planId": "validation-product-2-local-ai-video-studio-for-creator-workflows",
+      "field": "manualOutreachCount",
+      "label": "手动触达数量",
+      "description": "用户手动触达的人数或群数。",
+      "sourceHint": "用户手动记录",
+      "example": 0,
+      "requiredForDecision": false
+    },
+    {
+      "planId": "validation-product-2-local-ai-video-studio-for-creator-workflows",
+      "field": "positiveReplies",
+      "label": "正向回复数量",
+      "description": "明确表达兴趣、想看目录、想确认价格或交付的真实回复数。",
+      "sourceHint": "用户手动记录",
+      "example": 0,
+      "requiredForDecision": false
+    },
+    {
+      "planId": "validation-product-2-local-ai-video-studio-for-creator-workflows",
+      "field": "userFeedback",
+      "label": "用户真实反馈",
+      "description": "真实用户原话摘要，不能由 Codex 编造。",
+      "sourceHint": "用户真实聊天或评论摘要",
+      "example": [
+        "想先看目录再决定"
+      ],
+      "requiredForDecision": true
+    },
+    {
+      "planId": "validation-product-2-local-ai-video-studio-for-creator-workflows",
+      "field": "channelResults",
+      "label": "渠道结果明细",
+      "description": "每个外部渠道的链接、指标和备注。",
+      "sourceHint": "用户手动整理的渠道记录",
+      "example": [
+        {
+          "channel": "xiaohongshu",
+          "metricLabel": "messages",
+          "metricValue": 0,
+          "notes": ""
+        }
+      ],
+      "requiredForDecision": true
+    },
+    {
+      "planId": "validation-direction-3-ai-prompt-kit",
+      "field": "listingViews",
+      "label": "外部平台浏览量",
+      "description": "闲鱼、淘宝、Whop、小红书或微信等外部渠道的真实浏览数。",
+      "sourceHint": "闲鱼/淘宝/Whop/小红书/微信后台或页面可见统计",
+      "example": 0,
+      "requiredForDecision": false
+    },
+    {
+      "planId": "validation-direction-3-ai-prompt-kit",
+      "field": "messages",
+      "label": "外部平台咨询数",
+      "description": "外部渠道真实私信、评论咨询或购买前问题数量。",
+      "sourceHint": "平台私信、评论、微信群、微信私聊",
+      "example": 0,
+      "requiredForDecision": true
+    },
+    {
+      "planId": "validation-direction-3-ai-prompt-kit",
+      "field": "favorites",
+      "label": "外部平台收藏/想要数",
+      "description": "外部平台真实收藏、想要或类似意向动作数量。",
+      "sourceHint": "外部平台收藏/想要/点赞等公开或后台指标",
+      "example": 0,
+      "requiredForDecision": false
+    },
+    {
+      "planId": "validation-direction-3-ai-prompt-kit",
+      "field": "manualOutreachCount",
+      "label": "手动触达数量",
+      "description": "用户手动触达的人数或群数。",
+      "sourceHint": "用户手动记录",
+      "example": 0,
+      "requiredForDecision": false
+    },
+    {
+      "planId": "validation-direction-3-ai-prompt-kit",
+      "field": "positiveReplies",
+      "label": "正向回复数量",
+      "description": "明确表达兴趣、想看目录、想确认价格或交付的真实回复数。",
+      "sourceHint": "用户手动记录",
+      "example": 0,
+      "requiredForDecision": false
+    },
+    {
+      "planId": "validation-direction-3-ai-prompt-kit",
+      "field": "userFeedback",
+      "label": "用户真实反馈",
+      "description": "真实用户原话摘要，不能由 Codex 编造。",
+      "sourceHint": "用户真实聊天或评论摘要",
+      "example": [
+        "想先看目录再决定"
+      ],
+      "requiredForDecision": true
+    },
+    {
+      "planId": "validation-direction-3-ai-prompt-kit",
+      "field": "channelResults",
+      "label": "渠道结果明细",
+      "description": "每个外部渠道的链接、指标和备注。",
+      "sourceHint": "用户手动整理的渠道记录",
+      "example": [
+        {
+          "channel": "xiaohongshu",
+          "metricLabel": "messages",
+          "metricValue": 0,
+          "notes": ""
+        }
+      ],
+      "requiredForDecision": true
+    }
+  ],
+  "appliedChanges": [],
+  "skippedChanges": [],
+  "warnings": [
+    {
+      "code": "currency_inferred",
+      "severity": "warning",
+      "message": "Currency inferred as CNY because no explicit currency field was detected.",
+      "source": "internal_database"
+    }
+  ],
+  "backupPath": "C:/Users/HU/Documents/New project 2/reports/ebos/validation/backups/2026-07-03-validation-input.backup.2026-07-04T02-11-24-411Z.json"
+}

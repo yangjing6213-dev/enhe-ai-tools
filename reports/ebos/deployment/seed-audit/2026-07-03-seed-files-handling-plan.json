@@ -1,0 +1,19 @@
+{
+  "reportType": "seed_files_handling_plan",
+  "targetDate": "2026-07-03",
+  "generatedAt": "2026-07-07T14:58:31.157Z",
+  "decision": "quarantine_until_dedicated_seed_review",
+  "seedExecuted": false,
+  "productionSeedAllowed": false,
+  "actions": [
+    "Review seed diffs separately.",
+    "Do not run seed in production.",
+    "Require explicit approval before any seed commit."
+  ],
+  "forbiddenActions": [
+    "npm run prisma:seed",
+    "tsx prisma/seed.ts",
+    "git add prisma/seed.ts",
+    "git add prisma/seed-lumios.ts"
+  ]
+}

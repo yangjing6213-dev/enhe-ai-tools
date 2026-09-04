@@ -1,0 +1,18 @@
+{
+  "statusType": "production_deployment_execution_status",
+  "targetDate": "2026-07-03",
+  "updatedAt": "2026-07-05T00:54:29.665Z",
+  "deploymentStatus": "executing",
+  "approvedByUser": true,
+  "localCommandsRun": [],
+  "serverCommandsRun": [],
+  "dockerCommandsRun": [],
+  "verificationCommandsRun": [],
+  "postLaunchCheckStatus": "not_run",
+  "notes": [
+    "Approval phrase accepted from scripts/approve-ebos-deployment-execution.ts; status moved to approved_not_executed. Production is not deployed.",
+    "Production deployment execution entered executing state after exact second confirmation. Server/Docker/Nginx commands are still manual_required."
+  ],
+  "warnings": [],
+  "approvedAt": "2026-07-04T15:33:18.303Z"
+}

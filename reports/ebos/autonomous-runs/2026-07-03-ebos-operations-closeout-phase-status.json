@@ -1,0 +1,305 @@
+{
+  "reportType": "ebos_operations_closeout_phase_status",
+  "targetDate": "2026-07-03",
+  "generatedAt": "2026-07-08T00:50:00+08:00",
+  "phases": [
+    {
+      "phaseName": "Phase A: Unknown / Risky Files Final Triage",
+      "status": "passed",
+      "startedAt": "2026-07-08T00:50:00+08:00",
+      "finishedAt": "2026-07-08T00:50:00+08:00",
+      "commandsRun": [
+        "git status --short"
+      ],
+      "filesCreated": [
+        "reports/ebos/deployment/unknown-audit/2026-07-03-unknown-risky-final-triage.json",
+        "reports/ebos/deployment/unknown-audit/2026-07-03-unknown-risky-final-triage.md",
+        "reports/ebos/deployment/unknown-audit/2026-07-03-unknown-risky-final-handling-plan.json",
+        "reports/ebos/deployment/unknown-audit/2026-07-03-unknown-risky-final-handling-plan.md"
+      ],
+      "filesUpdated": [
+        "reports/ebos/autonomous-runs/2026-07-03-ebos-operations-closeout-phase-status.json",
+        "reports/ebos/autonomous-runs/2026-07-03-ebos-operations-closeout-phase-status.md"
+      ],
+      "safetyChecks": {
+        "gitAdd": false,
+        "gitCommit": false,
+        "gitPush": false,
+        "sourceModified": false,
+        "migration": false,
+        "seed": false,
+        "deployment": false,
+        "backfillApply": false
+      },
+      "qualityChecks": {},
+      "passedCriteria": [
+        "unknown/risky files classified",
+        "no git add/commit/push",
+        "no source modification"
+      ],
+      "failedCriteria": [],
+      "retryCount": 0,
+      "nextPhase": "Phase B",
+      "blockers": []
+    },
+    {
+      "phaseName": "Phase B: Report / Docs / Scripts Safe Commit Candidate Plan",
+      "status": "passed",
+      "startedAt": "2026-07-08T00:50:00+08:00",
+      "finishedAt": "2026-07-08T00:50:00+08:00",
+      "commandsRun": [],
+      "filesCreated": [
+        "reports/ebos/deployment/2026-07-03-ebos-operations-closeout-safe-commit-plan.json",
+        "reports/ebos/deployment/2026-07-03-ebos-operations-closeout-safe-commit-plan.md"
+      ],
+      "filesUpdated": [
+        "reports/ebos/autonomous-runs/2026-07-03-ebos-operations-closeout-phase-status.json",
+        "reports/ebos/autonomous-runs/2026-07-03-ebos-operations-closeout-phase-status.md"
+      ],
+      "safetyChecks": {
+        "forbiddenApprovedCount": 0,
+        "gitAdd": false,
+        "gitCommit": false,
+        "gitPush": false
+      },
+      "qualityChecks": {},
+      "passedCriteria": [
+        "approvedFilesCount > 0",
+        "forbidden approved count is 0",
+        "no commit performed"
+      ],
+      "failedCriteria": [],
+      "retryCount": 0,
+      "nextPhase": "Phase C",
+      "blockers": []
+    },
+    {
+      "phaseName": "Phase C: EBOS Operations Readiness Gate",
+      "status": "passed",
+      "startedAt": "2026-07-08T00:50:00+08:00",
+      "finishedAt": "2026-07-08T00:50:00+08:00",
+      "commandsRun": [],
+      "filesCreated": [
+        "reports/ebos/final/2026-07-03-ebos-operations-readiness-gate.json",
+        "reports/ebos/final/2026-07-03-ebos-operations-readiness-gate.md"
+      ],
+      "filesUpdated": [
+        "reports/ebos/autonomous-runs/2026-07-03-ebos-operations-closeout-phase-status.json",
+        "reports/ebos/autonomous-runs/2026-07-03-ebos-operations-closeout-phase-status.md"
+      ],
+      "safetyChecks": {
+        "gitAdd": false,
+        "gitCommit": false,
+        "gitPush": false,
+        "migration": false,
+        "seed": false,
+        "deployment": false,
+        "backfillApply": false,
+        "fakeDataCreated": false
+      },
+      "qualityChecks": {},
+      "passedCriteria": [
+        "operationsReady=true",
+        "deploymentStatus verified",
+        "postLaunchCheckStatus passed",
+        "quarantines established"
+      ],
+      "failedCriteria": [],
+      "retryCount": 0,
+      "nextPhase": "Phase D",
+      "blockers": []
+    },
+    {
+      "phaseName": "Phase D: EBOS Weekly Operating Cycle Dry Run",
+      "status": "passed",
+      "startedAt": "2026-07-08T01:00:00+08:00",
+      "finishedAt": "2026-07-08T01:00:00+08:00",
+      "commandsRun": [
+        "static audit of scripts/run-ebos-weekly-operating-cycle.ts"
+      ],
+      "filesCreated": [
+        "reports/ebos/automation/2026-07-03-weekly-operating-cycle-dry-run.json",
+        "reports/ebos/automation/2026-07-03-weekly-operating-cycle-dry-run.md"
+      ],
+      "filesUpdated": [
+        "reports/ebos/autonomous-runs/2026-07-03-ebos-operations-closeout-phase-status.json",
+        "reports/ebos/autonomous-runs/2026-07-03-ebos-operations-closeout-phase-status.md"
+      ],
+      "safetyChecks": {
+        "weeklyCycleDryRun": false,
+        "gitAdd": false,
+        "gitCommit": false,
+        "gitPush": false,
+        "migration": false,
+        "seed": false,
+        "deployment": false,
+        "serverDockerNginx": false,
+        "backfillApply": false
+      },
+      "qualityChecks": {},
+      "passedCriteria": [
+        "script exists",
+        "no side effects",
+        "no fake data",
+        "no forbidden commands executed"
+      ],
+      "failedCriteria": [],
+      "retryCount": 0,
+      "nextPhase": "Phase E",
+      "blockers": []
+    },
+    {
+      "phaseName": "Phase E: External Real Data Collection Kit Finalization",
+      "status": "passed",
+      "startedAt": "2026-07-08T01:08:00+08:00",
+      "finishedAt": "2026-07-08T01:08:00+08:00",
+      "commandsRun": [
+        "npx tsx scripts/check-ebos-external-publish-results.ts --date 2026-07-03",
+        "npx tsx scripts/backfill-ebos-external-channel-data.ts --date 2026-07-03"
+      ],
+      "filesCreated": [
+        "reports/ebos/external-publishing/2026-07-03-external-real-data-collection-kit.json",
+        "reports/ebos/external-publishing/2026-07-03-external-real-data-collection-kit.md",
+        "reports/ebos/external-publishing/inputs/2026-07-03-external-real-data-user-input-template.json",
+        "reports/ebos/external-publishing/inputs/2026-07-03-external-real-data-user-input-template.md"
+      ],
+      "filesUpdated": [
+        "reports/ebos/autonomous-runs/2026-07-03-ebos-operations-closeout-phase-status.json",
+        "reports/ebos/autonomous-runs/2026-07-03-ebos-operations-closeout-phase-status.md",
+        "reports/ebos/external-publishing/reports/2026-07-03-external-data-backfill-report.json",
+        "reports/ebos/external-publishing/reports/2026-07-03-external-data-backfill-report.md"
+      ],
+      "safetyChecks": {
+        "gitAdd": false,
+        "gitCommit": false,
+        "gitPush": false,
+        "migration": false,
+        "seed": false,
+        "deployment": false,
+        "backfillApply": false,
+        "fakeDataCreated": false
+      },
+      "qualityChecks": {},
+      "passedCriteria": [
+        "hasRealSignals=false so no apply",
+        "canBackfill=false so no apply",
+        "user input template created",
+        "no fake data"
+      ],
+      "failedCriteria": [],
+      "retryCount": 0,
+      "nextPhase": "Phase F",
+      "blockers": []
+    },
+    {
+      "phaseName": "Phase F: Production / Staging Manual Schema Check Kit Finalization",
+      "status": "passed",
+      "startedAt": "2026-07-08T01:14:00+08:00",
+      "finishedAt": "2026-07-08T01:14:00+08:00",
+      "commandsRun": [
+        "read readonly query pack only"
+      ],
+      "filesCreated": [
+        "reports/ebos/deployment/prisma-audit/2026-07-03-production-staging-manual-schema-check-kit.json",
+        "reports/ebos/deployment/prisma-audit/2026-07-03-production-staging-manual-schema-check-kit.md"
+      ],
+      "filesUpdated": [
+        "reports/ebos/autonomous-runs/2026-07-03-ebos-operations-closeout-phase-status.json",
+        "reports/ebos/autonomous-runs/2026-07-03-ebos-operations-closeout-phase-status.md"
+      ],
+      "safetyChecks": {
+        "sql": false,
+        "gitAdd": false,
+        "gitCommit": false,
+        "gitPush": false,
+        "migration": false,
+        "seed": false,
+        "deployment": false,
+        "serverDockerNginx": false,
+        "backfillApply": false,
+        "secretPrinted": false
+      },
+      "qualityChecks": {},
+      "passedCriteria": [
+        "no production/staging connection",
+        "no SQL run",
+        "no secret printed",
+        "manual kit generated"
+      ],
+      "failedCriteria": [],
+      "retryCount": 0,
+      "nextPhase": "Phase G",
+      "blockers": []
+    },
+    {
+      "phaseName": "Phase G: Final Quality Gate",
+      "status": "passed",
+      "startedAt": "2026-07-08T01:25:00+08:00",
+      "finishedAt": "2026-07-08T01:25:00+08:00",
+      "commandsRun": [
+        "npm run test -- src/lib/ebos",
+        "npm run lint",
+        "npm run typecheck",
+        "npm run build"
+      ],
+      "filesCreated": [
+        "reports/ebos/final/2026-07-03-ebos-operations-closeout-quality-gate.json",
+        "reports/ebos/final/2026-07-03-ebos-operations-closeout-quality-gate.md"
+      ],
+      "filesUpdated": [
+        "reports/ebos/autonomous-runs/2026-07-03-ebos-operations-closeout-phase-status.json",
+        "reports/ebos/autonomous-runs/2026-07-03-ebos-operations-closeout-phase-status.md"
+      ],
+      "safetyChecks": {
+        "gitAdd": false,
+        "gitCommit": false,
+        "gitPush": false,
+        "migration": false,
+        "seed": false,
+        "deployment": false,
+        "serverDockerNginx": false,
+        "backfillApply": false
+      },
+      "qualityChecks": {
+        "tests": {
+          "command": "npm run test -- src/lib/ebos",
+          "passed": true,
+          "summary": "161 test files passed; 606 tests passed."
+        },
+        "lint": {
+          "command": "npm run lint",
+          "passed": true,
+          "summary": "eslint . exited 0."
+        },
+        "typecheck": {
+          "command": "npm run typecheck",
+          "passed": true,
+          "summary": "tsc --noEmit exited 0."
+        },
+        "build": {
+          "command": "npm run build",
+          "passed": true,
+          "summary": "prisma generate && next build exited 0; no migration or seed command was run."
+        }
+      },
+      "passedCriteria": [
+        "test pass",
+        "lint pass",
+        "typecheck pass",
+        "build pass",
+        "migrationExecuted=false",
+        "seedExecuted=false",
+        "deploymentExecuted=false",
+        "backfillApplyExecuted=false",
+        "fakeDataCreated=false",
+        "safeToRunMigration=false"
+      ],
+      "failedCriteria": [],
+      "retryCount": 0,
+      "nextPhase": "Phase H",
+      "blockers": []
+    }
+  ],
+  "currentPhase": "Phase G: Final Quality Gate",
+  "overallStatus": "in_progress"
+}

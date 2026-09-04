@@ -1,0 +1,975 @@
+{
+  "meta": {
+    "contractVersion": "ebos-evidence-v1",
+    "evidenceKind": "market_evidence",
+    "generatedAt": "2026-07-03T15:28:33.759Z",
+    "targetDate": "2026-07-03",
+    "periodStart": "2026-06-29",
+    "periodEnd": "2026-07-05",
+    "environment": "unknown",
+    "generator": "scripts/generate-ebos-market-evidence.ts",
+    "sourceFiles": [
+      "C:\\Users\\HU\\Documents\\New project 2\\reports\\ebos\\market\\2026-07-03-market-evidence.md"
+    ],
+    "schemaNotes": [
+      "manual input 为市场观察方向种子，不代表真实搜索量、销量或趋势数据。"
+    ]
+  },
+  "quality": {
+    "score": 75,
+    "confidence": "partial",
+    "dataCompleteness": "partial",
+    "warningsCount": 1,
+    "errorsCount": 0,
+    "missingSources": [
+      "manual_input"
+    ]
+  },
+  "payload": {
+    "evidenceType": "market_evidence",
+    "targetDate": "2026-07-03",
+    "periodStart": "2026-06-29",
+    "periodEnd": "2026-07-05",
+    "generatedAt": "2026-07-03T15:28:33.759Z",
+    "overallScore": 75,
+    "confidence": "partial",
+    "marketSummary": {
+      "topTopics": [
+        {
+          "topic": "workflow",
+          "count": 5
+        },
+        {
+          "topic": "automation",
+          "count": 3
+        },
+        {
+          "topic": "ai_agent",
+          "count": 2
+        },
+        {
+          "topic": "comfyui",
+          "count": 2
+        },
+        {
+          "topic": "ai_video",
+          "count": 1
+        },
+        {
+          "topic": "ai_voice",
+          "count": 1
+        },
+        {
+          "topic": "local_ai",
+          "count": 1
+        },
+        {
+          "topic": "seo_geo",
+          "count": 1
+        }
+      ],
+      "topUserProblems": [
+        {
+          "problem": "template_gap",
+          "count": 7
+        },
+        {
+          "problem": "batch_processing",
+          "count": 4
+        },
+        {
+          "problem": "monetization_need",
+          "count": 3
+        },
+        {
+          "problem": "content_growth",
+          "count": 3
+        },
+        {
+          "problem": "save_time",
+          "count": 2
+        },
+        {
+          "problem": "reduce_cost",
+          "count": 1
+        },
+        {
+          "problem": "deployment_gap",
+          "count": 1
+        },
+        {
+          "problem": "local_offline_need",
+          "count": 1
+        }
+      ],
+      "topProductTypes": [
+        {
+          "productType": "template_pack",
+          "count": 7
+        },
+        {
+          "productType": "workflow_pack",
+          "count": 5
+        },
+        {
+          "productType": "software_tool",
+          "count": 2
+        },
+        {
+          "productType": "local_ai_bundle",
+          "count": 1
+        },
+        {
+          "productType": "seo_geo_content_cluster",
+          "count": 1
+        },
+        {
+          "productType": "prompt_kit",
+          "count": 1
+        }
+      ]
+    },
+    "signalSummary": {
+      "totalSignals": 10,
+      "manualSignals": 10,
+      "rssSignals": 0,
+      "networkSignals": 0,
+      "averageRelevanceScore": 65,
+      "averageMonetizationScore": 52
+    },
+    "opportunitySummary": {
+      "totalOpportunities": 7,
+      "buildNowCount": 0,
+      "validateFirstCount": 6,
+      "createContentFirstCount": 0,
+      "watchCount": 1,
+      "ignoreCount": 0,
+      "highestPriorityScore": 76
+    },
+    "recommendedProductDirections": [
+      {
+        "id": "market-opportunity-ai_agent",
+        "productDirection": "AI Agent 工作流模板包",
+        "description": "AI Agent 工作流模板包 可用低成本页面、内容或模板包先验证需求，再决定是否产品化。",
+        "targetUser": "希望自动化重复流程的运营、开发者和独立产品团队",
+        "userProblem": "save_time",
+        "evidenceSignalIds": [
+          "market-1tsszsm",
+          "market-1bi15hp"
+        ],
+        "demandScore": 25,
+        "competitionRisk": 5,
+        "buildDifficulty": 2,
+        "monetizationPotential": 15,
+        "seoPotential": 13,
+        "geoPotential": 10,
+        "enheFitScore": 20,
+        "priorityScore": 76,
+        "recommendedAction": "validate_first",
+        "suggestedProductFormats": [
+          "Workflow Pack",
+          "Template Pack"
+        ],
+        "suggestedPriceRange": "CNY 9-99 validation offer",
+        "risks": [],
+        "nextActions": [
+          "低成本验证 AI Agent 工作流模板包：发布预售/等候名单/内容测试。",
+          "用产品页点击、咨询、订单或手动购买意向验证需求。"
+        ]
+      },
+      {
+        "id": "market-opportunity-ai_video",
+        "productDirection": "AI 视频工作流包",
+        "description": "AI 视频工作流包 可用低成本页面、内容或模板包先验证需求，再决定是否产品化。",
+        "targetUser": "短视频创作者、设计师和本地 AI 生成工作流用户",
+        "userProblem": "template_gap",
+        "evidenceSignalIds": [
+          "market-1rmybsb"
+        ],
+        "demandScore": 23,
+        "competitionRisk": 6,
+        "buildDifficulty": 2,
+        "monetizationPotential": 19,
+        "seoPotential": 13,
+        "geoPotential": 8,
+        "enheFitScore": 20,
+        "priorityScore": 75,
+        "recommendedAction": "validate_first",
+        "suggestedProductFormats": [
+          "Workflow Pack",
+          "Template Pack"
+        ],
+        "suggestedPriceRange": "CNY 9-99 validation offer",
+        "risks": [
+          "竞争风险较高，必须先用细分场景和交付物做差异化。",
+          "AI 视频方向变化快，需避免押注单一模型或平台。"
+        ],
+        "nextActions": [
+          "低成本验证 AI 视频工作流包：发布预售/等候名单/内容测试。",
+          "用产品页点击、咨询、订单或手动购买意向验证需求。"
+        ]
+      },
+      {
+        "id": "market-opportunity-seo_geo",
+        "productDirection": "SEO/GEO 自动化内容集群",
+        "description": "SEO/GEO 自动化内容集群 可用低成本页面、内容或模板包先验证需求，再决定是否产品化。",
+        "targetUser": "需要搜索增长和 AI 回答引擎可见度的站长/运营",
+        "userProblem": "template_gap",
+        "evidenceSignalIds": [
+          "market-1t5qjse"
+        ],
+        "demandScore": 21,
+        "competitionRisk": 6,
+        "buildDifficulty": 1,
+        "monetizationPotential": 16,
+        "seoPotential": 15,
+        "geoPotential": 10,
+        "enheFitScore": 20,
+        "priorityScore": 75,
+        "recommendedAction": "validate_first",
+        "suggestedProductFormats": [
+          "Workflow Pack",
+          "Template Pack",
+          "SEO/GEO Content Cluster"
+        ],
+        "suggestedPriceRange": "CNY 9-99 validation offer",
+        "risks": [
+          "竞争风险较高，必须先用细分场景和交付物做差异化。"
+        ],
+        "nextActions": [
+          "低成本验证 SEO/GEO 自动化内容集群：发布预售/等候名单/内容测试。",
+          "用产品页点击、咨询、订单或手动购买意向验证需求。"
+        ]
+      },
+      {
+        "id": "market-opportunity-prompt_kit",
+        "productDirection": "AI Prompt Kit",
+        "description": "AI Prompt Kit 可用低成本页面、内容或模板包先验证需求，再决定是否产品化。",
+        "targetUser": "希望用 AI 降低执行成本的数字产品用户",
+        "userProblem": "template_gap",
+        "evidenceSignalIds": [
+          "market-b3dx3t"
+        ],
+        "demandScore": 23,
+        "competitionRisk": 4,
+        "buildDifficulty": 1,
+        "monetizationPotential": 19,
+        "seoPotential": 9,
+        "geoPotential": 8,
+        "enheFitScore": 20,
+        "priorityScore": 74,
+        "recommendedAction": "validate_first",
+        "suggestedProductFormats": [
+          "Prompt Kit",
+          "Template Pack"
+        ],
+        "suggestedPriceRange": "CNY 9-99 validation offer",
+        "risks": [],
+        "nextActions": [
+          "低成本验证 AI Prompt Kit：发布预售/等候名单/内容测试。",
+          "用产品页点击、咨询、订单或手动购买意向验证需求。"
+        ]
+      },
+      {
+        "id": "market-opportunity-comfyui",
+        "productDirection": "ComfyUI 工作流包",
+        "description": "ComfyUI 工作流包 可用低成本页面、内容或模板包先验证需求，再决定是否产品化。",
+        "targetUser": "希望用 AI 降低执行成本的数字产品用户",
+        "userProblem": "template_gap",
+        "evidenceSignalIds": [
+          "market-g5vpzt",
+          "market-1m3nhxl"
+        ],
+        "demandScore": 23,
+        "competitionRisk": 4,
+        "buildDifficulty": 1,
+        "monetizationPotential": 12,
+        "seoPotential": 9,
+        "geoPotential": 8,
+        "enheFitScore": 20,
+        "priorityScore": 67,
+        "recommendedAction": "validate_first",
+        "suggestedProductFormats": [
+          "Workflow Pack",
+          "Template Pack"
+        ],
+        "suggestedPriceRange": "CNY 9-99 validation offer",
+        "risks": [],
+        "nextActions": [
+          "低成本验证 ComfyUI 工作流包：发布预售/等候名单/内容测试。",
+          "用产品页点击、咨询、订单或手动购买意向验证需求。"
+        ]
+      }
+    ],
+    "risks": [
+      "当前 Market Evidence 主要来自 manual input，不能代表真实搜索量或销量。",
+      "部分机会竞争风险较高，需要用细分场景和交付物差异化。"
+    ],
+    "opportunities": [
+      "AI Agent 工作流模板包: 低成本验证 AI Agent 工作流模板包：发布预售/等候名单/内容测试。",
+      "AI 视频工作流包: 低成本验证 AI 视频工作流包：发布预售/等候名单/内容测试。",
+      "SEO/GEO 自动化内容集群: 低成本验证 SEO/GEO 自动化内容集群：发布预售/等候名单/内容测试。",
+      "AI Prompt Kit: 低成本验证 AI Prompt Kit：发布预售/等候名单/内容测试。",
+      "ComfyUI 工作流包: 低成本验证 ComfyUI 工作流包：发布预售/等候名单/内容测试。"
+    ],
+    "actionItems": [
+      {
+        "id": "market-action-1",
+        "title": "验证市场机会：AI Agent 工作流模板包",
+        "description": "低成本验证 AI Agent 工作流模板包：发布预售/等候名单/内容测试。 用产品页点击、咨询、订单或手动购买意向验证需求。",
+        "priority": "high",
+        "owner": "codex",
+        "relatedSection": "market",
+        "evidenceRefs": [
+          "market-1tsszsm",
+          "market-1bi15hp"
+        ],
+        "status": "open"
+      },
+      {
+        "id": "market-action-2",
+        "title": "验证市场机会：AI 视频工作流包",
+        "description": "低成本验证 AI 视频工作流包：发布预售/等候名单/内容测试。 用产品页点击、咨询、订单或手动购买意向验证需求。",
+        "priority": "high",
+        "owner": "codex",
+        "relatedSection": "market",
+        "evidenceRefs": [
+          "market-1rmybsb"
+        ],
+        "status": "open"
+      },
+      {
+        "id": "market-action-3",
+        "title": "验证市场机会：SEO/GEO 自动化内容集群",
+        "description": "低成本验证 SEO/GEO 自动化内容集群：发布预售/等候名单/内容测试。 用产品页点击、咨询、订单或手动购买意向验证需求。",
+        "priority": "high",
+        "owner": "codex",
+        "relatedSection": "market",
+        "evidenceRefs": [
+          "market-1t5qjse"
+        ],
+        "status": "open"
+      },
+      {
+        "id": "market-action-4",
+        "title": "验证市场机会：AI Prompt Kit",
+        "description": "低成本验证 AI Prompt Kit：发布预售/等候名单/内容测试。 用产品页点击、咨询、订单或手动购买意向验证需求。",
+        "priority": "high",
+        "owner": "codex",
+        "relatedSection": "market",
+        "evidenceRefs": [
+          "market-b3dx3t"
+        ],
+        "status": "open"
+      },
+      {
+        "id": "market-action-5",
+        "title": "验证市场机会：ComfyUI 工作流包",
+        "description": "低成本验证 ComfyUI 工作流包：发布预售/等候名单/内容测试。 用产品页点击、咨询、订单或手动购买意向验证需求。",
+        "priority": "high",
+        "owner": "codex",
+        "relatedSection": "market",
+        "evidenceRefs": [
+          "market-g5vpzt",
+          "market-1m3nhxl"
+        ],
+        "status": "open"
+      }
+    ],
+    "warnings": [
+      {
+        "code": "manual_market_seed",
+        "severity": "warning",
+        "message": "manual input 为市场观察方向种子，不代表真实搜索量、销量或趋势数据。",
+        "source": "manual_input"
+      }
+    ],
+    "signals": [
+      {
+        "id": "market-1tsszsm",
+        "source": "manual_input",
+        "sourceType": "manual",
+        "title": "AI Agent",
+        "description": "关注 AI Agent automation、workflow templates、节省时间和商业化。",
+        "tags": [
+          "AI Agent"
+        ],
+        "detectedTopics": [
+          "ai_agent",
+          "automation",
+          "workflow"
+        ],
+        "detectedProductTypes": [
+          "workflow_pack",
+          "template_pack"
+        ],
+        "detectedUserProblems": [
+          "save_time",
+          "template_gap",
+          "monetization_need"
+        ],
+        "relevanceScore": 81,
+        "freshnessScore": 60,
+        "monetizationScore": 86,
+        "confidence": "partial",
+        "rawText": "AI Agent 关注 AI Agent automation、workflow templates、节省时间和商业化。 AI Agent"
+      },
+      {
+        "id": "market-1rmybsb",
+        "source": "manual_input",
+        "sourceType": "manual",
+        "title": "AI 视频生成",
+        "description": "关注 AI video workflow、模板、批量处理和商业化素材包需求。",
+        "tags": [
+          "AI 视频生成"
+        ],
+        "detectedTopics": [
+          "ai_video",
+          "workflow"
+        ],
+        "detectedProductTypes": [
+          "workflow_pack",
+          "template_pack"
+        ],
+        "detectedUserProblems": [
+          "template_gap",
+          "batch_processing",
+          "monetization_need"
+        ],
+        "relevanceScore": 73,
+        "freshnessScore": 60,
+        "monetizationScore": 76,
+        "confidence": "partial",
+        "rawText": "AI 视频生成 关注 AI video workflow、模板、批量处理和商业化素材包需求。 AI 视频生成"
+      },
+      {
+        "id": "market-1rwmwee",
+        "source": "manual_input",
+        "sourceType": "manual",
+        "title": "AI 语音生成",
+        "description": "关注 AI voice、配音、音频批量处理和内容增长需求。",
+        "tags": [
+          "AI 语音生成"
+        ],
+        "detectedTopics": [
+          "ai_voice"
+        ],
+        "detectedProductTypes": [],
+        "detectedUserProblems": [
+          "batch_processing",
+          "content_growth"
+        ],
+        "relevanceScore": 45,
+        "freshnessScore": 60,
+        "monetizationScore": 25,
+        "confidence": "partial",
+        "rawText": "AI 语音生成 关注 AI voice、配音、音频批量处理和内容增长需求。 AI 语音生成"
+      },
+      {
+        "id": "market-dxq5y9",
+        "source": "manual_input",
+        "sourceType": "manual",
+        "title": "本地部署 AI 工具",
+        "description": "关注 local AI、离线部署、降低成本和不会部署的问题。",
+        "tags": [
+          "本地部署 AI 工具"
+        ],
+        "detectedTopics": [
+          "local_ai"
+        ],
+        "detectedProductTypes": [
+          "software_tool",
+          "local_ai_bundle"
+        ],
+        "detectedUserProblems": [
+          "reduce_cost",
+          "deployment_gap",
+          "local_offline_need"
+        ],
+        "relevanceScore": 65,
+        "freshnessScore": 60,
+        "monetizationScore": 51,
+        "confidence": "partial",
+        "rawText": "本地部署 AI 工具 关注 local AI、离线部署、降低成本和不会部署的问题。 本地部署 AI 工具"
+      },
+      {
+        "id": "market-1t5qjse",
+        "source": "manual_input",
+        "sourceType": "manual",
+        "title": "SEO/GEO 自动化",
+        "description": "关注 SEO/GEO automation、内容增长、回答引擎可见度和工作流模板。",
+        "tags": [
+          "SEO/GEO 自动化"
+        ],
+        "detectedTopics": [
+          "seo_geo",
+          "automation",
+          "workflow"
+        ],
+        "detectedProductTypes": [
+          "workflow_pack",
+          "template_pack",
+          "seo_geo_content_cluster"
+        ],
+        "detectedUserProblems": [
+          "template_gap",
+          "content_growth"
+        ],
+        "relevanceScore": 72,
+        "freshnessScore": 60,
+        "monetizationScore": 49,
+        "confidence": "partial",
+        "rawText": "SEO/GEO 自动化 关注 SEO/GEO automation、内容增长、回答引擎可见度和工作流模板。 SEO/GEO 自动化"
+      },
+      {
+        "id": "market-2vo55j",
+        "source": "manual_input",
+        "sourceType": "manual",
+        "title": "AI 工作效率工具",
+        "description": "关注 AI productivity tool、模板化交付、节省时间和内容增长。",
+        "tags": [
+          "AI 工作效率工具"
+        ],
+        "detectedTopics": [],
+        "detectedProductTypes": [
+          "software_tool",
+          "template_pack"
+        ],
+        "detectedUserProblems": [
+          "save_time",
+          "template_gap",
+          "content_growth"
+        ],
+        "relevanceScore": 57,
+        "freshnessScore": 60,
+        "monetizationScore": 51,
+        "confidence": "partial",
+        "rawText": "AI 工作效率工具 关注 AI productivity tool、模板化交付、节省时间和内容增长。 AI 工作效率工具"
+      },
+      {
+        "id": "market-b3dx3t",
+        "source": "manual_input",
+        "sourceType": "manual",
+        "title": "AI 数字产品/Prompt Kit",
+        "description": "关注 digital product、prompt kit、模板缺口和商业化。",
+        "tags": [
+          "AI 数字产品/Prompt Kit"
+        ],
+        "detectedTopics": [
+          "prompt_kit",
+          "digital_product"
+        ],
+        "detectedProductTypes": [
+          "prompt_kit",
+          "template_pack"
+        ],
+        "detectedUserProblems": [
+          "template_gap",
+          "prompt_gap",
+          "monetization_need"
+        ],
+        "relevanceScore": 73,
+        "freshnessScore": 60,
+        "monetizationScore": 76,
+        "confidence": "partial",
+        "rawText": "AI 数字产品/Prompt Kit 关注 digital product、prompt kit、模板缺口和商业化。 AI 数字产品/Prompt Kit"
+      },
+      {
+        "id": "market-g5vpzt",
+        "source": "manual_input",
+        "sourceType": "manual",
+        "title": "AI 工作流模板",
+        "description": "关注 workflow pack、ComfyUI 工作流、模板缺口和批量处理。",
+        "tags": [
+          "AI 工作流模板"
+        ],
+        "detectedTopics": [
+          "comfyui",
+          "workflow"
+        ],
+        "detectedProductTypes": [
+          "workflow_pack",
+          "template_pack"
+        ],
+        "detectedUserProblems": [
+          "template_gap",
+          "batch_processing"
+        ],
+        "relevanceScore": 67,
+        "freshnessScore": 60,
+        "monetizationScore": 41,
+        "confidence": "partial",
+        "rawText": "AI 工作流模板 关注 workflow pack、ComfyUI 工作流、模板缺口和批量处理。 AI 工作流模板"
+      },
+      {
+        "id": "market-1m3nhxl",
+        "source": "manual_input",
+        "sourceType": "manual",
+        "title": "ComfyUI 工作流",
+        "description": "关注 workflow pack、ComfyUI 工作流、模板缺口和批量处理。",
+        "tags": [
+          "ComfyUI 工作流"
+        ],
+        "detectedTopics": [
+          "comfyui",
+          "workflow"
+        ],
+        "detectedProductTypes": [
+          "workflow_pack",
+          "template_pack"
+        ],
+        "detectedUserProblems": [
+          "template_gap",
+          "batch_processing"
+        ],
+        "relevanceScore": 57,
+        "freshnessScore": 60,
+        "monetizationScore": 41,
+        "confidence": "partial",
+        "rawText": "ComfyUI 工作流 关注 workflow pack、ComfyUI 工作流、模板缺口和批量处理。 ComfyUI 工作流"
+      },
+      {
+        "id": "market-1bi15hp",
+        "source": "manual_input",
+        "sourceType": "manual",
+        "title": "MCP / Browser Agent",
+        "description": "关注 MCP、browser agent、automation 和跨平台发布。",
+        "tags": [
+          "MCP / Browser Agent"
+        ],
+        "detectedTopics": [
+          "ai_agent",
+          "automation",
+          "browser_agent",
+          "mcp"
+        ],
+        "detectedProductTypes": [],
+        "detectedUserProblems": [
+          "cross_platform_publishing"
+        ],
+        "relevanceScore": 63,
+        "freshnessScore": 60,
+        "monetizationScore": 25,
+        "confidence": "partial",
+        "rawText": "MCP / Browser Agent 关注 MCP、browser agent、automation 和跨平台发布。 MCP / Browser Agent"
+      }
+    ],
+    "opportunityScores": [
+      {
+        "id": "market-opportunity-ai_agent",
+        "productDirection": "AI Agent 工作流模板包",
+        "description": "AI Agent 工作流模板包 可用低成本页面、内容或模板包先验证需求，再决定是否产品化。",
+        "targetUser": "希望自动化重复流程的运营、开发者和独立产品团队",
+        "userProblem": "save_time",
+        "evidenceSignalIds": [
+          "market-1tsszsm",
+          "market-1bi15hp"
+        ],
+        "demandScore": 25,
+        "competitionRisk": 5,
+        "buildDifficulty": 2,
+        "monetizationPotential": 15,
+        "seoPotential": 13,
+        "geoPotential": 10,
+        "enheFitScore": 20,
+        "priorityScore": 76,
+        "recommendedAction": "validate_first",
+        "suggestedProductFormats": [
+          "Workflow Pack",
+          "Template Pack"
+        ],
+        "suggestedPriceRange": "CNY 9-99 validation offer",
+        "risks": [],
+        "nextActions": [
+          "低成本验证 AI Agent 工作流模板包：发布预售/等候名单/内容测试。",
+          "用产品页点击、咨询、订单或手动购买意向验证需求。"
+        ]
+      },
+      {
+        "id": "market-opportunity-ai_video",
+        "productDirection": "AI 视频工作流包",
+        "description": "AI 视频工作流包 可用低成本页面、内容或模板包先验证需求，再决定是否产品化。",
+        "targetUser": "短视频创作者、设计师和本地 AI 生成工作流用户",
+        "userProblem": "template_gap",
+        "evidenceSignalIds": [
+          "market-1rmybsb"
+        ],
+        "demandScore": 23,
+        "competitionRisk": 6,
+        "buildDifficulty": 2,
+        "monetizationPotential": 19,
+        "seoPotential": 13,
+        "geoPotential": 8,
+        "enheFitScore": 20,
+        "priorityScore": 75,
+        "recommendedAction": "validate_first",
+        "suggestedProductFormats": [
+          "Workflow Pack",
+          "Template Pack"
+        ],
+        "suggestedPriceRange": "CNY 9-99 validation offer",
+        "risks": [
+          "竞争风险较高，必须先用细分场景和交付物做差异化。",
+          "AI 视频方向变化快，需避免押注单一模型或平台。"
+        ],
+        "nextActions": [
+          "低成本验证 AI 视频工作流包：发布预售/等候名单/内容测试。",
+          "用产品页点击、咨询、订单或手动购买意向验证需求。"
+        ]
+      },
+      {
+        "id": "market-opportunity-seo_geo",
+        "productDirection": "SEO/GEO 自动化内容集群",
+        "description": "SEO/GEO 自动化内容集群 可用低成本页面、内容或模板包先验证需求，再决定是否产品化。",
+        "targetUser": "需要搜索增长和 AI 回答引擎可见度的站长/运营",
+        "userProblem": "template_gap",
+        "evidenceSignalIds": [
+          "market-1t5qjse"
+        ],
+        "demandScore": 21,
+        "competitionRisk": 6,
+        "buildDifficulty": 1,
+        "monetizationPotential": 16,
+        "seoPotential": 15,
+        "geoPotential": 10,
+        "enheFitScore": 20,
+        "priorityScore": 75,
+        "recommendedAction": "validate_first",
+        "suggestedProductFormats": [
+          "Workflow Pack",
+          "Template Pack",
+          "SEO/GEO Content Cluster"
+        ],
+        "suggestedPriceRange": "CNY 9-99 validation offer",
+        "risks": [
+          "竞争风险较高，必须先用细分场景和交付物做差异化。"
+        ],
+        "nextActions": [
+          "低成本验证 SEO/GEO 自动化内容集群：发布预售/等候名单/内容测试。",
+          "用产品页点击、咨询、订单或手动购买意向验证需求。"
+        ]
+      },
+      {
+        "id": "market-opportunity-prompt_kit",
+        "productDirection": "AI Prompt Kit",
+        "description": "AI Prompt Kit 可用低成本页面、内容或模板包先验证需求，再决定是否产品化。",
+        "targetUser": "希望用 AI 降低执行成本的数字产品用户",
+        "userProblem": "template_gap",
+        "evidenceSignalIds": [
+          "market-b3dx3t"
+        ],
+        "demandScore": 23,
+        "competitionRisk": 4,
+        "buildDifficulty": 1,
+        "monetizationPotential": 19,
+        "seoPotential": 9,
+        "geoPotential": 8,
+        "enheFitScore": 20,
+        "priorityScore": 74,
+        "recommendedAction": "validate_first",
+        "suggestedProductFormats": [
+          "Prompt Kit",
+          "Template Pack"
+        ],
+        "suggestedPriceRange": "CNY 9-99 validation offer",
+        "risks": [],
+        "nextActions": [
+          "低成本验证 AI Prompt Kit：发布预售/等候名单/内容测试。",
+          "用产品页点击、咨询、订单或手动购买意向验证需求。"
+        ]
+      },
+      {
+        "id": "market-opportunity-comfyui",
+        "productDirection": "ComfyUI 工作流包",
+        "description": "ComfyUI 工作流包 可用低成本页面、内容或模板包先验证需求，再决定是否产品化。",
+        "targetUser": "希望用 AI 降低执行成本的数字产品用户",
+        "userProblem": "template_gap",
+        "evidenceSignalIds": [
+          "market-g5vpzt",
+          "market-1m3nhxl"
+        ],
+        "demandScore": 23,
+        "competitionRisk": 4,
+        "buildDifficulty": 1,
+        "monetizationPotential": 12,
+        "seoPotential": 9,
+        "geoPotential": 8,
+        "enheFitScore": 20,
+        "priorityScore": 67,
+        "recommendedAction": "validate_first",
+        "suggestedProductFormats": [
+          "Workflow Pack",
+          "Template Pack"
+        ],
+        "suggestedPriceRange": "CNY 9-99 validation offer",
+        "risks": [],
+        "nextActions": [
+          "低成本验证 ComfyUI 工作流包：发布预售/等候名单/内容测试。",
+          "用产品页点击、咨询、订单或手动购买意向验证需求。"
+        ]
+      },
+      {
+        "id": "market-opportunity-local_ai",
+        "productDirection": "本地部署 AI 工具包",
+        "description": "本地部署 AI 工具包 可用低成本页面、内容或模板包先验证需求，再决定是否产品化。",
+        "targetUser": "需要本地离线和低成本部署的 AI 工具用户",
+        "userProblem": "reduce_cost",
+        "evidenceSignalIds": [
+          "market-dxq5y9"
+        ],
+        "demandScore": 22,
+        "competitionRisk": 5,
+        "buildDifficulty": 7,
+        "monetizationPotential": 14,
+        "seoPotential": 13,
+        "geoPotential": 10,
+        "enheFitScore": 20,
+        "priorityScore": 67,
+        "recommendedAction": "validate_first",
+        "suggestedProductFormats": [
+          "Software tool",
+          "Local AI Bundle"
+        ],
+        "suggestedPriceRange": "CNY 9-99 validation offer",
+        "risks": [
+          "构建难度较高，不适合直接大规模开发。"
+        ],
+        "nextActions": [
+          "低成本验证 本地部署 AI 工具包：发布预售/等候名单/内容测试。",
+          "用产品页点击、咨询、订单或手动购买意向验证需求。"
+        ]
+      },
+      {
+        "id": "market-opportunity-ai_voice",
+        "productDirection": "AI 语音生成模板包",
+        "description": "AI 语音生成模板包 可用低成本页面、内容或模板包先验证需求，再决定是否产品化。",
+        "targetUser": "希望用 AI 降低执行成本的数字产品用户",
+        "userProblem": "batch_processing",
+        "evidenceSignalIds": [
+          "market-1rwmwee"
+        ],
+        "demandScore": 16,
+        "competitionRisk": 5,
+        "buildDifficulty": 2,
+        "monetizationPotential": 5,
+        "seoPotential": 11,
+        "geoPotential": 8,
+        "enheFitScore": 12,
+        "priorityScore": 45,
+        "recommendedAction": "watch",
+        "suggestedProductFormats": [
+          "Template Pack",
+          "Tutorial Pack"
+        ],
+        "suggestedPriceRange": "not priced",
+        "risks": [],
+        "nextActions": [
+          "持续观察 AI 语音生成模板包，暂不进入产品开发。"
+        ]
+      }
+    ],
+    "dataSourceSummary": {
+      "manualSignalsCount": 10,
+      "rssSignalsCount": 0,
+      "githubSignalsCount": 0,
+      "redditSignalsCount": 0,
+      "productHuntSignalsCount": 0,
+      "unavailableSources": [],
+      "configuredSources": [
+        "manual_input"
+      ],
+      "warnings": [
+        "manual input 为市场观察方向种子，不代表真实搜索量、销量或趋势数据。"
+      ]
+    },
+    "manualInputSummary": {
+      "observationTopics": [
+        "AI Agent",
+        "AI 视频生成",
+        "AI 语音生成",
+        "本地部署 AI 工具",
+        "SEO/GEO 自动化",
+        "AI 工作效率工具",
+        "AI 数字产品/Prompt Kit",
+        "AI 工作流模板",
+        "ComfyUI 工作流",
+        "MCP / Browser Agent"
+      ],
+      "notes": [
+        "manual input 是 ENHE 当前重点观察方向，不代表真实搜索量、销量或市场份额。"
+      ]
+    }
+  },
+  "warnings": [
+    {
+      "code": "manual_market_seed",
+      "severity": "warning",
+      "message": "manual input 为市场观察方向种子，不代表真实搜索量、销量或趋势数据。",
+      "source": "manual_input"
+    }
+  ],
+  "actionItems": [
+    {
+      "id": "market-action-1",
+      "title": "验证市场机会：AI Agent 工作流模板包",
+      "description": "低成本验证 AI Agent 工作流模板包：发布预售/等候名单/内容测试。 用产品页点击、咨询、订单或手动购买意向验证需求。",
+      "priority": "high",
+      "owner": "codex",
+      "relatedSection": "market",
+      "evidenceRefs": [
+        "market-1tsszsm",
+        "market-1bi15hp"
+      ],
+      "status": "open"
+    },
+    {
+      "id": "market-action-2",
+      "title": "验证市场机会：AI 视频工作流包",
+      "description": "低成本验证 AI 视频工作流包：发布预售/等候名单/内容测试。 用产品页点击、咨询、订单或手动购买意向验证需求。",
+      "priority": "high",
+      "owner": "codex",
+      "relatedSection": "market",
+      "evidenceRefs": [
+        "market-1rmybsb"
+      ],
+      "status": "open"
+    },
+    {
+      "id": "market-action-3",
+      "title": "验证市场机会：SEO/GEO 自动化内容集群",
+      "description": "低成本验证 SEO/GEO 自动化内容集群：发布预售/等候名单/内容测试。 用产品页点击、咨询、订单或手动购买意向验证需求。",
+      "priority": "high",
+      "owner": "codex",
+      "relatedSection": "market",
+      "evidenceRefs": [
+        "market-1t5qjse"
+      ],
+      "status": "open"
+    },
+    {
+      "id": "market-action-4",
+      "title": "验证市场机会：AI Prompt Kit",
+      "description": "低成本验证 AI Prompt Kit：发布预售/等候名单/内容测试。 用产品页点击、咨询、订单或手动购买意向验证需求。",
+      "priority": "high",
+      "owner": "codex",
+      "relatedSection": "market",
+      "evidenceRefs": [
+        "market-b3dx3t"
+      ],
+      "status": "open"
+    },
+    {
+      "id": "market-action-5",
+      "title": "验证市场机会：ComfyUI 工作流包",
+      "description": "低成本验证 ComfyUI 工作流包：发布预售/等候名单/内容测试。 用产品页点击、咨询、订单或手动购买意向验证需求。",
+      "priority": "high",
+      "owner": "codex",
+      "relatedSection": "market",
+      "evidenceRefs": [
+        "market-g5vpzt",
+        "market-1m3nhxl"
+      ],
+      "status": "open"
+    }
+  ]
+}

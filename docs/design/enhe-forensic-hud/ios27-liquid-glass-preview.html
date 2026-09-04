@@ -1,0 +1,646 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>ENHE Liquid Glass Preview</title>
+    <style>
+      :root {
+        --canvas: #070a12;
+        --canvas-deep: #030611;
+        --panel: rgba(238, 246, 255, 0.12);
+        --panel-strong: rgba(238, 246, 255, 0.17);
+        --panel-soft: rgba(238, 246, 255, 0.07);
+        --line: rgba(210, 230, 255, 0.18);
+        --line-strong: rgba(210, 230, 255, 0.32);
+        --text: #f6faff;
+        --soft: #c8d6ea;
+        --muted: #8f9db2;
+        --dim: #667489;
+        --cyan: #7dd3fc;
+        --cyan-bright: #a7f3ff;
+        --primary: #8ea7ff;
+        --violet: #c4b5fd;
+        --mint: #5ef1c7;
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        margin: 0;
+        min-height: 100vh;
+        overflow: hidden;
+        background:
+          radial-gradient(circle at 78% 16%, rgba(125, 211, 252, 0.23), transparent 30%),
+          radial-gradient(circle at 22% 86%, rgba(142, 167, 255, 0.18), transparent 34%),
+          linear-gradient(140deg, #030611 0%, #07101e 46%, #081a29 100%);
+        color: var(--text);
+        font-family:
+          Inter,
+          "SF Pro Display",
+          "SF Pro Text",
+          Arial,
+          Helvetica,
+          sans-serif;
+      }
+
+      body::before {
+        content: "";
+        position: fixed;
+        inset: 0;
+        background-image: radial-gradient(rgba(210, 230, 255, 0.16) 1px, transparent 1px);
+        background-size: 24px 24px;
+        mask-image: linear-gradient(to bottom, rgba(0, 0, 0, 0.9), transparent 86%);
+        pointer-events: none;
+      }
+
+      body::after {
+        content: "";
+        position: fixed;
+        inset: -20%;
+        background:
+          linear-gradient(115deg, transparent 10%, rgba(125, 211, 252, 0.08), transparent 38%),
+          linear-gradient(18deg, transparent 38%, rgba(196, 181, 253, 0.07), transparent 60%);
+        filter: blur(24px);
+        opacity: 0.85;
+        pointer-events: none;
+      }
+
+      .page {
+        position: relative;
+        z-index: 1;
+        width: min(1280px, calc(100vw - 64px));
+        margin: 0 auto;
+        padding: 28px 0 42px;
+      }
+
+      .nav {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        min-height: 70px;
+        padding: 12px 18px;
+        border: 1px solid var(--line);
+        border-radius: 999px;
+        background: linear-gradient(135deg, rgba(246, 250, 255, 0.14), rgba(125, 211, 252, 0.08));
+        box-shadow:
+          0 22px 70px rgba(0, 0, 0, 0.36),
+          inset 0 1px 0 rgba(255, 255, 255, 0.22);
+        backdrop-filter: blur(28px) saturate(150%);
+      }
+
+      .brand {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        font-weight: 750;
+      }
+
+      .brand-mark,
+      .mini-icon {
+        display: grid;
+        place-items: center;
+        width: 42px;
+        height: 42px;
+        border-radius: 14px;
+        background:
+          linear-gradient(135deg, rgba(142, 167, 255, 0.30), rgba(125, 211, 252, 0.16)),
+          rgba(246, 250, 255, 0.08);
+        border: 1px solid rgba(210, 230, 255, 0.22);
+        box-shadow: 0 0 22px rgba(125, 211, 252, 0.16);
+      }
+
+      .brand-mark svg,
+      .mini-icon svg {
+        width: 27px;
+        height: 27px;
+      }
+
+      .nav-links {
+        display: flex;
+        gap: 8px;
+        color: var(--soft);
+        font-size: 14px;
+        font-weight: 650;
+      }
+
+      .nav-links span {
+        padding: 12px 15px;
+        border-radius: 999px;
+      }
+
+      .nav-links span:first-child {
+        color: var(--text);
+        background: rgba(246, 250, 255, 0.10);
+        border: 1px solid rgba(210, 230, 255, 0.16);
+      }
+
+      .lang {
+        display: flex;
+        gap: 6px;
+        padding: 6px;
+        border-radius: 999px;
+        background: rgba(246, 250, 255, 0.07);
+        border: 1px solid rgba(210, 230, 255, 0.16);
+        color: var(--muted);
+        font-size: 13px;
+      }
+
+      .lang b {
+        padding: 8px 16px;
+        border-radius: 999px;
+        color: #061018;
+        background: linear-gradient(135deg, var(--cyan-bright), var(--primary));
+      }
+
+      .hero {
+        display: grid;
+        grid-template-columns: minmax(0, 0.88fr) minmax(440px, 1fr);
+        align-items: center;
+        gap: 34px;
+        padding: 76px 0 58px;
+      }
+
+      .eyebrow {
+        display: inline-flex;
+        gap: 9px;
+        align-items: center;
+        padding: 10px 15px;
+        color: var(--cyan-bright);
+        border: 1px solid rgba(125, 211, 252, 0.35);
+        border-radius: 999px;
+        background: rgba(125, 211, 252, 0.08);
+        box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.14);
+        font-size: 14px;
+        font-weight: 700;
+      }
+
+      h1 {
+        margin: 22px 0 18px;
+        font-size: clamp(64px, 8vw, 116px);
+        line-height: 0.88;
+        letter-spacing: 0;
+        font-weight: 760;
+      }
+
+      .hero p {
+        max-width: 630px;
+        margin: 0;
+        color: var(--soft);
+        font-size: 20px;
+        line-height: 1.72;
+      }
+
+      .actions {
+        display: flex;
+        gap: 14px;
+        margin-top: 34px;
+      }
+
+      .btn {
+        border: 1px solid rgba(210, 230, 255, 0.20);
+        border-radius: 999px;
+        padding: 15px 22px;
+        color: var(--text);
+        background: rgba(246, 250, 255, 0.08);
+        box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.14);
+        font-weight: 750;
+      }
+
+      .btn.primary {
+        background: linear-gradient(135deg, rgba(142, 167, 255, 0.42), rgba(125, 211, 252, 0.28));
+        border-color: rgba(210, 230, 255, 0.30);
+      }
+
+      .logo-stage {
+        position: relative;
+        display: grid;
+        place-items: center;
+        min-height: 520px;
+      }
+
+      .halo {
+        position: absolute;
+        width: min(620px, 100%);
+        aspect-ratio: 1;
+        border-radius: 50%;
+        background:
+          radial-gradient(circle at 38% 52%, rgba(125, 211, 252, 0.28), transparent 34%),
+          radial-gradient(circle at 60% 44%, rgba(142, 167, 255, 0.18), transparent 38%);
+        border: 1px solid rgba(210, 230, 255, 0.10);
+        box-shadow:
+          inset 0 0 95px rgba(125, 211, 252, 0.08),
+          0 0 80px rgba(125, 211, 252, 0.08);
+      }
+
+      .halo::before,
+      .halo::after {
+        content: "";
+        position: absolute;
+        inset: 11%;
+        border-radius: 50%;
+        border: 1px solid rgba(210, 230, 255, 0.10);
+      }
+
+      .halo::after {
+        inset: 24%;
+        transform: rotate(-12deg) scaleX(1.32);
+        border-color: rgba(125, 211, 252, 0.16);
+      }
+
+      .orbit {
+        position: absolute;
+        inset: 12px;
+        border-radius: 50%;
+      }
+
+      .dot {
+        position: absolute;
+        width: 10px;
+        height: 10px;
+        border-radius: 50%;
+        background: var(--cyan-bright);
+        box-shadow: 0 0 18px rgba(125, 211, 252, 0.65);
+      }
+
+      .dot:nth-child(1) {
+        left: 12%;
+        top: 23%;
+      }
+
+      .dot:nth-child(2) {
+        right: 10%;
+        top: 36%;
+        background: var(--mint);
+      }
+
+      .dot:nth-child(3) {
+        left: 24%;
+        bottom: 16%;
+        background: var(--violet);
+      }
+
+      .dot:nth-child(4) {
+        right: 20%;
+        bottom: 23%;
+        width: 7px;
+        height: 7px;
+        background: var(--primary);
+      }
+
+      .hero-logo {
+        position: relative;
+        width: 360px;
+        filter: drop-shadow(0 0 22px rgba(125, 211, 252, 0.18));
+      }
+
+      .hero-logo svg {
+        display: block;
+        width: 100%;
+        height: auto;
+      }
+
+      .sections {
+        display: grid;
+        grid-template-columns: 1fr 1fr 0.9fr;
+        gap: 22px;
+      }
+
+      .panel {
+        border: 1px solid var(--line);
+        border-radius: 34px;
+        background: linear-gradient(145deg, rgba(238, 246, 255, 0.13), rgba(125, 211, 252, 0.06));
+        box-shadow:
+          0 30px 90px rgba(0, 0, 0, 0.38),
+          inset 0 1px 0 rgba(255, 255, 255, 0.16);
+        backdrop-filter: blur(30px) saturate(145%);
+      }
+
+      .tool-panel {
+        padding: 18px;
+      }
+
+      .cover {
+        position: relative;
+        height: 210px;
+        overflow: hidden;
+        border: 1px solid rgba(210, 230, 255, 0.16);
+        border-radius: 26px;
+        background:
+          radial-gradient(circle at 76% 24%, rgba(94, 241, 199, 0.35), transparent 20%),
+          linear-gradient(135deg, rgba(142, 167, 255, 0.33), rgba(125, 211, 252, 0.12)),
+          rgba(246, 250, 255, 0.06);
+      }
+
+      .cover::before {
+        content: "";
+        position: absolute;
+        inset: 24px 28px;
+        border-radius: 20px;
+        border: 1px solid rgba(255, 255, 255, 0.20);
+        background:
+          linear-gradient(90deg, rgba(246, 250, 255, 0.20), transparent 45%),
+          rgba(3, 6, 17, 0.28);
+        transform: perspective(420px) rotateY(-11deg) rotateX(4deg);
+      }
+
+      .cover::after {
+        content: "";
+        position: absolute;
+        right: 36px;
+        top: 42px;
+        width: 110px;
+        height: 110px;
+        border-radius: 24px;
+        border: 1px solid rgba(255, 255, 255, 0.20);
+        background: rgba(246, 250, 255, 0.10);
+        box-shadow: 0 0 45px rgba(125, 211, 252, 0.16);
+      }
+
+      .card-copy {
+        padding: 18px 6px 4px;
+      }
+
+      .chips {
+        display: flex;
+        gap: 8px;
+        margin-bottom: 14px;
+      }
+
+      .chip {
+        padding: 7px 11px;
+        border: 1px solid rgba(210, 230, 255, 0.16);
+        border-radius: 999px;
+        color: var(--soft);
+        background: rgba(246, 250, 255, 0.08);
+        font-size: 12px;
+        font-weight: 750;
+      }
+
+      .chip.cool {
+        color: var(--cyan-bright);
+        border-color: rgba(125, 211, 252, 0.32);
+      }
+
+      h2,
+      h3 {
+        margin: 0;
+        letter-spacing: 0;
+      }
+
+      h3 {
+        font-size: 23px;
+        line-height: 1.18;
+      }
+
+      .card-copy p,
+      .admin p,
+      .metric span {
+        color: var(--muted);
+      }
+
+      .admin {
+        padding: 28px;
+      }
+
+      .metrics {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 12px;
+        margin-top: 22px;
+      }
+
+      .metric {
+        min-height: 94px;
+        padding: 18px;
+        border: 1px solid rgba(210, 230, 255, 0.15);
+        border-radius: 22px;
+        background: rgba(246, 250, 255, 0.07);
+      }
+
+      .metric b {
+        display: block;
+        margin-top: 10px;
+        color: var(--text);
+        font-size: 34px;
+        line-height: 1;
+      }
+
+      .palette {
+        grid-column: 1 / -1;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 14px;
+        padding: 18px;
+      }
+
+      .swatches {
+        display: flex;
+        gap: 10px;
+      }
+
+      .swatch {
+        width: 84px;
+        height: 42px;
+        border-radius: 999px;
+        border: 1px solid rgba(255, 255, 255, 0.22);
+        box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.18);
+      }
+
+      .s1 {
+        background: #070a12;
+      }
+
+      .s2 {
+        background: #0d1424;
+      }
+
+      .s3 {
+        background: #8ea7ff;
+      }
+
+      .s4 {
+        background: #7dd3fc;
+      }
+
+      .s5 {
+        background: #c4b5fd;
+      }
+
+      .s6 {
+        background: rgba(238, 246, 255, 0.16);
+      }
+
+      @media (max-width: 900px) {
+        body {
+          overflow: auto;
+        }
+
+        .page {
+          width: min(100% - 28px, 720px);
+        }
+
+        .nav-links {
+          display: none;
+        }
+
+        .hero,
+        .sections {
+          grid-template-columns: 1fr;
+        }
+
+        .logo-stage {
+          min-height: 420px;
+        }
+
+        .hero-logo {
+          width: 290px;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <main class="page">
+      <nav class="nav">
+        <div class="brand">
+          <span class="brand-mark">
+            <svg viewBox="0 0 64 64" aria-hidden="true">
+              <path d="M13 18h28v8H9z" fill="#8ea7ff" opacity=".9" />
+              <path d="M16 31h24v7H16z" fill="#7dd3fc" opacity=".86" />
+              <path d="M9 44h32v8H13z" fill="#5ef1c7" opacity=".78" />
+              <path d="M42 18h10v34H42V38H31v-8h11z" fill="#dbeafe" opacity=".92" />
+            </svg>
+          </span>
+          <span>恩禾 ENHE AI</span>
+        </div>
+        <div class="nav-links">
+          <span>首页</span>
+          <span>本地软件</span>
+          <span>在线工具</span>
+          <span>会员价格</span>
+          <span>用户中心</span>
+        </div>
+        <div class="lang"><b>中文</b><span style="padding: 8px 14px">EN</span></div>
+      </nav>
+
+      <section class="hero">
+        <div>
+          <div class="eyebrow">Liquid Glass / 冷调预览</div>
+          <h1>ENHE<br />AI Tools</h1>
+          <p>
+            自研电脑软件与在线网页工具分享共研平台。把工具封面、会员权益、订单审核和后台运营统一进一套更冷静、更高级、更易读的空间玻璃界面。
+          </p>
+          <div class="actions">
+            <div class="btn primary">本地软件</div>
+            <div class="btn">在线工具</div>
+            <div class="btn">后台看板</div>
+          </div>
+        </div>
+
+        <div class="logo-stage">
+          <div class="halo">
+            <div class="orbit">
+              <span class="dot"></span>
+              <span class="dot"></span>
+              <span class="dot"></span>
+              <span class="dot"></span>
+            </div>
+          </div>
+          <div class="hero-logo">
+            <svg viewBox="0 0 560 360" aria-label="ENHE AI logo preview">
+              <defs>
+                <linearGradient id="glassBlue" x1="0" x2="1" y1="0" y2="1">
+                  <stop offset="0" stop-color="#b9c7ff" />
+                  <stop offset=".48" stop-color="#7dd3fc" />
+                  <stop offset="1" stop-color="#5ef1c7" />
+                </linearGradient>
+                <linearGradient id="silver" x1="0" x2="1" y1="0" y2="1">
+                  <stop offset="0" stop-color="#f8fbff" />
+                  <stop offset=".5" stop-color="#c8d6ea" />
+                  <stop offset="1" stop-color="#8ea7ff" />
+                </linearGradient>
+                <filter id="softGlow" x="-30%" y="-30%" width="160%" height="160%">
+                  <feGaussianBlur stdDeviation="5" result="blur" />
+                  <feColorMatrix
+                    in="blur"
+                    type="matrix"
+                    values="0 0 0 0 0.49 0 0 0 0 0.83 0 0 0 0 0.99 0 0 0 .46 0"
+                  />
+                  <feMerge>
+                    <feMergeNode />
+                    <feMergeNode in="SourceGraphic" />
+                  </feMerge>
+                </filter>
+              </defs>
+              <g filter="url(#softGlow)">
+                <path d="M96 91h214v44H60z" fill="url(#glassBlue)" opacity=".96" />
+                <path d="M96 158h206v39H96z" fill="url(#glassBlue)" opacity=".88" />
+                <path d="M60 224h250v44H96z" fill="url(#glassBlue)" opacity=".86" />
+                <path d="M334 91h72v177h-72v-70h-78v-40h78z" fill="url(#silver)" opacity=".95" />
+              </g>
+              <g opacity=".28">
+                <path d="M104 104h188" stroke="#fff" stroke-width="3" />
+                <path d="M112 171h176" stroke="#fff" stroke-width="3" />
+                <path d="M101 237h187" stroke="#fff" stroke-width="3" />
+              </g>
+            </svg>
+          </div>
+        </div>
+      </section>
+
+      <section class="sections">
+        <article class="panel tool-panel">
+          <div class="cover"></div>
+          <div class="card-copy">
+            <div class="chips"><span class="chip cool">本地软件</span><span class="chip">VIP</span></div>
+            <h3>批量文件重命名助手</h3>
+            <p>封面优先展示，工具卡像高级文件资产，而不是普通商品卡。</p>
+          </div>
+        </article>
+
+        <article class="panel tool-panel">
+          <div class="cover" style="background: radial-gradient(circle at 70% 24%, rgba(196,181,253,.34), transparent 20%), linear-gradient(135deg, rgba(125,211,252,.26), rgba(142,167,255,.13)), rgba(246,250,255,.06)"></div>
+          <div class="card-copy">
+            <div class="chips"><span class="chip cool">在线工具</span><span class="chip">权限控制</span></div>
+            <h3>文案清洗在线工具</h3>
+            <p>冷白文字、蓝灰层级、轻微玻璃高光，增强年轻感和高级感。</p>
+          </div>
+        </article>
+
+        <aside class="panel admin">
+          <div class="mini-icon">
+            <svg viewBox="0 0 64 64" aria-hidden="true">
+              <path d="M14 18h36M14 32h28M14 46h22" stroke="#a7f3ff" stroke-width="5" stroke-linecap="round" />
+            </svg>
+          </div>
+          <h2 style="margin-top: 18px">运营看板</h2>
+          <p>后台界面更克制，强化列表、筛选、状态和待办提醒。</p>
+          <div class="metrics">
+            <div class="metric"><span>待审核</span><b>12</b></div>
+            <div class="metric"><span>活跃 VIP</span><b>328</b></div>
+            <div class="metric"><span>工具数量</span><b>48</b></div>
+            <div class="metric"><span>转化率</span><b>9.6%</b></div>
+          </div>
+        </aside>
+
+        <section class="panel palette">
+          <div>
+            <h3>冷调 Liquid Glass 色彩样式</h3>
+            <p style="margin: 8px 0 0; color: var(--muted)">去掉暖琥珀主色，使用石墨蓝、冰蓝、冷白、淡紫和少量薄荷绿。</p>
+          </div>
+          <div class="swatches" aria-label="palette">
+            <span class="swatch s1"></span>
+            <span class="swatch s2"></span>
+            <span class="swatch s3"></span>
+            <span class="swatch s4"></span>
+            <span class="swatch s5"></span>
+            <span class="swatch s6"></span>
+          </div>
+        </section>
+      </section>
+    </main>
+  </body>
+</html>

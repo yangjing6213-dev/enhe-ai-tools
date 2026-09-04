@@ -1,0 +1,274 @@
+{
+  "snapshot": {
+    "generatedAt": "2026-07-03T02:33:32.597Z",
+    "commands": [
+      {
+        "key": "lint",
+        "label": "Lint",
+        "command": "npm run lint",
+        "status": "passed",
+        "exitCode": 0,
+        "stdoutSummary": "> enhe-ai-tools@0.1.0 lint > eslint .",
+        "stderrSummary": "",
+        "durationMs": 11815,
+        "checkedAt": "2026-07-03T02:31:15.434Z",
+        "summary": "Lint passed: npm run lint"
+      },
+      {
+        "key": "typecheck",
+        "label": "Typecheck",
+        "command": "npm run typecheck",
+        "status": "passed",
+        "exitCode": 0,
+        "stdoutSummary": "> enhe-ai-tools@0.1.0 typecheck > tsc --noEmit",
+        "stderrSummary": "",
+        "durationMs": 6242,
+        "checkedAt": "2026-07-03T02:31:21.676Z",
+        "summary": "Typecheck passed: npm run typecheck"
+      },
+      {
+        "key": "build",
+        "label": "Build",
+        "command": "npm run build",
+        "status": "passed",
+        "exitCode": 0,
+        "stdoutSummary": "└ ƒ /user                                    2.66 kB         117 kB + First Load JS shared by all                 102 kB ├ chunks/1255-b28ea36bf0cdbd65.js          46.2 kB ├ chunks/4bd1b696-f785427dddbba9fb.js      54.2 kB └ other shared chunks (total)                 2 kB ○  (Static)   prerendered as static content ●  (SSG)      prerendered as static HTML (uses generateStaticParams) ƒ  (Dynamic)  server-rendered on demand",
+        "stderrSummary": "Environment variables loaded from .env",
+        "durationMs": 124510,
+        "checkedAt": "2026-07-03T02:33:26.186Z",
+        "summary": "Build passed: npm run build"
+      },
+      {
+        "key": "ebos_tests",
+        "label": "EBOS Tests",
+        "command": "npm run test -- src/lib/ebos",
+        "status": "passed",
+        "exitCode": 0,
+        "stdoutSummary": "✓ src/lib/ebos/integrations/__tests__/env-detection.test.ts (2 tests) 6ms ✓ src/lib/ebos/monthly/__tests__/monthly-review-markdown.test.ts (2 tests) 7ms ✓ src/lib/ebos/monthly/__tests__/monthly-review-html.test.ts (1 test) 5ms ✓ src/lib/ebos/__tests__/confidence.test.ts (4 tests) 6ms Test Files  29 passed (29) Tests  127 passed (127) Start at  10:33:27 Duration  2.70s (transform 3.45s, setup 0ms, collect 7.11s, tests 495ms, environment 10ms, prepare 9.26s)",
+        "stderrSummary": "",
+        "durationMs": 4553,
+        "checkedAt": "2026-07-03T02:33:30.739Z",
+        "summary": "EBOS Tests passed: npm run test -- src/lib/ebos"
+      },
+      {
+        "key": "unit_tests",
+        "label": "Unit Tests",
+        "command": "npm test",
+        "status": "skipped",
+        "exitCode": null,
+        "stdoutSummary": "",
+        "stderrSummary": "Step 3 records this check as skipped until the command is wired into automated health snapshots.",
+        "durationMs": null,
+        "checkedAt": "2026-07-03T02:33:30.739Z",
+        "summary": "Unit Tests skipped: npm test"
+      },
+      {
+        "key": "playwright_smoke",
+        "label": "Playwright Smoke",
+        "command": "npm run test:e2e",
+        "status": "skipped",
+        "exitCode": null,
+        "stdoutSummary": "",
+        "stderrSummary": "Step 3 records this check as skipped until the command is wired into automated health snapshots.",
+        "durationMs": null,
+        "checkedAt": "2026-07-03T02:33:30.739Z",
+        "summary": "Playwright Smoke skipped: npm run test:e2e"
+      },
+      {
+        "key": "lighthouse",
+        "label": "Lighthouse",
+        "command": "lighthouse",
+        "status": "skipped",
+        "exitCode": null,
+        "stdoutSummary": "",
+        "stderrSummary": "Step 3 records this check as skipped until the command is wired into automated health snapshots.",
+        "durationMs": null,
+        "checkedAt": "2026-07-03T02:33:30.739Z",
+        "summary": "Lighthouse skipped: lighthouse"
+      },
+      {
+        "key": "sitemap",
+        "label": "Sitemap",
+        "command": "HEAD https://www.enhe-tech.com.cn/sitemap.xml",
+        "status": "passed",
+        "exitCode": 0,
+        "url": "https://www.enhe-tech.com.cn/sitemap.xml",
+        "httpStatus": 200,
+        "stdoutSummary": "",
+        "stderrSummary": "",
+        "durationMs": 174,
+        "checkedAt": "2026-07-03T02:33:32.327Z",
+        "summary": "Sitemap passed with HTTP 200.",
+        "recommendation": "No action required.",
+        "source": "default"
+      },
+      {
+        "key": "robots",
+        "label": "Robots",
+        "command": "HEAD https://www.enhe-tech.com.cn/robots.txt",
+        "status": "passed",
+        "exitCode": 0,
+        "url": "https://www.enhe-tech.com.cn/robots.txt",
+        "httpStatus": 200,
+        "stdoutSummary": "",
+        "stderrSummary": "",
+        "durationMs": 304,
+        "checkedAt": "2026-07-03T02:33:32.458Z",
+        "summary": "Robots passed with HTTP 200.",
+        "recommendation": "No action required.",
+        "source": "default"
+      },
+      {
+        "key": "homepage",
+        "label": "Homepage",
+        "command": "HEAD https://www.enhe-tech.com.cn",
+        "status": "passed",
+        "exitCode": 0,
+        "url": "https://www.enhe-tech.com.cn",
+        "httpStatus": 307,
+        "stdoutSummary": "",
+        "stderrSummary": "",
+        "durationMs": 329,
+        "checkedAt": "2026-07-03T02:33:32.484Z",
+        "summary": "Homepage passed with HTTP 307.",
+        "recommendation": "No action required.",
+        "source": "default"
+      },
+      {
+        "key": "key_product_pages",
+        "label": "Key Product Page Product detail: windows-ai",
+        "command": "HEAD https://www.enhe-tech.com.cn/software/windows-ai",
+        "status": "passed",
+        "exitCode": 0,
+        "url": "https://www.enhe-tech.com.cn/software/windows-ai",
+        "httpStatus": 200,
+        "stdoutSummary": "",
+        "stderrSummary": "",
+        "durationMs": 278,
+        "checkedAt": "2026-07-03T02:33:32.434Z",
+        "summary": "Key Product Page Product detail: windows-ai passed with HTTP 200.",
+        "recommendation": "No action required.",
+        "source": "sitemap",
+        "sourceConfidence": "complete",
+        "reason": "Discovered in the checked site's sitemap.xml.",
+        "expectedPublic": true,
+        "environmentMismatchRisk": false,
+        "isProductDetailPage": true
+      },
+      {
+        "key": "key_product_pages",
+        "label": "Key Product Page Product detail: local-ai-video-studio-for-creator-workflows",
+        "command": "HEAD https://www.enhe-tech.com.cn/software/local-ai-video-studio-for-creator-workflows",
+        "status": "passed",
+        "exitCode": 0,
+        "url": "https://www.enhe-tech.com.cn/software/local-ai-video-studio-for-creator-workflows",
+        "httpStatus": 200,
+        "stdoutSummary": "",
+        "stderrSummary": "",
+        "durationMs": 439,
+        "checkedAt": "2026-07-03T02:33:32.596Z",
+        "summary": "Key Product Page Product detail: local-ai-video-studio-for-creator-workflows passed with HTTP 200.",
+        "recommendation": "No action required.",
+        "source": "sitemap",
+        "sourceConfidence": "complete",
+        "reason": "Discovered in the checked site's sitemap.xml.",
+        "expectedPublic": true,
+        "environmentMismatchRisk": false,
+        "isProductDetailPage": true
+      },
+      {
+        "key": "key_product_pages",
+        "label": "Key Product Page Product detail: zfb-transfer-link-qr-code-generator",
+        "command": "HEAD https://www.enhe-tech.com.cn/software/zfb-transfer-link-qr-code-generator",
+        "status": "passed",
+        "exitCode": 0,
+        "url": "https://www.enhe-tech.com.cn/software/zfb-transfer-link-qr-code-generator",
+        "httpStatus": 200,
+        "stdoutSummary": "",
+        "stderrSummary": "",
+        "durationMs": 439,
+        "checkedAt": "2026-07-03T02:33:32.597Z",
+        "summary": "Key Product Page Product detail: zfb-transfer-link-qr-code-generator passed with HTTP 200.",
+        "recommendation": "No action required.",
+        "source": "sitemap",
+        "sourceConfidence": "complete",
+        "reason": "Discovered in the checked site's sitemap.xml.",
+        "expectedPublic": true,
+        "environmentMismatchRisk": false,
+        "isProductDetailPage": true
+      },
+      {
+        "key": "key_product_pages",
+        "label": "Key Product Page Product detail: faceswap-studio-ai",
+        "command": "HEAD https://www.enhe-tech.com.cn/software/faceswap-studio-ai",
+        "status": "passed",
+        "exitCode": 0,
+        "url": "https://www.enhe-tech.com.cn/software/faceswap-studio-ai",
+        "httpStatus": 200,
+        "stdoutSummary": "",
+        "stderrSummary": "",
+        "durationMs": 436,
+        "checkedAt": "2026-07-03T02:33:32.595Z",
+        "summary": "Key Product Page Product detail: faceswap-studio-ai passed with HTTP 200.",
+        "recommendation": "No action required.",
+        "source": "sitemap",
+        "sourceConfidence": "complete",
+        "reason": "Discovered in the checked site's sitemap.xml.",
+        "expectedPublic": true,
+        "environmentMismatchRisk": false,
+        "isProductDetailPage": true
+      },
+      {
+        "key": "key_product_pages",
+        "label": "Key Product Page Product detail: local-ai-voice-generator-for-voiceover-materials",
+        "command": "HEAD https://www.enhe-tech.com.cn/software/local-ai-voice-generator-for-voiceover-materials",
+        "status": "passed",
+        "exitCode": 0,
+        "url": "https://www.enhe-tech.com.cn/software/local-ai-voice-generator-for-voiceover-materials",
+        "httpStatus": 200,
+        "stdoutSummary": "",
+        "stderrSummary": "",
+        "durationMs": 434,
+        "checkedAt": "2026-07-03T02:33:32.594Z",
+        "summary": "Key Product Page Product detail: local-ai-voice-generator-for-voiceover-materials passed with HTTP 200.",
+        "recommendation": "No action required.",
+        "source": "sitemap",
+        "sourceConfidence": "complete",
+        "reason": "Discovered in the checked site's sitemap.xml.",
+        "expectedPublic": true,
+        "environmentMismatchRisk": false,
+        "isProductDetailPage": true
+      }
+    ]
+  },
+  "score": {
+    "score": 91,
+    "grade": "excellent",
+    "confidence": "partial",
+    "findings": [
+      {
+        "message": "EBOS website health snapshot: 15 of 15 recorded checks are not failed."
+      }
+    ],
+    "risks": [
+      {
+        "message": "No failed health checks recorded.",
+        "severity": "info"
+      }
+    ],
+    "recommendations": [
+      {
+        "message": "skipped check unit_tests; wire it into the health snapshot when the command is ready.",
+        "priority": "medium"
+      },
+      {
+        "message": "skipped check playwright_smoke; wire it into the health snapshot when the command is ready.",
+        "priority": "medium"
+      },
+      {
+        "message": "skipped check lighthouse; wire it into the health snapshot when the command is ready.",
+        "priority": "medium"
+      }
+    ]
+  }
+}

@@ -1,0 +1,935 @@
+{
+  "meta": {
+    "contractVersion": "ebos-evidence-v1",
+    "evidenceKind": "monthly_review",
+    "generatedAt": "2026-07-07T01:55:23.604Z",
+    "targetDate": "2026-07-01",
+    "periodStart": "2026-07-01",
+    "periodEnd": "2026-07-31",
+    "environment": "unknown",
+    "generator": "scripts/generate-ebos-monthly-review.ts",
+    "sourceFiles": [
+      "C:\\Users\\HU\\Documents\\New project 2\\reports\\ebos\\monthly\\2026-07-monthly-review.md",
+      "C:\\Users\\HU\\Documents\\New project 2\\reports\\ebos\\monthly\\2026-07-monthly-review.html"
+    ]
+  },
+  "quality": {
+    "score": 79.39,
+    "confidence": "partial",
+    "dataCompleteness": "complete",
+    "warningsCount": 0,
+    "errorsCount": 0
+  },
+  "payload": {
+    "reportType": "monthly",
+    "targetMonth": "2026-07",
+    "periodStart": "2026-07-01",
+    "periodEnd": "2026-07-31",
+    "generatedAt": "2026-07-07T01:55:23.604Z",
+    "evidenceCatalogPath": "reports/ebos/evidence/catalog/latest-evidence-catalog.json",
+    "evidenceUsed": [
+      {
+        "catalogEntryId": "monthly_review:2026-07-01:2026-07-monthly_review.json",
+        "evidenceKind": "monthly_review",
+        "targetDate": "2026-07-01",
+        "score": 79.4,
+        "confidence": "partial",
+        "filePath": "reports/ebos/evidence/monthly_review/2026-07-monthly_review.json",
+        "summary": {
+          "overallScore": 79.4,
+          "evidenceUsedCount": 10,
+          "majorRisksCount": 2,
+          "nextMonthOKRsCount": 2,
+          "confidence": "partial"
+        }
+      },
+      {
+        "catalogEntryId": "competitor_evidence:2026-07-03:2026-07-03-competitor_evidence.json",
+        "evidenceKind": "competitor_evidence",
+        "targetDate": "2026-07-03",
+        "score": 69,
+        "confidence": "partial",
+        "filePath": "reports/ebos/evidence/competitor_evidence/2026-07-03-competitor_evidence.json",
+        "summary": {
+          "summaryType": "competitor_evidence",
+          "overallScore": 69,
+          "competitorsCount": 3,
+          "competitorsAuditedCount": 3,
+          "includeNetworkSources": true,
+          "pagesAttempted": 6,
+          "pagesSucceeded": 3,
+          "pagesFailed": 3,
+          "opportunitiesCount": 6,
+          "topDifferentiationOpportunities": [
+            {
+              "title": "Validate AI Prompt Kit differentiation",
+              "priorityScore": 72,
+              "recommendedAction": "validate_first"
+            },
+            {
+              "title": "Validate SEO/GEO 自动化内容集群 differentiation",
+              "priorityScore": 68,
+              "recommendedAction": "validate_first"
+            },
+            {
+              "title": "Validate AI Agent 工作流模板包 differentiation",
+              "priorityScore": 67,
+              "recommendedAction": "validate_first"
+            },
+            {
+              "title": "Validate AI 视频工作流包 differentiation",
+              "priorityScore": 63,
+              "recommendedAction": "improve_existing_product"
+            },
+            {
+              "title": "Create competitor-informed SEO/GEO comparison content",
+              "priorityScore": 61,
+              "recommendedAction": "create_content_first"
+            }
+          ],
+          "actionItemsCount": 5,
+          "confidence": "partial"
+        }
+      },
+      {
+        "catalogEntryId": "market_evidence:2026-07-03:2026-07-03-market_evidence.json",
+        "evidenceKind": "market_evidence",
+        "targetDate": "2026-07-03",
+        "score": 75,
+        "confidence": "partial",
+        "filePath": "reports/ebos/evidence/market_evidence/2026-07-03-market_evidence.json",
+        "summary": {
+          "summaryType": "market_evidence",
+          "overallScore": 75,
+          "signalsCount": 10,
+          "recommendedProductDirectionsCount": 5,
+          "topProductDirections": [
+            {
+              "productDirection": "AI Agent 工作流模板包",
+              "priorityScore": 76,
+              "recommendedAction": "validate_first"
+            },
+            {
+              "productDirection": "AI 视频工作流包",
+              "priorityScore": 75,
+              "recommendedAction": "validate_first"
+            },
+            {
+              "productDirection": "SEO/GEO 自动化内容集群",
+              "priorityScore": 75,
+              "recommendedAction": "validate_first"
+            },
+            {
+              "productDirection": "AI Prompt Kit",
+              "priorityScore": 74,
+              "recommendedAction": "validate_first"
+            },
+            {
+              "productDirection": "ComfyUI 工作流包",
+              "priorityScore": 67,
+              "recommendedAction": "validate_first"
+            }
+          ],
+          "actionItemsCount": 5,
+          "confidence": "partial"
+        }
+      },
+      {
+        "catalogEntryId": "revenue_evidence:2026-07-03:2026-07-03-revenue_evidence.json",
+        "evidenceKind": "revenue_evidence",
+        "targetDate": "2026-07-03",
+        "score": 50,
+        "confidence": "partial",
+        "filePath": "reports/ebos/evidence/revenue_evidence/2026-07-03-revenue_evidence.json",
+        "summary": {
+          "summaryType": "revenue_evidence",
+          "overallScore": 50,
+          "grossRevenue": 29,
+          "netRevenue": 0,
+          "totalOrders": 1,
+          "paidOrders": 1,
+          "firstRevenueAchieved": false,
+          "topProductRevenueMetrics": [
+            {
+              "productSlug": "upload-fix-local-app-1780594990538",
+              "productName": "Upload Fix Local App 1780594990538",
+              "netRevenue": 0,
+              "paidOrdersCount": 0
+            },
+            {
+              "productSlug": "e2e-vip-software-1779325662692-320",
+              "productName": "E2E VIP 软件 1779325662692-320",
+              "netRevenue": 0,
+              "paidOrdersCount": 0
+            },
+            {
+              "productSlug": "auto-local-tool-1780589814970",
+              "productName": "Auto Local Tool 1780589814970",
+              "netRevenue": 0,
+              "paidOrdersCount": 0
+            },
+            {
+              "productSlug": "tool-cmptpgzow0007toe0ld9yuc0w",
+              "productName": "测试",
+              "netRevenue": 0,
+              "paidOrdersCount": 0
+            },
+            {
+              "productSlug": "e2e-vip-online-1779325662692-320",
+              "productName": "E2E VIP 在线工具 1779325662692-320",
+              "netRevenue": 0,
+              "paidOrdersCount": 0
+            }
+          ],
+          "actionItemsCount": 4,
+          "confidence": "partial"
+        }
+      },
+      {
+        "catalogEntryId": "product_evidence:2026-07-03:2026-07-03-product_evidence.json",
+        "evidenceKind": "product_evidence",
+        "targetDate": "2026-07-03",
+        "score": 91,
+        "confidence": "complete",
+        "filePath": "reports/ebos/evidence/product_evidence/2026-07-03-product_evidence.json",
+        "summary": {
+          "summaryType": "product_evidence",
+          "overallScore": 91,
+          "productsAudited": 5,
+          "conversionRisksCount": 3,
+          "actionItemsCount": 3,
+          "confidence": "complete",
+          "databaseSummary": {
+            "totalProducts": 7,
+            "publishedProducts": 6,
+            "draftProducts": 1,
+            "productsWithPrice": 2,
+            "productsWithDownload": 2,
+            "productsWithFaq": 4,
+            "productsWithCover": 7,
+            "productsWithTags": 0,
+            "productsWithSeoFields": 7,
+            "productsWithGeoFields": 7
+          }
+        }
+      },
+      {
+        "catalogEntryId": "weekly_report:2026-06-29:2026-06-29-weekly_report.json",
+        "evidenceKind": "weekly_report",
+        "targetDate": "2026-06-29",
+        "score": 74.1,
+        "confidence": "partial",
+        "filePath": "reports/ebos/evidence/weekly_report/2026-06-29-weekly_report.json",
+        "summary": {
+          "weeklyScore": 74.1,
+          "topActionItems": [
+            "选择 1-2 个高 readiness 产品进行首批收入验证",
+            "补齐购买后的下载/交付承接",
+            "验证产品收入路径：FaceSwap Studio｜本地人像合成研究工具",
+            "验证产品收入路径：AI Video Studio｜本地视频生成工作台",
+            "补齐流量来源数据源"
+          ],
+          "sectionCount": 10,
+          "confidence": "partial"
+        }
+      },
+      {
+        "catalogEntryId": "geo_evidence:2026-07-03:2026-07-03-geo_evidence.json",
+        "evidenceKind": "geo_evidence",
+        "targetDate": "2026-07-03",
+        "score": 95,
+        "confidence": "partial",
+        "filePath": "reports/ebos/evidence/geo_evidence/2026-07-03-geo_evidence.json",
+        "summary": {
+          "summaryType": "geo_evidence",
+          "overallScore": 95,
+          "pagesAudited": 20,
+          "citationReadinessAverage": 100,
+          "actionItemsCount": 1,
+          "confidence": "partial"
+        }
+      },
+      {
+        "catalogEntryId": "seo_evidence:2026-07-03:2026-07-03-seo_evidence.json",
+        "evidenceKind": "seo_evidence",
+        "targetDate": "2026-07-03",
+        "score": 90,
+        "confidence": "complete",
+        "filePath": "reports/ebos/evidence/seo_evidence/2026-07-03-seo_evidence.json",
+        "summary": {
+          "summaryType": "seo_evidence",
+          "overallScore": 90,
+          "pagesAudited": 20,
+          "technicalRisksCount": 0,
+          "actionItemsCount": 0,
+          "confidence": "complete"
+        }
+      },
+      {
+        "catalogEntryId": "data_source_readiness:2026-07-03:2026-07-03-data_source_readiness.json",
+        "evidenceKind": "data_source_readiness",
+        "targetDate": "2026-07-03",
+        "confidence": "partial",
+        "filePath": "reports/ebos/evidence/data_source_readiness/2026-07-03-data_source_readiness.json",
+        "summary": {
+          "configuredCount": 1,
+          "availableCount": 0,
+          "missingConfigCount": 8,
+          "missingIntegrations": [
+            "internal_database",
+            "google_search_console",
+            "google_analytics",
+            "bing_webmaster",
+            "cloudflare",
+            "whop",
+            "market_research",
+            "ai_search_probe"
+          ]
+        }
+      },
+      {
+        "catalogEntryId": "health_snapshot:2026-07-03:2026-07-03-health_snapshot.json",
+        "evidenceKind": "health_snapshot",
+        "targetDate": "2026-07-03",
+        "score": 91,
+        "confidence": "partial",
+        "filePath": "reports/ebos/evidence/health_snapshot/2026-07-03-health_snapshot.json",
+        "summary": {
+          "score": 91,
+          "grade": "excellent",
+          "failedChecks": [],
+          "smokeChecksCount": 8,
+          "keyProductPagesStatus": {
+            "total": 5,
+            "passed": 5,
+            "failed": 0
+          }
+        }
+      }
+    ],
+    "overallScore": 79.39,
+    "confidence": "partial",
+    "executiveSummary": "本月 evidence 平均分为 79.39，confidence 为 partial。下月重点是补齐经营证据链、减少执行积压，并建立收入与产品转化 evidence。",
+    "strategicFindings": [
+      {
+        "title": "技术健康基础较好",
+        "description": "health_snapshot score 为 91，说明构建、类型检查、EBOS 测试和关键页面健康基础较好。",
+        "evidenceRefs": [
+          "health_snapshot:2026-07-03:2026-07-03-health_snapshot.json"
+        ],
+        "severity": "info",
+        "recommendation": "继续保持构建、类型检查、EBOS 测试健康。"
+      },
+      {
+        "title": "经营数据源不足",
+        "description": "data_source_readiness 显示多个关键经营数据源仍缺失，月度复盘不能形成完整收入、流量、SEO/GEO 事实链。",
+        "evidenceRefs": [
+          "data_source_readiness:2026-07-03:2026-07-03-data_source_readiness.json"
+        ],
+        "severity": "warning",
+        "recommendation": "优先补齐收入、SEO/GEO、流量和产品转化 evidence。"
+      },
+      {
+        "title": "执行积压风险",
+        "description": "当前 open action items 约 39 个，可能导致计划持续新增但无法关闭。",
+        "evidenceRefs": [
+          "weekly_report:2026-06-29:2026-06-29-weekly_report.json"
+        ],
+        "severity": "warning",
+        "recommendation": "下月 OKR 必须包含减少执行积压。"
+      }
+    ],
+    "majorWins": [
+      {
+        "title": "技术健康基础较好",
+        "description": "health_snapshot score 为 91，说明构建、类型检查、EBOS 测试和关键页面健康基础较好。",
+        "evidenceRefs": [
+          "health_snapshot:2026-07-03:2026-07-03-health_snapshot.json"
+        ],
+        "severity": "info",
+        "recommendation": "继续保持构建、类型检查、EBOS 测试健康。"
+      }
+    ],
+    "majorRisks": [
+      {
+        "title": "经营数据源不足",
+        "description": "data_source_readiness 显示多个关键经营数据源仍缺失，月度复盘不能形成完整收入、流量、SEO/GEO 事实链。",
+        "evidenceRefs": [
+          "data_source_readiness:2026-07-03:2026-07-03-data_source_readiness.json"
+        ],
+        "severity": "warning",
+        "recommendation": "优先补齐收入、SEO/GEO、流量和产品转化 evidence。"
+      },
+      {
+        "title": "执行积压风险",
+        "description": "当前 open action items 约 39 个，可能导致计划持续新增但无法关闭。",
+        "evidenceRefs": [
+          "weekly_report:2026-06-29:2026-06-29-weekly_report.json"
+        ],
+        "severity": "warning",
+        "recommendation": "下月 OKR 必须包含减少执行积压。"
+      }
+    ],
+    "failedAssumptions": [],
+    "growthOpportunities": [],
+    "stopDoing": [
+      {
+        "title": "停止用感觉替代证据",
+        "reason": "当前仍缺 revenue/product/SEO/GEO 等关键证据，不能用主观判断替代证据链。",
+        "evidenceRefs": [],
+        "priority": "high",
+        "owner": "human"
+      }
+    ],
+    "keepDoing": [
+      {
+        "title": "保持构建、类型检查、EBOS 测试健康",
+        "reason": "health_snapshot 分数较高，应维持当前工程质量门槛。",
+        "evidenceRefs": [],
+        "priority": "medium",
+        "owner": "codex"
+      }
+    ],
+    "startDoing": [
+      {
+        "title": "Adjust validation direction: FaceSwap Studio｜本地人像合成研究工具",
+        "reason": "Validation result report recorded partial success; adjust offer, CTA, price, or channel before repeating.",
+        "evidenceRefs": [
+          "reports/ebos/validation/templates/2026-07-03-validation-tracker.json"
+        ],
+        "priority": "medium",
+        "owner": "human"
+      },
+      {
+        "title": "Adjust validation direction: AI Video Studio｜本地视频生成工作台",
+        "reason": "Validation result report recorded partial success; adjust offer, CTA, price, or channel before repeating.",
+        "evidenceRefs": [
+          "reports/ebos/validation/templates/2026-07-03-validation-tracker.json"
+        ],
+        "priority": "medium",
+        "owner": "human"
+      },
+      {
+        "title": "Adjust validation direction: AI Prompt Kit",
+        "reason": "Validation result report recorded partial success; adjust offer, CTA, price, or channel before repeating.",
+        "evidenceRefs": [
+          "reports/ebos/validation/templates/2026-07-03-validation-tracker.json"
+        ],
+        "priority": "medium",
+        "owner": "human"
+      },
+      {
+        "title": "把每次复盘写回 evidence catalog",
+        "reason": "Monthly Review 后续必须成为可索引 evidence。",
+        "evidenceRefs": [],
+        "priority": "high",
+        "owner": "codex"
+      }
+    ],
+    "nextMonthOKRs": [
+      {
+        "objective": "Keep migration guard active for non-schema work",
+        "keyResults": [
+          {
+            "title": "Migration release runbook exists",
+            "status": "not_started"
+          },
+          {
+            "title": "RUN_PRISMA_MIGRATE stays unset or 0 for page, copy, report, and external publishing work",
+            "status": "not_started"
+          },
+          {
+            "title": "No migration is recommended while safeToRunMigration=false",
+            "status": "not_started"
+          }
+        ]
+      },
+      {
+        "objective": "Move from synthetic optimization to real external publishing validation",
+        "keyResults": [
+          {
+            "title": "Confirm synthetic optimization implementation completed",
+            "status": "not_started"
+          },
+          {
+            "title": "Publish or contact at least one real external channel",
+            "status": "not_started"
+          },
+          {
+            "title": "Keep hasRealSignals=false until real external channel data exists",
+            "status": "not_started"
+          }
+        ]
+      },
+      {
+        "objective": "等待真实外部渠道数据",
+        "keyResults": [
+          {
+            "title": "Publish AI Prompt Kit on at least one real external channel",
+            "status": "not_started"
+          },
+          {
+            "title": "Keep all unobserved metrics at 0",
+            "status": "not_started"
+          },
+          {
+            "title": "Backfill only after hasRealSignals=true",
+            "status": "not_started"
+          }
+        ]
+      },
+      {
+        "objective": "Confirm real deployment execution with operator checklist",
+        "keyResults": [
+          {
+            "title": "User confirms whether to enter real production deployment execution",
+            "status": "not_started"
+          },
+          {
+            "title": "Keep server/Docker/Nginx commands manual until executable environment is confirmed",
+            "status": "not_started"
+          },
+          {
+            "title": "Update deployment status only from observed command results",
+            "status": "not_started"
+          }
+        ]
+      },
+      {
+        "objective": "开始真实外部渠道发布和数据回填",
+        "keyResults": [
+          {
+            "title": "Publish validation asset on real external channels",
+            "status": "not_started"
+          },
+          {
+            "title": "Record observed CTA, inquiry, order, revenue, refund, and feedback metrics only",
+            "status": "not_started"
+          },
+          {
+            "title": "Regenerate validation, decision, weekly, and monthly reports",
+            "status": "not_started"
+          }
+        ]
+      },
+      {
+        "objective": "Execute production deployment after explicit confirmation",
+        "keyResults": [
+          {
+            "title": "Confirm production deployment approval",
+            "status": "not_started"
+          },
+          {
+            "title": "Execute only the reviewed deployment plan",
+            "status": "not_started"
+          },
+          {
+            "title": "Run post-deploy smoke tests and regenerate EBOS reports",
+            "status": "not_started"
+          }
+        ]
+      },
+      {
+        "objective": "Execute validation deployment for AI Prompt Kit",
+        "keyResults": [
+          {
+            "title": "Complete launch execution checklist",
+            "status": "not_started"
+          },
+          {
+            "title": "Prepare post-launch route checks",
+            "status": "not_started"
+          },
+          {
+            "title": "Keep external data empty until real observed signals exist",
+            "status": "not_started"
+          }
+        ]
+      },
+      {
+        "objective": "Run real validation launch for AI Prompt Kit",
+        "keyResults": [
+          {
+            "title": "Publish or confirm the validation page",
+            "status": "not_started"
+          },
+          {
+            "title": "Record real CTA, inquiry, order, refund, and feedback signals only after they happen",
+            "status": "not_started"
+          },
+          {
+            "title": "Regenerate validation, decision, weekly, and monthly reports after intake",
+            "status": "not_started"
+          }
+        ]
+      },
+      {
+        "objective": "Validate decision report priority: Validate SEO/GEO 自动化内容集群",
+        "keyResults": [
+          {
+            "title": "Complete the primary validation asset",
+            "status": "not_started"
+          },
+          {
+            "title": "Record CTA clicks, leads, presale, or manual purchase intent",
+            "status": "not_started"
+          },
+          {
+            "title": "Write validation result back into next evidence cycle",
+            "status": "not_started"
+          }
+        ]
+      },
+      {
+        "objective": "获得第一批真实收入",
+        "keyResults": [
+          {
+            "title": "完成至少 1 个产品的付费验证",
+            "status": "not_started"
+          },
+          {
+            "title": "形成订单、支付、退款和产品归因证据",
+            "status": "not_started"
+          },
+          {
+            "title": "把首批收入验证结果写回 revenue_evidence",
+            "status": "not_started"
+          }
+        ]
+      },
+      {
+        "objective": "减少执行积压",
+        "keyResults": [
+          {
+            "title": "关闭或拆解 50% 高优先级 open action items",
+            "status": "not_started"
+          },
+          {
+            "title": "为每个高优先级任务定义验收标准",
+            "status": "not_started"
+          },
+          {
+            "title": "把无法本月完成的任务降级或移出计划",
+            "status": "not_started"
+          }
+        ]
+      }
+    ],
+    "codexTasks": [
+      {
+        "title": "Keep migration skipped unless a dedicated migration release is approved",
+        "reason": "Migration release risk audit exists and safeToRunMigration=false. migrationGuardVariable=RUN_PRISMA_MIGRATE; defaultMigrationBehavior=skip_unless_explicit; safeToRunMigration=false. Do not execute migration for page/copy/report-only releases.",
+        "evidenceRefs": [
+          "reports/ebos/deployment/migration-release/2026-07-03-migration-release-runbook.json",
+          "reports/ebos/deployment/migration-release/2026-07-03-migration-release-risk-audit.json"
+        ],
+        "priority": "medium",
+        "owner": "codex"
+      },
+      {
+        "title": "Start real publishing validation after synthetic optimization",
+        "reason": "Synthetic failure scenario and optimization implementation exist. Treat both as simulated planning and copy/page implementation only; next step is real publishing validation with observed data. implementedFixes=7; nextRealValidationActions=6; externalPublishingStatus=waiting_real_data; hasRealSignals=false; canBackfill=false.",
+        "evidenceRefs": [
+          "reports\\ebos\\external-publishing\\simulations\\2026-07-03-synthetic-optimization-implementation.json",
+          "reports\\ebos\\external-publishing\\simulations\\2026-07-03-synthetic-optimization-plan.json"
+        ],
+        "priority": "high",
+        "owner": "codex"
+      },
+      {
+        "title": "等待真实外部渠道数据",
+        "reason": "External publish result input exists, but no real external data has been recorded yet. publishCoverage=0; dataCoverage=0.",
+        "evidenceRefs": [
+          "reports\\ebos\\external-publishing\\inputs\\2026-07-03-external-publish-result-input.json"
+        ],
+        "priority": "high",
+        "owner": "codex"
+      },
+      {
+        "title": "Confirm real deployment execution with operator checklist",
+        "reason": "operator checklist safeToProceed=true; manualRequiredCommands=7. Do not execute server/Docker/Nginx commands until the user explicitly starts real deployment execution.",
+        "evidenceRefs": [],
+        "priority": "high",
+        "owner": "codex"
+      },
+      {
+        "title": "开始真实外部渠道发布和数据回填",
+        "reason": "deploymentStatus=verified; begin real external channel publishing and validation data intake with observed metrics only.",
+        "evidenceRefs": [],
+        "priority": "high",
+        "owner": "codex"
+      },
+      {
+        "title": "Execute production deployment",
+        "reason": "readinessStatus=ready_to_deploy; readinessScore=98. Execute real deployment only after explicit user confirmation.",
+        "evidenceRefs": [],
+        "priority": "high",
+        "owner": "codex"
+      },
+      {
+        "title": "Execute validation deployment",
+        "reason": "launchStatus=ready_to_deploy; run deployment checklist and post-launch dry-run without claiming deployment until confirmed.",
+        "evidenceRefs": [],
+        "priority": "high",
+        "owner": "codex"
+      },
+      {
+        "title": "Start real validation launch",
+        "reason": "readinessStatus=ready_with_warnings; readinessScore=98. Use the launch runbook and keep unobserved external data empty.",
+        "evidenceRefs": [],
+        "priority": "high",
+        "owner": "codex"
+      },
+      {
+        "title": "Fill external intake with real channel data",
+        "reason": "已生成填报模板，但尚未填写真实外部渠道数据. Use C:\\Users\\HU\\Documents\\New project 2\\reports\\ebos\\validation\\intake\\inputs\\2026-07-03-external-intake-input.json and keep unknown metrics as 0.",
+        "evidenceRefs": [
+          "C:\\Users\\HU\\Documents\\New project 2\\reports\\ebos\\validation\\intake\\inputs\\2026-07-03-external-intake-input.json"
+        ],
+        "priority": "high",
+        "owner": "codex"
+      },
+      {
+        "title": "补充 validation 外部渠道数据",
+        "reason": "Validation capture found 21 manual slots. External marketplace, social, and user-feedback metrics still require real user-provided data and cannot be filled by Codex.",
+        "evidenceRefs": [
+          "reports/ebos/validation/capture/2026-07-03-validation-capture-report.json"
+        ],
+        "priority": "high",
+        "owner": "codex"
+      },
+      {
+        "title": "Apply decision report top recommendation",
+        "reason": "SEO/GEO 自动化内容集群 is ranked as validate_this_week. Market and competitor evidence point in the same direction. First revenue is not achieved, so low-cost validation is preferred.",
+        "evidenceRefs": [
+          "market_evidence",
+          "competitor_evidence",
+          "product_evidence",
+          "revenue_evidence"
+        ],
+        "priority": "high",
+        "owner": "codex"
+      },
+      {
+        "title": "Review Revenue evidence action items",
+        "reason": "revenue_evidence shows firstRevenueAchieved=false and paidOrders=1; convert first-revenue validation into next-month execution tasks.",
+        "evidenceRefs": [
+          "revenue_evidence:2026-07-03:2026-07-03-revenue_evidence.json"
+        ],
+        "priority": "high",
+        "owner": "codex"
+      },
+      {
+        "title": "Review Market evidence product opportunities",
+        "reason": "market_evidence recommends AI Agent 工作流模板包; convert the top product direction into a scoped validation or PRD task.",
+        "evidenceRefs": [
+          "market_evidence:2026-07-03:2026-07-03-market_evidence.json"
+        ],
+        "priority": "high",
+        "owner": "codex"
+      },
+      {
+        "title": "低成本验证市场机会",
+        "reason": "Revenue evidence has not proved first real revenue; validate AI Agent 工作流模板包 with a low-cost offer, waitlist, content test, or presale before building deeply.",
+        "evidenceRefs": [
+          "market_evidence:2026-07-03:2026-07-03-market_evidence.json",
+          "revenue_evidence:2026-07-03:2026-07-03-revenue_evidence.json"
+        ],
+        "priority": "high",
+        "owner": "codex"
+      },
+      {
+        "title": "Review Competitor evidence differentiation opportunities",
+        "reason": "Competitor evidence recommends Validate AI Prompt Kit differentiation; convert it into a concrete differentiation task.",
+        "evidenceRefs": [
+          "competitor_evidence:2026-07-03:2026-07-03-competitor_evidence.json"
+        ],
+        "priority": "high",
+        "owner": "codex"
+      },
+      {
+        "title": "Competitor evidence low-cost validation priority",
+        "reason": "First revenue is not proven; turn Validate AI Prompt Kit differentiation into a low-cost validation offer, waitlist, comparison page, or presale before large builds.",
+        "evidenceRefs": [
+          "competitor_evidence:2026-07-03:2026-07-03-competitor_evidence.json",
+          "revenue_evidence:2026-07-03:2026-07-03-revenue_evidence.json"
+        ],
+        "priority": "high",
+        "owner": "codex"
+      },
+      {
+        "title": "Prioritize aligned market and competitor validation",
+        "reason": "market_evidence and competitor_evidence both point toward AI Agent 工作流模板包; lift Validate AI Prompt Kit differentiation into next-month validation priority.",
+        "evidenceRefs": [
+          "market_evidence:2026-07-03:2026-07-03-market_evidence.json",
+          "competitor_evidence:2026-07-03:2026-07-03-competitor_evidence.json"
+        ],
+        "priority": "high",
+        "owner": "codex"
+      },
+      {
+        "title": "Review GEO evidence action items",
+        "reason": "geo_evidence score is 95 with 1 open action items; convert answerability and citation readiness issues into next-month tasks.",
+        "evidenceRefs": [
+          "geo_evidence:2026-07-03:2026-07-03-geo_evidence.json"
+        ],
+        "priority": "high",
+        "owner": "codex"
+      },
+      {
+        "title": "Review Product evidence action items",
+        "reason": "product_evidence score is 91 with 3 open action items; convert product conversion readiness issues into next-month tasks.",
+        "evidenceRefs": [
+          "product_evidence:2026-07-03:2026-07-03-product_evidence.json"
+        ],
+        "priority": "high",
+        "owner": "codex"
+      }
+    ],
+    "dataGaps": [],
+    "warnings": [],
+    "actionItems": [
+      {
+        "id": "reduce-execution-backlog",
+        "title": "减少执行积压",
+        "description": "把 open action items 分为本月必须完成、延后、废弃三类。",
+        "priority": "high",
+        "owner": "codex",
+        "evidenceRefs": [],
+        "status": "open"
+      }
+    ],
+    "deploymentExecutionStatus": {
+      "statusType": "production_deployment_execution_status",
+      "targetDate": "2026-07-03",
+      "updatedAt": "2026-07-05T09:59:53.960Z",
+      "deploymentStatus": "verified",
+      "approvedByUser": true,
+      "localCommandsRun": [
+        "npm run lint",
+        "npm run typecheck",
+        "npm run build"
+      ],
+      "serverCommandsRun": [
+        "manual server deployment commands completed"
+      ],
+      "dockerCommandsRun": [
+        "manual Docker/Nginx deployment commands completed"
+      ],
+      "verificationCommandsRun": [
+        "npx tsx scripts/run-ebos-post-launch-live-check.ts --date 2026-07-03 --site-url https://www.enhe-tech.com.cn"
+      ],
+      "postLaunchCheckStatus": "passed",
+      "notes": [
+        "Approval phrase accepted from scripts/approve-ebos-deployment-execution.ts; status moved to approved_not_executed. Production is not deployed.",
+        "Production deployment execution entered executing state after exact second confirmation. Server/Docker/Nginx commands are still manual_required.",
+        "Local pre-deployment commands passed. Waiting for manual server deployment result.",
+        "Manual server, Docker, and Nginx deployment result recorded as complete. Post-launch check is still required before verified.",
+        "Post-launch live check passed; deployment status moved to verified."
+      ],
+      "warnings": [],
+      "approvedAt": "2026-07-04T15:33:18.303Z",
+      "deployedAt": "2026-07-05T17:14:48+08:00",
+      "verifiedAt": "2026-07-05T09:59:53.960Z"
+    },
+    "externalPublishingStatus": {
+      "status": "waiting_real_data",
+      "packPath": "reports\\ebos\\external-publishing\\packs\\2026-07-03-external-publishing-pack.json",
+      "resultInputPath": "reports\\ebos\\external-publishing\\inputs\\2026-07-03-external-publish-result-input.json",
+      "backfillReportPath": "reports\\ebos\\external-publishing\\reports\\2026-07-03-external-data-backfill-report.json",
+      "channelsCount": 6,
+      "publishAssetsCount": 6,
+      "publishCoverage": 0,
+      "dataCoverage": 0,
+      "hasRealSignals": false,
+      "canBackfill": false,
+      "warnings": [],
+      "blockers": [],
+      "summary": "External publish result input exists, but no real external data has been recorded yet."
+    },
+    "syntheticFailureScenarioStatus": {
+      "status": "generated",
+      "targetDate": "2026-07-03",
+      "synthetic": true,
+      "simulated": true,
+      "scenarioPath": "reports\\ebos\\external-publishing\\simulations\\2026-07-03-synthetic-failure-scenario.json",
+      "analysisPath": "reports\\ebos\\external-publishing\\simulations\\2026-07-03-synthetic-failure-analysis.json",
+      "optimizationPlanPath": "reports\\ebos\\external-publishing\\simulations\\2026-07-03-synthetic-optimization-plan.json",
+      "optimizationImplementationPath": "reports\\ebos\\external-publishing\\simulations\\2026-07-03-synthetic-optimization-implementation.json",
+      "optimizationImplementationCompleted": true,
+      "simulatedRevenue": 0,
+      "simulatedPaidOrders": 0,
+      "likelyFailureReasonsCount": 9,
+      "priorityFixesCount": 7,
+      "nextExperimentActionsCount": 7,
+      "implementedFixesCount": 7,
+      "nextRealValidationActionsCount": 6,
+      "warnings": [
+        "This is synthetic data.",
+        "Do not backfill as real data.",
+        "Do not use for revenue evidence.",
+        "Do not claim real market validation.",
+        "This is synthetic analysis.",
+        "Do not backfill as real data.",
+        "Do not use for revenue evidence.",
+        "Do not claim real market validation.",
+        "This is a synthetic optimization plan.",
+        "Do not backfill as real data.",
+        "Do not use for revenue evidence.",
+        "Do not claim real market validation.",
+        "This is a synthetic optimization implementation report.",
+        "Do not treat page or copy changes as real market validation.",
+        "Do not write synthetic results into external-publish-result-input.json.",
+        "Do not write synthetic results into external-intake-input.json.",
+        "Do not use this report as revenue evidence.",
+        "Do not execute backfill apply until real external signals exist."
+      ],
+      "summary": "Synthetic failure scenario and optimization implementation exist. Treat both as simulated planning and copy/page implementation only; next step is real publishing validation with observed data."
+    },
+    "optimizedValidationPageRedeployStatus": {
+      "status": "not_generated",
+      "targetDate": "2026-07-03",
+      "redeployed": false,
+      "warnings": [],
+      "summary": "No optimized validation page redeploy report exists for this date."
+    },
+    "migrationReleaseStatus": {
+      "status": "audit_generated",
+      "targetDate": "2026-07-03",
+      "runbookPath": "reports/ebos/deployment/migration-release/2026-07-03-migration-release-runbook.json",
+      "riskAuditPath": "reports/ebos/deployment/migration-release/2026-07-03-migration-release-risk-audit.json",
+      "migrationGuardVariable": "RUN_PRISMA_MIGRATE",
+      "defaultMigrationBehavior": "skip_unless_explicit",
+      "explicitEnableValue": "1",
+      "safeToRunMigration": false,
+      "blockers": [
+        "no migration files detected",
+        "database backup evidence is missing",
+        "dedicated migration confirmation phrase is missing"
+      ],
+      "warnings": [
+        "This runbook does not execute migration.",
+        "确认执行真实部署命令 does not authorize migration.",
+        "确认部署验证页 does not authorize migration.",
+        "Only 确认执行数据库迁移 allows entering migration release mode.",
+        "Do not print secrets, database URLs, cookies, tokens, or .env contents.",
+        "Audit is read-only and does not execute SQL or Prisma commands.",
+        "Do not treat deployment confirmation phrases as migration approval.",
+        "Backup evidence must be attached before any migration release."
+      ],
+      "summary": "Migration release risk audit exists and safeToRunMigration=false."
+    }
+  },
+  "warnings": [],
+  "actionItems": [
+    {
+      "id": "reduce-execution-backlog",
+      "title": "减少执行积压",
+      "description": "把 open action items 分为本月必须完成、延后、废弃三类。",
+      "priority": "high",
+      "owner": "codex",
+      "evidenceRefs": [],
+      "status": "open"
+    }
+  ]
+}

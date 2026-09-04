@@ -1,0 +1,54 @@
+{
+  "reportType": "seed_files_separate_audit",
+  "targetDate": "2026-07-03",
+  "generatedAt": "2026-07-07T14:58:31.157Z",
+  "seedExecuted": false,
+  "productionSeedAllowed": false,
+  "files": [
+    {
+      "path": "prisma/seed.ts",
+      "status": "dirty_or_untracked",
+      "lineCount": 430,
+      "flags": {
+        "mentionsUser": true,
+        "mentionsOrder": true,
+        "mentionsRevenue": true,
+        "mentionsSecret": true
+      },
+      "riskLevel": "high",
+      "recommendation": "quarantine_or_separate_seed_audit_required"
+    },
+    {
+      "path": "prisma/seed-lumios.ts",
+      "status": "dirty_or_untracked",
+      "lineCount": 653,
+      "flags": {
+        "mentionsUser": true,
+        "mentionsOrder": true,
+        "mentionsRevenue": true,
+        "mentionsSecret": false
+      },
+      "riskLevel": "high",
+      "recommendation": "quarantine_or_separate_seed_audit_required"
+    }
+  ],
+  "touchesRealUsers": true,
+  "touchesRealOrders": true,
+  "touchesRealRevenue": true,
+  "secretReferenceDetected": true,
+  "recommendedDecision": "quarantine_until_dedicated_seed_review",
+  "canCommitTogether": false,
+  "requiresSeparateAudit": true,
+  "requiresUserConfirmation": true,
+  "blockers": [
+    "Seed files are dirty/untracked and must not be executed or committed without dedicated review."
+  ],
+  "warnings": [
+    "Text scan flags are conservative and do not prove runtime behavior."
+  ],
+  "nextActions": [
+    "Review seed diffs separately.",
+    "Do not run seed in production.",
+    "Require explicit approval before any seed commit."
+  ]
+}

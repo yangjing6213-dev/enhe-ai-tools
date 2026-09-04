@@ -1,0 +1,22 @@
+{
+  "auditType": "migration_release_risk_audit",
+  "targetDate": "2026-07-03",
+  "generatedAt": "2026-07-06T17:22:41.760Z",
+  "migrationFilesDetected": [],
+  "pendingMigrationIntent": false,
+  "destructiveCommandRisks": [],
+  "secretExposureRisks": [],
+  "backupEvidenceRequired": true,
+  "approvalRequired": true,
+  "safeToRunMigration": false,
+  "blockers": [
+    "no migration files detected",
+    "database backup evidence is missing",
+    "dedicated migration confirmation phrase is missing"
+  ],
+  "warnings": [
+    "Audit is read-only and does not execute SQL or Prisma commands.",
+    "Do not treat deployment confirmation phrases as migration approval.",
+    "Backup evidence must be attached before any migration release."
+  ]
+}

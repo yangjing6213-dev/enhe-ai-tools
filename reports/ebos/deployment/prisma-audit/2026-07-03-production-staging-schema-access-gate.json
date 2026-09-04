@@ -1,0 +1,29 @@
+{
+  "reportType": "production_staging_schema_access_gate",
+  "targetDate": "2026-07-03",
+  "generatedAt": "2026-07-07T14:58:31.157Z",
+  "accessDecision": "manual_readonly_query_pack_required",
+  "safeConnectionAvailable": false,
+  "connectionAttempted": false,
+  "productionDbCheck": "not_performed_access_unavailable",
+  "stagingDbCheck": "not_performed_access_unavailable",
+  "secretPrinted": false,
+  "writeCommandsExecuted": false,
+  "migrationExecuted": false,
+  "seedExecuted": false,
+  "safeToRunMigration": false,
+  "safeToCommitMigrations": false,
+  "sqlContainsOnlySelect": true,
+  "queryPackPath": "reports/ebos/deployment/prisma-audit/2026-07-03-production-staging-schema-readonly-query-pack.sql",
+  "blockers": [
+    "No explicitly authorized production/staging readonly database connection is available without secret input.",
+    "productionDbCheck and stagingDbCheck remain unavailable."
+  ],
+  "warnings": [
+    "Current configured database evidence must not be treated as production/staging verification."
+  ],
+  "nextActions": [
+    "Run the query pack manually in production and staging readonly sessions.",
+    "Record environment label, query output, and backup evidence before any migration release decision."
+  ]
+}

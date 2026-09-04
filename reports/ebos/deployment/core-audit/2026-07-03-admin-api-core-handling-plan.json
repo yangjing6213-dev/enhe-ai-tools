@@ -1,0 +1,16 @@
+{
+  "reportType": "admin_api_core_handling_plan",
+  "targetDate": "2026-07-03",
+  "generatedAt": "2026-07-07T14:58:31.157Z",
+  "decision": "blocked_until_admin_api_core_review",
+  "canCommitTogether": false,
+  "actions": [
+    "Split admin/API/core review by functional area.",
+    "Run dedicated tests before any commit for these files."
+  ],
+  "forbiddenActions": [
+    "git add src/app/admin",
+    "git add src/app/api",
+    "git add src/lib non-EBOS files in EBOS report commit"
+  ]
+}

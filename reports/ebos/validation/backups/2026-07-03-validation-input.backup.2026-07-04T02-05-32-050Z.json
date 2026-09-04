@@ -1,0 +1,58 @@
+{
+  "trackerPath": "reports/ebos/validation/templates/2026-07-03-validation-tracker.json",
+  "targetDate": "2026-07-03",
+  "results": [
+    {
+      "planId": "validation-product-1-faceswap-studio-ai",
+      "status": "running",
+      "priceShown": "",
+      "ctaClicks": 0,
+      "paidOrders": 0,
+      "refundCount": 0,
+      "feedback": [],
+      "productPageViews": 0,
+      "productPageCtaClicks": 0,
+      "listingViews": 0,
+      "messages": 0,
+      "deliveryFeedback": [],
+      "supportQuestions": 0,
+      "userFeedback": [],
+      "channelResults": [],
+      "notes": "Step 9.8 prepared FaceSwap Studio validation copy, marketplace snippets, compliance notes, and tracking plan in docs/ebos/validation-assets/2026-07-03-faceswap-validation-copy.md. Suggested CTA event: validation_faceswap_cta_click. No real views, clicks, messages, orders, refunds, or feedback have been recorded yet."
+    },
+    {
+      "planId": "validation-product-2-local-ai-video-studio-for-creator-workflows",
+      "status": "running",
+      "priceShown": "",
+      "ctaClicks": 0,
+      "paidOrders": 0,
+      "refundCount": 0,
+      "feedback": [],
+      "productPageViews": 0,
+      "productPageCtaClicks": 0,
+      "listingViews": 0,
+      "messages": 0,
+      "deliveryFeedback": [],
+      "supportQuestions": 0,
+      "userFeedback": [],
+      "channelResults": [],
+      "notes": "Step 9.8 prepared AI Video Studio validation copy, GPU/deployment threshold notes, marketplace snippets, compliance notes, and tracking plan in docs/ebos/validation-assets/2026-07-03-ai-video-studio-validation-copy.md. Suggested CTA event: validation_ai_video_cta_click. No real views, clicks, messages, orders, refunds, or feedback have been recorded yet."
+    },
+    {
+      "planId": "validation-direction-3-ai-prompt-kit",
+      "status": "running",
+      "pageViews": 0,
+      "ctaClicks": 0,
+      "leads": 0,
+      "conversionRate": 0,
+      "notes": "Step 9.8 prepared AI Prompt Kit minimum product, landing copy, marketplace copy, social copy, and bilingual validation pages at /validation/ai-prompt-kit and /en/validation/ai-prompt-kit. CTA event added: validation_ai_prompt_kit_cta_click. No real page views, CTA clicks, leads, presale orders, paid orders, revenue, or user feedback have been recorded yet.",
+      "listingViews": 0,
+      "messages": 0,
+      "presaleOrders": 0,
+      "paidOrders": 0,
+      "revenue": 0,
+      "userFeedback": [],
+      "channelResults": []
+    }
+  ]
+}

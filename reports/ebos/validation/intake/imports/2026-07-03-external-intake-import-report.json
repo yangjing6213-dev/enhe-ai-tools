@@ -1,0 +1,14 @@
+{
+  "targetDate": "2026-07-03",
+  "inputPath": "C:\\Users\\HU\\Documents\\New project 2\\reports\\ebos\\validation\\intake\\inputs\\2026-07-03-external-intake-input.json",
+  "validationInputPath": "C:\\Users\\HU\\Documents\\New project 2\\reports\\ebos\\validation\\inputs\\2026-07-03-validation-input.json",
+  "dryRun": false,
+  "appliedChanges": [],
+  "skippedChanges": [],
+  "validationWarnings": [],
+  "dataQualityWarnings": [],
+  "importedChannelsCount": 0,
+  "importedPlansCount": 0,
+  "summary": "Imported 0 external intake changes for 0 channels and 0 plans.",
+  "backupPath": "C:\\Users\\HU\\Documents\\New project 2\\reports\\ebos\\validation\\intake\\backups\\2026-07-03-validation-input.before-external-intake.2026-07-04T03-16-26-791Z.json"
+}

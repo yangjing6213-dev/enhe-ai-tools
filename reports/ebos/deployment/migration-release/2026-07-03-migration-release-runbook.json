@@ -1,0 +1,201 @@
+{
+  "runbookType": "migration_release_mode_runbook",
+  "targetDate": "2026-07-03",
+  "generatedAt": "2026-07-06T17:22:41.632Z",
+  "migrationGuardVariable": "RUN_PRISMA_MIGRATE",
+  "defaultMigrationBehavior": "skip_unless_explicit",
+  "explicitEnableValue": "1",
+  "allowedUseCases": [
+    "本轮有明确 Prisma migration 文件。",
+    "migration 内容已 review。",
+    "已确认数据库备份。",
+    "已确认回滚策略。",
+    "用户明确回复 migration 专用确认句：确认执行数据库迁移。",
+    "生产部署确实需要 schema 变更。"
+  ],
+  "forbiddenUseCases": [
+    "EBOS 页面更新。",
+    "验证页文案更新。",
+    "报告脚本更新。",
+    "external publishing pack 更新。",
+    "synthetic report 更新。",
+    "没有 migration 文件的普通发布。",
+    "只是 Docker 重启。",
+    "只是 Nginx reload。"
+  ],
+  "approvalChecklist": [
+    {
+      "id": "approval-dedicated-confirmation",
+      "title": "Dedicated migration confirmation phrase received",
+      "required": true,
+      "status": "manual_required",
+      "description": "User must reply exactly: 确认执行数据库迁移.",
+      "evidence": "确认执行数据库迁移",
+      "blockerIfMissing": true
+    },
+    {
+      "id": "approval-not-deployment-phrase",
+      "title": "Deployment confirmation phrases are not reused",
+      "required": true,
+      "status": "manual_required",
+      "description": "确认执行真实部署命令 and 确认部署验证页 do not authorize database migration.",
+      "blockerIfMissing": true
+    },
+    {
+      "id": "approval-schema-change-required",
+      "title": "Production release requires a schema change",
+      "required": true,
+      "status": "manual_required",
+      "description": "Migration release mode is allowed only when the production release cannot work without a reviewed schema change.",
+      "blockerIfMissing": true
+    }
+  ],
+  "preMigrationChecklist": [
+    {
+      "id": "pre-migration-file-exists",
+      "title": "New Prisma migration file exists",
+      "required": true,
+      "status": "manual_required",
+      "description": "Confirm there is an explicit Prisma migration file for this release.",
+      "blockerIfMissing": true
+    },
+    {
+      "id": "pre-migration-reviewed",
+      "title": "Migration file reviewed",
+      "required": true,
+      "status": "manual_required",
+      "description": "Review migration SQL and Prisma schema diff before enabling RUN_PRISMA_MIGRATE=1.",
+      "blockerIfMissing": true
+    },
+    {
+      "id": "pre-backup-evidence",
+      "title": "Database backup evidence confirmed",
+      "required": true,
+      "status": "manual_required",
+      "description": "Record backup timestamp, location, and restore owner without printing secrets.",
+      "blockerIfMissing": true
+    },
+    {
+      "id": "pre-no-critical-drop",
+      "title": "No critical table or field deletion confirmed",
+      "required": true,
+      "status": "manual_required",
+      "description": "Confirm the migration does not delete critical payment, order, user, product, or revenue data.",
+      "blockerIfMissing": true
+    },
+    {
+      "id": "pre-no-destructive-sql",
+      "title": "No destructive SQL confirmed",
+      "required": true,
+      "status": "manual_required",
+      "description": "Scan for DROP TABLE, DROP COLUMN, TRUNCATE, DELETE FROM, ALTER TYPE, and DROP INDEX.",
+      "blockerIfMissing": true
+    },
+    {
+      "id": "pre-maintenance-window",
+      "title": "Maintenance window confirmed",
+      "required": true,
+      "status": "manual_required",
+      "description": "Confirm a release window and the person responsible for monitoring production.",
+      "blockerIfMissing": true
+    },
+    {
+      "id": "pre-rollback-strategy",
+      "title": "Rollback strategy confirmed",
+      "required": true,
+      "status": "manual_required",
+      "description": "Document app rollback, data restore criteria, and stop conditions before migration.",
+      "blockerIfMissing": true
+    }
+  ],
+  "executionPlan": [
+    {
+      "id": "execution-set-run-prisma-migrate",
+      "title": "Set RUN_PRISMA_MIGRATE=1 only for the approved migration release",
+      "required": true,
+      "status": "manual_required",
+      "description": "RUN_PRISMA_MIGRATE must remain unset or 0 for EBOS page, copy, report, Docker-only, or Nginx-only releases.",
+      "blockerIfMissing": true
+    },
+    {
+      "id": "execution-run-reviewed-command",
+      "title": "Run only the reviewed migration command",
+      "required": true,
+      "status": "manual_required",
+      "description": "The migration command remains high risk and must be run only after the dedicated approval phrase and backup evidence.",
+      "blockerIfMissing": true
+    },
+    {
+      "id": "execution-record-output",
+      "title": "Record migration result without secrets",
+      "required": true,
+      "status": "manual_required",
+      "description": "Record success/failure, migration names, timestamps, and errors. Do not print environment values.",
+      "blockerIfMissing": true
+    }
+  ],
+  "postMigrationVerification": [
+    {
+      "id": "post-smoke-test",
+      "title": "Run post-migration smoke test",
+      "required": true,
+      "status": "manual_required",
+      "description": "Run smoke checks after migration and before marking the release healthy.",
+      "blockerIfMissing": true
+    },
+    {
+      "id": "post-order-payment-login-product",
+      "title": "Verify orders, payments, login, and product pages",
+      "required": true,
+      "status": "manual_required",
+      "description": "Confirm order creation, payment paths, login/session behavior, product detail pages, and revenue views still work.",
+      "blockerIfMissing": true
+    },
+    {
+      "id": "post-ebos-report-refresh",
+      "title": "Refresh EBOS reports after verification",
+      "required": false,
+      "status": "pending",
+      "description": "Regenerate EBOS weekly/monthly reports only after observed migration and smoke test evidence exists.",
+      "blockerIfMissing": false
+    }
+  ],
+  "rollbackPlan": [
+    {
+      "id": "rollback-app-version",
+      "title": "Application rollback version identified",
+      "required": true,
+      "status": "manual_required",
+      "description": "Identify the previous commit/image that can run against the current or restored database.",
+      "blockerIfMissing": true
+    },
+    {
+      "id": "rollback-database-restore",
+      "title": "Database restore criteria defined",
+      "required": true,
+      "status": "manual_required",
+      "description": "Define when to restore backup, who approves restore, and how restore success is verified.",
+      "blockerIfMissing": true
+    },
+    {
+      "id": "rollback-user-impact",
+      "title": "User impact and data loss window documented",
+      "required": true,
+      "status": "manual_required",
+      "description": "Document the possible data loss window and customer-impact notes before release.",
+      "blockerIfMissing": true
+    }
+  ],
+  "warnings": [
+    "This runbook does not execute migration.",
+    "确认执行真实部署命令 does not authorize migration.",
+    "确认部署验证页 does not authorize migration.",
+    "Only 确认执行数据库迁移 allows entering migration release mode.",
+    "Do not print secrets, database URLs, cookies, tokens, or .env contents."
+  ],
+  "nextActions": [
+    "Keep RUN_PRISMA_MIGRATE unset or 0 for page, copy, report, and read-only EBOS releases.",
+    "Before any real migration, generate risk audit and attach backup evidence.",
+    "Ask for the dedicated confirmation phrase only after migration review, backup evidence, and rollback plan are ready."
+  ]
+}

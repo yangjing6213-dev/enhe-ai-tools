@@ -1,0 +1,919 @@
+{
+  "reportType": "production_deployment_operator_checklist",
+  "targetDate": "2026-07-03",
+  "generatedAt": "2026-07-04T23:47:16.780Z",
+  "currentDeploymentStatus": "approved_not_executed",
+  "approvedByUser": true,
+  "deploymentScope": [
+    "Validation page deployment for /validation/ai-prompt-kit and /en/validation/ai-prompt-kit"
+  ],
+  "commandAudit": {
+    "commandsAudited": 31,
+    "localCommands": [
+      {
+        "id": "local-1",
+        "title": "Run lint locally",
+        "command": "npm run lint",
+        "category": "local",
+        "source": "deployment-plan:Local Commands",
+        "manualRequired": false,
+        "dangerous": false,
+        "migration": false,
+        "secretExposure": false,
+        "warnings": []
+      },
+      {
+        "id": "local-2",
+        "title": "Run typecheck locally",
+        "command": "npm run typecheck",
+        "category": "local",
+        "source": "deployment-plan:Local Commands",
+        "manualRequired": false,
+        "dangerous": false,
+        "migration": false,
+        "secretExposure": false,
+        "warnings": []
+      },
+      {
+        "id": "local-3",
+        "title": "Run production build locally",
+        "command": "npm run build",
+        "category": "local",
+        "source": "deployment-plan:Local Commands",
+        "manualRequired": false,
+        "dangerous": false,
+        "migration": false,
+        "secretExposure": false,
+        "warnings": []
+      },
+      {
+        "id": "local-4",
+        "title": "Regenerate validation launch readiness",
+        "command": "npx tsx scripts/check-ebos-validation-launch-readiness.ts --date 2026-07-03",
+        "category": "local",
+        "source": "deployment-plan:Local Commands",
+        "manualRequired": false,
+        "dangerous": false,
+        "migration": false,
+        "secretExposure": false,
+        "warnings": []
+      },
+      {
+        "id": "local-5",
+        "title": "Regenerate validation launch execution",
+        "command": "npx tsx scripts/generate-ebos-validation-launch-execution.ts --date 2026-07-03",
+        "category": "local",
+        "source": "deployment-plan:Local Commands",
+        "manualRequired": false,
+        "dangerous": false,
+        "migration": false,
+        "secretExposure": false,
+        "warnings": []
+      },
+      {
+        "id": "local-6",
+        "title": "Review git status manually",
+        "command": "git status",
+        "category": "local",
+        "source": "deployment-plan:Local Commands",
+        "manualRequired": false,
+        "dangerous": false,
+        "migration": false,
+        "secretExposure": false,
+        "warnings": []
+      },
+      {
+        "id": "local-7",
+        "title": "Review diff stat manually",
+        "command": "git diff --stat",
+        "category": "local",
+        "source": "deployment-plan:Local Commands",
+        "manualRequired": false,
+        "dangerous": false,
+        "migration": false,
+        "secretExposure": false,
+        "warnings": []
+      },
+      {
+        "id": "local-8",
+        "title": "Create a scoped commit only after review",
+        "command": "git add <reviewed files> && git commit -m \"ebos: add production deployment preflight\"",
+        "category": "local",
+        "source": "deployment-plan:Local Commands",
+        "manualRequired": false,
+        "dangerous": false,
+        "migration": false,
+        "secretExposure": false,
+        "warnings": []
+      },
+      {
+        "id": "local-20",
+        "title": "local command",
+        "command": "npm run lint",
+        "category": "local",
+        "source": "deployment-execution-runbook",
+        "manualRequired": false,
+        "dangerous": false,
+        "migration": false,
+        "secretExposure": false,
+        "warnings": []
+      },
+      {
+        "id": "local-21",
+        "title": "local command",
+        "command": "npm run typecheck",
+        "category": "local",
+        "source": "deployment-execution-runbook",
+        "manualRequired": false,
+        "dangerous": false,
+        "migration": false,
+        "secretExposure": false,
+        "warnings": []
+      },
+      {
+        "id": "local-22",
+        "title": "local command",
+        "command": "npm run build",
+        "category": "local",
+        "source": "deployment-execution-runbook",
+        "manualRequired": false,
+        "dangerous": false,
+        "migration": false,
+        "secretExposure": false,
+        "warnings": []
+      },
+      {
+        "id": "local-23",
+        "title": "local command",
+        "command": "npx tsx scripts/check-ebos-validation-launch-readiness.ts --date 2026-07-03",
+        "category": "local",
+        "source": "deployment-execution-runbook",
+        "manualRequired": false,
+        "dangerous": false,
+        "migration": false,
+        "secretExposure": false,
+        "warnings": []
+      },
+      {
+        "id": "local-24",
+        "title": "local command",
+        "command": "npx tsx scripts/generate-ebos-validation-launch-execution.ts --date 2026-07-03",
+        "category": "local",
+        "source": "deployment-execution-runbook",
+        "manualRequired": false,
+        "dangerous": false,
+        "migration": false,
+        "secretExposure": false,
+        "warnings": []
+      },
+      {
+        "id": "local-25",
+        "title": "local command",
+        "command": "git status",
+        "category": "local",
+        "source": "deployment-execution-runbook",
+        "manualRequired": false,
+        "dangerous": false,
+        "migration": false,
+        "secretExposure": false,
+        "warnings": []
+      },
+      {
+        "id": "local-26",
+        "title": "local command",
+        "command": "git diff --stat",
+        "category": "local",
+        "source": "deployment-execution-runbook",
+        "manualRequired": false,
+        "dangerous": false,
+        "migration": false,
+        "secretExposure": false,
+        "warnings": []
+      },
+      {
+        "id": "local-27",
+        "title": "local command",
+        "command": "git add <reviewed files> && git commit -m \"ebos: add production deployment preflight\"",
+        "category": "local",
+        "source": "deployment-execution-runbook",
+        "manualRequired": false,
+        "dangerous": false,
+        "migration": false,
+        "secretExposure": false,
+        "warnings": []
+      }
+    ],
+    "serverCommands": [
+      {
+        "id": "server-9",
+        "title": "Manual confirmation required",
+        "command": "Server project path must be confirmed before SSH or deployment commands are run.",
+        "category": "server",
+        "source": "deployment-plan:Server Commands",
+        "manualRequired": true,
+        "dangerous": false,
+        "migration": false,
+        "secretExposure": false,
+        "warnings": [
+          "Must be executed by the user in the server context or after explicit executable environment confirmation."
+        ]
+      },
+      {
+        "id": "server-28",
+        "title": "server command",
+        "command": "Manual confirmation required: Server project path must be confirmed before SSH or deployment commands are run.",
+        "category": "server",
+        "source": "deployment-execution-runbook",
+        "manualRequired": true,
+        "dangerous": false,
+        "migration": false,
+        "secretExposure": false,
+        "warnings": [
+          "Must be executed by the user in the server context or after explicit executable environment confirmation."
+        ]
+      }
+    ],
+    "dockerCommands": [
+      {
+        "id": "docker-10",
+        "title": "Build and start production compose stack on server",
+        "command": "docker compose -f deploy/enhe-ai-tools/docker-compose.yml up -d --build",
+        "category": "docker",
+        "source": "deployment-plan:Docker Commands",
+        "manualRequired": true,
+        "dangerous": false,
+        "migration": false,
+        "secretExposure": false,
+        "warnings": [
+          "Must be executed by the user in the server context or after explicit executable environment confirmation."
+        ]
+      },
+      {
+        "id": "docker-11",
+        "title": "Verify production containers on server",
+        "command": "docker compose -f deploy/enhe-ai-tools/docker-compose.yml ps",
+        "category": "docker",
+        "source": "deployment-plan:Docker Commands",
+        "manualRequired": true,
+        "dangerous": false,
+        "migration": false,
+        "secretExposure": false,
+        "warnings": [
+          "Must be executed by the user in the server context or after explicit executable environment confirmation."
+        ]
+      },
+      {
+        "id": "docker-29",
+        "title": "docker command",
+        "command": "docker compose -f deploy/enhe-ai-tools/docker-compose.yml up -d --build",
+        "category": "docker",
+        "source": "deployment-execution-runbook",
+        "manualRequired": true,
+        "dangerous": false,
+        "migration": false,
+        "secretExposure": false,
+        "warnings": [
+          "Must be executed by the user in the server context or after explicit executable environment confirmation."
+        ]
+      },
+      {
+        "id": "docker-30",
+        "title": "docker command",
+        "command": "docker compose -f deploy/enhe-ai-tools/docker-compose.yml ps",
+        "category": "docker",
+        "source": "deployment-execution-runbook",
+        "manualRequired": true,
+        "dangerous": false,
+        "migration": false,
+        "secretExposure": false,
+        "warnings": [
+          "Must be executed by the user in the server context or after explicit executable environment confirmation."
+        ]
+      }
+    ],
+    "nginxCommands": [
+      {
+        "id": "nginx-31",
+        "title": "nginx command",
+        "command": "nginx -t && nginx -s reload",
+        "category": "nginx",
+        "source": "deployment-execution-runbook",
+        "manualRequired": true,
+        "dangerous": false,
+        "migration": false,
+        "secretExposure": false,
+        "warnings": [
+          "Must be executed by the user in the server context or after explicit executable environment confirmation."
+        ]
+      }
+    ],
+    "verificationCommands": [
+      {
+        "id": "verification-12",
+        "title": "Run public post-launch validation routes check",
+        "command": "npx tsx scripts/check-ebos-validation-post-launch.ts --date 2026-07-03 --site-url https://www.enhe-tech.com.cn",
+        "category": "verification",
+        "source": "deployment-plan:Verification Commands",
+        "manualRequired": false,
+        "dangerous": false,
+        "migration": false,
+        "secretExposure": false,
+        "warnings": []
+      }
+    ],
+    "rollbackCommands": [
+      {
+        "id": "rollback-13",
+        "title": "Rollback Steps 1",
+        "command": "Scoped rollback: revert only validation launch surface changes or redeploy the previous reviewed build. Do not reset the whole worktree.",
+        "category": "rollback",
+        "source": "deployment-plan:Rollback Steps",
+        "manualRequired": false,
+        "dangerous": false,
+        "migration": false,
+        "secretExposure": false,
+        "warnings": []
+      },
+      {
+        "id": "rollback-14",
+        "title": "Rollback Steps 2",
+        "command": "Create a reviewed revert commit for validation route files if the route breaks production.",
+        "category": "rollback",
+        "source": "deployment-plan:Rollback Steps",
+        "manualRequired": false,
+        "dangerous": false,
+        "migration": false,
+        "secretExposure": false,
+        "warnings": []
+      },
+      {
+        "id": "rollback-15",
+        "title": "Rollback Steps 3",
+        "command": "Revert tracking event whitelist changes only if they break build or analytics runtime.",
+        "category": "rollback",
+        "source": "deployment-plan:Rollback Steps",
+        "manualRequired": false,
+        "dangerous": false,
+        "migration": false,
+        "secretExposure": false,
+        "warnings": []
+      },
+      {
+        "id": "rollback-16",
+        "title": "Rollback Steps 4",
+        "command": "Redeploy the previous known-good build from the server deployment system.",
+        "category": "rollback",
+        "source": "deployment-plan:Rollback Steps",
+        "manualRequired": false,
+        "dangerous": false,
+        "migration": false,
+        "secretExposure": false,
+        "warnings": []
+      },
+      {
+        "id": "rollback-17",
+        "title": "Rollback Steps 5",
+        "command": "Keep reports/ebos deployment, validation, weekly, and monthly artifacts for 2026-07-03.",
+        "category": "rollback",
+        "source": "deployment-plan:Rollback Steps",
+        "manualRequired": false,
+        "dangerous": false,
+        "migration": false,
+        "secretExposure": false,
+        "warnings": []
+      },
+      {
+        "id": "rollback-18",
+        "title": "Rollback Steps 6",
+        "command": "Do not delete reports/ebos during rollback; reports are audit evidence.",
+        "category": "rollback",
+        "source": "deployment-plan:Rollback Steps",
+        "manualRequired": false,
+        "dangerous": false,
+        "migration": false,
+        "secretExposure": false,
+        "warnings": []
+      },
+      {
+        "id": "rollback-19",
+        "title": "Rollback Steps 7",
+        "command": "Do not run database reset or destructive Prisma commands for validation-page rollback.",
+        "category": "rollback",
+        "source": "deployment-plan:Rollback Steps",
+        "manualRequired": false,
+        "dangerous": false,
+        "migration": false,
+        "secretExposure": false,
+        "warnings": []
+      }
+    ],
+    "dangerousCommandsDetected": [],
+    "migrationCommandsDetected": [],
+    "secretExposureRisks": [],
+    "manualRequiredCommands": [
+      {
+        "id": "server-9",
+        "title": "Manual confirmation required",
+        "command": "Server project path must be confirmed before SSH or deployment commands are run.",
+        "category": "server",
+        "source": "deployment-plan:Server Commands",
+        "manualRequired": true,
+        "dangerous": false,
+        "migration": false,
+        "secretExposure": false,
+        "warnings": [
+          "Must be executed by the user in the server context or after explicit executable environment confirmation."
+        ]
+      },
+      {
+        "id": "docker-10",
+        "title": "Build and start production compose stack on server",
+        "command": "docker compose -f deploy/enhe-ai-tools/docker-compose.yml up -d --build",
+        "category": "docker",
+        "source": "deployment-plan:Docker Commands",
+        "manualRequired": true,
+        "dangerous": false,
+        "migration": false,
+        "secretExposure": false,
+        "warnings": [
+          "Must be executed by the user in the server context or after explicit executable environment confirmation."
+        ]
+      },
+      {
+        "id": "docker-11",
+        "title": "Verify production containers on server",
+        "command": "docker compose -f deploy/enhe-ai-tools/docker-compose.yml ps",
+        "category": "docker",
+        "source": "deployment-plan:Docker Commands",
+        "manualRequired": true,
+        "dangerous": false,
+        "migration": false,
+        "secretExposure": false,
+        "warnings": [
+          "Must be executed by the user in the server context or after explicit executable environment confirmation."
+        ]
+      },
+      {
+        "id": "server-28",
+        "title": "server command",
+        "command": "Manual confirmation required: Server project path must be confirmed before SSH or deployment commands are run.",
+        "category": "server",
+        "source": "deployment-execution-runbook",
+        "manualRequired": true,
+        "dangerous": false,
+        "migration": false,
+        "secretExposure": false,
+        "warnings": [
+          "Must be executed by the user in the server context or after explicit executable environment confirmation."
+        ]
+      },
+      {
+        "id": "docker-29",
+        "title": "docker command",
+        "command": "docker compose -f deploy/enhe-ai-tools/docker-compose.yml up -d --build",
+        "category": "docker",
+        "source": "deployment-execution-runbook",
+        "manualRequired": true,
+        "dangerous": false,
+        "migration": false,
+        "secretExposure": false,
+        "warnings": [
+          "Must be executed by the user in the server context or after explicit executable environment confirmation."
+        ]
+      },
+      {
+        "id": "docker-30",
+        "title": "docker command",
+        "command": "docker compose -f deploy/enhe-ai-tools/docker-compose.yml ps",
+        "category": "docker",
+        "source": "deployment-execution-runbook",
+        "manualRequired": true,
+        "dangerous": false,
+        "migration": false,
+        "secretExposure": false,
+        "warnings": [
+          "Must be executed by the user in the server context or after explicit executable environment confirmation."
+        ]
+      },
+      {
+        "id": "nginx-31",
+        "title": "nginx command",
+        "command": "nginx -t && nginx -s reload",
+        "category": "nginx",
+        "source": "deployment-execution-runbook",
+        "manualRequired": true,
+        "dangerous": false,
+        "migration": false,
+        "secretExposure": false,
+        "warnings": [
+          "Must be executed by the user in the server context or after explicit executable environment confirmation."
+        ]
+      }
+    ],
+    "safeToProceed": true,
+    "warnings": [
+      "Must be executed by the user in the server context or after explicit executable environment confirmation."
+    ]
+  },
+  "operatorChecklist": [
+    {
+      "id": "local-lint",
+      "title": "Run lint locally",
+      "phase": "local_precheck",
+      "actor": "codex_local",
+      "status": "ready",
+      "command": "npm run lint",
+      "riskLevel": "low",
+      "approvalRequired": false,
+      "evidence": "Local precheck command; safe for Codex to run locally."
+    },
+    {
+      "id": "local-typecheck",
+      "title": "Run typecheck locally",
+      "phase": "local_precheck",
+      "actor": "codex_local",
+      "status": "ready",
+      "command": "npm run typecheck",
+      "riskLevel": "low",
+      "approvalRequired": false,
+      "evidence": "Local precheck command; safe for Codex to run locally."
+    },
+    {
+      "id": "local-build",
+      "title": "Run production build locally",
+      "phase": "local_precheck",
+      "actor": "codex_local",
+      "status": "ready",
+      "command": "npm run build",
+      "riskLevel": "low",
+      "approvalRequired": false,
+      "evidence": "Local precheck command; safe for Codex to run locally."
+    },
+    {
+      "id": "local-status-check",
+      "title": "Check deployment execution status",
+      "phase": "local_precheck",
+      "actor": "codex_local",
+      "status": "ready",
+      "command": "npx tsx scripts/check-ebos-deployment-execution-status.ts --date 2026-07-03",
+      "riskLevel": "low",
+      "approvalRequired": false,
+      "evidence": "Local precheck command; safe for Codex to run locally."
+    },
+    {
+      "id": "server-9",
+      "title": "Manual confirmation required",
+      "phase": "server_deploy",
+      "actor": "user_server",
+      "status": "manual_required",
+      "command": "Server project path must be confirmed before SSH or deployment commands are run.",
+      "riskLevel": "high",
+      "approvalRequired": true,
+      "evidence": "Must be executed by the user in the server context or after explicit executable environment confirmation.",
+      "rollbackNote": "Stop and use scoped rollback if this command fails."
+    },
+    {
+      "id": "server-28",
+      "title": "server command",
+      "phase": "server_deploy",
+      "actor": "user_server",
+      "status": "manual_required",
+      "command": "Manual confirmation required: Server project path must be confirmed before SSH or deployment commands are run.",
+      "riskLevel": "high",
+      "approvalRequired": true,
+      "evidence": "Must be executed by the user in the server context or after explicit executable environment confirmation.",
+      "rollbackNote": "Stop and use scoped rollback if this command fails."
+    },
+    {
+      "id": "docker-10",
+      "title": "Build and start production compose stack on server",
+      "phase": "docker_restart",
+      "actor": "user_server",
+      "status": "manual_required",
+      "command": "docker compose -f deploy/enhe-ai-tools/docker-compose.yml up -d --build",
+      "riskLevel": "high",
+      "approvalRequired": true,
+      "evidence": "Must be executed by the user in the server context or after explicit executable environment confirmation.",
+      "rollbackNote": "Stop and use scoped rollback if this command fails."
+    },
+    {
+      "id": "docker-11",
+      "title": "Verify production containers on server",
+      "phase": "docker_restart",
+      "actor": "user_server",
+      "status": "manual_required",
+      "command": "docker compose -f deploy/enhe-ai-tools/docker-compose.yml ps",
+      "riskLevel": "high",
+      "approvalRequired": true,
+      "evidence": "Must be executed by the user in the server context or after explicit executable environment confirmation.",
+      "rollbackNote": "Stop and use scoped rollback if this command fails."
+    },
+    {
+      "id": "docker-29",
+      "title": "docker command",
+      "phase": "docker_restart",
+      "actor": "user_server",
+      "status": "manual_required",
+      "command": "docker compose -f deploy/enhe-ai-tools/docker-compose.yml up -d --build",
+      "riskLevel": "high",
+      "approvalRequired": true,
+      "evidence": "Must be executed by the user in the server context or after explicit executable environment confirmation.",
+      "rollbackNote": "Stop and use scoped rollback if this command fails."
+    },
+    {
+      "id": "docker-30",
+      "title": "docker command",
+      "phase": "docker_restart",
+      "actor": "user_server",
+      "status": "manual_required",
+      "command": "docker compose -f deploy/enhe-ai-tools/docker-compose.yml ps",
+      "riskLevel": "high",
+      "approvalRequired": true,
+      "evidence": "Must be executed by the user in the server context or after explicit executable environment confirmation.",
+      "rollbackNote": "Stop and use scoped rollback if this command fails."
+    },
+    {
+      "id": "nginx-31",
+      "title": "nginx command",
+      "phase": "nginx_reload",
+      "actor": "user_server",
+      "status": "manual_required",
+      "command": "nginx -t && nginx -s reload",
+      "riskLevel": "high",
+      "approvalRequired": true,
+      "evidence": "Must be executed by the user in the server context or after explicit executable environment confirmation.",
+      "rollbackNote": "Stop and use scoped rollback if this command fails."
+    },
+    {
+      "id": "post-launch-check",
+      "title": "Run post-launch validation check after user confirms deployment",
+      "phase": "post_launch_check",
+      "actor": "codex_local",
+      "status": "ready",
+      "command": "npx tsx scripts/check-ebos-validation-post-launch.ts --date 2026-07-03 --site-url https://www.enhe-tech.com.cn",
+      "riskLevel": "low",
+      "approvalRequired": false,
+      "evidence": "Run only after server deployment commands are confirmed complete.",
+      "rollbackNote": "If route checks fail, keep status pending verification and review scoped rollback."
+    },
+    {
+      "id": "status-update",
+      "title": "Update deployment execution status from observed results only",
+      "phase": "status_update",
+      "actor": "codex_local",
+      "status": "pending",
+      "riskLevel": "medium",
+      "approvalRequired": false,
+      "evidence": "Use the status update template; do not write verified until post-launch check passes."
+    },
+    {
+      "id": "rollback-13",
+      "title": "Rollback Steps 1",
+      "phase": "rollback",
+      "actor": "manual_required",
+      "status": "pending",
+      "command": "Scoped rollback: revert only validation launch surface changes or redeploy the previous reviewed build. Do not reset the whole worktree.",
+      "riskLevel": "high",
+      "approvalRequired": true,
+      "evidence": "Rollback step from deployment plan; execute only if needed and confirmed.",
+      "rollbackNote": "Do not run broad reset or destructive database commands."
+    },
+    {
+      "id": "rollback-14",
+      "title": "Rollback Steps 2",
+      "phase": "rollback",
+      "actor": "manual_required",
+      "status": "pending",
+      "command": "Create a reviewed revert commit for validation route files if the route breaks production.",
+      "riskLevel": "high",
+      "approvalRequired": true,
+      "evidence": "Rollback step from deployment plan; execute only if needed and confirmed.",
+      "rollbackNote": "Do not run broad reset or destructive database commands."
+    },
+    {
+      "id": "rollback-15",
+      "title": "Rollback Steps 3",
+      "phase": "rollback",
+      "actor": "manual_required",
+      "status": "pending",
+      "command": "Revert tracking event whitelist changes only if they break build or analytics runtime.",
+      "riskLevel": "high",
+      "approvalRequired": true,
+      "evidence": "Rollback step from deployment plan; execute only if needed and confirmed.",
+      "rollbackNote": "Do not run broad reset or destructive database commands."
+    },
+    {
+      "id": "rollback-16",
+      "title": "Rollback Steps 4",
+      "phase": "rollback",
+      "actor": "manual_required",
+      "status": "pending",
+      "command": "Redeploy the previous known-good build from the server deployment system.",
+      "riskLevel": "high",
+      "approvalRequired": true,
+      "evidence": "Rollback step from deployment plan; execute only if needed and confirmed.",
+      "rollbackNote": "Do not run broad reset or destructive database commands."
+    },
+    {
+      "id": "rollback-17",
+      "title": "Rollback Steps 5",
+      "phase": "rollback",
+      "actor": "manual_required",
+      "status": "pending",
+      "command": "Keep reports/ebos deployment, validation, weekly, and monthly artifacts for 2026-07-03.",
+      "riskLevel": "high",
+      "approvalRequired": true,
+      "evidence": "Rollback step from deployment plan; execute only if needed and confirmed.",
+      "rollbackNote": "Do not run broad reset or destructive database commands."
+    },
+    {
+      "id": "rollback-18",
+      "title": "Rollback Steps 6",
+      "phase": "rollback",
+      "actor": "manual_required",
+      "status": "pending",
+      "command": "Do not delete reports/ebos during rollback; reports are audit evidence.",
+      "riskLevel": "high",
+      "approvalRequired": true,
+      "evidence": "Rollback step from deployment plan; execute only if needed and confirmed.",
+      "rollbackNote": "Do not run broad reset or destructive database commands."
+    },
+    {
+      "id": "rollback-19",
+      "title": "Rollback Steps 7",
+      "phase": "rollback",
+      "actor": "manual_required",
+      "status": "pending",
+      "command": "Do not run database reset or destructive Prisma commands for validation-page rollback.",
+      "riskLevel": "high",
+      "approvalRequired": true,
+      "evidence": "Rollback step from deployment plan; execute only if needed and confirmed.",
+      "rollbackNote": "Do not run broad reset or destructive database commands."
+    }
+  ],
+  "executionSteps": [
+    {
+      "stepNumber": 1,
+      "title": "确认当前状态仍为 approved_not_executed",
+      "actor": "codex_local",
+      "command": "npx tsx scripts/check-ebos-deployment-execution-status.ts --date 2026-07-03",
+      "expectedOutcome": "状态显示 approvedByUser=true，且未记录 server/docker/nginx 命令执行。",
+      "failureHandling": "停止执行，先检查 status 文件，不准备任何生产执行动作。",
+      "statusUpdateHint": "此检查不改变状态。",
+      "mustNotDo": [
+        "不要 SSH。",
+        "不要声称生产部署已完成。"
+      ]
+    },
+    {
+      "stepNumber": 2,
+      "title": "运行本地预检查",
+      "actor": "codex_local",
+      "command": "npm run lint && npm run typecheck && npm run build",
+      "expectedOutcome": "在任何生产执行前，本地 lint、typecheck、build 通过。",
+      "failureHandling": "修复本地失败项，并重新生成 operator checklist 后再继续。",
+      "statusUpdateHint": "本地命令完成后，状态仍保持 approved_not_executed，最多只能进入 executing。",
+      "mustNotDo": [
+        "不要从 Codex 运行服务器命令。",
+        "不要运行 Prisma migration。"
+      ]
+    },
+    {
+      "stepNumber": 3,
+      "title": "由用户确认服务器执行环境",
+      "actor": "manual_required",
+      "expectedOutcome": "用户确认服务器项目路径，并理解 7 条命令仍需人工或明确授权执行。",
+      "failureHandling": "如果服务器路径或部署方式不清楚，停止并请求用户澄清。",
+      "statusUpdateHint": "真实命令执行前不改变状态。",
+      "mustNotDo": [
+        "不要编造服务器路径。",
+        "不要打印 secret。"
+      ]
+    },
+    {
+      "stepNumber": 4,
+      "title": "用户在服务器执行部署命令",
+      "actor": "user_server",
+      "expectedOutcome": "用户反馈具体服务器部署命令已完成，并提供不含 secret 的执行证据。",
+      "failureHandling": "任何命令失败时，记录 failed 状态并准备 scoped rollback。",
+      "statusUpdateHint": "服务器执行被用户确认后，状态可以进入 deployed_pending_verification。",
+      "mustNotDo": [
+        "不要让 Codex 自动 SSH。",
+        "不要运行破坏性清理。"
+      ]
+    },
+    {
+      "stepNumber": 5,
+      "title": "用户在服务器执行 Docker / Nginx 步骤",
+      "actor": "user_server",
+      "expectedOutcome": "Docker stack 已刷新；如需 Nginx reload，也由用户确认完成。",
+      "failureHandling": "如果 Docker 或 Nginx 失败，停止并使用 scoped rollback 说明。",
+      "statusUpdateHint": "公共检查通过前，保持 deployed_pending_verification。",
+      "mustNotDo": [
+        "不要删除 Docker volume。",
+        "不要运行数据库 reset 命令。"
+      ]
+    },
+    {
+      "stepNumber": 6,
+      "title": "部署后运行 post-launch check",
+      "actor": "codex_local",
+      "command": "npx tsx scripts/check-ebos-validation-post-launch.ts --date 2026-07-03 --site-url https://www.enhe-tech.com.cn",
+      "expectedOutcome": "仅在用户确认生产命令已执行后，公共 validation routes 检查通过。",
+      "failureHandling": "检查失败时，保持 deployed_pending_verification 或 failed，并启动 rollback review。",
+      "statusUpdateHint": "只有 post-launch check 通过后才允许 verified。",
+      "mustNotDo": [
+        "不要在真实部署前运行非 dry-run 的上线检查。",
+        "不要伪造 route 结果。"
+      ]
+    },
+    {
+      "stepNumber": 7,
+      "title": "按真实结果更新 deployment execution status",
+      "actor": "codex_local",
+      "expectedOutcome": "状态只反映已观察到的命令执行与验证结果，且不含 secret。",
+      "failureHandling": "证据不完整时，不要把状态推进到 deployed_pending_verification 之后。",
+      "statusUpdateHint": "verified 只能在 post-launch check passed 后写入。",
+      "mustNotDo": [
+        "不要跳过状态流转。",
+        "不要提前写 verified。"
+      ]
+    },
+    {
+      "stepNumber": 8,
+      "title": "必要时执行 scoped rollback",
+      "actor": "manual_required",
+      "expectedOutcome": "命令审计未发现危险命令、migration 命令或 secret 暴露阻断项。",
+      "failureHandling": "只使用限定范围 rollback，并保留 EBOS reports 作为审计证据。",
+      "statusUpdateHint": "如果发生 rollback，状态可以进入 rolled_back。",
+      "mustNotDo": [
+        "不要删除 reports/ebos。",
+        "不要 reset 数据库。"
+      ]
+    }
+  ],
+  "statusUpdateTemplate": {
+    "targetDate": "2026-07-03",
+    "currentStatus": "approved_not_executed",
+    "allowedNextStatuses": [
+      "executing",
+      "deployed_pending_verification",
+      "failed",
+      "rolled_back"
+    ],
+    "forbiddenStatuses": [
+      "verified"
+    ],
+    "statusUpdateRules": [
+      "approved_not_executed 只能表示已批准但尚未执行真实部署。",
+      "本地预检查完成后仍为 approved_not_executed 或 executing，不得写 deployed_pending_verification。",
+      "服务器部署命令完成且用户确认后，才允许写 deployed_pending_verification。",
+      "不能跳过 post-launch check 直接写 verified。",
+      "post-launch check 通过后才允许写 verified。"
+    ],
+    "templateAfterLocalCommands": {
+      "targetDate": "2026-07-03",
+      "deploymentStatus": "approved_not_executed",
+      "approvedByUser": true,
+      "postLaunchCheckStatus": "not_run",
+      "localCommandsRun": [
+        "npm run lint",
+        "npm run typecheck",
+        "npm run build",
+        "npx tsx scripts/check-ebos-deployment-execution-status.ts --date 2026-07-03"
+      ]
+    },
+    "templateAfterServerCommands": {
+      "targetDate": "2026-07-03",
+      "deploymentStatus": "deployed_pending_verification",
+      "approvedByUser": true,
+      "postLaunchCheckStatus": "not_run"
+    },
+    "templateAfterPostLaunchCheck": {
+      "targetDate": "2026-07-03",
+      "deploymentStatus": "verified",
+      "approvedByUser": true,
+      "postLaunchCheckStatus": "passed"
+    },
+    "warnings": [
+      "Do not write verified until post-launch check has passed.",
+      "Do not record server/docker/nginx commands unless the user confirms they were actually executed."
+    ]
+  },
+  "postCommandVerificationPlan": [
+    "Confirm user-reported server command completion before running post-launch check.",
+    "Run npx tsx scripts/check-ebos-validation-post-launch.ts --date 2026-07-03 --site-url https://www.enhe-tech.com.cn only after deployment execution.",
+    "If post-launch check passes, status may move to verified.",
+    "If post-launch check fails, keep status deployed_pending_verification or failed and prepare scoped rollback."
+  ],
+  "blockers": [],
+  "warnings": [
+    "Must be executed by the user in the server context or after explicit executable environment confirmation.",
+    "This checklist does not execute deployment commands.",
+    "Server, Docker, and Nginx commands remain manual_required."
+  ],
+  "nextActions": [
+    "Ask the user whether to enter real production deployment execution.",
+    "Keep server/Docker/Nginx commands manual until explicit executable environment is confirmed."
+  ]
+}

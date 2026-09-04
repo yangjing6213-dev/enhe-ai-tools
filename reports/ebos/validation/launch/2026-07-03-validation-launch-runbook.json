@@ -1,0 +1,389 @@
+{
+  "runbookType": "validation_launch_operator_runbook",
+  "targetDate": "2026-07-03",
+  "generatedAt": "2026-07-04T08:18:51.310Z",
+  "launchObjective": "发布并验证 AI Prompt Kit 最小可交付产品的真实需求，形成可复盘的外部渠道和站内证据。",
+  "validationTargets": [
+    "/validation/ai-prompt-kit",
+    "/en/validation/ai-prompt-kit",
+    "AI Prompt Kit external marketplace and social posts"
+  ],
+  "readinessReportPath": "reports/ebos/validation/launch/2026-07-03-validation-launch-readiness.json",
+  "readinessReport": {
+    "reportType": "validation_launch_readiness",
+    "targetDate": "2026-07-03",
+    "generatedAt": "2026-07-04T08:18:40.273Z",
+    "validationPages": [
+      {
+        "path": "/validation/ai-prompt-kit",
+        "filePath": "C:\\Users\\HU\\Documents\\New project 2\\src\\app\\(zh-public)\\validation\\ai-prompt-kit\\page.tsx",
+        "exists": true,
+        "hasHero": true,
+        "hasSummary": true,
+        "hasCTA": true,
+        "hasFAQ": true,
+        "hasComplianceNotice": true,
+        "hasTrackingEvent": true,
+        "hasSeoMetadata": true,
+        "warnings": []
+      },
+      {
+        "path": "/en/validation/ai-prompt-kit",
+        "filePath": "C:\\Users\\HU\\Documents\\New project 2\\src\\app\\en\\validation\\ai-prompt-kit\\page.tsx",
+        "exists": true,
+        "hasHero": true,
+        "hasSummary": true,
+        "hasCTA": true,
+        "hasFAQ": true,
+        "hasComplianceNotice": true,
+        "hasTrackingEvent": true,
+        "hasSeoMetadata": true,
+        "warnings": []
+      }
+    ],
+    "assetFiles": [
+      {
+        "filePath": "C:\\Users\\HU\\Documents\\New project 2\\docs\\ebos\\validation-assets\\2026-07-03-ai-prompt-kit-landing-copy.md",
+        "exists": true,
+        "purpose": "AI Prompt Kit landing page copy",
+        "readyForUse": true,
+        "warnings": []
+      },
+      {
+        "filePath": "C:\\Users\\HU\\Documents\\New project 2\\docs\\ebos\\validation-assets\\2026-07-03-ai-prompt-kit-marketplace-listings.md",
+        "exists": true,
+        "purpose": "AI Prompt Kit marketplace listing copy",
+        "readyForUse": true,
+        "warnings": []
+      },
+      {
+        "filePath": "C:\\Users\\HU\\Documents\\New project 2\\docs\\ebos\\validation-assets\\2026-07-03-ai-prompt-kit-minimum-product.md",
+        "exists": true,
+        "purpose": "AI Prompt Kit minimum product draft",
+        "readyForUse": true,
+        "warnings": []
+      },
+      {
+        "filePath": "C:\\Users\\HU\\Documents\\New project 2\\docs\\ebos\\validation-assets\\2026-07-03-ai-video-studio-validation-copy.md",
+        "exists": true,
+        "purpose": "AI Video Studio validation copy",
+        "readyForUse": true,
+        "warnings": []
+      },
+      {
+        "filePath": "C:\\Users\\HU\\Documents\\New project 2\\docs\\ebos\\validation-assets\\2026-07-03-codex-operator-summary.md",
+        "exists": true,
+        "purpose": "Codex operator summary",
+        "readyForUse": true,
+        "warnings": []
+      },
+      {
+        "filePath": "C:\\Users\\HU\\Documents\\New project 2\\docs\\ebos\\validation-assets\\2026-07-03-faceswap-validation-copy.md",
+        "exists": true,
+        "purpose": "FaceSwap validation copy",
+        "readyForUse": true,
+        "warnings": []
+      },
+      {
+        "filePath": "C:\\Users\\HU\\Documents\\New project 2\\docs\\ebos\\validation-assets\\2026-07-03-social-promotion-copy.md",
+        "exists": true,
+        "purpose": "Social promotion copy",
+        "readyForUse": true,
+        "warnings": []
+      },
+      {
+        "filePath": "C:\\Users\\HU\\Documents\\New project 2\\docs\\ebos\\validation-assets\\2026-07-03-three-day-validation-checklist.md",
+        "exists": true,
+        "purpose": "Three-day validation checklist",
+        "readyForUse": true,
+        "warnings": []
+      },
+      {
+        "filePath": "C:\\Users\\HU\\Documents\\New project 2\\docs\\ebos\\validation-assets\\2026-07-03-validation-input-fill-guide.md",
+        "exists": true,
+        "purpose": "Validation input fill guide",
+        "readyForUse": true,
+        "warnings": []
+      }
+    ],
+    "trackingChecks": [
+      {
+        "eventName": "validation_ai_prompt_kit_cta_click",
+        "expectedLocation": "src/lib/analytics.ts analyticsEventNames",
+        "found": true,
+        "sourceFile": "C:\\Users\\HU\\Documents\\New project 2\\src\\lib\\analytics.ts",
+        "warnings": []
+      },
+      {
+        "eventName": "validation_faceswap_cta_click",
+        "expectedLocation": "src/lib/analytics.ts analyticsEventNames",
+        "found": true,
+        "sourceFile": "C:\\Users\\HU\\Documents\\New project 2\\src\\lib\\analytics.ts",
+        "warnings": []
+      },
+      {
+        "eventName": "validation_ai_video_cta_click",
+        "expectedLocation": "src/lib/analytics.ts analyticsEventNames",
+        "found": true,
+        "sourceFile": "C:\\Users\\HU\\Documents\\New project 2\\src\\lib\\analytics.ts",
+        "warnings": []
+      }
+    ],
+    "seoGeoChecks": [
+      {
+        "key": "metadata",
+        "label": "SEO metadata",
+        "passed": true,
+        "warnings": []
+      },
+      {
+        "key": "answerability",
+        "label": "GEO answerability",
+        "passed": true,
+        "warnings": []
+      }
+    ],
+    "externalIntakeChecks": [
+      {
+        "key": "external_intake_template",
+        "filePath": "C:\\Users\\HU\\Documents\\New project 2\\reports\\ebos\\validation\\intake\\templates\\2026-07-03-external-intake-template.json",
+        "exists": true,
+        "readyForUse": true,
+        "warnings": []
+      },
+      {
+        "key": "external_intake_input",
+        "filePath": "C:\\Users\\HU\\Documents\\New project 2\\reports\\ebos\\validation\\intake\\inputs\\2026-07-03-external-intake-input.json",
+        "exists": true,
+        "readyForUse": false,
+        "warnings": [
+          "External intake input exists but is not filled with real channel data."
+        ]
+      },
+      {
+        "key": "external_intake_import_report",
+        "filePath": "C:\\Users\\HU\\Documents\\New project 2\\reports\\ebos\\validation\\intake\\imports\\2026-07-03-external-intake-import-report.json",
+        "exists": true,
+        "readyForUse": true,
+        "warnings": []
+      }
+    ],
+    "deploymentChecks": [
+      {
+        "key": "build_script",
+        "label": "Build script",
+        "passed": true,
+        "warnings": []
+      },
+      {
+        "key": "lint_script",
+        "label": "Lint script",
+        "passed": true,
+        "warnings": []
+      },
+      {
+        "key": "typecheck_script",
+        "label": "Typecheck script",
+        "passed": true,
+        "warnings": []
+      }
+    ],
+    "readinessScore": 98,
+    "readinessStatus": "ready_with_warnings",
+    "blockers": [],
+    "warnings": [
+      "External intake input exists but is not filled with real channel data."
+    ],
+    "nextActions": [
+      "Validation page can proceed only if warnings are accepted.",
+      "Keep external channel metrics empty until real user data exists.",
+      "External intake input exists but is not filled with real channel data."
+    ]
+  },
+  "codexSteps": [
+    {
+      "id": "codex-build",
+      "title": "Run build check",
+      "description": "确认 Next.js build 可以通过，避免验证页上线前存在编译错误。",
+      "owner": "codex",
+      "command": "npm run build",
+      "verification": "Build exits with code 0."
+    },
+    {
+      "id": "codex-lint",
+      "title": "Run lint check",
+      "description": "确认 lint 没有阻断级问题。",
+      "owner": "codex",
+      "command": "npm run lint",
+      "verification": "Lint exits with code 0."
+    },
+    {
+      "id": "codex-typecheck",
+      "title": "Run typecheck check",
+      "description": "确认 TypeScript 类型检查通过。",
+      "owner": "codex",
+      "command": "npm run typecheck",
+      "verification": "Typecheck exits with code 0."
+    },
+    {
+      "id": "codex-validation-page",
+      "title": "Check validation page files",
+      "description": "检查 validation page 路由和共享组件是否存在，并包含 Hero、Summary、CTA、FAQ、合规提示和 metadata。",
+      "owner": "codex",
+      "command": "npx tsx scripts/check-ebos-validation-launch-readiness.ts --date 2026-07-03",
+      "verification": "Readiness report lists both validation pages."
+    },
+    {
+      "id": "codex-cta-tracking",
+      "title": "Check CTA tracking",
+      "description": "检查 CTA tracking 事件是否在页面和 analytics 白名单里同时存在。",
+      "owner": "codex",
+      "command": "npx tsx scripts/check-ebos-validation-launch-readiness.ts --date 2026-07-03",
+      "verification": "Readiness trackingChecks are found=true."
+    },
+    {
+      "id": "codex-validation-input",
+      "title": "Check validation-input status",
+      "description": "确认 validation-input 文件存在，且不会把未知外部数据当成真实结果。",
+      "owner": "codex",
+      "command": "npx tsx scripts/check-ebos-validation-input.ts --date 2026-07-03",
+      "verification": "Validation input check completes without fabricated metrics."
+    },
+    {
+      "id": "codex-external-intake",
+      "title": "Check external intake template",
+      "description": "确认 external intake 模板、可编辑 input 和导入报告路径已经准备好。",
+      "owner": "codex",
+      "command": "npx tsx scripts/generate-ebos-external-intake-template.ts --date 2026-07-03",
+      "verification": "External intake template and input paths exist."
+    }
+  ],
+  "userMinimumActions": [
+    "确认发布验证页，或明确说明暂缓发布的原因。",
+    "把平台文案复制到外部平台，不需要手动改代码。",
+    "真实发生咨询、订单、退款或用户反馈后，把数据复制给 Codex，不能补猜。"
+  ],
+  "externalChannelSteps": [
+    {
+      "channel": "xianyu",
+      "title": "闲鱼发布",
+      "description": "使用 AI Prompt Kit 标题、卖点、价格测试和 FAQ 文案发布或准备草稿。",
+      "assetHint": "docs/ebos/validation-assets 中已有可复制素材；发布前按平台规则人工确认。",
+      "forbiddenActions": [
+        "Codex 不能登录外部平台。",
+        "Codex 不能伪造浏览、点击、咨询、订单、收入或用户反馈。",
+        "Codex 不能绕过平台规则。"
+      ]
+    },
+    {
+      "channel": "taobao",
+      "title": "淘宝发布",
+      "description": "整理商品标题、详情页、交付说明、售后边界和价格测试信息。",
+      "assetHint": "docs/ebos/validation-assets 中已有可复制素材；发布前按平台规则人工确认。",
+      "forbiddenActions": [
+        "Codex 不能登录外部平台。",
+        "Codex 不能伪造浏览、点击、咨询、订单、收入或用户反馈。",
+        "Codex 不能绕过平台规则。"
+      ]
+    },
+    {
+      "channel": "whop",
+      "title": "Whop listing",
+      "description": "整理英文 listing、benefits、delivery、FAQ、support 和 pricing 文案。",
+      "assetHint": "docs/ebos/validation-assets 中已有可复制素材；发布前按平台规则人工确认。",
+      "forbiddenActions": [
+        "Codex 不能登录外部平台。",
+        "Codex 不能伪造浏览、点击、咨询、订单、收入或用户反馈。",
+        "Codex 不能绕过平台规则。"
+      ]
+    },
+    {
+      "channel": "xiaohongshu",
+      "title": "小红书笔记",
+      "description": "使用合规种草文案说明场景、交付物和咨询入口。",
+      "assetHint": "docs/ebos/validation-assets 中已有可复制素材；发布前按平台规则人工确认。",
+      "forbiddenActions": [
+        "Codex 不能登录外部平台。",
+        "Codex 不能伪造浏览、点击、咨询、订单、收入或用户反馈。",
+        "Codex 不能绕过平台规则。"
+      ]
+    },
+    {
+      "channel": "wechat",
+      "title": "微信私域",
+      "description": "整理朋友圈、私聊、社群发布文本和用户咨询记录口径。",
+      "assetHint": "docs/ebos/validation-assets 中已有可复制素材；发布前按平台规则人工确认。",
+      "forbiddenActions": [
+        "Codex 不能登录外部平台。",
+        "Codex 不能伪造浏览、点击、咨询、订单、收入或用户反馈。",
+        "Codex 不能绕过平台规则。"
+      ]
+    }
+  ],
+  "dataIntakeSteps": [
+    {
+      "id": "intake-template",
+      "title": "生成 external intake template",
+      "description": "生成外部渠道填报模板和可编辑 input。",
+      "owner": "codex",
+      "command": "npx tsx scripts/generate-ebos-external-intake-template.ts --date 2026-07-03",
+      "verification": "Template Markdown/JSON and editable input are generated."
+    },
+    {
+      "id": "intake-real-data",
+      "title": "等待用户提供真实数据",
+      "description": "只接收真实发生的浏览、点击、咨询、订单、收入、退款、反馈。",
+      "owner": "codex",
+      "verification": "No fabricated external platform metrics are added."
+    },
+    {
+      "id": "intake-dry-run",
+      "title": "dry-run import",
+      "description": "先执行 dry-run，检查将要回填的字段和异常值。",
+      "owner": "codex",
+      "command": "npx tsx scripts/import-ebos-external-intake.ts --date 2026-07-03",
+      "verification": "Dry-run import report is generated."
+    },
+    {
+      "id": "intake-anomaly-review",
+      "title": "检查异常值",
+      "description": "检查异常高点击、订单、收入、退款和空字段，不确定时保留 warning。",
+      "owner": "codex",
+      "verification": "Anomalies are either confirmed by user-provided data or skipped."
+    },
+    {
+      "id": "intake-apply",
+      "title": "--apply",
+      "description": "只有 dry-run 没有异常后才写回 validation input。",
+      "owner": "codex",
+      "command": "npx tsx scripts/import-ebos-external-intake.ts --date 2026-07-03 --apply",
+      "verification": "Validation input backup and import report are generated."
+    },
+    {
+      "id": "intake-regenerate",
+      "title": "重新生成 validation / decision / weekly / monthly",
+      "description": "导入后重新生成下游 EBOS 报告。",
+      "owner": "codex",
+      "command": "npx tsx scripts/generate-ebos-validation-report.ts --date 2026-07-03 && npx tsx scripts/generate-ebos-decision-report.ts --date 2026-07-03 && npx tsx scripts/generate-ebos-weekly-report.ts --date 2026-07-03 && npx tsx scripts/generate-ebos-monthly-review.ts --date 2026-07-03",
+      "verification": "Validation, decision, weekly, and monthly reports are regenerated."
+    }
+  ],
+  "postLaunchCommands": [
+    "npx tsx scripts/generate-ebos-validation-report.ts --date 2026-07-03",
+    "npx tsx scripts/generate-ebos-decision-report.ts --date 2026-07-03",
+    "npx tsx scripts/generate-ebos-weekly-report.ts --date 2026-07-03",
+    "npx tsx scripts/generate-ebos-monthly-review.ts --date 2026-07-03"
+  ],
+  "rollbackNotes": [
+    "如果 validation page 编译、路由、CTA tracking 或合规文案失败，先暂缓发布并修复 readiness blockers。",
+    "如果外部平台文案被平台拒绝，保留拒绝原因，不要绕过平台规则。",
+    "如果没有真实用户行为，validation input 保持 0、空字符串或空数组，不要补猜。",
+    "如果导入 external intake 后发现异常值，恢复 validation input backup，并重新执行 dry-run。"
+  ],
+  "warnings": [
+    "Codex 不能伪造外部平台数据。",
+    "Codex 不能登录闲鱼、淘宝、Whop、小红书、微信或其他外部平台。",
+    "真实订单、咨询、退款、点击和用户反馈必须来自真实用户行为。",
+    "External intake input exists but is not filled with real channel data."
+  ]
+}

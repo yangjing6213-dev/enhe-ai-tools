@@ -1,0 +1,32 @@
+{
+  "inputType": "server_deployment_result_input",
+  "targetDate": "2026-07-03",
+  "filledAt": "2026-07-05T17:15:52.0535054+08:00",
+  "serverCommandsCompleted": true,
+  "dockerCommandsCompleted": true,
+  "nginxCommandsCompleted": true,
+  "deployedAt": "2026-07-05T17:14:48+08:00",
+  "commandSummaries": [
+    "Git push succeeded: f3500dd was pushed to origin/main.",
+    "Tencent Cloud project path /opt/enhe-ai-tools was updated by fast-forward git pull to f3500dd.",
+    "Server tracked dirty changes were preserved in git stash before pull; conflicting untracked product-path files were preserved in a separate git stash.",
+    "docker compose build app completed successfully and produced image enhe-ai-tools-app.",
+    "docker compose up -d --no-deps app completed with a temporary command override to run node server.js and avoid the migration entrypoint.",
+    "docker inspect confirmed app command is [\"node\",\"server.js\"].",
+    "Container health check returned HTTP 200 with status ok and database ok.",
+    "Docker hot-content-nginx nginx -t and nginx -s reload completed successfully.",
+    "Public validation URLs returned HTTP 200 for /validation/ai-prompt-kit and /en/validation/ai-prompt-kit."
+  ],
+  "failures": [],
+  "evidence": [
+    "git pull output: Updating 4d70deb..f3500dd; Fast-forward; post-pull HEAD f3500dd.",
+    "docker compose build output ended with: app Built.",
+    "docker inspect output: cmd=[\"node\",\"server.js\"] entrypoint=[\"docker-entrypoint.sh\"] image=enhe-ai-tools-app.",
+    "app logs after restart: Next.js 15.5.18; Ready in 327ms.",
+    "health check: HTTP/1.1 200 OK; {\"app\":\"enhe-ai-tools\",\"status\":\"ok\",\"database\":\"ok\"}.",
+    "nginx output: configuration file syntax is ok; test is successful; signal process started.",
+    "curl /validation/ai-prompt-kit: status=200 final=https://www.enhe-tech.com.cn/validation/ai-prompt-kit.",
+    "curl /en/validation/ai-prompt-kit: status=200 final=https://www.enhe-tech.com.cn/en/validation/ai-prompt-kit."
+  ],
+  "notes": "Codex executed the Tencent Cloud deployment with the existing SSH authorization. deploy.sh was not used because it runs prisma migrate deploy. App startup used a temporary compose override for this deployment so the container ran node server.js directly; no Prisma migration or destructive database command was executed."
+}

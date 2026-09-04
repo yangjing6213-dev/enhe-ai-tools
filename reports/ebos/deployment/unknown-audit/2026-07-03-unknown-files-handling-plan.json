@@ -1,0 +1,17 @@
+{
+  "reportType": "unknown_files_handling_plan",
+  "targetDate": "2026-07-03",
+  "generatedAt": "2026-07-07T14:58:31.157Z",
+  "decision": "risky_unknown_requires_user_confirmation",
+  "unknownFilesMayBeCommitted": false,
+  "actions": [
+    "Confirm ownership of risky unknown files.",
+    "Exclude generated/cache files from commits.",
+    "Create separate cleanup/commit batches only after approval."
+  ],
+  "forbiddenActions": [
+    "git add unknown files",
+    "delete untracked files without approval",
+    "mix unknown files into EBOS report commit"
+  ]
+}

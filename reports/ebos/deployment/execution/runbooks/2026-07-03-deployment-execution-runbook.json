@@ -1,0 +1,164 @@
+{
+  "reportType": "production_deployment_execution_runbook",
+  "targetDate": "2026-07-03",
+  "generatedAt": "2026-07-04T10:46:43.848Z",
+  "siteUrl": "https://www.enhe-tech.com.cn",
+  "deploymentGoal": "Deploy the validation pages only after explicit user approval, then verify public routes before any external channel data intake.",
+  "userConfirmationPhrase": "确认部署验证页",
+  "codexPreApprovalCommands": [
+    {
+      "id": "local-lint",
+      "command": "npm run lint",
+      "environment": "local",
+      "riskLevel": "low",
+      "requiresUserApproval": false,
+      "canCodexRunLocally": true,
+      "mustBeRunOnServer": false,
+      "description": "Prepared command; execute only in the appropriate local/server context."
+    },
+    {
+      "id": "local-typecheck",
+      "command": "npm run typecheck",
+      "environment": "local",
+      "riskLevel": "low",
+      "requiresUserApproval": false,
+      "canCodexRunLocally": true,
+      "mustBeRunOnServer": false,
+      "description": "Prepared command; execute only in the appropriate local/server context."
+    },
+    {
+      "id": "local-build",
+      "command": "npm run build",
+      "environment": "local",
+      "riskLevel": "low",
+      "requiresUserApproval": false,
+      "canCodexRunLocally": true,
+      "mustBeRunOnServer": false,
+      "description": "Prepared command; execute only in the appropriate local/server context."
+    },
+    {
+      "id": "local-launch-readiness",
+      "command": "npx tsx scripts/check-ebos-validation-launch-readiness.ts --date 2026-07-03",
+      "environment": "local",
+      "riskLevel": "low",
+      "requiresUserApproval": false,
+      "canCodexRunLocally": true,
+      "mustBeRunOnServer": false,
+      "description": "Prepared command; execute only in the appropriate local/server context."
+    },
+    {
+      "id": "local-launch-execution",
+      "command": "npx tsx scripts/generate-ebos-validation-launch-execution.ts --date 2026-07-03",
+      "environment": "local",
+      "riskLevel": "low",
+      "requiresUserApproval": false,
+      "canCodexRunLocally": true,
+      "mustBeRunOnServer": false,
+      "description": "Prepared command; execute only in the appropriate local/server context."
+    },
+    {
+      "id": "local-git-status",
+      "command": "git status",
+      "environment": "local",
+      "riskLevel": "low",
+      "requiresUserApproval": false,
+      "canCodexRunLocally": true,
+      "mustBeRunOnServer": false,
+      "description": "Prepared command; execute only in the appropriate local/server context."
+    },
+    {
+      "id": "local-git-diff-stat",
+      "command": "git diff --stat",
+      "environment": "local",
+      "riskLevel": "low",
+      "requiresUserApproval": false,
+      "canCodexRunLocally": true,
+      "mustBeRunOnServer": false,
+      "description": "Prepared command; execute only in the appropriate local/server context."
+    },
+    {
+      "id": "local-git-commit-suggestion",
+      "command": "git add <reviewed files> && git commit -m \"ebos: add production deployment preflight\"",
+      "environment": "local",
+      "riskLevel": "low",
+      "requiresUserApproval": false,
+      "canCodexRunLocally": true,
+      "mustBeRunOnServer": false,
+      "description": "Prepared command; execute only in the appropriate local/server context."
+    }
+  ],
+  "commandsAfterApproval": [
+    {
+      "id": "server-path",
+      "command": "Manual confirmation required: Server project path must be confirmed before SSH or deployment commands are run.",
+      "environment": "server",
+      "riskLevel": "high",
+      "requiresUserApproval": true,
+      "canCodexRunLocally": false,
+      "mustBeRunOnServer": true,
+      "description": "Server project path must be confirmed before SSH or deployment commands are run.",
+      "rollbackNote": "Requires explicit confirmation and rollback readiness before execution."
+    },
+    {
+      "id": "docker-compose-build",
+      "command": "docker compose -f deploy/enhe-ai-tools/docker-compose.yml up -d --build",
+      "environment": "docker",
+      "riskLevel": "high",
+      "requiresUserApproval": true,
+      "canCodexRunLocally": false,
+      "mustBeRunOnServer": true,
+      "description": "Prepared command; execute only in the appropriate local/server context.",
+      "rollbackNote": "Requires explicit confirmation and rollback readiness before execution."
+    },
+    {
+      "id": "docker-compose-ps",
+      "command": "docker compose -f deploy/enhe-ai-tools/docker-compose.yml ps",
+      "environment": "docker",
+      "riskLevel": "high",
+      "requiresUserApproval": true,
+      "canCodexRunLocally": false,
+      "mustBeRunOnServer": true,
+      "description": "Prepared command; execute only in the appropriate local/server context.",
+      "rollbackNote": "Requires explicit confirmation and rollback readiness before execution."
+    },
+    {
+      "id": "nginx-reload-confirmation",
+      "command": "nginx -t && nginx -s reload",
+      "environment": "nginx",
+      "riskLevel": "high",
+      "requiresUserApproval": true,
+      "canCodexRunLocally": false,
+      "mustBeRunOnServer": true,
+      "description": "Nginx reload is listed as an approval-required production operation. Do not run before explicit user confirmation.",
+      "rollbackNote": "If Nginx reload breaks routing, restore the previous Nginx config and reload only after verification."
+    }
+  ],
+  "dockerNginxNotes": [
+    "Docker and Nginx commands are production operations and must not run before approval.",
+    "Confirm server project path and compose file before executing any Docker command.",
+    "Run Nginx config test before reload if Nginx reload is needed."
+  ],
+  "postDeploySmokeTestCommand": "npx tsx scripts/check-ebos-validation-post-launch.ts --date 2026-07-03 --site-url https://www.enhe-tech.com.cn",
+  "smokeTestFailureRollbackSteps": [
+    "Create a reviewed revert commit for validation route files if the route breaks production.",
+    "Revert tracking event whitelist changes only if they break build or analytics runtime.",
+    "Redeploy the previous known-good build from the server deployment system."
+  ],
+  "smokeTestSuccessStatusUpdates": [
+    "Update deployment execution status to verified only after the post-launch check passes.",
+    "Record deployedAt, deployedCommit, and verification command output summary without secrets.",
+    "Regenerate EBOS weekly and monthly reports after verification."
+  ],
+  "externalDataNextSteps": [
+    "Start real external channel publishing only after deployment status is verified.",
+    "Fill validation external intake with observed metrics only; keep unknown metrics as 0.",
+    "Regenerate validation result, decision, weekly, and monthly reports after intake."
+  ],
+  "warnings": [
+    "Do not SSH or deploy until the user explicitly confirms production deployment.",
+    "No destructive git reset, broad checkout, broad Docker cleanup, or report deletion is included.",
+    "Rollback requires explicit user confirmation before touching production.",
+    "approvalStatus is awaiting_user_approval; this report is not approval and is not deployment.",
+    "This runbook does not deploy production and does not imply approval."
+  ]
+}

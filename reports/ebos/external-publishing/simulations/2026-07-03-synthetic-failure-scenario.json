@@ -1,0 +1,172 @@
+{
+  "scenarioType": "synthetic_failure_scenario",
+  "targetDate": "2026-07-03",
+  "generatedAt": "2026-07-06T05:16:12.716Z",
+  "synthetic": true,
+  "simulationPurpose": "Use a clearly marked worst-case synthetic scenario to stress-test page copy, offer clarity, channel fit, and next validation priorities without polluting real EBOS data.",
+  "failureAssumptions": [
+    "No real external publishing results are available yet.",
+    "The validation page is live, but demand, message, lead, order, and revenue signals are still unobserved.",
+    "The simulation intentionally assumes weak exposure, weak interaction, zero leads, zero paid orders, and zero revenue.",
+    "The scenario is for diagnosis and planning only, not for revenue, validation, or decision evidence."
+  ],
+  "simulatedChannelResults": [
+    {
+      "channel": "manual_outreach",
+      "simulatedPublished": true,
+      "simulatedViews": 0,
+      "simulatedClicks": 0,
+      "simulatedSaves": 0,
+      "simulatedShares": 0,
+      "simulatedMessages": 10,
+      "simulatedLeads": 0,
+      "simulatedPositiveReplies": 0,
+      "simulatedNegativeReplies": 2,
+      "simulatedOrders": 0,
+      "simulatedPaidOrders": 0,
+      "simulatedRevenue": 0,
+      "simulatedRefundCount": 0,
+      "simulatedFeedbackThemes": [
+        "Value proposition unclear",
+        "No immediate reason to continue",
+        "No concrete free sample"
+      ],
+      "failureNotes": "10 人触达后无人愿意继续了解或购买。"
+    },
+    {
+      "channel": "wechat",
+      "simulatedPublished": true,
+      "simulatedViews": 20,
+      "simulatedClicks": 1,
+      "simulatedSaves": 0,
+      "simulatedShares": 0,
+      "simulatedMessages": 0,
+      "simulatedLeads": 0,
+      "simulatedPositiveReplies": 0,
+      "simulatedNegativeReplies": 0,
+      "simulatedOrders": 0,
+      "simulatedPaidOrders": 0,
+      "simulatedRevenue": 0,
+      "simulatedRefundCount": 0,
+      "simulatedFeedbackThemes": [
+        "Private traffic exposure is low",
+        "CTA does not trigger a reply"
+      ],
+      "failureNotes": "私域内容曝光低，无咨询。"
+    },
+    {
+      "channel": "xiaohongshu",
+      "simulatedPublished": true,
+      "simulatedViews": 80,
+      "simulatedClicks": 0,
+      "simulatedSaves": 0,
+      "simulatedShares": 0,
+      "simulatedMessages": 0,
+      "simulatedLeads": 0,
+      "simulatedPositiveReplies": 0,
+      "simulatedNegativeReplies": 0,
+      "simulatedOrders": 0,
+      "simulatedPaidOrders": 0,
+      "simulatedRevenue": 0,
+      "simulatedRefundCount": 0,
+      "simulatedFeedbackThemes": [
+        "Weak hook",
+        "No save-worthy template preview",
+        "No visible proof"
+      ],
+      "failureNotes": "有少量曝光，但没有互动和转化。"
+    },
+    {
+      "channel": "xianyu",
+      "simulatedPublished": false,
+      "simulatedViews": 0,
+      "simulatedClicks": 0,
+      "simulatedSaves": 0,
+      "simulatedShares": 0,
+      "simulatedMessages": 0,
+      "simulatedLeads": 0,
+      "simulatedPositiveReplies": 0,
+      "simulatedNegativeReplies": 0,
+      "simulatedOrders": 0,
+      "simulatedPaidOrders": 0,
+      "simulatedRevenue": 0,
+      "simulatedRefundCount": 0,
+      "simulatedFeedbackThemes": [],
+      "failureNotes": "未发布，不纳入真实判断。"
+    },
+    {
+      "channel": "taobao",
+      "simulatedPublished": false,
+      "simulatedViews": 0,
+      "simulatedClicks": 0,
+      "simulatedSaves": 0,
+      "simulatedShares": 0,
+      "simulatedMessages": 0,
+      "simulatedLeads": 0,
+      "simulatedPositiveReplies": 0,
+      "simulatedNegativeReplies": 0,
+      "simulatedOrders": 0,
+      "simulatedPaidOrders": 0,
+      "simulatedRevenue": 0,
+      "simulatedRefundCount": 0,
+      "simulatedFeedbackThemes": [],
+      "failureNotes": "未发布，不纳入真实判断。"
+    },
+    {
+      "channel": "whop",
+      "simulatedPublished": false,
+      "simulatedViews": 0,
+      "simulatedClicks": 0,
+      "simulatedSaves": 0,
+      "simulatedShares": 0,
+      "simulatedMessages": 0,
+      "simulatedLeads": 0,
+      "simulatedPositiveReplies": 0,
+      "simulatedNegativeReplies": 0,
+      "simulatedOrders": 0,
+      "simulatedPaidOrders": 0,
+      "simulatedRevenue": 0,
+      "simulatedRefundCount": 0,
+      "simulatedFeedbackThemes": [],
+      "failureNotes": "未发布，不纳入真实判断。"
+    }
+  ],
+  "simulatedFunnelSummary": {
+    "simulatedPublishedChannelsCount": 3,
+    "simulatedViews": 100,
+    "simulatedClicks": 1,
+    "simulatedSaves": 0,
+    "simulatedShares": 0,
+    "simulatedMessages": 10,
+    "simulatedLeads": 0,
+    "simulatedPositiveReplies": 0,
+    "simulatedNegativeReplies": 2,
+    "simulatedOrders": 0,
+    "simulatedPaidOrders": 0,
+    "simulatedRevenue": 0,
+    "simulatedRefundCount": 0,
+    "simulatedClickRate": 0.01,
+    "simulatedMessageRate": 0.0909,
+    "simulatedLeadRate": 0,
+    "simulatedPaidConversionRate": 0,
+    "notes": [
+      "Synthetic scenario assumes zero leads, zero paid orders, and zero revenue.",
+      "Manual outreach messages are simulated as sent messages, not real user replies.",
+      "Marketplace channels are simulated as unpublished and must not be interpreted as failed real listings."
+    ]
+  },
+  "constraints": [
+    "Synthetic results must stay under reports/ebos/external-publishing/simulations/.",
+    "Synthetic results must not be written into external-publish-result-input.json.",
+    "Synthetic results must not be written into external-intake-input.json.",
+    "Synthetic results must not be used to set hasRealSignals=true.",
+    "Synthetic results must not be used to set canBackfill=true.",
+    "Synthetic results must not be counted as revenue, order, inquiry, or user feedback evidence."
+  ],
+  "warnings": [
+    "This is synthetic data.",
+    "Do not backfill as real data.",
+    "Do not use for revenue evidence.",
+    "Do not claim real market validation."
+  ]
+}

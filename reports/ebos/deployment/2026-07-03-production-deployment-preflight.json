@@ -1,0 +1,342 @@
+{
+  "reportType": "production_deployment_preflight",
+  "targetDate": "2026-07-03",
+  "generatedAt": "2026-07-04T09:53:29.639Z",
+  "siteUrl": "https://www.enhe-tech.com.cn",
+  "validationRoutes": [
+    "/validation/ai-prompt-kit",
+    "/en/validation/ai-prompt-kit"
+  ],
+  "configSummary": {
+    "packageManagerDetected": "npm",
+    "scriptsDetected": {
+      "lint": true,
+      "typecheck": true,
+      "build": true,
+      "start": true,
+      "test": true,
+      "prisma:generate": true
+    },
+    "nextConfigDetected": true,
+    "dockerfileDetected": true,
+    "dockerComposeDetected": true,
+    "nginxConfigDetected": true,
+    "deployDocsDetected": true,
+    "standaloneOutputDetected": true,
+    "warnings": []
+  },
+  "buildChecks": [
+    {
+      "id": "build-script",
+      "category": "build",
+      "title": "package.json build script",
+      "status": "pass",
+      "evidence": "package.json contains build script.",
+      "filePath": "package.json",
+      "command": "npm run build"
+    },
+    {
+      "id": "build-evidence",
+      "category": "build",
+      "title": "Production build evidence",
+      "status": "pass",
+      "evidence": "Build evidence exists from local build or explicit input.",
+      "command": "npm run build"
+    }
+  ],
+  "routeChecks": [
+    {
+      "id": "route-validation-ai-prompt-kit",
+      "category": "route",
+      "title": "Validation route /validation/ai-prompt-kit",
+      "status": "pass",
+      "evidence": "/validation/ai-prompt-kit page file exists.",
+      "filePath": "src\\app\\(zh-public)\\validation\\ai-prompt-kit\\page.tsx"
+    },
+    {
+      "id": "route-en-validation-ai-prompt-kit",
+      "category": "route",
+      "title": "Validation route /en/validation/ai-prompt-kit",
+      "status": "pass",
+      "evidence": "/en/validation/ai-prompt-kit page file exists.",
+      "filePath": "src\\app\\en\\validation\\ai-prompt-kit\\page.tsx"
+    }
+  ],
+  "environmentChecks": [
+    {
+      "id": "env-database-url",
+      "category": "env",
+      "title": "DATABASE_URL",
+      "status": "pass",
+      "evidence": "DATABASE_URL key name is configured or documented."
+    },
+    {
+      "id": "env-auth-secret",
+      "category": "env",
+      "title": "Auth secret key",
+      "status": "pass",
+      "evidence": "AUTH_SECRET or NEXTAUTH_SECRET key name is configured or documented."
+    },
+    {
+      "id": "env-site-url",
+      "category": "env",
+      "title": "Site URL key",
+      "status": "pass",
+      "evidence": "APP_URL, NEXT_PUBLIC_APP_URL, NEXTAUTH_URL, or EBOS_SITE_URL key name is configured or documented."
+    },
+    {
+      "id": "env-smtp",
+      "category": "env",
+      "title": "SMTP keys",
+      "status": "pass",
+      "evidence": "SMTP_* keys key name is configured or documented."
+    }
+  ],
+  "dockerChecks": [
+    {
+      "id": "dockerfile",
+      "category": "docker",
+      "title": "Dockerfile detected",
+      "status": "pass",
+      "evidence": "Dockerfile exists."
+    },
+    {
+      "id": "docker-compose",
+      "category": "docker",
+      "title": "Docker Compose detected",
+      "status": "pass",
+      "evidence": "Docker Compose file exists."
+    }
+  ],
+  "nginxChecks": [
+    {
+      "id": "nginx-config",
+      "category": "nginx",
+      "title": "Nginx config detected",
+      "status": "pass",
+      "evidence": "Nginx config exists."
+    },
+    {
+      "id": "deploy-docs",
+      "category": "nginx",
+      "title": "Deploy docs detected",
+      "status": "pass",
+      "evidence": "Deploy docs exist."
+    }
+  ],
+  "deploymentPlan": {
+    "localCommands": [
+      {
+        "id": "local-lint",
+        "title": "Run lint locally",
+        "status": "ready",
+        "command": "npm run lint",
+        "notes": "Prepared command; execute only in the appropriate local/server context."
+      },
+      {
+        "id": "local-typecheck",
+        "title": "Run typecheck locally",
+        "status": "ready",
+        "command": "npm run typecheck",
+        "notes": "Prepared command; execute only in the appropriate local/server context."
+      },
+      {
+        "id": "local-build",
+        "title": "Run production build locally",
+        "status": "ready",
+        "command": "npm run build",
+        "notes": "Prepared command; execute only in the appropriate local/server context."
+      },
+      {
+        "id": "local-launch-readiness",
+        "title": "Regenerate validation launch readiness",
+        "status": "ready",
+        "command": "npx tsx scripts/check-ebos-validation-launch-readiness.ts --date 2026-07-03",
+        "notes": "Prepared command; execute only in the appropriate local/server context."
+      },
+      {
+        "id": "local-launch-execution",
+        "title": "Regenerate validation launch execution",
+        "status": "ready",
+        "command": "npx tsx scripts/generate-ebos-validation-launch-execution.ts --date 2026-07-03",
+        "notes": "Prepared command; execute only in the appropriate local/server context."
+      },
+      {
+        "id": "local-git-status",
+        "title": "Review git status manually",
+        "status": "ready",
+        "command": "git status",
+        "notes": "Prepared command; execute only in the appropriate local/server context."
+      },
+      {
+        "id": "local-git-diff-stat",
+        "title": "Review diff stat manually",
+        "status": "ready",
+        "command": "git diff --stat",
+        "notes": "Prepared command; execute only in the appropriate local/server context."
+      },
+      {
+        "id": "local-git-commit-suggestion",
+        "title": "Create a scoped commit only after review",
+        "status": "ready",
+        "command": "git add <reviewed files> && git commit -m \"ebos: add production deployment preflight\"",
+        "notes": "Prepared command; execute only in the appropriate local/server context."
+      }
+    ],
+    "serverCommands": [
+      {
+        "id": "server-path",
+        "title": "Manual confirmation required",
+        "status": "manual_required",
+        "notes": "Server project path must be confirmed before SSH or deployment commands are run."
+      }
+    ],
+    "dockerCommands": [
+      {
+        "id": "docker-compose-build",
+        "title": "Build and start production compose stack on server",
+        "status": "ready",
+        "command": "docker compose -f deploy/enhe-ai-tools/docker-compose.yml up -d --build",
+        "notes": "Prepared command; execute only in the appropriate local/server context."
+      },
+      {
+        "id": "docker-compose-ps",
+        "title": "Verify production containers on server",
+        "status": "ready",
+        "command": "docker compose -f deploy/enhe-ai-tools/docker-compose.yml ps",
+        "notes": "Prepared command; execute only in the appropriate local/server context."
+      }
+    ],
+    "verificationCommands": [
+      {
+        "id": "verify-post-launch",
+        "title": "Run public post-launch validation routes check",
+        "status": "ready",
+        "command": "npx tsx scripts/check-ebos-validation-post-launch.ts --date 2026-07-03 --site-url https://www.enhe-tech.com.cn",
+        "notes": "Prepared command; execute only in the appropriate local/server context."
+      }
+    ],
+    "notes": [
+      "This is a command plan only; no server command is executed by EBOS.",
+      "Git add/commit commands are suggestions and require explicit human review.",
+      "Do not print secrets in terminal output or reports."
+    ],
+    "warnings": [
+      "Do not SSH or deploy until the user explicitly confirms production deployment."
+    ]
+  },
+  "rollbackPlan": {
+    "rollbackStrategy": "Scoped rollback: revert only validation launch surface changes or redeploy the previous reviewed build. Do not reset the whole worktree.",
+    "filesToRevert": [
+      "src/app/(zh-public)/validation/ai-prompt-kit/page.tsx",
+      "src/app/en/validation/ai-prompt-kit/page.tsx",
+      "src/components/validation-ai-prompt-kit-page.tsx",
+      "src/lib/analytics.ts"
+    ],
+    "commands": [
+      "Create a reviewed revert commit for validation route files if the route breaks production.",
+      "Revert tracking event whitelist changes only if they break build or analytics runtime.",
+      "Redeploy the previous known-good build from the server deployment system."
+    ],
+    "dataSafetyNotes": [
+      "Keep reports/ebos deployment, validation, weekly, and monthly artifacts for 2026-07-03.",
+      "Do not delete reports/ebos during rollback; reports are audit evidence.",
+      "Do not run database reset or destructive Prisma commands for validation-page rollback."
+    ],
+    "warnings": [
+      "No destructive git reset, broad checkout, broad Docker cleanup, or report deletion is included.",
+      "Rollback requires explicit user confirmation before touching production."
+    ]
+  },
+  "postDeploySmokeTests": [
+    {
+      "id": "smoke-http_status-www-enhe-tech-com-cn-validation-ai-prompt-kit",
+      "category": "smoke",
+      "title": "http_status https://www.enhe-tech.com.cn/validation/ai-prompt-kit",
+      "status": "manual_required",
+      "evidence": "Page responds with 200.",
+      "command": "npx tsx scripts/check-ebos-validation-post-launch.ts --date 2026-07-03 --site-url https://www.enhe-tech.com.cn"
+    },
+    {
+      "id": "smoke-page_content-www-enhe-tech-com-cn-validation-ai-prompt-kit",
+      "category": "smoke",
+      "title": "page_content https://www.enhe-tech.com.cn/validation/ai-prompt-kit",
+      "status": "manual_required",
+      "evidence": "Hero, FAQ, and compliance notice are visible.",
+      "command": "npx tsx scripts/check-ebos-validation-post-launch.ts --date 2026-07-03 --site-url https://www.enhe-tech.com.cn"
+    },
+    {
+      "id": "smoke-cta_present-www-enhe-tech-com-cn-validation-ai-prompt-kit",
+      "category": "smoke",
+      "title": "cta_present https://www.enhe-tech.com.cn/validation/ai-prompt-kit",
+      "status": "manual_required",
+      "evidence": "CTA copy is present and does not claim unobserved results.",
+      "command": "npx tsx scripts/check-ebos-validation-post-launch.ts --date 2026-07-03 --site-url https://www.enhe-tech.com.cn"
+    },
+    {
+      "id": "smoke-metadata-www-enhe-tech-com-cn-validation-ai-prompt-kit",
+      "category": "smoke",
+      "title": "metadata https://www.enhe-tech.com.cn/validation/ai-prompt-kit",
+      "status": "manual_required",
+      "evidence": "Title and description metadata are present.",
+      "command": "npx tsx scripts/check-ebos-validation-post-launch.ts --date 2026-07-03 --site-url https://www.enhe-tech.com.cn"
+    },
+    {
+      "id": "smoke-tracking_plan-www-enhe-tech-com-cn-validation-ai-prompt-kit",
+      "category": "smoke",
+      "title": "tracking_plan https://www.enhe-tech.com.cn/validation/ai-prompt-kit",
+      "status": "manual_required",
+      "evidence": "CTA tracking plan includes validation_ai_prompt_kit_cta_click.",
+      "command": "npx tsx scripts/check-ebos-validation-post-launch.ts --date 2026-07-03 --site-url https://www.enhe-tech.com.cn"
+    },
+    {
+      "id": "smoke-http_status-www-enhe-tech-com-cn-en-validation-ai-prompt-kit",
+      "category": "smoke",
+      "title": "http_status https://www.enhe-tech.com.cn/en/validation/ai-prompt-kit",
+      "status": "manual_required",
+      "evidence": "Page responds with 200.",
+      "command": "npx tsx scripts/check-ebos-validation-post-launch.ts --date 2026-07-03 --site-url https://www.enhe-tech.com.cn"
+    },
+    {
+      "id": "smoke-page_content-www-enhe-tech-com-cn-en-validation-ai-prompt-kit",
+      "category": "smoke",
+      "title": "page_content https://www.enhe-tech.com.cn/en/validation/ai-prompt-kit",
+      "status": "manual_required",
+      "evidence": "Hero, FAQ, and compliance notice are visible.",
+      "command": "npx tsx scripts/check-ebos-validation-post-launch.ts --date 2026-07-03 --site-url https://www.enhe-tech.com.cn"
+    },
+    {
+      "id": "smoke-cta_present-www-enhe-tech-com-cn-en-validation-ai-prompt-kit",
+      "category": "smoke",
+      "title": "cta_present https://www.enhe-tech.com.cn/en/validation/ai-prompt-kit",
+      "status": "manual_required",
+      "evidence": "CTA copy is present and does not claim unobserved results.",
+      "command": "npx tsx scripts/check-ebos-validation-post-launch.ts --date 2026-07-03 --site-url https://www.enhe-tech.com.cn"
+    },
+    {
+      "id": "smoke-metadata-www-enhe-tech-com-cn-en-validation-ai-prompt-kit",
+      "category": "smoke",
+      "title": "metadata https://www.enhe-tech.com.cn/en/validation/ai-prompt-kit",
+      "status": "manual_required",
+      "evidence": "Title and description metadata are present.",
+      "command": "npx tsx scripts/check-ebos-validation-post-launch.ts --date 2026-07-03 --site-url https://www.enhe-tech.com.cn"
+    },
+    {
+      "id": "smoke-tracking_plan-www-enhe-tech-com-cn-en-validation-ai-prompt-kit",
+      "category": "smoke",
+      "title": "tracking_plan https://www.enhe-tech.com.cn/en/validation/ai-prompt-kit",
+      "status": "manual_required",
+      "evidence": "CTA tracking plan includes validation_ai_prompt_kit_cta_click.",
+      "command": "npx tsx scripts/check-ebos-validation-post-launch.ts --date 2026-07-03 --site-url https://www.enhe-tech.com.cn"
+    }
+  ],
+  "readinessScore": 98,
+  "readinessStatus": "ready_to_deploy",
+  "blockers": [],
+  "warnings": [],
+  "nextActions": [
+    "Production preflight is ready_to_deploy, but this report does not deploy.",
+    "Ask for explicit user confirmation before SSH or server commands.",
+    "Run post-launch smoke tests only after deployment is confirmed."
+  ]
+}

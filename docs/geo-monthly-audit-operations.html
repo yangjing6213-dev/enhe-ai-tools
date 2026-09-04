@@ -1,0 +1,899 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>ENHE AI 月度 GEO 巡检操作说明</title>
+    <meta
+      name="description"
+      content="ENHE AI 月度 GEO 巡检操作说明，用于记录 ChatGPT、Perplexity、Google、Bing、百度、豆包等平台的品牌可见度、官网引用、竞品引用和内容动作。"
+    />
+    <style>
+      :root {
+        color-scheme: dark;
+        --bg: #07090f;
+        --panel: rgba(255, 255, 255, 0.075);
+        --panel-strong: rgba(255, 255, 255, 0.12);
+        --text: #f3f7ff;
+        --muted: #aab6c8;
+        --line: rgba(255, 255, 255, 0.14);
+        --accent: #ff7a3d;
+        --accent-2: #42f5d7;
+        --good: #59d99d;
+        --warn: #ffc76b;
+        --bad: #ff6b6b;
+        --shadow: 0 24px 80px rgba(0, 0, 0, 0.36);
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      html {
+        scroll-behavior: smooth;
+      }
+
+      body {
+        margin: 0;
+        font-family:
+          "Microsoft YaHei",
+          "PingFang SC",
+          "Noto Sans CJK SC",
+          Arial,
+          sans-serif;
+        background:
+          radial-gradient(circle at 12% 0%, rgba(66, 245, 215, 0.18), transparent 32rem),
+          radial-gradient(circle at 88% 12%, rgba(255, 122, 61, 0.16), transparent 30rem),
+          linear-gradient(145deg, #07090f 0%, #101521 46%, #090b11 100%);
+        color: var(--text);
+        line-height: 1.75;
+      }
+
+      a {
+        color: var(--accent-2);
+        text-decoration: none;
+      }
+
+      a:hover {
+        color: #ffffff;
+      }
+
+      .page {
+        width: min(1160px, calc(100% - 32px));
+        margin: 0 auto;
+        padding: 48px 0 72px;
+      }
+
+      .hero {
+        border: 1px solid var(--line);
+        border-radius: 24px;
+        padding: clamp(28px, 5vw, 56px);
+        background: linear-gradient(135deg, rgba(255, 255, 255, 0.12), rgba(255, 255, 255, 0.045));
+        box-shadow: var(--shadow);
+        backdrop-filter: blur(20px);
+      }
+
+      .eyebrow {
+        display: inline-flex;
+        gap: 8px;
+        align-items: center;
+        border: 1px solid rgba(66, 245, 215, 0.28);
+        border-radius: 999px;
+        padding: 7px 12px;
+        color: var(--accent-2);
+        background: rgba(66, 245, 215, 0.08);
+        font-size: 13px;
+        font-weight: 700;
+      }
+
+      h1,
+      h2,
+      h3 {
+        line-height: 1.25;
+        letter-spacing: 0;
+      }
+
+      h1 {
+        margin: 22px 0 14px;
+        font-size: clamp(34px, 5vw, 56px);
+      }
+
+      h2 {
+        margin: 0 0 18px;
+        font-size: clamp(24px, 3vw, 34px);
+      }
+
+      h3 {
+        margin: 24px 0 10px;
+        font-size: 20px;
+      }
+
+      p {
+        margin: 0 0 14px;
+        color: var(--muted);
+      }
+
+      .hero p {
+        max-width: 860px;
+        font-size: 17px;
+      }
+
+      .meta-grid {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 14px;
+        margin-top: 24px;
+      }
+
+      .meta-item,
+      .card,
+      .section,
+      .toc,
+      .note,
+      .stat {
+        border: 1px solid var(--line);
+        background: var(--panel);
+        box-shadow: 0 16px 50px rgba(0, 0, 0, 0.18);
+        backdrop-filter: blur(18px);
+      }
+
+      .meta-item {
+        border-radius: 18px;
+        padding: 16px;
+      }
+
+      .meta-item strong {
+        display: block;
+        color: var(--text);
+      }
+
+      .toc {
+        margin: 24px 0;
+        border-radius: 20px;
+        padding: 22px;
+      }
+
+      .toc h2 {
+        font-size: 18px;
+        margin-bottom: 12px;
+      }
+
+      .toc ol {
+        columns: 2;
+        padding-left: 20px;
+        margin: 0;
+      }
+
+      .toc li {
+        break-inside: avoid;
+        margin: 6px 0;
+        color: var(--muted);
+      }
+
+      .section {
+        margin-top: 24px;
+        border-radius: 24px;
+        padding: clamp(22px, 4vw, 36px);
+      }
+
+      .grid {
+        display: grid;
+        gap: 16px;
+      }
+
+      .grid.two {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+
+      .grid.three {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+      }
+
+      .card {
+        border-radius: 18px;
+        padding: 18px;
+      }
+
+      .card h3 {
+        margin-top: 0;
+      }
+
+      ul,
+      ol {
+        margin: 10px 0 0;
+        padding-left: 22px;
+        color: var(--muted);
+      }
+
+      li {
+        margin: 7px 0;
+      }
+
+      code,
+      pre {
+        font-family: "Cascadia Code", Consolas, monospace;
+      }
+
+      code {
+        border-radius: 7px;
+        padding: 2px 6px;
+        background: rgba(255, 255, 255, 0.1);
+        color: #ffffff;
+      }
+
+      pre {
+        overflow: auto;
+        border: 1px solid rgba(255, 255, 255, 0.12);
+        border-radius: 16px;
+        padding: 16px;
+        background: rgba(0, 0, 0, 0.34);
+        color: #edf7ff;
+        line-height: 1.65;
+      }
+
+      table {
+        width: 100%;
+        border-collapse: collapse;
+        overflow: hidden;
+        border-radius: 16px;
+        margin-top: 12px;
+        background: rgba(0, 0, 0, 0.22);
+      }
+
+      th,
+      td {
+        border: 1px solid rgba(255, 255, 255, 0.12);
+        padding: 12px 14px;
+        text-align: left;
+        vertical-align: top;
+      }
+
+      th {
+        color: var(--text);
+        background: rgba(255, 255, 255, 0.1);
+      }
+
+      td {
+        color: var(--muted);
+      }
+
+      .badge {
+        display: inline-flex;
+        align-items: center;
+        border-radius: 999px;
+        padding: 4px 10px;
+        font-size: 12px;
+        font-weight: 800;
+      }
+
+      .badge.good {
+        color: #06120d;
+        background: var(--good);
+      }
+
+      .badge.warn {
+        color: #1c1200;
+        background: var(--warn);
+      }
+
+      .badge.bad {
+        color: #220606;
+        background: var(--bad);
+      }
+
+      .note {
+        border-radius: 18px;
+        padding: 18px;
+        border-color: rgba(255, 122, 61, 0.3);
+        background: rgba(255, 122, 61, 0.09);
+      }
+
+      .steps {
+        counter-reset: step;
+        display: grid;
+        gap: 14px;
+      }
+
+      .step {
+        position: relative;
+        padding: 18px 18px 18px 62px;
+        border: 1px solid var(--line);
+        border-radius: 18px;
+        background: rgba(255, 255, 255, 0.055);
+      }
+
+      .step::before {
+        counter-increment: step;
+        content: counter(step);
+        position: absolute;
+        left: 18px;
+        top: 18px;
+        display: grid;
+        width: 30px;
+        height: 30px;
+        place-items: center;
+        border-radius: 999px;
+        background: var(--accent);
+        color: #ffffff;
+        font-weight: 900;
+      }
+
+      .stats {
+        display: grid;
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+        gap: 14px;
+      }
+
+      .stat {
+        border-radius: 18px;
+        padding: 18px;
+      }
+
+      .stat strong {
+        display: block;
+        color: var(--text);
+        font-size: 26px;
+      }
+
+      .actions {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+        margin-top: 20px;
+      }
+
+      .button {
+        border: 1px solid rgba(255, 255, 255, 0.16);
+        border-radius: 999px;
+        padding: 10px 16px;
+        background: rgba(255, 255, 255, 0.08);
+        color: var(--text);
+        font-weight: 800;
+      }
+
+      .button.primary {
+        border-color: transparent;
+        background: var(--accent);
+        color: #ffffff;
+      }
+
+      .footer {
+        padding: 30px 0 0;
+        color: var(--muted);
+        font-size: 13px;
+      }
+
+      @media (max-width: 820px) {
+        .meta-grid,
+        .grid.two,
+        .grid.three,
+        .stats {
+          grid-template-columns: 1fr;
+        }
+
+        .toc ol {
+          columns: 1;
+        }
+      }
+
+      @media print {
+        :root {
+          color-scheme: light;
+        }
+
+        body {
+          background: #ffffff;
+          color: #111827;
+        }
+
+        .page {
+          width: 100%;
+          padding: 0;
+        }
+
+        .hero,
+        .section,
+        .toc,
+        .card,
+        .note,
+        .stat,
+        .meta-item {
+          box-shadow: none;
+          background: #ffffff;
+          border-color: #d1d5db;
+          color: #111827;
+          break-inside: avoid;
+        }
+
+        p,
+        li,
+        td {
+          color: #374151;
+        }
+
+        a {
+          color: #111827;
+        }
+
+        .actions {
+          display: none;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <main class="page">
+      <header class="hero">
+        <span class="eyebrow">ENHE AI GEO Operations</span>
+        <h1>ENHE AI 月度 GEO 巡检操作说明</h1>
+        <p>
+          本说明用于每月把 ChatGPT、Perplexity、Google、Bing/Copilot、百度、豆包等平台的查询结果录入后台，让系统持续沉淀品牌可见度、官网引用率、竞品引用和下一步内容动作。
+        </p>
+        <div class="meta-grid">
+          <div class="meta-item">
+            <strong>适用网站</strong>
+            <a href="https://www.enhe-tech.com.cn/" target="_blank" rel="noopener noreferrer">https://www.enhe-tech.com.cn/</a>
+          </div>
+          <div class="meta-item">
+            <strong>后台入口</strong>
+            <a href="https://www.enhe-tech.com.cn/admin/geo-monitoring" target="_blank" rel="noopener noreferrer">/admin/geo-monitoring</a>
+          </div>
+        </div>
+        <div class="actions">
+          <a class="button primary" href="#monthly-workflow">查看月度流程</a>
+          <a class="button" href="#record-fields">查看录入字段</a>
+          <button class="button" type="button" onclick="window.print()">打印说明</button>
+        </div>
+      </header>
+
+      <nav class="toc" aria-label="目录">
+        <h2>目录</h2>
+        <ol>
+          <li><a href="#goal">目标</a></li>
+          <li><a href="#frequency">执行频率</a></li>
+          <li><a href="#prepare">执行前准备</a></li>
+          <li><a href="#queries">核心查询词</a></li>
+          <li><a href="#platforms">平台检查方法</a></li>
+          <li><a href="#record-fields">后台录入字段</a></li>
+          <li><a href="#rules">判断规则</a></li>
+          <li><a href="#order">录入顺序</a></li>
+          <li><a href="#review">月度复盘</a></li>
+          <li><a href="#actions">数据转行动</a></li>
+          <li><a href="#priority">优先级</a></li>
+          <li><a href="#notes">注意事项</a></li>
+          <li><a href="#monthly-workflow">推荐月度工作流</a></li>
+          <li><a href="#deliverables">最终交付物</a></li>
+        </ol>
+      </nav>
+
+      <section id="goal" class="section">
+        <h2>1. 目标</h2>
+        <p>
+          月度 GEO 巡检的目标不是简单查看搜索排名，而是持续记录 ENHE AI 在回答型平台中的可见度，并把这些数据转成明确的下一步内容动作。
+        </p>
+        <div class="grid two">
+          <div class="card">
+            <h3>要记录什么</h3>
+            <ul>
+              <li>AI 平台是否提到 ENHE AI、恩禾、ENHE AI Tools。</li>
+              <li>平台是否引用 <code>enhe-tech.com.cn</code> 的页面。</li>
+              <li>平台引用了哪些竞争品牌、工具、教程或资讯来源。</li>
+              <li>哪些查询词需要补内容、FAQ、对比表、来源引用或 OKF 概念页。</li>
+            </ul>
+          </div>
+          <div class="card">
+            <h3>要形成什么</h3>
+            <ul>
+              <li>新增 AI 前沿资讯。</li>
+              <li>优化软件详情页。</li>
+              <li>补充账号服务 FAQ。</li>
+              <li>制作技能课程。</li>
+              <li>扩展 OKF 概念页。</li>
+            </ul>
+          </div>
+        </div>
+      </section>
+
+      <section id="frequency" class="section">
+        <h2>2. 每月执行频率</h2>
+        <div class="stats">
+          <div class="stat"><strong>1-5</strong><span>建议每月第 1-5 个工作日完成</span></div>
+          <div class="stat"><strong>20+</strong><span>后台默认核心 GEO 查询</span></div>
+          <div class="stat"><strong>6</strong><span>最低必查平台</span></div>
+          <div class="stat"><strong>120</strong><span>建议每月录入结果量</span></div>
+        </div>
+        <h3>最低执行范围</h3>
+        <ul>
+          <li>核心查询词：后台默认的 20+ 条 GEO 查询。</li>
+          <li>必查平台：ChatGPT、Perplexity、Google、Bing/Copilot、百度、豆包。</li>
+          <li>建议记录量：20 条核心查询 × 6 个重点平台，约 120 条结果。</li>
+        </ul>
+        <h3>扩展执行范围</h3>
+        <ul>
+          <li>每季度增加 Claude、Kimi、通义千问、腾讯元宝、DeepSeek。</li>
+          <li>每月同时查看 Google Search Console 和 Bing Webmaster Tools 的查询/页面表现，用于辅助判断。</li>
+        </ul>
+      </section>
+
+      <section id="prepare" class="section">
+        <h2>3. 执行前准备</h2>
+        <div class="steps">
+          <div class="step">登录网站后台，进入 <code>后台管理 -> GEO 监控中心</code>。</div>
+          <div class="step">确认页面顶部能看到核心查询、监控平台、品牌提及率、已记录结果等统计卡片。</div>
+          <div class="step">准备好 ChatGPT、Perplexity、Google、Bing/Copilot、百度、豆包等平台访问入口。</div>
+          <div class="step">如需留存证据，提前准备截图存放位置，并确保截图 URL 可访问。</div>
+          <div class="step">每个平台尽量使用同一浏览器、同一地区、同一账号状态，减少个性化推荐波动。</div>
+        </div>
+      </section>
+
+      <section id="queries" class="section">
+        <h2>4. 核心查询词</h2>
+        <p>执行时不要随意改写查询词。除非本月新增专题，否则先使用后台下拉框里的原始查询词，保证月度数据可对比。</p>
+        <div class="grid two">
+          <div class="card">
+            <h3>中文查询</h3>
+            <ul>
+              <li>AI智能体工具推荐</li>
+              <li>本地部署AI应用</li>
+              <li>AI账号服务合规使用</li>
+              <li>私有化AI部署方案</li>
+              <li>开源大模型怎么选</li>
+              <li>AI效率工具有哪些</li>
+              <li>AI提示词教程</li>
+              <li>Agentic AI 工作流怎么落地</li>
+              <li>端侧AI应用场景</li>
+              <li>AI编程工具推荐</li>
+              <li>AI视频工具推荐</li>
+              <li>AI搜索趋势</li>
+              <li>AI监管政策对工具使用有什么影响</li>
+              <li>AI推理成本和GPU趋势</li>
+              <li>AI工具账号安全使用建议</li>
+            </ul>
+          </div>
+          <div class="card">
+            <h3>英文查询</h3>
+            <ul>
+              <li>AI Agent tools for workflow automation</li>
+              <li>best local AI deployment tools</li>
+              <li>open source LLM comparison for business</li>
+              <li>AI account service compliance guidance</li>
+              <li>prompt engineering course for beginners</li>
+              <li>best AI productivity tools for creators</li>
+              <li>generative AI search optimization</li>
+            </ul>
+          </div>
+        </div>
+      </section>
+
+      <section id="platforms" class="section">
+        <h2>5. 平台检查方法</h2>
+        <div class="grid two">
+          <article class="card">
+            <h3>ChatGPT</h3>
+            <ol>
+              <li>新建一个对话，并确认可使用联网搜索能力。</li>
+              <li>输入后台查询词原文，不要主动加入“ENHE AI”或“恩禾”。</li>
+              <li>记录回答中是否出现 ENHE AI、是否有官网链接、引用了哪些竞品或资料来源。</li>
+              <li>如果回答没有显示来源，可追问一次：<code>请列出你参考或建议用户进一步阅读的网页来源。</code></li>
+            </ol>
+          </article>
+          <article class="card">
+            <h3>Perplexity</h3>
+            <ol>
+              <li>输入后台查询词原文。</li>
+              <li>查看回答正文和 Sources 来源列表。</li>
+              <li>重点记录来源列表中是否有 <code>www.enhe-tech.com.cn</code>。</li>
+              <li>记录竞品、媒体、论坛、工具官网、教程站点等被引用对象。</li>
+            </ol>
+          </article>
+          <article class="card">
+            <h3>Google</h3>
+            <ol>
+              <li>在 Google 搜索框输入查询词原文。</li>
+              <li>记录是否出现 AI Overview。</li>
+              <li>如果出现 AI Overview，记录其中引用来源。</li>
+              <li>如果没有 AI Overview，记录自然搜索前 5 个结果中是否有 ENHE AI。</li>
+            </ol>
+          </article>
+          <article class="card">
+            <h3>Bing / Copilot</h3>
+            <ol>
+              <li>先在 Bing 搜索输入查询词，记录自然搜索和 AI 答案区域。</li>
+              <li>如果 Copilot 可用，再用同一个查询词问 Copilot。</li>
+              <li>记录是否提到 ENHE AI、是否引用官网、是否推荐竞品。</li>
+            </ol>
+          </article>
+          <article class="card">
+            <h3>百度</h3>
+            <ol>
+              <li>在百度搜索输入中文查询词原文。</li>
+              <li>记录百度 AI 答案、精选摘要、自然结果前 5 名。</li>
+              <li>重点看是否出现 ENHE AI、是否出现竞品站、知乎、百家号、媒体或工具官网。</li>
+              <li>如果没有明确引用链接，在回答摘要里写明“未显示明确引用来源”。</li>
+            </ol>
+          </article>
+          <article class="card">
+            <h3>豆包</h3>
+            <ol>
+              <li>新建对话并输入中文查询词原文。</li>
+              <li>记录豆包是否直接推荐工具、教程、服务、资讯来源。</li>
+              <li>记录是否出现 ENHE AI、是否提到竞品、是否有网页来源。</li>
+              <li>如果没有来源链接但提到具体品牌，也要写入竞品字段。</li>
+            </ol>
+          </article>
+        </div>
+      </section>
+
+      <section id="record-fields" class="section">
+        <h2>6. 后台录入字段说明</h2>
+        <table>
+          <thead>
+            <tr>
+              <th>字段</th>
+              <th>填写规则</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>查询词</td>
+              <td>选择本次检查使用的查询词，必须和平台中输入的查询词一致。</td>
+            </tr>
+            <tr>
+              <td>平台</td>
+              <td>选择本次检查的平台，例如 ChatGPT、Perplexity、Google AI Overview、Bing/Copilot、百度、豆包。</td>
+            </tr>
+            <tr>
+              <td>回答摘要</td>
+              <td>记录平台回答重点、是否提到 ENHE AI、是否引用官网、主要推荐/引用对象、用户下一步可能点击的来源。</td>
+            </tr>
+            <tr>
+              <td>引用链接</td>
+              <td>每行一个 URL。只有平台显示来源链接时填写；如果没有来源链接，在摘要中说明。</td>
+            </tr>
+            <tr>
+              <td>竞品或被引用品牌</td>
+              <td>每行一个竞品、工具、网站或内容来源名称，例如 OpenAI、Perplexity、Zapier、知乎、腾讯云、百度智能云。</td>
+            </tr>
+            <tr>
+              <td>截图 URL</td>
+              <td>建议高价值结果保留截图。可填站内文件、COS、网盘或其他可访问地址。</td>
+            </tr>
+            <tr>
+              <td>情绪判断</td>
+              <td>建议填写：正向、中性、负向、未提及。</td>
+            </tr>
+            <tr>
+              <td>已提及 ENHE AI</td>
+              <td>回答出现 ENHE AI、恩禾、ENHE AI Tools、恩禾 AI 工具站等任一形式就勾选。</td>
+            </tr>
+            <tr>
+              <td>已引用官网链接</td>
+              <td>只有出现 <code>enhe-tech.com.cn</code> 页面链接、来源卡片或可点击引用时才勾选。</td>
+            </tr>
+          </tbody>
+        </table>
+        <h3>回答摘要推荐格式</h3>
+        <pre>平台回答重点：
+是否提到 ENHE AI：
+是否引用官网：
+主要推荐/引用对象：
+用户下一步可能会点击的来源：
+备注：</pre>
+      </section>
+
+      <section id="rules" class="section">
+        <h2>7. 判断规则</h2>
+        <div class="grid two">
+          <div class="card">
+            <h3>品牌可见度</h3>
+            <p>品牌可见度看“是否提到 ENHE AI”。只要提到品牌，即使没有链接，也算品牌提及。</p>
+          </div>
+          <div class="card">
+            <h3>官网引用率</h3>
+            <p>官网引用率看“是否引用 enhe-tech.com.cn”。只有出现官网 URL 或来源卡片才算引用。</p>
+          </div>
+          <div class="card">
+            <h3>竞品引用</h3>
+            <p>如果平台推荐了其他品牌、工具、资讯站、教程站，全部记录为竞品或被引用来源。</p>
+          </div>
+          <div class="card">
+            <h3>内容缺口</h3>
+            <p>没有提及、没有官网引用、竞品被引用、站内无对应内容或出现风险误解，都视为内容缺口。</p>
+          </div>
+        </div>
+      </section>
+
+      <section id="order" class="section">
+        <h2>8. 每月录入顺序</h2>
+        <div class="steps">
+          <div class="step">先跑 ChatGPT：录入 20+ 条查询结果。</div>
+          <div class="step">再跑 Perplexity：录入 20+ 条查询结果。</div>
+          <div class="step">再跑 Google：录入 AI Overview 或自然结果。</div>
+          <div class="step">再跑 Bing/Copilot。</div>
+          <div class="step">再跑百度。</div>
+          <div class="step">最后跑豆包。</div>
+        </div>
+        <div class="note" style="margin-top: 16px;">
+          如果时间有限，优先跑中文高价值查询：AI智能体工具推荐、本地部署AI应用、AI账号服务合规使用、AI效率工具有哪些、AI提示词教程、AI工具账号安全使用建议。
+        </div>
+      </section>
+
+      <section id="review" class="section">
+        <h2>9. 月度复盘方法</h2>
+        <p>录入完成后，在后台查看顶部统计和“下一步优化建议”。重点看品牌提及率、官网引用率、竞品出现频率和待处理建议。</p>
+        <pre># 2026-07 ENHE AI 月度 GEO 巡检报告
+
+## 本月数据
+- 录入结果数：
+- 覆盖平台：
+- 品牌提及率：
+- 官网引用率：
+- 最高可见平台：
+- 最弱平台：
+
+## 高频竞品/来源
+1.
+2.
+3.
+
+## 主要内容缺口
+1.
+2.
+3.
+
+## 下月内容动作
+1. 发布：
+2. 优化：
+3. 补充 FAQ：
+4. 补充对比表：
+5. 补充来源引用：
+6. 更新 OKF：</pre>
+      </section>
+
+      <section id="actions" class="section">
+        <h2>10. 如何把数据转成下一步动作</h2>
+        <div class="grid two">
+          <div class="card">
+            <h3>没有品牌提及，也没有官网引用</h3>
+            <ul>
+              <li>在目标页面增加 40-80 字可摘录答案段。</li>
+              <li>增加 3-5 个 FAQ。</li>
+              <li>增加权威来源引用。</li>
+              <li>发布一篇围绕该查询词的 AI 前沿资讯或教程。</li>
+            </ul>
+          </div>
+          <div class="card">
+            <h3>竞品被频繁引用</h3>
+            <ul>
+              <li>增加对比表。</li>
+              <li>发布“如何选择”类文章。</li>
+              <li>在详情页补适合人群、使用场景、风险边界。</li>
+            </ul>
+          </div>
+          <div class="card">
+            <h3>提到 ENHE AI，但没有引用官网</h3>
+            <ul>
+              <li>强化 title、description、H1、H2。</li>
+              <li>增加结构化数据。</li>
+              <li>增加指向该目标页的站内内链。</li>
+              <li>更新 OKF 概念页和 <code>/llms.txt</code>。</li>
+            </ul>
+          </div>
+          <div class="card">
+            <h3>中文或英文平台表现弱</h3>
+            <ul>
+              <li>中文平台：补中文答案式段落、FAQ、真实搜索表达和合规提醒。</li>
+              <li>英文平台：补英文正文、FAQ、摘要、分类名和卡片描述，避免机械直译。</li>
+            </ul>
+          </div>
+        </div>
+      </section>
+
+      <section id="priority" class="section">
+        <h2>11. 内容动作优先级</h2>
+        <table>
+          <thead>
+            <tr>
+              <th>优先级</th>
+              <th>判断标准</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><span class="badge bad">高</span></td>
+              <td>查询词和核心业务强相关；多个平台都没有提到 ENHE AI；多个平台引用同一批竞品；查询词有转化意图；涉及合规、安全、平台政策。</td>
+            </tr>
+            <tr>
+              <td><span class="badge warn">中</span></td>
+              <td>只在部分平台弱；已提到品牌但未引用官网；需要补 FAQ 或来源引用即可改善。</td>
+            </tr>
+            <tr>
+              <td><span class="badge good">低</span></td>
+              <td>趋势较远、转化弱；查询词宽泛，短期不容易建立权威；只是 OKF 或概念页层面的补充。</td>
+            </tr>
+          </tbody>
+        </table>
+      </section>
+
+      <section id="notes" class="section">
+        <h2>12. 注意事项</h2>
+        <ol>
+          <li>不要为了让 AI 提到 ENHE AI，在查询词里强行加入品牌名。</li>
+          <li>不要伪造引用、伪造截图或填写不存在的来源。</li>
+          <li>不要使用批量爬虫硬抓需要登录的平台，优先人工浏览器巡检或官方 API。</li>
+          <li>不要一天发布大量相似短文进入 sitemap。</li>
+          <li>只把内容完整、可索引、能解决真实问题的页面作为 GEO 优化目标。</li>
+          <li>账号服务相关内容必须使用合规表达，例如“AI账号服务咨询”“订阅与账号使用支持”“以官方平台政策为准”。</li>
+          <li>每次内容优化后，下月用同一查询词复查，判断是否真的提升品牌提及和官网引用。</li>
+        </ol>
+      </section>
+
+      <section id="monthly-workflow" class="section">
+        <h2>13. 推荐月度工作流</h2>
+        <table>
+          <thead>
+            <tr>
+              <th>时间</th>
+              <th>动作</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>第 1 天</td>
+              <td>导出或确认本月核心查询和平台范围。</td>
+            </tr>
+            <tr>
+              <td>第 2-3 天</td>
+              <td>逐个平台执行查询并录入后台。</td>
+            </tr>
+            <tr>
+              <td>第 4 天</td>
+              <td>查看后台统计和系统建议。</td>
+            </tr>
+            <tr>
+              <td>第 5 天</td>
+              <td>确定本月内容动作清单。</td>
+            </tr>
+            <tr>
+              <td>第 6-20 天</td>
+              <td>发布或优化内容。</td>
+            </tr>
+            <tr>
+              <td>第 21-25 天</td>
+              <td>补 OKF、FAQ、对比表、来源引用和内链。</td>
+            </tr>
+            <tr>
+              <td>第 26-30 天</td>
+              <td>抽查重点查询，看是否出现改善。</td>
+            </tr>
+          </tbody>
+        </table>
+      </section>
+
+      <section id="deliverables" class="section">
+        <h2>14. 每月最终交付物</h2>
+        <div class="grid two">
+          <div class="card">
+            <h3>必须留下</h3>
+            <ol>
+              <li>后台录入的 GEO 查询结果。</li>
+              <li>一份月度 GEO 巡检报告。</li>
+              <li>一份下月内容动作清单。</li>
+              <li>已执行内容优化的页面列表。</li>
+            </ol>
+          </div>
+          <div class="card">
+            <h3>工作闭环</h3>
+            <p>
+              让 ENHE AI 的 GEO 工作从“偶尔检查”变成“持续积累数据 -> 发现缺口 -> 优化页面 -> 下月复查”的增长系统。
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <footer class="footer">
+        ENHE AI 月度 GEO 巡检操作说明 · 建议每月更新一次数据和动作清单
+      </footer>
+    </main>
+  </body>
+</html>

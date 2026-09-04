@@ -1,0 +1,763 @@
+{
+  "meta": {
+    "contractVersion": "ebos-evidence-v1",
+    "evidenceKind": "geo_evidence",
+    "generatedAt": "2026-07-03T03:43:46.872Z",
+    "targetDate": "2026-07-03",
+    "siteUrl": "https://www.enhe-tech.com.cn",
+    "environment": "unknown",
+    "generator": "scripts/generate-ebos-geo-evidence.ts",
+    "sourceFiles": [
+      "C:\\Users\\HU\\Documents\\New project 2\\reports\\ebos\\geo\\2026-07-03-geo-evidence.md"
+    ]
+  },
+  "quality": {
+    "score": 95,
+    "confidence": "partial",
+    "dataCompleteness": "partial",
+    "warningsCount": 1,
+    "errorsCount": 0,
+    "missingSources": [
+      "ai_search_probe"
+    ]
+  },
+  "payload": {
+    "evidenceType": "geo_evidence",
+    "targetDate": "2026-07-03",
+    "siteUrl": "https://www.enhe-tech.com.cn",
+    "generatedAt": "2026-07-03T03:43:46.872Z",
+    "pagesAudited": 20,
+    "overallScore": 95,
+    "confidence": "partial",
+    "entityFindings": [
+      "20 pages have clear entity signals."
+    ],
+    "answerabilityFindings": [
+      "Average answerability score: 90."
+    ],
+    "citationReadinessFindings": [
+      "Average citation readiness score: 100."
+    ],
+    "contentStructureFindings": [
+      "13 pages have summary sections.",
+      "19 pages have FAQ sections.",
+      "20 pages have HowTo sections."
+    ],
+    "risks": [
+      "Some pages lack concise summary sections for answer engines.",
+      "Some pages lack FAQ sections for answerability."
+    ],
+    "opportunities": [
+      "Add FAQ blocks to improve answer-engine extraction.",
+      "Add summary sections to help ChatGPT, Perplexity, and Gemini summarize pages."
+    ],
+    "actionItems": [
+      {
+        "id": "geo-product-summary",
+        "title": "Add summary sections to product pages",
+        "description": "Product pages need summary or overview sections for answer-engine extraction.",
+        "priority": "medium",
+        "owner": "codex",
+        "relatedSection": "geo",
+        "status": "open"
+      }
+    ],
+    "warnings": [
+      {
+        "code": "geo_probe_not_connected",
+        "severity": "warning",
+        "message": "Current GEO evidence measures page structure readiness and does not represent real AI search citation results.",
+        "source": "ai_search_probe"
+      }
+    ],
+    "pageAudits": [
+      {
+        "url": "https://www.enhe-tech.com.cn/software/faceswap-studio-ai",
+        "path": "/software/faceswap-studio-ai",
+        "pageType": "software_detail",
+        "title": "FaceSwap Studio｜本地人像合成研究工具 | 恩禾 ENHE AI",
+        "h1": "FaceSwap Studio｜本地人像合成研究工具",
+        "hasClearEntity": true,
+        "detectedEntities": [
+          "ENHE"
+        ],
+        "hasSummarySection": false,
+        "hasFaqSection": true,
+        "hasHowToSection": true,
+        "hasComparisonSection": true,
+        "hasPricingOrPurchaseSection": true,
+        "hasAuthorOrBrandSignal": true,
+        "hasDateSignal": true,
+        "hasEvidenceOrSourceLinks": true,
+        "hasStructuredData": true,
+        "answerabilityScore": 75,
+        "citationReadinessScore": 100,
+        "score": 90,
+        "confidence": "partial",
+        "findings": [
+          "Detected entities: ENHE.",
+          "FAQ section or FAQ structured data is present.",
+          "External source links are present."
+        ],
+        "risks": [
+          "Page is missing a clear summary or introduction section."
+        ],
+        "opportunities": [],
+        "warnings": []
+      },
+      {
+        "url": "https://www.enhe-tech.com.cn/software/local-ai-video-studio-for-creator-workflows",
+        "path": "/software/local-ai-video-studio-for-creator-workflows",
+        "pageType": "software_detail",
+        "title": "AI Video Studio｜本地视频生成工作台 | 恩禾 ENHE AI",
+        "h1": "AI Video Studio｜本地视频生成工作台",
+        "hasClearEntity": true,
+        "detectedEntities": [
+          "ENHE"
+        ],
+        "hasSummarySection": false,
+        "hasFaqSection": true,
+        "hasHowToSection": true,
+        "hasComparisonSection": false,
+        "hasPricingOrPurchaseSection": true,
+        "hasAuthorOrBrandSignal": true,
+        "hasDateSignal": true,
+        "hasEvidenceOrSourceLinks": true,
+        "hasStructuredData": true,
+        "answerabilityScore": 75,
+        "citationReadinessScore": 100,
+        "score": 90,
+        "confidence": "partial",
+        "findings": [
+          "Detected entities: ENHE.",
+          "FAQ section or FAQ structured data is present.",
+          "External source links are present."
+        ],
+        "risks": [
+          "Page is missing a clear summary or introduction section."
+        ],
+        "opportunities": [],
+        "warnings": []
+      },
+      {
+        "url": "https://www.enhe-tech.com.cn/software/local-ai-voice-generator-for-voiceover-materials",
+        "path": "/software/local-ai-voice-generator-for-voiceover-materials",
+        "pageType": "software_detail",
+        "title": "AI语音生成｜本地配音素材工作台 | 恩禾 ENHE AI",
+        "h1": "AI语音生成｜本地配音素材工作台",
+        "hasClearEntity": true,
+        "detectedEntities": [
+          "ENHE"
+        ],
+        "hasSummarySection": false,
+        "hasFaqSection": true,
+        "hasHowToSection": true,
+        "hasComparisonSection": false,
+        "hasPricingOrPurchaseSection": true,
+        "hasAuthorOrBrandSignal": true,
+        "hasDateSignal": true,
+        "hasEvidenceOrSourceLinks": true,
+        "hasStructuredData": true,
+        "answerabilityScore": 75,
+        "citationReadinessScore": 100,
+        "score": 90,
+        "confidence": "partial",
+        "findings": [
+          "Detected entities: ENHE.",
+          "FAQ section or FAQ structured data is present.",
+          "External source links are present."
+        ],
+        "risks": [
+          "Page is missing a clear summary or introduction section."
+        ],
+        "opportunities": [],
+        "warnings": []
+      },
+      {
+        "url": "https://www.enhe-tech.com.cn/software/no-code-chat-screenshot-maker",
+        "path": "/software/no-code-chat-screenshot-maker",
+        "pageType": "software_detail",
+        "title": "聊天截图素材制作｜无需代码 (No-Code Chat Screenshot Maker) | 恩禾 ENHE AI",
+        "h1": "聊天截图素材制作｜无需代码",
+        "hasClearEntity": true,
+        "detectedEntities": [
+          "ENHE"
+        ],
+        "hasSummarySection": false,
+        "hasFaqSection": true,
+        "hasHowToSection": true,
+        "hasComparisonSection": false,
+        "hasPricingOrPurchaseSection": true,
+        "hasAuthorOrBrandSignal": true,
+        "hasDateSignal": true,
+        "hasEvidenceOrSourceLinks": true,
+        "hasStructuredData": true,
+        "answerabilityScore": 75,
+        "citationReadinessScore": 100,
+        "score": 90,
+        "confidence": "partial",
+        "findings": [
+          "Detected entities: ENHE.",
+          "FAQ section or FAQ structured data is present.",
+          "External source links are present."
+        ],
+        "risks": [
+          "Page is missing a clear summary or introduction section."
+        ],
+        "opportunities": [],
+        "warnings": []
+      },
+      {
+        "url": "https://www.enhe-tech.com.cn/software/windows-ai",
+        "path": "/software/windows-ai",
+        "pageType": "software_detail",
+        "title": "Lumi-OS｜AI情感智能体 | AI伴侣 | 贾维斯 | 恩禾 ENHE AI",
+        "h1": "Lumi-OS｜AI情感智能体 | AI伴侣 | 贾维斯",
+        "hasClearEntity": true,
+        "detectedEntities": [
+          "ENHE"
+        ],
+        "hasSummarySection": false,
+        "hasFaqSection": true,
+        "hasHowToSection": true,
+        "hasComparisonSection": false,
+        "hasPricingOrPurchaseSection": true,
+        "hasAuthorOrBrandSignal": true,
+        "hasDateSignal": true,
+        "hasEvidenceOrSourceLinks": true,
+        "hasStructuredData": true,
+        "answerabilityScore": 75,
+        "citationReadinessScore": 100,
+        "score": 90,
+        "confidence": "partial",
+        "findings": [
+          "Detected entities: ENHE.",
+          "FAQ section or FAQ structured data is present.",
+          "External source links are present."
+        ],
+        "risks": [
+          "Page is missing a clear summary or introduction section."
+        ],
+        "opportunities": [],
+        "warnings": []
+      },
+      {
+        "url": "https://www.enhe-tech.com.cn/software/zfb-transfer-link-qr-code-generator",
+        "path": "/software/zfb-transfer-link-qr-code-generator",
+        "pageType": "software_detail",
+        "title": "转账链接二维码生成器｜本地整理工具 | 恩禾 ENHE AI",
+        "h1": "转账链接二维码生成器｜本地整理工具",
+        "hasClearEntity": true,
+        "detectedEntities": [
+          "ENHE"
+        ],
+        "hasSummarySection": false,
+        "hasFaqSection": true,
+        "hasHowToSection": true,
+        "hasComparisonSection": false,
+        "hasPricingOrPurchaseSection": true,
+        "hasAuthorOrBrandSignal": true,
+        "hasDateSignal": true,
+        "hasEvidenceOrSourceLinks": true,
+        "hasStructuredData": true,
+        "answerabilityScore": 75,
+        "citationReadinessScore": 100,
+        "score": 90,
+        "confidence": "partial",
+        "findings": [
+          "Detected entities: ENHE.",
+          "FAQ section or FAQ structured data is present.",
+          "External source links are present."
+        ],
+        "risks": [
+          "Page is missing a clear summary or introduction section."
+        ],
+        "opportunities": [],
+        "warnings": []
+      },
+      {
+        "url": "https://www.enhe-tech.com.cn/ai-news",
+        "path": "/ai-news",
+        "pageType": "ai_news",
+        "title": "AI前沿资讯与趋势洞察 | 恩禾 ENHE AI",
+        "h1": "AI前沿资讯与趋势洞察",
+        "hasClearEntity": true,
+        "detectedEntities": [
+          "ENHE",
+          "ChatGPT",
+          "Gemini",
+          "Claude"
+        ],
+        "hasSummarySection": false,
+        "hasFaqSection": false,
+        "hasHowToSection": true,
+        "hasComparisonSection": true,
+        "hasPricingOrPurchaseSection": false,
+        "hasAuthorOrBrandSignal": true,
+        "hasDateSignal": true,
+        "hasEvidenceOrSourceLinks": true,
+        "hasStructuredData": true,
+        "answerabilityScore": 50,
+        "citationReadinessScore": 100,
+        "score": 65,
+        "confidence": "partial",
+        "findings": [
+          "Detected entities: ENHE, ChatGPT, Gemini, Claude.",
+          "External source links are present."
+        ],
+        "risks": [
+          "Page is missing a clear summary or introduction section.",
+          "Page is missing FAQ signals for answer-engine extraction."
+        ],
+        "opportunities": [
+          "Add concise FAQ content that answers buyer and setup questions."
+        ],
+        "warnings": []
+      },
+      {
+        "url": "https://www.enhe-tech.com.cn/ai-news/adobe-creative-agent-ai",
+        "path": "/ai-news/adobe-creative-agent-ai",
+        "pageType": "ai_news",
+        "title": "Adobe扩展Creative Agent，创作者AI工作流进入应用内协作阶段 影响解读 | 恩禾 ENHE AI",
+        "h1": "Adobe扩展Creative Agent，创作者AI工作流进入应用内协作阶段",
+        "hasClearEntity": true,
+        "detectedEntities": [
+          "ENHE",
+          "Claude"
+        ],
+        "hasSummarySection": true,
+        "hasFaqSection": true,
+        "hasHowToSection": true,
+        "hasComparisonSection": true,
+        "hasPricingOrPurchaseSection": true,
+        "hasAuthorOrBrandSignal": true,
+        "hasDateSignal": true,
+        "hasEvidenceOrSourceLinks": true,
+        "hasStructuredData": true,
+        "answerabilityScore": 100,
+        "citationReadinessScore": 100,
+        "score": 100,
+        "confidence": "complete",
+        "findings": [
+          "Detected entities: ENHE, Claude.",
+          "FAQ section or FAQ structured data is present.",
+          "External source links are present."
+        ],
+        "risks": [],
+        "opportunities": [],
+        "warnings": []
+      },
+      {
+        "url": "https://www.enhe-tech.com.cn/ai-news/agent-365-ai",
+        "path": "/ai-news/agent-365-ai",
+        "pageType": "ai_news",
+        "title": "微软Agent 365亮相：AI智能体进入统一治理阶段 影响解读 | 恩禾 ENHE AI",
+        "h1": "微软Agent 365亮相：AI智能体进入统一治理阶段",
+        "hasClearEntity": true,
+        "detectedEntities": [
+          "ENHE"
+        ],
+        "hasSummarySection": true,
+        "hasFaqSection": true,
+        "hasHowToSection": true,
+        "hasComparisonSection": false,
+        "hasPricingOrPurchaseSection": true,
+        "hasAuthorOrBrandSignal": true,
+        "hasDateSignal": true,
+        "hasEvidenceOrSourceLinks": true,
+        "hasStructuredData": true,
+        "answerabilityScore": 100,
+        "citationReadinessScore": 100,
+        "score": 100,
+        "confidence": "complete",
+        "findings": [
+          "Detected entities: ENHE.",
+          "FAQ section or FAQ structured data is present.",
+          "External source links are present."
+        ],
+        "risks": [],
+        "opportunities": [],
+        "warnings": []
+      },
+      {
+        "url": "https://www.enhe-tech.com.cn/ai-news/agentic-ai",
+        "path": "/ai-news/agentic-ai",
+        "pageType": "ai_news",
+        "title": "上海华为云发布 Agentic AI 系列新品，企业级智能体平台同步亮相 影响解读 | 恩禾 ENHE AI",
+        "h1": "上海华为云发布 Agentic AI 系列新品，企业级智能体平台同步亮相",
+        "hasClearEntity": true,
+        "detectedEntities": [
+          "ENHE",
+          "Claude"
+        ],
+        "hasSummarySection": true,
+        "hasFaqSection": true,
+        "hasHowToSection": true,
+        "hasComparisonSection": true,
+        "hasPricingOrPurchaseSection": true,
+        "hasAuthorOrBrandSignal": true,
+        "hasDateSignal": true,
+        "hasEvidenceOrSourceLinks": true,
+        "hasStructuredData": true,
+        "answerabilityScore": 100,
+        "citationReadinessScore": 100,
+        "score": 100,
+        "confidence": "complete",
+        "findings": [
+          "Detected entities: ENHE, Claude.",
+          "FAQ section or FAQ structured data is present.",
+          "External source links are present."
+        ],
+        "risks": [],
+        "opportunities": [],
+        "warnings": []
+      },
+      {
+        "url": "https://www.enhe-tech.com.cn/ai-news/agentic-ai-2",
+        "path": "/ai-news/agentic-ai-2",
+        "pageType": "ai_news",
+        "title": "Agentic AI工具怎么选？先看权限、日志、人工确认和测试环境 影响解读 | 恩禾 ENHE AI",
+        "h1": "Agentic AI工具怎么选？先看权限、日志、人工确认和测试环境",
+        "hasClearEntity": true,
+        "detectedEntities": [
+          "ENHE",
+          "Claude"
+        ],
+        "hasSummarySection": true,
+        "hasFaqSection": true,
+        "hasHowToSection": true,
+        "hasComparisonSection": true,
+        "hasPricingOrPurchaseSection": true,
+        "hasAuthorOrBrandSignal": true,
+        "hasDateSignal": true,
+        "hasEvidenceOrSourceLinks": true,
+        "hasStructuredData": true,
+        "answerabilityScore": 100,
+        "citationReadinessScore": 100,
+        "score": 100,
+        "confidence": "complete",
+        "findings": [
+          "Detected entities: ENHE, Claude.",
+          "FAQ section or FAQ structured data is present.",
+          "External source links are present."
+        ],
+        "risks": [],
+        "opportunities": [],
+        "warnings": []
+      },
+      {
+        "url": "https://www.enhe-tech.com.cn/ai-news/agentic-infra-ai",
+        "path": "/ai-news/agentic-infra-ai",
+        "pageType": "ai_news",
+        "title": "华为云发布Agentic Infra，AI智能体进入基础设施竞争阶段 影响解读 | 恩禾 ENHE AI",
+        "h1": "华为云发布Agentic Infra，AI智能体进入基础设施竞争阶段",
+        "hasClearEntity": true,
+        "detectedEntities": [
+          "ENHE",
+          "Claude"
+        ],
+        "hasSummarySection": true,
+        "hasFaqSection": true,
+        "hasHowToSection": true,
+        "hasComparisonSection": true,
+        "hasPricingOrPurchaseSection": true,
+        "hasAuthorOrBrandSignal": true,
+        "hasDateSignal": true,
+        "hasEvidenceOrSourceLinks": true,
+        "hasStructuredData": true,
+        "answerabilityScore": 100,
+        "citationReadinessScore": 100,
+        "score": 100,
+        "confidence": "complete",
+        "findings": [
+          "Detected entities: ENHE, Claude.",
+          "FAQ section or FAQ structured data is present.",
+          "External source links are present."
+        ],
+        "risks": [],
+        "opportunities": [],
+        "warnings": []
+      },
+      {
+        "url": "https://www.enhe-tech.com.cn/ai-news/agentic-overlay-ai",
+        "path": "/ai-news/agentic-overlay-ai",
+        "pageType": "ai_news",
+        "title": "什么是Agentic Overlay？为什么它能让老系统接入AI智能体？ 影响解读 | 恩禾 ENHE AI",
+        "h1": "什么是Agentic Overlay？为什么它能让老系统接入AI智能体？",
+        "hasClearEntity": true,
+        "detectedEntities": [
+          "ENHE"
+        ],
+        "hasSummarySection": true,
+        "hasFaqSection": true,
+        "hasHowToSection": true,
+        "hasComparisonSection": true,
+        "hasPricingOrPurchaseSection": true,
+        "hasAuthorOrBrandSignal": true,
+        "hasDateSignal": true,
+        "hasEvidenceOrSourceLinks": true,
+        "hasStructuredData": true,
+        "answerabilityScore": 100,
+        "citationReadinessScore": 100,
+        "score": 100,
+        "confidence": "complete",
+        "findings": [
+          "Detected entities: ENHE.",
+          "FAQ section or FAQ structured data is present.",
+          "External source links are present."
+        ],
+        "risks": [],
+        "opportunities": [],
+        "warnings": []
+      },
+      {
+        "url": "https://www.enhe-tech.com.cn/ai-news/agentrun-skill-mcp-ai",
+        "path": "/ai-news/agentrun-skill-mcp-ai",
+        "pageType": "ai_news",
+        "title": "阿里云AgentRun强化Skill与MCP工具，AI智能体落地进入工具资产阶段 影响解读 | 恩禾 ENHE AI",
+        "h1": "阿里云AgentRun强化Skill与MCP工具，AI智能体落地进入工具资产阶段",
+        "hasClearEntity": true,
+        "detectedEntities": [
+          "ENHE",
+          "Claude"
+        ],
+        "hasSummarySection": true,
+        "hasFaqSection": true,
+        "hasHowToSection": true,
+        "hasComparisonSection": true,
+        "hasPricingOrPurchaseSection": true,
+        "hasAuthorOrBrandSignal": true,
+        "hasDateSignal": true,
+        "hasEvidenceOrSourceLinks": true,
+        "hasStructuredData": true,
+        "answerabilityScore": 100,
+        "citationReadinessScore": 100,
+        "score": 100,
+        "confidence": "complete",
+        "findings": [
+          "Detected entities: ENHE, Claude.",
+          "FAQ section or FAQ structured data is present.",
+          "External source links are present."
+        ],
+        "risks": [],
+        "opportunities": [],
+        "warnings": []
+      },
+      {
+        "url": "https://www.enhe-tech.com.cn/ai-news/agentscope-java-2-0-ai",
+        "path": "/ai-news/agentscope-java-2-0-ai",
+        "pageType": "ai_news",
+        "title": "AgentScope Java 2.0发布，企业AI智能体进入生产部署阶段 影响解读 | 恩禾 ENHE AI",
+        "h1": "AgentScope Java 2.0发布，企业AI智能体进入生产部署阶段",
+        "hasClearEntity": true,
+        "detectedEntities": [
+          "ENHE",
+          "Claude"
+        ],
+        "hasSummarySection": true,
+        "hasFaqSection": true,
+        "hasHowToSection": true,
+        "hasComparisonSection": true,
+        "hasPricingOrPurchaseSection": true,
+        "hasAuthorOrBrandSignal": true,
+        "hasDateSignal": true,
+        "hasEvidenceOrSourceLinks": true,
+        "hasStructuredData": true,
+        "answerabilityScore": 100,
+        "citationReadinessScore": 100,
+        "score": 100,
+        "confidence": "complete",
+        "findings": [
+          "Detected entities: ENHE, Claude.",
+          "FAQ section or FAQ structured data is present.",
+          "External source links are present."
+        ],
+        "risks": [],
+        "opportunities": [],
+        "warnings": []
+      },
+      {
+        "url": "https://www.enhe-tech.com.cn/ai-news/ai-4",
+        "path": "/ai-news/ai-4",
+        "pageType": "ai_news",
+        "title": "AI视频生成工具和在线剪辑工具有什么区别？新手怎么选？ 影响解读 | 恩禾 ENHE AI",
+        "h1": "AI视频生成工具和在线剪辑工具有什么区别？新手怎么选？",
+        "hasClearEntity": true,
+        "detectedEntities": [
+          "ENHE",
+          "Claude"
+        ],
+        "hasSummarySection": true,
+        "hasFaqSection": true,
+        "hasHowToSection": true,
+        "hasComparisonSection": true,
+        "hasPricingOrPurchaseSection": true,
+        "hasAuthorOrBrandSignal": true,
+        "hasDateSignal": true,
+        "hasEvidenceOrSourceLinks": true,
+        "hasStructuredData": true,
+        "answerabilityScore": 100,
+        "citationReadinessScore": 100,
+        "score": 100,
+        "confidence": "complete",
+        "findings": [
+          "Detected entities: ENHE, Claude.",
+          "FAQ section or FAQ structured data is present.",
+          "External source links are present."
+        ],
+        "risks": [],
+        "opportunities": [],
+        "warnings": []
+      },
+      {
+        "url": "https://www.enhe-tech.com.cn/ai-news/ai-5",
+        "path": "/ai-news/ai-5",
+        "pageType": "ai_news",
+        "title": "什么是智能体AI安全边界？普通用户先看权限、工具和人工复核 影响解读 | 恩禾 ENHE AI",
+        "h1": "什么是智能体AI安全边界？普通用户先看权限、工具和人工复核",
+        "hasClearEntity": true,
+        "detectedEntities": [
+          "ENHE"
+        ],
+        "hasSummarySection": true,
+        "hasFaqSection": true,
+        "hasHowToSection": true,
+        "hasComparisonSection": true,
+        "hasPricingOrPurchaseSection": true,
+        "hasAuthorOrBrandSignal": true,
+        "hasDateSignal": true,
+        "hasEvidenceOrSourceLinks": true,
+        "hasStructuredData": true,
+        "answerabilityScore": 100,
+        "citationReadinessScore": 100,
+        "score": 100,
+        "confidence": "complete",
+        "findings": [
+          "Detected entities: ENHE.",
+          "FAQ section or FAQ structured data is present.",
+          "External source links are present."
+        ],
+        "risks": [],
+        "opportunities": [],
+        "warnings": []
+      },
+      {
+        "url": "https://www.enhe-tech.com.cn/ai-news/ai-6",
+        "path": "/ai-news/ai-6",
+        "pageType": "ai_news",
+        "title": "如何用AI编程助手处理多分支任务？从测试仓库到人工复核的6步 影响解读 | 恩禾 ENHE AI",
+        "h1": "如何用AI编程助手处理多分支任务？从测试仓库到人工复核的6步",
+        "hasClearEntity": true,
+        "detectedEntities": [
+          "ENHE"
+        ],
+        "hasSummarySection": true,
+        "hasFaqSection": true,
+        "hasHowToSection": true,
+        "hasComparisonSection": true,
+        "hasPricingOrPurchaseSection": true,
+        "hasAuthorOrBrandSignal": true,
+        "hasDateSignal": true,
+        "hasEvidenceOrSourceLinks": true,
+        "hasStructuredData": true,
+        "answerabilityScore": 100,
+        "citationReadinessScore": 100,
+        "score": 100,
+        "confidence": "complete",
+        "findings": [
+          "Detected entities: ENHE.",
+          "FAQ section or FAQ structured data is present.",
+          "External source links are present."
+        ],
+        "risks": [],
+        "opportunities": [],
+        "warnings": []
+      },
+      {
+        "url": "https://www.enhe-tech.com.cn/ai-news/ai-6-2",
+        "path": "/ai-news/ai-6-2",
+        "pageType": "ai_news",
+        "title": "如何安全试用AI编程智能体？从实验仓库到代码复核的6步 影响解读 | 恩禾 ENHE AI",
+        "h1": "如何安全试用AI编程智能体？从实验仓库到代码复核的6步",
+        "hasClearEntity": true,
+        "detectedEntities": [
+          "ENHE"
+        ],
+        "hasSummarySection": true,
+        "hasFaqSection": true,
+        "hasHowToSection": true,
+        "hasComparisonSection": true,
+        "hasPricingOrPurchaseSection": true,
+        "hasAuthorOrBrandSignal": true,
+        "hasDateSignal": true,
+        "hasEvidenceOrSourceLinks": true,
+        "hasStructuredData": true,
+        "answerabilityScore": 100,
+        "citationReadinessScore": 100,
+        "score": 100,
+        "confidence": "complete",
+        "findings": [
+          "Detected entities: ENHE.",
+          "FAQ section or FAQ structured data is present.",
+          "External source links are present."
+        ],
+        "risks": [],
+        "opportunities": [],
+        "warnings": []
+      },
+      {
+        "url": "https://www.enhe-tech.com.cn/ai-news/ai-7",
+        "path": "/ai-news/ai-7",
+        "pageType": "ai_news",
+        "title": "如何安全试用AI智能体？从权限清单到人工复核的7个步骤 影响解读 | 恩禾 ENHE AI",
+        "h1": "如何安全试用AI智能体？从权限清单到人工复核的7个步骤",
+        "hasClearEntity": true,
+        "detectedEntities": [
+          "ENHE",
+          "Claude"
+        ],
+        "hasSummarySection": true,
+        "hasFaqSection": true,
+        "hasHowToSection": true,
+        "hasComparisonSection": true,
+        "hasPricingOrPurchaseSection": true,
+        "hasAuthorOrBrandSignal": true,
+        "hasDateSignal": true,
+        "hasEvidenceOrSourceLinks": true,
+        "hasStructuredData": true,
+        "answerabilityScore": 100,
+        "citationReadinessScore": 100,
+        "score": 100,
+        "confidence": "complete",
+        "findings": [
+          "Detected entities: ENHE, Claude.",
+          "FAQ section or FAQ structured data is present.",
+          "External source links are present."
+        ],
+        "risks": [],
+        "opportunities": [],
+        "warnings": []
+      }
+    ]
+  },
+  "warnings": [
+    {
+      "code": "geo_probe_not_connected",
+      "severity": "warning",
+      "message": "Current GEO evidence measures page structure readiness and does not represent real AI search citation results.",
+      "source": "ai_search_probe"
+    }
+  ],
+  "actionItems": [
+    {
+      "id": "geo-product-summary",
+      "title": "Add summary sections to product pages",
+      "description": "Product pages need summary or overview sections for answer-engine extraction.",
+      "priority": "medium",
+      "owner": "codex",
+      "relatedSection": "geo",
+      "evidenceRefs": [],
+      "status": "open"
+    }
+  ]
+}

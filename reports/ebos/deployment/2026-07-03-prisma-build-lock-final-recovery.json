@@ -1,0 +1,79 @@
+{
+  "reportType": "prisma_build_lock_final_recovery",
+  "targetDate": "2026-07-03",
+  "generatedAt": "2026-07-05T19:42:10.1610728+08:00",
+  "lockType": "prisma_windows_dll_lock",
+  "errorSummary": {
+    "command": "npm run build",
+    "failedStage": "prisma generate",
+    "errorCode": "EPERM",
+    "message": "operation not permitted, rename node_modules/.prisma/client/query_engine-windows.dll.node.tmp* -> node_modules/.prisma/client/query_engine-windows.dll.node",
+    "assessment": "Local Windows Prisma query engine DLL file lock; diagnostic npx next build already passed before this recovery."
+  },
+  "projectNodeProcessesDetected": [
+    {
+      "pid": 17940,
+      "type": "next_dev",
+      "commandLineSummary": "node .../next/dist/bin/next dev --turbopack --port 3000",
+      "matchedProjectPath": true
+    },
+    {
+      "pid": 106252,
+      "type": "next_build_postcss_worker",
+      "commandLineSummary": "node C:/Users/HU/Documents/New project 2/.next/postcss.js 3658",
+      "matchedProjectPath": true
+    },
+    {
+      "pid": 107888,
+      "type": "next_start_server",
+      "commandLineSummary": "node .../next/dist/server/lib/start-server.js",
+      "matchedProjectPath": true
+    }
+  ],
+  "projectNodeProcessesStopped": [
+    {
+      "pid": 17940,
+      "stopped": true,
+      "reason": "Confirmed current project next dev process with command line under C:/Users/HU/Documents/New project 2."
+    }
+  ],
+  "projectNodeProcessesNotStopped": [
+    {
+      "pid": 106252,
+      "stopped": false,
+      "reason": "Process was no longer present or no longer matched the current project path at stop time."
+    },
+    {
+      "pid": 107888,
+      "stopped": false,
+      "reason": "Process was no longer present or no longer matched the current project path at stop time."
+    }
+  ],
+  "postStopProjectNodeProcessesDetected": [],
+  "prismaGenerateResult": {
+    "command": "npx prisma generate",
+    "exitCode": 0,
+    "passed": true,
+    "summary": "Generated Prisma Client v6.19.3 to node_modules/@prisma/client."
+  },
+  "npmBuildResult": {
+    "command": "npm run build",
+    "exitCode": 0,
+    "passed": true,
+    "summary": "prisma generate completed, Next.js production build compiled successfully, generated 105 static pages, and exited 0."
+  },
+  "buildPassed": true,
+  "manualRequired": false,
+  "safetyNotes": [
+    "No production deployment was executed.",
+    "No SSH command was run.",
+    "No server, Docker, or Nginx command was run.",
+    "No secret values were printed.",
+    "No Prisma migration, migrate deploy, migrate reset, or destructive database command was run.",
+    "node_modules and package-lock.json were not deleted.",
+    "npm install was not run.",
+    "No dependency was added.",
+    "Only Node processes with command lines explicitly matching C:/Users/HU/Documents/New project 2 were considered for stopping.",
+    "No non-current-project Node process was stopped."
+  ]
+}

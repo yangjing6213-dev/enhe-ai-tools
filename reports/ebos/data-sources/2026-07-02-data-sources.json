@@ -1,0 +1,336 @@
+{
+  "generatedAt": "2026-07-02T15:02:09.352Z",
+  "checks": [
+    {
+      "key": "internal_database",
+      "label": "Internal Database",
+      "status": "missing_config",
+      "requiredEnvKeys": [
+        "DATABASE_URL"
+      ],
+      "configuredEnvKeys": [],
+      "missingEnvKeys": [
+        "DATABASE_URL"
+      ],
+      "env": [
+        {
+          "key": "DATABASE_URL",
+          "maskedKey": "DATABASE...URL",
+          "configured": false
+        }
+      ],
+      "actionItems": [
+        {
+          "title": "Configure Internal Database required env keys: DATABASE_URL",
+          "verification": "Internal Database status becomes configured or available in EBOS data source readiness."
+        }
+      ],
+      "checkedAt": "2026-07-02T15:02:09.352Z"
+    },
+    {
+      "key": "google_search_console",
+      "label": "Google Search Console",
+      "status": "missing_config",
+      "requiredEnvKeys": [
+        "GOOGLE_SERVICE_ACCOUNT_EMAIL",
+        "GOOGLE_SERVICE_ACCOUNT_PRIVATE_KEY",
+        "GOOGLE_SEARCH_CONSOLE_SITE_URL"
+      ],
+      "configuredEnvKeys": [],
+      "missingEnvKeys": [
+        "GOOGLE_SERVICE_ACCOUNT_EMAIL",
+        "GOOGLE_SERVICE_ACCOUNT_PRIVATE_KEY",
+        "GOOGLE_SEARCH_CONSOLE_SITE_URL"
+      ],
+      "env": [
+        {
+          "key": "GOOGLE_SERVICE_ACCOUNT_EMAIL",
+          "maskedKey": "GOOGLE...EMAIL",
+          "configured": false
+        },
+        {
+          "key": "GOOGLE_SERVICE_ACCOUNT_PRIVATE_KEY",
+          "maskedKey": "GOOGLE...KEY",
+          "configured": false
+        },
+        {
+          "key": "GOOGLE_SEARCH_CONSOLE_SITE_URL",
+          "maskedKey": "GOOGLE...URL",
+          "configured": false
+        }
+      ],
+      "actionItems": [
+        {
+          "title": "Configure Google Search Console required env keys: GOOGLE_SERVICE_ACCOUNT_EMAIL, GOOGLE_SERVICE_ACCOUNT_PRIVATE_KEY, GOOGLE_SEARCH_CONSOLE_SITE_URL",
+          "verification": "Google Search Console status becomes configured or available in EBOS data source readiness."
+        }
+      ],
+      "checkedAt": "2026-07-02T15:02:09.352Z"
+    },
+    {
+      "key": "google_analytics",
+      "label": "Google Analytics",
+      "status": "missing_config",
+      "requiredEnvKeys": [
+        "GA_PROPERTY_ID",
+        "GOOGLE_SERVICE_ACCOUNT_EMAIL",
+        "GOOGLE_SERVICE_ACCOUNT_PRIVATE_KEY"
+      ],
+      "configuredEnvKeys": [],
+      "missingEnvKeys": [
+        "GA_PROPERTY_ID",
+        "GOOGLE_SERVICE_ACCOUNT_EMAIL",
+        "GOOGLE_SERVICE_ACCOUNT_PRIVATE_KEY"
+      ],
+      "env": [
+        {
+          "key": "GA_PROPERTY_ID",
+          "maskedKey": "GA...ID",
+          "configured": false
+        },
+        {
+          "key": "GOOGLE_SERVICE_ACCOUNT_EMAIL",
+          "maskedKey": "GOOGLE...EMAIL",
+          "configured": false
+        },
+        {
+          "key": "GOOGLE_SERVICE_ACCOUNT_PRIVATE_KEY",
+          "maskedKey": "GOOGLE...KEY",
+          "configured": false
+        }
+      ],
+      "actionItems": [
+        {
+          "title": "Configure Google Analytics required env keys: GA_PROPERTY_ID, GOOGLE_SERVICE_ACCOUNT_EMAIL, GOOGLE_SERVICE_ACCOUNT_PRIVATE_KEY",
+          "verification": "Google Analytics status becomes configured or available in EBOS data source readiness."
+        }
+      ],
+      "checkedAt": "2026-07-02T15:02:09.352Z"
+    },
+    {
+      "key": "bing_webmaster",
+      "label": "Bing Webmaster",
+      "status": "missing_config",
+      "requiredEnvKeys": [
+        "BING_WEBMASTER_API_KEY",
+        "BING_SITE_URL"
+      ],
+      "configuredEnvKeys": [],
+      "missingEnvKeys": [
+        "BING_WEBMASTER_API_KEY",
+        "BING_SITE_URL"
+      ],
+      "env": [
+        {
+          "key": "BING_WEBMASTER_API_KEY",
+          "maskedKey": "BING...KEY",
+          "configured": false
+        },
+        {
+          "key": "BING_SITE_URL",
+          "maskedKey": "BING...URL",
+          "configured": false
+        }
+      ],
+      "actionItems": [
+        {
+          "title": "Configure Bing Webmaster required env keys: BING_WEBMASTER_API_KEY, BING_SITE_URL",
+          "verification": "Bing Webmaster status becomes configured or available in EBOS data source readiness."
+        }
+      ],
+      "checkedAt": "2026-07-02T15:02:09.352Z"
+    },
+    {
+      "key": "cloudflare",
+      "label": "Cloudflare",
+      "status": "missing_config",
+      "requiredEnvKeys": [
+        "CLOUDFLARE_API_TOKEN",
+        "CLOUDFLARE_ZONE_ID"
+      ],
+      "configuredEnvKeys": [],
+      "missingEnvKeys": [
+        "CLOUDFLARE_API_TOKEN",
+        "CLOUDFLARE_ZONE_ID"
+      ],
+      "env": [
+        {
+          "key": "CLOUDFLARE_API_TOKEN",
+          "maskedKey": "CLOUDFLARE...TOKEN",
+          "configured": false
+        },
+        {
+          "key": "CLOUDFLARE_ZONE_ID",
+          "maskedKey": "CLOUDFLARE...ID",
+          "configured": false
+        }
+      ],
+      "actionItems": [
+        {
+          "title": "Configure Cloudflare required env keys: CLOUDFLARE_API_TOKEN, CLOUDFLARE_ZONE_ID",
+          "verification": "Cloudflare status becomes configured or available in EBOS data source readiness."
+        }
+      ],
+      "checkedAt": "2026-07-02T15:02:09.352Z"
+    },
+    {
+      "key": "whop",
+      "label": "Whop",
+      "status": "missing_config",
+      "requiredEnvKeys": [
+        "WHOP_API_KEY",
+        "WHOP_COMPANY_ID"
+      ],
+      "configuredEnvKeys": [],
+      "missingEnvKeys": [
+        "WHOP_API_KEY",
+        "WHOP_COMPANY_ID"
+      ],
+      "env": [
+        {
+          "key": "WHOP_API_KEY",
+          "maskedKey": "WHOP...KEY",
+          "configured": false
+        },
+        {
+          "key": "WHOP_COMPANY_ID",
+          "maskedKey": "WHOP...ID",
+          "configured": false
+        }
+      ],
+      "actionItems": [
+        {
+          "title": "Configure Whop required env keys: WHOP_API_KEY, WHOP_COMPANY_ID",
+          "verification": "Whop status becomes configured or available in EBOS data source readiness."
+        }
+      ],
+      "checkedAt": "2026-07-02T15:02:09.352Z"
+    },
+    {
+      "key": "market_research",
+      "label": "Market Research",
+      "status": "missing_config",
+      "requiredEnvKeys": [
+        "EBOS_MARKET_RSS_SOURCES",
+        "EBOS_REDDIT_SOURCES",
+        "EBOS_GITHUB_TRENDING_ENABLED"
+      ],
+      "configuredEnvKeys": [],
+      "missingEnvKeys": [
+        "EBOS_MARKET_RSS_SOURCES",
+        "EBOS_REDDIT_SOURCES",
+        "EBOS_GITHUB_TRENDING_ENABLED"
+      ],
+      "env": [
+        {
+          "key": "EBOS_MARKET_RSS_SOURCES",
+          "maskedKey": "EBOS...SOURCES",
+          "configured": false
+        },
+        {
+          "key": "EBOS_REDDIT_SOURCES",
+          "maskedKey": "EBOS...SOURCES",
+          "configured": false
+        },
+        {
+          "key": "EBOS_GITHUB_TRENDING_ENABLED",
+          "maskedKey": "EBOS...ENABLED",
+          "configured": false
+        }
+      ],
+      "actionItems": [
+        {
+          "title": "Configure Market Research required env keys: EBOS_MARKET_RSS_SOURCES, EBOS_REDDIT_SOURCES, EBOS_GITHUB_TRENDING_ENABLED",
+          "verification": "Market Research status becomes configured or available in EBOS data source readiness."
+        }
+      ],
+      "checkedAt": "2026-07-02T15:02:09.352Z"
+    },
+    {
+      "key": "ai_search_probe",
+      "label": "AI Search Probe",
+      "status": "missing_config",
+      "requiredEnvKeys": [
+        "EBOS_AI_SEARCH_PROBE_ENABLED",
+        "EBOS_AI_SEARCH_PROVIDERS"
+      ],
+      "configuredEnvKeys": [],
+      "missingEnvKeys": [
+        "EBOS_AI_SEARCH_PROBE_ENABLED",
+        "EBOS_AI_SEARCH_PROVIDERS"
+      ],
+      "env": [
+        {
+          "key": "EBOS_AI_SEARCH_PROBE_ENABLED",
+          "maskedKey": "EBOS...ENABLED",
+          "configured": false
+        },
+        {
+          "key": "EBOS_AI_SEARCH_PROVIDERS",
+          "maskedKey": "EBOS...PROVIDERS",
+          "configured": false
+        }
+      ],
+      "actionItems": [
+        {
+          "title": "Configure AI Search Probe required env keys: EBOS_AI_SEARCH_PROBE_ENABLED, EBOS_AI_SEARCH_PROVIDERS",
+          "verification": "AI Search Probe status becomes configured or available in EBOS data source readiness."
+        }
+      ],
+      "checkedAt": "2026-07-02T15:02:09.352Z"
+    },
+    {
+      "key": "manual_input",
+      "label": "Manual Input",
+      "status": "configured",
+      "requiredEnvKeys": [],
+      "configuredEnvKeys": [],
+      "missingEnvKeys": [],
+      "env": [],
+      "actionItems": [],
+      "checkedAt": "2026-07-02T15:02:09.352Z"
+    }
+  ],
+  "summary": {
+    "available": 0,
+    "configured": 1,
+    "missing_config": 8,
+    "not_configured": 0,
+    "unavailable": 0,
+    "unknown": 0
+  },
+  "recommendations": [
+    {
+      "title": "Configure Internal Database required env keys: DATABASE_URL",
+      "verification": "Internal Database status becomes configured or available in EBOS data source readiness."
+    },
+    {
+      "title": "Configure Google Search Console required env keys: GOOGLE_SERVICE_ACCOUNT_EMAIL, GOOGLE_SERVICE_ACCOUNT_PRIVATE_KEY, GOOGLE_SEARCH_CONSOLE_SITE_URL",
+      "verification": "Google Search Console status becomes configured or available in EBOS data source readiness."
+    },
+    {
+      "title": "Configure Google Analytics required env keys: GA_PROPERTY_ID, GOOGLE_SERVICE_ACCOUNT_EMAIL, GOOGLE_SERVICE_ACCOUNT_PRIVATE_KEY",
+      "verification": "Google Analytics status becomes configured or available in EBOS data source readiness."
+    },
+    {
+      "title": "Configure Bing Webmaster required env keys: BING_WEBMASTER_API_KEY, BING_SITE_URL",
+      "verification": "Bing Webmaster status becomes configured or available in EBOS data source readiness."
+    },
+    {
+      "title": "Configure Cloudflare required env keys: CLOUDFLARE_API_TOKEN, CLOUDFLARE_ZONE_ID",
+      "verification": "Cloudflare status becomes configured or available in EBOS data source readiness."
+    },
+    {
+      "title": "Configure Whop required env keys: WHOP_API_KEY, WHOP_COMPANY_ID",
+      "verification": "Whop status becomes configured or available in EBOS data source readiness."
+    },
+    {
+      "title": "Configure Market Research required env keys: EBOS_MARKET_RSS_SOURCES, EBOS_REDDIT_SOURCES, EBOS_GITHUB_TRENDING_ENABLED",
+      "verification": "Market Research status becomes configured or available in EBOS data source readiness."
+    },
+    {
+      "title": "Configure AI Search Probe required env keys: EBOS_AI_SEARCH_PROBE_ENABLED, EBOS_AI_SEARCH_PROVIDERS",
+      "verification": "AI Search Probe status becomes configured or available in EBOS data source readiness."
+    }
+  ]
+}

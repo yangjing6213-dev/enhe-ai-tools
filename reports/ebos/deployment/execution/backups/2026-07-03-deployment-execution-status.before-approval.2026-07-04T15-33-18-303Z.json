@@ -1,0 +1,14 @@
+{
+  "statusType": "production_deployment_execution_status",
+  "targetDate": "2026-07-03",
+  "updatedAt": "2026-07-04T10:41:25.704Z",
+  "deploymentStatus": "awaiting_approval",
+  "approvedByUser": false,
+  "localCommandsRun": [],
+  "serverCommandsRun": [],
+  "dockerCommandsRun": [],
+  "verificationCommandsRun": [],
+  "postLaunchCheckStatus": "not_run",
+  "notes": [],
+  "warnings": []
+}

@@ -1,0 +1,598 @@
+{
+  "inputType": "validation_execution_input",
+  "targetDate": "2026-07-03",
+  "generatedAt": "2026-07-03T18:47:48.763Z",
+  "decisionReportPath": "reports/ebos/decision/2026-07-03-decision-report.json",
+  "validationTrackerPath": "reports/ebos/validation/templates/2026-07-03-validation-tracker.json",
+  "validationResultInputPath": "reports/ebos/validation/inputs/2026-07-03-validation-input.json",
+  "executionPlans": [
+    {
+      "planId": "validation-product-1-faceswap-studio-ai",
+      "title": "Validate existing product: FaceSwap Studio｜本地人像合成研究工具",
+      "targetDirection": "Existing product revenue validation",
+      "targetProduct": "FaceSwap Studio｜本地人像合成研究工具",
+      "validationMethod": "pricing_test",
+      "objective": "Validate whether FaceSwap Studio｜本地人像合成研究工具 can produce first-revenue intent before starting new product work.",
+      "hypothesis": "If pricing, CTA, and delivery details are clear, FaceSwap Studio｜本地人像合成研究工具 can produce measurable purchase intent.",
+      "successMetric": "Product page CTA clicks, leads, or presale orders.",
+      "minimumSuccessThreshold": "CTA clicks >= 10 or leads >= 3 or presale orders >= 1 within 7 days.",
+      "durationDays": 7,
+      "executionStatus": "not_started",
+      "marketplaceListingUrls": [],
+      "contentTestUrls": [],
+      "outreachTargets": [],
+      "trackingFields": [
+        {
+          "key": "priceShown",
+          "label": "Price shown",
+          "type": "string",
+          "required": false,
+          "description": "Price shown during the test.",
+          "example": ""
+        },
+        {
+          "key": "ctaClicks",
+          "label": "CTA clicks",
+          "type": "number",
+          "required": true,
+          "description": "Observed CTA clicks.",
+          "example": 0
+        },
+        {
+          "key": "paidOrders",
+          "label": "Paid orders",
+          "type": "number",
+          "required": true,
+          "description": "Observed paid orders.",
+          "example": 0
+        },
+        {
+          "key": "refundCount",
+          "label": "Refund count",
+          "type": "number",
+          "required": true,
+          "description": "Observed refunds.",
+          "example": 0
+        },
+        {
+          "key": "feedback",
+          "label": "Feedback",
+          "type": "string_array",
+          "required": false,
+          "description": "Observed pricing feedback.",
+          "example": []
+        },
+        {
+          "key": "productPageViews",
+          "label": "Product page views",
+          "type": "number",
+          "required": true,
+          "description": "Observed product page views.",
+          "example": 0
+        },
+        {
+          "key": "productPageCtaClicks",
+          "label": "Product page CTA clicks",
+          "type": "number",
+          "required": true,
+          "description": "Observed product page CTA clicks.",
+          "example": 0
+        },
+        {
+          "key": "listingViews",
+          "label": "Listing views",
+          "type": "number",
+          "required": true,
+          "description": "Observed marketplace listing views.",
+          "example": 0
+        },
+        {
+          "key": "messages",
+          "label": "Messages",
+          "type": "number",
+          "required": true,
+          "description": "Observed marketplace messages.",
+          "example": 0
+        },
+        {
+          "key": "deliveryFeedback",
+          "label": "Delivery/support feedback",
+          "type": "string_array",
+          "required": false,
+          "description": "Observed delivery or support feedback.",
+          "example": []
+        },
+        {
+          "key": "supportQuestions",
+          "label": "Support questions",
+          "type": "number",
+          "required": true,
+          "description": "Observed support questions.",
+          "example": 0
+        }
+      ],
+      "codexTasks": [
+        "Audit FaceSwap Studio｜本地人像合成研究工具 product page pricing, CTA, FAQ, and delivery copy.",
+        "Draft a pricing test checklist for FaceSwap Studio｜本地人像合成研究工具."
+      ],
+      "humanTasks": [
+        "Confirm the FaceSwap Studio｜本地人像合成研究工具 validation offer and price.",
+        "Handle manual payment, lead follow-up, or customer questions."
+      ],
+      "acceptanceCriteria": [
+        "Validate existing product: FaceSwap Studio｜本地人像合成研究工具 has a clear offer, CTA, and tracking note.",
+        "All observed results are written to validation-input.json without fabricated metrics.",
+        "Every required channel has a URL, skipped reason, or manual note.",
+        "Product delivery/support feedback is recorded when users ask about delivery or support."
+      ],
+      "resultInputTemplate": {
+        "planId": "validation-product-1-faceswap-studio-ai",
+        "status": "not_started",
+        "priceShown": "",
+        "ctaClicks": 0,
+        "paidOrders": 0,
+        "refundCount": 0,
+        "feedback": [],
+        "productPageViews": 0,
+        "productPageCtaClicks": 0,
+        "listingViews": 0,
+        "messages": 0,
+        "deliveryFeedback": [],
+        "supportQuestions": 0,
+        "userFeedback": [],
+        "channelResults": [],
+        "notes": ""
+      }
+    },
+    {
+      "planId": "validation-product-2-local-ai-video-studio-for-creator-workflows",
+      "title": "Validate existing product: AI Video Studio｜本地视频生成工作台",
+      "targetDirection": "Existing product revenue validation",
+      "targetProduct": "AI Video Studio｜本地视频生成工作台",
+      "validationMethod": "pricing_test",
+      "objective": "Validate whether AI Video Studio｜本地视频生成工作台 can produce first-revenue intent before starting new product work.",
+      "hypothesis": "If pricing, CTA, and delivery details are clear, AI Video Studio｜本地视频生成工作台 can produce measurable purchase intent.",
+      "successMetric": "Product page CTA clicks, leads, or presale orders.",
+      "minimumSuccessThreshold": "CTA clicks >= 10 or leads >= 3 or presale orders >= 1 within 7 days.",
+      "durationDays": 7,
+      "executionStatus": "not_started",
+      "marketplaceListingUrls": [],
+      "contentTestUrls": [],
+      "outreachTargets": [],
+      "trackingFields": [
+        {
+          "key": "priceShown",
+          "label": "Price shown",
+          "type": "string",
+          "required": false,
+          "description": "Price shown during the test.",
+          "example": ""
+        },
+        {
+          "key": "ctaClicks",
+          "label": "CTA clicks",
+          "type": "number",
+          "required": true,
+          "description": "Observed CTA clicks.",
+          "example": 0
+        },
+        {
+          "key": "paidOrders",
+          "label": "Paid orders",
+          "type": "number",
+          "required": true,
+          "description": "Observed paid orders.",
+          "example": 0
+        },
+        {
+          "key": "refundCount",
+          "label": "Refund count",
+          "type": "number",
+          "required": true,
+          "description": "Observed refunds.",
+          "example": 0
+        },
+        {
+          "key": "feedback",
+          "label": "Feedback",
+          "type": "string_array",
+          "required": false,
+          "description": "Observed pricing feedback.",
+          "example": []
+        },
+        {
+          "key": "productPageViews",
+          "label": "Product page views",
+          "type": "number",
+          "required": true,
+          "description": "Observed product page views.",
+          "example": 0
+        },
+        {
+          "key": "productPageCtaClicks",
+          "label": "Product page CTA clicks",
+          "type": "number",
+          "required": true,
+          "description": "Observed product page CTA clicks.",
+          "example": 0
+        },
+        {
+          "key": "listingViews",
+          "label": "Listing views",
+          "type": "number",
+          "required": true,
+          "description": "Observed marketplace listing views.",
+          "example": 0
+        },
+        {
+          "key": "messages",
+          "label": "Messages",
+          "type": "number",
+          "required": true,
+          "description": "Observed marketplace messages.",
+          "example": 0
+        },
+        {
+          "key": "deliveryFeedback",
+          "label": "Delivery/support feedback",
+          "type": "string_array",
+          "required": false,
+          "description": "Observed delivery or support feedback.",
+          "example": []
+        },
+        {
+          "key": "supportQuestions",
+          "label": "Support questions",
+          "type": "number",
+          "required": true,
+          "description": "Observed support questions.",
+          "example": 0
+        }
+      ],
+      "codexTasks": [
+        "Audit AI Video Studio｜本地视频生成工作台 product page pricing, CTA, FAQ, and delivery copy.",
+        "Draft a pricing test checklist for AI Video Studio｜本地视频生成工作台."
+      ],
+      "humanTasks": [
+        "Confirm the AI Video Studio｜本地视频生成工作台 validation offer and price.",
+        "Handle manual payment, lead follow-up, or customer questions."
+      ],
+      "acceptanceCriteria": [
+        "Validate existing product: AI Video Studio｜本地视频生成工作台 has a clear offer, CTA, and tracking note.",
+        "All observed results are written to validation-input.json without fabricated metrics.",
+        "Every required channel has a URL, skipped reason, or manual note.",
+        "Product delivery/support feedback is recorded when users ask about delivery or support."
+      ],
+      "resultInputTemplate": {
+        "planId": "validation-product-2-local-ai-video-studio-for-creator-workflows",
+        "status": "not_started",
+        "priceShown": "",
+        "ctaClicks": 0,
+        "paidOrders": 0,
+        "refundCount": 0,
+        "feedback": [],
+        "productPageViews": 0,
+        "productPageCtaClicks": 0,
+        "listingViews": 0,
+        "messages": 0,
+        "deliveryFeedback": [],
+        "supportQuestions": 0,
+        "userFeedback": [],
+        "channelResults": [],
+        "notes": ""
+      }
+    },
+    {
+      "planId": "validation-direction-3-ai-prompt-kit",
+      "title": "Validate AI Prompt Kit",
+      "targetDirection": "AI Prompt Kit",
+      "validationMethod": "landing_page",
+      "objective": "Validate whether AI Prompt Kit can produce near-term purchase intent before heavy development.",
+      "hypothesis": "If ENHE presents a clear AI Prompt Kit offer, users will click CTA, leave leads, or place at least one presale order.",
+      "successMetric": "Landing page CTA clicks, leads, or presale orders.",
+      "minimumSuccessThreshold": "CTA clicks >= 10 or leads >= 3 or presale orders >= 1.",
+      "durationDays": 7,
+      "executionStatus": "not_started",
+      "marketplaceListingUrls": [],
+      "contentTestUrls": [],
+      "outreachTargets": [],
+      "trackingFields": [
+        {
+          "key": "pageViews",
+          "label": "Page views",
+          "type": "number",
+          "required": true,
+          "description": "Observed landing page views.",
+          "example": 0
+        },
+        {
+          "key": "ctaClicks",
+          "label": "CTA clicks",
+          "type": "number",
+          "required": true,
+          "description": "Observed CTA clicks.",
+          "example": 0
+        },
+        {
+          "key": "leads",
+          "label": "Leads",
+          "type": "number",
+          "required": true,
+          "description": "Observed leads or signups.",
+          "example": 0
+        },
+        {
+          "key": "conversionRate",
+          "label": "Conversion rate",
+          "type": "number",
+          "required": true,
+          "description": "Manual conversion rate, if calculated.",
+          "example": 0
+        },
+        {
+          "key": "notes",
+          "label": "Notes",
+          "type": "string",
+          "required": false,
+          "description": "Manual notes from the landing page test.",
+          "example": ""
+        },
+        {
+          "key": "listingViews",
+          "label": "Listing views",
+          "type": "number",
+          "required": true,
+          "description": "Observed marketplace listing views.",
+          "example": 0
+        },
+        {
+          "key": "messages",
+          "label": "Messages",
+          "type": "number",
+          "required": true,
+          "description": "Observed buyer messages.",
+          "example": 0
+        },
+        {
+          "key": "presaleOrders",
+          "label": "Presale orders",
+          "type": "number",
+          "required": true,
+          "description": "Observed presale orders.",
+          "example": 0
+        },
+        {
+          "key": "paidOrders",
+          "label": "Paid orders",
+          "type": "number",
+          "required": true,
+          "description": "Observed paid orders.",
+          "example": 0
+        },
+        {
+          "key": "revenue",
+          "label": "Revenue",
+          "type": "number",
+          "required": true,
+          "description": "Observed revenue.",
+          "example": 0
+        }
+      ],
+      "codexTasks": [
+        "Draft one focused AI Prompt Kit validation page with pricing, FAQ, and CTA.",
+        "Add tracking notes for CTA clicks, leads, and manual purchase intent.",
+        "Create one comparison or use-case content brief supporting AI Prompt Kit."
+      ],
+      "humanTasks": [
+        "Review the AI Prompt Kit offer and decide the validation price.",
+        "Respond manually to leads or presale inquiries within 24 hours."
+      ],
+      "acceptanceCriteria": [
+        "Validate AI Prompt Kit has a clear offer, CTA, and tracking note.",
+        "All observed results are written to validation-input.json without fabricated metrics.",
+        "Every required channel has a URL, skipped reason, or manual note."
+      ],
+      "resultInputTemplate": {
+        "planId": "validation-direction-3-ai-prompt-kit",
+        "status": "not_started",
+        "pageViews": 0,
+        "ctaClicks": 0,
+        "leads": 0,
+        "conversionRate": 0,
+        "notes": "",
+        "listingViews": 0,
+        "messages": 0,
+        "presaleOrders": 0,
+        "paidOrders": 0,
+        "revenue": 0,
+        "userFeedback": [],
+        "channelResults": []
+      }
+    }
+  ],
+  "channelTracking": [
+    {
+      "channel": "website",
+      "plannedAction": "Validate existing product: FaceSwap Studio｜本地人像合成研究工具: publish or update ENHE page CTA.",
+      "metricFields": [
+        {
+          "key": "ctaClicks",
+          "label": "CTA clicks",
+          "type": "number",
+          "required": true,
+          "description": "Observed CTA clicks.",
+          "example": 0
+        },
+        {
+          "key": "productPageViews",
+          "label": "Product page views",
+          "type": "number",
+          "required": true,
+          "description": "Observed product page views.",
+          "example": 0
+        },
+        {
+          "key": "productPageCtaClicks",
+          "label": "Product page CTA clicks",
+          "type": "number",
+          "required": true,
+          "description": "Observed product page CTA clicks.",
+          "example": 0
+        }
+      ],
+      "notes": "Record observed website metrics only."
+    },
+    {
+      "channel": "whop",
+      "plannedAction": "Validate existing product: FaceSwap Studio｜本地人像合成研究工具: prepare marketplace listing copy.",
+      "metricFields": [
+        {
+          "key": "listingViews",
+          "label": "Listing views",
+          "type": "number",
+          "required": true,
+          "description": "Observed marketplace listing views.",
+          "example": 0
+        },
+        {
+          "key": "messages",
+          "label": "Messages",
+          "type": "number",
+          "required": true,
+          "description": "Observed marketplace messages.",
+          "example": 0
+        }
+      ],
+      "notes": "Use observed marketplace metrics only."
+    },
+    {
+      "channel": "website",
+      "plannedAction": "Validate existing product: AI Video Studio｜本地视频生成工作台: publish or update ENHE page CTA.",
+      "metricFields": [
+        {
+          "key": "ctaClicks",
+          "label": "CTA clicks",
+          "type": "number",
+          "required": true,
+          "description": "Observed CTA clicks.",
+          "example": 0
+        },
+        {
+          "key": "productPageViews",
+          "label": "Product page views",
+          "type": "number",
+          "required": true,
+          "description": "Observed product page views.",
+          "example": 0
+        },
+        {
+          "key": "productPageCtaClicks",
+          "label": "Product page CTA clicks",
+          "type": "number",
+          "required": true,
+          "description": "Observed product page CTA clicks.",
+          "example": 0
+        }
+      ],
+      "notes": "Record observed website metrics only."
+    },
+    {
+      "channel": "whop",
+      "plannedAction": "Validate existing product: AI Video Studio｜本地视频生成工作台: prepare marketplace listing copy.",
+      "metricFields": [
+        {
+          "key": "listingViews",
+          "label": "Listing views",
+          "type": "number",
+          "required": true,
+          "description": "Observed marketplace listing views.",
+          "example": 0
+        },
+        {
+          "key": "messages",
+          "label": "Messages",
+          "type": "number",
+          "required": true,
+          "description": "Observed marketplace messages.",
+          "example": 0
+        }
+      ],
+      "notes": "Use observed marketplace metrics only."
+    },
+    {
+      "channel": "website",
+      "plannedAction": "Validate AI Prompt Kit: publish or update ENHE page CTA.",
+      "metricFields": [
+        {
+          "key": "pageViews",
+          "label": "Page views",
+          "type": "number",
+          "required": true,
+          "description": "Observed landing page views.",
+          "example": 0
+        },
+        {
+          "key": "ctaClicks",
+          "label": "CTA clicks",
+          "type": "number",
+          "required": true,
+          "description": "Observed CTA clicks.",
+          "example": 0
+        },
+        {
+          "key": "leads",
+          "label": "Leads",
+          "type": "number",
+          "required": true,
+          "description": "Observed leads or signups.",
+          "example": 0
+        }
+      ],
+      "notes": "Record observed website metrics only."
+    },
+    {
+      "channel": "whop",
+      "plannedAction": "Validate AI Prompt Kit: prepare marketplace listing copy.",
+      "metricFields": [
+        {
+          "key": "listingViews",
+          "label": "Listing views",
+          "type": "number",
+          "required": true,
+          "description": "Observed marketplace listing views.",
+          "example": 0
+        },
+        {
+          "key": "messages",
+          "label": "Messages",
+          "type": "number",
+          "required": true,
+          "description": "Observed buyer messages.",
+          "example": 0
+        },
+        {
+          "key": "revenue",
+          "label": "Revenue",
+          "type": "number",
+          "required": true,
+          "description": "Observed revenue.",
+          "example": 0
+        }
+      ],
+      "notes": "Use observed marketplace metrics only."
+    }
+  ],
+  "resultRecordingRules": [
+    "Do not fabricate CTA clicks, leads, orders, revenue, refunds, or feedback.",
+    "Leave unknown string fields empty and unknown numeric fields as 0.",
+    "Keep planId unchanged so the result reader can merge results back to the tracker.",
+    "Use notes for uncertainty, skipped channels, or manual context."
+  ],
+  "weeklyReviewQuestions": [
+    "Which validation plan produced the strongest observed signal?",
+    "Which channel produced clicks, leads, messages, or orders?",
+    "Did any paid order refund or produce delivery/support risk?",
+    "Should EBOS continue, adjust, stop, or scale the direction next week?"
+  ],
+  "warnings": []
+}

@@ -1,0 +1,261 @@
+{
+  "reportType": "weekly_friday_operating_cycle",
+  "targetDate": "2026-07-03",
+  "generatedAt": "2026-07-07T14:50:11.865Z",
+  "cycleStatus": "passed",
+  "localScript": "scripts/run-ebos-weekly-operating-cycle.ts",
+  "realSchedulerCreated": false,
+  "migrationExecuted": false,
+  "seedExecuted": false,
+  "deploymentExecuted": false,
+  "externalPublishingExecuted": false,
+  "backfillApplyExecuted": false,
+  "fakeDataCreated": false,
+  "forbiddenCommands": [
+    "prisma migrate deploy",
+    "prisma migrate dev",
+    "prisma migrate reset",
+    "prisma db push",
+    "tsx prisma/seed.ts",
+    "docker",
+    "nginx",
+    "ssh",
+    "scripts/backfill-ebos-external-channel-data.ts --apply"
+  ],
+  "steps": [
+    {
+      "key": "validation_report",
+      "description": "Generate EBOS validation report",
+      "command": "npx.cmd",
+      "args": [
+        "tsx",
+        "scripts/generate-ebos-validation-report.ts",
+        "--date",
+        "2026-07-03"
+      ],
+      "required": true,
+      "exitCode": 0,
+      "status": "passed",
+      "stdoutTail": [
+        "EBOS validation result report generated:",
+        "- Markdown: C:\\Users\\HU\\Documents\\New project 2\\reports\\ebos\\validation\\reports\\2026-07-03-validation-result-report.md",
+        "- JSON: C:\\Users\\HU\\Documents\\New project 2\\reports\\ebos\\validation\\reports\\2026-07-03-validation-result-report.json",
+        "- overallValidationScore: 15",
+        "- success / partial / failed / inconclusive: 0 / 0 / 0 / 3",
+        "- not_started: 0",
+        "- continue / adjust / stop / scale: 0 / 3 / 0 / 0",
+        "- Capture report used: yes",
+        "- Capture ctaClicksDetected: 0",
+        "- Capture manualSlots: 21",
+        "- External intake status: template_generated_unfilled",
+        "- External intake imported channels/plans: 0/0"
+      ],
+      "stderrTail": []
+    },
+    {
+      "key": "revenue_evidence",
+      "description": "Generate EBOS revenue evidence",
+      "command": "npx.cmd",
+      "args": [
+        "tsx",
+        "scripts/generate-ebos-revenue-evidence.ts",
+        "--date",
+        "2026-07-03"
+      ],
+      "required": true,
+      "exitCode": 0,
+      "status": "passed",
+      "stdoutTail": [
+        "- top opportunities:",
+        "  - 选择 1-2 个高 readiness 产品做限时付费验证。",
+        "  - 优先验证 FaceSwap Studio｜本地人像合成研究工具。",
+        "  - 优先验证 AI Video Studio｜本地视频生成工作台。",
+        "- top actionItems:",
+        "  - [critical] 选择 1-2 个高 readiness 产品进行首批收入验证",
+        "  - [high] 补齐购买后的下载/交付承接",
+        "  - [high] 验证产品收入路径：FaceSwap Studio｜本地人像合成研究工具",
+        "  - [high] 验证产品收入路径：AI Video Studio｜本地视频生成工作台",
+        "- Evidence JSON: C:\\Users\\HU\\Documents\\New project 2\\reports\\ebos\\evidence\\revenue_evidence\\2026-07-03-revenue_evidence.json",
+        "- Markdown: C:\\Users\\HU\\Documents\\New project 2\\reports\\ebos\\revenue\\2026-07-03-revenue-evidence.md",
+        "- Next: run npx tsx scripts/index-ebos-evidence.ts to refresh the EBOS evidence catalog."
+      ],
+      "stderrTail": []
+    },
+    {
+      "key": "decision_report",
+      "description": "Generate EBOS decision report",
+      "command": "npx.cmd",
+      "args": [
+        "tsx",
+        "scripts/generate-ebos-decision-report.ts",
+        "--date",
+        "2026-07-03"
+      ],
+      "required": true,
+      "exitCode": 0,
+      "status": "passed",
+      "stdoutTail": [
+        "EBOS decision report generated:",
+        "- top priority direction: SEO/GEO 自动化内容集群",
+        "- top existing product: FaceSwap Studio｜本地人像合成研究工具",
+        "- validation plans count: 3",
+        "- doNext count: 2",
+        "- codexTasks count: 5",
+        "- confidence: partial",
+        "- validation result report used: yes",
+        "- Markdown: C:\\Users\\HU\\Documents\\New project 2\\reports\\ebos\\decision\\2026-07-03-decision-report.md",
+        "- JSON: C:\\Users\\HU\\Documents\\New project 2\\reports\\ebos\\decision\\2026-07-03-decision-report.json",
+        "- Note: decision_report is not an evidence kind and is not written into the EBOS evidence catalog."
+      ],
+      "stderrTail": []
+    },
+    {
+      "key": "weekly_report",
+      "description": "Generate EBOS weekly report",
+      "command": "npx.cmd",
+      "args": [
+        "tsx",
+        "scripts/generate-ebos-weekly-report.ts",
+        "--date",
+        "2026-07-03"
+      ],
+      "required": true,
+      "exitCode": 0,
+      "status": "passed",
+      "stdoutTail": [
+        "- Optimized validation page redeploy status used: yes",
+        "- Optimized validation page redeployed: false",
+        "- Optimized validation page redeploy status: not_generated",
+        "- Migration release status used: yes",
+        "- Migration release status: audit_generated",
+        "- Migration release safeToRunMigration: false",
+        "- Top action items:",
+        "  - [medium] Keep migration skipped by RUN_PRISMA_MIGRATE guard",
+        "  - [high] Start real publishing validation after synthetic optimization",
+        "  - [high] 等待真实外部渠道数据",
+        "  - [high] Confirm real deployment execution with operator checklist",
+        "  - [high] 开始真实外部渠道发布和数据回填"
+      ],
+      "stderrTail": []
+    },
+    {
+      "key": "monthly_review",
+      "description": "Generate EBOS monthly review",
+      "command": "npx.cmd",
+      "args": [
+        "tsx",
+        "scripts/generate-ebos-monthly-review.ts",
+        "--date",
+        "2026-07-03"
+      ],
+      "required": true,
+      "exitCode": 0,
+      "status": "passed",
+      "stdoutTail": [
+        "- Synthetic failure scenario used: yes",
+        "- Synthetic failure scenario simulated: true",
+        "- Synthetic simulatedRevenue: 0",
+        "- Synthetic simulatedPaidOrders: 0",
+        "- Synthetic optimization implementation completed: true",
+        "- Optimized validation page redeploy status used: yes",
+        "- Optimized validation page redeployed: false",
+        "- Optimized validation page redeploy status: not_generated",
+        "- Migration release status used: yes",
+        "- Migration release status: audit_generated",
+        "- Migration release safeToRunMigration: false",
+        "- Next: run npx tsx scripts/index-ebos-evidence.ts to refresh the EBOS evidence catalog."
+      ],
+      "stderrTail": []
+    },
+    {
+      "key": "external_real_data_status",
+      "description": "Check external real data status",
+      "command": "npx.cmd",
+      "args": [
+        "tsx",
+        "scripts/check-ebos-external-publish-results.ts",
+        "--date",
+        "2026-07-03"
+      ],
+      "required": true,
+      "exitCode": 0,
+      "status": "passed",
+      "stdoutTail": [
+        "EBOS external publish result check:",
+        "- Input: C:\\Users\\HU\\Documents\\New project 2\\reports\\ebos\\external-publishing\\inputs\\2026-07-03-external-publish-result-input.json",
+        "- valid: true",
+        "- publishCoverage: 0",
+        "- dataCoverage: 0",
+        "- hasRealSignals: false",
+        "- canBackfill: false",
+        "- publishedChannels: none",
+        "- channelsWithData: none",
+        "- warnings: 0",
+        "- blockers: 0"
+      ],
+      "stderrTail": []
+    },
+    {
+      "key": "migration_release_safety",
+      "description": "Check migration release safety",
+      "command": "npx.cmd",
+      "args": [
+        "tsx",
+        "scripts/audit-ebos-migration-release-readiness.ts",
+        "--date",
+        "2026-07-03"
+      ],
+      "required": true,
+      "exitCode": 0,
+      "status": "passed",
+      "stdoutTail": [
+        "EBOS migration release readiness audit generated:",
+        "- migrationFilesDetected: 0",
+        "- destructiveCommandRisks: 0",
+        "- secretExposureRisks: 0",
+        "- backupEvidenceRequired: true",
+        "- approvalRequired: true",
+        "- safeToRunMigration: false",
+        "- blockers count: 3",
+        "- warnings count: 3",
+        "- JSON: C:\\Users\\HU\\Documents\\New project 2\\reports\\ebos\\deployment\\migration-release\\2026-07-03-migration-release-risk-audit.json",
+        "- Markdown: C:\\Users\\HU\\Documents\\New project 2\\reports\\ebos\\deployment\\migration-release\\2026-07-03-migration-release-risk-audit.md"
+      ],
+      "stderrTail": []
+    },
+    {
+      "key": "dirty_risk_state",
+      "description": "Read current dirty risk state",
+      "command": "git",
+      "args": [
+        "status",
+        "--short"
+      ],
+      "required": true,
+      "exitCode": 0,
+      "status": "passed",
+      "stdoutTail": [
+        "?? tmp-enhe-deploy-6caa950.bundle",
+        "?? tmp-enhe-deploy-74f372a.bundle",
+        "?? tmp-enhe-deploy-7647bc5.bundle",
+        "?? tmp-enhe-deploy-77f6307.bundle",
+        "?? tmp-enhe-deploy-822ec25.bundle",
+        "?? tmp-enhe-deploy-82f4264.bundle",
+        "?? tmp-enhe-deploy-8a367f1.bundle",
+        "?? tmp-enhe-deploy-8d2dd4b.bundle",
+        "?? tmp-enhe-deploy-9df36df.bundle",
+        "?? tmp-enhe-deploy-d18ec5e.bundle",
+        "?? tmp-enhe-deploy-da11a54.bundle",
+        "?? tmp-enhe-deploy.bundle"
+      ],
+      "stderrTail": []
+    }
+  ],
+  "nextWeekActions": [
+    "Keep safeToRunMigration=false until production/staging readonly checks, backup evidence, and explicit migration approval exist.",
+    "Collect real external publishing metrics before any external data backfill apply.",
+    "Keep package, seed, admin/API/core, and unknown dirty work in separate audits.",
+    "Use this local script for Friday EBOS inspection; do not create a system scheduler without user confirmation."
+  ],
+  "warnings": []
+}

@@ -1,0 +1,409 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>ENHE AI light SaaS UI direction preview</title>
+    <style>
+      :root {
+        color-scheme: light;
+        --ink: #08080a;
+        --muted: #74777f;
+        --soft: #f4f5f7;
+        --line: #e5e7eb;
+        --accent: #f05a35;
+        --accent-dark: #cf4325;
+        --paper: #ffffff;
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        margin: 0;
+        background:
+          radial-gradient(circle at 74% 28%, rgba(240, 90, 53, 0.08), transparent 23rem),
+          linear-gradient(180deg, #ffffff 0%, #f7f8fa 100%);
+        color: var(--ink);
+        font-family:
+          "Microsoft YaHei",
+          "PingFang SC",
+          "Noto Sans SC",
+          Arial,
+          sans-serif;
+      }
+
+      .page {
+        min-height: 100vh;
+        padding: 28px 54px 42px;
+      }
+
+      .nav {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 40px;
+        max-width: 1120px;
+        margin: 0 auto;
+      }
+
+      .brand {
+        display: inline-flex;
+        align-items: center;
+        gap: 12px;
+        font-size: 26px;
+        font-weight: 800;
+        letter-spacing: -0.02em;
+      }
+
+      .mark {
+        width: 46px;
+        height: 30px;
+        border-radius: 0;
+        overflow: hidden;
+        position: relative;
+      }
+
+      .mark img {
+        width: 100%;
+        height: 100%;
+        display: block;
+        object-fit: cover;
+      }
+
+      .nav-links {
+        display: flex;
+        align-items: center;
+        gap: 28px;
+        font-size: 14px;
+        font-weight: 700;
+        color: #33353a;
+      }
+
+      .nav-right {
+        display: flex;
+        align-items: center;
+        gap: 24px;
+        margin-left: auto;
+        font-size: 14px;
+        font-weight: 700;
+      }
+
+      .nav-cta {
+        border: 0;
+        border-radius: 5px;
+        background: var(--accent);
+        color: #fff;
+        padding: 14px 22px;
+        font-weight: 800;
+        box-shadow: 0 14px 34px rgba(240, 90, 53, 0.22);
+      }
+
+      .hero {
+        max-width: 1120px;
+        min-height: 640px;
+        margin: 0 auto;
+        padding: 125px 0 0;
+        text-align: center;
+        position: relative;
+      }
+
+      .eyebrow {
+        margin: 0;
+        color: #383b42;
+        font-size: 15px;
+        font-weight: 800;
+      }
+
+      h1 {
+        max-width: 760px;
+        margin: 42px auto 24px;
+        font-size: clamp(68px, 7.2vw, 96px);
+        line-height: 0.98;
+        letter-spacing: -0.045em;
+        font-weight: 900;
+      }
+
+      .subcopy {
+        max-width: 660px;
+        margin: 0 auto;
+        color: var(--muted);
+        font-size: 17px;
+        line-height: 1.75;
+        font-weight: 600;
+      }
+
+      .proof {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        gap: 34px;
+        margin-top: 34px;
+      }
+
+      .proof-item {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        min-width: 150px;
+      }
+
+      .proof-value {
+        display: block;
+        font-size: 25px;
+        font-weight: 900;
+        letter-spacing: -0.025em;
+      }
+
+      .proof-label {
+        display: block;
+        margin-top: 4px;
+        color: #9a9da4;
+        font-size: 12px;
+        font-weight: 800;
+      }
+
+      .actions {
+        display: flex;
+        justify-content: center;
+        gap: 16px;
+        margin-top: 38px;
+      }
+
+      .btn {
+        min-width: 132px;
+        border-radius: 5px;
+        padding: 15px 22px;
+        border: 0;
+        font-size: 14px;
+        font-weight: 850;
+      }
+
+      .btn-dark {
+        background: #050505;
+        color: #fff;
+      }
+
+      .btn-accent {
+        background: var(--accent);
+        color: #fff;
+      }
+
+      .product-peek {
+        width: min(920px, 90%);
+        height: 160px;
+        margin: 54px auto 0;
+        border-radius: 18px 18px 0 0;
+        border: 1px solid rgba(12, 12, 14, 0.08);
+        background:
+          linear-gradient(180deg, rgba(255, 255, 255, 0.96), rgba(255, 255, 255, 0.78)),
+          repeating-linear-gradient(90deg, rgba(0, 0, 0, 0.05) 0 1px, transparent 1px 74px),
+          #f1f3f6;
+        box-shadow: 0 -12px 70px rgba(8, 8, 10, 0.08);
+        overflow: hidden;
+        position: relative;
+      }
+
+      .product-bar {
+        height: 42px;
+        border-bottom: 1px solid var(--line);
+        display: flex;
+        align-items: center;
+        gap: 9px;
+        padding: 0 18px;
+      }
+
+      .dot {
+        width: 9px;
+        height: 9px;
+        border-radius: 50%;
+        background: #c8cbd1;
+      }
+
+      .product-grid {
+        display: grid;
+        grid-template-columns: 1.1fr 0.9fr 0.9fr;
+        gap: 14px;
+        padding: 20px;
+      }
+
+      .panel {
+        min-height: 84px;
+        border: 1px solid var(--line);
+        border-radius: 10px;
+        background: #fff;
+        padding: 14px;
+      }
+
+      .panel-title {
+        width: 50%;
+        height: 10px;
+        border-radius: 99px;
+        background: #111;
+      }
+
+      .panel-line {
+        width: 86%;
+        height: 8px;
+        margin-top: 16px;
+        border-radius: 99px;
+        background: #d8dbe1;
+      }
+
+      .panel-line.small {
+        width: 62%;
+        margin-top: 10px;
+      }
+
+      .notes {
+        max-width: 1120px;
+        margin: 28px auto 0;
+        display: grid;
+        gap: 14px;
+        grid-template-columns: repeat(3, 1fr);
+      }
+
+      .note {
+        border: 1px solid var(--line);
+        border-radius: 14px;
+        background: rgba(255, 255, 255, 0.8);
+        padding: 18px;
+      }
+
+      .note h2 {
+        margin: 0;
+        font-size: 15px;
+      }
+
+      .note p {
+        margin: 9px 0 0;
+        color: var(--muted);
+        font-size: 13px;
+        line-height: 1.65;
+      }
+
+      @media (max-width: 860px) {
+        .page {
+          padding: 22px 20px 34px;
+        }
+
+        .nav {
+          align-items: flex-start;
+        }
+
+        .nav-links,
+        .nav-right span {
+          display: none;
+        }
+
+        .hero {
+          min-height: auto;
+          padding-top: 86px;
+        }
+
+        h1 {
+          font-size: 56px;
+        }
+
+        .proof {
+          flex-direction: column;
+          gap: 18px;
+        }
+
+        .notes {
+          grid-template-columns: 1fr;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <main class="page">
+      <nav class="nav" aria-label="ENHE AI preview navigation">
+        <div class="brand">
+          <span class="mark"><img src="./enhe-icon-gradient-white-bg-cropped.png" alt="" /></span>
+          ENHE AI
+        </div>
+        <div class="nav-links">
+          <span>AI软件应用</span>
+          <span>AI账号服务</span>
+          <span>AI技能学习</span>
+          <span>更新日志</span>
+        </div>
+        <div class="nav-right">
+          <span>帮助支持</span>
+          <span>登录</span>
+          <button class="nav-cta">用户中心</button>
+        </div>
+      </nav>
+
+      <section class="hero">
+        <p class="eyebrow">ENHE AI Tools</p>
+        <h1>AI工具<br />即刻可用</h1>
+        <p class="subcopy">
+          用精选软件、账号服务和技能课程，把重复工作交给 AI 自动化，让创作、运营和学习更快进入结果。
+        </p>
+
+        <div class="proof" aria-label="trust proof">
+          <div class="proof-item">
+            <span>
+              <span class="proof-value">30+</span>
+              <span class="proof-label">精选工具与课程</span>
+            </span>
+          </div>
+          <div class="proof-item">
+            <span>
+              <span class="proof-value">自动解锁</span>
+              <span class="proof-label">支付后开通权益</span>
+            </span>
+          </div>
+        </div>
+
+        <div class="actions">
+          <button class="btn btn-dark">AI软件应用</button>
+          <button class="btn btn-accent">AI技能学习</button>
+        </div>
+
+        <div class="product-peek" aria-hidden="true">
+          <div class="product-bar">
+            <span class="dot"></span>
+            <span class="dot"></span>
+            <span class="dot"></span>
+          </div>
+          <div class="product-grid">
+            <div class="panel">
+              <div class="panel-title"></div>
+              <div class="panel-line"></div>
+              <div class="panel-line small"></div>
+            </div>
+            <div class="panel">
+              <div class="panel-title"></div>
+              <div class="panel-line"></div>
+              <div class="panel-line small"></div>
+            </div>
+            <div class="panel">
+              <div class="panel-title"></div>
+              <div class="panel-line"></div>
+              <div class="panel-line small"></div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="notes" aria-label="design notes">
+        <article class="note">
+          <h2>方向 A：参考图贴近版</h2>
+          <p>白底、居中、巨型黑字、双按钮。最像附件截图，适合把首页升级成高信任产品官网。</p>
+        </article>
+        <article class="note">
+          <h2>ENHE 内容适配</h2>
+          <p>主按钮对应 AI 软件应用，副按钮对应 AI 技能学习，指标不夸张造数，使用工具数量和自动解锁机制。</p>
+        </article>
+        <article class="note">
+          <h2>落地提醒</h2>
+          <p>这会替换当前暗色 HUD 首屏。正式实施时需要同步重做卡片、导航、移动端和商品详情入口。</p>
+        </article>
+      </section>
+    </main>
+  </body>
+</html>

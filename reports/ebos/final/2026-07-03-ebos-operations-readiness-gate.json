@@ -1,0 +1,52 @@
+{
+  "reportType": "ebos_operations_readiness_gate",
+  "targetDate": "2026-07-03",
+  "generatedAt": "2026-07-08T00:50:00+08:00",
+  "checks": {
+    "deploymentStatus": "verified",
+    "postLaunchCheckStatus": "passed",
+    "weeklyOperatingCycleDocExists": true,
+    "weeklyOperatingCycleScriptExists": true,
+    "externalPublishingStatus": "waiting_real_data",
+    "hasRealSignals": false,
+    "canBackfill": false,
+    "safeToRunMigration": false,
+    "migrationQuarantineEstablished": true,
+    "packageQuarantineEstablished": true,
+    "seedQuarantineEstablished": true,
+    "adminApiCoreReviewPlanEstablished": true,
+    "productionStagingReadonlySchemaCheck": "manual_check_required",
+    "externalRealData": "manual_collection_required",
+    "technicalBlocker": false,
+    "nonBlockingDevelopmentBlockers": [
+      "package/prisma/seed/admin/API/core dirty work remains quarantined for later review."
+    ]
+  },
+  "operationsReady": true,
+  "blockingReasons": [],
+  "nonBlockingRisks": [
+    "External publishing remains waiting_real_data until real published URLs and metrics are provided.",
+    "Production/staging schema verification remains manual_check_required until authorized readonly checks are performed.",
+    "Package, Prisma migration, seed, admin/API/core, and unknown/risky dirty files remain quarantined."
+  ],
+  "manualActionsRequired": [
+    "Run production/staging readonly schema check manually with authorized, secret-safe access.",
+    "Publish or outreach through 1-3 external channels and collect real metrics.",
+    "Run external publish result check and backfill dry-run after real data exists."
+  ],
+  "nextOperationalActions": [
+    "Use the weekly operating cycle script locally each Friday or on demand.",
+    "Keep safeToRunMigration=false until backup, rollback, schema checks, and explicit confirmation exist.",
+    "Do not run seed, deployment, or backfill apply during normal weekly operations."
+  ],
+  "commandsExecuted": {
+    "gitAdd": false,
+    "gitCommit": false,
+    "gitPush": false,
+    "migration": false,
+    "seed": false,
+    "deployment": false,
+    "backfillApply": false,
+    "fakeDataCreated": false
+  }
+}

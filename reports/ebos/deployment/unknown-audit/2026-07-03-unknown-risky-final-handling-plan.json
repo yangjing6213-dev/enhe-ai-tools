@@ -1,0 +1,146 @@
+{
+  "reportType": "unknown_risky_final_handling_plan",
+  "targetDate": "2026-07-03",
+  "generatedAt": "2026-07-08T00:50:00+08:00",
+  "basedOn": "reports/ebos/deployment/unknown-audit/2026-07-03-unknown-risky-final-triage.json",
+  "handlingGroups": [
+    {
+      "category": "do_not_commit",
+      "fileCount": 1,
+      "canCommitNowCount": 0,
+      "recommendedAction": "do_not_commit",
+      "requiresUserConfirmation": true,
+      "cleanupAllowedNow": false,
+      "commitAllowedNow": false
+    },
+    {
+      "category": "product_tool_content_review_required",
+      "fileCount": 94,
+      "canCommitNowCount": 0,
+      "recommendedAction": "dedicated_review_required_do_not_commit_now",
+      "requiresUserConfirmation": true,
+      "cleanupAllowedNow": false,
+      "commitAllowedNow": false
+    },
+    {
+      "category": "auth_permission_review_required",
+      "fileCount": 10,
+      "canCommitNowCount": 0,
+      "recommendedAction": "explicit_user_confirmation_required_do_not_commit_now",
+      "requiresUserConfirmation": true,
+      "cleanupAllowedNow": false,
+      "commitAllowedNow": false
+    },
+    {
+      "category": "unknown_risky_requires_user_confirmation",
+      "fileCount": 28,
+      "canCommitNowCount": 0,
+      "recommendedAction": "manual_triage_required_do_not_commit_now",
+      "requiresUserConfirmation": true,
+      "cleanupAllowedNow": false,
+      "commitAllowedNow": false
+    },
+    {
+      "category": "package_dependency_quarantine",
+      "fileCount": 2,
+      "canCommitNowCount": 0,
+      "recommendedAction": "quarantine_do_not_commit_or_revert_now",
+      "requiresUserConfirmation": true,
+      "cleanupAllowedNow": false,
+      "commitAllowedNow": false
+    },
+    {
+      "category": "seed_quarantine",
+      "fileCount": 2,
+      "canCommitNowCount": 0,
+      "recommendedAction": "quarantine_do_not_commit_run_or_revert_now",
+      "requiresUserConfirmation": true,
+      "cleanupAllowedNow": false,
+      "commitAllowedNow": false
+    },
+    {
+      "category": "payment_order_revenue_review_required",
+      "fileCount": 3,
+      "canCommitNowCount": 0,
+      "recommendedAction": "explicit_user_confirmation_required_do_not_commit_now",
+      "requiresUserConfirmation": true,
+      "cleanupAllowedNow": false,
+      "commitAllowedNow": false
+    },
+    {
+      "category": "ebos_report_only_candidate",
+      "fileCount": 62,
+      "canCommitNowCount": 62,
+      "recommendedAction": "candidate_for_safe_plan_only_do_not_commit_in_phase_a",
+      "requiresUserConfirmation": false,
+      "cleanupAllowedNow": false,
+      "commitAllowedNow": false
+    },
+    {
+      "category": "external_publishing_review_required",
+      "fileCount": 15,
+      "canCommitNowCount": 0,
+      "recommendedAction": "dedicated_review_required_do_not_commit_now",
+      "requiresUserConfirmation": true,
+      "cleanupAllowedNow": false,
+      "commitAllowedNow": false
+    },
+    {
+      "category": "admin_api_core_review_required",
+      "fileCount": 7,
+      "canCommitNowCount": 0,
+      "recommendedAction": "dedicated_review_required_do_not_commit_now",
+      "requiresUserConfirmation": true,
+      "cleanupAllowedNow": false,
+      "commitAllowedNow": false
+    },
+    {
+      "category": "local_cache_or_temp",
+      "fileCount": 25,
+      "canCommitNowCount": 0,
+      "recommendedAction": "exclude_from_git_keep_or_clean_later_with_user_approval",
+      "requiresUserConfirmation": false,
+      "cleanupAllowedNow": false,
+      "commitAllowedNow": false
+    },
+    {
+      "category": "prisma_migration_quarantine",
+      "fileCount": 3,
+      "canCommitNowCount": 0,
+      "recommendedAction": "quarantine_do_not_commit_run_delete_or_move_now",
+      "requiresUserConfirmation": true,
+      "cleanupAllowedNow": false,
+      "commitAllowedNow": false
+    },
+    {
+      "category": "rejected_script_review_required",
+      "fileCount": 1,
+      "canCommitNowCount": 0,
+      "recommendedAction": "rejected_script_requires_manual_review",
+      "requiresUserConfirmation": true,
+      "cleanupAllowedNow": false,
+      "commitAllowedNow": false
+    }
+  ],
+  "rules": [
+    "Do not delete local cache/temp files in this phase.",
+    "Do not commit package, Prisma, seed, admin/API/core, auth, payment/order/revenue, rejected script, or unknown/risky files.",
+    "Only EBOS reports/docs/script candidates may proceed to Phase B safe commit planning.",
+    "Use exact-path staging only in Phase H if Phase G passes."
+  ],
+  "commandsExecuted": {
+    "gitStatus": true,
+    "gitAdd": false,
+    "gitCommit": false,
+    "gitPush": false,
+    "sourceModified": false,
+    "migration": false,
+    "seed": false,
+    "deployment": false,
+    "backfillApply": false
+  },
+  "nextActions": [
+    "Use Phase B to produce an exact safe commit candidate plan for EBOS report/docs/script files only.",
+    "Keep quarantined and high-risk files unstaged."
+  ]
+}

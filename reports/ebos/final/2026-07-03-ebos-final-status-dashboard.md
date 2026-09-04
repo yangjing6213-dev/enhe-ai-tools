@@ -1,0 +1,21 @@
+# EBOS Final Status Dashboard
+
+- deploymentStatus: `verified`
+- postLaunchCheckStatus: `passed`
+- externalPublishingStatus: `waiting_real_data`
+- hasRealSignals: `false`
+- canBackfill: `false`
+- safeToRunMigration: `false`
+- migrationQuarantineStatus: `quarantine_until_production_staging_checked`
+- packageAuditStatus: `blocked_until_package_audit`
+- seedAuditStatus: `quarantine_until_dedicated_seed_review`
+- adminApiCoreAuditStatus: `blocked_until_admin_api_core_review`
+- unknownFileStatus: `risky_unknown_requires_user_confirmation`
+- weeklyAutomationStatus: `passed`
+
+## Next Actions
+
+- Keep migration quarantine until production/staging readonly checks are available.
+- Collect real external publishing data.
+- Keep high-risk dirty files out of safe report commit.
+- Run final quality gate before any commit decision.

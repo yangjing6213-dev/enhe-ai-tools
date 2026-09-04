@@ -1,0 +1,18 @@
+{
+  "reportType": "package_remotion_a11y_handling_plan",
+  "targetDate": "2026-07-03",
+  "generatedAt": "2026-07-07T14:58:31.157Z",
+  "decision": "blocked_until_package_audit",
+  "safeToCommitPackage": false,
+  "actions": [
+    "Do not commit package files in EBOS report batch.",
+    "Keep Remotion/a11y changes separate from EBOS closure reports.",
+    "Require user approval and dedicated package audit before any dependency commit."
+  ],
+  "forbiddenActions": [
+    "npm install",
+    "git add package.json",
+    "git add package-lock.json",
+    "git commit package changes without approval"
+  ]
+}

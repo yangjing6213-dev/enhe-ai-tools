@@ -1,0 +1,439 @@
+{
+  "reportType": "validation_result_report",
+  "targetDate": "2026-07-03",
+  "generatedAt": "2026-07-04T03:17:02.250Z",
+  "trackerPath": "reports/ebos/validation/templates/2026-07-03-validation-tracker.json",
+  "inputPath": "reports/ebos/validation/inputs/2026-07-03-validation-input.json",
+  "analyses": [
+    {
+      "planId": "validation-product-1-faceswap-studio-ai",
+      "title": "Validate existing product: FaceSwap Studio｜本地人像合成研究工具",
+      "targetDirection": "Existing product revenue validation",
+      "targetProduct": "FaceSwap Studio｜本地人像合成研究工具",
+      "status": "running",
+      "successStatus": "inconclusive",
+      "score": 15,
+      "resultInput": {
+        "planId": "validation-product-1-faceswap-studio-ai",
+        "status": "running",
+        "productPageViews": 0,
+        "productPageCtaClicks": 0,
+        "listingViews": 0,
+        "messages": 0,
+        "ctaClicks": 0,
+        "paidOrders": 0,
+        "refundCount": 0,
+        "supportQuestions": 0,
+        "notes": "Step 9.8 prepared FaceSwap Studio validation copy, marketplace snippets, compliance notes, and tracking plan in docs/ebos/validation-assets/2026-07-03-faceswap-validation-copy.md. Suggested CTA event: validation_faceswap_cta_click. No real views, clicks, messages, orders, refunds, or feedback have been recorded yet."
+      },
+      "evidenceSummary": [
+        "Notes: Step 9.8 prepared FaceSwap Studio validation copy, marketplace snippets, compliance notes, and tracking plan in docs/ebos/validation-assets/2026-07-03-faceswap-validation-copy.md. Suggested CTA event: validation_faceswap_cta_click. No real views, clicks, messages, orders, refunds, or feedback have been recorded yet."
+      ],
+      "channelAttributionSummary": {
+        "planId": "validation-product-1-faceswap-studio-ai",
+        "channels": [
+          {
+            "channel": "marketplace_listing",
+            "status": "no_data",
+            "metrics": {
+              "listingViews": 0,
+              "messages": 0,
+              "orders": 0
+            },
+            "summary": "No marketplace listing data recorded.",
+            "recommendations": [
+              "Record marketplace listing views, clicks, favorites, messages, orders, and revenue before judging this channel."
+            ]
+          },
+          {
+            "channel": "product_page",
+            "status": "no_data",
+            "metrics": {
+              "productPageViews": 0,
+              "productPageCtaClicks": 0,
+              "ctaClicks": 0,
+              "paidOrders": 0
+            },
+            "summary": "No product page data recorded.",
+            "recommendations": [
+              "Record product page views, CTA clicks, leads, and paid orders before judging this channel."
+            ]
+          },
+          {
+            "channel": "manual_outreach",
+            "status": "no_data",
+            "metrics": {},
+            "summary": "No manual outreach data recorded.",
+            "recommendations": [
+              "Record outreach count, replies, calls booked, and orders before judging this channel."
+            ]
+          },
+          {
+            "channel": "pricing_test",
+            "status": "no_data",
+            "metrics": {
+              "ctaClicks": 0,
+              "paidOrders": 0,
+              "refundCount": 0
+            },
+            "summary": "No pricing test data recorded.",
+            "recommendations": [
+              "Record price shown, CTA clicks, paid orders, refunds, and pricing feedback before judging price."
+            ]
+          }
+        ],
+        "summary": [
+          "marketplace_listing: No marketplace listing data recorded.",
+          "product_page: No product page data recorded.",
+          "manual_outreach: No manual outreach data recorded.",
+          "pricing_test: No pricing test data recorded."
+        ],
+        "recommendations": [
+          "Record marketplace listing views, clicks, favorites, messages, orders, and revenue before judging this channel.",
+          "Record product page views, CTA clicks, leads, and paid orders before judging this channel.",
+          "Record outreach count, replies, calls booked, and orders before judging this channel.",
+          "Record price shown, CTA clicks, paid orders, refunds, and pricing feedback before judging price."
+        ]
+      },
+      "inputCompleteness": {
+        "totalPlans": 1,
+        "completedPlans": 0,
+        "plansWithAnySignal": 1,
+        "totalTrackableFields": 9,
+        "filledTrackableFields": 1,
+        "completenessPercent": 11,
+        "level": "low",
+        "suggestedFieldsToFill": {
+          "validation-product-1-faceswap-studio-ai": [
+            "productPageViews",
+            "productPageCtaClicks",
+            "listingViews",
+            "messages",
+            "ctaClicks",
+            "paidOrders",
+            "refundCount",
+            "supportQuestions"
+          ]
+        }
+      },
+      "dataQualityWarnings": [],
+      "decisionRecommendation": "adjust",
+      "reason": "The result is incomplete, so EBOS needs more data before changing direction.",
+      "nextActions": [
+        "Adjust offer, price, CTA, or channel for Existing product revenue validation.",
+        "Record marketplace listing views, clicks, favorites, messages, orders, and revenue before judging this channel.",
+        "Record product page views, CTA clicks, leads, and paid orders before judging this channel.",
+        "Audit FaceSwap Studio｜本地人像合成研究工具 product page pricing, CTA, FAQ, and delivery copy.",
+        "Draft a pricing test checklist for FaceSwap Studio｜本地人像合成研究工具."
+      ],
+      "risks": [
+        "Existing product readiness does not prove paid demand."
+      ],
+      "warnings": []
+    },
+    {
+      "planId": "validation-product-2-local-ai-video-studio-for-creator-workflows",
+      "title": "Validate existing product: AI Video Studio｜本地视频生成工作台",
+      "targetDirection": "Existing product revenue validation",
+      "targetProduct": "AI Video Studio｜本地视频生成工作台",
+      "status": "running",
+      "successStatus": "inconclusive",
+      "score": 15,
+      "resultInput": {
+        "planId": "validation-product-2-local-ai-video-studio-for-creator-workflows",
+        "status": "running",
+        "productPageViews": 0,
+        "productPageCtaClicks": 0,
+        "listingViews": 0,
+        "messages": 0,
+        "ctaClicks": 0,
+        "paidOrders": 0,
+        "refundCount": 0,
+        "supportQuestions": 0,
+        "notes": "Step 9.8 prepared AI Video Studio validation copy, GPU/deployment threshold notes, marketplace snippets, compliance notes, and tracking plan in docs/ebos/validation-assets/2026-07-03-ai-video-studio-validation-copy.md. Suggested CTA event: validation_ai_video_cta_click. No real views, clicks, messages, orders, refunds, or feedback have been recorded yet."
+      },
+      "evidenceSummary": [
+        "Notes: Step 9.8 prepared AI Video Studio validation copy, GPU/deployment threshold notes, marketplace snippets, compliance notes, and tracking plan in docs/ebos/validation-assets/2026-07-03-ai-video-studio-validation-copy.md. Suggested CTA event: validation_ai_video_cta_click. No real views, clicks, messages, orders, refunds, or feedback have been recorded yet."
+      ],
+      "channelAttributionSummary": {
+        "planId": "validation-product-2-local-ai-video-studio-for-creator-workflows",
+        "channels": [
+          {
+            "channel": "marketplace_listing",
+            "status": "no_data",
+            "metrics": {
+              "listingViews": 0,
+              "messages": 0,
+              "orders": 0
+            },
+            "summary": "No marketplace listing data recorded.",
+            "recommendations": [
+              "Record marketplace listing views, clicks, favorites, messages, orders, and revenue before judging this channel."
+            ]
+          },
+          {
+            "channel": "product_page",
+            "status": "no_data",
+            "metrics": {
+              "productPageViews": 0,
+              "productPageCtaClicks": 0,
+              "ctaClicks": 0,
+              "paidOrders": 0
+            },
+            "summary": "No product page data recorded.",
+            "recommendations": [
+              "Record product page views, CTA clicks, leads, and paid orders before judging this channel."
+            ]
+          },
+          {
+            "channel": "manual_outreach",
+            "status": "no_data",
+            "metrics": {},
+            "summary": "No manual outreach data recorded.",
+            "recommendations": [
+              "Record outreach count, replies, calls booked, and orders before judging this channel."
+            ]
+          },
+          {
+            "channel": "pricing_test",
+            "status": "no_data",
+            "metrics": {
+              "ctaClicks": 0,
+              "paidOrders": 0,
+              "refundCount": 0
+            },
+            "summary": "No pricing test data recorded.",
+            "recommendations": [
+              "Record price shown, CTA clicks, paid orders, refunds, and pricing feedback before judging price."
+            ]
+          }
+        ],
+        "summary": [
+          "marketplace_listing: No marketplace listing data recorded.",
+          "product_page: No product page data recorded.",
+          "manual_outreach: No manual outreach data recorded.",
+          "pricing_test: No pricing test data recorded."
+        ],
+        "recommendations": [
+          "Record marketplace listing views, clicks, favorites, messages, orders, and revenue before judging this channel.",
+          "Record product page views, CTA clicks, leads, and paid orders before judging this channel.",
+          "Record outreach count, replies, calls booked, and orders before judging this channel.",
+          "Record price shown, CTA clicks, paid orders, refunds, and pricing feedback before judging price."
+        ]
+      },
+      "inputCompleteness": {
+        "totalPlans": 1,
+        "completedPlans": 0,
+        "plansWithAnySignal": 1,
+        "totalTrackableFields": 9,
+        "filledTrackableFields": 1,
+        "completenessPercent": 11,
+        "level": "low",
+        "suggestedFieldsToFill": {
+          "validation-product-2-local-ai-video-studio-for-creator-workflows": [
+            "productPageViews",
+            "productPageCtaClicks",
+            "listingViews",
+            "messages",
+            "ctaClicks",
+            "paidOrders",
+            "refundCount",
+            "supportQuestions"
+          ]
+        }
+      },
+      "dataQualityWarnings": [],
+      "decisionRecommendation": "adjust",
+      "reason": "The result is incomplete, so EBOS needs more data before changing direction.",
+      "nextActions": [
+        "Adjust offer, price, CTA, or channel for Existing product revenue validation.",
+        "Record marketplace listing views, clicks, favorites, messages, orders, and revenue before judging this channel.",
+        "Record product page views, CTA clicks, leads, and paid orders before judging this channel.",
+        "Audit AI Video Studio｜本地视频生成工作台 product page pricing, CTA, FAQ, and delivery copy.",
+        "Draft a pricing test checklist for AI Video Studio｜本地视频生成工作台."
+      ],
+      "risks": [
+        "Existing product readiness does not prove paid demand."
+      ],
+      "warnings": []
+    },
+    {
+      "planId": "validation-direction-3-ai-prompt-kit",
+      "title": "Validate AI Prompt Kit",
+      "targetDirection": "AI Prompt Kit",
+      "status": "running",
+      "successStatus": "inconclusive",
+      "score": 15,
+      "resultInput": {
+        "planId": "validation-direction-3-ai-prompt-kit",
+        "status": "running",
+        "pageViews": 0,
+        "listingViews": 0,
+        "messages": 0,
+        "conversionRate": 0,
+        "ctaClicks": 0,
+        "leads": 0,
+        "presaleOrders": 0,
+        "paidOrders": 0,
+        "revenue": 0,
+        "notes": "Step 9.8 prepared AI Prompt Kit minimum product, landing copy, marketplace copy, social copy, and bilingual validation pages at /validation/ai-prompt-kit and /en/validation/ai-prompt-kit. CTA event added: validation_ai_prompt_kit_cta_click. No real page views, CTA clicks, leads, presale orders, paid orders, revenue, or user feedback have been recorded yet."
+      },
+      "evidenceSummary": [
+        "Notes: Step 9.8 prepared AI Prompt Kit minimum product, landing copy, marketplace copy, social copy, and bilingual validation pages at /validation/ai-prompt-kit and /en/validation/ai-prompt-kit. CTA event added: validation_ai_prompt_kit_cta_click. No real page views, CTA clicks, leads, presale orders, paid orders, revenue, or user feedback have been recorded yet."
+      ],
+      "channelAttributionSummary": {
+        "planId": "validation-direction-3-ai-prompt-kit",
+        "channels": [
+          {
+            "channel": "marketplace_listing",
+            "status": "no_data",
+            "metrics": {
+              "listingViews": 0,
+              "messages": 0,
+              "orders": 0,
+              "revenue": 0
+            },
+            "summary": "No marketplace listing data recorded.",
+            "recommendations": [
+              "Record marketplace listing views, clicks, favorites, messages, orders, and revenue before judging this channel."
+            ]
+          },
+          {
+            "channel": "product_page",
+            "status": "no_data",
+            "metrics": {
+              "ctaClicks": 0,
+              "leads": 0,
+              "paidOrders": 0
+            },
+            "summary": "No product page data recorded.",
+            "recommendations": [
+              "Record product page views, CTA clicks, leads, and paid orders before judging this channel."
+            ]
+          },
+          {
+            "channel": "manual_outreach",
+            "status": "no_data",
+            "metrics": {},
+            "summary": "No manual outreach data recorded.",
+            "recommendations": [
+              "Record outreach count, replies, calls booked, and orders before judging this channel."
+            ]
+          },
+          {
+            "channel": "pricing_test",
+            "status": "no_data",
+            "metrics": {
+              "ctaClicks": 0,
+              "paidOrders": 0
+            },
+            "summary": "No pricing test data recorded.",
+            "recommendations": [
+              "Record price shown, CTA clicks, paid orders, refunds, and pricing feedback before judging price."
+            ]
+          }
+        ],
+        "summary": [
+          "marketplace_listing: No marketplace listing data recorded.",
+          "product_page: No product page data recorded.",
+          "manual_outreach: No manual outreach data recorded.",
+          "pricing_test: No pricing test data recorded."
+        ],
+        "recommendations": [
+          "Record marketplace listing views, clicks, favorites, messages, orders, and revenue before judging this channel.",
+          "Record product page views, CTA clicks, leads, and paid orders before judging this channel.",
+          "Record outreach count, replies, calls booked, and orders before judging this channel.",
+          "Record price shown, CTA clicks, paid orders, refunds, and pricing feedback before judging price."
+        ]
+      },
+      "inputCompleteness": {
+        "totalPlans": 1,
+        "completedPlans": 0,
+        "plansWithAnySignal": 1,
+        "totalTrackableFields": 10,
+        "filledTrackableFields": 1,
+        "completenessPercent": 10,
+        "level": "low",
+        "suggestedFieldsToFill": {
+          "validation-direction-3-ai-prompt-kit": [
+            "pageViews",
+            "listingViews",
+            "messages",
+            "conversionRate",
+            "ctaClicks",
+            "leads",
+            "presaleOrders",
+            "paidOrders",
+            "revenue"
+          ]
+        }
+      },
+      "dataQualityWarnings": [],
+      "decisionRecommendation": "adjust",
+      "reason": "The result is incomplete, so EBOS needs more data before changing direction.",
+      "nextActions": [
+        "Adjust offer, price, CTA, or channel for AI Prompt Kit.",
+        "Record marketplace listing views, clicks, favorites, messages, orders, and revenue before judging this channel.",
+        "Record product page views, CTA clicks, leads, and paid orders before judging this channel.",
+        "Draft one focused AI Prompt Kit validation page with pricing, FAQ, and CTA.",
+        "Add tracking notes for CTA clicks, leads, and manual purchase intent."
+      ],
+      "risks": [
+        "Competitor signals do not prove traffic, sales, or revenue."
+      ],
+      "warnings": []
+    }
+  ],
+  "overallValidationScore": 15,
+  "summary": "Validation score 15. success=0, partial_success=0, failed=0, inconclusive=3, not_started=0.",
+  "continueDirections": [],
+  "adjustDirections": [
+    "FaceSwap Studio｜本地人像合成研究工具",
+    "AI Video Studio｜本地视频生成工作台",
+    "AI Prompt Kit"
+  ],
+  "stopDirections": [],
+  "scaleDirections": [],
+  "codexTasks": [
+    "Audit FaceSwap Studio｜本地人像合成研究工具 product page pricing, CTA, FAQ, and delivery copy.",
+    "Draft a pricing test checklist for FaceSwap Studio｜本地人像合成研究工具.",
+    "Audit AI Video Studio｜本地视频生成工作台 product page pricing, CTA, FAQ, and delivery copy.",
+    "Draft a pricing test checklist for AI Video Studio｜本地视频生成工作台.",
+    "Draft one focused AI Prompt Kit validation page with pricing, FAQ, and CTA.",
+    "Add tracking notes for CTA clicks, leads, and manual purchase intent.",
+    "Create one comparison or use-case content brief supporting AI Prompt Kit."
+  ],
+  "humanTasks": [
+    "Confirm the FaceSwap Studio｜本地人像合成研究工具 validation offer and price.",
+    "Handle manual payment, lead follow-up, or customer questions.",
+    "Confirm the AI Video Studio｜本地视频生成工作台 validation offer and price.",
+    "Review the AI Prompt Kit offer and decide the validation price.",
+    "Respond manually to leads or presale inquiries within 24 hours."
+  ],
+  "warnings": [],
+  "captureReportPath": "reports/ebos/validation/capture/2026-07-03-validation-capture-report.json",
+  "captureSummary": {
+    "analyticsAvailable": true,
+    "eventsDetected": 60,
+    "ctaClicksDetected": 0,
+    "ordersAvailable": true,
+    "paidOrders": 0,
+    "revenue": 0,
+    "refundCount": 0,
+    "manualSlotsCount": 21,
+    "warnings": [
+      "Currency inferred as CNY because no explicit currency field was detected."
+    ]
+  },
+  "externalIntakeSummary": {
+    "status": "template_generated_unfilled",
+    "inputPath": "C:\\Users\\HU\\Documents\\New project 2\\reports\\ebos\\validation\\intake\\inputs\\2026-07-03-external-intake-input.json",
+    "importReportPath": "reports\\ebos\\validation\\intake\\imports\\2026-07-03-external-intake-import-report.json",
+    "importedChannelsCount": 0,
+    "importedPlansCount": 0,
+    "appliedChangesCount": 0,
+    "skippedChangesCount": 0,
+    "warnings": [],
+    "summary": "已生成填报模板，但尚未填写真实外部渠道数据"
+  }
+}

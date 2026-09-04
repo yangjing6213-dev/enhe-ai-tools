@@ -1,0 +1,35 @@
+{
+  "reportType": "post_launch_verified_transition",
+  "targetDate": "2026-07-03",
+  "generatedAt": "2026-07-05T09:59:53.967Z",
+  "liveCheckReportPath": "C:\\Users\\HU\\Documents\\New project 2\\reports\\ebos\\deployment\\post-launch\\2026-07-03-post-launch-live-check.json",
+  "liveCheckMarkdownPath": "C:\\Users\\HU\\Documents\\New project 2\\reports\\ebos\\deployment\\post-launch\\2026-07-03-post-launch-live-check.md",
+  "overallStatus": "passed",
+  "canTransitionToVerified": true,
+  "statusTransition": {
+    "previousStatus": "deployed_pending_verification",
+    "nextStatus": "verified",
+    "updated": true,
+    "backupPath": "C:/Users/HU/Documents/New project 2/reports/ebos/deployment/execution/backups/2026-07-03-deployment-execution-status.before-verification.2026-07-05T09-59-53-960Z.json",
+    "reason": "Post-launch live check passed; status updated to verified.",
+    "warnings": []
+  },
+  "checkedRoutes": [
+    "/validation/ai-prompt-kit",
+    "/en/validation/ai-prompt-kit"
+  ],
+  "routeHttpStatuses": [
+    {
+      "route": "/validation/ai-prompt-kit",
+      "status": 200,
+      "ok": true
+    },
+    {
+      "route": "/en/validation/ai-prompt-kit",
+      "status": 200,
+      "ok": true
+    }
+  ],
+  "blockers": [],
+  "warnings": []
+}

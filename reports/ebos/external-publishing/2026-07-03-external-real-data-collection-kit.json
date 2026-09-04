@@ -1,0 +1,92 @@
+{
+  "reportType": "external_real_data_collection_kit",
+  "targetDate": "2026-07-03",
+  "generatedAt": "2026-07-08T01:08:00+08:00",
+  "channelsRequiringManualPublishing": [
+    "xianyu",
+    "taobao",
+    "whop",
+    "xiaohongshu",
+    "wechat",
+    "manual_outreach"
+  ],
+  "fieldsToBackfill": [
+    "published",
+    "publishedAt",
+    "publishedUrl",
+    "listingTitle",
+    "views",
+    "clicks",
+    "favorites",
+    "saves",
+    "shares",
+    "messages",
+    "leads",
+    "positiveReplies",
+    "negativeReplies",
+    "orders",
+    "paidOrders",
+    "revenue",
+    "refundCount",
+    "refundedAmount",
+    "userFeedback",
+    "evidence",
+    "notes",
+    "failures"
+  ],
+  "publishedUrlRules": [
+    "Use the real platform URL if publicly available.",
+    "For WeChat private chat/manual outreach, do not invent a URL; put evidence notes without private identifiers.",
+    "Never use placeholder URLs as publishedUrl."
+  ],
+  "metricRules": {
+    "views": "Real platform views only; 0 if unavailable.",
+    "clicks": "Real tracked or observed clicks only; 0 if unavailable.",
+    "messages": "Real inquiries/messages only; 0 if none.",
+    "orders": "Real orders only; 0 if none.",
+    "revenue": "Actual paid revenue only; 0 if none."
+  },
+  "evidenceFieldRules": [
+    "Evidence can be screenshot filename, public URL, timestamped note, or manually recorded non-secret observation.",
+    "Do not include cookies, tokens, passwords, private phone numbers, or private user identifiers."
+  ],
+  "noSyntheticData": true,
+  "syntheticDataCanBackfillApply": false,
+  "waitingStateWhenNoRealData": "waiting_real_data",
+  "currentCheck": {
+    "valid": true,
+    "publishCoverage": 0,
+    "dataCoverage": 0,
+    "hasRealSignals": false,
+    "canBackfill": false,
+    "publishedChannels": [],
+    "channelsWithData": []
+  },
+  "commandsRun": [
+    "npx tsx scripts/check-ebos-external-publish-results.ts --date 2026-07-03",
+    "npx tsx scripts/backfill-ebos-external-channel-data.ts --date 2026-07-03"
+  ],
+  "backfillDryRunInstruction": "npx tsx scripts/backfill-ebos-external-channel-data.ts --date 2026-07-03",
+  "backfillApplyForbiddenConditions": [
+    "hasRealSignals=false",
+    "canBackfill=false",
+    "missing real publishedUrl/evidence for public channels",
+    "synthetic or assumed metrics",
+    "user has not explicitly approved apply"
+  ],
+  "userNextCodexInstruction": "After filling real results, ask Codex to run check-ebos-external-publish-results and backfill-ebos-external-channel-data dry-run for 2026-07-03. Do not request --apply unless hasRealSignals=true and canBackfill=true.",
+  "commandsExecuted": {
+    "gitAdd": false,
+    "gitCommit": false,
+    "gitPush": false,
+    "migration": false,
+    "seed": false,
+    "deployment": false,
+    "backfillApply": false,
+    "fakeDataCreated": false
+  },
+  "blockers": [],
+  "warnings": [
+    "No real signals exist yet; keep externalPublishingStatus=waiting_real_data."
+  ]
+}

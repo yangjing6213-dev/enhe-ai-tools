@@ -1,0 +1,195 @@
+{
+  "reportType": "production_deployment_execution",
+  "targetDate": "2026-07-03",
+  "generatedAt": "2026-07-05T09:17:50.827Z",
+  "executionStatus": {
+    "statusType": "production_deployment_execution_status",
+    "targetDate": "2026-07-03",
+    "updatedAt": "2026-07-05T09:16:59.612Z",
+    "deploymentStatus": "deployed_pending_verification",
+    "approvedByUser": true,
+    "localCommandsRun": [
+      "npm run lint",
+      "npm run typecheck",
+      "npm run build"
+    ],
+    "serverCommandsRun": [
+      "manual server deployment commands completed"
+    ],
+    "dockerCommandsRun": [
+      "manual Docker/Nginx deployment commands completed"
+    ],
+    "verificationCommandsRun": [],
+    "postLaunchCheckStatus": "not_run",
+    "notes": [
+      "Approval phrase accepted from scripts/approve-ebos-deployment-execution.ts; status moved to approved_not_executed. Production is not deployed.",
+      "Production deployment execution entered executing state after exact second confirmation. Server/Docker/Nginx commands are still manual_required.",
+      "Local pre-deployment commands passed. Waiting for manual server deployment result.",
+      "Manual server, Docker, and Nginx deployment result recorded as complete. Post-launch check is still required before verified."
+    ],
+    "warnings": [],
+    "approvedAt": "2026-07-04T15:33:18.303Z",
+    "deployedAt": "2026-07-05T17:14:48+08:00"
+  },
+  "localCommandResults": [
+    {
+      "id": "local-1",
+      "command": "npm run lint",
+      "environment": "local",
+      "status": "success",
+      "exitCode": 0,
+      "startedAt": "2026-07-05T00:54:29.670Z",
+      "completedAt": "2026-07-05T00:54:44.396Z",
+      "summary": "> enhe-ai-tools@0.1.0 lint\n> eslint .",
+      "evidence": [
+        "> enhe-ai-tools@0.1.0 lint\n> eslint ."
+      ],
+      "warnings": []
+    },
+    {
+      "id": "local-2",
+      "command": "npm run typecheck",
+      "environment": "local",
+      "status": "success",
+      "exitCode": 0,
+      "startedAt": "2026-07-05T00:54:44.396Z",
+      "completedAt": "2026-07-05T00:54:51.430Z",
+      "summary": "> enhe-ai-tools@0.1.0 typecheck\n> tsc --noEmit",
+      "evidence": [
+        "> enhe-ai-tools@0.1.0 typecheck\n> tsc --noEmit"
+      ],
+      "warnings": []
+    },
+    {
+      "id": "local-3",
+      "command": "npm run build",
+      "environment": "local",
+      "status": "success",
+      "exitCode": 0,
+      "startedAt": "2026-07-05T00:54:51.430Z",
+      "completedAt": "2026-07-05T00:57:11.497Z",
+      "summary": "                      1.27 kB         114 kB\n├ ƒ /en/user                                 2.66 kB         117 kB\n├ ƒ /en/validation/ai-prompt-kit             1.27 kB         114 kB\n├ ● /legal/[slug]                            1.19 kB         114 kB\n├   ├ /legal/user-agreement\n├   ├ /legal/privacy-policy\n├   ├ /legal/disclaimer\n├   └ [+3 more paths]\n├ ƒ /login                                   2.66 kB         117 kB\n├ ○ /manifest.webmanifest                      199 B         103 kB\n├ ○ /online-tools                              199 B         103 kB          5m      1y\n├ ƒ /online-tools/[slug]                       199 B         103 kB\n├ ƒ /orders/[id]                             1.55 kB         121 kB\n├ ƒ /orders/[id]/pay                         1.08 kB         112 kB\n├ ƒ /pricing                                 1.27 kB         114 kB\n├ ƒ /register                                2.66 kB         117 kB\n├ ○ /robots.txt                                199 B         103 kB\n├ ƒ /sitemap.xml                               199 B         103 kB\n├ ƒ /skill-learning                          1.27 kB         114 kB\n├ ƒ /skill-learning/[slug]                   2.65 kB         124 kB\n├ ƒ /software                                1.27 kB         114 kB\n├ ƒ /software/[slug]                         2.65 kB         124 kB\n├ ƒ /tools/[slug]                              199 B         103 kB\n├ ƒ /tutorials                               1.27 kB         114 kB\n├ ƒ /user                                    2.66 kB         117 kB\n└ ƒ /validation/ai-prompt-kit                1.27 kB         114 kB\n+ First Load JS shared by all                 102 kB\n  ├ chunks/1255-b28ea36bf0cdbd65.js          46.2 kB\n  ├ chunks/4bd1b696-f785427dddbba9fb.js      54.2 kB\n  └ other shared chunks (total)                 2 kB\n\n\n○  (Static)   prerendered as static content\n●  (SSG)      prerendered as static HTML (uses generateStaticParams)\nƒ  (Dynamic)  server-rendered on demand\nEnvironment variables loaded from .env",
+      "evidence": [
+        "                      1.27 kB         114 kB\n├ ƒ /en/user                                 2.66 kB         117 kB\n├ ƒ /en/validation/ai-prompt-kit             1.27 kB         114 kB\n├ ● /legal/[slug]                            1.19 kB         114 kB\n├   ├ /legal/user-agreement\n├   ├ /legal/privacy-policy\n├   ├ /legal/disclaimer\n├   └ [+3 more paths]\n├ ƒ /login                                   2.66 kB         117 kB\n├ ○ /manifest.webmanifest                      199 B         103 kB\n├ ○ /online-tools                              199 B         103 kB          5m      1y\n├ ƒ /online-tools/[slug]                       199 B         103 kB\n├ ƒ /orders/[id]                             1.55 kB         121 kB\n├ ƒ /orders/[id]/pay                         1.08 kB         112 kB\n├ ƒ /pricing                                 1.27 kB         114 kB\n├ ƒ /register                                2.66 kB         117 kB\n├ ○ /robots.txt                                199 B         103 kB\n├ ƒ /sitemap.xml                               199 B         103 kB\n├ ƒ /skill-learning                          1.27 kB         114 kB\n├ ƒ /skill-learning/[slug]                   2.65 kB         124 kB\n├ ƒ /software                                1.27 kB         114 kB\n├ ƒ /software/[slug]                         2.65 kB         124 kB\n├ ƒ /tools/[slug]                              199 B         103 kB\n├ ƒ /tutorials                               1.27 kB         114 kB\n├ ƒ /user                                    2.66 kB         117 kB\n└ ƒ /validation/ai-prompt-kit                1.27 kB         114 kB\n+ First Load JS shared by all                 102 kB\n  ├ chunks/1255-b28ea36bf0cdbd65.js          46.2 kB\n  ├ chunks/4bd1b696-f785427dddbba9fb.js      54.2 kB\n  └ other shared chunks (total)                 2 kB\n\n\n○  (Static)   prerendered as static content\n●  (SSG)      prerendered as static HTML (uses generateStaticParams)\nƒ  (Dynamic)  server-rendered on demand\nEnvironment variables loaded from .env"
+      ],
+      "warnings": []
+    }
+  ],
+  "serverCommandResults": [
+    {
+      "id": "server-9",
+      "command": "Server project path must be confirmed before SSH or deployment commands are run.",
+      "environment": "server",
+      "status": "manual_required",
+      "summary": "Must be executed by the user in the server context or after explicit executable environment confirmation.",
+      "evidence": [
+        "Must be executed by the user in the server context or after explicit executable environment confirmation."
+      ],
+      "warnings": [
+        "Codex did not execute this command."
+      ]
+    },
+    {
+      "id": "server-28",
+      "command": "Manual confirmation required: Server project path must be confirmed before SSH or deployment commands are run.",
+      "environment": "server",
+      "status": "manual_required",
+      "summary": "Must be executed by the user in the server context or after explicit executable environment confirmation.",
+      "evidence": [
+        "Must be executed by the user in the server context or after explicit executable environment confirmation."
+      ],
+      "warnings": [
+        "Codex did not execute this command."
+      ]
+    }
+  ],
+  "dockerCommandResults": [
+    {
+      "id": "docker-10",
+      "command": "docker compose -f deploy/enhe-ai-tools/docker-compose.yml up -d --build",
+      "environment": "docker",
+      "status": "manual_required",
+      "summary": "Must be executed by the user in the server context or after explicit executable environment confirmation.",
+      "evidence": [
+        "Must be executed by the user in the server context or after explicit executable environment confirmation."
+      ],
+      "warnings": [
+        "Codex did not execute this command."
+      ]
+    },
+    {
+      "id": "docker-11",
+      "command": "docker compose -f deploy/enhe-ai-tools/docker-compose.yml ps",
+      "environment": "docker",
+      "status": "manual_required",
+      "summary": "Must be executed by the user in the server context or after explicit executable environment confirmation.",
+      "evidence": [
+        "Must be executed by the user in the server context or after explicit executable environment confirmation."
+      ],
+      "warnings": [
+        "Codex did not execute this command."
+      ]
+    },
+    {
+      "id": "docker-29",
+      "command": "docker compose -f deploy/enhe-ai-tools/docker-compose.yml up -d --build",
+      "environment": "docker",
+      "status": "manual_required",
+      "summary": "Must be executed by the user in the server context or after explicit executable environment confirmation.",
+      "evidence": [
+        "Must be executed by the user in the server context or after explicit executable environment confirmation."
+      ],
+      "warnings": [
+        "Codex did not execute this command."
+      ]
+    },
+    {
+      "id": "docker-30",
+      "command": "docker compose -f deploy/enhe-ai-tools/docker-compose.yml ps",
+      "environment": "docker",
+      "status": "manual_required",
+      "summary": "Must be executed by the user in the server context or after explicit executable environment confirmation.",
+      "evidence": [
+        "Must be executed by the user in the server context or after explicit executable environment confirmation."
+      ],
+      "warnings": [
+        "Codex did not execute this command."
+      ]
+    }
+  ],
+  "nginxCommandResults": [
+    {
+      "id": "nginx-31",
+      "command": "nginx -t && nginx -s reload",
+      "environment": "nginx",
+      "status": "manual_required",
+      "summary": "Must be executed by the user in the server context or after explicit executable environment confirmation.",
+      "evidence": [
+        "Must be executed by the user in the server context or after explicit executable environment confirmation."
+      ],
+      "warnings": [
+        "Codex did not execute this command."
+      ]
+    }
+  ],
+  "verificationReadiness": {
+    "postLaunchCheckAllowed": true,
+    "reason": "Manual server deployment result is complete; post-launch check can run.",
+    "command": "npx tsx scripts/check-ebos-validation-post-launch.ts --date 2026-07-03 --site-url https://www.enhe-tech.com.cn"
+  },
+  "statusTransition": {
+    "previousStatus": "deployed_pending_verification",
+    "nextStatus": "deployed_pending_verification",
+    "updated": false,
+    "reason": "Generated execution report without changing status.",
+    "warnings": [],
+    "forbiddenStatuses": [
+      "verified"
+    ]
+  },
+  "blockers": [],
+  "warnings": [],
+  "nextActions": [
+    "Run post-launch check before marking deployment verified."
+  ]
+}

@@ -1,0 +1,453 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>ENHE OHZI Faithful Concept</title>
+    <style>
+      :root {
+        --bg: #070b0f;
+        --deep: #020304;
+        --text: #f7f8fb;
+        --muted: rgba(247, 248, 251, 0.74);
+        --dim: rgba(247, 248, 251, 0.32);
+        --edge: #4c7dff;
+        --warm: #d49a43;
+        --purple: #a944d4;
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        margin: 0;
+        min-height: 100vh;
+        background: #05080b;
+        color: var(--text);
+        font-family:
+          Montserrat,
+          "Microsoft YaHei",
+          "PingFang SC",
+          Arial,
+          sans-serif;
+      }
+
+      .screen {
+        position: relative;
+        width: 1440px;
+        height: 900px;
+        overflow: hidden;
+        background:
+          radial-gradient(circle at 50% 36%, rgba(26, 82, 92, 0.24), transparent 32%),
+          radial-gradient(ellipse at 50% 90%, rgba(57, 85, 96, 0.16), transparent 46%),
+          linear-gradient(105deg, #06090c 0%, #0a1418 43%, #050506 100%);
+      }
+
+      .screen::before {
+        position: absolute;
+        inset: 0;
+        content: "";
+        background:
+          radial-gradient(circle at 14% 10%, rgba(255, 255, 255, 0.12) 0 1px, transparent 2px),
+          radial-gradient(circle at 68% 19%, rgba(255, 255, 255, 0.08) 0 1px, transparent 2px),
+          radial-gradient(circle at 78% 63%, rgba(70, 115, 255, 0.14) 0 1px, transparent 2px),
+          radial-gradient(circle at 37% 78%, rgba(255, 255, 255, 0.06) 0 1px, transparent 2px);
+        background-size: 141px 161px, 219px 197px, 188px 173px, 241px 211px;
+        opacity: 0.5;
+      }
+
+      .screen::after {
+        position: absolute;
+        inset: 0;
+        content: "";
+        background:
+          radial-gradient(ellipse at 50% 62%, rgba(255, 255, 255, 0.05), transparent 22%),
+          radial-gradient(ellipse at 49% 88%, rgba(0, 0, 0, 0.2), transparent 38%);
+        pointer-events: none;
+      }
+
+      header {
+        position: absolute;
+        z-index: 10;
+        top: 0;
+        left: 0;
+        right: 0;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        height: 82px;
+        padding: 24px 24px 0;
+        background: transparent;
+      }
+
+      .brand {
+        display: flex;
+        align-items: center;
+        gap: 16px;
+      }
+
+      .brand img {
+        width: 50px;
+        height: 38px;
+        object-fit: contain;
+        display: block;
+      }
+
+      .brand span {
+        color: #fff;
+        font-size: 15px;
+        font-weight: 800;
+        letter-spacing: 0.2px;
+        text-transform: uppercase;
+      }
+
+      .hamburger {
+        width: 44px;
+        height: 26px;
+        display: grid;
+        gap: 8px;
+        margin-right: 0;
+      }
+
+      .hamburger i {
+        display: block;
+        height: 3px;
+        border-radius: 10px;
+        background: rgba(255, 255, 255, 0.92);
+      }
+
+      .hero-copy {
+        position: absolute;
+        z-index: 5;
+        top: 142px;
+        left: 0;
+        width: 100%;
+        text-align: center;
+      }
+
+      h1 {
+        margin: 0;
+        font-size: 42px;
+        line-height: 1.1;
+        font-weight: 900;
+        letter-spacing: 0.4px;
+        text-shadow: 0 8px 24px rgba(0, 0, 0, 0.72);
+      }
+
+      .subtitle {
+        margin-top: 14px;
+        color: var(--muted);
+        font-size: 24px;
+        font-weight: 400;
+        letter-spacing: 1.4px;
+        text-shadow: 0 7px 20px rgba(0, 0, 0, 0.7);
+      }
+
+      .cube-stage {
+        position: absolute;
+        z-index: 4;
+        left: 50%;
+        top: 294px;
+        width: 340px;
+        height: 340px;
+        transform: translateX(-50%);
+        perspective: 900px;
+      }
+
+      .cube {
+        position: absolute;
+        left: 50%;
+        top: 16px;
+        width: 238px;
+        height: 238px;
+        transform-style: preserve-3d;
+        transform: translateX(-50%) rotateX(-17deg) rotateY(-32deg);
+      }
+
+      .face {
+        position: absolute;
+        width: 238px;
+        height: 238px;
+        border: 1px solid rgba(92, 126, 255, 0.68);
+        background:
+          radial-gradient(circle at 52% 52%, rgba(213, 154, 67, 0.42), transparent 28%),
+          linear-gradient(145deg, rgba(255, 255, 255, 0.08), rgba(15, 25, 36, 0.56) 38%, rgba(4, 8, 12, 0.78));
+        box-shadow:
+          inset 0 0 54px rgba(76, 125, 255, 0.14),
+          inset 0 0 22px rgba(255, 255, 255, 0.08),
+          0 0 18px rgba(76, 125, 255, 0.35);
+        overflow: hidden;
+      }
+
+      .face::before,
+      .face::after {
+        position: absolute;
+        content: "";
+        inset: -24px;
+        background:
+          radial-gradient(circle at 32% 30%, rgba(255, 255, 255, 0.08), transparent 24%),
+          radial-gradient(circle at 60% 60%, rgba(213, 154, 67, 0.22), transparent 30%),
+          repeating-linear-gradient(120deg, transparent 0 16px, rgba(255, 255, 255, 0.035) 17px 18px);
+        filter: blur(5px);
+        opacity: 0.68;
+      }
+
+      .front {
+        transform: translateZ(119px);
+      }
+
+      .right {
+        transform: rotateY(90deg) translateZ(119px);
+        background:
+          radial-gradient(circle at 30% 55%, rgba(213, 154, 67, 0.28), transparent 28%),
+          linear-gradient(145deg, rgba(16, 28, 42, 0.72), rgba(3, 5, 8, 0.86));
+        opacity: 0.9;
+      }
+
+      .top {
+        transform: rotateX(90deg) translateZ(119px);
+        background:
+          linear-gradient(145deg, rgba(80, 102, 146, 0.28), rgba(6, 12, 19, 0.82)),
+          repeating-linear-gradient(0deg, rgba(255, 255, 255, 0.035) 0 2px, transparent 3px 13px);
+        opacity: 0.92;
+      }
+
+      .core-light {
+        position: absolute;
+        z-index: 2;
+        left: 50%;
+        top: 50%;
+        width: 110px;
+        height: 96px;
+        transform: translate(-50%, -46%) translateZ(128px);
+        border-radius: 50%;
+        background: radial-gradient(circle, rgba(241, 181, 83, 0.9), rgba(213, 154, 67, 0.36) 42%, transparent 72%);
+        filter: blur(10px);
+      }
+
+      .floor {
+        position: absolute;
+        z-index: 2;
+        left: 50%;
+        top: 604px;
+        width: 520px;
+        height: 250px;
+        transform: translateX(-50%);
+        border-radius: 50%;
+        background:
+          radial-gradient(ellipse at 50% 12%, rgba(213, 154, 67, 0.34), transparent 24%),
+          radial-gradient(ellipse at 50% 36%, rgba(76, 125, 255, 0.17), transparent 48%),
+          radial-gradient(ellipse at 50% 70%, rgba(255, 255, 255, 0.045), transparent 58%);
+        filter: blur(12px);
+        opacity: 0.72;
+      }
+
+      .floor::after {
+        position: absolute;
+        inset: 18px 44px;
+        content: "";
+        background:
+          repeating-linear-gradient(0deg, transparent 0 18px, rgba(255, 255, 255, 0.05) 19px 20px),
+          linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.08), transparent);
+        transform: skewX(-9deg);
+        opacity: 0.44;
+      }
+
+      .button-row {
+        position: absolute;
+        z-index: 6;
+        left: 0;
+        right: 0;
+        top: 682px;
+        display: flex;
+        justify-content: center;
+      }
+
+      .explore {
+        position: relative;
+        width: 154px;
+        height: 62px;
+        display: grid;
+        place-items: center;
+        border: 1px solid rgba(255, 255, 255, 0.84);
+        border-radius: 18px;
+        background: rgba(255, 255, 255, 0.09);
+        color: #fff;
+        font-size: 17px;
+        font-weight: 900;
+        letter-spacing: 3px;
+        text-align: center;
+        box-shadow:
+          inset 1px 1px 0 rgba(255, 255, 255, 0.7),
+          inset 0 0 20px rgba(255, 255, 255, 0.16),
+          0 0 42px rgba(213, 154, 67, 0.24),
+          0 20px 42px rgba(0, 0, 0, 0.36);
+        backdrop-filter: blur(5px);
+      }
+
+      .bottom-note {
+        position: absolute;
+        z-index: 6;
+        left: 0;
+        right: 0;
+        bottom: 90px;
+        color: rgba(255, 255, 255, 0.78);
+        font-size: 15px;
+        letter-spacing: 1px;
+        text-align: center;
+      }
+
+      .mail {
+        position: absolute;
+        z-index: 6;
+        right: 34px;
+        bottom: 28px;
+        width: 34px;
+        height: 22px;
+        border: 1px solid rgba(255, 255, 255, 0.86);
+        border-radius: 2px;
+      }
+
+      .mail::before,
+      .mail::after {
+        position: absolute;
+        top: 0;
+        width: 21px;
+        height: 1px;
+        content: "";
+        background: rgba(255, 255, 255, 0.86);
+        transform-origin: left center;
+      }
+
+      .mail::before {
+        left: 0;
+        transform: rotate(34deg);
+      }
+
+      .mail::after {
+        right: -2px;
+        transform: rotate(146deg);
+      }
+
+      .menu-state .hero-copy,
+      .menu-state .button-row,
+      .menu-state .bottom-note {
+        display: none;
+      }
+
+      .menu-state .cube-stage {
+        left: 66%;
+        top: 250px;
+      }
+
+      .menu-state .floor {
+        left: 66%;
+      }
+
+      .menu-state .face {
+        background:
+          radial-gradient(circle at 52% 52%, rgba(169, 68, 212, 0.56), transparent 30%),
+          linear-gradient(145deg, rgba(255, 255, 255, 0.08), rgba(17, 23, 40, 0.56) 38%, rgba(4, 5, 11, 0.82));
+      }
+
+      .menu-state .core-light {
+        width: 130px;
+        height: 130px;
+        border-radius: 24px;
+        background:
+          radial-gradient(circle, rgba(169, 68, 212, 0.95), rgba(169, 68, 212, 0.36) 40%, transparent 70%),
+          radial-gradient(circle at 16% 72%, rgba(49, 145, 255, 0.7), transparent 28%);
+      }
+
+      .menu-state .floor {
+        background:
+          radial-gradient(ellipse at 50% 12%, rgba(169, 68, 212, 0.36), transparent 28%),
+          radial-gradient(ellipse at 50% 36%, rgba(76, 125, 255, 0.18), transparent 50%);
+      }
+
+      .menu-list {
+        position: absolute;
+        z-index: 7;
+        left: 76px;
+        top: 514px;
+        display: none;
+        flex-direction: column;
+      }
+
+      .menu-state .menu-list {
+        display: flex;
+      }
+
+      .section-kicker {
+        margin-left: 23px;
+        margin-bottom: 18px;
+        color: rgba(255, 255, 255, 0.52);
+        font-size: 16px;
+        letter-spacing: 1px;
+      }
+
+      .item {
+        position: relative;
+        margin: 0;
+        padding: 7px 0 9px 25px;
+        color: rgba(255, 255, 255, 0.31);
+        font-size: 42px;
+        line-height: 1.32;
+        font-weight: 900;
+        letter-spacing: 2px;
+      }
+
+      .item.active {
+        color: #fff;
+      }
+
+      .item.active::before {
+        position: absolute;
+        left: 0;
+        top: 12px;
+        width: 4px;
+        height: 40px;
+        content: "";
+        background: #fff;
+      }
+    </style>
+  </head>
+  <body>
+    <main class="screen" data-state="home">
+      <header>
+        <div class="brand">
+          <img src="file:///E:/Ai%20Project/01.%E7%BD%91%E7%AB%99%E7%9B%B8%E5%85%B3%E8%B5%84%E6%96%99/LOGO/enhe_logo_final_exact_package/enhe_icon_gradient_transparent.png" alt="ENHE" />
+          <span>ENHE AI</span>
+        </div>
+        <div class="hamburger" aria-label="菜单"><i></i><i></i><i></i></div>
+      </header>
+
+      <section class="hero-copy">
+        <h1>驾驭 AI 智能，重塑你的人生</h1>
+        <div class="subtitle">本地应用与云端工具，帮你把重复工作交给自动化</div>
+      </section>
+
+      <section class="menu-list">
+        <div class="section-kicker">1/4 - 开始探索</div>
+        <div class="item active">本地应用</div>
+        <div class="item">云端工具</div>
+        <div class="item">下载记录</div>
+        <div class="item">用户中心</div>
+      </section>
+
+      <div class="cube-stage" aria-hidden="true">
+        <div class="cube">
+          <div class="face front"></div>
+          <div class="face right"></div>
+          <div class="face top"></div>
+          <div class="core-light"></div>
+        </div>
+      </div>
+      <div class="floor" aria-hidden="true"></div>
+      <div class="button-row"><div class="explore">探索工具</div></div>
+      <div class="bottom-note">向下探索工具</div>
+      <div class="mail" aria-hidden="true"></div>
+    </main>
+  </body>
+</html>

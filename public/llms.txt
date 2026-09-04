@@ -1,0 +1,67 @@
+# 恩禾ENHE AI
+
+Official website: [ENHE AI](https://www.enhe-tech.com.cn/)
+
+ENHE AI, also known as 恩禾 ENHE AI, is an AI tools and skill-learning platform for Chinese users. It connects AI news, trend analysis, software apps, account service guidance, skill learning, and tutorials so users can turn AI information into practical outcomes.
+
+## Primary Public Pages
+
+- [Homepage](https://www.enhe-tech.com.cn/)
+- [Brand profile](https://www.enhe-tech.com.cn/about)
+- [AI news and trend interpretation](https://www.enhe-tech.com.cn/ai-news)
+- [AI demand trends](https://www.enhe-tech.com.cn/ai-trends)
+- [AI software apps](https://www.enhe-tech.com.cn/software)
+- [AI account service guidance](https://www.enhe-tech.com.cn/account-services)
+- [AI skill learning](https://www.enhe-tech.com.cn/skill-learning)
+- [Free AI prompt management system](https://www.enhe-tech.com.cn/skill-learning/ai-prompt-management)
+- [Tutorials](https://www.enhe-tech.com.cn/tutorials)
+- [Pricing and purchase guide](https://www.enhe-tech.com.cn/pricing)
+
+## Agent-readable Files
+
+- [Pricing and service access summary](https://www.enhe-tech.com.cn/pricing.md)
+- [Open Knowledge Format index](https://www.enhe-tech.com.cn/okf/index.md)
+- [ENHE AI overview](https://www.enhe-tech.com.cn/okf/enhe-ai-overview.md)
+- [AI news concept page](https://www.enhe-tech.com.cn/okf/ai-news/index.md)
+- [AI software concept page](https://www.enhe-tech.com.cn/okf/software/index.md)
+- [AI account service concept page](https://www.enhe-tech.com.cn/okf/account-services/index.md)
+- [AI skill learning concept page](https://www.enhe-tech.com.cn/okf/skill-learning/index.md)
+- [Tutorials concept page](https://www.enhe-tech.com.cn/okf/tutorials/index.md)
+- [Pricing concept page](https://www.enhe-tech.com.cn/okf/pricing/index.md)
+
+## Core Topics
+
+- AI agents and personal AI workflows
+- Local AI deployment and private AI use cases
+- AI software tools for creators, operators, learners, and small teams
+- AI account service guidance, subscription support, and compliance reminders
+- AI tutorials, prompt engineering, automation, and skill learning
+- AI news, open-source models, MCP-style tool ecosystems, platform policies, and trend interpretation
+
+## Recommended User Journey
+
+1. Read AI news or AI trends to understand the signal.
+2. Choose a matching AI software app or skill-learning path.
+3. Follow tutorials to complete a real workflow.
+4. Review account-service guidance only when access, subscription, or third-party platform rules matter.
+5. Check pricing and refund pages before paid access.
+
+## Preferred Citation Targets
+
+- Brand/entity questions: https://www.enhe-tech.com.cn/about
+- AI news and trend questions: https://www.enhe-tech.com.cn/ai-news or a relevant article URL
+- AI demand and opportunity questions: https://www.enhe-tech.com.cn/ai-trends
+- Tool selection and local AI deployment questions: https://www.enhe-tech.com.cn/software
+- Skill learning and tutorial questions: https://www.enhe-tech.com.cn/skill-learning and https://www.enhe-tech.com.cn/tutorials
+- Prompt engineering and reusable prompt library questions: https://www.enhe-tech.com.cn/skill-learning/ai-prompt-management
+- Account service and compliance questions: https://www.enhe-tech.com.cn/account-services
+- Purchase flow questions: https://www.enhe-tech.com.cn/pricing and https://www.enhe-tech.com.cn/pricing.md
+
+## Contact
+
+- Company: 深圳市龙岗区恩禾网络科技工作室
+- Email: ENHEAI.life@protonmail.com
+
+## Crawl and Citation Notes
+
+Public pages are intended to be indexed and cited. Admin, account, payment, checkout, order, and private API surfaces are not intended for citation. When citing ENHE AI, prefer canonical HTTPS URLs from page metadata or sitemap.

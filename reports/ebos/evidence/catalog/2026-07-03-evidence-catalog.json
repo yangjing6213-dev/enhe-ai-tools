@@ -1,0 +1,2610 @@
+{
+  "catalogVersion": "ebos-evidence-catalog-v1",
+  "generatedAt": "2026-07-03T16:45:14.665Z",
+  "rootDir": "reports/ebos/evidence",
+  "totalEntries": 10,
+  "entries": [
+    {
+      "id": "competitor_evidence:2026-07-03:2026-07-03-competitor_evidence.json",
+      "filePath": "reports/ebos/evidence/competitor_evidence/2026-07-03-competitor_evidence.json",
+      "fileName": "2026-07-03-competitor_evidence.json",
+      "evidenceKind": "competitor_evidence",
+      "contractVersion": "ebos-evidence-v1",
+      "targetDate": "2026-07-03",
+      "generatedAt": "2026-07-03T16:44:06.637Z",
+      "periodStart": "2026-06-29",
+      "periodEnd": "2026-07-05",
+      "environment": "unknown",
+      "generator": "scripts/generate-ebos-competitor-evidence.ts",
+      "score": 69,
+      "confidence": "partial",
+      "dataCompleteness": "partial",
+      "warningsCount": 5,
+      "errorsCount": 0,
+      "actionItemsCount": 5,
+      "missingSources": [
+        "manual_input",
+        "market_research"
+      ],
+      "validationStatus": "valid_with_warnings",
+      "payloadSummary": {
+        "summaryType": "competitor_evidence",
+        "overallScore": 69,
+        "competitorsCount": 3,
+        "competitorsAuditedCount": 3,
+        "includeNetworkSources": true,
+        "pagesAttempted": 6,
+        "pagesSucceeded": 3,
+        "pagesFailed": 3,
+        "opportunitiesCount": 6,
+        "topDifferentiationOpportunities": [
+          {
+            "title": "Validate AI Prompt Kit differentiation",
+            "priorityScore": 72,
+            "recommendedAction": "validate_first"
+          },
+          {
+            "title": "Validate SEO/GEO 自动化内容集群 differentiation",
+            "priorityScore": 68,
+            "recommendedAction": "validate_first"
+          },
+          {
+            "title": "Validate AI Agent 工作流模板包 differentiation",
+            "priorityScore": 67,
+            "recommendedAction": "validate_first"
+          },
+          {
+            "title": "Validate AI 视频工作流包 differentiation",
+            "priorityScore": 63,
+            "recommendedAction": "improve_existing_product"
+          },
+          {
+            "title": "Create competitor-informed SEO/GEO comparison content",
+            "priorityScore": 61,
+            "recommendedAction": "create_content_first"
+          }
+        ],
+        "actionItemsCount": 5,
+        "confidence": "partial"
+      },
+      "warnings": [
+        {
+          "code": "default_competitor_seed",
+          "severity": "warning",
+          "message": "Competitor seeds are observation targets only and do not represent a complete competitor list.",
+          "source": "manual_input"
+        },
+        {
+          "code": "competitor_page_unavailable",
+          "severity": "warning",
+          "message": "Public competitor page https://www.futurepedia.io/pricing could not be read; continuing without it. HTTP 404",
+          "source": "market_research"
+        },
+        {
+          "code": "competitor_page_unavailable",
+          "severity": "warning",
+          "message": "Public competitor page https://theresanaiforthat.com/pricing could not be read; continuing without it. HTTP 403",
+          "source": "market_research"
+        },
+        {
+          "code": "competitor_page_unavailable",
+          "severity": "warning",
+          "message": "Public competitor page https://www.toolify.ai/category could not be read; continuing without it. HTTP 403",
+          "source": "market_research"
+        },
+        {
+          "code": "competitor_public_audit_thin",
+          "severity": "warning",
+          "message": "Public competitor URL audit was enabled, but successful page coverage is too thin for complete competitor confidence.",
+          "source": "market_research"
+        }
+      ],
+      "actionItems": [
+        {
+          "id": "competitor-action-1",
+          "title": "Validate AI Prompt Kit differentiation",
+          "description": "Draft a one-page validation brief for AI Prompt Kit. Create a differentiated landing page outline for AI Prompt Kit.",
+          "priority": "high",
+          "owner": "codex",
+          "relatedSection": "competitor",
+          "evidenceRefs": [
+            "Futurepedia",
+            "There's An AI For That",
+            "Toolify"
+          ],
+          "status": "open"
+        },
+        {
+          "id": "competitor-action-2",
+          "title": "Validate SEO/GEO 自动化内容集群 differentiation",
+          "description": "Draft a one-page validation brief for SEO/GEO 自动化内容集群. Create a differentiated landing page outline for SEO/GEO 自动化内容集群.",
+          "priority": "high",
+          "owner": "codex",
+          "relatedSection": "competitor",
+          "evidenceRefs": [
+            "Futurepedia",
+            "There's An AI For That",
+            "Toolify"
+          ],
+          "status": "open"
+        },
+        {
+          "id": "competitor-action-3",
+          "title": "Validate AI Agent 工作流模板包 differentiation",
+          "description": "Draft a one-page validation brief for AI Agent 工作流模板包. Create a differentiated landing page outline for AI Agent 工作流模板包.",
+          "priority": "high",
+          "owner": "codex",
+          "relatedSection": "competitor",
+          "evidenceRefs": [
+            "Futurepedia",
+            "There's An AI For That",
+            "Toolify"
+          ],
+          "status": "open"
+        },
+        {
+          "id": "competitor-action-4",
+          "title": "Validate AI 视频工作流包 differentiation",
+          "description": "Draft a one-page validation brief for AI 视频工作流包. Create a differentiated landing page outline for AI 视频工作流包.",
+          "priority": "medium",
+          "owner": "codex",
+          "relatedSection": "competitor",
+          "evidenceRefs": [
+            "Futurepedia",
+            "There's An AI For That",
+            "Toolify"
+          ],
+          "status": "open"
+        },
+        {
+          "id": "competitor-action-5",
+          "title": "Create competitor-informed SEO/GEO comparison content",
+          "description": "Create a comparison content brief for the top competitor category. Add FAQ, how-to, source/date, and author blocks to the validation page.",
+          "priority": "medium",
+          "owner": "codex",
+          "relatedSection": "competitor",
+          "evidenceRefs": [
+            "Futurepedia",
+            "There's An AI For That",
+            "Toolify"
+          ],
+          "status": "open"
+        }
+      ]
+    },
+    {
+      "id": "data_source_readiness:2026-07-03:2026-07-03-data_source_readiness.json",
+      "filePath": "reports/ebos/evidence/data_source_readiness/2026-07-03-data_source_readiness.json",
+      "fileName": "2026-07-03-data_source_readiness.json",
+      "evidenceKind": "data_source_readiness",
+      "contractVersion": "ebos-evidence-v1",
+      "targetDate": "2026-07-03",
+      "generatedAt": "2026-07-03T02:33:56.987Z",
+      "environment": "unknown",
+      "generator": "scripts/check-ebos-data-sources.ts",
+      "confidence": "partial",
+      "dataCompleteness": "partial",
+      "warningsCount": 8,
+      "errorsCount": 0,
+      "actionItemsCount": 0,
+      "missingSources": [
+        "internal_database",
+        "google_search_console",
+        "google_analytics",
+        "bing_webmaster",
+        "cloudflare",
+        "whop",
+        "market_research",
+        "ai_search_probe"
+      ],
+      "validationStatus": "valid_with_warnings",
+      "payloadSummary": {
+        "configuredCount": 1,
+        "availableCount": 0,
+        "missingConfigCount": 8,
+        "missingIntegrations": [
+          "internal_database",
+          "google_search_console",
+          "google_analytics",
+          "bing_webmaster",
+          "cloudflare",
+          "whop",
+          "market_research",
+          "ai_search_probe"
+        ]
+      },
+      "warnings": [
+        {
+          "code": "missing_data",
+          "severity": "warning",
+          "message": "internal_database is not available for EBOS evidence.",
+          "source": "internal_database"
+        },
+        {
+          "code": "missing_data",
+          "severity": "warning",
+          "message": "google_search_console is not available for EBOS evidence.",
+          "source": "google_search_console"
+        },
+        {
+          "code": "missing_data",
+          "severity": "warning",
+          "message": "google_analytics is not available for EBOS evidence.",
+          "source": "google_analytics"
+        },
+        {
+          "code": "missing_data",
+          "severity": "warning",
+          "message": "bing_webmaster is not available for EBOS evidence.",
+          "source": "bing_webmaster"
+        },
+        {
+          "code": "missing_data",
+          "severity": "warning",
+          "message": "cloudflare is not available for EBOS evidence.",
+          "source": "cloudflare"
+        },
+        {
+          "code": "missing_data",
+          "severity": "warning",
+          "message": "whop is not available for EBOS evidence.",
+          "source": "whop"
+        },
+        {
+          "code": "missing_data",
+          "severity": "warning",
+          "message": "market_research is not available for EBOS evidence.",
+          "source": "market_research"
+        },
+        {
+          "code": "missing_data",
+          "severity": "warning",
+          "message": "ai_search_probe is not available for EBOS evidence.",
+          "source": "ai_search_probe"
+        }
+      ],
+      "actionItems": []
+    },
+    {
+      "id": "geo_evidence:2026-07-03:2026-07-03-geo_evidence.json",
+      "filePath": "reports/ebos/evidence/geo_evidence/2026-07-03-geo_evidence.json",
+      "fileName": "2026-07-03-geo_evidence.json",
+      "evidenceKind": "geo_evidence",
+      "contractVersion": "ebos-evidence-v1",
+      "targetDate": "2026-07-03",
+      "generatedAt": "2026-07-03T03:43:46.872Z",
+      "siteUrl": "https://www.enhe-tech.com.cn",
+      "environment": "unknown",
+      "generator": "scripts/generate-ebos-geo-evidence.ts",
+      "score": 95,
+      "confidence": "partial",
+      "dataCompleteness": "partial",
+      "warningsCount": 1,
+      "errorsCount": 0,
+      "actionItemsCount": 1,
+      "missingSources": [
+        "ai_search_probe"
+      ],
+      "validationStatus": "valid_with_warnings",
+      "payloadSummary": {
+        "summaryType": "geo_evidence",
+        "overallScore": 95,
+        "pagesAudited": 20,
+        "citationReadinessAverage": 100,
+        "actionItemsCount": 1,
+        "confidence": "partial"
+      },
+      "warnings": [
+        {
+          "code": "geo_probe_not_connected",
+          "severity": "warning",
+          "message": "Current GEO evidence measures page structure readiness and does not represent real AI search citation results.",
+          "source": "ai_search_probe"
+        }
+      ],
+      "actionItems": [
+        {
+          "id": "geo-product-summary",
+          "title": "Add summary sections to product pages",
+          "description": "Product pages need summary or overview sections for answer-engine extraction.",
+          "priority": "medium",
+          "owner": "codex",
+          "relatedSection": "geo",
+          "evidenceRefs": [],
+          "status": "open"
+        }
+      ]
+    },
+    {
+      "id": "health_snapshot:2026-07-03:2026-07-03-health_snapshot.json",
+      "filePath": "reports/ebos/evidence/health_snapshot/2026-07-03-health_snapshot.json",
+      "fileName": "2026-07-03-health_snapshot.json",
+      "evidenceKind": "health_snapshot",
+      "contractVersion": "ebos-evidence-v1",
+      "targetDate": "2026-07-03",
+      "generatedAt": "2026-07-03T02:33:32.597Z",
+      "environment": "unknown",
+      "generator": "scripts/generate-ebos-health-snapshot.ts",
+      "score": 91,
+      "grade": "excellent",
+      "confidence": "partial",
+      "dataCompleteness": "partial",
+      "warningsCount": 4,
+      "errorsCount": 0,
+      "actionItemsCount": 0,
+      "missingSources": [
+        "unit_tests",
+        "playwright_smoke",
+        "lighthouse"
+      ],
+      "validationStatus": "valid_with_warnings",
+      "payloadSummary": {
+        "score": 91,
+        "grade": "excellent",
+        "failedChecks": [],
+        "smokeChecksCount": 8,
+        "keyProductPagesStatus": {
+          "total": 5,
+          "passed": 5,
+          "failed": 0
+        }
+      },
+      "warnings": [
+        {
+          "code": "warning_1",
+          "severity": "info",
+          "message": "No failed health checks recorded."
+        },
+        {
+          "code": "partial_data",
+          "severity": "warning",
+          "message": "Unit Tests skipped: npm test",
+          "source": "unit_tests"
+        },
+        {
+          "code": "partial_data",
+          "severity": "warning",
+          "message": "Playwright Smoke skipped: npm run test:e2e",
+          "source": "playwright_smoke"
+        },
+        {
+          "code": "partial_data",
+          "severity": "warning",
+          "message": "Lighthouse skipped: lighthouse",
+          "source": "lighthouse"
+        }
+      ],
+      "actionItems": []
+    },
+    {
+      "id": "market_evidence:2026-07-03:2026-07-03-market_evidence.json",
+      "filePath": "reports/ebos/evidence/market_evidence/2026-07-03-market_evidence.json",
+      "fileName": "2026-07-03-market_evidence.json",
+      "evidenceKind": "market_evidence",
+      "contractVersion": "ebos-evidence-v1",
+      "targetDate": "2026-07-03",
+      "generatedAt": "2026-07-03T15:28:33.759Z",
+      "periodStart": "2026-06-29",
+      "periodEnd": "2026-07-05",
+      "environment": "unknown",
+      "generator": "scripts/generate-ebos-market-evidence.ts",
+      "score": 75,
+      "confidence": "partial",
+      "dataCompleteness": "partial",
+      "warningsCount": 1,
+      "errorsCount": 0,
+      "actionItemsCount": 5,
+      "missingSources": [
+        "manual_input"
+      ],
+      "validationStatus": "valid_with_warnings",
+      "payloadSummary": {
+        "summaryType": "market_evidence",
+        "overallScore": 75,
+        "signalsCount": 10,
+        "recommendedProductDirectionsCount": 5,
+        "topProductDirections": [
+          {
+            "productDirection": "AI Agent 工作流模板包",
+            "priorityScore": 76,
+            "recommendedAction": "validate_first"
+          },
+          {
+            "productDirection": "AI 视频工作流包",
+            "priorityScore": 75,
+            "recommendedAction": "validate_first"
+          },
+          {
+            "productDirection": "SEO/GEO 自动化内容集群",
+            "priorityScore": 75,
+            "recommendedAction": "validate_first"
+          },
+          {
+            "productDirection": "AI Prompt Kit",
+            "priorityScore": 74,
+            "recommendedAction": "validate_first"
+          },
+          {
+            "productDirection": "ComfyUI 工作流包",
+            "priorityScore": 67,
+            "recommendedAction": "validate_first"
+          }
+        ],
+        "actionItemsCount": 5,
+        "confidence": "partial"
+      },
+      "warnings": [
+        {
+          "code": "manual_market_seed",
+          "severity": "warning",
+          "message": "manual input 为市场观察方向种子，不代表真实搜索量、销量或趋势数据。",
+          "source": "manual_input"
+        }
+      ],
+      "actionItems": [
+        {
+          "id": "market-action-1",
+          "title": "验证市场机会：AI Agent 工作流模板包",
+          "description": "低成本验证 AI Agent 工作流模板包：发布预售/等候名单/内容测试。 用产品页点击、咨询、订单或手动购买意向验证需求。",
+          "priority": "high",
+          "owner": "codex",
+          "relatedSection": "market",
+          "evidenceRefs": [
+            "market-1tsszsm",
+            "market-1bi15hp"
+          ],
+          "status": "open"
+        },
+        {
+          "id": "market-action-2",
+          "title": "验证市场机会：AI 视频工作流包",
+          "description": "低成本验证 AI 视频工作流包：发布预售/等候名单/内容测试。 用产品页点击、咨询、订单或手动购买意向验证需求。",
+          "priority": "high",
+          "owner": "codex",
+          "relatedSection": "market",
+          "evidenceRefs": [
+            "market-1rmybsb"
+          ],
+          "status": "open"
+        },
+        {
+          "id": "market-action-3",
+          "title": "验证市场机会：SEO/GEO 自动化内容集群",
+          "description": "低成本验证 SEO/GEO 自动化内容集群：发布预售/等候名单/内容测试。 用产品页点击、咨询、订单或手动购买意向验证需求。",
+          "priority": "high",
+          "owner": "codex",
+          "relatedSection": "market",
+          "evidenceRefs": [
+            "market-1t5qjse"
+          ],
+          "status": "open"
+        },
+        {
+          "id": "market-action-4",
+          "title": "验证市场机会：AI Prompt Kit",
+          "description": "低成本验证 AI Prompt Kit：发布预售/等候名单/内容测试。 用产品页点击、咨询、订单或手动购买意向验证需求。",
+          "priority": "high",
+          "owner": "codex",
+          "relatedSection": "market",
+          "evidenceRefs": [
+            "market-b3dx3t"
+          ],
+          "status": "open"
+        },
+        {
+          "id": "market-action-5",
+          "title": "验证市场机会：ComfyUI 工作流包",
+          "description": "低成本验证 ComfyUI 工作流包：发布预售/等候名单/内容测试。 用产品页点击、咨询、订单或手动购买意向验证需求。",
+          "priority": "high",
+          "owner": "codex",
+          "relatedSection": "market",
+          "evidenceRefs": [
+            "market-g5vpzt",
+            "market-1m3nhxl"
+          ],
+          "status": "open"
+        }
+      ]
+    },
+    {
+      "id": "monthly_review:2026-07-01:2026-07-monthly_review.json",
+      "filePath": "reports/ebos/evidence/monthly_review/2026-07-monthly_review.json",
+      "fileName": "2026-07-monthly_review.json",
+      "evidenceKind": "monthly_review",
+      "contractVersion": "ebos-evidence-v1",
+      "targetDate": "2026-07-01",
+      "generatedAt": "2026-07-03T16:44:55.509Z",
+      "periodStart": "2026-07-01",
+      "periodEnd": "2026-07-31",
+      "environment": "unknown",
+      "generator": "scripts/generate-ebos-monthly-review.ts",
+      "score": 79.4,
+      "confidence": "partial",
+      "dataCompleteness": "complete",
+      "warningsCount": 0,
+      "errorsCount": 0,
+      "actionItemsCount": 1,
+      "validationStatus": "valid",
+      "payloadSummary": {
+        "overallScore": 79.4,
+        "evidenceUsedCount": 10,
+        "majorRisksCount": 2,
+        "nextMonthOKRsCount": 2,
+        "confidence": "partial"
+      },
+      "warnings": [],
+      "actionItems": [
+        {
+          "id": "reduce-execution-backlog",
+          "title": "减少执行积压",
+          "description": "把 open action items 分为本月必须完成、延后、废弃三类。",
+          "priority": "high",
+          "owner": "codex",
+          "evidenceRefs": [],
+          "status": "open"
+        }
+      ]
+    },
+    {
+      "id": "product_evidence:2026-07-03:2026-07-03-product_evidence.json",
+      "filePath": "reports/ebos/evidence/product_evidence/2026-07-03-product_evidence.json",
+      "fileName": "2026-07-03-product_evidence.json",
+      "evidenceKind": "product_evidence",
+      "contractVersion": "ebos-evidence-v1",
+      "targetDate": "2026-07-03",
+      "generatedAt": "2026-07-03T10:55:15.968Z",
+      "siteUrl": "https://www.enhe-tech.com.cn",
+      "environment": "unknown",
+      "generator": "scripts/generate-ebos-product-evidence.ts",
+      "score": 91,
+      "confidence": "complete",
+      "dataCompleteness": "complete",
+      "warningsCount": 0,
+      "errorsCount": 0,
+      "actionItemsCount": 3,
+      "validationStatus": "valid",
+      "payloadSummary": {
+        "summaryType": "product_evidence",
+        "overallScore": 91,
+        "productsAudited": 5,
+        "conversionRisksCount": 3,
+        "actionItemsCount": 3,
+        "confidence": "complete",
+        "databaseSummary": {
+          "totalProducts": 7,
+          "publishedProducts": 6,
+          "draftProducts": 1,
+          "productsWithPrice": 2,
+          "productsWithDownload": 2,
+          "productsWithFaq": 4,
+          "productsWithCover": 7,
+          "productsWithTags": 0,
+          "productsWithSeoFields": 7,
+          "productsWithGeoFields": 7
+        }
+      },
+      "warnings": [],
+      "actionItems": [
+        {
+          "id": "product-db-price",
+          "title": "Complete product price configuration",
+          "description": "Review published products and add price specs or paid download configuration where needed.",
+          "priority": "high",
+          "owner": "codex",
+          "relatedSection": "product",
+          "evidenceRefs": [],
+          "status": "open"
+        },
+        {
+          "id": "product-db-delivery",
+          "title": "Complete product download configuration",
+          "description": "Review published products and connect download files or online delivery URLs.",
+          "priority": "high",
+          "owner": "codex",
+          "relatedSection": "product",
+          "evidenceRefs": [],
+          "status": "open"
+        },
+        {
+          "id": "product-revenue-validation",
+          "title": "Select 1-2 products for revenue validation",
+          "description": "Connect product page, checkout, order, and revenue evidence for the highest-intent products.",
+          "priority": "high",
+          "owner": "codex",
+          "relatedSection": "product",
+          "evidenceRefs": [],
+          "status": "open"
+        }
+      ]
+    },
+    {
+      "id": "revenue_evidence:2026-07-03:2026-07-03-revenue_evidence.json",
+      "filePath": "reports/ebos/evidence/revenue_evidence/2026-07-03-revenue_evidence.json",
+      "fileName": "2026-07-03-revenue_evidence.json",
+      "evidenceKind": "revenue_evidence",
+      "contractVersion": "ebos-evidence-v1",
+      "targetDate": "2026-07-03",
+      "generatedAt": "2026-07-03T11:43:03.700Z",
+      "periodStart": "2026-06-29",
+      "periodEnd": "2026-07-05",
+      "siteUrl": "https://www.enhe-tech.com.cn",
+      "environment": "unknown",
+      "generator": "scripts/generate-ebos-revenue-evidence.ts",
+      "score": 50,
+      "confidence": "partial",
+      "dataCompleteness": "partial",
+      "warningsCount": 2,
+      "errorsCount": 0,
+      "actionItemsCount": 4,
+      "missingSources": [
+        "internal_database"
+      ],
+      "validationStatus": "valid_with_warnings",
+      "payloadSummary": {
+        "summaryType": "revenue_evidence",
+        "overallScore": 50,
+        "grossRevenue": 29,
+        "netRevenue": 0,
+        "totalOrders": 1,
+        "paidOrders": 1,
+        "firstRevenueAchieved": false,
+        "topProductRevenueMetrics": [
+          {
+            "productSlug": "upload-fix-local-app-1780594990538",
+            "productName": "Upload Fix Local App 1780594990538",
+            "netRevenue": 0,
+            "paidOrdersCount": 0
+          },
+          {
+            "productSlug": "e2e-vip-software-1779325662692-320",
+            "productName": "E2E VIP 软件 1779325662692-320",
+            "netRevenue": 0,
+            "paidOrdersCount": 0
+          },
+          {
+            "productSlug": "auto-local-tool-1780589814970",
+            "productName": "Auto Local Tool 1780589814970",
+            "netRevenue": 0,
+            "paidOrdersCount": 0
+          },
+          {
+            "productSlug": "tool-cmptpgzow0007toe0ld9yuc0w",
+            "productName": "测试",
+            "netRevenue": 0,
+            "paidOrdersCount": 0
+          },
+          {
+            "productSlug": "e2e-vip-online-1779325662692-320",
+            "productName": "E2E VIP 在线工具 1779325662692-320",
+            "netRevenue": 0,
+            "paidOrdersCount": 0
+          }
+        ],
+        "actionItemsCount": 4,
+        "confidence": "partial"
+      },
+      "warnings": [
+        {
+          "code": "currency_inferred",
+          "severity": "warning",
+          "message": "Currency inferred as CNY because no explicit currency field was detected.",
+          "source": "internal_database"
+        },
+        {
+          "code": "no_revenue",
+          "severity": "warning",
+          "message": "尚未完成第一批真实收入验证。",
+          "source": "internal_database"
+        }
+      ],
+      "actionItems": [
+        {
+          "id": "revenue-first-validation",
+          "title": "选择 1-2 个高 readiness 产品进行首批收入验证",
+          "description": "选择产品页 readiness 高、价格和交付配置较完整的产品，完成一次真实下单和支付验证。",
+          "priority": "critical",
+          "owner": "codex",
+          "relatedSection": "revenue",
+          "evidenceRefs": [],
+          "status": "open"
+        },
+        {
+          "id": "revenue-delivery-readiness",
+          "title": "补齐购买后的下载/交付承接",
+          "description": "对已有价格配置但缺少下载或交付配置的产品补齐文件、在线地址或售后说明。",
+          "priority": "high",
+          "owner": "codex",
+          "relatedSection": "revenue",
+          "evidenceRefs": [],
+          "status": "open"
+        },
+        {
+          "id": "revenue-validate-faceswap-studio-ai",
+          "title": "验证产品收入路径：FaceSwap Studio｜本地人像合成研究工具",
+          "description": "检查产品页 CTA、价格、下载交付、订单、支付、退款记录，并完成真实付费验证。",
+          "priority": "high",
+          "owner": "codex",
+          "relatedSection": "revenue",
+          "evidenceRefs": [],
+          "status": "open"
+        },
+        {
+          "id": "revenue-validate-local-ai-video-studio-for-creator-workflows",
+          "title": "验证产品收入路径：AI Video Studio｜本地视频生成工作台",
+          "description": "检查产品页 CTA、价格、下载交付、订单、支付、退款记录，并完成真实付费验证。",
+          "priority": "high",
+          "owner": "codex",
+          "relatedSection": "revenue",
+          "evidenceRefs": [],
+          "status": "open"
+        }
+      ]
+    },
+    {
+      "id": "seo_evidence:2026-07-03:2026-07-03-seo_evidence.json",
+      "filePath": "reports/ebos/evidence/seo_evidence/2026-07-03-seo_evidence.json",
+      "fileName": "2026-07-03-seo_evidence.json",
+      "evidenceKind": "seo_evidence",
+      "contractVersion": "ebos-evidence-v1",
+      "targetDate": "2026-07-03",
+      "generatedAt": "2026-07-03T03:43:30.656Z",
+      "siteUrl": "https://www.enhe-tech.com.cn",
+      "environment": "unknown",
+      "generator": "scripts/generate-ebos-seo-evidence.ts",
+      "score": 90,
+      "confidence": "complete",
+      "dataCompleteness": "complete",
+      "warningsCount": 0,
+      "errorsCount": 0,
+      "actionItemsCount": 0,
+      "validationStatus": "valid",
+      "payloadSummary": {
+        "summaryType": "seo_evidence",
+        "overallScore": 90,
+        "pagesAudited": 20,
+        "technicalRisksCount": 0,
+        "actionItemsCount": 0,
+        "confidence": "complete"
+      },
+      "warnings": [],
+      "actionItems": []
+    },
+    {
+      "id": "weekly_report:2026-06-29:2026-06-29-weekly_report.json",
+      "filePath": "reports/ebos/evidence/weekly_report/2026-06-29-weekly_report.json",
+      "fileName": "2026-06-29-weekly_report.json",
+      "evidenceKind": "weekly_report",
+      "contractVersion": "ebos-evidence-v1",
+      "targetDate": "2026-06-29",
+      "generatedAt": "2026-07-03T04:00:00.000Z",
+      "periodStart": "2026-06-29",
+      "periodEnd": "2026-07-05",
+      "environment": "unknown",
+      "generator": "scripts/generate-ebos-weekly-report.ts",
+      "score": 74.1,
+      "confidence": "partial",
+      "dataCompleteness": "partial",
+      "warningsCount": 14,
+      "errorsCount": 0,
+      "actionItemsCount": 39,
+      "missingSources": [
+        "google_search_console",
+        "google_analytics",
+        "cloudflare",
+        "whop",
+        "market_research",
+        "ai_search_probe",
+        "internal_database",
+        "bing_webmaster"
+      ],
+      "validationStatus": "valid_with_warnings",
+      "payloadSummary": {
+        "weeklyScore": 74.1,
+        "topActionItems": [
+          "选择 1-2 个高 readiness 产品进行首批收入验证",
+          "补齐购买后的下载/交付承接",
+          "验证产品收入路径：FaceSwap Studio｜本地人像合成研究工具",
+          "验证产品收入路径：AI Video Studio｜本地视频生成工作台",
+          "补齐流量来源数据源"
+        ],
+        "sectionCount": 10,
+        "confidence": "partial"
+      },
+      "warnings": [
+        {
+          "code": "missing_data",
+          "severity": "warning",
+          "message": "EBOS data source google_search_console is missing for this report.",
+          "source": "google_search_console"
+        },
+        {
+          "code": "missing_data",
+          "severity": "warning",
+          "message": "EBOS data source google_analytics is missing for this report.",
+          "source": "google_analytics"
+        },
+        {
+          "code": "missing_data",
+          "severity": "warning",
+          "message": "EBOS data source cloudflare is missing for this report.",
+          "source": "cloudflare"
+        },
+        {
+          "code": "missing_data",
+          "severity": "warning",
+          "message": "EBOS data source whop is missing for this report.",
+          "source": "whop"
+        },
+        {
+          "code": "missing_data",
+          "severity": "warning",
+          "message": "EBOS data source market_research is missing for this report.",
+          "source": "market_research"
+        },
+        {
+          "code": "missing_data",
+          "severity": "warning",
+          "message": "EBOS data source ai_search_probe is missing for this report.",
+          "source": "ai_search_probe"
+        },
+        {
+          "code": "missing_data",
+          "severity": "warning",
+          "message": "Internal Database data source is missing_config. Missing config: DATABASE_URL.",
+          "source": "internal_database"
+        },
+        {
+          "code": "missing_data",
+          "severity": "warning",
+          "message": "Google Search Console data source is missing_config. Missing config: GOOGLE_SERVICE_ACCOUNT_EMAIL, GOOGLE_SERVICE_ACCOUNT_PRIVATE_KEY, GOOGLE_SEARCH_CONSOLE_SITE_URL.",
+          "source": "google_search_console"
+        },
+        {
+          "code": "missing_data",
+          "severity": "warning",
+          "message": "Google Analytics data source is missing_config. Missing config: GA_PROPERTY_ID, GOOGLE_SERVICE_ACCOUNT_EMAIL, GOOGLE_SERVICE_ACCOUNT_PRIVATE_KEY.",
+          "source": "google_analytics"
+        },
+        {
+          "code": "missing_data",
+          "severity": "warning",
+          "message": "Bing Webmaster data source is missing_config. Missing config: BING_WEBMASTER_API_KEY, BING_SITE_URL.",
+          "source": "bing_webmaster"
+        },
+        {
+          "code": "missing_data",
+          "severity": "warning",
+          "message": "Cloudflare data source is missing_config. Missing config: CLOUDFLARE_API_TOKEN, CLOUDFLARE_ZONE_ID.",
+          "source": "cloudflare"
+        },
+        {
+          "code": "missing_data",
+          "severity": "warning",
+          "message": "Whop data source is missing_config. Missing config: WHOP_API_KEY, WHOP_COMPANY_ID.",
+          "source": "whop"
+        },
+        {
+          "code": "missing_data",
+          "severity": "warning",
+          "message": "Market Research data source is missing_config. Missing config: EBOS_MARKET_RSS_SOURCES, EBOS_REDDIT_SOURCES, EBOS_GITHUB_TRENDING_ENABLED.",
+          "source": "market_research"
+        },
+        {
+          "code": "missing_data",
+          "severity": "warning",
+          "message": "AI Search Probe data source is missing_config. Missing config: EBOS_AI_SEARCH_PROBE_ENABLED, EBOS_AI_SEARCH_PROVIDERS.",
+          "source": "ai_search_probe"
+        }
+      ],
+      "actionItems": [
+        {
+          "id": "action-1",
+          "title": "选择 1-2 个高 readiness 产品进行首批收入验证",
+          "description": "选择产品页 readiness 高、价格和交付配置较完整的产品，完成一次真实下单和支付验证。",
+          "priority": "high",
+          "owner": "codex",
+          "relatedSection": "revenue",
+          "evidenceRefs": [],
+          "status": "open"
+        },
+        {
+          "id": "action-2",
+          "title": "补齐购买后的下载/交付承接",
+          "description": "对已有价格配置但缺少下载或交付配置的产品补齐文件、在线地址或售后说明。",
+          "priority": "high",
+          "owner": "codex",
+          "relatedSection": "revenue",
+          "evidenceRefs": [],
+          "status": "open"
+        },
+        {
+          "id": "action-3",
+          "title": "验证产品收入路径：FaceSwap Studio｜本地人像合成研究工具",
+          "description": "检查产品页 CTA、价格、下载交付、订单、支付、退款记录，并完成真实付费验证。",
+          "priority": "high",
+          "owner": "codex",
+          "relatedSection": "revenue",
+          "evidenceRefs": [],
+          "status": "open"
+        },
+        {
+          "id": "action-4",
+          "title": "验证产品收入路径：AI Video Studio｜本地视频生成工作台",
+          "description": "检查产品页 CTA、价格、下载交付、订单、支付、退款记录，并完成真实付费验证。",
+          "priority": "high",
+          "owner": "codex",
+          "relatedSection": "revenue",
+          "evidenceRefs": [],
+          "status": "open"
+        },
+        {
+          "id": "action-5",
+          "title": "补齐流量来源数据源",
+          "description": "下一版 EBOS 可展示 GA/Cloudflare 或明确 warning。",
+          "priority": "medium",
+          "owner": "codex",
+          "relatedSection": "traffic",
+          "evidenceRefs": [],
+          "status": "open"
+        },
+        {
+          "id": "action-6",
+          "title": "Add summary sections to product pages",
+          "description": "Product pages need summary or overview sections for answer-engine extraction.",
+          "priority": "medium",
+          "owner": "codex",
+          "relatedSection": "geo",
+          "evidenceRefs": [],
+          "status": "open"
+        },
+        {
+          "id": "action-7",
+          "title": "Complete product price configuration",
+          "description": "Review published products and add price specs or paid download configuration where needed.",
+          "priority": "high",
+          "owner": "codex",
+          "relatedSection": "product",
+          "evidenceRefs": [],
+          "status": "open"
+        },
+        {
+          "id": "action-8",
+          "title": "Complete product download configuration",
+          "description": "Review published products and connect download files or online delivery URLs.",
+          "priority": "high",
+          "owner": "codex",
+          "relatedSection": "product",
+          "evidenceRefs": [],
+          "status": "open"
+        },
+        {
+          "id": "action-9",
+          "title": "Select 1-2 products for revenue validation",
+          "description": "Connect product page, checkout, order, and revenue evidence for the highest-intent products.",
+          "priority": "high",
+          "owner": "codex",
+          "relatedSection": "product",
+          "evidenceRefs": [],
+          "status": "open"
+        },
+        {
+          "id": "action-10",
+          "title": "为高意图内容补转化入口",
+          "description": "至少 3 篇内容新增自然内部链接和下一步 CTA。",
+          "priority": "medium",
+          "owner": "codex",
+          "relatedSection": "content",
+          "evidenceRefs": [],
+          "status": "open"
+        },
+        {
+          "id": "action-11",
+          "title": "验证市场机会：AI Agent 工作流模板包",
+          "description": "低成本验证 AI Agent 工作流模板包：发布预售/等候名单/内容测试。 用产品页点击、咨询、订单或手动购买意向验证需求。",
+          "priority": "high",
+          "owner": "codex",
+          "relatedSection": "market",
+          "evidenceRefs": [],
+          "status": "open"
+        },
+        {
+          "id": "action-12",
+          "title": "验证市场机会：AI 视频工作流包",
+          "description": "低成本验证 AI 视频工作流包：发布预售/等候名单/内容测试。 用产品页点击、咨询、订单或手动购买意向验证需求。",
+          "priority": "high",
+          "owner": "codex",
+          "relatedSection": "market",
+          "evidenceRefs": [],
+          "status": "open"
+        },
+        {
+          "id": "action-13",
+          "title": "验证市场机会：SEO/GEO 自动化内容集群",
+          "description": "低成本验证 SEO/GEO 自动化内容集群：发布预售/等候名单/内容测试。 用产品页点击、咨询、订单或手动购买意向验证需求。",
+          "priority": "high",
+          "owner": "codex",
+          "relatedSection": "market",
+          "evidenceRefs": [],
+          "status": "open"
+        },
+        {
+          "id": "action-14",
+          "title": "验证市场机会：AI Prompt Kit",
+          "description": "低成本验证 AI Prompt Kit：发布预售/等候名单/内容测试。 用产品页点击、咨询、订单或手动购买意向验证需求。",
+          "priority": "high",
+          "owner": "codex",
+          "relatedSection": "market",
+          "evidenceRefs": [],
+          "status": "open"
+        },
+        {
+          "id": "action-15",
+          "title": "验证市场机会：ComfyUI 工作流包",
+          "description": "低成本验证 ComfyUI 工作流包：发布预售/等候名单/内容测试。 用产品页点击、咨询、订单或手动购买意向验证需求。",
+          "priority": "high",
+          "owner": "codex",
+          "relatedSection": "market",
+          "evidenceRefs": [],
+          "status": "open"
+        },
+        {
+          "id": "action-16",
+          "title": "Validate AI Prompt Kit differentiation",
+          "description": "Draft a one-page validation brief for AI Prompt Kit. Create a differentiated landing page outline for AI Prompt Kit.",
+          "priority": "high",
+          "owner": "codex",
+          "relatedSection": "competitor",
+          "evidenceRefs": [],
+          "status": "open"
+        },
+        {
+          "id": "action-17",
+          "title": "Validate SEO/GEO 自动化内容集群 differentiation",
+          "description": "Draft a one-page validation brief for SEO/GEO 自动化内容集群. Create a differentiated landing page outline for SEO/GEO 自动化内容集群.",
+          "priority": "high",
+          "owner": "codex",
+          "relatedSection": "competitor",
+          "evidenceRefs": [],
+          "status": "open"
+        },
+        {
+          "id": "action-18",
+          "title": "Validate AI Agent 工作流模板包 differentiation",
+          "description": "Draft a one-page validation brief for AI Agent 工作流模板包. Create a differentiated landing page outline for AI Agent 工作流模板包.",
+          "priority": "high",
+          "owner": "codex",
+          "relatedSection": "competitor",
+          "evidenceRefs": [],
+          "status": "open"
+        },
+        {
+          "id": "action-19",
+          "title": "Validate AI 视频工作流包 differentiation",
+          "description": "Draft a one-page validation brief for AI 视频工作流包. Create a differentiated landing page outline for AI 视频工作流包.",
+          "priority": "medium",
+          "owner": "codex",
+          "relatedSection": "competitor",
+          "evidenceRefs": [],
+          "status": "open"
+        },
+        {
+          "id": "action-20",
+          "title": "Create competitor-informed SEO/GEO comparison content",
+          "description": "Create a comparison content brief for the top competitor category. Add FAQ, how-to, source/date, and author blocks to the validation page.",
+          "priority": "medium",
+          "owner": "codex",
+          "relatedSection": "competitor",
+          "evidenceRefs": [],
+          "status": "open"
+        },
+        {
+          "id": "action-21",
+          "title": "skipped check unit_tests; wire it into the health snapshot when the command is ready.",
+          "description": "下一次 EBOS health snapshot 中对应检查通过或被明确标记为 skipped。",
+          "priority": "medium",
+          "owner": "codex",
+          "relatedSection": "website_health",
+          "evidenceRefs": [],
+          "status": "open"
+        },
+        {
+          "id": "action-22",
+          "title": "skipped check playwright_smoke; wire it into the health snapshot when the command is ready.",
+          "description": "下一次 EBOS health snapshot 中对应检查通过或被明确标记为 skipped。",
+          "priority": "medium",
+          "owner": "codex",
+          "relatedSection": "website_health",
+          "evidenceRefs": [],
+          "status": "open"
+        },
+        {
+          "id": "action-23",
+          "title": "skipped check lighthouse; wire it into the health snapshot when the command is ready.",
+          "description": "下一次 EBOS health snapshot 中对应检查通过或被明确标记为 skipped。",
+          "priority": "medium",
+          "owner": "codex",
+          "relatedSection": "website_health",
+          "evidenceRefs": [],
+          "status": "open"
+        },
+        {
+          "id": "action-24",
+          "title": "接入 AI Search Probe / GEO 可见度巡检",
+          "description": "建立 ChatGPT、Perplexity、Google AI Overview、豆包、Kimi 等回答引擎的抽样记录。",
+          "priority": "medium",
+          "owner": "codex",
+          "relatedSection": "geo",
+          "evidenceRefs": [],
+          "status": "open"
+        },
+        {
+          "id": "action-25",
+          "title": "Add summary sections to product pages",
+          "description": "Product pages need summary or overview sections for answer-engine extraction.",
+          "priority": "medium",
+          "owner": "codex",
+          "relatedSection": "geo",
+          "evidenceRefs": [],
+          "status": "open"
+        },
+        {
+          "id": "action-26",
+          "title": "Complete product price configuration",
+          "description": "Review published products and add price specs or paid download configuration where needed.",
+          "priority": "high",
+          "owner": "codex",
+          "relatedSection": "product",
+          "evidenceRefs": [],
+          "status": "open"
+        },
+        {
+          "id": "action-27",
+          "title": "Complete product download configuration",
+          "description": "Review published products and connect download files or online delivery URLs.",
+          "priority": "high",
+          "owner": "codex",
+          "relatedSection": "product",
+          "evidenceRefs": [],
+          "status": "open"
+        },
+        {
+          "id": "action-28",
+          "title": "选择 1-2 个高 readiness 产品进行首批收入验证",
+          "description": "选择产品页 readiness 高、价格和交付配置较完整的产品，完成一次真实下单和支付验证。",
+          "priority": "high",
+          "owner": "codex",
+          "relatedSection": "revenue",
+          "evidenceRefs": [],
+          "status": "open"
+        },
+        {
+          "id": "action-29",
+          "title": "补齐购买后的下载/交付承接",
+          "description": "对已有价格配置但缺少下载或交付配置的产品补齐文件、在线地址或售后说明。",
+          "priority": "high",
+          "owner": "codex",
+          "relatedSection": "revenue",
+          "evidenceRefs": [],
+          "status": "open"
+        },
+        {
+          "id": "action-30",
+          "title": "验证市场机会：AI Agent 工作流模板包",
+          "description": "低成本验证 AI Agent 工作流模板包：发布预售/等候名单/内容测试。 用产品页点击、咨询、订单或手动购买意向验证需求。",
+          "priority": "high",
+          "owner": "codex",
+          "relatedSection": "market",
+          "evidenceRefs": [],
+          "status": "open"
+        },
+        {
+          "id": "action-31",
+          "title": "验证市场机会：AI 视频工作流包",
+          "description": "低成本验证 AI 视频工作流包：发布预售/等候名单/内容测试。 用产品页点击、咨询、订单或手动购买意向验证需求。",
+          "priority": "high",
+          "owner": "codex",
+          "relatedSection": "market",
+          "evidenceRefs": [],
+          "status": "open"
+        },
+        {
+          "id": "action-32",
+          "title": "接入 AI Search Probe / GEO 可见度巡检",
+          "description": "建立 ChatGPT、Perplexity、Google AI Overview、豆包、Kimi 等回答引擎的抽样记录。",
+          "priority": "medium",
+          "owner": "codex",
+          "relatedSection": "geo",
+          "evidenceRefs": [],
+          "status": "open"
+        },
+        {
+          "id": "action-33",
+          "title": "Add summary sections to product pages",
+          "description": "Product pages need summary or overview sections for answer-engine extraction.",
+          "priority": "medium",
+          "owner": "codex",
+          "relatedSection": "geo",
+          "evidenceRefs": [],
+          "status": "open"
+        },
+        {
+          "id": "action-34",
+          "title": "Complete product price configuration",
+          "description": "Review published products and add price specs or paid download configuration where needed.",
+          "priority": "high",
+          "owner": "codex",
+          "relatedSection": "product",
+          "evidenceRefs": [],
+          "status": "open"
+        },
+        {
+          "id": "action-35",
+          "title": "Complete product download configuration",
+          "description": "Review published products and connect download files or online delivery URLs.",
+          "priority": "high",
+          "owner": "codex",
+          "relatedSection": "product",
+          "evidenceRefs": [],
+          "status": "open"
+        },
+        {
+          "id": "action-36",
+          "title": "选择 1-2 个高 readiness 产品进行首批收入验证",
+          "description": "选择产品页 readiness 高、价格和交付配置较完整的产品，完成一次真实下单和支付验证。",
+          "priority": "high",
+          "owner": "codex",
+          "relatedSection": "revenue",
+          "evidenceRefs": [],
+          "status": "open"
+        },
+        {
+          "id": "action-37",
+          "title": "补齐购买后的下载/交付承接",
+          "description": "对已有价格配置但缺少下载或交付配置的产品补齐文件、在线地址或售后说明。",
+          "priority": "high",
+          "owner": "codex",
+          "relatedSection": "revenue",
+          "evidenceRefs": [],
+          "status": "open"
+        },
+        {
+          "id": "action-38",
+          "title": "验证市场机会：AI Agent 工作流模板包",
+          "description": "低成本验证 AI Agent 工作流模板包：发布预售/等候名单/内容测试。 用产品页点击、咨询、订单或手动购买意向验证需求。",
+          "priority": "high",
+          "owner": "codex",
+          "relatedSection": "market",
+          "evidenceRefs": [],
+          "status": "open"
+        },
+        {
+          "id": "action-39",
+          "title": "验证市场机会：AI 视频工作流包",
+          "description": "低成本验证 AI 视频工作流包：发布预售/等候名单/内容测试。 用产品页点击、咨询、订单或手动购买意向验证需求。",
+          "priority": "high",
+          "owner": "codex",
+          "relatedSection": "market",
+          "evidenceRefs": [],
+          "status": "open"
+        }
+      ]
+    }
+  ],
+  "summary": {
+    "byKind": {
+      "competitor_evidence": 1,
+      "data_source_readiness": 1,
+      "geo_evidence": 1,
+      "health_snapshot": 1,
+      "market_evidence": 1,
+      "monthly_review": 1,
+      "product_evidence": 1,
+      "revenue_evidence": 1,
+      "seo_evidence": 1,
+      "weekly_report": 1
+    },
+    "byConfidence": {
+      "partial": 8,
+      "complete": 2
+    },
+    "byValidationStatus": {
+      "valid_with_warnings": 7,
+      "valid": 3
+    },
+    "latestByKind": {
+      "monthly_review": {
+        "id": "monthly_review:2026-07-01:2026-07-monthly_review.json",
+        "filePath": "reports/ebos/evidence/monthly_review/2026-07-monthly_review.json",
+        "fileName": "2026-07-monthly_review.json",
+        "evidenceKind": "monthly_review",
+        "contractVersion": "ebos-evidence-v1",
+        "targetDate": "2026-07-01",
+        "generatedAt": "2026-07-03T16:44:55.509Z",
+        "periodStart": "2026-07-01",
+        "periodEnd": "2026-07-31",
+        "environment": "unknown",
+        "generator": "scripts/generate-ebos-monthly-review.ts",
+        "score": 79.4,
+        "confidence": "partial",
+        "dataCompleteness": "complete",
+        "warningsCount": 0,
+        "errorsCount": 0,
+        "actionItemsCount": 1,
+        "validationStatus": "valid",
+        "payloadSummary": {
+          "overallScore": 79.4,
+          "evidenceUsedCount": 10,
+          "majorRisksCount": 2,
+          "nextMonthOKRsCount": 2,
+          "confidence": "partial"
+        },
+        "warnings": [],
+        "actionItems": [
+          {
+            "id": "reduce-execution-backlog",
+            "title": "减少执行积压",
+            "description": "把 open action items 分为本月必须完成、延后、废弃三类。",
+            "priority": "high",
+            "owner": "codex",
+            "evidenceRefs": [],
+            "status": "open"
+          }
+        ]
+      },
+      "competitor_evidence": {
+        "id": "competitor_evidence:2026-07-03:2026-07-03-competitor_evidence.json",
+        "filePath": "reports/ebos/evidence/competitor_evidence/2026-07-03-competitor_evidence.json",
+        "fileName": "2026-07-03-competitor_evidence.json",
+        "evidenceKind": "competitor_evidence",
+        "contractVersion": "ebos-evidence-v1",
+        "targetDate": "2026-07-03",
+        "generatedAt": "2026-07-03T16:44:06.637Z",
+        "periodStart": "2026-06-29",
+        "periodEnd": "2026-07-05",
+        "environment": "unknown",
+        "generator": "scripts/generate-ebos-competitor-evidence.ts",
+        "score": 69,
+        "confidence": "partial",
+        "dataCompleteness": "partial",
+        "warningsCount": 5,
+        "errorsCount": 0,
+        "actionItemsCount": 5,
+        "missingSources": [
+          "manual_input",
+          "market_research"
+        ],
+        "validationStatus": "valid_with_warnings",
+        "payloadSummary": {
+          "summaryType": "competitor_evidence",
+          "overallScore": 69,
+          "competitorsCount": 3,
+          "competitorsAuditedCount": 3,
+          "includeNetworkSources": true,
+          "pagesAttempted": 6,
+          "pagesSucceeded": 3,
+          "pagesFailed": 3,
+          "opportunitiesCount": 6,
+          "topDifferentiationOpportunities": [
+            {
+              "title": "Validate AI Prompt Kit differentiation",
+              "priorityScore": 72,
+              "recommendedAction": "validate_first"
+            },
+            {
+              "title": "Validate SEO/GEO 自动化内容集群 differentiation",
+              "priorityScore": 68,
+              "recommendedAction": "validate_first"
+            },
+            {
+              "title": "Validate AI Agent 工作流模板包 differentiation",
+              "priorityScore": 67,
+              "recommendedAction": "validate_first"
+            },
+            {
+              "title": "Validate AI 视频工作流包 differentiation",
+              "priorityScore": 63,
+              "recommendedAction": "improve_existing_product"
+            },
+            {
+              "title": "Create competitor-informed SEO/GEO comparison content",
+              "priorityScore": 61,
+              "recommendedAction": "create_content_first"
+            }
+          ],
+          "actionItemsCount": 5,
+          "confidence": "partial"
+        },
+        "warnings": [
+          {
+            "code": "default_competitor_seed",
+            "severity": "warning",
+            "message": "Competitor seeds are observation targets only and do not represent a complete competitor list.",
+            "source": "manual_input"
+          },
+          {
+            "code": "competitor_page_unavailable",
+            "severity": "warning",
+            "message": "Public competitor page https://www.futurepedia.io/pricing could not be read; continuing without it. HTTP 404",
+            "source": "market_research"
+          },
+          {
+            "code": "competitor_page_unavailable",
+            "severity": "warning",
+            "message": "Public competitor page https://theresanaiforthat.com/pricing could not be read; continuing without it. HTTP 403",
+            "source": "market_research"
+          },
+          {
+            "code": "competitor_page_unavailable",
+            "severity": "warning",
+            "message": "Public competitor page https://www.toolify.ai/category could not be read; continuing without it. HTTP 403",
+            "source": "market_research"
+          },
+          {
+            "code": "competitor_public_audit_thin",
+            "severity": "warning",
+            "message": "Public competitor URL audit was enabled, but successful page coverage is too thin for complete competitor confidence.",
+            "source": "market_research"
+          }
+        ],
+        "actionItems": [
+          {
+            "id": "competitor-action-1",
+            "title": "Validate AI Prompt Kit differentiation",
+            "description": "Draft a one-page validation brief for AI Prompt Kit. Create a differentiated landing page outline for AI Prompt Kit.",
+            "priority": "high",
+            "owner": "codex",
+            "relatedSection": "competitor",
+            "evidenceRefs": [
+              "Futurepedia",
+              "There's An AI For That",
+              "Toolify"
+            ],
+            "status": "open"
+          },
+          {
+            "id": "competitor-action-2",
+            "title": "Validate SEO/GEO 自动化内容集群 differentiation",
+            "description": "Draft a one-page validation brief for SEO/GEO 自动化内容集群. Create a differentiated landing page outline for SEO/GEO 自动化内容集群.",
+            "priority": "high",
+            "owner": "codex",
+            "relatedSection": "competitor",
+            "evidenceRefs": [
+              "Futurepedia",
+              "There's An AI For That",
+              "Toolify"
+            ],
+            "status": "open"
+          },
+          {
+            "id": "competitor-action-3",
+            "title": "Validate AI Agent 工作流模板包 differentiation",
+            "description": "Draft a one-page validation brief for AI Agent 工作流模板包. Create a differentiated landing page outline for AI Agent 工作流模板包.",
+            "priority": "high",
+            "owner": "codex",
+            "relatedSection": "competitor",
+            "evidenceRefs": [
+              "Futurepedia",
+              "There's An AI For That",
+              "Toolify"
+            ],
+            "status": "open"
+          },
+          {
+            "id": "competitor-action-4",
+            "title": "Validate AI 视频工作流包 differentiation",
+            "description": "Draft a one-page validation brief for AI 视频工作流包. Create a differentiated landing page outline for AI 视频工作流包.",
+            "priority": "medium",
+            "owner": "codex",
+            "relatedSection": "competitor",
+            "evidenceRefs": [
+              "Futurepedia",
+              "There's An AI For That",
+              "Toolify"
+            ],
+            "status": "open"
+          },
+          {
+            "id": "competitor-action-5",
+            "title": "Create competitor-informed SEO/GEO comparison content",
+            "description": "Create a comparison content brief for the top competitor category. Add FAQ, how-to, source/date, and author blocks to the validation page.",
+            "priority": "medium",
+            "owner": "codex",
+            "relatedSection": "competitor",
+            "evidenceRefs": [
+              "Futurepedia",
+              "There's An AI For That",
+              "Toolify"
+            ],
+            "status": "open"
+          }
+        ]
+      },
+      "market_evidence": {
+        "id": "market_evidence:2026-07-03:2026-07-03-market_evidence.json",
+        "filePath": "reports/ebos/evidence/market_evidence/2026-07-03-market_evidence.json",
+        "fileName": "2026-07-03-market_evidence.json",
+        "evidenceKind": "market_evidence",
+        "contractVersion": "ebos-evidence-v1",
+        "targetDate": "2026-07-03",
+        "generatedAt": "2026-07-03T15:28:33.759Z",
+        "periodStart": "2026-06-29",
+        "periodEnd": "2026-07-05",
+        "environment": "unknown",
+        "generator": "scripts/generate-ebos-market-evidence.ts",
+        "score": 75,
+        "confidence": "partial",
+        "dataCompleteness": "partial",
+        "warningsCount": 1,
+        "errorsCount": 0,
+        "actionItemsCount": 5,
+        "missingSources": [
+          "manual_input"
+        ],
+        "validationStatus": "valid_with_warnings",
+        "payloadSummary": {
+          "summaryType": "market_evidence",
+          "overallScore": 75,
+          "signalsCount": 10,
+          "recommendedProductDirectionsCount": 5,
+          "topProductDirections": [
+            {
+              "productDirection": "AI Agent 工作流模板包",
+              "priorityScore": 76,
+              "recommendedAction": "validate_first"
+            },
+            {
+              "productDirection": "AI 视频工作流包",
+              "priorityScore": 75,
+              "recommendedAction": "validate_first"
+            },
+            {
+              "productDirection": "SEO/GEO 自动化内容集群",
+              "priorityScore": 75,
+              "recommendedAction": "validate_first"
+            },
+            {
+              "productDirection": "AI Prompt Kit",
+              "priorityScore": 74,
+              "recommendedAction": "validate_first"
+            },
+            {
+              "productDirection": "ComfyUI 工作流包",
+              "priorityScore": 67,
+              "recommendedAction": "validate_first"
+            }
+          ],
+          "actionItemsCount": 5,
+          "confidence": "partial"
+        },
+        "warnings": [
+          {
+            "code": "manual_market_seed",
+            "severity": "warning",
+            "message": "manual input 为市场观察方向种子，不代表真实搜索量、销量或趋势数据。",
+            "source": "manual_input"
+          }
+        ],
+        "actionItems": [
+          {
+            "id": "market-action-1",
+            "title": "验证市场机会：AI Agent 工作流模板包",
+            "description": "低成本验证 AI Agent 工作流模板包：发布预售/等候名单/内容测试。 用产品页点击、咨询、订单或手动购买意向验证需求。",
+            "priority": "high",
+            "owner": "codex",
+            "relatedSection": "market",
+            "evidenceRefs": [
+              "market-1tsszsm",
+              "market-1bi15hp"
+            ],
+            "status": "open"
+          },
+          {
+            "id": "market-action-2",
+            "title": "验证市场机会：AI 视频工作流包",
+            "description": "低成本验证 AI 视频工作流包：发布预售/等候名单/内容测试。 用产品页点击、咨询、订单或手动购买意向验证需求。",
+            "priority": "high",
+            "owner": "codex",
+            "relatedSection": "market",
+            "evidenceRefs": [
+              "market-1rmybsb"
+            ],
+            "status": "open"
+          },
+          {
+            "id": "market-action-3",
+            "title": "验证市场机会：SEO/GEO 自动化内容集群",
+            "description": "低成本验证 SEO/GEO 自动化内容集群：发布预售/等候名单/内容测试。 用产品页点击、咨询、订单或手动购买意向验证需求。",
+            "priority": "high",
+            "owner": "codex",
+            "relatedSection": "market",
+            "evidenceRefs": [
+              "market-1t5qjse"
+            ],
+            "status": "open"
+          },
+          {
+            "id": "market-action-4",
+            "title": "验证市场机会：AI Prompt Kit",
+            "description": "低成本验证 AI Prompt Kit：发布预售/等候名单/内容测试。 用产品页点击、咨询、订单或手动购买意向验证需求。",
+            "priority": "high",
+            "owner": "codex",
+            "relatedSection": "market",
+            "evidenceRefs": [
+              "market-b3dx3t"
+            ],
+            "status": "open"
+          },
+          {
+            "id": "market-action-5",
+            "title": "验证市场机会：ComfyUI 工作流包",
+            "description": "低成本验证 ComfyUI 工作流包：发布预售/等候名单/内容测试。 用产品页点击、咨询、订单或手动购买意向验证需求。",
+            "priority": "high",
+            "owner": "codex",
+            "relatedSection": "market",
+            "evidenceRefs": [
+              "market-g5vpzt",
+              "market-1m3nhxl"
+            ],
+            "status": "open"
+          }
+        ]
+      },
+      "revenue_evidence": {
+        "id": "revenue_evidence:2026-07-03:2026-07-03-revenue_evidence.json",
+        "filePath": "reports/ebos/evidence/revenue_evidence/2026-07-03-revenue_evidence.json",
+        "fileName": "2026-07-03-revenue_evidence.json",
+        "evidenceKind": "revenue_evidence",
+        "contractVersion": "ebos-evidence-v1",
+        "targetDate": "2026-07-03",
+        "generatedAt": "2026-07-03T11:43:03.700Z",
+        "periodStart": "2026-06-29",
+        "periodEnd": "2026-07-05",
+        "siteUrl": "https://www.enhe-tech.com.cn",
+        "environment": "unknown",
+        "generator": "scripts/generate-ebos-revenue-evidence.ts",
+        "score": 50,
+        "confidence": "partial",
+        "dataCompleteness": "partial",
+        "warningsCount": 2,
+        "errorsCount": 0,
+        "actionItemsCount": 4,
+        "missingSources": [
+          "internal_database"
+        ],
+        "validationStatus": "valid_with_warnings",
+        "payloadSummary": {
+          "summaryType": "revenue_evidence",
+          "overallScore": 50,
+          "grossRevenue": 29,
+          "netRevenue": 0,
+          "totalOrders": 1,
+          "paidOrders": 1,
+          "firstRevenueAchieved": false,
+          "topProductRevenueMetrics": [
+            {
+              "productSlug": "upload-fix-local-app-1780594990538",
+              "productName": "Upload Fix Local App 1780594990538",
+              "netRevenue": 0,
+              "paidOrdersCount": 0
+            },
+            {
+              "productSlug": "e2e-vip-software-1779325662692-320",
+              "productName": "E2E VIP 软件 1779325662692-320",
+              "netRevenue": 0,
+              "paidOrdersCount": 0
+            },
+            {
+              "productSlug": "auto-local-tool-1780589814970",
+              "productName": "Auto Local Tool 1780589814970",
+              "netRevenue": 0,
+              "paidOrdersCount": 0
+            },
+            {
+              "productSlug": "tool-cmptpgzow0007toe0ld9yuc0w",
+              "productName": "测试",
+              "netRevenue": 0,
+              "paidOrdersCount": 0
+            },
+            {
+              "productSlug": "e2e-vip-online-1779325662692-320",
+              "productName": "E2E VIP 在线工具 1779325662692-320",
+              "netRevenue": 0,
+              "paidOrdersCount": 0
+            }
+          ],
+          "actionItemsCount": 4,
+          "confidence": "partial"
+        },
+        "warnings": [
+          {
+            "code": "currency_inferred",
+            "severity": "warning",
+            "message": "Currency inferred as CNY because no explicit currency field was detected.",
+            "source": "internal_database"
+          },
+          {
+            "code": "no_revenue",
+            "severity": "warning",
+            "message": "尚未完成第一批真实收入验证。",
+            "source": "internal_database"
+          }
+        ],
+        "actionItems": [
+          {
+            "id": "revenue-first-validation",
+            "title": "选择 1-2 个高 readiness 产品进行首批收入验证",
+            "description": "选择产品页 readiness 高、价格和交付配置较完整的产品，完成一次真实下单和支付验证。",
+            "priority": "critical",
+            "owner": "codex",
+            "relatedSection": "revenue",
+            "evidenceRefs": [],
+            "status": "open"
+          },
+          {
+            "id": "revenue-delivery-readiness",
+            "title": "补齐购买后的下载/交付承接",
+            "description": "对已有价格配置但缺少下载或交付配置的产品补齐文件、在线地址或售后说明。",
+            "priority": "high",
+            "owner": "codex",
+            "relatedSection": "revenue",
+            "evidenceRefs": [],
+            "status": "open"
+          },
+          {
+            "id": "revenue-validate-faceswap-studio-ai",
+            "title": "验证产品收入路径：FaceSwap Studio｜本地人像合成研究工具",
+            "description": "检查产品页 CTA、价格、下载交付、订单、支付、退款记录，并完成真实付费验证。",
+            "priority": "high",
+            "owner": "codex",
+            "relatedSection": "revenue",
+            "evidenceRefs": [],
+            "status": "open"
+          },
+          {
+            "id": "revenue-validate-local-ai-video-studio-for-creator-workflows",
+            "title": "验证产品收入路径：AI Video Studio｜本地视频生成工作台",
+            "description": "检查产品页 CTA、价格、下载交付、订单、支付、退款记录，并完成真实付费验证。",
+            "priority": "high",
+            "owner": "codex",
+            "relatedSection": "revenue",
+            "evidenceRefs": [],
+            "status": "open"
+          }
+        ]
+      },
+      "product_evidence": {
+        "id": "product_evidence:2026-07-03:2026-07-03-product_evidence.json",
+        "filePath": "reports/ebos/evidence/product_evidence/2026-07-03-product_evidence.json",
+        "fileName": "2026-07-03-product_evidence.json",
+        "evidenceKind": "product_evidence",
+        "contractVersion": "ebos-evidence-v1",
+        "targetDate": "2026-07-03",
+        "generatedAt": "2026-07-03T10:55:15.968Z",
+        "siteUrl": "https://www.enhe-tech.com.cn",
+        "environment": "unknown",
+        "generator": "scripts/generate-ebos-product-evidence.ts",
+        "score": 91,
+        "confidence": "complete",
+        "dataCompleteness": "complete",
+        "warningsCount": 0,
+        "errorsCount": 0,
+        "actionItemsCount": 3,
+        "validationStatus": "valid",
+        "payloadSummary": {
+          "summaryType": "product_evidence",
+          "overallScore": 91,
+          "productsAudited": 5,
+          "conversionRisksCount": 3,
+          "actionItemsCount": 3,
+          "confidence": "complete",
+          "databaseSummary": {
+            "totalProducts": 7,
+            "publishedProducts": 6,
+            "draftProducts": 1,
+            "productsWithPrice": 2,
+            "productsWithDownload": 2,
+            "productsWithFaq": 4,
+            "productsWithCover": 7,
+            "productsWithTags": 0,
+            "productsWithSeoFields": 7,
+            "productsWithGeoFields": 7
+          }
+        },
+        "warnings": [],
+        "actionItems": [
+          {
+            "id": "product-db-price",
+            "title": "Complete product price configuration",
+            "description": "Review published products and add price specs or paid download configuration where needed.",
+            "priority": "high",
+            "owner": "codex",
+            "relatedSection": "product",
+            "evidenceRefs": [],
+            "status": "open"
+          },
+          {
+            "id": "product-db-delivery",
+            "title": "Complete product download configuration",
+            "description": "Review published products and connect download files or online delivery URLs.",
+            "priority": "high",
+            "owner": "codex",
+            "relatedSection": "product",
+            "evidenceRefs": [],
+            "status": "open"
+          },
+          {
+            "id": "product-revenue-validation",
+            "title": "Select 1-2 products for revenue validation",
+            "description": "Connect product page, checkout, order, and revenue evidence for the highest-intent products.",
+            "priority": "high",
+            "owner": "codex",
+            "relatedSection": "product",
+            "evidenceRefs": [],
+            "status": "open"
+          }
+        ]
+      },
+      "weekly_report": {
+        "id": "weekly_report:2026-06-29:2026-06-29-weekly_report.json",
+        "filePath": "reports/ebos/evidence/weekly_report/2026-06-29-weekly_report.json",
+        "fileName": "2026-06-29-weekly_report.json",
+        "evidenceKind": "weekly_report",
+        "contractVersion": "ebos-evidence-v1",
+        "targetDate": "2026-06-29",
+        "generatedAt": "2026-07-03T04:00:00.000Z",
+        "periodStart": "2026-06-29",
+        "periodEnd": "2026-07-05",
+        "environment": "unknown",
+        "generator": "scripts/generate-ebos-weekly-report.ts",
+        "score": 74.1,
+        "confidence": "partial",
+        "dataCompleteness": "partial",
+        "warningsCount": 14,
+        "errorsCount": 0,
+        "actionItemsCount": 39,
+        "missingSources": [
+          "google_search_console",
+          "google_analytics",
+          "cloudflare",
+          "whop",
+          "market_research",
+          "ai_search_probe",
+          "internal_database",
+          "bing_webmaster"
+        ],
+        "validationStatus": "valid_with_warnings",
+        "payloadSummary": {
+          "weeklyScore": 74.1,
+          "topActionItems": [
+            "选择 1-2 个高 readiness 产品进行首批收入验证",
+            "补齐购买后的下载/交付承接",
+            "验证产品收入路径：FaceSwap Studio｜本地人像合成研究工具",
+            "验证产品收入路径：AI Video Studio｜本地视频生成工作台",
+            "补齐流量来源数据源"
+          ],
+          "sectionCount": 10,
+          "confidence": "partial"
+        },
+        "warnings": [
+          {
+            "code": "missing_data",
+            "severity": "warning",
+            "message": "EBOS data source google_search_console is missing for this report.",
+            "source": "google_search_console"
+          },
+          {
+            "code": "missing_data",
+            "severity": "warning",
+            "message": "EBOS data source google_analytics is missing for this report.",
+            "source": "google_analytics"
+          },
+          {
+            "code": "missing_data",
+            "severity": "warning",
+            "message": "EBOS data source cloudflare is missing for this report.",
+            "source": "cloudflare"
+          },
+          {
+            "code": "missing_data",
+            "severity": "warning",
+            "message": "EBOS data source whop is missing for this report.",
+            "source": "whop"
+          },
+          {
+            "code": "missing_data",
+            "severity": "warning",
+            "message": "EBOS data source market_research is missing for this report.",
+            "source": "market_research"
+          },
+          {
+            "code": "missing_data",
+            "severity": "warning",
+            "message": "EBOS data source ai_search_probe is missing for this report.",
+            "source": "ai_search_probe"
+          },
+          {
+            "code": "missing_data",
+            "severity": "warning",
+            "message": "Internal Database data source is missing_config. Missing config: DATABASE_URL.",
+            "source": "internal_database"
+          },
+          {
+            "code": "missing_data",
+            "severity": "warning",
+            "message": "Google Search Console data source is missing_config. Missing config: GOOGLE_SERVICE_ACCOUNT_EMAIL, GOOGLE_SERVICE_ACCOUNT_PRIVATE_KEY, GOOGLE_SEARCH_CONSOLE_SITE_URL.",
+            "source": "google_search_console"
+          },
+          {
+            "code": "missing_data",
+            "severity": "warning",
+            "message": "Google Analytics data source is missing_config. Missing config: GA_PROPERTY_ID, GOOGLE_SERVICE_ACCOUNT_EMAIL, GOOGLE_SERVICE_ACCOUNT_PRIVATE_KEY.",
+            "source": "google_analytics"
+          },
+          {
+            "code": "missing_data",
+            "severity": "warning",
+            "message": "Bing Webmaster data source is missing_config. Missing config: BING_WEBMASTER_API_KEY, BING_SITE_URL.",
+            "source": "bing_webmaster"
+          },
+          {
+            "code": "missing_data",
+            "severity": "warning",
+            "message": "Cloudflare data source is missing_config. Missing config: CLOUDFLARE_API_TOKEN, CLOUDFLARE_ZONE_ID.",
+            "source": "cloudflare"
+          },
+          {
+            "code": "missing_data",
+            "severity": "warning",
+            "message": "Whop data source is missing_config. Missing config: WHOP_API_KEY, WHOP_COMPANY_ID.",
+            "source": "whop"
+          },
+          {
+            "code": "missing_data",
+            "severity": "warning",
+            "message": "Market Research data source is missing_config. Missing config: EBOS_MARKET_RSS_SOURCES, EBOS_REDDIT_SOURCES, EBOS_GITHUB_TRENDING_ENABLED.",
+            "source": "market_research"
+          },
+          {
+            "code": "missing_data",
+            "severity": "warning",
+            "message": "AI Search Probe data source is missing_config. Missing config: EBOS_AI_SEARCH_PROBE_ENABLED, EBOS_AI_SEARCH_PROVIDERS.",
+            "source": "ai_search_probe"
+          }
+        ],
+        "actionItems": [
+          {
+            "id": "action-1",
+            "title": "选择 1-2 个高 readiness 产品进行首批收入验证",
+            "description": "选择产品页 readiness 高、价格和交付配置较完整的产品，完成一次真实下单和支付验证。",
+            "priority": "high",
+            "owner": "codex",
+            "relatedSection": "revenue",
+            "evidenceRefs": [],
+            "status": "open"
+          },
+          {
+            "id": "action-2",
+            "title": "补齐购买后的下载/交付承接",
+            "description": "对已有价格配置但缺少下载或交付配置的产品补齐文件、在线地址或售后说明。",
+            "priority": "high",
+            "owner": "codex",
+            "relatedSection": "revenue",
+            "evidenceRefs": [],
+            "status": "open"
+          },
+          {
+            "id": "action-3",
+            "title": "验证产品收入路径：FaceSwap Studio｜本地人像合成研究工具",
+            "description": "检查产品页 CTA、价格、下载交付、订单、支付、退款记录，并完成真实付费验证。",
+            "priority": "high",
+            "owner": "codex",
+            "relatedSection": "revenue",
+            "evidenceRefs": [],
+            "status": "open"
+          },
+          {
+            "id": "action-4",
+            "title": "验证产品收入路径：AI Video Studio｜本地视频生成工作台",
+            "description": "检查产品页 CTA、价格、下载交付、订单、支付、退款记录，并完成真实付费验证。",
+            "priority": "high",
+            "owner": "codex",
+            "relatedSection": "revenue",
+            "evidenceRefs": [],
+            "status": "open"
+          },
+          {
+            "id": "action-5",
+            "title": "补齐流量来源数据源",
+            "description": "下一版 EBOS 可展示 GA/Cloudflare 或明确 warning。",
+            "priority": "medium",
+            "owner": "codex",
+            "relatedSection": "traffic",
+            "evidenceRefs": [],
+            "status": "open"
+          },
+          {
+            "id": "action-6",
+            "title": "Add summary sections to product pages",
+            "description": "Product pages need summary or overview sections for answer-engine extraction.",
+            "priority": "medium",
+            "owner": "codex",
+            "relatedSection": "geo",
+            "evidenceRefs": [],
+            "status": "open"
+          },
+          {
+            "id": "action-7",
+            "title": "Complete product price configuration",
+            "description": "Review published products and add price specs or paid download configuration where needed.",
+            "priority": "high",
+            "owner": "codex",
+            "relatedSection": "product",
+            "evidenceRefs": [],
+            "status": "open"
+          },
+          {
+            "id": "action-8",
+            "title": "Complete product download configuration",
+            "description": "Review published products and connect download files or online delivery URLs.",
+            "priority": "high",
+            "owner": "codex",
+            "relatedSection": "product",
+            "evidenceRefs": [],
+            "status": "open"
+          },
+          {
+            "id": "action-9",
+            "title": "Select 1-2 products for revenue validation",
+            "description": "Connect product page, checkout, order, and revenue evidence for the highest-intent products.",
+            "priority": "high",
+            "owner": "codex",
+            "relatedSection": "product",
+            "evidenceRefs": [],
+            "status": "open"
+          },
+          {
+            "id": "action-10",
+            "title": "为高意图内容补转化入口",
+            "description": "至少 3 篇内容新增自然内部链接和下一步 CTA。",
+            "priority": "medium",
+            "owner": "codex",
+            "relatedSection": "content",
+            "evidenceRefs": [],
+            "status": "open"
+          },
+          {
+            "id": "action-11",
+            "title": "验证市场机会：AI Agent 工作流模板包",
+            "description": "低成本验证 AI Agent 工作流模板包：发布预售/等候名单/内容测试。 用产品页点击、咨询、订单或手动购买意向验证需求。",
+            "priority": "high",
+            "owner": "codex",
+            "relatedSection": "market",
+            "evidenceRefs": [],
+            "status": "open"
+          },
+          {
+            "id": "action-12",
+            "title": "验证市场机会：AI 视频工作流包",
+            "description": "低成本验证 AI 视频工作流包：发布预售/等候名单/内容测试。 用产品页点击、咨询、订单或手动购买意向验证需求。",
+            "priority": "high",
+            "owner": "codex",
+            "relatedSection": "market",
+            "evidenceRefs": [],
+            "status": "open"
+          },
+          {
+            "id": "action-13",
+            "title": "验证市场机会：SEO/GEO 自动化内容集群",
+            "description": "低成本验证 SEO/GEO 自动化内容集群：发布预售/等候名单/内容测试。 用产品页点击、咨询、订单或手动购买意向验证需求。",
+            "priority": "high",
+            "owner": "codex",
+            "relatedSection": "market",
+            "evidenceRefs": [],
+            "status": "open"
+          },
+          {
+            "id": "action-14",
+            "title": "验证市场机会：AI Prompt Kit",
+            "description": "低成本验证 AI Prompt Kit：发布预售/等候名单/内容测试。 用产品页点击、咨询、订单或手动购买意向验证需求。",
+            "priority": "high",
+            "owner": "codex",
+            "relatedSection": "market",
+            "evidenceRefs": [],
+            "status": "open"
+          },
+          {
+            "id": "action-15",
+            "title": "验证市场机会：ComfyUI 工作流包",
+            "description": "低成本验证 ComfyUI 工作流包：发布预售/等候名单/内容测试。 用产品页点击、咨询、订单或手动购买意向验证需求。",
+            "priority": "high",
+            "owner": "codex",
+            "relatedSection": "market",
+            "evidenceRefs": [],
+            "status": "open"
+          },
+          {
+            "id": "action-16",
+            "title": "Validate AI Prompt Kit differentiation",
+            "description": "Draft a one-page validation brief for AI Prompt Kit. Create a differentiated landing page outline for AI Prompt Kit.",
+            "priority": "high",
+            "owner": "codex",
+            "relatedSection": "competitor",
+            "evidenceRefs": [],
+            "status": "open"
+          },
+          {
+            "id": "action-17",
+            "title": "Validate SEO/GEO 自动化内容集群 differentiation",
+            "description": "Draft a one-page validation brief for SEO/GEO 自动化内容集群. Create a differentiated landing page outline for SEO/GEO 自动化内容集群.",
+            "priority": "high",
+            "owner": "codex",
+            "relatedSection": "competitor",
+            "evidenceRefs": [],
+            "status": "open"
+          },
+          {
+            "id": "action-18",
+            "title": "Validate AI Agent 工作流模板包 differentiation",
+            "description": "Draft a one-page validation brief for AI Agent 工作流模板包. Create a differentiated landing page outline for AI Agent 工作流模板包.",
+            "priority": "high",
+            "owner": "codex",
+            "relatedSection": "competitor",
+            "evidenceRefs": [],
+            "status": "open"
+          },
+          {
+            "id": "action-19",
+            "title": "Validate AI 视频工作流包 differentiation",
+            "description": "Draft a one-page validation brief for AI 视频工作流包. Create a differentiated landing page outline for AI 视频工作流包.",
+            "priority": "medium",
+            "owner": "codex",
+            "relatedSection": "competitor",
+            "evidenceRefs": [],
+            "status": "open"
+          },
+          {
+            "id": "action-20",
+            "title": "Create competitor-informed SEO/GEO comparison content",
+            "description": "Create a comparison content brief for the top competitor category. Add FAQ, how-to, source/date, and author blocks to the validation page.",
+            "priority": "medium",
+            "owner": "codex",
+            "relatedSection": "competitor",
+            "evidenceRefs": [],
+            "status": "open"
+          },
+          {
+            "id": "action-21",
+            "title": "skipped check unit_tests; wire it into the health snapshot when the command is ready.",
+            "description": "下一次 EBOS health snapshot 中对应检查通过或被明确标记为 skipped。",
+            "priority": "medium",
+            "owner": "codex",
+            "relatedSection": "website_health",
+            "evidenceRefs": [],
+            "status": "open"
+          },
+          {
+            "id": "action-22",
+            "title": "skipped check playwright_smoke; wire it into the health snapshot when the command is ready.",
+            "description": "下一次 EBOS health snapshot 中对应检查通过或被明确标记为 skipped。",
+            "priority": "medium",
+            "owner": "codex",
+            "relatedSection": "website_health",
+            "evidenceRefs": [],
+            "status": "open"
+          },
+          {
+            "id": "action-23",
+            "title": "skipped check lighthouse; wire it into the health snapshot when the command is ready.",
+            "description": "下一次 EBOS health snapshot 中对应检查通过或被明确标记为 skipped。",
+            "priority": "medium",
+            "owner": "codex",
+            "relatedSection": "website_health",
+            "evidenceRefs": [],
+            "status": "open"
+          },
+          {
+            "id": "action-24",
+            "title": "接入 AI Search Probe / GEO 可见度巡检",
+            "description": "建立 ChatGPT、Perplexity、Google AI Overview、豆包、Kimi 等回答引擎的抽样记录。",
+            "priority": "medium",
+            "owner": "codex",
+            "relatedSection": "geo",
+            "evidenceRefs": [],
+            "status": "open"
+          },
+          {
+            "id": "action-25",
+            "title": "Add summary sections to product pages",
+            "description": "Product pages need summary or overview sections for answer-engine extraction.",
+            "priority": "medium",
+            "owner": "codex",
+            "relatedSection": "geo",
+            "evidenceRefs": [],
+            "status": "open"
+          },
+          {
+            "id": "action-26",
+            "title": "Complete product price configuration",
+            "description": "Review published products and add price specs or paid download configuration where needed.",
+            "priority": "high",
+            "owner": "codex",
+            "relatedSection": "product",
+            "evidenceRefs": [],
+            "status": "open"
+          },
+          {
+            "id": "action-27",
+            "title": "Complete product download configuration",
+            "description": "Review published products and connect download files or online delivery URLs.",
+            "priority": "high",
+            "owner": "codex",
+            "relatedSection": "product",
+            "evidenceRefs": [],
+            "status": "open"
+          },
+          {
+            "id": "action-28",
+            "title": "选择 1-2 个高 readiness 产品进行首批收入验证",
+            "description": "选择产品页 readiness 高、价格和交付配置较完整的产品，完成一次真实下单和支付验证。",
+            "priority": "high",
+            "owner": "codex",
+            "relatedSection": "revenue",
+            "evidenceRefs": [],
+            "status": "open"
+          },
+          {
+            "id": "action-29",
+            "title": "补齐购买后的下载/交付承接",
+            "description": "对已有价格配置但缺少下载或交付配置的产品补齐文件、在线地址或售后说明。",
+            "priority": "high",
+            "owner": "codex",
+            "relatedSection": "revenue",
+            "evidenceRefs": [],
+            "status": "open"
+          },
+          {
+            "id": "action-30",
+            "title": "验证市场机会：AI Agent 工作流模板包",
+            "description": "低成本验证 AI Agent 工作流模板包：发布预售/等候名单/内容测试。 用产品页点击、咨询、订单或手动购买意向验证需求。",
+            "priority": "high",
+            "owner": "codex",
+            "relatedSection": "market",
+            "evidenceRefs": [],
+            "status": "open"
+          },
+          {
+            "id": "action-31",
+            "title": "验证市场机会：AI 视频工作流包",
+            "description": "低成本验证 AI 视频工作流包：发布预售/等候名单/内容测试。 用产品页点击、咨询、订单或手动购买意向验证需求。",
+            "priority": "high",
+            "owner": "codex",
+            "relatedSection": "market",
+            "evidenceRefs": [],
+            "status": "open"
+          },
+          {
+            "id": "action-32",
+            "title": "接入 AI Search Probe / GEO 可见度巡检",
+            "description": "建立 ChatGPT、Perplexity、Google AI Overview、豆包、Kimi 等回答引擎的抽样记录。",
+            "priority": "medium",
+            "owner": "codex",
+            "relatedSection": "geo",
+            "evidenceRefs": [],
+            "status": "open"
+          },
+          {
+            "id": "action-33",
+            "title": "Add summary sections to product pages",
+            "description": "Product pages need summary or overview sections for answer-engine extraction.",
+            "priority": "medium",
+            "owner": "codex",
+            "relatedSection": "geo",
+            "evidenceRefs": [],
+            "status": "open"
+          },
+          {
+            "id": "action-34",
+            "title": "Complete product price configuration",
+            "description": "Review published products and add price specs or paid download configuration where needed.",
+            "priority": "high",
+            "owner": "codex",
+            "relatedSection": "product",
+            "evidenceRefs": [],
+            "status": "open"
+          },
+          {
+            "id": "action-35",
+            "title": "Complete product download configuration",
+            "description": "Review published products and connect download files or online delivery URLs.",
+            "priority": "high",
+            "owner": "codex",
+            "relatedSection": "product",
+            "evidenceRefs": [],
+            "status": "open"
+          },
+          {
+            "id": "action-36",
+            "title": "选择 1-2 个高 readiness 产品进行首批收入验证",
+            "description": "选择产品页 readiness 高、价格和交付配置较完整的产品，完成一次真实下单和支付验证。",
+            "priority": "high",
+            "owner": "codex",
+            "relatedSection": "revenue",
+            "evidenceRefs": [],
+            "status": "open"
+          },
+          {
+            "id": "action-37",
+            "title": "补齐购买后的下载/交付承接",
+            "description": "对已有价格配置但缺少下载或交付配置的产品补齐文件、在线地址或售后说明。",
+            "priority": "high",
+            "owner": "codex",
+            "relatedSection": "revenue",
+            "evidenceRefs": [],
+            "status": "open"
+          },
+          {
+            "id": "action-38",
+            "title": "验证市场机会：AI Agent 工作流模板包",
+            "description": "低成本验证 AI Agent 工作流模板包：发布预售/等候名单/内容测试。 用产品页点击、咨询、订单或手动购买意向验证需求。",
+            "priority": "high",
+            "owner": "codex",
+            "relatedSection": "market",
+            "evidenceRefs": [],
+            "status": "open"
+          },
+          {
+            "id": "action-39",
+            "title": "验证市场机会：AI 视频工作流包",
+            "description": "低成本验证 AI 视频工作流包：发布预售/等候名单/内容测试。 用产品页点击、咨询、订单或手动购买意向验证需求。",
+            "priority": "high",
+            "owner": "codex",
+            "relatedSection": "market",
+            "evidenceRefs": [],
+            "status": "open"
+          }
+        ]
+      },
+      "geo_evidence": {
+        "id": "geo_evidence:2026-07-03:2026-07-03-geo_evidence.json",
+        "filePath": "reports/ebos/evidence/geo_evidence/2026-07-03-geo_evidence.json",
+        "fileName": "2026-07-03-geo_evidence.json",
+        "evidenceKind": "geo_evidence",
+        "contractVersion": "ebos-evidence-v1",
+        "targetDate": "2026-07-03",
+        "generatedAt": "2026-07-03T03:43:46.872Z",
+        "siteUrl": "https://www.enhe-tech.com.cn",
+        "environment": "unknown",
+        "generator": "scripts/generate-ebos-geo-evidence.ts",
+        "score": 95,
+        "confidence": "partial",
+        "dataCompleteness": "partial",
+        "warningsCount": 1,
+        "errorsCount": 0,
+        "actionItemsCount": 1,
+        "missingSources": [
+          "ai_search_probe"
+        ],
+        "validationStatus": "valid_with_warnings",
+        "payloadSummary": {
+          "summaryType": "geo_evidence",
+          "overallScore": 95,
+          "pagesAudited": 20,
+          "citationReadinessAverage": 100,
+          "actionItemsCount": 1,
+          "confidence": "partial"
+        },
+        "warnings": [
+          {
+            "code": "geo_probe_not_connected",
+            "severity": "warning",
+            "message": "Current GEO evidence measures page structure readiness and does not represent real AI search citation results.",
+            "source": "ai_search_probe"
+          }
+        ],
+        "actionItems": [
+          {
+            "id": "geo-product-summary",
+            "title": "Add summary sections to product pages",
+            "description": "Product pages need summary or overview sections for answer-engine extraction.",
+            "priority": "medium",
+            "owner": "codex",
+            "relatedSection": "geo",
+            "evidenceRefs": [],
+            "status": "open"
+          }
+        ]
+      },
+      "seo_evidence": {
+        "id": "seo_evidence:2026-07-03:2026-07-03-seo_evidence.json",
+        "filePath": "reports/ebos/evidence/seo_evidence/2026-07-03-seo_evidence.json",
+        "fileName": "2026-07-03-seo_evidence.json",
+        "evidenceKind": "seo_evidence",
+        "contractVersion": "ebos-evidence-v1",
+        "targetDate": "2026-07-03",
+        "generatedAt": "2026-07-03T03:43:30.656Z",
+        "siteUrl": "https://www.enhe-tech.com.cn",
+        "environment": "unknown",
+        "generator": "scripts/generate-ebos-seo-evidence.ts",
+        "score": 90,
+        "confidence": "complete",
+        "dataCompleteness": "complete",
+        "warningsCount": 0,
+        "errorsCount": 0,
+        "actionItemsCount": 0,
+        "validationStatus": "valid",
+        "payloadSummary": {
+          "summaryType": "seo_evidence",
+          "overallScore": 90,
+          "pagesAudited": 20,
+          "technicalRisksCount": 0,
+          "actionItemsCount": 0,
+          "confidence": "complete"
+        },
+        "warnings": [],
+        "actionItems": []
+      },
+      "data_source_readiness": {
+        "id": "data_source_readiness:2026-07-03:2026-07-03-data_source_readiness.json",
+        "filePath": "reports/ebos/evidence/data_source_readiness/2026-07-03-data_source_readiness.json",
+        "fileName": "2026-07-03-data_source_readiness.json",
+        "evidenceKind": "data_source_readiness",
+        "contractVersion": "ebos-evidence-v1",
+        "targetDate": "2026-07-03",
+        "generatedAt": "2026-07-03T02:33:56.987Z",
+        "environment": "unknown",
+        "generator": "scripts/check-ebos-data-sources.ts",
+        "confidence": "partial",
+        "dataCompleteness": "partial",
+        "warningsCount": 8,
+        "errorsCount": 0,
+        "actionItemsCount": 0,
+        "missingSources": [
+          "internal_database",
+          "google_search_console",
+          "google_analytics",
+          "bing_webmaster",
+          "cloudflare",
+          "whop",
+          "market_research",
+          "ai_search_probe"
+        ],
+        "validationStatus": "valid_with_warnings",
+        "payloadSummary": {
+          "configuredCount": 1,
+          "availableCount": 0,
+          "missingConfigCount": 8,
+          "missingIntegrations": [
+            "internal_database",
+            "google_search_console",
+            "google_analytics",
+            "bing_webmaster",
+            "cloudflare",
+            "whop",
+            "market_research",
+            "ai_search_probe"
+          ]
+        },
+        "warnings": [
+          {
+            "code": "missing_data",
+            "severity": "warning",
+            "message": "internal_database is not available for EBOS evidence.",
+            "source": "internal_database"
+          },
+          {
+            "code": "missing_data",
+            "severity": "warning",
+            "message": "google_search_console is not available for EBOS evidence.",
+            "source": "google_search_console"
+          },
+          {
+            "code": "missing_data",
+            "severity": "warning",
+            "message": "google_analytics is not available for EBOS evidence.",
+            "source": "google_analytics"
+          },
+          {
+            "code": "missing_data",
+            "severity": "warning",
+            "message": "bing_webmaster is not available for EBOS evidence.",
+            "source": "bing_webmaster"
+          },
+          {
+            "code": "missing_data",
+            "severity": "warning",
+            "message": "cloudflare is not available for EBOS evidence.",
+            "source": "cloudflare"
+          },
+          {
+            "code": "missing_data",
+            "severity": "warning",
+            "message": "whop is not available for EBOS evidence.",
+            "source": "whop"
+          },
+          {
+            "code": "missing_data",
+            "severity": "warning",
+            "message": "market_research is not available for EBOS evidence.",
+            "source": "market_research"
+          },
+          {
+            "code": "missing_data",
+            "severity": "warning",
+            "message": "ai_search_probe is not available for EBOS evidence.",
+            "source": "ai_search_probe"
+          }
+        ],
+        "actionItems": []
+      },
+      "health_snapshot": {
+        "id": "health_snapshot:2026-07-03:2026-07-03-health_snapshot.json",
+        "filePath": "reports/ebos/evidence/health_snapshot/2026-07-03-health_snapshot.json",
+        "fileName": "2026-07-03-health_snapshot.json",
+        "evidenceKind": "health_snapshot",
+        "contractVersion": "ebos-evidence-v1",
+        "targetDate": "2026-07-03",
+        "generatedAt": "2026-07-03T02:33:32.597Z",
+        "environment": "unknown",
+        "generator": "scripts/generate-ebos-health-snapshot.ts",
+        "score": 91,
+        "grade": "excellent",
+        "confidence": "partial",
+        "dataCompleteness": "partial",
+        "warningsCount": 4,
+        "errorsCount": 0,
+        "actionItemsCount": 0,
+        "missingSources": [
+          "unit_tests",
+          "playwright_smoke",
+          "lighthouse"
+        ],
+        "validationStatus": "valid_with_warnings",
+        "payloadSummary": {
+          "score": 91,
+          "grade": "excellent",
+          "failedChecks": [],
+          "smokeChecksCount": 8,
+          "keyProductPagesStatus": {
+            "total": 5,
+            "passed": 5,
+            "failed": 0
+          }
+        },
+        "warnings": [
+          {
+            "code": "warning_1",
+            "severity": "info",
+            "message": "No failed health checks recorded."
+          },
+          {
+            "code": "partial_data",
+            "severity": "warning",
+            "message": "Unit Tests skipped: npm test",
+            "source": "unit_tests"
+          },
+          {
+            "code": "partial_data",
+            "severity": "warning",
+            "message": "Playwright Smoke skipped: npm run test:e2e",
+            "source": "playwright_smoke"
+          },
+          {
+            "code": "partial_data",
+            "severity": "warning",
+            "message": "Lighthouse skipped: lighthouse",
+            "source": "lighthouse"
+          }
+        ],
+        "actionItems": []
+      }
+    },
+    "missingKinds": [],
+    "averageScore": 79.39,
+    "criticalWarningsCount": 0,
+    "openActionItemsCount": 58,
+    "dateRange": {
+      "start": "2026-06-29",
+      "end": "2026-07-03"
+    }
+  }
+}

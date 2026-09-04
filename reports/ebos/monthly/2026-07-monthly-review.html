@@ -1,0 +1,64 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>ENHE Monthly Strategy Review</title>
+  <style>
+    :root { color-scheme: dark; --bg: #07111d; --panel: #0f1c2d; --line: rgba(255,255,255,.14); --text: #f3f7ff; --muted: #9fb0c7; --accent: #13c4e2; --warn: #f59e0b; }
+    * { box-sizing: border-box; }
+    body { margin: 0; background: var(--bg); color: var(--text); font-family: Inter, "Microsoft YaHei", system-ui, sans-serif; line-height: 1.65; }
+    main { max-width: 1120px; margin: 0 auto; padding: 40px 20px 56px; }
+    h1 { margin: 0; font-size: 34px; letter-spacing: 0; }
+    h2 { margin: 0 0 12px; font-size: 20px; }
+    .muted { color: var(--muted); }
+    .grid { display: grid; gap: 16px; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); margin: 24px 0; }
+    .score-card, .panel { border: 1px solid var(--line); background: var(--panel); border-radius: 8px; padding: 18px; }
+    .score { font-size: 42px; font-weight: 800; color: var(--accent); }
+    .panel { margin-top: 16px; }
+    ul, ol { padding-left: 20px; }
+    li { margin: 6px 0; }
+    .warning { color: var(--warn); }
+  </style>
+</head>
+<body>
+  <main>
+    <h1>ENHE Monthly Strategy Review</h1>
+    <p class="muted">2026-07-01 至 2026-07-31</p>
+    <section class="grid">
+      <div class="score-card">
+        <div class="muted">本月经营评分</div>
+        <div class="score">79.39</div>
+        <div class="muted">Confidence: partial</div>
+      </div>
+      <div class="score-card">
+        <div class="muted">Evidence Used</div>
+        <div class="score">10</div>
+        <div class="muted">样本满足基础复盘</div>
+      </div>
+    </section>
+    <section class="panel">
+      <h2>Evidence 使用情况</h2>
+      <ul><li>monthly_review / 2026-07-01 / reports/ebos/evidence/monthly_review/2026-07-monthly_review.json</li><li>competitor_evidence / 2026-07-03 / reports/ebos/evidence/competitor_evidence/2026-07-03-competitor_evidence.json</li><li>market_evidence / 2026-07-03 / reports/ebos/evidence/market_evidence/2026-07-03-market_evidence.json</li><li>revenue_evidence / 2026-07-03 / reports/ebos/evidence/revenue_evidence/2026-07-03-revenue_evidence.json</li><li>product_evidence / 2026-07-03 / reports/ebos/evidence/product_evidence/2026-07-03-product_evidence.json</li><li>weekly_report / 2026-06-29 / reports/ebos/evidence/weekly_report/2026-06-29-weekly_report.json</li><li>geo_evidence / 2026-07-03 / reports/ebos/evidence/geo_evidence/2026-07-03-geo_evidence.json</li><li>seo_evidence / 2026-07-03 / reports/ebos/evidence/seo_evidence/2026-07-03-seo_evidence.json</li><li>data_source_readiness / 2026-07-03 / reports/ebos/evidence/data_source_readiness/2026-07-03-data_source_readiness.json</li><li>health_snapshot / 2026-07-03 / reports/ebos/evidence/health_snapshot/2026-07-03-health_snapshot.json</li></ul>
+    </section>
+    <section class="panel">
+      <h2>Stop / Keep / Start</h2>
+      <h3>Stop</h3><ul><li><strong>[high] 停止用感觉替代证据</strong><br><span class="muted">当前仍缺 revenue/product/SEO/GEO 等关键证据，不能用主观判断替代证据链。</span></li></ul>
+      <h3>Keep</h3><ul><li><strong>[medium] 保持构建、类型检查、EBOS 测试健康</strong><br><span class="muted">health_snapshot 分数较高，应维持当前工程质量门槛。</span></li></ul>
+      <h3>Start</h3><ul><li><strong>[medium] Adjust validation direction: FaceSwap Studio｜本地人像合成研究工具</strong><br><span class="muted">Validation result report recorded partial success; adjust offer, CTA, price, or channel before repeating.</span></li><li><strong>[medium] Adjust validation direction: AI Video Studio｜本地视频生成工作台</strong><br><span class="muted">Validation result report recorded partial success; adjust offer, CTA, price, or channel before repeating.</span></li><li><strong>[medium] Adjust validation direction: AI Prompt Kit</strong><br><span class="muted">Validation result report recorded partial success; adjust offer, CTA, price, or channel before repeating.</span></li><li><strong>[high] 把每次复盘写回 evidence catalog</strong><br><span class="muted">Monthly Review 后续必须成为可索引 evidence。</span></li></ul>
+    </section>
+    <section class="panel">
+      <h2>下月 OKR</h2>
+      <ol><li><strong>Keep migration guard active for non-schema work</strong><ul><li>Migration release runbook exists</li><li>RUN_PRISMA_MIGRATE stays unset or 0 for page, copy, report, and external publishing work</li><li>No migration is recommended while safeToRunMigration=false</li></ul></li><li><strong>Move from synthetic optimization to real external publishing validation</strong><ul><li>Confirm synthetic optimization implementation completed</li><li>Publish or contact at least one real external channel</li><li>Keep hasRealSignals=false until real external channel data exists</li></ul></li><li><strong>等待真实外部渠道数据</strong><ul><li>Publish AI Prompt Kit on at least one real external channel</li><li>Keep all unobserved metrics at 0</li><li>Backfill only after hasRealSignals=true</li></ul></li><li><strong>Confirm real deployment execution with operator checklist</strong><ul><li>User confirms whether to enter real production deployment execution</li><li>Keep server/Docker/Nginx commands manual until executable environment is confirmed</li><li>Update deployment status only from observed command results</li></ul></li><li><strong>开始真实外部渠道发布和数据回填</strong><ul><li>Publish validation asset on real external channels</li><li>Record observed CTA, inquiry, order, revenue, refund, and feedback metrics only</li><li>Regenerate validation, decision, weekly, and monthly reports</li></ul></li><li><strong>Execute production deployment after explicit confirmation</strong><ul><li>Confirm production deployment approval</li><li>Execute only the reviewed deployment plan</li><li>Run post-deploy smoke tests and regenerate EBOS reports</li></ul></li><li><strong>Execute validation deployment for AI Prompt Kit</strong><ul><li>Complete launch execution checklist</li><li>Prepare post-launch route checks</li><li>Keep external data empty until real observed signals exist</li></ul></li><li><strong>Run real validation launch for AI Prompt Kit</strong><ul><li>Publish or confirm the validation page</li><li>Record real CTA, inquiry, order, refund, and feedback signals only after they happen</li><li>Regenerate validation, decision, weekly, and monthly reports after intake</li></ul></li><li><strong>Validate decision report priority: Validate SEO/GEO 自动化内容集群</strong><ul><li>Complete the primary validation asset</li><li>Record CTA clicks, leads, presale, or manual purchase intent</li><li>Write validation result back into next evidence cycle</li></ul></li><li><strong>获得第一批真实收入</strong><ul><li>完成至少 1 个产品的付费验证</li><li>形成订单、支付、退款和产品归因证据</li><li>把首批收入验证结果写回 revenue_evidence</li></ul></li><li><strong>减少执行积压</strong><ul><li>关闭或拆解 50% 高优先级 open action items</li><li>为每个高优先级任务定义验收标准</li><li>把无法本月完成的任务降级或移出计划</li></ul></li></ol>
+    </section>
+    <section class="panel">
+      <h2>Codex Tasks</h2>
+      <ul><li><strong>[medium] Keep migration skipped unless a dedicated migration release is approved</strong><br><span class="muted">Migration release risk audit exists and safeToRunMigration=false. migrationGuardVariable=RUN_PRISMA_MIGRATE; defaultMigrationBehavior=skip_unless_explicit; safeToRunMigration=false. Do not execute migration for page/copy/report-only releases.</span></li><li><strong>[high] Start real publishing validation after synthetic optimization</strong><br><span class="muted">Synthetic failure scenario and optimization implementation exist. Treat both as simulated planning and copy/page implementation only; next step is real publishing validation with observed data. implementedFixes=7; nextRealValidationActions=6; externalPublishingStatus=waiting_real_data; hasRealSignals=false; canBackfill=false.</span></li><li><strong>[high] 等待真实外部渠道数据</strong><br><span class="muted">External publish result input exists, but no real external data has been recorded yet. publishCoverage=0; dataCoverage=0.</span></li><li><strong>[high] Confirm real deployment execution with operator checklist</strong><br><span class="muted">operator checklist safeToProceed=true; manualRequiredCommands=7. Do not execute server/Docker/Nginx commands until the user explicitly starts real deployment execution.</span></li><li><strong>[high] 开始真实外部渠道发布和数据回填</strong><br><span class="muted">deploymentStatus=verified; begin real external channel publishing and validation data intake with observed metrics only.</span></li><li><strong>[high] Execute production deployment</strong><br><span class="muted">readinessStatus=ready_to_deploy; readinessScore=98. Execute real deployment only after explicit user confirmation.</span></li><li><strong>[high] Execute validation deployment</strong><br><span class="muted">launchStatus=ready_to_deploy; run deployment checklist and post-launch dry-run without claiming deployment until confirmed.</span></li><li><strong>[high] Start real validation launch</strong><br><span class="muted">readinessStatus=ready_with_warnings; readinessScore=98. Use the launch runbook and keep unobserved external data empty.</span></li><li><strong>[high] Fill external intake with real channel data</strong><br><span class="muted">已生成填报模板，但尚未填写真实外部渠道数据. Use C:\Users\HU\Documents\New project 2\reports\ebos\validation\intake\inputs\2026-07-03-external-intake-input.json and keep unknown metrics as 0.</span></li><li><strong>[high] 补充 validation 外部渠道数据</strong><br><span class="muted">Validation capture found 21 manual slots. External marketplace, social, and user-feedback metrics still require real user-provided data and cannot be filled by Codex.</span></li><li><strong>[high] Apply decision report top recommendation</strong><br><span class="muted">SEO/GEO 自动化内容集群 is ranked as validate_this_week. Market and competitor evidence point in the same direction. First revenue is not achieved, so low-cost validation is preferred.</span></li><li><strong>[high] Review Revenue evidence action items</strong><br><span class="muted">revenue_evidence shows firstRevenueAchieved=false and paidOrders=1; convert first-revenue validation into next-month execution tasks.</span></li><li><strong>[high] Review Market evidence product opportunities</strong><br><span class="muted">market_evidence recommends AI Agent 工作流模板包; convert the top product direction into a scoped validation or PRD task.</span></li><li><strong>[high] 低成本验证市场机会</strong><br><span class="muted">Revenue evidence has not proved first real revenue; validate AI Agent 工作流模板包 with a low-cost offer, waitlist, content test, or presale before building deeply.</span></li><li><strong>[high] Review Competitor evidence differentiation opportunities</strong><br><span class="muted">Competitor evidence recommends Validate AI Prompt Kit differentiation; convert it into a concrete differentiation task.</span></li><li><strong>[high] Competitor evidence low-cost validation priority</strong><br><span class="muted">First revenue is not proven; turn Validate AI Prompt Kit differentiation into a low-cost validation offer, waitlist, comparison page, or presale before large builds.</span></li><li><strong>[high] Prioritize aligned market and competitor validation</strong><br><span class="muted">market_evidence and competitor_evidence both point toward AI Agent 工作流模板包; lift Validate AI Prompt Kit differentiation into next-month validation priority.</span></li><li><strong>[high] Review GEO evidence action items</strong><br><span class="muted">geo_evidence score is 95 with 1 open action items; convert answerability and citation readiness issues into next-month tasks.</span></li><li><strong>[high] Review Product evidence action items</strong><br><span class="muted">product_evidence score is 91 with 3 open action items; convert product conversion readiness issues into next-month tasks.</span></li></ul>
+    </section>
+    <section class="panel">
+      <h2>数据缺口</h2>
+      <ul><li>暂无。</li></ul>
+    </section>
+  </main>
+</body>
+</html>

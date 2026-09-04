@@ -1,0 +1,216 @@
+{
+  "templateType": "external_channel_intake_template",
+  "targetDate": "2026-07-03",
+  "generatedAt": "2026-07-04T03:14:48.125Z",
+  "sourceCaptureReportPath": "reports/ebos/validation/capture/2026-07-03-validation-capture-report.json",
+  "sourceValidationInputPath": "reports/ebos/validation/inputs/2026-07-03-validation-input.json",
+  "channels": [
+    "xianyu",
+    "taobao",
+    "whop",
+    "xiaohongshu",
+    "wechat",
+    "manual_outreach"
+  ],
+  "planFields": [
+    {
+      "planId": "validation-product-1-faceswap-studio-ai",
+      "notes": "Step 9.8 prepared FaceSwap Studio validation copy, marketplace snippets, compliance notes, and tracking plan in docs/ebos/validation-assets/2026-07-03-faceswap-validation-copy.md. Suggested CTA event: validation_faceswap_cta_click. No real views, clicks, messages, orders, refunds, or feedback have been recorded yet.",
+      "manualFields": [
+        "listingViews",
+        "messages",
+        "favorites",
+        "manualOutreachCount",
+        "positiveReplies",
+        "userFeedback",
+        "channelResults"
+      ],
+      "manualSlots": [
+        {
+          "field": "listingViews",
+          "label": "外部平台浏览量",
+          "description": "闲鱼、淘宝、Whop、小红书或微信等外部渠道的真实浏览数。",
+          "sourceHint": "闲鱼/淘宝/Whop/小红书/微信后台或页面可见统计",
+          "requiredForDecision": false
+        },
+        {
+          "field": "messages",
+          "label": "外部平台咨询数",
+          "description": "外部渠道真实私信、评论咨询或购买前问题数量。",
+          "sourceHint": "平台私信、评论、微信群、微信私聊",
+          "requiredForDecision": true
+        },
+        {
+          "field": "favorites",
+          "label": "外部平台收藏/想要数",
+          "description": "外部平台真实收藏、想要或类似意向动作数量。",
+          "sourceHint": "外部平台收藏/想要/点赞等公开或后台指标",
+          "requiredForDecision": false
+        },
+        {
+          "field": "manualOutreachCount",
+          "label": "手动触达数量",
+          "description": "用户手动触达的人数或群数。",
+          "sourceHint": "用户手动记录",
+          "requiredForDecision": false
+        },
+        {
+          "field": "positiveReplies",
+          "label": "正向回复数量",
+          "description": "明确表达兴趣、想看目录、想确认价格或交付的真实回复数。",
+          "sourceHint": "用户手动记录",
+          "requiredForDecision": false
+        },
+        {
+          "field": "userFeedback",
+          "label": "用户真实反馈",
+          "description": "真实用户原话摘要，不能由 Codex 编造。",
+          "sourceHint": "用户真实聊天或评论摘要",
+          "requiredForDecision": true
+        },
+        {
+          "field": "channelResults",
+          "label": "渠道结果明细",
+          "description": "每个外部渠道的链接、指标和备注。",
+          "sourceHint": "用户手动整理的渠道记录",
+          "requiredForDecision": true
+        }
+      ]
+    },
+    {
+      "planId": "validation-product-2-local-ai-video-studio-for-creator-workflows",
+      "notes": "Step 9.8 prepared AI Video Studio validation copy, GPU/deployment threshold notes, marketplace snippets, compliance notes, and tracking plan in docs/ebos/validation-assets/2026-07-03-ai-video-studio-validation-copy.md. Suggested CTA event: validation_ai_video_cta_click. No real views, clicks, messages, orders, refunds, or feedback have been recorded yet.",
+      "manualFields": [
+        "listingViews",
+        "messages",
+        "favorites",
+        "manualOutreachCount",
+        "positiveReplies",
+        "userFeedback",
+        "channelResults"
+      ],
+      "manualSlots": [
+        {
+          "field": "listingViews",
+          "label": "外部平台浏览量",
+          "description": "闲鱼、淘宝、Whop、小红书或微信等外部渠道的真实浏览数。",
+          "sourceHint": "闲鱼/淘宝/Whop/小红书/微信后台或页面可见统计",
+          "requiredForDecision": false
+        },
+        {
+          "field": "messages",
+          "label": "外部平台咨询数",
+          "description": "外部渠道真实私信、评论咨询或购买前问题数量。",
+          "sourceHint": "平台私信、评论、微信群、微信私聊",
+          "requiredForDecision": true
+        },
+        {
+          "field": "favorites",
+          "label": "外部平台收藏/想要数",
+          "description": "外部平台真实收藏、想要或类似意向动作数量。",
+          "sourceHint": "外部平台收藏/想要/点赞等公开或后台指标",
+          "requiredForDecision": false
+        },
+        {
+          "field": "manualOutreachCount",
+          "label": "手动触达数量",
+          "description": "用户手动触达的人数或群数。",
+          "sourceHint": "用户手动记录",
+          "requiredForDecision": false
+        },
+        {
+          "field": "positiveReplies",
+          "label": "正向回复数量",
+          "description": "明确表达兴趣、想看目录、想确认价格或交付的真实回复数。",
+          "sourceHint": "用户手动记录",
+          "requiredForDecision": false
+        },
+        {
+          "field": "userFeedback",
+          "label": "用户真实反馈",
+          "description": "真实用户原话摘要，不能由 Codex 编造。",
+          "sourceHint": "用户真实聊天或评论摘要",
+          "requiredForDecision": true
+        },
+        {
+          "field": "channelResults",
+          "label": "渠道结果明细",
+          "description": "每个外部渠道的链接、指标和备注。",
+          "sourceHint": "用户手动整理的渠道记录",
+          "requiredForDecision": true
+        }
+      ]
+    },
+    {
+      "planId": "validation-direction-3-ai-prompt-kit",
+      "notes": "Step 9.8 prepared AI Prompt Kit minimum product, landing copy, marketplace copy, social copy, and bilingual validation pages at /validation/ai-prompt-kit and /en/validation/ai-prompt-kit. CTA event added: validation_ai_prompt_kit_cta_click. No real page views, CTA clicks, leads, presale orders, paid orders, revenue, or user feedback have been recorded yet.",
+      "manualFields": [
+        "listingViews",
+        "messages",
+        "favorites",
+        "manualOutreachCount",
+        "positiveReplies",
+        "userFeedback",
+        "channelResults"
+      ],
+      "manualSlots": [
+        {
+          "field": "listingViews",
+          "label": "外部平台浏览量",
+          "description": "闲鱼、淘宝、Whop、小红书或微信等外部渠道的真实浏览数。",
+          "sourceHint": "闲鱼/淘宝/Whop/小红书/微信后台或页面可见统计",
+          "requiredForDecision": false
+        },
+        {
+          "field": "messages",
+          "label": "外部平台咨询数",
+          "description": "外部渠道真实私信、评论咨询或购买前问题数量。",
+          "sourceHint": "平台私信、评论、微信群、微信私聊",
+          "requiredForDecision": true
+        },
+        {
+          "field": "favorites",
+          "label": "外部平台收藏/想要数",
+          "description": "外部平台真实收藏、想要或类似意向动作数量。",
+          "sourceHint": "外部平台收藏/想要/点赞等公开或后台指标",
+          "requiredForDecision": false
+        },
+        {
+          "field": "manualOutreachCount",
+          "label": "手动触达数量",
+          "description": "用户手动触达的人数或群数。",
+          "sourceHint": "用户手动记录",
+          "requiredForDecision": false
+        },
+        {
+          "field": "positiveReplies",
+          "label": "正向回复数量",
+          "description": "明确表达兴趣、想看目录、想确认价格或交付的真实回复数。",
+          "sourceHint": "用户手动记录",
+          "requiredForDecision": false
+        },
+        {
+          "field": "userFeedback",
+          "label": "用户真实反馈",
+          "description": "真实用户原话摘要，不能由 Codex 编造。",
+          "sourceHint": "用户真实聊天或评论摘要",
+          "requiredForDecision": true
+        },
+        {
+          "field": "channelResults",
+          "label": "渠道结果明细",
+          "description": "每个外部渠道的链接、指标和备注。",
+          "sourceHint": "用户手动整理的渠道记录",
+          "requiredForDecision": true
+        }
+      ]
+    }
+  ],
+  "instructions": [
+    "Only fill real observed data from external channels.",
+    "Do not invent views, clicks, messages, orders, revenue, refunds, or feedback.",
+    "If a metric is unavailable or did not happen, keep it as 0.",
+    "Codex may validate and merge this local file, but must not log in to external platforms or call external APIs."
+  ],
+  "warnings": []
+}

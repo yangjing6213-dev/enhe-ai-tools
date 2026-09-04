@@ -1,0 +1,27 @@
+{
+  "reportType": "external_real_data_gate_finalization",
+  "targetDate": "2026-07-03",
+  "generatedAt": "2026-07-07T14:58:31.157Z",
+  "inputPath": "reports/ebos/external-publishing/inputs/2026-07-03-external-publish-result-input.json",
+  "packPath": "reports/ebos/external-publishing/packs/2026-07-03-external-publishing-pack.json",
+  "checkCommandExecuted": true,
+  "backfillDryRunExecuted": true,
+  "backfillApplyExecuted": false,
+  "hasRealSignals": false,
+  "canBackfill": false,
+  "externalPublishingStatus": "waiting_real_data",
+  "fakeDataCreated": false,
+  "publishedUrlFabricated": false,
+  "publishAssetsCount": 6,
+  "blockers": [
+    "No real external channel signals are recorded yet."
+  ],
+  "warnings": [
+    "Backfill apply remains forbidden until hasRealSignals=true and canBackfill=true."
+  ],
+  "nextActions": [
+    "Publish or outreach manually in approved channels.",
+    "Record real URL, views, clicks, messages, orders, revenue, refunds, and evidence.",
+    "Run check and dry-run again before considering apply."
+  ]
+}

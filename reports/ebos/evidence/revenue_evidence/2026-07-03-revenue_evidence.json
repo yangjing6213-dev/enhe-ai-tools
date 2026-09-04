@@ -1,0 +1,632 @@
+{
+  "meta": {
+    "contractVersion": "ebos-evidence-v1",
+    "evidenceKind": "revenue_evidence",
+    "generatedAt": "2026-07-03T11:43:03.700Z",
+    "targetDate": "2026-07-03",
+    "periodStart": "2026-06-29",
+    "periodEnd": "2026-07-05",
+    "siteUrl": "https://www.enhe-tech.com.cn",
+    "environment": "unknown",
+    "generator": "scripts/generate-ebos-revenue-evidence.ts",
+    "sourceFiles": [
+      "C:\\Users\\HU\\Documents\\New project 2\\reports\\ebos\\revenue\\2026-07-03-revenue-evidence.md"
+    ],
+    "schemaNotes": [
+      "Currency inferred as CNY because no explicit currency field was detected."
+    ]
+  },
+  "quality": {
+    "score": 50,
+    "confidence": "partial",
+    "dataCompleteness": "partial",
+    "warningsCount": 2,
+    "errorsCount": 0,
+    "missingSources": [
+      "internal_database"
+    ]
+  },
+  "payload": {
+    "evidenceType": "revenue_evidence",
+    "targetDate": "2026-07-03",
+    "periodStart": "2026-06-29",
+    "periodEnd": "2026-07-05",
+    "generatedAt": "2026-07-03T11:43:03.700Z",
+    "overallScore": 50,
+    "confidence": "partial",
+    "currency": "CNY",
+    "revenueSummary": {
+      "grossRevenue": 29,
+      "netRevenue": 0,
+      "refundedAmount": 29,
+      "paidRevenue": 29,
+      "pendingRevenue": 0,
+      "unpaidRevenue": 0,
+      "averageOrderValue": 29,
+      "firstRevenueAchieved": false,
+      "firstPaidOrderDate": "2026-05-23T07:47:26.484Z",
+      "lastPaidOrderDate": "2026-05-23T07:47:26.484Z"
+    },
+    "orderSummary": {
+      "totalOrders": 1,
+      "paidOrders": 1,
+      "pendingOrders": 0,
+      "unpaidOrders": 0,
+      "cancelledOrders": 0,
+      "refundedOrders": 1,
+      "currentPeriodOrders": 0,
+      "currentPeriodPaidOrders": 0,
+      "conversionEvidenceAvailable": true,
+      "orderStatusBreakdown": {
+        "refunded": 1
+      }
+    },
+    "refundSummary": {
+      "totalRefunds": 1,
+      "currentPeriodRefunds": 0,
+      "refundedAmount": 29,
+      "refundRate": 1,
+      "refundRisks": [
+        "Refund rate is higher than 20%."
+      ]
+    },
+    "productRevenueSummary": {
+      "productMetrics": [
+        {
+          "productId": "cmpzsaahp000btor882nw5wbj",
+          "productSlug": "upload-fix-local-app-1780594990538",
+          "productName": "Upload Fix Local App 1780594990538",
+          "ordersCount": 0,
+          "paidOrdersCount": 0,
+          "grossRevenue": 0,
+          "netRevenue": 0,
+          "refundedAmount": 0,
+          "averageOrderValue": 0,
+          "hasPriceConfigured": false,
+          "hasDownloadConfigured": false,
+          "hasFaqConfigured": false,
+          "revenueReadinessScore": 0,
+          "findings": [],
+          "risks": [
+            "Product price configuration is missing."
+          ],
+          "opportunities": [],
+          "actionItems": [
+            "配置下载/交付承接",
+            "配置价格/购买入口",
+            "进行首批收入验证"
+          ]
+        },
+        {
+          "productId": "cmpesk4hp0007tousk5ou810g",
+          "productSlug": "e2e-vip-software-1779325662692-320",
+          "productName": "E2E VIP 软件 1779325662692-320",
+          "ordersCount": 0,
+          "paidOrdersCount": 0,
+          "grossRevenue": 0,
+          "netRevenue": 0,
+          "refundedAmount": 0,
+          "averageOrderValue": 0,
+          "hasPriceConfigured": false,
+          "hasDownloadConfigured": false,
+          "hasFaqConfigured": true,
+          "revenueReadinessScore": 10,
+          "findings": [],
+          "risks": [
+            "Product price configuration is missing."
+          ],
+          "opportunities": [],
+          "actionItems": [
+            "配置下载/交付承接",
+            "配置价格/购买入口",
+            "进行首批收入验证"
+          ]
+        },
+        {
+          "productId": "cmpzp7aju0004tor8es46igwu",
+          "productSlug": "auto-local-tool-1780589814970",
+          "productName": "Auto Local Tool 1780589814970",
+          "ordersCount": 0,
+          "paidOrdersCount": 0,
+          "grossRevenue": 0,
+          "netRevenue": 0,
+          "refundedAmount": 0,
+          "averageOrderValue": 0,
+          "hasPriceConfigured": false,
+          "hasDownloadConfigured": false,
+          "hasFaqConfigured": true,
+          "revenueReadinessScore": 10,
+          "findings": [],
+          "risks": [
+            "Product price configuration is missing."
+          ],
+          "opportunities": [],
+          "actionItems": [
+            "配置下载/交付承接",
+            "配置价格/购买入口",
+            "进行首批收入验证"
+          ]
+        },
+        {
+          "productId": "cmptpgzow0007toe0ld9yuc0w",
+          "productSlug": "tool-cmptpgzow0007toe0ld9yuc0w",
+          "productName": "测试",
+          "ordersCount": 0,
+          "paidOrdersCount": 0,
+          "grossRevenue": 0,
+          "netRevenue": 0,
+          "refundedAmount": 0,
+          "averageOrderValue": 0,
+          "hasPriceConfigured": true,
+          "hasDownloadConfigured": false,
+          "hasFaqConfigured": true,
+          "revenueReadinessScore": 30,
+          "findings": [
+            "Price configuration is present."
+          ],
+          "risks": [
+            "购买后交付承接不完整。"
+          ],
+          "opportunities": [],
+          "actionItems": [
+            "配置下载/交付承接",
+            "进行首批收入验证"
+          ]
+        },
+        {
+          "productId": "cmpesk4hu0009touspd9hysq6",
+          "productSlug": "e2e-vip-online-1779325662692-320",
+          "productName": "E2E VIP 在线工具 1779325662692-320",
+          "ordersCount": 0,
+          "paidOrdersCount": 0,
+          "grossRevenue": 0,
+          "netRevenue": 0,
+          "refundedAmount": 0,
+          "averageOrderValue": 0,
+          "hasPriceConfigured": false,
+          "hasDownloadConfigured": true,
+          "hasFaqConfigured": false,
+          "revenueReadinessScore": 20,
+          "findings": [
+            "Download or delivery configuration is present."
+          ],
+          "risks": [
+            "Product price configuration is missing."
+          ],
+          "opportunities": [],
+          "actionItems": [
+            "配置价格/购买入口",
+            "进行首批收入验证"
+          ]
+        },
+        {
+          "productId": "cmpbbvbe80008too47vnlbtcz",
+          "productSlug": "enhe-copy-cleaner",
+          "productName": "ENHE 文案清洗在线工具",
+          "ordersCount": 0,
+          "paidOrdersCount": 0,
+          "grossRevenue": 0,
+          "netRevenue": 0,
+          "refundedAmount": 0,
+          "averageOrderValue": 0,
+          "hasPriceConfigured": false,
+          "hasDownloadConfigured": true,
+          "hasFaqConfigured": false,
+          "revenueReadinessScore": 20,
+          "findings": [
+            "Download or delivery configuration is present."
+          ],
+          "risks": [
+            "Product price configuration is missing."
+          ],
+          "opportunities": [],
+          "actionItems": [
+            "配置价格/购买入口",
+            "进行首批收入验证"
+          ]
+        },
+        {
+          "productId": "cmpbbvbe00005too4t54v5a6j",
+          "productSlug": "enhe-batch-renamer",
+          "productName": "ENHE 批量文件重命名助手",
+          "ordersCount": 1,
+          "paidOrdersCount": 1,
+          "grossRevenue": 29,
+          "netRevenue": 0,
+          "refundedAmount": 29,
+          "averageOrderValue": 29,
+          "hasPriceConfigured": true,
+          "hasDownloadConfigured": false,
+          "hasFaqConfigured": true,
+          "revenueReadinessScore": 55,
+          "findings": [
+            "Price configuration is present.",
+            "1 paid orders attributed."
+          ],
+          "risks": [
+            "购买后交付承接不完整。"
+          ],
+          "opportunities": [
+            "Scale this validated product with more channels and conversion improvements."
+          ],
+          "actionItems": [
+            "配置下载/交付承接"
+          ]
+        },
+        {
+          "productSlug": "faceswap-studio-ai",
+          "productName": "FaceSwap Studio｜本地人像合成研究工具",
+          "ordersCount": 0,
+          "paidOrdersCount": 0,
+          "grossRevenue": 0,
+          "netRevenue": 0,
+          "refundedAmount": 0,
+          "averageOrderValue": 0,
+          "hasPriceConfigured": true,
+          "hasDownloadConfigured": true,
+          "hasFaqConfigured": true,
+          "productPageScore": 100,
+          "revenueReadinessScore": 75,
+          "findings": [
+            "Price configuration is present.",
+            "Download or delivery configuration is present."
+          ],
+          "risks": [],
+          "opportunities": [
+            "Use this product for first revenue validation."
+          ],
+          "actionItems": [
+            "进行首批收入验证"
+          ]
+        },
+        {
+          "productSlug": "local-ai-video-studio-for-creator-workflows",
+          "productName": "AI Video Studio｜本地视频生成工作台",
+          "ordersCount": 0,
+          "paidOrdersCount": 0,
+          "grossRevenue": 0,
+          "netRevenue": 0,
+          "refundedAmount": 0,
+          "averageOrderValue": 0,
+          "hasPriceConfigured": true,
+          "hasDownloadConfigured": true,
+          "hasFaqConfigured": true,
+          "productPageScore": 100,
+          "revenueReadinessScore": 75,
+          "findings": [
+            "Price configuration is present.",
+            "Download or delivery configuration is present."
+          ],
+          "risks": [],
+          "opportunities": [
+            "Use this product for first revenue validation."
+          ],
+          "actionItems": [
+            "进行首批收入验证"
+          ]
+        },
+        {
+          "productSlug": "local-ai-voice-generator-for-voiceover-materials",
+          "productName": "AI语音生成｜本地配音素材工作台",
+          "ordersCount": 0,
+          "paidOrdersCount": 0,
+          "grossRevenue": 0,
+          "netRevenue": 0,
+          "refundedAmount": 0,
+          "averageOrderValue": 0,
+          "hasPriceConfigured": true,
+          "hasDownloadConfigured": true,
+          "hasFaqConfigured": true,
+          "productPageScore": 100,
+          "revenueReadinessScore": 75,
+          "findings": [
+            "Price configuration is present.",
+            "Download or delivery configuration is present."
+          ],
+          "risks": [],
+          "opportunities": [
+            "Use this product for first revenue validation."
+          ],
+          "actionItems": [
+            "进行首批收入验证"
+          ]
+        },
+        {
+          "productSlug": "no-code-chat-screenshot-maker",
+          "productName": "聊天截图素材制作｜无需代码",
+          "ordersCount": 0,
+          "paidOrdersCount": 0,
+          "grossRevenue": 0,
+          "netRevenue": 0,
+          "refundedAmount": 0,
+          "averageOrderValue": 0,
+          "hasPriceConfigured": true,
+          "hasDownloadConfigured": true,
+          "hasFaqConfigured": true,
+          "productPageScore": 100,
+          "revenueReadinessScore": 75,
+          "findings": [
+            "Price configuration is present.",
+            "Download or delivery configuration is present."
+          ],
+          "risks": [],
+          "opportunities": [
+            "Use this product for first revenue validation."
+          ],
+          "actionItems": [
+            "进行首批收入验证"
+          ]
+        },
+        {
+          "productSlug": "windows-ai",
+          "productName": "Lumi-OS｜AI情感智能体 | AI伴侣 | 贾维斯",
+          "ordersCount": 0,
+          "paidOrdersCount": 0,
+          "grossRevenue": 0,
+          "netRevenue": 0,
+          "refundedAmount": 0,
+          "averageOrderValue": 0,
+          "hasPriceConfigured": true,
+          "hasDownloadConfigured": true,
+          "hasFaqConfigured": true,
+          "productPageScore": 100,
+          "revenueReadinessScore": 75,
+          "findings": [
+            "Price configuration is present.",
+            "Download or delivery configuration is present."
+          ],
+          "risks": [],
+          "opportunities": [
+            "Use this product for first revenue validation."
+          ],
+          "actionItems": [
+            "进行首批收入验证"
+          ]
+        }
+      ],
+      "unattributedRevenue": {
+        "ordersCount": 0,
+        "paidOrdersCount": 0,
+        "grossRevenue": 0,
+        "netRevenue": 0,
+        "refundedAmount": 0,
+        "averageOrderValue": 0,
+        "revenueReadinessScore": 0,
+        "findings": [],
+        "risks": [
+          "Product price configuration is missing."
+        ],
+        "opportunities": [],
+        "actionItems": [
+          "配置下载/交付承接",
+          "配置价格/购买入口",
+          "进行首批收入验证"
+        ]
+      },
+      "recommendedValidationProducts": [
+        {
+          "productSlug": "faceswap-studio-ai",
+          "productName": "FaceSwap Studio｜本地人像合成研究工具",
+          "ordersCount": 0,
+          "paidOrdersCount": 0,
+          "grossRevenue": 0,
+          "netRevenue": 0,
+          "refundedAmount": 0,
+          "averageOrderValue": 0,
+          "hasPriceConfigured": true,
+          "hasDownloadConfigured": true,
+          "hasFaqConfigured": true,
+          "productPageScore": 100,
+          "revenueReadinessScore": 75,
+          "findings": [
+            "Price configuration is present.",
+            "Download or delivery configuration is present."
+          ],
+          "risks": [],
+          "opportunities": [
+            "Use this product for first revenue validation."
+          ],
+          "actionItems": [
+            "进行首批收入验证"
+          ]
+        },
+        {
+          "productSlug": "local-ai-video-studio-for-creator-workflows",
+          "productName": "AI Video Studio｜本地视频生成工作台",
+          "ordersCount": 0,
+          "paidOrdersCount": 0,
+          "grossRevenue": 0,
+          "netRevenue": 0,
+          "refundedAmount": 0,
+          "averageOrderValue": 0,
+          "hasPriceConfigured": true,
+          "hasDownloadConfigured": true,
+          "hasFaqConfigured": true,
+          "productPageScore": 100,
+          "revenueReadinessScore": 75,
+          "findings": [
+            "Price configuration is present.",
+            "Download or delivery configuration is present."
+          ],
+          "risks": [],
+          "opportunities": [
+            "Use this product for first revenue validation."
+          ],
+          "actionItems": [
+            "进行首批收入验证"
+          ]
+        }
+      ]
+    },
+    "revenueReadinessFindings": [
+      "尚未完成真实收入验证。"
+    ],
+    "attributionFindings": [
+      "0 products have attributed net revenue.",
+      "0 orders could not be attributed to products."
+    ],
+    "risks": [
+      "尚未完成第一批真实收入验证。",
+      "购买后交付承接不完整。"
+    ],
+    "opportunities": [
+      "选择 1-2 个高 readiness 产品做限时付费验证。",
+      "优先验证 FaceSwap Studio｜本地人像合成研究工具。",
+      "优先验证 AI Video Studio｜本地视频生成工作台。"
+    ],
+    "actionItems": [
+      {
+        "id": "revenue-first-validation",
+        "title": "选择 1-2 个高 readiness 产品进行首批收入验证",
+        "description": "选择产品页 readiness 高、价格和交付配置较完整的产品，完成一次真实下单和支付验证。",
+        "priority": "critical",
+        "owner": "codex",
+        "relatedSection": "revenue",
+        "status": "open"
+      },
+      {
+        "id": "revenue-delivery-readiness",
+        "title": "补齐购买后的下载/交付承接",
+        "description": "对已有价格配置但缺少下载或交付配置的产品补齐文件、在线地址或售后说明。",
+        "priority": "high",
+        "owner": "codex",
+        "relatedSection": "revenue",
+        "status": "open"
+      },
+      {
+        "id": "revenue-validate-faceswap-studio-ai",
+        "title": "验证产品收入路径：FaceSwap Studio｜本地人像合成研究工具",
+        "description": "检查产品页 CTA、价格、下载交付、订单、支付、退款记录，并完成真实付费验证。",
+        "priority": "high",
+        "owner": "codex",
+        "relatedSection": "revenue",
+        "status": "open"
+      },
+      {
+        "id": "revenue-validate-local-ai-video-studio-for-creator-workflows",
+        "title": "验证产品收入路径：AI Video Studio｜本地视频生成工作台",
+        "description": "检查产品页 CTA、价格、下载交付、订单、支付、退款记录，并完成真实付费验证。",
+        "priority": "high",
+        "owner": "codex",
+        "relatedSection": "revenue",
+        "status": "open"
+      }
+    ],
+    "warnings": [
+      {
+        "code": "currency_inferred",
+        "severity": "warning",
+        "message": "Currency inferred as CNY because no explicit currency field was detected.",
+        "source": "internal_database"
+      },
+      {
+        "code": "no_revenue",
+        "severity": "warning",
+        "message": "尚未完成第一批真实收入验证。",
+        "source": "internal_database"
+      }
+    ],
+    "databaseSummary": {
+      "hasOrderModel": true,
+      "hasRefundModel": true,
+      "hasPaymentModel": true,
+      "hasProductModel": true,
+      "orderFieldsDetected": [
+        "id",
+        "orderNo",
+        "toolId",
+        "toolPriceSpecId",
+        "amount",
+        "orderStatus",
+        "paidAt",
+        "createdAt"
+      ],
+      "refundFieldsDetected": [
+        "id",
+        "orderId",
+        "amount",
+        "status",
+        "createdAt",
+        "completedAt"
+      ],
+      "productFieldsDetected": [
+        "id",
+        "slug",
+        "name",
+        "englishName",
+        "isDownloadPaid",
+        "downloadPrice",
+        "downloadFileId",
+        "onlineUrl",
+        "priceSpecs",
+        "faqs"
+      ],
+      "attributionFieldsDetected": [
+        "toolId",
+        "tool.id",
+        "tool.slug",
+        "tool.name"
+      ],
+      "unsupportedFields": [],
+      "warnings": [
+        "Currency inferred as CNY because no explicit currency field was detected."
+      ]
+    }
+  },
+  "warnings": [
+    {
+      "code": "currency_inferred",
+      "severity": "warning",
+      "message": "Currency inferred as CNY because no explicit currency field was detected.",
+      "source": "internal_database"
+    },
+    {
+      "code": "no_revenue",
+      "severity": "warning",
+      "message": "尚未完成第一批真实收入验证。",
+      "source": "internal_database"
+    }
+  ],
+  "actionItems": [
+    {
+      "id": "revenue-first-validation",
+      "title": "选择 1-2 个高 readiness 产品进行首批收入验证",
+      "description": "选择产品页 readiness 高、价格和交付配置较完整的产品，完成一次真实下单和支付验证。",
+      "priority": "critical",
+      "owner": "codex",
+      "relatedSection": "revenue",
+      "evidenceRefs": [],
+      "status": "open"
+    },
+    {
+      "id": "revenue-delivery-readiness",
+      "title": "补齐购买后的下载/交付承接",
+      "description": "对已有价格配置但缺少下载或交付配置的产品补齐文件、在线地址或售后说明。",
+      "priority": "high",
+      "owner": "codex",
+      "relatedSection": "revenue",
+      "evidenceRefs": [],
+      "status": "open"
+    },
+    {
+      "id": "revenue-validate-faceswap-studio-ai",
+      "title": "验证产品收入路径：FaceSwap Studio｜本地人像合成研究工具",
+      "description": "检查产品页 CTA、价格、下载交付、订单、支付、退款记录，并完成真实付费验证。",
+      "priority": "high",
+      "owner": "codex",
+      "relatedSection": "revenue",
+      "evidenceRefs": [],
+      "status": "open"
+    },
+    {
+      "id": "revenue-validate-local-ai-video-studio-for-creator-workflows",
+      "title": "验证产品收入路径：AI Video Studio｜本地视频生成工作台",
+      "description": "检查产品页 CTA、价格、下载交付、订单、支付、退款记录，并完成真实付费验证。",
+      "priority": "high",
+      "owner": "codex",
+      "relatedSection": "revenue",
+      "evidenceRefs": [],
+      "status": "open"
+    }
+  ]
+}

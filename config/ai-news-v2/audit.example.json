@@ -1,0 +1,19 @@
+{
+  "mode": "automated",
+  "auditor": "enhe-ai-news-v2",
+  "auditedAt": "2026-09-04T00:00:00.000Z",
+  "manifestDigest": "0000000000000000000000000000000000000000000000000000000000000000",
+  "snapshotDigest": "0000000000000000000000000000000000000000000000000000000000000000",
+  "validatorSha256": "0000000000000000000000000000000000000000000000000000000000000000",
+  "checks": {
+    "sourceEvidence": true,
+    "mediaRights": true,
+    "freshness": true,
+    "htmlValidation": true,
+    "safety": true,
+    "aiDisclosure": true,
+    "bilingualParity": true,
+    "deduplication": true,
+    "canonicalSafety": true
+  }
+}

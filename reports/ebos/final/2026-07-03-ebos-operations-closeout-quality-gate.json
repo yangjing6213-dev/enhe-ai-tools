@@ -1,0 +1,46 @@
+{
+  "reportType": "ebos_operations_closeout_quality_gate",
+  "targetDate": "2026-07-03",
+  "generatedAt": "2026-07-08T01:25:00+08:00",
+  "tests": {
+    "command": "npm run test -- src/lib/ebos",
+    "passed": true,
+    "summary": "161 test files passed; 606 tests passed."
+  },
+  "lint": {
+    "command": "npm run lint",
+    "passed": true,
+    "summary": "eslint . exited 0."
+  },
+  "typecheck": {
+    "command": "npm run typecheck",
+    "passed": true,
+    "summary": "tsc --noEmit exited 0."
+  },
+  "build": {
+    "command": "npm run build",
+    "passed": true,
+    "summary": "prisma generate && next build exited 0; no migration or seed command was run."
+  },
+  "migrationExecuted": false,
+  "seedExecuted": false,
+  "deploymentExecuted": false,
+  "backfillApplyExecuted": false,
+  "fakeDataCreated": false,
+  "safeToRunMigration": false,
+  "qualityGatePassed": true,
+  "blockers": [],
+  "warnings": [
+    "Build script runs prisma generate as part of normal local build; this is not a migration."
+  ],
+  "commandsExecuted": {
+    "gitAdd": false,
+    "gitCommit": false,
+    "gitPush": false,
+    "migration": false,
+    "seed": false,
+    "deployment": false,
+    "serverDockerNginx": false,
+    "backfillApply": false
+  }
+}

@@ -1,0 +1,8 @@
+<svg width="240" height="240" viewBox="0 0 240 240" xmlns="http://www.w3.org/2000/svg">
+  <rect width="240" height="240" fill="#fff"/>
+  <rect x="24" y="24" width="64" height="64" fill="#1677ff"/>
+  <rect x="152" y="24" width="64" height="64" fill="#1677ff"/>
+  <rect x="24" y="152" width="64" height="64" fill="#1677ff"/>
+  <path d="M116 44h16v32h-16zM104 100h68v16h-68zM116 128h16v68h-16zM148 132h48v16h-48zM164 164h32v32h-32z" fill="#111827"/>
+  <text x="120" y="226" text-anchor="middle" font-size="14" fill="#111827">Alipay QR Placeholder</text>
+</svg>

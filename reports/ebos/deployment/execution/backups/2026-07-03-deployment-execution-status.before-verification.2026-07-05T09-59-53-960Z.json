@@ -1,0 +1,29 @@
+{
+  "statusType": "production_deployment_execution_status",
+  "targetDate": "2026-07-03",
+  "updatedAt": "2026-07-05T09:16:59.612Z",
+  "deploymentStatus": "deployed_pending_verification",
+  "approvedByUser": true,
+  "localCommandsRun": [
+    "npm run lint",
+    "npm run typecheck",
+    "npm run build"
+  ],
+  "serverCommandsRun": [
+    "manual server deployment commands completed"
+  ],
+  "dockerCommandsRun": [
+    "manual Docker/Nginx deployment commands completed"
+  ],
+  "verificationCommandsRun": [],
+  "postLaunchCheckStatus": "not_run",
+  "notes": [
+    "Approval phrase accepted from scripts/approve-ebos-deployment-execution.ts; status moved to approved_not_executed. Production is not deployed.",
+    "Production deployment execution entered executing state after exact second confirmation. Server/Docker/Nginx commands are still manual_required.",
+    "Local pre-deployment commands passed. Waiting for manual server deployment result.",
+    "Manual server, Docker, and Nginx deployment result recorded as complete. Post-launch check is still required before verified."
+  ],
+  "warnings": [],
+  "approvedAt": "2026-07-04T15:33:18.303Z",
+  "deployedAt": "2026-07-05T17:14:48+08:00"
+}

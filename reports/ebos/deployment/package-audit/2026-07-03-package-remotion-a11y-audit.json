@@ -1,0 +1,56 @@
+{
+  "reportType": "package_remotion_a11y_audit",
+  "targetDate": "2026-07-03",
+  "generatedAt": "2026-07-07T14:58:31.157Z",
+  "packageFiles": [
+    "package.json",
+    "package-lock.json"
+  ],
+  "remotionDependencies": [
+    "remotion",
+    "@remotion/bundler",
+    "@remotion/renderer"
+  ],
+  "axeCoreDependencies": [
+    "axe-core"
+  ],
+  "remotionUsageDetected": true,
+  "axeCoreUsageDetected": true,
+  "relatedScripts": [
+    {
+      "name": "audit:performance",
+      "command": "node scripts/audit-public-performance.mjs"
+    },
+    {
+      "name": "audit:a11y",
+      "command": "node scripts/audit-public-a11y.mjs"
+    }
+  ],
+  "relatedFiles": {
+    "remotionFiles": [
+      "remotion/",
+      "scripts/generate-ai-trend-briefing-video.test.ts",
+      "scripts/generate-ai-trend-briefing-video.ts"
+    ],
+    "axeFiles": [
+      "scripts/audit-public-a11y.mjs",
+      "src/lib/public-a11y-smoke-source.test.ts"
+    ]
+  },
+  "safeToCommitPackage": false,
+  "riskLevel": "high",
+  "canCommitTogether": false,
+  "requiresSeparateAudit": true,
+  "requiresUserConfirmation": true,
+  "reason": "Remotion/a11y dependencies and scripts are not proven to be required for the current EBOS closure scope.",
+  "blockers": [
+    "User confirmation is required before committing dependency changes."
+  ],
+  "warnings": [
+    "package.json and package-lock.json are dirty and must not be mixed into EBOS report-only commits."
+  ],
+  "nextActions": [
+    "Review dependency provenance separately.",
+    "Only commit package files after proving product scope, tests, and install/build impact."
+  ]
+}

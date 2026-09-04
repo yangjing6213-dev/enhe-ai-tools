@@ -1,0 +1,107 @@
+{
+  "reportType": "validation_post_launch_check",
+  "targetDate": "2026-07-03",
+  "generatedAt": "2026-07-04T08:57:15.212Z",
+  "siteUrl": "https://www.enhe-tech.com.cn",
+  "dryRun": true,
+  "checks": [
+    {
+      "id": "http_status-www-enhe-tech-com-cn-validation-ai-prompt-kit",
+      "url": "https://www.enhe-tech.com.cn/validation/ai-prompt-kit",
+      "expectedStatus": 200,
+      "checkType": "http_status",
+      "dryRun": true,
+      "status": "pending",
+      "notes": "Dry-run only; no network request was made."
+    },
+    {
+      "id": "page_content-www-enhe-tech-com-cn-validation-ai-prompt-kit",
+      "url": "https://www.enhe-tech.com.cn/validation/ai-prompt-kit",
+      "expectedStatus": 200,
+      "checkType": "page_content",
+      "dryRun": true,
+      "status": "pending",
+      "notes": "Dry-run only; no network request was made."
+    },
+    {
+      "id": "cta_present-www-enhe-tech-com-cn-validation-ai-prompt-kit",
+      "url": "https://www.enhe-tech.com.cn/validation/ai-prompt-kit",
+      "expectedStatus": 200,
+      "checkType": "cta_present",
+      "dryRun": true,
+      "status": "pending",
+      "notes": "Dry-run only; no network request was made."
+    },
+    {
+      "id": "metadata-www-enhe-tech-com-cn-validation-ai-prompt-kit",
+      "url": "https://www.enhe-tech.com.cn/validation/ai-prompt-kit",
+      "expectedStatus": 200,
+      "checkType": "metadata",
+      "dryRun": true,
+      "status": "pending",
+      "notes": "Dry-run only; no network request was made."
+    },
+    {
+      "id": "tracking_plan-www-enhe-tech-com-cn-validation-ai-prompt-kit",
+      "url": "https://www.enhe-tech.com.cn/validation/ai-prompt-kit",
+      "expectedStatus": 200,
+      "checkType": "tracking_plan",
+      "dryRun": true,
+      "status": "pending",
+      "notes": "Dry-run only; no network request was made."
+    },
+    {
+      "id": "http_status-www-enhe-tech-com-cn-en-validation-ai-prompt-kit",
+      "url": "https://www.enhe-tech.com.cn/en/validation/ai-prompt-kit",
+      "expectedStatus": 200,
+      "checkType": "http_status",
+      "dryRun": true,
+      "status": "pending",
+      "notes": "Dry-run only; no network request was made."
+    },
+    {
+      "id": "page_content-www-enhe-tech-com-cn-en-validation-ai-prompt-kit",
+      "url": "https://www.enhe-tech.com.cn/en/validation/ai-prompt-kit",
+      "expectedStatus": 200,
+      "checkType": "page_content",
+      "dryRun": true,
+      "status": "pending",
+      "notes": "Dry-run only; no network request was made."
+    },
+    {
+      "id": "cta_present-www-enhe-tech-com-cn-en-validation-ai-prompt-kit",
+      "url": "https://www.enhe-tech.com.cn/en/validation/ai-prompt-kit",
+      "expectedStatus": 200,
+      "checkType": "cta_present",
+      "dryRun": true,
+      "status": "pending",
+      "notes": "Dry-run only; no network request was made."
+    },
+    {
+      "id": "metadata-www-enhe-tech-com-cn-en-validation-ai-prompt-kit",
+      "url": "https://www.enhe-tech.com.cn/en/validation/ai-prompt-kit",
+      "expectedStatus": 200,
+      "checkType": "metadata",
+      "dryRun": true,
+      "status": "pending",
+      "notes": "Dry-run only; no network request was made."
+    },
+    {
+      "id": "tracking_plan-www-enhe-tech-com-cn-en-validation-ai-prompt-kit",
+      "url": "https://www.enhe-tech.com.cn/en/validation/ai-prompt-kit",
+      "expectedStatus": 200,
+      "checkType": "tracking_plan",
+      "dryRun": true,
+      "status": "pending",
+      "notes": "Dry-run only; no network request was made."
+    }
+  ],
+  "status": "dry_run",
+  "warnings": [
+    "Dry-run only; no network request was made."
+  ],
+  "blockers": [],
+  "nextActions": [
+    "Dry-run only. Run a live check after deployment is confirmed."
+  ]
+}

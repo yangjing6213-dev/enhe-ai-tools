@@ -1,0 +1,93 @@
+[
+  {
+    "id": "server-9",
+    "command": "Server project path must be confirmed before SSH or deployment commands are run.",
+    "environment": "server",
+    "status": "manual_required",
+    "summary": "Must be executed by the user in the server context or after explicit executable environment confirmation.",
+    "evidence": [
+      "Must be executed by the user in the server context or after explicit executable environment confirmation."
+    ],
+    "warnings": [
+      "Codex did not execute this command."
+    ]
+  },
+  {
+    "id": "server-28",
+    "command": "Manual confirmation required: Server project path must be confirmed before SSH or deployment commands are run.",
+    "environment": "server",
+    "status": "manual_required",
+    "summary": "Must be executed by the user in the server context or after explicit executable environment confirmation.",
+    "evidence": [
+      "Must be executed by the user in the server context or after explicit executable environment confirmation."
+    ],
+    "warnings": [
+      "Codex did not execute this command."
+    ]
+  },
+  {
+    "id": "docker-10",
+    "command": "docker compose -f deploy/enhe-ai-tools/docker-compose.yml up -d --build",
+    "environment": "docker",
+    "status": "manual_required",
+    "summary": "Must be executed by the user in the server context or after explicit executable environment confirmation.",
+    "evidence": [
+      "Must be executed by the user in the server context or after explicit executable environment confirmation."
+    ],
+    "warnings": [
+      "Codex did not execute this command."
+    ]
+  },
+  {
+    "id": "docker-11",
+    "command": "docker compose -f deploy/enhe-ai-tools/docker-compose.yml ps",
+    "environment": "docker",
+    "status": "manual_required",
+    "summary": "Must be executed by the user in the server context or after explicit executable environment confirmation.",
+    "evidence": [
+      "Must be executed by the user in the server context or after explicit executable environment confirmation."
+    ],
+    "warnings": [
+      "Codex did not execute this command."
+    ]
+  },
+  {
+    "id": "docker-29",
+    "command": "docker compose -f deploy/enhe-ai-tools/docker-compose.yml up -d --build",
+    "environment": "docker",
+    "status": "manual_required",
+    "summary": "Must be executed by the user in the server context or after explicit executable environment confirmation.",
+    "evidence": [
+      "Must be executed by the user in the server context or after explicit executable environment confirmation."
+    ],
+    "warnings": [
+      "Codex did not execute this command."
+    ]
+  },
+  {
+    "id": "docker-30",
+    "command": "docker compose -f deploy/enhe-ai-tools/docker-compose.yml ps",
+    "environment": "docker",
+    "status": "manual_required",
+    "summary": "Must be executed by the user in the server context or after explicit executable environment confirmation.",
+    "evidence": [
+      "Must be executed by the user in the server context or after explicit executable environment confirmation."
+    ],
+    "warnings": [
+      "Codex did not execute this command."
+    ]
+  },
+  {
+    "id": "nginx-31",
+    "command": "nginx -t && nginx -s reload",
+    "environment": "nginx",
+    "status": "manual_required",
+    "summary": "Must be executed by the user in the server context or after explicit executable environment confirmation.",
+    "evidence": [
+      "Must be executed by the user in the server context or after explicit executable environment confirmation."
+    ],
+    "warnings": [
+      "Codex did not execute this command."
+    ]
+  }
+]

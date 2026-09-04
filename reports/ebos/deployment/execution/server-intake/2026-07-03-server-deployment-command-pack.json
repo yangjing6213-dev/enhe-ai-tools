@@ -1,0 +1,94 @@
+{
+  "packType": "server_deployment_command_pack",
+  "targetDate": "2026-07-03",
+  "generatedAt": "2026-07-05T06:34:54.977Z",
+  "currentDeploymentStatus": "executing",
+  "manualRequiredCommands": [
+    "Server project path must be confirmed before SSH or deployment commands are run.",
+    "Manual confirmation required: Server project path must be confirmed before SSH or deployment commands are run.",
+    "docker compose -f deploy/enhe-ai-tools/docker-compose.yml up -d --build",
+    "docker compose -f deploy/enhe-ai-tools/docker-compose.yml ps",
+    "docker compose -f deploy/enhe-ai-tools/docker-compose.yml up -d --build",
+    "docker compose -f deploy/enhe-ai-tools/docker-compose.yml ps",
+    "nginx -t && nginx -s reload"
+  ],
+  "commandGroups": [
+    {
+      "groupId": "server",
+      "title": "Server 命令",
+      "environment": "server",
+      "commands": [
+        "Server project path must be confirmed before SSH or deployment commands are run.",
+        "Manual confirmation required: Server project path must be confirmed before SSH or deployment commands are run."
+      ],
+      "expectedOutcome": "服务器项目路径和执行上下文已被真实操作者确认，后续命令只在正确服务器环境执行。",
+      "failureHandling": "如果服务器路径或权限不明确，立即停止，不要猜测路径，并在 failures 中记录原因。",
+      "evidenceToCollect": [
+        "服务器项目路径确认摘要，不包含主机 secret。",
+        "执行账号/目录上下文的非 secret 描述。"
+      ],
+      "rollbackNote": "Stop and use scoped rollback if this command fails.",
+      "riskLevel": "high",
+      "approvalRequired": true
+    },
+    {
+      "groupId": "docker",
+      "title": "Docker 命令",
+      "environment": "docker",
+      "commands": [
+        "docker compose -f deploy/enhe-ai-tools/docker-compose.yml up -d --build",
+        "docker compose -f deploy/enhe-ai-tools/docker-compose.yml ps",
+        "docker compose -f deploy/enhe-ai-tools/docker-compose.yml up -d --build",
+        "docker compose -f deploy/enhe-ai-tools/docker-compose.yml ps"
+      ],
+      "expectedOutcome": "生产 Docker compose stack 完成构建/刷新，并能看到目标容器状态。",
+      "failureHandling": "如果 build、up 或 ps 失败，停止后续 Nginx 步骤，收集非 secret 错误摘要并准备 scoped rollback。",
+      "evidenceToCollect": [
+        "docker compose up/build 的成功或失败摘要。",
+        "docker compose ps 的目标服务状态摘要。"
+      ],
+      "rollbackNote": "Stop and use scoped rollback if this command fails.",
+      "riskLevel": "high",
+      "approvalRequired": true
+    },
+    {
+      "groupId": "nginx",
+      "title": "Nginx 命令",
+      "environment": "nginx",
+      "commands": [
+        "nginx -t && nginx -s reload"
+      ],
+      "expectedOutcome": "Nginx 配置测试通过后完成 reload；如果配置测试失败，不执行 reload。",
+      "failureHandling": "如果 nginx -t 失败，不要 reload；如果 reload 失败，记录错误摘要并准备 scoped rollback。",
+      "evidenceToCollect": [
+        "nginx -t 的通过或失败摘要。",
+        "nginx reload 是否执行的确认摘要。"
+      ],
+      "rollbackNote": "Stop and use scoped rollback if this command fails.",
+      "riskLevel": "high",
+      "approvalRequired": true
+    }
+  ],
+  "executionOrder": [
+    "server_deploy",
+    "docker_commands",
+    "nginx_commands",
+    "status_recording"
+  ],
+  "resultInputTemplatePath": "reports/ebos/deployment/execution/command-results/2026-07-03-server-deployment-result.json",
+  "safetyWarnings": [
+    "Codex 本阶段不 SSH、不运行 server/docker/nginx 命令。",
+    "执行结果必须来自真实服务器，不能用计划或本地构建结果代替。",
+    "不要打印、复制或提交 secret、token、password、.env 内容。",
+    "不要运行 Prisma migration、database reset 或破坏性清理命令。"
+  ],
+  "rollbackNotes": [
+    "Stop and use scoped rollback if this command fails.",
+    "If route checks fail, keep status pending verification and review scoped rollback.",
+    "Do not run broad reset or destructive database commands."
+  ],
+  "nextCommands": [
+    "npx tsx scripts/check-ebos-server-deployment-result-input.ts --date 2026-07-03",
+    "npx tsx scripts/record-ebos-server-deployment-result.ts --date 2026-07-03 --input reports/ebos/deployment/execution/command-results/2026-07-03-server-deployment-result.json"
+  ]
+}

@@ -1,0 +1,160 @@
+{
+  "trackerType": "validation_tracker",
+  "targetDate": "2026-07-03",
+  "periodStart": "2026-06-29",
+  "periodEnd": "2026-07-05",
+  "generatedAt": "2026-07-03T18:15:37.497Z",
+  "decisionReportPath": "reports/ebos/decision/2026-07-03-decision-report.json",
+  "topPriorityDirection": "AI Prompt Kit",
+  "topExistingProduct": "FaceSwap Studio｜本地人像合成研究工具",
+  "validationPlans": [
+    {
+      "id": "validation-product-1-faceswap-studio-ai",
+      "title": "Validate existing product: FaceSwap Studio｜本地人像合成研究工具",
+      "targetDirection": "Existing product revenue validation",
+      "targetProduct": "FaceSwap Studio｜本地人像合成研究工具",
+      "objective": "Validate whether FaceSwap Studio｜本地人像合成研究工具 can produce first-revenue intent before starting new product work.",
+      "hypothesis": "If pricing, CTA, and delivery details are clear, FaceSwap Studio｜本地人像合成研究工具 can produce measurable purchase intent.",
+      "validationMethod": "pricing_test",
+      "successMetric": "Product page CTA clicks, leads, or presale orders.",
+      "minimumSuccessThreshold": "CTA clicks >= 10 or leads >= 3 or presale orders >= 1 within 7 days.",
+      "durationDays": 7,
+      "requiredAssets": [
+        "Product page pricing block",
+        "Delivery/support copy",
+        "CTA tracking checklist"
+      ],
+      "codexTasks": [
+        "Audit FaceSwap Studio｜本地人像合成研究工具 product page pricing, CTA, FAQ, and delivery copy.",
+        "Draft a pricing test checklist for FaceSwap Studio｜本地人像合成研究工具."
+      ],
+      "humanTasks": [
+        "Confirm the FaceSwap Studio｜本地人像合成研究工具 validation offer and price.",
+        "Handle manual payment, lead follow-up, or customer questions."
+      ],
+      "risks": [
+        "Existing product readiness does not prove paid demand."
+      ],
+      "resultInput": {
+        "planId": "validation-product-1-faceswap-studio-ai",
+        "status": "not_started"
+      }
+    },
+    {
+      "id": "validation-product-2-local-ai-video-studio-for-creator-workflows",
+      "title": "Validate existing product: AI Video Studio｜本地视频生成工作台",
+      "targetDirection": "Existing product revenue validation",
+      "targetProduct": "AI Video Studio｜本地视频生成工作台",
+      "objective": "Validate whether AI Video Studio｜本地视频生成工作台 can produce first-revenue intent before starting new product work.",
+      "hypothesis": "If pricing, CTA, and delivery details are clear, AI Video Studio｜本地视频生成工作台 can produce measurable purchase intent.",
+      "validationMethod": "pricing_test",
+      "successMetric": "Product page CTA clicks, leads, or presale orders.",
+      "minimumSuccessThreshold": "CTA clicks >= 10 or leads >= 3 or presale orders >= 1 within 7 days.",
+      "durationDays": 7,
+      "requiredAssets": [
+        "Product page pricing block",
+        "Delivery/support copy",
+        "CTA tracking checklist"
+      ],
+      "codexTasks": [
+        "Audit AI Video Studio｜本地视频生成工作台 product page pricing, CTA, FAQ, and delivery copy.",
+        "Draft a pricing test checklist for AI Video Studio｜本地视频生成工作台."
+      ],
+      "humanTasks": [
+        "Confirm the AI Video Studio｜本地视频生成工作台 validation offer and price.",
+        "Handle manual payment, lead follow-up, or customer questions."
+      ],
+      "risks": [
+        "Existing product readiness does not prove paid demand."
+      ],
+      "resultInput": {
+        "planId": "validation-product-2-local-ai-video-studio-for-creator-workflows",
+        "status": "not_started"
+      }
+    },
+    {
+      "id": "validation-direction-3-ai-prompt-kit",
+      "title": "Validate AI Prompt Kit",
+      "targetDirection": "AI Prompt Kit",
+      "objective": "Validate whether AI Prompt Kit can produce near-term purchase intent before heavy development.",
+      "hypothesis": "If ENHE presents a clear AI Prompt Kit offer, users will click CTA, leave leads, or place at least one presale order.",
+      "validationMethod": "landing_page",
+      "successMetric": "Landing page CTA clicks, leads, or presale orders.",
+      "minimumSuccessThreshold": "CTA clicks >= 10 or leads >= 3 or presale orders >= 1.",
+      "durationDays": 7,
+      "requiredAssets": [
+        "AI Prompt Kit landing page",
+        "Pricing block",
+        "FAQ block",
+        "CTA tracking checklist"
+      ],
+      "codexTasks": [
+        "Draft one focused AI Prompt Kit validation page with pricing, FAQ, and CTA.",
+        "Add tracking notes for CTA clicks, leads, and manual purchase intent.",
+        "Create one comparison or use-case content brief supporting AI Prompt Kit."
+      ],
+      "humanTasks": [
+        "Review the AI Prompt Kit offer and decide the validation price.",
+        "Respond manually to leads or presale inquiries within 24 hours."
+      ],
+      "risks": [
+        "Competitor signals do not prove traffic, sales, or revenue."
+      ],
+      "resultInput": {
+        "planId": "validation-direction-3-ai-prompt-kit",
+        "status": "not_started"
+      }
+    }
+  ],
+  "instructions": [
+    "Edit the manual validation input JSON under reports/ebos/validation/inputs.",
+    "For each result, keep planId unchanged and set status to not_started, running, completed, or skipped.",
+    "Record only observed metrics: ctaClicks, leads, presaleOrders, paidOrders, revenue, refunds, replies, feedback, and notes.",
+    "Leave unknown fields empty; EBOS must not fabricate clicks, leads, orders, or revenue.",
+    "Run scripts/generate-ebos-validation-report.ts after manual results are recorded."
+  ],
+  "manualInputSchema": {
+    "allowedStatuses": [
+      "not_started",
+      "running",
+      "completed",
+      "skipped"
+    ],
+    "numericFields": [
+      "actualMetricValue",
+      "ctaClicks",
+      "leads",
+      "presaleOrders",
+      "paidOrders",
+      "revenue",
+      "refundCount",
+      "manualOutreachCount",
+      "positiveReplies",
+      "negativeReplies"
+    ],
+    "optionalTextFields": [
+      "actualMetricLabel",
+      "notes",
+      "completedAt"
+    ],
+    "optionalArrayFields": [
+      "userFeedback",
+      "channelResults"
+    ],
+    "results": [
+      {
+        "planId": "validation-product-1-faceswap-studio-ai",
+        "status": "not_started"
+      },
+      {
+        "planId": "validation-product-2-local-ai-video-studio-for-creator-workflows",
+        "status": "not_started"
+      },
+      {
+        "planId": "validation-direction-3-ai-prompt-kit",
+        "status": "not_started"
+      }
+    ]
+  },
+  "warnings": []
+}

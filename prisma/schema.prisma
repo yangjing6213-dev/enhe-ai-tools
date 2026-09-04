@@ -1,0 +1,1233 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum UserRole {
+  user
+  admin
+}
+
+enum UserStatus {
+  active
+  disabled
+}
+
+enum ApiDeveloperProfileStatus {
+  active
+  suspended
+  closed
+}
+
+enum ApiKeyStatus {
+  active
+  revoked
+}
+
+enum ApiUsageBillingStatus {
+  not_billable
+  pending
+  billed
+  review
+}
+
+enum ApiCreditTransactionType {
+  plan_grant
+  recharge
+  referral_reward
+  api_charge
+  admin_adjustment
+  refund
+  correction
+}
+
+enum ApiCreditBalanceBucket {
+  plan
+  recharge
+  referral
+  mixed
+}
+
+enum PlanStatus {
+  active
+  disabled
+}
+
+enum MembershipStatus {
+  active
+  expired
+  cancelled
+}
+
+enum ToolType {
+  software
+  online
+  skill_learning
+}
+
+enum PublishStatus {
+  draft
+  published
+  offline
+}
+
+enum PaymentMethod {
+  alipay
+  wechat
+}
+
+enum OrderStatus {
+  pending_payment
+  pending_review
+  paid
+  activated
+  rejected
+  cancelled
+  refunded
+}
+
+enum PaymentTransactionStatus {
+  pending
+  paid
+  failed
+  refunded
+}
+
+enum OrderType {
+  vip
+  software_download
+}
+
+enum RefundStatus {
+  pending
+  completed
+  rejected
+}
+
+enum ProofReviewStatus {
+  not_submitted
+  pending
+  approved
+  rejected
+}
+
+enum CommentStatus {
+  pending
+  approved
+  rejected
+  deleted
+}
+
+enum ContentStatus {
+  active
+  disabled
+}
+
+enum DevelopmentVersionStatus {
+  planned
+  active
+  released
+  archived
+}
+
+enum DevelopmentItemStatus {
+  completed
+  partial
+  not_started
+  recommended
+}
+
+enum DevelopmentPriority {
+  high
+  medium
+  low
+}
+
+enum ProductReleaseStatus {
+  planned
+  active
+  released
+  archived
+}
+
+enum NewsStatus {
+  draft
+  published
+  archived
+}
+
+enum AiTrendBriefingStatus {
+  draft
+  published
+  archived
+}
+
+enum GeoPlatformRegion {
+  global
+  china
+}
+
+enum GeoProviderMode {
+  api
+  manual_browser
+  search_console
+  bing_webmaster
+}
+
+enum GeoQueryStatus {
+  active
+  paused
+}
+
+enum GeoRunStatus {
+  pending
+  completed
+  failed
+}
+
+enum GeoRecommendationStatus {
+  open
+  planned
+  done
+  dismissed
+}
+
+enum BaiduPushQueueStatus {
+  pending
+  processing
+  succeeded
+  failed
+}
+
+model User {
+  id              String          @id @default(cuid())
+  email           String?         @unique
+  phone           String?         @unique
+  passwordHash    String          @map("password_hash")
+  nickname        String?
+  avatar          String?
+  role            UserRole        @default(user)
+  status          UserStatus      @default(active)
+  createdAt       DateTime        @default(now()) @map("created_at")
+  updatedAt       DateTime        @updatedAt @map("updated_at")
+  memberships     Membership[]
+  orders          Order[]
+  paymentProofs   PaymentProof[]  @relation("ProofOwner")
+  reviewedProofs  PaymentProof[]  @relation("ProofReviewer")
+  comments        Comment[]
+  downloadLogs    DownloadLog[]
+  toolUsageLogs   ToolUsageLog[]
+  analyticsEvents AnalyticsEvent[]
+  toolPurchases   ToolPurchase[]
+  vipAdjustments   VipAdjustmentLog[] @relation("VipAdjustmentTarget")
+  vipOperations    VipAdjustmentLog[] @relation("VipAdjustmentAdmin")
+  refundRecords     OrderRefundRecord[] @relation("RefundAdmin")
+  refundRequests    OrderRefundRecord[] @relation("RefundRequester")
+  adminAuditLogs    AdminAuditLog[] @relation("AdminAuditLogs")
+    sessions         Session[]
+    notifications    Notification[]
+    newsletterEmail     String?   @map("newsletter_email")
+    acceptEmailUpdates  Boolean   @default(true) @map("accept_email_updates")
+  newsFavorites    NewsArticleFavorite[]
+  newsLikes        NewsArticleLike[]
+  apiDeveloperProfile ApiDeveloperProfile?
+  apiKeys             ApiKey[]
+  apiUsageLogs        ApiUsageLog[]
+  apiWallet           ApiWallet?
+  apiCreditTransactions ApiCreditTransaction[]
+
+  @@map("users")
+}
+
+model VipPlan {
+  id             String       @id @default(cuid())
+  name           String
+  durationDays   Int          @map("duration_days")
+  price          Decimal      @db.Decimal(10, 2)
+  originalPrice  Decimal?     @map("original_price") @db.Decimal(10, 2)
+  description    String?
+  isRecommended  Boolean      @default(false) @map("is_recommended")
+  status         PlanStatus   @default(active)
+  sortOrder      Int          @default(0) @map("sort_order")
+  createdAt      DateTime     @default(now()) @map("created_at")
+  updatedAt      DateTime     @updatedAt @map("updated_at")
+  memberships    Membership[]
+  orders         Order[]
+
+  @@map("vip_plans")
+}
+
+model Membership {
+  id         String           @id @default(cuid())
+  userId     String           @map("user_id")
+  planId     String?          @map("plan_id")
+  vipType    String           @map("vip_type")
+  startTime  DateTime         @map("start_time")
+  endTime    DateTime?        @map("end_time")
+  isLifetime Boolean          @default(false) @map("is_lifetime")
+  status     MembershipStatus @default(active)
+  createdAt  DateTime         @default(now()) @map("created_at")
+  updatedAt  DateTime         @updatedAt @map("updated_at")
+  user       User             @relation(fields: [userId], references: [id])
+  plan       VipPlan?         @relation(fields: [planId], references: [id])
+
+  @@index([userId, status])
+  @@map("memberships")
+}
+
+model ToolCategory {
+  id          String        @id @default(cuid())
+  name        String
+  type        ToolType
+  description String?
+  sortOrder   Int           @default(0) @map("sort_order")
+  status      ContentStatus @default(active)
+  createdAt   DateTime      @default(now()) @map("created_at")
+  updatedAt   DateTime      @updatedAt @map("updated_at")
+  tools       Tool[]
+
+  @@index([type, status])
+  @@map("tool_categories")
+}
+
+model Tool {
+  id                String         @id @default(cuid())
+  name              String
+  englishName       String?        @map("english_name")
+  slug              String         @unique
+  type              ToolType
+  categoryId        String?        @map("category_id")
+  shortDescription  String         @map("short_description")
+  content           String
+  coverImage        String?        @map("cover_image")
+  screenshots       String[]       @default([])
+  videoUrl          String?        @map("video_url")
+  videoTitle        String?        @map("video_title")
+  videoDescription  String?        @map("video_description")
+  version           String?
+  systemRequirement String?        @map("system_requirement")
+  isVipRequired     Boolean        @default(true) @map("is_vip_required")
+  isDownloadPaid    Boolean        @default(false) @map("is_download_paid")
+  isDownloadLinkVipOnly Boolean    @default(true) @map("is_download_link_vip_only")
+  isHomeRecommended Boolean        @default(false) @map("is_home_recommended")
+  downloadPrice     Decimal        @default(0) @map("download_price") @db.Decimal(10, 2)
+  onlineUrl         String?        @map("online_url")
+  downloadFileId    String?        @unique @map("download_file_id")
+  downloadCount     Int            @default(0) @map("download_count")
+  usageCount        Int            @default(0) @map("usage_count")
+  status            PublishStatus  @default(draft)
+  sortOrder         Int            @default(0) @map("sort_order")
+  createdAt         DateTime       @default(now()) @map("created_at")
+  updatedAt         DateTime       @updatedAt @map("updated_at")
+  category          ToolCategory?  @relation(fields: [categoryId], references: [id])
+  files             File[]         @relation("ToolFiles")
+  downloadFile      File?          @relation("PrimaryDownload", fields: [downloadFileId], references: [id])
+  tutorials         Tutorial[]
+  comments          Comment[]
+  downloadLogs      DownloadLog[]
+  toolUsageLogs     ToolUsageLog[]
+  orders            Order[]
+  purchases         ToolPurchase[]
+  priceSpecs        ToolPriceSpec[]
+  tagLinks          ToolTagLink[]
+  faqs              ToolFaq[]
+  changelogs        ToolChangelog[]
+
+  @@index([type, status])
+  @@index([isHomeRecommended, status, sortOrder])
+  @@map("tools")
+}
+
+model ToolTag {
+  id          String        @id @default(cuid())
+  name        String        @unique
+  slug        String        @unique
+  color       String?
+  description String?
+  status      ContentStatus @default(active)
+  sortOrder   Int           @default(0) @map("sort_order")
+  createdAt   DateTime      @default(now()) @map("created_at")
+  updatedAt   DateTime      @updatedAt @map("updated_at")
+  toolLinks   ToolTagLink[]
+
+  @@map("tool_tags")
+}
+
+model ToolTagLink {
+  id        String  @id @default(cuid())
+  toolId    String  @map("tool_id")
+  tagId     String  @map("tag_id")
+  tool      Tool    @relation(fields: [toolId], references: [id])
+  tag       ToolTag @relation(fields: [tagId], references: [id])
+
+  @@unique([toolId, tagId])
+  @@map("tool_tag_links")
+}
+
+model ToolFaq {
+  id        String        @id @default(cuid())
+  toolId    String        @map("tool_id")
+  question  String
+  answer    String
+  status    ContentStatus @default(active)
+  sortOrder Int           @default(0) @map("sort_order")
+  createdAt DateTime      @default(now()) @map("created_at")
+  updatedAt DateTime      @updatedAt @map("updated_at")
+  tool      Tool          @relation(fields: [toolId], references: [id])
+
+  @@index([toolId, status])
+  @@map("tool_faqs")
+}
+
+model ToolChangelog {
+  id          String        @id @default(cuid())
+  toolId      String        @map("tool_id")
+  version     String
+  title       String
+  content     String
+  releaseDate DateTime?     @map("release_date")
+  status      ContentStatus @default(active)
+  sortOrder   Int           @default(0) @map("sort_order")
+  createdAt   DateTime      @default(now()) @map("created_at")
+  updatedAt   DateTime      @updatedAt @map("updated_at")
+  tool        Tool          @relation(fields: [toolId], references: [id])
+
+  @@index([toolId, status])
+  @@map("tool_changelogs")
+}
+
+model ToolPriceSpec {
+  id        String        @id @default(cuid())
+  toolId    String        @map("tool_id")
+  name      String
+  price     Decimal       @db.Decimal(10, 2)
+  sortOrder Int           @default(0) @map("sort_order")
+  status    ContentStatus @default(active)
+  createdAt DateTime      @default(now()) @map("created_at")
+  updatedAt DateTime      @updatedAt @map("updated_at")
+  tool      Tool          @relation(fields: [toolId], references: [id], onDelete: Cascade)
+  orders    Order[]
+  purchases ToolPurchase[]
+
+  @@index([toolId, status, sortOrder])
+  @@map("tool_price_specs")
+}
+
+model File {
+  id            String        @id @default(cuid())
+  toolId        String?       @map("tool_id")
+  fileName      String        @map("file_name")
+  filePath      String        @map("file_path")
+  fileUrl       String?       @map("file_url")
+  fileSize      BigInt?       @map("file_size")
+  version       String?
+  mimeType      String?       @map("mime_type")
+  downloadCount Int           @default(0) @map("download_count")
+  createdAt     DateTime      @default(now()) @map("created_at")
+  updatedAt     DateTime      @updatedAt @map("updated_at")
+  tool          Tool?         @relation("ToolFiles", fields: [toolId], references: [id])
+  primaryFor    Tool?         @relation("PrimaryDownload")
+  downloadLogs  DownloadLog[]
+
+  @@map("files")
+}
+
+model Tutorial {
+  id        String        @id @default(cuid())
+  toolId    String        @map("tool_id")
+  title     String
+  content   String
+  imageUrl  String?       @map("image_url")
+  videoUrl  String?       @map("video_url")
+  notes     String?
+  commonErrors String?    @map("common_errors")
+  sortOrder Int           @default(0) @map("sort_order")
+  status    ContentStatus @default(active)
+  createdAt DateTime      @default(now()) @map("created_at")
+  updatedAt DateTime      @updatedAt @map("updated_at")
+  tool      Tool          @relation(fields: [toolId], references: [id])
+
+  @@index([toolId, status])
+  @@map("tutorials")
+}
+
+model Order {
+  id            String          @id @default(cuid())
+  orderNo       String          @unique @map("order_no")
+  userId        String          @map("user_id")
+  planId        String?         @map("plan_id")
+  toolId        String?         @map("tool_id")
+  toolPriceSpecId   String?     @map("tool_price_spec_id")
+  toolPriceSpecName String?     @map("tool_price_spec_name")
+  orderType     OrderType       @default(vip) @map("order_type")
+  amount        Decimal         @db.Decimal(10, 2)
+  paymentMethod PaymentMethod?  @map("payment_method")
+  orderStatus   OrderStatus     @default(pending_payment) @map("order_status")
+  paidAt        DateTime?       @map("paid_at")
+  activatedAt   DateTime?       @map("activated_at")
+  createdAt     DateTime        @default(now()) @map("created_at")
+  updatedAt     DateTime        @updatedAt @map("updated_at")
+  user          User            @relation(fields: [userId], references: [id])
+  plan          VipPlan?        @relation(fields: [planId], references: [id])
+  tool          Tool?           @relation(fields: [toolId], references: [id])
+  toolPriceSpec ToolPriceSpec?  @relation(fields: [toolPriceSpecId], references: [id], onDelete: SetNull)
+  paymentProof  PaymentProof?
+  paymentTransaction PaymentTransaction?
+  toolPurchase  ToolPurchase?
+  refundRecords OrderRefundRecord[]
+
+  @@index([userId, orderStatus])
+  @@index([toolId, orderStatus])
+  @@map("orders")
+}
+
+model PaymentTransaction {
+  id              String                   @id @default(cuid())
+  orderId         String                   @unique @map("order_id")
+  provider        String                   @default("zpay")
+  providerTradeNo String?                  @map("provider_trade_no")
+  providerOrderId String?                  @map("provider_order_id")
+  paymentType     String                   @map("payment_type")
+  status          PaymentTransactionStatus @default(pending)
+  amount          Decimal                  @db.Decimal(10, 2)
+  qrCodeUrl       String?                  @map("qr_code_url")
+  qrImageUrl      String?                  @map("qr_image_url")
+  payUrl          String?                  @map("pay_url")
+  payUrl2         String?                  @map("pay_url2")
+  rawResponse     Json?                    @map("raw_response")
+  notifyPayload   Json?                    @map("notify_payload")
+  refundPayload   Json?                    @map("refund_payload")
+  paidAt          DateTime?                @map("paid_at")
+  refundedAt      DateTime?                @map("refunded_at")
+  createdAt       DateTime                 @default(now()) @map("created_at")
+  updatedAt       DateTime                 @updatedAt @map("updated_at")
+  order           Order                    @relation(fields: [orderId], references: [id], onDelete: Cascade)
+
+  @@index([providerTradeNo])
+  @@index([status])
+  @@map("payment_transactions")
+}
+
+model OrderRefundRecord {
+  id        String       @id @default(cuid())
+  orderId   String       @map("order_id")
+  adminId   String?      @map("admin_id")
+  requesterId String?    @map("requester_id")
+  amount    Decimal      @db.Decimal(10, 2)
+  status    RefundStatus @default(completed)
+  reason    String
+  note      String?
+  refundReceiverQr String? @map("refund_receiver_qr")
+  refundProofImage String? @map("refund_proof_image")
+  completedAt DateTime?    @map("completed_at")
+  createdAt DateTime     @default(now()) @map("created_at")
+  updatedAt DateTime     @updatedAt @map("updated_at")
+  order     Order        @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  admin     User?        @relation("RefundAdmin", fields: [adminId], references: [id], onDelete: SetNull)
+  requester User?        @relation("RefundRequester", fields: [requesterId], references: [id], onDelete: SetNull)
+
+  @@index([orderId, createdAt])
+  @@index([adminId, createdAt])
+  @@index([requesterId, createdAt])
+  @@map("order_refund_records")
+}
+
+model ToolPurchase {
+  id        String   @id @default(cuid())
+  userId    String   @map("user_id")
+  toolId    String   @map("tool_id")
+  toolPriceSpecId   String? @map("tool_price_spec_id")
+  toolPriceSpecName String? @map("tool_price_spec_name")
+  orderId   String   @unique @map("order_id")
+  amount    Decimal  @db.Decimal(10, 2)
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+  user      User     @relation(fields: [userId], references: [id])
+  tool      Tool     @relation(fields: [toolId], references: [id])
+  toolPriceSpec ToolPriceSpec? @relation(fields: [toolPriceSpecId], references: [id], onDelete: SetNull)
+  order     Order    @relation(fields: [orderId], references: [id])
+
+  @@unique([userId, toolId])
+  @@map("tool_purchases")
+}
+
+model PaymentProof {
+  id             String            @id @default(cuid())
+  orderId        String            @unique @map("order_id")
+  userId         String            @map("user_id")
+  paymentMethod  PaymentMethod     @map("payment_method")
+  paymentRemark  String?           @map("payment_remark")
+  proofImage     String            @map("proof_image")
+  reviewStatus   ProofReviewStatus @default(pending) @map("review_status")
+  reviewerId     String?           @map("reviewer_id")
+  reviewedAt     DateTime?         @map("reviewed_at")
+  reviewNote     String?           @map("review_note")
+  createdAt      DateTime          @default(now()) @map("created_at")
+  updatedAt      DateTime          @updatedAt @map("updated_at")
+  order          Order             @relation(fields: [orderId], references: [id])
+  user           User              @relation("ProofOwner", fields: [userId], references: [id])
+  reviewer       User?             @relation("ProofReviewer", fields: [reviewerId], references: [id])
+
+  @@index([reviewStatus])
+  @@map("payment_proofs")
+}
+
+model Comment {
+  id        String        @id @default(cuid())
+  userId    String        @map("user_id")
+  toolId    String        @map("tool_id")
+  content   String
+  status    CommentStatus @default(pending)
+  likeCount Int           @default(0) @map("like_count")
+  isPinned  Boolean       @default(false) @map("is_pinned")
+  createdAt DateTime      @default(now()) @map("created_at")
+  updatedAt DateTime      @updatedAt @map("updated_at")
+  user      User          @relation(fields: [userId], references: [id])
+  tool      Tool          @relation(fields: [toolId], references: [id])
+
+  @@index([toolId, status])
+  @@map("comments")
+}
+
+model DownloadLog {
+  id        String   @id @default(cuid())
+  userId    String   @map("user_id")
+  toolId    String   @map("tool_id")
+  fileId    String   @map("file_id")
+  ip        String?
+  userAgent String?  @map("user_agent")
+  createdAt DateTime @default(now()) @map("created_at")
+  user      User     @relation(fields: [userId], references: [id])
+  tool      Tool     @relation(fields: [toolId], references: [id])
+  file      File     @relation(fields: [fileId], references: [id])
+
+  @@map("download_logs")
+}
+
+model ToolUsageLog {
+  id        String   @id @default(cuid())
+  userId    String   @map("user_id")
+  toolId    String   @map("tool_id")
+  ip        String?
+  userAgent String?  @map("user_agent")
+  createdAt DateTime @default(now()) @map("created_at")
+  user      User     @relation(fields: [userId], references: [id])
+  tool      Tool     @relation(fields: [toolId], references: [id])
+
+  @@map("tool_usage_logs")
+}
+
+model AnalyticsEvent {
+  id         String   @id @default(cuid())
+  eventName  String   @map("event_name")
+  path       String?
+  entityType String?  @map("entity_type")
+  entityId   String?  @map("entity_id")
+  userId     String?  @map("user_id")
+  metadata   Json?
+  ip         String?
+  userAgent  String?  @map("user_agent")
+  createdAt  DateTime @default(now()) @map("created_at")
+  user       User?    @relation(fields: [userId], references: [id], onDelete: SetNull)
+
+  @@index([eventName, createdAt])
+  @@index([path, createdAt])
+  @@index([userId, createdAt])
+  @@map("analytics_events")
+}
+
+model SiteSetting {
+  id          String   @id @default(cuid())
+  key         String   @unique
+  value       String
+  description String?
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+
+  @@map("site_settings")
+}
+
+model DevelopmentVersion {
+  id          String                   @id @default(cuid())
+  version     String                   @unique
+  name        String
+  description String?
+  status      DevelopmentVersionStatus @default(active)
+  startedAt   DateTime?                @map("started_at")
+  releasedAt  DateTime?                @map("released_at")
+  sortOrder   Int                      @default(0) @map("sort_order")
+  createdAt   DateTime                 @default(now()) @map("created_at")
+  updatedAt   DateTime                 @updatedAt @map("updated_at")
+  items       DevelopmentItem[]
+  productReleases ProductRelease[]
+
+  @@index([status, sortOrder])
+  @@map("development_versions")
+}
+
+model ProductRelease {
+  id                   String               @id @default(cuid())
+  version              String               @unique
+  name                 String
+  description          String?
+  status               ProductReleaseStatus @default(planned)
+  developmentVersionId String?              @map("development_version_id")
+  releaseDate          DateTime?            @map("release_date")
+  sortOrder            Int                  @default(0) @map("sort_order")
+  createdAt            DateTime             @default(now()) @map("created_at")
+  updatedAt            DateTime             @updatedAt @map("updated_at")
+  developmentVersion   DevelopmentVersion?  @relation(fields: [developmentVersionId], references: [id], onDelete: SetNull)
+
+  @@index([status, sortOrder])
+  @@map("product_releases")
+}
+
+model DevelopmentItem {
+  id           String                @id @default(cuid())
+  versionId    String                @map("version_id")
+  module       String
+  name         String
+  status       DevelopmentItemStatus @default(not_started)
+  priority     DevelopmentPriority   @default(medium)
+  relatedFiles String?               @map("related_files")
+  notes        String?
+  sortOrder    Int                   @default(0) @map("sort_order")
+  createdAt    DateTime              @default(now()) @map("created_at")
+  updatedAt    DateTime              @updatedAt @map("updated_at")
+  version      DevelopmentVersion    @relation(fields: [versionId], references: [id], onDelete: Cascade)
+
+  @@unique([versionId, name])
+  @@index([versionId, module, status])
+  @@map("development_items")
+}
+
+model VipAdjustmentLog {
+  id           String   @id @default(cuid())
+  userId       String   @map("user_id")
+  adminId      String   @map("admin_id")
+  actionType   String   @map("action_type")
+  reason       String
+  beforeStatus Json?    @map("before_status")
+  afterStatus  Json?    @map("after_status")
+  createdAt    DateTime @default(now()) @map("created_at")
+  user         User     @relation("VipAdjustmentTarget", fields: [userId], references: [id])
+  admin        User     @relation("VipAdjustmentAdmin", fields: [adminId], references: [id])
+
+  @@index([userId, createdAt])
+  @@index([adminId, createdAt])
+  @@map("vip_adjustment_logs")
+}
+
+model AdminAuditLog {
+  id         String   @id @default(cuid())
+  adminId    String?  @map("admin_id")
+  action     String
+  targetType String   @map("target_type")
+  targetId   String?  @map("target_id")
+  summary    String
+  metadata   Json?
+  ip         String?
+  userAgent  String?  @map("user_agent")
+  createdAt  DateTime @default(now()) @map("created_at")
+  admin      User?    @relation("AdminAuditLogs", fields: [adminId], references: [id])
+
+  @@index([adminId, createdAt])
+  @@index([targetType, targetId])
+  @@index([createdAt])
+  @@map("admin_audit_logs")
+}
+
+model BaiduPushQueueItem {
+  id            String               @id @default(cuid())
+  url           String               @unique
+  status        BaiduPushQueueStatus @default(pending)
+  attemptCount  Int                  @default(0) @map("attempt_count")
+  nextAttemptAt DateTime             @map("next_attempt_at")
+  lastAttemptAt DateTime?            @map("last_attempt_at")
+  lastStatus    Int?                 @map("last_status")
+  lastResponse  Json?                @map("last_response")
+  lastError     String?              @map("last_error")
+  context       Json?
+  createdAt     DateTime             @default(now()) @map("created_at")
+  updatedAt     DateTime             @updatedAt @map("updated_at")
+
+  @@index([status, nextAttemptAt])
+  @@map("baidu_push_queue_items")
+}
+
+model Notification {
+  id        String    @id @default(cuid())
+  userId    String    @map("user_id")
+  type      String
+  title     String
+  content   String
+  linkUrl   String?   @map("link_url")
+  readAt    DateTime? @map("read_at")
+  createdAt DateTime  @default(now()) @map("created_at")
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, readAt, createdAt])
+  @@map("notifications")
+}
+
+model ApiDeveloperProfile {
+  id              String                    @id @default(cuid())
+  userId          String                    @unique @map("user_id")
+  developerId     String                    @unique @map("developer_id")
+  displayName     String                    @map("display_name")
+  emailSnapshot   String?                   @map("email_snapshot")
+  status          ApiDeveloperProfileStatus @default(active)
+  suspendedReason String?                   @map("suspended_reason")
+  suspendedAt     DateTime?                 @map("suspended_at")
+  closedAt        DateTime?                 @map("closed_at")
+  createdAt       DateTime                  @default(now()) @map("created_at")
+  updatedAt       DateTime                  @updatedAt @map("updated_at")
+  user            User                      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  apiKeys         ApiKey[]
+  apiUsageLogs    ApiUsageLog[]
+  apiWallet       ApiWallet?
+  apiCreditTransactions ApiCreditTransaction[]
+
+  @@index([status, createdAt])
+  @@map("api_developer_profiles")
+}
+
+model ApiKey {
+  id                 String       @id @default(cuid())
+  userId             String       @map("user_id")
+  developerProfileId String       @map("developer_profile_id")
+  name               String
+  keyPrefix          String       @map("key_prefix")
+  keyHash            String       @unique @map("key_hash")
+  keyHashVersion     Int          @default(1) @map("key_hash_version")
+  status             ApiKeyStatus @default(active)
+  lastUsedAt         DateTime?    @map("last_used_at")
+  revokedAt          DateTime?    @map("revoked_at")
+  createdAt          DateTime     @default(now()) @map("created_at")
+  updatedAt          DateTime     @updatedAt @map("updated_at")
+
+  user             User                @relation(fields: [userId], references: [id], onDelete: Cascade)
+  developerProfile ApiDeveloperProfile @relation(fields: [developerProfileId], references: [id], onDelete: Cascade)
+  usageLogs        ApiUsageLog[]
+
+  @@index([userId, status, createdAt])
+  @@index([developerProfileId, status, createdAt])
+  @@index([keyPrefix])
+  @@map("api_keys")
+}
+
+model ApiUsageLog {
+  id                    String                @id @default(cuid())
+  requestId             String                @unique @map("request_id")
+  userId                String                @map("user_id")
+  developerProfileId    String                @map("developer_profile_id")
+  apiKeyId              String?               @map("api_key_id")
+  keyPrefix             String                @map("key_prefix")
+  method                String
+  path                  String
+  model                 String?
+  publicModelName       String?               @map("public_model_name")
+  upstreamProvider      String?               @map("upstream_provider")
+  upstreamModel         String?               @map("upstream_model")
+  statusCode            Int                   @map("status_code")
+  inputTokens           Int                   @default(0) @map("input_tokens")
+  outputTokens          Int                   @default(0) @map("output_tokens")
+  cacheReadTokens       Int                   @default(0) @map("cache_read_tokens")
+  cacheWriteTokens      Int                   @default(0) @map("cache_write_tokens")
+  costUsd               Decimal               @default(0) @map("cost_usd") @db.Decimal(18, 8)
+  chargedUsd            Decimal               @default(0) @map("charged_usd") @db.Decimal(18, 8)
+  latencyMs             Int?                  @map("latency_ms")
+  isStream              Boolean               @default(false) @map("is_stream")
+  errorCode             String?               @map("error_code")
+  errorMessage          String?               @map("error_message")
+  clientIpHash          String?               @map("client_ip_hash")
+  userAgentHash         String?               @map("user_agent_hash")
+  billingStatus         ApiUsageBillingStatus @default(not_billable) @map("billing_status")
+  streamFinishReason    String?               @map("stream_finish_reason")
+  upstreamRequestIdHash String?               @map("upstream_request_id_hash")
+  routeId               String?               @map("route_id")
+  walletTransactionId   String?               @map("wallet_transaction_id")
+  createdAt             DateTime              @default(now()) @map("created_at")
+
+  user             User                @relation(fields: [userId], references: [id], onDelete: Cascade)
+  developerProfile ApiDeveloperProfile @relation(fields: [developerProfileId], references: [id], onDelete: Cascade)
+  apiKey           ApiKey?             @relation(fields: [apiKeyId], references: [id], onDelete: SetNull)
+  creditTransactions ApiCreditTransaction[]
+
+  @@index([userId, createdAt])
+  @@index([developerProfileId, createdAt])
+  @@index([apiKeyId, createdAt])
+  @@index([publicModelName, createdAt])
+  @@index([model, createdAt])
+  @@index([statusCode, createdAt])
+  @@index([errorCode, createdAt])
+  @@index([path, createdAt])
+  @@map("api_usage_logs")
+}
+
+model ApiWallet {
+  id                 String   @id @default(cuid())
+  userId             String   @unique @map("user_id")
+  developerProfileId String   @unique @map("developer_profile_id")
+  planBalanceUsd     Decimal  @default(0) @map("plan_balance_usd") @db.Decimal(18, 8)
+  rechargeBalanceUsd Decimal  @default(0) @map("recharge_balance_usd") @db.Decimal(18, 8)
+  referralBalanceUsd Decimal  @default(0) @map("referral_balance_usd") @db.Decimal(18, 8)
+  lockedBalanceUsd   Decimal  @default(0) @map("locked_balance_usd") @db.Decimal(18, 8)
+  version            Int      @default(0)
+  createdAt          DateTime @default(now()) @map("created_at")
+  updatedAt          DateTime @updatedAt @map("updated_at")
+
+  user               User                   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  developerProfile   ApiDeveloperProfile    @relation(fields: [developerProfileId], references: [id], onDelete: Cascade)
+  creditTransactions ApiCreditTransaction[]
+
+  @@index([updatedAt])
+  @@map("api_wallets")
+}
+
+model ApiCreditTransaction {
+  id                 String                   @id @default(cuid())
+  userId             String                   @map("user_id")
+  developerProfileId String                   @map("developer_profile_id")
+  walletId           String                   @map("wallet_id")
+  usageLogId         String?                  @map("usage_log_id")
+  paymentId          String?                  @map("payment_id")
+  referralId         String?                  @map("referral_id")
+  adminAuditId       String?                  @map("admin_audit_id")
+  idempotencyKey     String                   @unique @map("idempotency_key")
+  transactionType    ApiCreditTransactionType @map("transaction_type")
+  amountUsd          Decimal                  @map("amount_usd") @db.Decimal(18, 8)
+  balanceBucket      ApiCreditBalanceBucket   @map("balance_bucket")
+  balanceAfter       Json                     @map("balance_after")
+  reason             String?
+  createdAt          DateTime                 @default(now()) @map("created_at")
+
+  user               User                @relation(fields: [userId], references: [id], onDelete: Cascade)
+  developerProfile   ApiDeveloperProfile @relation(fields: [developerProfileId], references: [id], onDelete: Cascade)
+  wallet             ApiWallet           @relation(fields: [walletId], references: [id], onDelete: Cascade)
+  usageLog           ApiUsageLog?        @relation(fields: [usageLogId], references: [id], onDelete: SetNull)
+
+  @@index([userId, createdAt])
+  @@index([developerProfileId, createdAt])
+  @@index([walletId, createdAt])
+  @@index([usageLogId])
+  @@index([paymentId])
+  @@index([transactionType, createdAt])
+  @@map("api_credit_transactions")
+}
+
+model Session {
+  id         String    @id @default(cuid())
+  userId     String    @map("user_id")
+  tokenHash  String    @unique @map("token_hash")
+  userAgent  String?   @map("user_agent")
+  ip         String?
+  expiresAt  DateTime  @map("expires_at")
+  revokedAt  DateTime? @map("revoked_at")
+  createdAt  DateTime  @default(now()) @map("created_at")
+  lastSeenAt DateTime  @default(now()) @map("last_seen_at")
+  user       User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([expiresAt])
+  @@map("sessions")
+}
+
+model LoginAttempt {
+  id         String   @id @default(cuid())
+  identifier String
+  ip         String?
+  success    Boolean  @default(false)
+  createdAt  DateTime @default(now()) @map("created_at")
+
+  @@index([identifier, createdAt])
+  @@index([ip, createdAt])
+  @@map("login_attempts")
+}
+
+model NewsCategory {
+  id          String        @id @default(cuid())
+  name        String
+  slug        String        @unique
+  description String?
+  status      ContentStatus @default(active)
+  sortOrder   Int           @default(0) @map("sort_order")
+  createdAt   DateTime      @default(now()) @map("created_at")
+  updatedAt   DateTime      @updatedAt @map("updated_at")
+  articles    NewsArticle[]
+
+  @@index([status, sortOrder])
+  @@map("news_categories")
+}
+
+model NewsTag {
+  id           String           @id @default(cuid())
+  name         String           @unique
+  slug         String           @unique
+  description  String?
+  status       ContentStatus    @default(active)
+  sortOrder    Int              @default(0) @map("sort_order")
+  createdAt    DateTime         @default(now()) @map("created_at")
+  updatedAt    DateTime         @updatedAt @map("updated_at")
+  articleLinks NewsArticleTag[]
+
+  @@index([status, sortOrder])
+  @@map("news_tags")
+}
+
+model NewsKeywordIntervention {
+  id          String   @id @default(cuid())
+  keyword     String
+  locale      String
+  isPinned    Boolean  @default(false) @map("is_pinned")
+  isHidden    Boolean  @default(false) @map("is_hidden")
+  displayName String?  @map("display_name")
+  weightBoost Int      @default(0) @map("weight_boost")
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+
+  @@unique([keyword, locale])
+  @@index([locale, isPinned, isHidden])
+  @@map("news_keyword_interventions")
+}
+
+model NewsArticle {
+  id                    String               @id @default(cuid())
+  title                 String
+  slug                  String               @unique
+  subtitle              String?
+  description           String?
+  keywords              String?
+  summary               String
+  content               String
+  coverImage            String?              @map("cover_image")
+  videoUrl              String?              @map("video_url")
+  videoTitle            String?              @map("video_title")
+  videoDescription      String?              @map("video_description")
+  author                String?
+  status                NewsStatus           @default(draft)
+  categoryId            String?              @map("category_id")
+  publishedAt           DateTime?            @map("published_at")
+  readingTime           Int                  @default(5) @map("reading_time")
+  viewCount             Int                  @default(0) @map("view_count")
+  likeCount             Int                  @default(0) @map("like_count")
+  favoriteCount         Int                  @default(0) @map("favorite_count")
+  isFeatured            Boolean              @default(false) @map("is_featured")
+  isPinned              Boolean              @default(false) @map("is_pinned")
+  sortOrder             Int                  @default(0) @map("sort_order")
+  seoTitle              String?              @map("seo_title")
+  seoDescription        String?              @map("seo_description")
+  seoKeywords           String?              @map("seo_keywords")
+  canonicalUrl          String?              @map("canonical_url")
+  keyTakeaways          String[]             @default([]) @map("key_takeaways")
+  impactNotes           String?              @map("impact_notes")
+  conclusion            String?
+  relatedArticleIds     String[]             @default([]) @map("related_article_ids")
+  relatedToolIds        String[]             @default([]) @map("related_tool_ids")
+  relatedTutorialIds    String[]             @default([]) @map("related_tutorial_ids")
+  englishTitle          String?              @map("english_title")
+  englishSubtitle       String?              @map("english_subtitle")
+  englishDescription    String?              @map("english_description")
+  englishSummary        String?              @map("english_summary")
+  englishContent        String?              @map("english_content")
+  englishKeywords       String?              @map("english_keywords")
+  englishSeoTitle       String?              @map("english_seo_title")
+  englishSeoDescription String?              @map("english_seo_description")
+  englishSeoKeywords    String?              @map("english_seo_keywords")
+  englishKeyTakeaways   String[]             @default([]) @map("english_key_takeaways")
+  englishImpactNotes    String?              @map("english_impact_notes")
+  englishConclusion     String?              @map("english_conclusion")
+  createdAt             DateTime             @default(now()) @map("created_at")
+  updatedAt             DateTime             @updatedAt @map("updated_at")
+  category              NewsCategory?        @relation(fields: [categoryId], references: [id], onDelete: SetNull)
+  tagLinks              NewsArticleTag[]
+  externalSources       NewsExternalSource[]
+  favorites             NewsArticleFavorite[]
+  likes                 NewsArticleLike[]
+
+  @@index([status, publishedAt])
+  @@index([categoryId, status])
+  @@index([isFeatured, isPinned, sortOrder])
+  @@map("news_articles")
+}
+
+model NewsArticleTag {
+  id        String      @id @default(cuid())
+  articleId String      @map("article_id")
+  tagId     String      @map("tag_id")
+  article   NewsArticle @relation(fields: [articleId], references: [id], onDelete: Cascade)
+  tag       NewsTag     @relation(fields: [tagId], references: [id], onDelete: Cascade)
+
+  @@unique([articleId, tagId])
+  @@map("news_article_tags")
+}
+
+model NewsExternalSource {
+  id          String      @id @default(cuid())
+  articleId   String      @map("article_id")
+  title       String
+  url         String
+  sourceType  String      @map("source_type")
+  description String?
+  sortOrder   Int         @default(0) @map("sort_order")
+  createdAt   DateTime    @default(now()) @map("created_at")
+  updatedAt   DateTime    @updatedAt @map("updated_at")
+  article     NewsArticle @relation(fields: [articleId], references: [id], onDelete: Cascade)
+
+  @@index([articleId, sortOrder])
+  @@map("news_external_sources")
+}
+
+model NewsArticleFavorite {
+  id        String      @id @default(cuid())
+  articleId String      @map("article_id")
+  userId    String      @map("user_id")
+  createdAt DateTime    @default(now()) @map("created_at")
+  article   NewsArticle @relation(fields: [articleId], references: [id], onDelete: Cascade)
+  user      User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([articleId, userId])
+  @@index([userId, createdAt])
+  @@map("news_article_favorites")
+}
+
+model NewsArticleLike {
+  id        String      @id @default(cuid())
+  articleId String      @map("article_id")
+  userId    String      @map("user_id")
+  createdAt DateTime    @default(now()) @map("created_at")
+  article   NewsArticle @relation(fields: [articleId], references: [id], onDelete: Cascade)
+  user      User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([articleId, userId])
+  @@index([userId, createdAt])
+  @@map("news_article_likes")
+}
+
+model AiTrendBriefing {
+  id                    String                 @id @default(cuid())
+  date                  DateTime               @unique
+  slug                  String                 @unique
+  title                 String
+  summary               String
+  coreConclusion        String                 @map("core_conclusion")
+  publicHighlights      String[]               @default([]) @map("public_highlights")
+  fullHtml              String                 @map("full_html")
+  sourceSignals         Json?                  @map("source_signals")
+  videoUrl              String?                @map("video_url")
+  videoTitle            String?                @map("video_title")
+  videoDescription      String?                @map("video_description")
+  videoPosterUrl        String?                @map("video_poster_url")
+  videoDurationSeconds  Int?                   @map("video_duration_seconds")
+  status                AiTrendBriefingStatus  @default(draft)
+  publishedAt           DateTime?              @map("published_at")
+  isIncludedInTopicPage Boolean                @default(false) @map("is_included_in_topic_page")
+  createdAt             DateTime               @default(now()) @map("created_at")
+  updatedAt             DateTime               @updatedAt @map("updated_at")
+
+  @@index([status, publishedAt])
+  @@index([isIncludedInTopicPage, publishedAt])
+  @@map("ai_trend_briefings")
+}
+
+model GeoQuery {
+  id          String          @id @default(cuid())
+  query       String
+  locale      String          @default("zh")
+  intent      String
+  topic       String
+  targetPath  String          @map("target_path")
+  tags        String[]        @default([])
+  status      GeoQueryStatus  @default(active)
+  sortOrder   Int             @default(0) @map("sort_order")
+  createdAt   DateTime        @default(now()) @map("created_at")
+  updatedAt   DateTime        @updatedAt @map("updated_at")
+  results     GeoVisibilityResult[]
+  recommendations GeoRecommendation[]
+
+  @@unique([query, locale])
+  @@index([status, sortOrder])
+  @@map("geo_queries")
+}
+
+model GeoProvider {
+  id          String            @id @default(cuid())
+  providerKey String            @unique @map("provider_key")
+  name        String
+  region      GeoPlatformRegion
+  mode        GeoProviderMode
+  officialUrl String            @map("official_url")
+  description String?
+  status      GeoQueryStatus    @default(active)
+  sortOrder   Int               @default(0) @map("sort_order")
+  createdAt   DateTime          @default(now()) @map("created_at")
+  updatedAt   DateTime          @updatedAt @map("updated_at")
+  results     GeoVisibilityResult[]
+
+  @@index([region, status, sortOrder])
+  @@map("geo_providers")
+}
+
+model GeoVisibilityRun {
+  id          String          @id @default(cuid())
+  title       String
+  status      GeoRunStatus    @default(pending)
+  startedAt   DateTime        @default(now()) @map("started_at")
+  completedAt DateTime?       @map("completed_at")
+  notes       String?
+  createdAt   DateTime        @default(now()) @map("created_at")
+  updatedAt   DateTime        @updatedAt @map("updated_at")
+  results     GeoVisibilityResult[]
+
+  @@index([status, startedAt])
+  @@map("geo_visibility_runs")
+}
+
+model GeoVisibilityResult {
+  id              String            @id @default(cuid())
+  runId           String?           @map("run_id")
+  queryId         String?           @map("query_id")
+  providerId      String?           @map("provider_id")
+  queryText       String            @map("query_text")
+  providerKey     String            @map("provider_key")
+  answerSummary   String?           @map("answer_summary")
+  isBrandMentioned Boolean          @default(false) @map("is_brand_mentioned")
+  isDomainCited   Boolean           @default(false) @map("is_domain_cited")
+  citedUrls       String[]          @default([]) @map("cited_urls")
+  competitors     String[]          @default([])
+  sentiment       String?
+  screenshotUrl   String?           @map("screenshot_url")
+  checkedAt       DateTime          @default(now()) @map("checked_at")
+  createdAt       DateTime          @default(now()) @map("created_at")
+  updatedAt       DateTime          @updatedAt @map("updated_at")
+  run             GeoVisibilityRun? @relation(fields: [runId], references: [id], onDelete: SetNull)
+  query           GeoQuery?         @relation(fields: [queryId], references: [id], onDelete: SetNull)
+  provider        GeoProvider?      @relation(fields: [providerId], references: [id], onDelete: SetNull)
+
+  @@index([queryText, providerKey, checkedAt])
+  @@index([isBrandMentioned, isDomainCited])
+  @@map("geo_visibility_results")
+}
+
+model GeoRecommendation {
+  id          String                  @id @default(cuid())
+  queryId     String?                 @map("query_id")
+  type        String
+  priority    String
+  title       String
+  reason      String
+  action      String
+  targetPath  String                  @map("target_path")
+  status      GeoRecommendationStatus @default(open)
+  createdAt   DateTime                @default(now()) @map("created_at")
+  updatedAt   DateTime                @updatedAt @map("updated_at")
+  query       GeoQuery?               @relation(fields: [queryId], references: [id], onDelete: SetNull)
+
+  @@index([status, priority])
+  @@index([targetPath])
+  @@map("geo_recommendations")
+}

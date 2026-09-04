@@ -1,0 +1,42 @@
+{
+  "reportType": "weekly_operating_cycle_dry_run",
+  "targetDate": "2026-07-03",
+  "generatedAt": "2026-07-08T01:00:00+08:00",
+  "scriptPath": "scripts/run-ebos-weekly-operating-cycle.ts",
+  "scriptExists": true,
+  "supportsDryRun": false,
+  "dryRunExecuted": false,
+  "staticAuditPerformed": true,
+  "staticAuditStatus": "warning",
+  "reason": "Script exists but does not implement a true --dry-run branch; per Phase D instruction, it was not executed.",
+  "realSchedulerCreated": false,
+  "migrationExecuted": false,
+  "seedExecuted": false,
+  "deploymentExecuted": false,
+  "serverDockerNginxExecuted": false,
+  "backfillApplyExecuted": false,
+  "fakeDataCreated": false,
+  "externalPublishingExecuted": false,
+  "waitingRealData": true,
+  "nextWeekActions": [
+    "Run the weekly operating cycle manually only after confirming expected report side effects are acceptable.",
+    "Keep externalPublishingStatus=waiting_real_data until real channel data exists.",
+    "Collect real published URLs, views, clicks, messages, orders, revenue, and evidence before any backfill apply.",
+    "Keep safeToRunMigration=false during the weekly cycle unless a separate migration release approval exists."
+  ],
+  "warnings": [
+    "--dry-run is not implemented as a true safe branch; static audit used instead of execution."
+  ],
+  "blockers": [],
+  "commandsExecuted": {
+    "weeklyCycleDryRun": false,
+    "gitAdd": false,
+    "gitCommit": false,
+    "gitPush": false,
+    "migration": false,
+    "seed": false,
+    "deployment": false,
+    "serverDockerNginx": false,
+    "backfillApply": false
+  }
+}

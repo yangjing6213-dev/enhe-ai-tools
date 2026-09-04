@@ -1,0 +1,782 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>ENHE Forensic HUD Style Preview</title>
+    <style>
+      :root {
+        --canvas: #04100e;
+        --canvas-deep: #020706;
+        --glass: rgba(18, 33, 31, 0.72);
+        --glass-strong: rgba(24, 42, 39, 0.86);
+        --border: rgba(239, 228, 197, 0.16);
+        --border-strong: rgba(239, 228, 197, 0.28);
+        --text: #f4eeda;
+        --text-soft: #c8bea6;
+        --muted: #8e9b91;
+        --dim: #59685f;
+        --cyan: #35bee7;
+        --cyan-soft: #8ddff5;
+        --green: #37d66f;
+        --amber: #f5c66b;
+        --orange: #ff6b2c;
+        --folder: #5ea7d7;
+        --folder-deep: #1d689b;
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        margin: 0;
+        min-height: 100vh;
+        overflow: hidden;
+        background:
+          radial-gradient(circle at 12% 18%, rgba(53, 190, 231, 0.14), transparent 28%),
+          radial-gradient(circle at 78% 10%, rgba(245, 198, 107, 0.16), transparent 24%),
+          radial-gradient(circle at 88% 88%, rgba(255, 107, 44, 0.12), transparent 32%),
+          linear-gradient(135deg, #020706 0%, #06120f 48%, #0d1711 100%);
+        color: var(--text);
+        font-family: Inter, Arial, Helvetica, sans-serif;
+      }
+
+      body::before {
+        content: "";
+        position: fixed;
+        inset: -10%;
+        background:
+          linear-gradient(90deg, transparent 0 18%, rgba(255,255,255,0.05) 18% 19%, transparent 19% 100%),
+          radial-gradient(circle at 50% 35%, rgba(255,255,255,0.2), transparent 10%),
+          radial-gradient(circle at 22% 70%, rgba(39, 73, 69, 0.8), transparent 22%);
+        filter: blur(34px);
+        opacity: 0.52;
+        transform: scale(1.08);
+      }
+
+      body::after {
+        content: "";
+        position: fixed;
+        inset: 0;
+        background:
+          linear-gradient(rgba(255,255,255,0.025) 1px, transparent 1px),
+          linear-gradient(90deg, rgba(255,255,255,0.02) 1px, transparent 1px),
+          radial-gradient(circle at center, transparent 42%, rgba(0,0,0,0.42) 100%);
+        background-size: 42px 42px, 42px 42px, auto;
+        pointer-events: none;
+      }
+
+      .stage {
+        position: relative;
+        z-index: 1;
+        width: 1440px;
+        height: 900px;
+        padding: 42px 54px 54px;
+      }
+
+      .topbar {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        height: 48px;
+        color: var(--text-soft);
+      }
+
+      .auth {
+        display: flex;
+        align-items: center;
+        gap: 18px;
+        font-size: 20px;
+        font-weight: 650;
+      }
+
+      .auth-mark {
+        width: 18px;
+        height: 46px;
+        border-radius: 99px;
+        background: linear-gradient(#d4c19b, #938869);
+        position: relative;
+        box-shadow: 0 0 36px rgba(245, 198, 107, 0.2);
+      }
+
+      .auth-mark::before,
+      .auth-mark::after {
+        content: "";
+        position: absolute;
+        left: 6px;
+        width: 6px;
+        height: 6px;
+        border-radius: 50%;
+        background: #06100e;
+      }
+
+      .auth-mark::before {
+        top: 7px;
+      }
+
+      .auth-mark::after {
+        bottom: 7px;
+      }
+
+      .toolbar {
+        display: flex;
+        align-items: center;
+        gap: 14px;
+      }
+
+      .icon {
+        width: 42px;
+        height: 42px;
+        border: 1px solid var(--border);
+        border-radius: 999px;
+        background: rgba(255,255,255,0.045);
+        display: grid;
+        place-items: center;
+        color: var(--text-soft);
+      }
+
+      .icon svg {
+        width: 20px;
+        height: 20px;
+        fill: none;
+        stroke: currentColor;
+        stroke-width: 2;
+      }
+
+      .shell {
+        margin-top: 32px;
+        height: 746px;
+        display: grid;
+        grid-template-columns: 286px 1fr;
+        gap: 36px;
+      }
+
+      .rail {
+        padding: 34px 28px;
+        border-radius: 42px;
+        border: 1px solid var(--border);
+        background: linear-gradient(180deg, rgba(18, 31, 29, 0.76), rgba(8, 18, 16, 0.58));
+        backdrop-filter: blur(28px) saturate(125%);
+        box-shadow: 0 30px 90px rgba(0,0,0,0.34);
+      }
+
+      .kicker {
+        color: var(--amber);
+        font-size: 12px;
+        font-weight: 700;
+        letter-spacing: 0.14em;
+        text-transform: uppercase;
+      }
+
+      h1 {
+        margin: 18px 0 0;
+        max-width: 850px;
+        font-size: 58px;
+        line-height: 0.98;
+        letter-spacing: -0.035em;
+        font-weight: 650;
+      }
+
+      .subcopy {
+        width: 560px;
+        margin: 20px 0 0;
+        color: var(--muted);
+        font-size: 17px;
+        line-height: 1.65;
+      }
+
+      .rail-title {
+        margin: 22px 0 4px;
+        font-size: 30px;
+        line-height: 1.05;
+        letter-spacing: -0.03em;
+      }
+
+      .rail-sub {
+        color: var(--muted);
+        font-weight: 600;
+      }
+
+      .case-line {
+        margin-top: 34px;
+        padding-left: 22px;
+        border-left: 2px solid rgba(245, 198, 107, 0.72);
+      }
+
+      .case-line b {
+        display: block;
+        color: var(--text);
+        font-size: 17px;
+        margin-bottom: 8px;
+      }
+
+      .case-line span {
+        display: block;
+        color: var(--muted);
+        font-size: 13px;
+        line-height: 1.6;
+      }
+
+      .rail-stat {
+        margin-top: 32px;
+        display: grid;
+        gap: 12px;
+      }
+
+      .stat-row {
+        display: flex;
+        justify-content: space-between;
+        gap: 16px;
+        padding: 14px 16px;
+        border: 1px solid var(--border);
+        border-radius: 999px;
+        background: rgba(255,255,255,0.045);
+        color: var(--text-soft);
+      }
+
+      .stat-row strong {
+        color: var(--text);
+      }
+
+      .main {
+        position: relative;
+        padding: 22px 0 0;
+      }
+
+      .hero {
+        position: relative;
+        height: 250px;
+      }
+
+      .hud-pill {
+        position: absolute;
+        right: 28px;
+        top: 18px;
+        display: flex;
+        align-items: center;
+        gap: 16px;
+        padding: 14px 22px;
+        border: 1px solid rgba(245, 198, 107, 0.42);
+        border-radius: 999px;
+        background: rgba(245, 198, 107, 0.14);
+        color: var(--amber);
+        box-shadow: 0 0 42px rgba(245, 198, 107, 0.12);
+      }
+
+      .hud-pill .dot {
+        width: 12px;
+        height: 12px;
+        border-radius: 50%;
+        background: var(--amber);
+        box-shadow: 0 0 18px var(--amber);
+      }
+
+      .board {
+        position: relative;
+        height: 470px;
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        grid-template-rows: 300px 150px;
+        gap: 20px;
+      }
+
+      .dossier,
+      .folder-panel {
+        border: 1px solid var(--border);
+        border-radius: 36px;
+        background: linear-gradient(140deg, rgba(23, 39, 37, 0.82), rgba(10, 22, 19, 0.68));
+        backdrop-filter: blur(26px) saturate(128%);
+        box-shadow: 0 30px 90px rgba(0,0,0,0.32);
+      }
+
+      .dossier {
+        grid-column: 1 / 2;
+        position: relative;
+        padding: 26px;
+        overflow: hidden;
+      }
+
+      .dossier::before {
+        content: "";
+        position: absolute;
+        inset: 0;
+        background:
+          radial-gradient(circle at 70% 46%, rgba(53,190,231,0.16), transparent 23%),
+          radial-gradient(circle at 18% 20%, rgba(245,198,107,0.12), transparent 18%);
+        pointer-events: none;
+      }
+
+      .dossier-head,
+      .folder-head {
+        position: relative;
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        gap: 18px;
+      }
+
+      .dossier h2,
+      .folder-panel h2 {
+        margin: 0;
+        font-size: 26px;
+        letter-spacing: -0.02em;
+      }
+
+      .id {
+        margin-top: 5px;
+        color: var(--muted);
+        font-size: 13px;
+        font-weight: 700;
+      }
+
+      .status {
+        border: 1px solid rgba(55, 214, 111, 0.32);
+        border-radius: 999px;
+        color: var(--green);
+        padding: 8px 12px;
+        background: rgba(55, 214, 111, 0.12);
+        font-size: 12px;
+        font-weight: 700;
+      }
+
+      .scan {
+        position: relative;
+        margin-top: 22px;
+        height: 176px;
+        border: 1px solid var(--border);
+        border-radius: 30px;
+        background:
+          linear-gradient(115deg, rgba(255,255,255,0.04), transparent 38%),
+          rgba(0,0,0,0.18);
+        overflow: hidden;
+      }
+
+      .scan::before {
+        content: "";
+        position: absolute;
+        inset: 26px;
+        border: 1px solid rgba(141,223,245,0.22);
+        border-radius: 50%;
+        box-shadow:
+          0 0 0 38px rgba(53,190,231,0.04),
+          0 0 0 86px rgba(245,198,107,0.035);
+      }
+
+      .scan::after {
+        content: "";
+        position: absolute;
+        width: 150%;
+        height: 2px;
+        left: -22%;
+        top: 48%;
+        background: linear-gradient(90deg, transparent, rgba(141,223,245,0.9), transparent);
+        transform: rotate(-7deg);
+        box-shadow: 0 0 24px rgba(53,190,231,0.44);
+      }
+
+      .scan-label {
+        position: absolute;
+        left: 28px;
+        bottom: 24px;
+        color: var(--text-soft);
+        font-weight: 700;
+      }
+
+      .scan-label span {
+        color: var(--green);
+      }
+
+      .permission {
+        position: absolute;
+        right: 32px;
+        top: 42px;
+        width: 96px;
+        height: 96px;
+        border-radius: 34px;
+        background:
+          linear-gradient(135deg, rgba(53,190,231,0.34), rgba(245,198,107,0.08)),
+          rgba(255,255,255,0.06);
+        display: grid;
+        place-items: center;
+      }
+
+      .permission svg {
+        width: 68px;
+        height: 68px;
+        stroke: var(--text);
+        fill: none;
+        stroke-width: 7;
+        filter: drop-shadow(0 0 18px rgba(53,190,231,0.34));
+      }
+
+      .folder-panel {
+        grid-column: 2 / 4;
+        padding: 26px;
+      }
+
+      .folder-grid {
+        margin-top: 24px;
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 18px 28px;
+      }
+
+      .folder {
+        position: relative;
+        display: grid;
+        justify-items: center;
+        gap: 10px;
+        padding: 12px 8px 6px;
+      }
+
+      .folder.active {
+        border-radius: 24px;
+        background: rgba(245, 198, 107, 0.09);
+        box-shadow: inset 0 0 0 1px rgba(245,198,107,0.14);
+      }
+
+      .folder-icon {
+        width: 68px;
+        height: 44px;
+        border-radius: 9px 12px 12px 12px;
+        background: linear-gradient(#76b9e3, #3d88bd);
+        box-shadow: inset 0 -8px 0 rgba(16,77,119,0.28), 0 18px 30px rgba(0,0,0,0.22);
+        position: relative;
+      }
+
+      .folder.active .folder-icon {
+        background: linear-gradient(#ffd779, #e89822);
+      }
+
+      .folder-icon::before {
+        content: "";
+        position: absolute;
+        left: 0;
+        top: -11px;
+        width: 38px;
+        height: 17px;
+        border-radius: 10px 10px 0 0;
+        background: inherit;
+      }
+
+      .folder span {
+        color: var(--text-soft);
+        font-size: 12px;
+        font-weight: 750;
+      }
+
+      .float-card {
+        position: relative;
+        border: 1px solid var(--border);
+        border-radius: 28px;
+        background: linear-gradient(145deg, rgba(26, 45, 42, 0.9), rgba(8, 18, 16, 0.82));
+        box-shadow: 0 26px 72px rgba(0,0,0,0.42);
+        overflow: hidden;
+      }
+
+      .float-card h3 {
+        margin: 0;
+        font-size: 19px;
+        letter-spacing: -0.02em;
+      }
+
+      .float-card small {
+        display: block;
+        margin-top: 4px;
+        color: var(--muted);
+        font-weight: 700;
+      }
+
+      .card-menu {
+        position: absolute;
+        top: 16px;
+        right: 16px;
+        color: var(--text-soft);
+        font-size: 26px;
+        line-height: 1;
+      }
+
+      .card-1 {
+        grid-column: 1 / 2;
+        grid-row: 2 / 3;
+        padding: 18px;
+      }
+
+      .card-2 {
+        grid-column: 2 / 3;
+        grid-row: 2 / 3;
+        padding: 18px;
+      }
+
+      .card-3 {
+        grid-column: 3 / 4;
+        grid-row: 2 / 3;
+        padding: 18px;
+        border-color: rgba(255, 107, 44, 0.32);
+        background: linear-gradient(145deg, rgba(62, 38, 24, 0.9), rgba(13, 20, 16, 0.82));
+      }
+
+      .preview {
+        margin-top: 14px;
+        height: 46px;
+        border-radius: 18px;
+        background:
+          radial-gradient(circle at 72% 38%, rgba(245,198,107,0.7), transparent 12%),
+          linear-gradient(130deg, rgba(53,190,231,0.12), rgba(245,198,107,0.09)),
+          repeating-linear-gradient(135deg, rgba(244,238,218,0.16) 0 2px, transparent 2px 16px);
+        border: 1px solid rgba(239,228,197,0.16);
+      }
+
+      .preview.alt {
+        background:
+          radial-gradient(circle at 28% 32%, rgba(53,190,231,0.42), transparent 16%),
+          linear-gradient(160deg, rgba(43,75,70,0.95), rgba(8,18,16,0.92)),
+          repeating-linear-gradient(90deg, rgba(141,223,245,0.22) 0 3px, transparent 3px 18px);
+      }
+
+      .preview.small {
+        height: 46px;
+        background:
+          linear-gradient(90deg, rgba(55,214,111,0.7) 0 62%, rgba(255,107,44,0.45) 62%),
+          rgba(255,255,255,0.05);
+      }
+
+      .details {
+        margin-top: 12px;
+        color: var(--text-soft);
+        font-size: 13px;
+        font-weight: 750;
+      }
+
+      .details span {
+        color: var(--green);
+      }
+
+      .timeline {
+        display: none;
+        position: absolute;
+        left: 26px;
+        right: 32px;
+        bottom: 6px;
+        height: 86px;
+        display: flex;
+        align-items: flex-end;
+        gap: 22px;
+      }
+
+      .timeline::before {
+        content: "";
+        position: absolute;
+        left: 0;
+        right: 0;
+        bottom: 28px;
+        height: 8px;
+        border-radius: 999px;
+        background: linear-gradient(90deg, var(--text) 0 24%, rgba(244,238,218,0.34) 24% 78%, rgba(53,190,231,0.25) 78%);
+        box-shadow: 0 0 18px rgba(245,198,107,0.16);
+      }
+
+      .tick {
+        position: relative;
+        z-index: 1;
+        width: 13px;
+        height: 13px;
+        border: 3px solid var(--text);
+        border-radius: 50%;
+        background: #07100d;
+        margin-bottom: 25px;
+      }
+
+      .tick.red {
+        border-color: #ff2250;
+        box-shadow: 0 0 16px rgba(255,34,80,0.6);
+      }
+
+      .time-label {
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        color: var(--text-soft);
+        font-size: 12px;
+        font-weight: 800;
+      }
+
+      .alert-hud {
+        display: none;
+        position: absolute;
+        right: 22px;
+        bottom: 34px;
+        width: 394px;
+        height: 112px;
+        border: 1px solid rgba(255,107,44,0.48);
+        border-radius: 999px;
+        background: rgba(255,107,44,0.13);
+        box-shadow: 0 0 56px rgba(255,107,44,0.12);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: var(--orange);
+      }
+
+      .alert-hud strong {
+        font-size: 44px;
+        font-weight: 500;
+        letter-spacing: 0.03em;
+      }
+
+      .alert-hud span {
+        position: absolute;
+        top: 24px;
+        font-size: 12px;
+        letter-spacing: 0.22em;
+        font-weight: 800;
+      }
+    </style>
+  </head>
+  <body>
+    <main class="stage">
+      <header class="topbar">
+        <div class="auth">
+          <span class="auth-mark"></span>
+          <span>Host <strong>ENHE 167.349.203</strong></span>
+          <span>Auth <strong>AI TOOL 3892</strong></span>
+        </div>
+        <div class="toolbar" aria-label="toolbar">
+          <span class="icon">
+            <svg viewBox="0 0 24 24"><path d="M4 5h16M7 12h10M10 19h4"/></svg>
+          </span>
+          <span class="icon">
+            <svg viewBox="0 0 24 24"><path d="M5 6h14v12H5zM9 6v12"/></svg>
+          </span>
+          <span class="icon">
+            <svg viewBox="0 0 24 24"><path d="M6 7h12M9 12h6M11 17h2"/></svg>
+          </span>
+          <span class="icon">
+            <svg viewBox="0 0 24 24"><path d="M5 5h6v6H5zM13 5h6v6h-6zM5 13h6v6H5zM13 13h6v6h-6z"/></svg>
+          </span>
+        </div>
+      </header>
+
+      <section class="shell">
+        <aside class="rail">
+          <div class="kicker">ENHE Secure Console</div>
+          <h2 class="rail-title">Tool Case<br />#2026 Files</h2>
+          <div class="rail-sub">3,352 verified objects</div>
+
+          <div class="case-line">
+            <b>Software Release</b>
+            <span>Local installers, cover assets, version logs, VIP entitlement, download records.</span>
+          </div>
+
+          <div class="case-line">
+            <b>Online Utility</b>
+            <span>Browser tools, usage authorization, tutorial steps, user feedback, audit trail.</span>
+          </div>
+
+          <div class="rail-stat">
+            <div class="stat-row"><span>Payment Proof</span><strong>04</strong></div>
+            <div class="stat-row"><span>VIP Expiring</span><strong>12</strong></div>
+            <div class="stat-row"><span>Upload Queue</span><strong>08</strong></div>
+          </div>
+        </aside>
+
+        <section class="main">
+          <section class="hero">
+            <div class="kicker">Tool Intelligence Board</div>
+            <h1>ENHE AI Tools<br />Operational Interface</h1>
+            <p class="subcopy">
+              Use dossier cards, file grids, payment proof previews, and permission scans to turn
+              every tool, order, and upload into a traceable product asset.
+            </p>
+            <div class="hud-pill"><span class="dot"></span><strong>PAYMENT REVIEW</strong><span>04 pending</span></div>
+          </section>
+
+          <section class="board">
+            <article class="dossier">
+              <div class="dossier-head">
+                <div>
+                  <h2>Permission Scan</h2>
+                  <div class="id">ID ENHE-AUTH-2026-0525</div>
+                </div>
+                <span class="status">MATCHED</span>
+              </div>
+
+              <div class="scan">
+                <div class="permission">
+                  <svg viewBox="0 0 120 120" aria-label="ENHE mark">
+                    <path d="M28 38h45M22 60h51M28 82h45" />
+                    <path d="M78 60h19V22M97 22v76" />
+                  </svg>
+                </div>
+                <div class="scan-label">VIP + Paid Download <span>verified</span></div>
+              </div>
+            </article>
+
+            <article class="folder-panel">
+              <div class="folder-head">
+                <div>
+                  <h2>Release Files</h2>
+                  <div class="id">8 active folders</div>
+                </div>
+                <span class="status">SYNC READY</span>
+              </div>
+
+              <div class="folder-grid">
+                <div class="folder">
+                  <div class="folder-icon"></div>
+                  <span>Software</span>
+                </div>
+                <div class="folder active">
+                  <div class="folder-icon"></div>
+                  <span>Payment</span>
+                </div>
+                <div class="folder">
+                  <div class="folder-icon"></div>
+                  <span>Tutorials</span>
+                </div>
+                <div class="folder">
+                  <div class="folder-icon"></div>
+                  <span>Comments</span>
+                </div>
+                <div class="folder">
+                  <div class="folder-icon"></div>
+                  <span>Versions</span>
+                </div>
+                <div class="folder">
+                  <div class="folder-icon"></div>
+                  <span>COS Logs</span>
+                </div>
+              </div>
+            </article>
+
+            <article class="float-card card-1">
+              <span class="card-menu">⋮</span>
+              <h3>Batch Renamer Pro</h3>
+              <small>ID 5615853890203Z</small>
+              <div class="preview"></div>
+              <div class="details">Details: Software package <span>licensed</span></div>
+            </article>
+
+            <article class="float-card card-2">
+              <span class="card-menu">⋮</span>
+              <h3>Online Text Cleaner</h3>
+              <small>ID 5615854232A</small>
+              <div class="preview alt"></div>
+              <div class="details">Usage: browser tool <span>approved</span></div>
+            </article>
+
+            <article class="float-card card-3">
+              <span class="card-menu">⋮</span>
+              <h3>Refund Risk</h3>
+              <small>Downloaded: no · Used: no</small>
+              <div class="preview small"></div>
+              <div class="details">Eligible: <span>yes</span></div>
+            </article>
+
+          </section>
+        </section>
+      </section>
+    </main>
+  </body>
+</html>

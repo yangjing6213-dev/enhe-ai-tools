@@ -1,0 +1,44 @@
+[
+  {
+    "id": "local-1",
+    "command": "npm run lint",
+    "environment": "local",
+    "status": "success",
+    "exitCode": 0,
+    "startedAt": "2026-07-05T00:54:29.670Z",
+    "completedAt": "2026-07-05T00:54:44.396Z",
+    "summary": "> enhe-ai-tools@0.1.0 lint\n> eslint .",
+    "evidence": [
+      "> enhe-ai-tools@0.1.0 lint\n> eslint ."
+    ],
+    "warnings": []
+  },
+  {
+    "id": "local-2",
+    "command": "npm run typecheck",
+    "environment": "local",
+    "status": "success",
+    "exitCode": 0,
+    "startedAt": "2026-07-05T00:54:44.396Z",
+    "completedAt": "2026-07-05T00:54:51.430Z",
+    "summary": "> enhe-ai-tools@0.1.0 typecheck\n> tsc --noEmit",
+    "evidence": [
+      "> enhe-ai-tools@0.1.0 typecheck\n> tsc --noEmit"
+    ],
+    "warnings": []
+  },
+  {
+    "id": "local-3",
+    "command": "npm run build",
+    "environment": "local",
+    "status": "success",
+    "exitCode": 0,
+    "startedAt": "2026-07-05T00:54:51.430Z",
+    "completedAt": "2026-07-05T00:57:11.497Z",
+    "summary": "                      1.27 kB         114 kB\n├ ƒ /en/user                                 2.66 kB         117 kB\n├ ƒ /en/validation/ai-prompt-kit             1.27 kB         114 kB\n├ ● /legal/[slug]                            1.19 kB         114 kB\n├   ├ /legal/user-agreement\n├   ├ /legal/privacy-policy\n├   ├ /legal/disclaimer\n├   └ [+3 more paths]\n├ ƒ /login                                   2.66 kB         117 kB\n├ ○ /manifest.webmanifest                      199 B         103 kB\n├ ○ /online-tools                              199 B         103 kB          5m      1y\n├ ƒ /online-tools/[slug]                       199 B         103 kB\n├ ƒ /orders/[id]                             1.55 kB         121 kB\n├ ƒ /orders/[id]/pay                         1.08 kB         112 kB\n├ ƒ /pricing                                 1.27 kB         114 kB\n├ ƒ /register                                2.66 kB         117 kB\n├ ○ /robots.txt                                199 B         103 kB\n├ ƒ /sitemap.xml                               199 B         103 kB\n├ ƒ /skill-learning                          1.27 kB         114 kB\n├ ƒ /skill-learning/[slug]                   2.65 kB         124 kB\n├ ƒ /software                                1.27 kB         114 kB\n├ ƒ /software/[slug]                         2.65 kB         124 kB\n├ ƒ /tools/[slug]                              199 B         103 kB\n├ ƒ /tutorials                               1.27 kB         114 kB\n├ ƒ /user                                    2.66 kB         117 kB\n└ ƒ /validation/ai-prompt-kit                1.27 kB         114 kB\n+ First Load JS shared by all                 102 kB\n  ├ chunks/1255-b28ea36bf0cdbd65.js          46.2 kB\n  ├ chunks/4bd1b696-f785427dddbba9fb.js      54.2 kB\n  └ other shared chunks (total)                 2 kB\n\n\n○  (Static)   prerendered as static content\n●  (SSG)      prerendered as static HTML (uses generateStaticParams)\nƒ  (Dynamic)  server-rendered on demand\nEnvironment variables loaded from .env",
+    "evidence": [
+      "                      1.27 kB         114 kB\n├ ƒ /en/user                                 2.66 kB         117 kB\n├ ƒ /en/validation/ai-prompt-kit             1.27 kB         114 kB\n├ ● /legal/[slug]                            1.19 kB         114 kB\n├   ├ /legal/user-agreement\n├   ├ /legal/privacy-policy\n├   ├ /legal/disclaimer\n├   └ [+3 more paths]\n├ ƒ /login                                   2.66 kB         117 kB\n├ ○ /manifest.webmanifest                      199 B         103 kB\n├ ○ /online-tools                              199 B         103 kB          5m      1y\n├ ƒ /online-tools/[slug]                       199 B         103 kB\n├ ƒ /orders/[id]                             1.55 kB         121 kB\n├ ƒ /orders/[id]/pay                         1.08 kB         112 kB\n├ ƒ /pricing                                 1.27 kB         114 kB\n├ ƒ /register                                2.66 kB         117 kB\n├ ○ /robots.txt                                199 B         103 kB\n├ ƒ /sitemap.xml                               199 B         103 kB\n├ ƒ /skill-learning                          1.27 kB         114 kB\n├ ƒ /skill-learning/[slug]                   2.65 kB         124 kB\n├ ƒ /software                                1.27 kB         114 kB\n├ ƒ /software/[slug]                         2.65 kB         124 kB\n├ ƒ /tools/[slug]                              199 B         103 kB\n├ ƒ /tutorials                               1.27 kB         114 kB\n├ ƒ /user                                    2.66 kB         117 kB\n└ ƒ /validation/ai-prompt-kit                1.27 kB         114 kB\n+ First Load JS shared by all                 102 kB\n  ├ chunks/1255-b28ea36bf0cdbd65.js          46.2 kB\n  ├ chunks/4bd1b696-f785427dddbba9fb.js      54.2 kB\n  └ other shared chunks (total)                 2 kB\n\n\n○  (Static)   prerendered as static content\n●  (SSG)      prerendered as static HTML (uses generateStaticParams)\nƒ  (Dynamic)  server-rendered on demand\nEnvironment variables loaded from .env"
+    ],
+    "warnings": []
+  }
+]

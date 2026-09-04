@@ -1,0 +1,681 @@
+{
+  "reportType": "decision",
+  "targetDate": "2026-07-03",
+  "periodStart": "2026-06-29",
+  "periodEnd": "2026-07-05",
+  "generatedAt": "2026-07-04T03:17:17.278Z",
+  "evidenceCatalogPath": "reports/ebos/evidence/catalog/latest-evidence-catalog.json",
+  "evidenceUsed": [
+    {
+      "evidenceKind": "market_evidence",
+      "filePath": "reports/ebos/evidence/market_evidence/2026-07-03-market_evidence.json",
+      "targetDate": "2026-07-03",
+      "confidence": "partial",
+      "score": 75
+    },
+    {
+      "evidenceKind": "competitor_evidence",
+      "filePath": "reports/ebos/evidence/competitor_evidence/2026-07-03-competitor_evidence.json",
+      "targetDate": "2026-07-03",
+      "confidence": "partial",
+      "score": 69
+    },
+    {
+      "evidenceKind": "product_evidence",
+      "filePath": "reports/ebos/evidence/product_evidence/2026-07-03-product_evidence.json",
+      "targetDate": "2026-07-03",
+      "confidence": "complete",
+      "score": 91
+    },
+    {
+      "evidenceKind": "revenue_evidence",
+      "filePath": "reports/ebos/evidence/revenue_evidence/2026-07-03-revenue_evidence.json",
+      "targetDate": "2026-07-03",
+      "confidence": "partial",
+      "score": 50
+    },
+    {
+      "evidenceKind": "seo_evidence",
+      "filePath": "reports/ebos/evidence/seo_evidence/2026-07-03-seo_evidence.json",
+      "targetDate": "2026-07-03",
+      "confidence": "complete",
+      "score": 90
+    },
+    {
+      "evidenceKind": "geo_evidence",
+      "filePath": "reports/ebos/evidence/geo_evidence/2026-07-03-geo_evidence.json",
+      "targetDate": "2026-07-03",
+      "confidence": "partial",
+      "score": 95
+    },
+    {
+      "evidenceKind": "weekly_report",
+      "filePath": "reports/ebos/evidence/weekly_report/2026-06-29-weekly_report.json",
+      "targetDate": "2026-06-29",
+      "confidence": "partial",
+      "score": 74.1
+    },
+    {
+      "evidenceKind": "monthly_review",
+      "filePath": "reports/ebos/evidence/monthly_review/2026-07-monthly_review.json",
+      "targetDate": "2026-07-01",
+      "confidence": "partial",
+      "score": 79.4
+    }
+  ],
+  "overallConfidence": "partial",
+  "strategicSummary": "This week should focus on Validate SEO/GEO 自动化内容集群. Backup: Backup: validate FaceSwap Studio｜本地人像合成研究工具. Confidence: partial. Validation feedback: continue=none, scale=none, stop=none.",
+  "priorityProductDirections": [
+    {
+      "id": "market-opportunity-seo_geo",
+      "name": "SEO/GEO 自动化内容集群",
+      "description": "SEO/GEO 自动化内容集群 可用低成本页面、内容或模板包先验证需求，再决定是否产品化。",
+      "sourceSignals": [
+        "market_evidence",
+        "competitor_evidence",
+        "product_evidence",
+        "revenue_evidence"
+      ],
+      "marketScore": 15,
+      "competitorScore": 14,
+      "productFitScore": 18,
+      "revenueUrgencyScore": 15,
+      "seoPotentialScore": 8,
+      "geoPotentialScore": 8,
+      "buildDifficultyScore": 1,
+      "validationSpeedScore": 10,
+      "totalPriorityScore": 87,
+      "recommendation": "validate_this_week",
+      "reason": "SEO/GEO 自动化内容集群 is ranked as validate_this_week. Market and competitor evidence point in the same direction. First revenue is not achieved, so low-cost validation is preferred.",
+      "risks": [
+        "竞争风险较高，必须先用细分场景和交付物做差异化。",
+        "Competitor signals do not prove traffic, sales, or revenue."
+      ],
+      "suggestedFormats": [
+        "Workflow Pack",
+        "Template Pack",
+        "SEO/GEO Content Cluster"
+      ],
+      "suggestedPriceRange": "CNY 9-99 validation offer",
+      "nextActions": [
+        "低成本验证 SEO/GEO 自动化内容集群：发布预售/等候名单/内容测试。",
+        "用产品页点击、咨询、订单或手动购买意向验证需求。"
+      ]
+    },
+    {
+      "id": "market-opportunity-prompt_kit",
+      "name": "AI Prompt Kit",
+      "description": "AI Prompt Kit 可用低成本页面、内容或模板包先验证需求，再决定是否产品化。",
+      "sourceSignals": [
+        "market_evidence",
+        "competitor_evidence",
+        "product_evidence",
+        "revenue_evidence"
+      ],
+      "marketScore": 15,
+      "competitorScore": 15,
+      "productFitScore": 18,
+      "revenueUrgencyScore": 15,
+      "seoPotentialScore": 8,
+      "geoPotentialScore": 8,
+      "buildDifficultyScore": 1,
+      "validationSpeedScore": 10,
+      "totalPriorityScore": 83,
+      "recommendation": "validate_this_week",
+      "reason": "AI Prompt Kit is ranked as validate_this_week. Market and competitor evidence point in the same direction. First revenue is not achieved, so low-cost validation is preferred. Validation result suggests adjustment before scaling: The result is incomplete, so EBOS needs more data before changing direction..",
+      "risks": [
+        "Competitor signals do not prove traffic, sales, or revenue."
+      ],
+      "suggestedFormats": [
+        "Prompt Kit",
+        "Template Pack"
+      ],
+      "suggestedPriceRange": "CNY 9-99 validation offer",
+      "nextActions": [
+        "低成本验证 AI Prompt Kit：发布预售/等候名单/内容测试。",
+        "用产品页点击、咨询、订单或手动购买意向验证需求。"
+      ]
+    },
+    {
+      "id": "market-opportunity-ai_agent",
+      "name": "AI Agent 工作流模板包",
+      "description": "AI Agent 工作流模板包 可用低成本页面、内容或模板包先验证需求，再决定是否产品化。",
+      "sourceSignals": [
+        "market_evidence",
+        "competitor_evidence",
+        "product_evidence",
+        "revenue_evidence"
+      ],
+      "marketScore": 15,
+      "competitorScore": 15,
+      "productFitScore": 16,
+      "revenueUrgencyScore": 15,
+      "seoPotentialScore": 3,
+      "geoPotentialScore": 3,
+      "buildDifficultyScore": 1,
+      "validationSpeedScore": 10,
+      "totalPriorityScore": 76,
+      "recommendation": "prepare_landing_page",
+      "reason": "AI Agent 工作流模板包 is ranked as prepare_landing_page. Market and competitor evidence point in the same direction. First revenue is not achieved, so low-cost validation is preferred.",
+      "risks": [
+        "Competitor signals do not prove traffic, sales, or revenue."
+      ],
+      "suggestedFormats": [
+        "Workflow Pack",
+        "Template Pack"
+      ],
+      "suggestedPriceRange": "CNY 9-99 validation offer",
+      "nextActions": [
+        "低成本验证 AI Agent 工作流模板包：发布预售/等候名单/内容测试。",
+        "用产品页点击、咨询、订单或手动购买意向验证需求。"
+      ]
+    },
+    {
+      "id": "market-opportunity-ai_video",
+      "name": "AI 视频工作流包",
+      "description": "AI 视频工作流包 可用低成本页面、内容或模板包先验证需求，再决定是否产品化。",
+      "sourceSignals": [
+        "market_evidence",
+        "competitor_evidence",
+        "product_evidence",
+        "revenue_evidence"
+      ],
+      "marketScore": 15,
+      "competitorScore": 15,
+      "productFitScore": 8,
+      "revenueUrgencyScore": 3,
+      "seoPotentialScore": 3,
+      "geoPotentialScore": 3,
+      "buildDifficultyScore": 4,
+      "validationSpeedScore": 6,
+      "totalPriorityScore": 49,
+      "recommendation": "ignore",
+      "reason": "AI 视频工作流包 is ranked as ignore. Market and competitor evidence point in the same direction. First revenue is not achieved, so low-cost validation is preferred.",
+      "risks": [
+        "竞争风险较高，必须先用细分场景和交付物做差异化。",
+        "AI 视频方向变化快，需避免押注单一模型或平台。",
+        "Competitor signals do not prove traffic, sales, or revenue."
+      ],
+      "suggestedFormats": [
+        "Workflow Pack",
+        "Template Pack"
+      ],
+      "suggestedPriceRange": "CNY 9-99 validation offer",
+      "nextActions": [
+        "低成本验证 AI 视频工作流包：发布预售/等候名单/内容测试。",
+        "用产品页点击、咨询、订单或手动购买意向验证需求。"
+      ]
+    },
+    {
+      "id": "market-opportunity-comfyui",
+      "name": "ComfyUI 工作流包",
+      "description": "ComfyUI 工作流包 可用低成本页面、内容或模板包先验证需求，再决定是否产品化。",
+      "sourceSignals": [
+        "market_evidence",
+        "product_evidence",
+        "revenue_evidence"
+      ],
+      "marketScore": 13,
+      "competitorScore": 0,
+      "productFitScore": 8,
+      "revenueUrgencyScore": 3,
+      "seoPotentialScore": 3,
+      "geoPotentialScore": 3,
+      "buildDifficultyScore": 4,
+      "validationSpeedScore": 6,
+      "totalPriorityScore": 32,
+      "recommendation": "ignore",
+      "reason": "ComfyUI 工作流包 is ranked as ignore. First revenue is not achieved, so low-cost validation is preferred.",
+      "risks": [],
+      "suggestedFormats": [
+        "Workflow Pack",
+        "Template Pack"
+      ],
+      "suggestedPriceRange": "CNY 9-99 validation offer",
+      "nextActions": [
+        "低成本验证 ComfyUI 工作流包：发布预售/等候名单/内容测试。",
+        "用产品页点击、咨询、订单或手动购买意向验证需求。"
+      ]
+    }
+  ],
+  "priorityExistingProducts": [
+    {
+      "productName": "FaceSwap Studio｜本地人像合成研究工具",
+      "slug": "faceswap-studio-ai",
+      "readinessScore": 100,
+      "revenueStatus": "first_revenue_not_achieved",
+      "seoGeoReadiness": "strong",
+      "conversionRisks": [],
+      "totalPriorityScore": 84,
+      "recommendation": "validate_this_week",
+      "reason": "Product readiness is high while revenue is still unproven; validate demand before building new products. Validation result suggests adjustment before scaling: The result is incomplete, so EBOS needs more data before changing direction..",
+      "nextActions": [
+        "Run a pricing or marketplace validation for FaceSwap Studio｜本地人像合成研究工具."
+      ]
+    },
+    {
+      "productName": "AI Video Studio｜本地视频生成工作台",
+      "slug": "local-ai-video-studio-for-creator-workflows",
+      "readinessScore": 100,
+      "revenueStatus": "first_revenue_not_achieved",
+      "seoGeoReadiness": "strong",
+      "conversionRisks": [],
+      "totalPriorityScore": 84,
+      "recommendation": "validate_this_week",
+      "reason": "Product readiness is high while revenue is still unproven; validate demand before building new products. Validation result suggests adjustment before scaling: The result is incomplete, so EBOS needs more data before changing direction..",
+      "nextActions": [
+        "Run a pricing or marketplace validation for AI Video Studio｜本地视频生成工作台."
+      ]
+    },
+    {
+      "productName": "AI语音生成｜本地配音素材工作台",
+      "slug": "local-ai-voice-generator-for-voiceover-materials",
+      "readinessScore": 100,
+      "revenueStatus": "first_revenue_not_achieved",
+      "seoGeoReadiness": "strong",
+      "conversionRisks": [],
+      "totalPriorityScore": 83,
+      "recommendation": "validate_this_week",
+      "reason": "Product readiness is high while revenue is still unproven; validate demand before building new products.",
+      "nextActions": [
+        "Run a pricing or marketplace validation for AI语音生成｜本地配音素材工作台."
+      ]
+    },
+    {
+      "productName": "聊天截图素材制作｜无需代码",
+      "slug": "no-code-chat-screenshot-maker",
+      "readinessScore": 100,
+      "revenueStatus": "first_revenue_not_achieved",
+      "seoGeoReadiness": "strong",
+      "conversionRisks": [],
+      "totalPriorityScore": 83,
+      "recommendation": "validate_this_week",
+      "reason": "Product readiness is high while revenue is still unproven; validate demand before building new products.",
+      "nextActions": [
+        "Run a pricing or marketplace validation for 聊天截图素材制作｜无需代码."
+      ]
+    },
+    {
+      "productName": "Lumi-OS｜AI情感智能体 | AI伴侣 | 贾维斯",
+      "slug": "windows-ai",
+      "readinessScore": 100,
+      "revenueStatus": "first_revenue_not_achieved",
+      "seoGeoReadiness": "strong",
+      "conversionRisks": [],
+      "totalPriorityScore": 83,
+      "recommendation": "validate_this_week",
+      "reason": "Product readiness is high while revenue is still unproven; validate demand before building new products.",
+      "nextActions": [
+        "Run a pricing or marketplace validation for Lumi-OS｜AI情感智能体 | AI伴侣 | 贾维斯."
+      ]
+    }
+  ],
+  "validationPlans": [
+    {
+      "id": "validation-direction-1-seo-geo-自动化内容集群",
+      "title": "Validate SEO/GEO 自动化内容集群",
+      "targetDirection": "SEO/GEO 自动化内容集群",
+      "objective": "Validate whether SEO/GEO 自动化内容集群 can produce near-term purchase intent before heavy development.",
+      "hypothesis": "If ENHE presents a clear SEO/GEO 自动化内容集群 offer, users will click CTA, leave leads, or place at least one presale order.",
+      "validationMethod": "content_test",
+      "successMetric": "Indexed content page, impressions, CTA clicks, or leads.",
+      "minimumSuccessThreshold": "Indexed or impressions recorded, plus CTA clicks >= 10 or leads >= 3.",
+      "durationDays": 7,
+      "requiredAssets": [
+        "SEO/GEO 自动化内容集群 content brief",
+        "FAQ/summary block",
+        "CTA destination"
+      ],
+      "codexTasks": [
+        "Draft one focused SEO/GEO 自动化内容集群 validation page with pricing, FAQ, and CTA.",
+        "Add tracking notes for CTA clicks, leads, and manual purchase intent.",
+        "Create one comparison or use-case content brief supporting SEO/GEO 自动化内容集群."
+      ],
+      "humanTasks": [
+        "Review the SEO/GEO 自动化内容集群 offer and decide the validation price.",
+        "Respond manually to leads or presale inquiries within 24 hours."
+      ],
+      "risks": [
+        "竞争风险较高，必须先用细分场景和交付物做差异化。",
+        "Competitor signals do not prove traffic, sales, or revenue."
+      ]
+    },
+    {
+      "id": "validation-product-2-faceswap-studio-ai",
+      "title": "Validate existing product: FaceSwap Studio｜本地人像合成研究工具",
+      "targetDirection": "Existing product revenue validation",
+      "targetProduct": "FaceSwap Studio｜本地人像合成研究工具",
+      "objective": "Validate whether FaceSwap Studio｜本地人像合成研究工具 can produce first-revenue intent before starting new product work.",
+      "hypothesis": "If pricing, CTA, and delivery details are clear, FaceSwap Studio｜本地人像合成研究工具 can produce measurable purchase intent.",
+      "validationMethod": "pricing_test",
+      "successMetric": "Product page CTA clicks, leads, or presale orders.",
+      "minimumSuccessThreshold": "CTA clicks >= 10 or leads >= 3 or presale orders >= 1 within 7 days.",
+      "durationDays": 7,
+      "requiredAssets": [
+        "Product page pricing block",
+        "Delivery/support copy",
+        "CTA tracking checklist"
+      ],
+      "codexTasks": [
+        "Audit FaceSwap Studio｜本地人像合成研究工具 product page pricing, CTA, FAQ, and delivery copy.",
+        "Draft a pricing test checklist for FaceSwap Studio｜本地人像合成研究工具."
+      ],
+      "humanTasks": [
+        "Confirm the FaceSwap Studio｜本地人像合成研究工具 validation offer and price.",
+        "Handle manual payment, lead follow-up, or customer questions."
+      ],
+      "risks": [
+        "Existing product readiness does not prove paid demand."
+      ]
+    },
+    {
+      "id": "validation-product-3-local-ai-video-studio-for-creator-workflows",
+      "title": "Validate existing product: AI Video Studio｜本地视频生成工作台",
+      "targetDirection": "Existing product revenue validation",
+      "targetProduct": "AI Video Studio｜本地视频生成工作台",
+      "objective": "Validate whether AI Video Studio｜本地视频生成工作台 can produce first-revenue intent before starting new product work.",
+      "hypothesis": "If pricing, CTA, and delivery details are clear, AI Video Studio｜本地视频生成工作台 can produce measurable purchase intent.",
+      "validationMethod": "pricing_test",
+      "successMetric": "Product page CTA clicks, leads, or presale orders.",
+      "minimumSuccessThreshold": "CTA clicks >= 10 or leads >= 3 or presale orders >= 1 within 7 days.",
+      "durationDays": 7,
+      "requiredAssets": [
+        "Product page pricing block",
+        "Delivery/support copy",
+        "CTA tracking checklist"
+      ],
+      "codexTasks": [
+        "Audit AI Video Studio｜本地视频生成工作台 product page pricing, CTA, FAQ, and delivery copy.",
+        "Draft a pricing test checklist for AI Video Studio｜本地视频生成工作台."
+      ],
+      "humanTasks": [
+        "Confirm the AI Video Studio｜本地视频生成工作台 validation offer and price.",
+        "Handle manual payment, lead follow-up, or customer questions."
+      ],
+      "risks": [
+        "Existing product readiness does not prove paid demand."
+      ]
+    }
+  ],
+  "stopDoing": [
+    {
+      "title": "Do not optimize UI endlessly",
+      "reason": "Without first-revenue evidence, UI polish should not displace validation work.",
+      "evidenceRefs": [
+        "revenue_evidence"
+      ]
+    },
+    {
+      "title": "Do not build too many products at once",
+      "reason": "Cross-evidence prioritization is designed to keep this week to one main validation and one backup.",
+      "evidenceRefs": [
+        "market_evidence",
+        "product_evidence"
+      ]
+    },
+    {
+      "title": "Do not start heavy development before revenue proof",
+      "reason": "firstRevenueAchieved=false means heavy builds should wait for landing page, content, marketplace, or pricing validation.",
+      "evidenceRefs": [
+        "revenue_evidence"
+      ]
+    }
+  ],
+  "doNext": [
+    {
+      "title": "Validate SEO/GEO 自动化内容集群",
+      "reason": "SEO/GEO 自动化内容集群 is ranked as validate_this_week. Market and competitor evidence point in the same direction. First revenue is not achieved, so low-cost validation is preferred.",
+      "evidenceRefs": [
+        "market_evidence",
+        "competitor_evidence",
+        "product_evidence",
+        "revenue_evidence"
+      ]
+    },
+    {
+      "title": "Backup: validate FaceSwap Studio｜本地人像合成研究工具",
+      "reason": "Product readiness is high while revenue is still unproven; validate demand before building new products. Validation result suggests adjustment before scaling: The result is incomplete, so EBOS needs more data before changing direction..",
+      "evidenceRefs": [
+        "product_evidence",
+        "revenue_evidence"
+      ]
+    }
+  ],
+  "codexTasks": [
+    {
+      "id": "decision-codex-task-1-1",
+      "title": "Draft one focused SEO/GEO 自动化内容集群 validation page with pricing, FAQ, and CTA.",
+      "description": "Supports validation plan: Validate SEO/GEO 自动化内容集群.",
+      "priority": "high",
+      "owner": "codex",
+      "relatedSection": "next_plan",
+      "evidenceRefs": [
+        "validation-direction-1-seo-geo-自动化内容集群"
+      ],
+      "status": "open"
+    },
+    {
+      "id": "decision-codex-task-1-2",
+      "title": "Add tracking notes for CTA clicks, leads, and manual purchase intent.",
+      "description": "Supports validation plan: Validate SEO/GEO 自动化内容集群.",
+      "priority": "high",
+      "owner": "codex",
+      "relatedSection": "next_plan",
+      "evidenceRefs": [
+        "validation-direction-1-seo-geo-自动化内容集群"
+      ],
+      "status": "open"
+    },
+    {
+      "id": "decision-codex-task-1-3",
+      "title": "Create one comparison or use-case content brief supporting SEO/GEO 自动化内容集群.",
+      "description": "Supports validation plan: Validate SEO/GEO 自动化内容集群.",
+      "priority": "high",
+      "owner": "codex",
+      "relatedSection": "next_plan",
+      "evidenceRefs": [
+        "validation-direction-1-seo-geo-自动化内容集群"
+      ],
+      "status": "open"
+    },
+    {
+      "id": "decision-codex-task-2-1",
+      "title": "Audit FaceSwap Studio｜本地人像合成研究工具 product page pricing, CTA, FAQ, and delivery copy.",
+      "description": "Supports validation plan: Validate existing product: FaceSwap Studio｜本地人像合成研究工具.",
+      "priority": "medium",
+      "owner": "codex",
+      "relatedSection": "next_plan",
+      "evidenceRefs": [
+        "validation-product-2-faceswap-studio-ai"
+      ],
+      "status": "open"
+    },
+    {
+      "id": "decision-codex-task-2-2",
+      "title": "Draft a pricing test checklist for FaceSwap Studio｜本地人像合成研究工具.",
+      "description": "Supports validation plan: Validate existing product: FaceSwap Studio｜本地人像合成研究工具.",
+      "priority": "medium",
+      "owner": "codex",
+      "relatedSection": "next_plan",
+      "evidenceRefs": [
+        "validation-product-2-faceswap-studio-ai"
+      ],
+      "status": "open"
+    }
+  ],
+  "risks": [
+    "Decision report does not fabricate traffic, sales, revenue, or competitor performance.",
+    "Public competitor page structure is directional evidence only."
+  ],
+  "warnings": [
+    {
+      "code": "manual_market_seed",
+      "severity": "warning",
+      "message": "manual input 为市场观察方向种子，不代表真实搜索量、销量或趋势数据。",
+      "source": "manual_input"
+    },
+    {
+      "code": "decision_evidence_validation_warning",
+      "severity": "warning",
+      "message": "market_evidence catalog entry is valid_with_warnings.",
+      "source": "market_research"
+    },
+    {
+      "code": "default_competitor_seed",
+      "severity": "warning",
+      "message": "Competitor seeds are observation targets only and do not represent a complete competitor list.",
+      "source": "manual_input"
+    },
+    {
+      "code": "competitor_page_unavailable",
+      "severity": "warning",
+      "message": "Public competitor page https://www.futurepedia.io/pricing could not be read; continuing without it. HTTP 404",
+      "source": "market_research"
+    },
+    {
+      "code": "competitor_page_unavailable",
+      "severity": "warning",
+      "message": "Public competitor page https://theresanaiforthat.com/pricing could not be read; continuing without it. HTTP 403",
+      "source": "market_research"
+    },
+    {
+      "code": "competitor_page_unavailable",
+      "severity": "warning",
+      "message": "Public competitor page https://www.toolify.ai/category could not be read; continuing without it. HTTP 403",
+      "source": "market_research"
+    },
+    {
+      "code": "competitor_public_audit_thin",
+      "severity": "warning",
+      "message": "Public competitor URL audit was enabled, but successful page coverage is too thin for complete competitor confidence.",
+      "source": "market_research"
+    },
+    {
+      "code": "decision_evidence_validation_warning",
+      "severity": "warning",
+      "message": "competitor_evidence catalog entry is valid_with_warnings.",
+      "source": "market_research"
+    },
+    {
+      "code": "currency_inferred",
+      "severity": "warning",
+      "message": "Currency inferred as CNY because no explicit currency field was detected.",
+      "source": "internal_database"
+    },
+    {
+      "code": "no_revenue",
+      "severity": "warning",
+      "message": "尚未完成第一批真实收入验证。",
+      "source": "internal_database"
+    },
+    {
+      "code": "decision_evidence_validation_warning",
+      "severity": "warning",
+      "message": "revenue_evidence catalog entry is valid_with_warnings.",
+      "source": "market_research"
+    },
+    {
+      "code": "geo_probe_not_connected",
+      "severity": "warning",
+      "message": "Current GEO evidence measures page structure readiness and does not represent real AI search citation results.",
+      "source": "ai_search_probe"
+    },
+    {
+      "code": "decision_evidence_validation_warning",
+      "severity": "warning",
+      "message": "geo_evidence catalog entry is valid_with_warnings.",
+      "source": "market_research"
+    },
+    {
+      "code": "missing_data",
+      "severity": "warning",
+      "message": "EBOS data source google_search_console is missing for this report.",
+      "source": "google_search_console"
+    },
+    {
+      "code": "missing_data",
+      "severity": "warning",
+      "message": "EBOS data source google_analytics is missing for this report.",
+      "source": "google_analytics"
+    },
+    {
+      "code": "missing_data",
+      "severity": "warning",
+      "message": "EBOS data source cloudflare is missing for this report.",
+      "source": "cloudflare"
+    },
+    {
+      "code": "missing_data",
+      "severity": "warning",
+      "message": "EBOS data source whop is missing for this report.",
+      "source": "whop"
+    },
+    {
+      "code": "missing_data",
+      "severity": "warning",
+      "message": "EBOS data source market_research is missing for this report.",
+      "source": "market_research"
+    },
+    {
+      "code": "missing_data",
+      "severity": "warning",
+      "message": "EBOS data source ai_search_probe is missing for this report.",
+      "source": "ai_search_probe"
+    },
+    {
+      "code": "missing_data",
+      "severity": "warning",
+      "message": "Internal Database data source is missing_config. Missing config: DATABASE_URL.",
+      "source": "internal_database"
+    },
+    {
+      "code": "missing_data",
+      "severity": "warning",
+      "message": "Google Search Console data source is missing_config. Missing config: GOOGLE_SERVICE_ACCOUNT_EMAIL, GOOGLE_SERVICE_ACCOUNT_PRIVATE_KEY, GOOGLE_SEARCH_CONSOLE_SITE_URL.",
+      "source": "google_search_console"
+    },
+    {
+      "code": "missing_data",
+      "severity": "warning",
+      "message": "Google Analytics data source is missing_config. Missing config: GA_PROPERTY_ID, GOOGLE_SERVICE_ACCOUNT_EMAIL, GOOGLE_SERVICE_ACCOUNT_PRIVATE_KEY.",
+      "source": "google_analytics"
+    },
+    {
+      "code": "missing_data",
+      "severity": "warning",
+      "message": "Bing Webmaster data source is missing_config. Missing config: BING_WEBMASTER_API_KEY, BING_SITE_URL.",
+      "source": "bing_webmaster"
+    },
+    {
+      "code": "missing_data",
+      "severity": "warning",
+      "message": "Cloudflare data source is missing_config. Missing config: CLOUDFLARE_API_TOKEN, CLOUDFLARE_ZONE_ID.",
+      "source": "cloudflare"
+    },
+    {
+      "code": "missing_data",
+      "severity": "warning",
+      "message": "Whop data source is missing_config. Missing config: WHOP_API_KEY, WHOP_COMPANY_ID.",
+      "source": "whop"
+    },
+    {
+      "code": "missing_data",
+      "severity": "warning",
+      "message": "Market Research data source is missing_config. Missing config: EBOS_MARKET_RSS_SOURCES, EBOS_REDDIT_SOURCES, EBOS_GITHUB_TRENDING_ENABLED.",
+      "source": "market_research"
+    },
+    {
+      "code": "missing_data",
+      "severity": "warning",
+      "message": "AI Search Probe data source is missing_config. Missing config: EBOS_AI_SEARCH_PROBE_ENABLED, EBOS_AI_SEARCH_PROVIDERS.",
+      "source": "ai_search_probe"
+    },
+    {
+      "code": "decision_evidence_validation_warning",
+      "severity": "warning",
+      "message": "weekly_report catalog entry is valid_with_warnings.",
+      "source": "market_research"
+    }
+  ],
+  "dataGaps": []
+}

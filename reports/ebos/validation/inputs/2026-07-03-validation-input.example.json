@@ -1,0 +1,18 @@
+{
+  "trackerPath": "reports/ebos/validation/templates/2026-07-03-validation-tracker.json",
+  "targetDate": "2026-07-03",
+  "results": [
+    {
+      "planId": "validation-product-1-faceswap-studio-ai",
+      "status": "not_started"
+    },
+    {
+      "planId": "validation-product-2-local-ai-video-studio-for-creator-workflows",
+      "status": "not_started"
+    },
+    {
+      "planId": "validation-direction-3-ai-prompt-kit",
+      "status": "not_started"
+    }
+  ]
+}

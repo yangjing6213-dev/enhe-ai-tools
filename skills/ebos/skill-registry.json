@@ -1,0 +1,213 @@
+{
+  "version": "1.0.0",
+  "owner": "codex",
+  "skills": [
+    {
+      "id": "technical-seo-auditor",
+      "name": "Technical SEO Auditor",
+      "category": "seo",
+      "description": "Audit robots, sitemap, canonical, metadata, schema, hreflang, 404s, page structure, and Core Web Vitals readiness.",
+      "skillPath": "skills/ebos/technical-seo-auditor/SKILL.md",
+      "primaryUseCases": [
+        "Diagnose traffic drops or missing organic traffic",
+        "Turn technical SEO evidence into Codex implementation tasks",
+        "Prepare seo_evidence drafts from EBOS health and readiness data"
+      ],
+      "requiredEvidenceKinds": ["health_snapshot", "data_source_readiness"],
+      "optionalEvidenceKinds": ["seo_evidence", "product_evidence"],
+      "outputs": ["seo_evidence draft", "SEO fix task list", "Codex technical tasks"],
+      "riskLevel": "medium",
+      "owner": "codex",
+      "status": "active",
+      "version": "1.0.0"
+    },
+    {
+      "id": "geo-visibility-auditor",
+      "name": "GEO Visibility Auditor",
+      "category": "geo",
+      "description": "Plan visibility checks for ChatGPT, Perplexity, Gemini, Claude, Bing Copilot, Kimi, Doubao, and other answer engines.",
+      "skillPath": "skills/ebos/geo-visibility-auditor/SKILL.md",
+      "primaryUseCases": [
+        "Investigate AI search visibility gaps",
+        "Plan AI search probe setup",
+        "Draft GEO content actions from weekly report evidence"
+      ],
+      "requiredEvidenceKinds": ["data_source_readiness", "weekly_report"],
+      "optionalEvidenceKinds": ["geo_evidence", "seo_evidence", "market_evidence"],
+      "outputs": ["geo_evidence draft", "GEO content plan", "AI search probe setup tasks"],
+      "riskLevel": "medium",
+      "owner": "codex",
+      "status": "active",
+      "version": "1.0.0"
+    },
+    {
+      "id": "growth-product-manager",
+      "name": "Growth Product Manager",
+      "category": "product",
+      "description": "Use Weekly and Monthly Review evidence to set product priorities and revenue validation plans.",
+      "skillPath": "skills/ebos/growth-product-manager/SKILL.md",
+      "primaryUseCases": [
+        "Prioritize product development after weekly or monthly review",
+        "Define revenue validation experiments",
+        "Draft the next product PRD"
+      ],
+      "requiredEvidenceKinds": ["weekly_report", "monthly_review"],
+      "optionalEvidenceKinds": ["product_evidence", "revenue_evidence", "market_evidence"],
+      "outputs": ["product roadmap", "revenue validation plan", "next product PRD draft"],
+      "riskLevel": "high",
+      "owner": "codex",
+      "status": "active",
+      "version": "1.0.0"
+    },
+    {
+      "id": "digital-product-researcher",
+      "name": "Digital Product Researcher",
+      "category": "market",
+      "description": "Research AI digital product opportunities such as agents, video tools, voice tools, SEO tools, templates, prompt kits, and workflow packs.",
+      "skillPath": "skills/ebos/digital-product-researcher/SKILL.md",
+      "primaryUseCases": [
+        "Find AI digital product opportunities",
+        "Score product candidates",
+        "Translate market signals into product bets"
+      ],
+      "requiredEvidenceKinds": ["monthly_review"],
+      "optionalEvidenceKinds": ["market_evidence", "competitor_evidence", "product_evidence"],
+      "outputs": ["opportunity list", "product opportunity score", "product candidates"],
+      "riskLevel": "medium",
+      "owner": "codex",
+      "status": "active",
+      "version": "1.0.0"
+    },
+    {
+      "id": "competitor-watch-analyst",
+      "name": "Competitor Watch Analyst",
+      "category": "competitor",
+      "description": "Analyze competitor site structure, products, pricing, SEO pages, content strategy, and traffic entry points.",
+      "skillPath": "skills/ebos/competitor-watch-analyst/SKILL.md",
+      "primaryUseCases": [
+        "Compare ENHE against direct or adjacent competitors",
+        "Draft competitor evidence",
+        "Extract positioning and differentiation actions"
+      ],
+      "requiredEvidenceKinds": [],
+      "optionalEvidenceKinds": ["market_evidence", "competitor_evidence", "seo_evidence"],
+      "outputs": ["competitor_evidence draft", "competitor comparison", "differentiation plan"],
+      "riskLevel": "medium",
+      "owner": "codex",
+      "status": "active",
+      "version": "1.0.0"
+    },
+    {
+      "id": "landing-page-conversion-auditor",
+      "name": "Landing Page Conversion Auditor",
+      "category": "conversion",
+      "description": "Audit product page conversion through headline, subheadline, CTA, FAQ, pricing, purchase path, trust elements, demo video, and schema.",
+      "skillPath": "skills/ebos/landing-page-conversion-auditor/SKILL.md",
+      "primaryUseCases": [
+        "Diagnose poor conversion or no revenue",
+        "Create landing page improvement tasks",
+        "Turn product page evidence into A/B test ideas"
+      ],
+      "requiredEvidenceKinds": ["health_snapshot"],
+      "optionalEvidenceKinds": ["product_evidence", "revenue_evidence", "seo_evidence"],
+      "outputs": ["landing page improvement plan", "A/B test ideas", "Codex UI tasks"],
+      "riskLevel": "high",
+      "owner": "codex",
+      "status": "active",
+      "version": "1.0.0"
+    },
+    {
+      "id": "weekly-business-reviewer",
+      "name": "Weekly Business Reviewer",
+      "category": "weekly_review",
+      "description": "Read weekly_report evidence and turn the weekly business state into explicit execution tasks.",
+      "skillPath": "skills/ebos/weekly-business-reviewer/SKILL.md",
+      "primaryUseCases": [
+        "Clarify next-week execution",
+        "Split weekly risks into actionable tasks",
+        "Prioritize tasks from current weekly evidence"
+      ],
+      "requiredEvidenceKinds": ["weekly_report", "health_snapshot", "data_source_readiness"],
+      "optionalEvidenceKinds": ["monthly_review", "product_evidence", "revenue_evidence"],
+      "outputs": ["weekly execution plan", "priority tasks", "risk list"],
+      "riskLevel": "medium",
+      "owner": "codex",
+      "status": "active",
+      "version": "1.0.0"
+    },
+    {
+      "id": "monthly-strategy-reviewer",
+      "name": "Monthly Strategy Reviewer",
+      "category": "monthly_review",
+      "description": "Read monthly_review evidence and generate next-month strategic priorities, stop/keep/start decisions, and OKRs.",
+      "skillPath": "skills/ebos/monthly-strategy-reviewer/SKILL.md",
+      "primaryUseCases": [
+        "Create monthly strategy plans",
+        "Translate monthly review evidence into OKRs",
+        "Decide what to stop, keep, or start next month"
+      ],
+      "requiredEvidenceKinds": ["monthly_review", "weekly_report"],
+      "optionalEvidenceKinds": ["market_evidence", "revenue_evidence", "product_evidence"],
+      "outputs": ["monthly strategy plan", "stop/keep/start decisions", "next month OKR"],
+      "riskLevel": "high",
+      "owner": "codex",
+      "status": "active",
+      "version": "1.0.0"
+    },
+    {
+      "id": "ai-digital-product-launcher",
+      "name": "AI Digital Product Launcher",
+      "category": "launch",
+      "description": "Turn an AI product idea into a launch package with product page copy, FAQ, SEO/GEO labels, marketplace copy, and cover image requirements.",
+      "skillPath": "skills/ebos/ai-digital-product-launcher/SKILL.md",
+      "primaryUseCases": [
+        "Prepare a new AI digital product for listing",
+        "Draft product page and marketplace copy",
+        "Create Codex tasks for launch assets and pages"
+      ],
+      "requiredEvidenceKinds": [],
+      "optionalEvidenceKinds": ["product_evidence", "seo_evidence", "geo_evidence"],
+      "outputs": [
+        "product launch checklist",
+        "product page copy",
+        "marketplace listing copy",
+        "Codex product page tasks"
+      ],
+      "riskLevel": "high",
+      "owner": "codex",
+      "status": "active",
+      "version": "1.0.0"
+    },
+    {
+      "id": "ebos-evidence-analyst",
+      "name": "EBOS Evidence Analyst",
+      "category": "evidence",
+      "description": "Read the Evidence Catalog and decide which evidence is missing and which data gaps most affect business judgment.",
+      "skillPath": "skills/ebos/ebos-evidence-analyst/SKILL.md",
+      "primaryUseCases": [
+        "Assess current EBOS evidence gaps",
+        "Prioritize data source setup",
+        "Create the next evidence task list"
+      ],
+      "requiredEvidenceKinds": [
+        "health_snapshot",
+        "data_source_readiness",
+        "weekly_report",
+        "monthly_review"
+      ],
+      "optionalEvidenceKinds": [
+        "seo_evidence",
+        "geo_evidence",
+        "market_evidence",
+        "competitor_evidence",
+        "revenue_evidence",
+        "product_evidence"
+      ],
+      "outputs": ["missing evidence analysis", "data source priority", "next evidence task list"],
+      "riskLevel": "low",
+      "owner": "codex",
+      "status": "active",
+      "version": "1.0.0"
+    }
+  ]
+}
