@@ -37,6 +37,16 @@ R22 applies the established DB-free local-preview safety pattern to the bilingua
 - Configured database reads, P1001/environment fallback, English indexability filtering, pagination, and unknown-error propagation must remain unchanged.
 - No topic configuration module, article-detail shell, shared UI component, settings guard, Prisma schema, database configuration, route wrapper, or production configuration may change.
 
+## Controlled regression-fixture expansion
+
+The first relevant regression run proved that three existing tests exercised configured-database behavior without declaring a configured `DATABASE_URL`. Standing authorization therefore adds only these direct test dependencies:
+
+1. `src/lib/ai-news-listing-seo.test.ts`
+2. `src/lib/ai-news-pagination-page-shell.test.tsx`
+3. `src/lib/public-content-news-pagination.test.ts`
+
+The permitted change is limited to setting a non-routable placeholder `DATABASE_URL` for configured-path cases and restoring the environment afterward. Assertions, product behavior, pagination rules, and coverage may not be weakened.
+
 ## TDD acceptance criteria
 
 - Focused RED evidence proves the current DB-free public-content reads before any shared edit.
