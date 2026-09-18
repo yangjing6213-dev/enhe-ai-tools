@@ -16,8 +16,13 @@ Content evidence: `UNVERIFIED`
 
 正常开发前的受控恢复阶段。新 recovery worktree 是唯一开发主线；旧 worktree 的 207 项 dirty/untracked 状态保持冻结，不清理、不迁移、不覆盖。
 
-Current local batch: `R23 -> R24 -> R25`
-Batch progress: `3/3`
+Current local batch: `R27 -> R28 -> R29`
+Batch progress: `0/3`
+
+Analytics DB-free investigation: the observed `/api/analytics` 503 is the
+existing fail-closed storage contract. The route explicitly reports a dropped
+event as 503, while the browser sender ignores the response body and handles
+network rejection. `R26` was therefore not created; no analytics code changed.
 
 ## Completed
 
@@ -75,6 +80,9 @@ Batch progress: `3/3`
 | E1-NB-R23 | COMPLETED_LOCAL_ONLY | AI Trends DB-free UNVERIFIED preview boundary | `IMPLEMENTATION=GREEN_FOCUSED`; `LOCAL_ACCEPTANCE=PASS`; commit `0f304c46abf03ba1b9c6d1e928a7a04661c2f839`; content unverified and publication blocked |
 | E1-NB-R24 | COMPLETED_LOCAL_ONLY | Bilingual public-shell skip-to-content navigation | `IMPLEMENTATION=GREEN_FOCUSED`; `LOCAL_ACCEPTANCE=PASS`; commit `c35eb6e7ac0094a7e2286baecb16f249f1fa254c`; desktop/mobile keyboard and layout acceptance passed; publication remains blocked |
 | E1-NB-R25 | COMPLETED_LOCAL_ONLY | Replace machine-facing AI News answer labels | `IMPLEMENTATION=GREEN_FOCUSED`; `LOCAL_ACCEPTANCE=PASS`; commit `cb04661d189ca7e37f6116236ec15e8765271b6c`; news facts, JSON-LD, and indexing behavior unchanged; content unverified and publication blocked |
+| E1-NB-R27 | AUTHORIZED | AI Trends human-facing answer labels | Replace machine-facing bilingual labels without changing trend facts, sources, JSON-LD, or indexing behavior |
+| E1-NB-R28 | AUTHORIZED_WAITING_FOR_R27 | AI News Topic human-facing answer labels | Replace machine-facing bilingual topic labels without changing topic content, facts, JSON-LD, or indexing behavior |
+| E1-NB-R29 | AUTHORIZED_WAITING_FOR_R28 | AI Topic Hub human-facing answer copy | Replace machine-facing hub/detail copy with user-facing guidance without changing topic data, links, JSON-LD, or indexing behavior |
 | CONTENT-EVIDENCE-RECONCILIATION | BLOCKED | Reconcile first-party tutorial/content evidence only when an approved source is available | Source bytes/hash and publication approval independently verified |
 | PHASE-2C.6 RELEASE | NOT APPROVED | Production publication/deployment | Separate production, database, deployment and factual-evidence approvals |
 
