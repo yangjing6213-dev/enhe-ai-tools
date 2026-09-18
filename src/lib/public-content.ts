@@ -898,14 +898,19 @@ export async function getPublicLegalPage(locale: "zh" | "en", slug: string) {
 }
 
 export async function getPublicNewsListing(filters: PublicNewsListingFilters) {
+  if (!process.env.DATABASE_URL?.trim()) {
+    return { articles: [], total: 0 };
+  }
   return getCachedPublicNewsListing(filters);
 }
 
 export async function getPublicNewsCategories() {
+  if (!process.env.DATABASE_URL?.trim()) return [];
   return getCachedPublicNewsCategories();
 }
 
 export async function getPublicNewsTags(locale: "zh" | "en" = "zh") {
+  if (!process.env.DATABASE_URL?.trim()) return [];
   return filterPublicNewsTags(await getCachedPublicNewsTags(), locale);
 }
 
@@ -914,6 +919,9 @@ export async function getPublicNewsArticleBySlug(slug: string) {
 }
 
 export async function getPublicAiNewsDiscovery(locale: "zh" | "en") {
+  if (!process.env.DATABASE_URL?.trim()) {
+    return { keywordCloudItems: [], topicCollectionItems: [] };
+  }
   return getCachedPublicAiNewsDiscovery(locale);
 }
 

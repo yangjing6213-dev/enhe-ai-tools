@@ -187,6 +187,7 @@ export async function generateAiNewsPageMetadata(
   });
   if (!isNewsPaginationPageQueryable(filters.page)) notFound();
   const isFiltered = hasActiveNewsFilters(filters);
+  const isDbFreeMode = !process.env.DATABASE_URL?.trim();
   const canonicalPath = isFiltered
     ? "/ai-news"
     : filters.page > 1
@@ -196,7 +197,9 @@ export async function generateAiNewsPageMetadata(
     forceLocale === "en" ? `Page ${filters.page}` : `第${filters.page}页`;
   const baseDescription = buildListingMetaDescription("ai-news", forceLocale);
   const languageLocales =
-    !isFiltered && forceLocale === "zh" && filters.page > 1
+    isDbFreeMode
+      ? (['zh', 'en'] as const)
+      : !isFiltered && forceLocale === "zh" && filters.page > 1
       ? getNewsPaginationLocales(
           filters.page,
           (
@@ -215,8 +218,11 @@ export async function generateAiNewsPageMetadata(
           brand: t.brand,
         })
       : buildListingMetadataTitle("ai-news", forceLocale, t.brand),
-    description:
-      !isFiltered && filters.page > 1
+    description: isDbFreeMode
+      ? forceLocale === "en"
+        ? "AI News content is not available in this local preview because it has not been verified."
+        : "本地预览不提供 AI 资讯内容，因为相关内容尚未核验。"
+      : !isFiltered && filters.page > 1
         ? `${pageLabel}: ${baseDescription}`
         : baseDescription,
     path: canonicalPath,
@@ -225,7 +231,7 @@ export async function generateAiNewsPageMetadata(
     languageAlternates: buildAvailableLanguageAlternates(canonicalPath, [...languageLocales]),
   });
 
-  if (isFiltered) {
+  if (isDbFreeMode || isFiltered) {
     metadata.robots = { index: false, follow: true };
   }
 
@@ -249,6 +255,33 @@ export async function AiNewsPageShell({
   if (!isNewsPaginationPageQueryable(filters.page)) notFound();
   const filtered = hasActiveNewsFilters(filters);
   const t = getDictionary(forceLocale);
+  if (!process.env.DATABASE_URL?.trim()) {
+    return (
+      <main>
+        <Container className="py-14">
+          <section
+            data-content-status="UNVERIFIED"
+            className="surface-panel p-8"
+          >
+            <SectionTitle
+              as="h1"
+              title={t.aiNews.title}
+              intro={
+                forceLocale === "en"
+                  ? "AI News content is not available in this local preview."
+                  : "AI 资讯内容尚未核验，当前本地预览不展示资讯卡片或资讯事实。"
+              }
+            />
+            <p className="mt-6 text-sm font-semibold leading-7 text-[var(--marketing-muted)]">
+              {forceLocale === "en"
+                ? "UNVERIFIED — AI News content has not been verified yet."
+                : "UNVERIFIED — AI 资讯内容尚未核验。"}
+            </p>
+          </section>
+        </Container>
+      </main>
+    );
+  }
   const [{ articles, total }, featured, hot, categories, tags, discovery, topics] =
     await Promise.all([
       getPublicNewsListing({

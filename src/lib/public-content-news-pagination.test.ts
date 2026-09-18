@@ -1,4 +1,4 @@
-import { beforeEach, describe, expect, it, vi } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 const db = vi.hoisted(() => ({
   newsFindMany: vi.fn(),
@@ -36,6 +36,11 @@ describe("public English AI news pagination", () => {
   beforeEach(() => {
     vi.resetModules();
     vi.clearAllMocks();
+    vi.stubEnv("DATABASE_URL", "postgresql://configured.invalid/enhe");
+  });
+
+  afterEach(() => {
+    vi.unstubAllEnvs();
   });
 
   it("counts and paginates all indexable English articles beyond the first 80 candidates", async () => {

@@ -1,5 +1,5 @@
 import React, { Children, isValidElement, type ReactNode } from "react";
-import { beforeEach, describe, expect, it, vi } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 const navigation = vi.hoisted(() => ({
   notFound: vi.fn(() => {
@@ -50,6 +50,11 @@ function pathname(value: unknown) {
 describe("AI news pagination page shell", () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    vi.stubEnv("DATABASE_URL", "postgresql://configured.invalid/enhe");
+  });
+
+  afterEach(() => {
+    vi.unstubAllEnvs();
   });
 
   it("returns not found when the requested page exceeds the actual page count", async () => {

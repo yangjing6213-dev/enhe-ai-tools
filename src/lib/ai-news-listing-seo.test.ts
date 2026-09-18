@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { describe, expect, it, vi } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 vi.mock("@/lib/public-content", () => ({
   getPublicNewsListing: vi.fn(async () => ({ articles: [], total: 60 })),
@@ -16,6 +16,14 @@ const generateListingMetadata =
   generateAiNewsPageMetadata as GenerateListingMetadata;
 
 describe("AI news listing SEO state", () => {
+  beforeEach(() => {
+    vi.stubEnv("DATABASE_URL", "postgresql://configured.invalid/enhe");
+  });
+
+  afterEach(() => {
+    vi.unstubAllEnvs();
+  });
+
   it("keeps the unfiltered first page indexable with the listing canonical", async () => {
     const metadata = await generateListingMetadata("zh");
 
