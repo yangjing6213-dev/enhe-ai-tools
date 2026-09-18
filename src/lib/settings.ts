@@ -1,5 +1,4 @@
 import { unstable_cache } from "next/cache";
-import { prisma } from "@/lib/db";
 import type { Locale } from "@/lib/i18n";
 import { defaultBrandIcon } from "@/lib/seo";
 
@@ -47,7 +46,13 @@ function isRecoverableSettingsReadError(error: unknown) {
 }
 
 const getCachedSettingsMap = unstable_cache(
-  async () => {
+  async (): Promise<SettingsMap> => {
+    if (!process.env.DATABASE_URL?.trim()) {
+      return {};
+    }
+
+    const { prisma } = await import("@/lib/db");
+
     try {
       const settings = await prisma.siteSetting.findMany();
       return Object.fromEntries(settings.map((setting) => [setting.key, setting.value]));

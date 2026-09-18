@@ -149,6 +149,10 @@ const getCachedPublicToolListing = unstable_cache(
     paid?: string,
     sort?: string,
   ) => {
+    if (!process.env.DATABASE_URL?.trim()) {
+      return [];
+    }
+
     try {
       return await prisma.tool.findMany({
         where: {
@@ -293,6 +297,10 @@ const getCachedPublicToolsByCategoryNames = unstable_cache(
 
 const getCachedPublicTutorials = unstable_cache(
   async () => {
+    if (!process.env.DATABASE_URL?.trim()) {
+      return [];
+    }
+
     try {
       return await prisma.tutorial.findMany({
         where: { status: "active", tool: { status: "published" } },
@@ -313,6 +321,10 @@ const getCachedPublicTutorials = unstable_cache(
 
 const getCachedPublicToolCategories = unstable_cache(
   async (type: PublicToolType) => {
+    if (!process.env.DATABASE_URL?.trim()) {
+      return [];
+    }
+
     try {
       return await prisma.toolCategory.findMany({
         where: { type, status: "active" },

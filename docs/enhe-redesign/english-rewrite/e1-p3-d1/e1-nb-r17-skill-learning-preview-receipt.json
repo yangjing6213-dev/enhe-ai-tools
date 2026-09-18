@@ -1,0 +1,245 @@
+{
+  "task_id": "E1-NB-R17",
+  "task_name": "Skill-learning DB-free UNVERIFIED preview parity",
+  "remediation_id": "R17A+R17B",
+  "remediation_name": "Public settings and public content DB-free guards",
+  "repository_root": "C:\\Users\\HU\\Documents\\New project 2\\.worktrees\\enhe-recovery-baseline",
+  "branch": "codex/enhe-recovery-baseline",
+  "base_head": "0b189737cc9b7e733fb925c8274399c90d9a04ac",
+  "verification_time": "2026-09-18T20:56:09+08:00",
+  "allowed_files": [
+    "src/app/skill-learning/page-shell.tsx",
+    "src/lib/e1-nb-r17-skill-learning-preview.test.tsx",
+    "docs/enhe-redesign/english-rewrite/e1-p3-d1/e1-nb-r17-skill-learning-preview-receipt.json",
+    "src/lib/settings.ts",
+    "src/lib/settings-db-fallback.test.ts",
+    "src/lib/public-content.ts",
+    "src/lib/public-content-db-fallback.test.ts"
+  ],
+  "changed_files": [
+    {
+      "path": "src/app/skill-learning/page-shell.tsx",
+      "bytes": 21811,
+      "sha256": "f85f50583d550d9b93714994b0c9313ea8042d4a6d5e307055b98e5712d3313b",
+      "git_state": "tracked_modified"
+    },
+    {
+      "path": "src/lib/e1-nb-r17-skill-learning-preview.test.tsx",
+      "bytes": 3485,
+      "sha256": "af39220b636f24386e6b27197bace9922486d2a79ed773ffa0b707207a4cbb7f",
+      "git_state": "untracked"
+    },
+    {
+      "path": "src/lib/settings.ts",
+      "bytes": 7247,
+      "sha256": "9acf1ba9d5f22aaa343e7d9556adb78dd7dc8ca551c5170ab2e9de10d9ba077f",
+      "git_state": "tracked_modified"
+    },
+    {
+      "path": "src/lib/settings-db-fallback.test.ts",
+      "bytes": 2216,
+      "sha256": "5b38640c9c24289159c3093ec0167e2425bbbf2f022a1a64d7a454112adf0db5",
+      "git_state": "tracked_modified"
+    },
+    {
+      "path": "src/lib/public-content.ts",
+      "bytes": 27464,
+      "sha256": "c500542608d92ce97dcb3363f0c92c94ec4e84fa8c8c2a7d13b513d2ebe38c49",
+      "git_state": "tracked_modified"
+    },
+    {
+      "path": "src/lib/public-content-db-fallback.test.ts",
+      "bytes": 4244,
+      "sha256": "2c8aa8c6ba37c87da6076f2299b67dbf4250264fe4198d8d8810cd5c1c5bc5bc",
+      "git_state": "tracked_modified"
+    },
+    {
+      "path": "docs/enhe-redesign/english-rewrite/e1-p3-d1/e1-nb-r17-skill-learning-preview-receipt.json",
+      "bytes": null,
+      "sha256": null,
+      "git_state": "untracked",
+      "self_hash_excluded": true,
+      "final_bytes_and_sha256_reported_externally": true
+    }
+  ],
+  "r17_tdd": {
+    "red": {
+      "command": "npx --no-install vitest run src/lib/e1-nb-r17-skill-learning-preview.test.tsx --reporter=verbose",
+      "status": "PASS_EXPECTED_RED",
+      "exit_code": 1,
+      "test_files": 1,
+      "passed": 0,
+      "failed": 4,
+      "failure_reason": "Empty-state UNVERIFIED marker and DB-free robots metadata were absent; configured-card fixture initially lacked the complete ToolCard shape and was corrected within the allowed focused test."
+    },
+    "green": {
+      "command": "npx --no-install vitest run src/lib/e1-nb-r17-skill-learning-preview.test.tsx --reporter=verbose",
+      "status": "PASS",
+      "exit_code": 0,
+      "test_files": 1,
+      "passed": 4,
+      "failed": 0
+    }
+  },
+  "r17a_tdd": {
+    "historical_runtime_red": {
+      "status": "PASS_EXPECTED_RED",
+      "routes": [
+        {"path": "/skill-learning", "http_status": 500},
+        {"path": "/en/skill-learning", "http_status": 500}
+      ],
+      "failure_call_chain": "PublicSiteChrome -> getSettingsMap -> getCachedSettingsMap -> prisma.siteSetting.findMany",
+      "failure_reason": "DATABASE_URL was unset but the settings boundary statically loaded the DB module and attempted siteSetting.findMany."
+    },
+    "focused_red": {
+      "command": "npx --no-install vitest run src/lib/settings-db-fallback.test.ts --reporter=verbose",
+      "status": "PASS_EXPECTED_RED",
+      "exit_code": 1,
+      "passed": 3,
+      "failed": 3,
+      "failure_reason": "Unset, empty, and whitespace DATABASE_URL values still loaded the DB module or called siteSetting.findMany."
+    },
+    "focused_green": {
+      "command": "npx --no-install vitest run src/lib/settings-db-fallback.test.ts --reporter=verbose",
+      "status": "PASS",
+      "exit_code": 0,
+      "passed": 6,
+      "failed": 0,
+      "settings_db_module_loads_without_database_url": 0,
+      "settings_find_many_calls_without_database_url": 0,
+      "configured_database_behavior": "NORMAL_QUERY_PRESERVED_P1001_FALLBACK_PRESERVED_UNEXPECTED_ERRORS_RETHROWN"
+    }
+  },
+  "r17b_tdd": {
+    "historical_runtime_red": {
+      "status": "PASS_EXPECTED_RED",
+      "routes": [
+        {"path": "/skill-learning", "http_status": 500, "query_attempts": ["prisma.toolCategory.findMany", "prisma.tool.findMany"]},
+        {"path": "/en/skill-learning", "http_status": 500, "query_attempts": ["prisma.toolCategory.findMany", "prisma.tool.findMany"]},
+        {"path": "/tutorials", "http_status": 500, "query_attempts": ["prisma.tutorial.findMany"]},
+        {"path": "/en/tutorials", "http_status": 500, "query_attempts": ["prisma.tutorial.findMany"]}
+      ]
+    },
+    "focused_red": {
+      "command": "npx --no-install vitest run src/lib/public-content-db-fallback.test.ts --reporter=verbose",
+      "status": "PASS_EXPECTED_RED",
+      "exit_code": 1,
+      "passed": 3,
+      "failed": 1,
+      "observed_query_counts": {"tool": 1, "tutorial": 1, "category": 1},
+      "expected_query_counts": {"tool": 0, "tutorial": 0, "category": 0}
+    },
+    "focused_green": {
+      "command": "npx --no-install vitest run src/lib/public-content-db-fallback.test.ts --reporter=verbose",
+      "status": "PASS",
+      "exit_code": 0,
+      "passed": 4,
+      "failed": 0,
+      "public_content_query_count_without_database_url": 0,
+      "configured_database_behavior": "NORMAL_QUERIES_PRESERVED_P1001_FALLBACK_PRESERVED_UNEXPECTED_ERRORS_RETHROWN"
+    }
+  },
+  "regression_tests": {
+    "command": "npx --no-install vitest run src/lib/public-content-db-fallback.test.ts src/lib/settings-db-fallback.test.ts src/lib/e1-nb-r17-skill-learning-preview.test.tsx src/lib/e1-nb-r16-tutorials-preview.test.tsx --reporter=verbose",
+    "status": "PASS",
+    "exit_code": 0,
+    "test_files": 4,
+    "total_passed": 18,
+    "r17b_passed": 4,
+    "r17a_passed": 6,
+    "r17_passed": 4,
+    "r16_passed": 4,
+    "failed": 0
+  },
+  "eslint": {
+    "command": "npx --no-install eslint src/lib/public-content.ts src/lib/public-content-db-fallback.test.ts src/lib/settings.ts src/lib/settings-db-fallback.test.ts src/app/skill-learning/page-shell.tsx src/lib/e1-nb-r17-skill-learning-preview.test.tsx",
+    "status": "PASS",
+    "exit_code": 0
+  },
+  "localhost_routes": {
+    "status": "PASS",
+    "historical_settings_failure_retained_as_red_evidence": true,
+    "historical_public_content_failure_retained_as_red_evidence": true,
+    "settings_guard_result": "PASS_SETTINGS_QUERY_COUNT_ZERO",
+    "public_content_guard_result": "PASS_PUBLIC_CONTENT_QUERY_COUNT_ZERO",
+    "routes": [
+      {"path": "/skill-learning", "http_status": 200, "unverified_visible": true, "robots": "noindex, follow", "noindex_follow": true, "fabricated_content_rendered": false, "rendered_content_entity_count": 0, "settings_prisma_query_count": 0, "public_content_prisma_query_count": 0},
+      {"path": "/en/skill-learning", "http_status": 200, "unverified_visible": true, "robots": "noindex, follow", "noindex_follow": true, "fabricated_content_rendered": false, "rendered_content_entity_count": 0, "settings_prisma_query_count": 0, "public_content_prisma_query_count": 0},
+      {"path": "/tutorials", "http_status": 200, "unverified_visible": true, "robots": "noindex, follow", "noindex_follow": true, "fabricated_content_rendered": false, "rendered_content_entity_count": 0, "settings_prisma_query_count": 0, "public_content_prisma_query_count": 0},
+      {"path": "/en/tutorials", "http_status": 200, "unverified_visible": true, "robots": "noindex, follow", "noindex_follow": true, "fabricated_content_rendered": false, "rendered_content_entity_count": 0, "settings_prisma_query_count": 0, "public_content_prisma_query_count": 0}
+    ],
+    "server_start_status": "READY",
+    "server_stopped": "STOPPED_CTRL_C",
+    "residual_listener_count": 0
+  },
+  "environment": {
+    "DATABASE_URL": "UNSET",
+    "settings_prisma_query_count": 0,
+    "public_content_prisma_query_count": 0,
+    "historical_public_content_prisma_query_attempt_count": 6,
+    "successful_database_connection_count": 0,
+    "database_write_count": 0,
+    "external_network_request_count": 0,
+    "external_network_request_scope": "localhost application verification only; the separately approved npm dependency installation registry activity is excluded",
+    "ssh": "NOT_RUN",
+    "docker": "NOT_RUN"
+  },
+  "git": {
+    "branch": "codex/enhe-recovery-baseline",
+    "head": "0b189737cc9b7e733fb925c8274399c90d9a04ac",
+    "tracked_modified": 5,
+    "untracked": 2,
+    "staged": 0,
+    "porcelain_entries": 7,
+    "staged_paths": [],
+    "index_lock_present": false,
+    "git_diff_check": {"status": "PASS", "exit_code": 0}
+  },
+  "scope_check": {
+    "status": "PASS",
+    "out_of_scope_changes": 0,
+    "public_site_chrome_modified": false,
+    "old_worktree_touched_by_this_task": false,
+    "old_worktree_preexisting_status": "FROZEN_DIRTY_NOT_ATTRIBUTED_OR_MODIFIED_BY_R17A",
+    "r16_files_modified": false
+  },
+  "receipt_self_hash_in_document": false,
+  "receipt_self_hash_policy": "excluded_from_self_hash",
+  "receipt_final_hash_reported_externally": true,
+  "r17a_db_free_guard": "PASS_SETTINGS_BOUNDARY_ONLY",
+  "r17b_db_free_guard": "PASS",
+  "local_acceptance": "PASS",
+  "content_evidence": "UNVERIFIED",
+  "publish_status": "BLOCKED",
+  "commit_status": "NOT_CREATED",
+  "blockers": [],
+  "next_action": "COMMIT_STAGE_ELIGIBLE_AWAITING_SEPARATE_AUTHORIZATION",
+  "exact_commands_run": [
+    "git branch --show-current",
+    "git rev-parse HEAD",
+    "git status --porcelain=v1 --untracked-files=all",
+    "npm install --ignore-scripts --no-audit --no-fund",
+    "npx --no-install vitest run src/lib/settings-db-fallback.test.ts --reporter=verbose",
+    "npx --no-install vitest run src/lib/public-content-db-fallback.test.ts --reporter=verbose",
+    "npx --no-install vitest run src/lib/public-content-db-fallback.test.ts src/lib/settings-db-fallback.test.ts src/lib/e1-nb-r17-skill-learning-preview.test.tsx src/lib/e1-nb-r16-tutorials-preview.test.tsx --reporter=verbose",
+    "npx --no-install vitest run src/lib/e1-nb-r17-skill-learning-preview.test.tsx src/lib/e1-nb-r16-tutorials-preview.test.tsx --reporter=verbose",
+    "npx --no-install eslint src/lib/public-content.ts src/lib/public-content-db-fallback.test.ts src/lib/settings.ts src/lib/settings-db-fallback.test.ts src/app/skill-learning/page-shell.tsx src/lib/e1-nb-r17-skill-learning-preview.test.tsx",
+    "node node_modules/next/dist/bin/next dev --hostname 127.0.0.1 --port 3271",
+    "HTTP GET http://127.0.0.1:3271/skill-learning",
+    "HTTP GET http://127.0.0.1:3271/en/skill-learning",
+    "HTTP GET http://127.0.0.1:3271/tutorials",
+    "HTTP GET http://127.0.0.1:3271/en/tutorials",
+    "git diff --check",
+    "netstat -ano"
+  ],
+  "governance": {
+    "R17A_DB_FREE_GUARD": "PASS_SETTINGS_BOUNDARY_ONLY",
+    "R17B_DB_FREE_GUARD": "PASS",
+    "R17_IMPLEMENTATION": "GREEN_FOCUSED",
+    "R17_LOCAL_ACCEPTANCE": "PASS",
+    "R17_CONTENT_EVIDENCE": "UNVERIFIED",
+    "R17_COMMIT_CLOSED": "NO",
+    "PUSH_STATUS": "NOT_PUSHED",
+    "PUBLISH_STATUS": "BLOCKED"
+  }
+}

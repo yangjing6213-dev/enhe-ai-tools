@@ -140,13 +140,22 @@ export async function generateSkillLearningPageMetadata(
   searchParams: Promise<Record<string, string | undefined>> = Promise.resolve({}),
 ): Promise<Metadata> {
   const t = getDictionary(forceLocale);
+  const isDbFreePreview = !process.env.DATABASE_URL;
   const metadata = buildPageMetadata({
     title: buildListingMetadataTitle("skill-learning", forceLocale, t.brand),
-    description: buildListingMetaDescription("skill-learning", forceLocale),
+    description: isDbFreePreview
+      ? forceLocale === "en"
+        ? "English skill-learning content is not available in this local preview."
+        : "技能学习内容尚未核验，当前本地预览不提供可发布 Skill 事实。"
+      : buildListingMetaDescription("skill-learning", forceLocale),
     path: "/skill-learning",
     locale: forceLocale === "en" ? "en_US" : "zh_CN",
     localeKey: forceLocale,
   });
+
+  if (isDbFreePreview) {
+    metadata.robots = { index: false, follow: true };
+  }
 
   return applyFilteredListingRobots(metadata, await searchParams, [
     "q",
@@ -189,6 +198,31 @@ export async function SkillLearningPageShell({
       sort,
     ),
   ]);
+
+  if (tools.length === 0) {
+    return (
+      <main>
+        <Container className="py-14">
+          <section
+            data-content-status="UNVERIFIED"
+            className="surface-panel p-8"
+          >
+            <SectionTitle
+              as="h1"
+              title={t.listing.skillLearningTitle}
+              intro={t.listing.skillLearningIntro}
+            />
+            <p className="mt-6 text-sm font-semibold leading-7 text-[var(--marketing-muted)]">
+              {forceLocale === "en"
+                ? "UNVERIFIED — English skill-learning content is not available yet."
+                : "UNVERIFIED — 技能学习内容尚未核验。"}
+            </p>
+          </section>
+        </Container>
+      </main>
+    );
+  }
+
   const categoryOptions = buildThemedToolCategories(categories, "futureAi");
 
   return (
