@@ -137,7 +137,7 @@ export async function AiNewsTopicPageShell({
 
         <section className="glass mt-8 rounded-2xl p-6">
           <p className="text-xs font-bold uppercase tracking-[0.16em] text-[var(--marketing-accent)]">
-            {forceLocale === "en" ? "Extractable answer" : "可摘录答案"}
+            {forceLocale === "en" ? "Key takeaway" : "核心结论"}
           </p>
           <h2 className="mt-4 text-2xl font-black text-[var(--marketing-text)]">
             {forceLocale === "en"

@@ -1,0 +1,141 @@
+{
+  "task_id": "E1-NB-R28",
+  "task_name": "AI News Topic human-facing answer labels",
+  "repository_root": "C:\\Users\\HU\\Documents\\New project 2\\.worktrees\\enhe-recovery-baseline",
+  "branch": "codex/enhe-recovery-baseline",
+  "contract_base_head": "3a3b385d854d104ef80051f74529e41802cde517",
+  "implementation_base_head": "1847b8a8eddf609f6a4715a11e6258fa38bd16a7",
+  "verification_time": "2026-09-18T21:00:16.1015543Z",
+  "allowed_files": [
+    "src/app/ai-news/topics/[slug]/page-shell.tsx",
+    "src/lib/e1-nb-r28-ai-news-topic-human-copy.test.tsx",
+    "docs/enhe-redesign/english-rewrite/e1-p3-d1/e1-nb-r28-ai-news-topic-human-copy-receipt.json"
+  ],
+  "changed_files": [
+    {
+      "path": "src/app/ai-news/topics/[slug]/page-shell.tsx",
+      "bytes": 13485,
+      "sha256": "7c81beccebe9da56317bb3673a3ff389425e7a6d4382689e70d2304933985c42",
+      "git_state_before_commit": "tracked_modified"
+    },
+    {
+      "path": "src/lib/e1-nb-r28-ai-news-topic-human-copy.test.tsx",
+      "bytes": 2606,
+      "sha256": "66ce2ed713889c6ee9a043943f8c612bea92f8e5430f9ac19c7acf47ac496ea6",
+      "git_state_before_commit": "untracked"
+    },
+    {
+      "path": "docs/enhe-redesign/english-rewrite/e1-p3-d1/e1-nb-r28-ai-news-topic-human-copy-receipt.json",
+      "bytes": null,
+      "sha256": null,
+      "git_state_before_commit": "untracked",
+      "self_hash_excluded": true,
+      "final_bytes_and_sha256_reported_externally": true
+    }
+  ],
+  "tdd": {
+    "red": {
+      "command": "rtk npx --no-install vitest run src/lib/e1-nb-r28-ai-news-topic-human-copy.test.tsx --reporter=verbose",
+      "status": "PASS_EXPECTED_RED",
+      "exit_code": 1,
+      "passed": 0,
+      "failed": 3,
+      "failure_reason": "The topic source and configured-content render still used the machine-facing Chinese and English labels."
+    },
+    "green": {
+      "command": "rtk npx --no-install vitest run src/lib/e1-nb-r28-ai-news-topic-human-copy.test.tsx --reporter=verbose",
+      "status": "PASS",
+      "exit_code": 0,
+      "passed": 3,
+      "failed": 0
+    }
+  },
+  "direct_regression": {
+    "command": "rtk npx --no-install vitest run src/lib/e1-nb-r28-ai-news-topic-human-copy.test.tsx src/lib/ai-news-topic-config.test.ts src/lib/e1-nb-r22-ai-news-listing-preview.test.tsx src/lib/ai-news-listing-seo.test.ts src/lib/ai-news-pagination-page-shell.test.tsx src/lib/ai-news-pagination-route.test.tsx --reporter=verbose",
+    "status": "PASS",
+    "exit_code": 0,
+    "test_files": 6,
+    "passed": 38,
+    "failed": 0,
+    "topic_configuration_regression": "PASS",
+    "r22_db_free_regression": "PASS",
+    "ai_news_seo_regression": "PASS",
+    "ai_news_pagination_regression": "PASS"
+  },
+  "copy_contract": {
+    "configured_chinese_label": "核心结论",
+    "configured_english_label": "Key takeaway",
+    "old_chinese_label_in_page_source": false,
+    "old_english_label_in_page_source": false,
+    "old_labels_in_configured_render": false,
+    "topic_content_modified": false,
+    "related_articles_modified": false,
+    "factual_data_modified": false,
+    "json_ld_modified": false,
+    "metadata_modified": false,
+    "indexing_rules_modified": false
+  },
+  "eslint": {
+    "command": "rtk npx --no-install eslint 'src/app/ai-news/topics/[slug]/page-shell.tsx' src/lib/e1-nb-r28-ai-news-topic-human-copy.test.tsx",
+    "status": "PASS",
+    "exit_code": 0
+  },
+  "typecheck": {
+    "command": "rtk npm run typecheck",
+    "status": "PASS",
+    "exit_code": 0
+  },
+  "localhost": {
+    "status": "PASS",
+    "host": "127.0.0.1",
+    "port": 3228,
+    "database_url": "UNSET",
+    "configured_topic_routes": "NOT_RUN_NO_CONFIGURED_TOPIC_IN_DB_FREE_MODE",
+    "configured_topic_render_validation": "PASS_FOCUSED_MOCK",
+    "routes": [
+      {
+        "path": "/ai-news",
+        "http_status": 200,
+        "unverified_visible": true,
+        "robots": "noindex, follow",
+        "old_labels_visible": false
+      },
+      {
+        "path": "/en/ai-news",
+        "http_status": 200,
+        "unverified_visible": true,
+        "robots": "noindex, follow",
+        "old_labels_visible": false
+      }
+    ],
+    "validation_method": "DB-free public entry routes plus configured topic render in focused mock; no topic data was fabricated for localhost",
+    "server_stopped": true,
+    "residual_listener_count": 0
+  },
+  "database_and_network": {
+    "DATABASE_URL": "UNSET",
+    "successful_database_connection_count": 0,
+    "database_write_count": 0,
+    "external_network_request_count": 0,
+    "ssh": "NOT_RUN",
+    "docker": "NOT_RUN",
+    "deployment": "NOT_RUN"
+  },
+  "scope_check": {
+    "status": "PASS",
+    "scope_expansion_count": 0,
+    "out_of_scope_changes": 0,
+    "production_configuration_modified": false,
+    "old_worktree_touched": false
+  },
+  "git_diff_check": "PASS",
+  "staged_paths_before_commit": [],
+  "receipt_self_hash_in_document": false,
+  "receipt_self_hash_policy": "excluded_from_self_hash",
+  "receipt_final_hash_reported_externally": true,
+  "local_acceptance": "PASS",
+  "content_evidence": "UNVERIFIED",
+  "publish_status": "BLOCKED",
+  "push_status": "NOT_PUSHED",
+  "commit_status": "PENDING_AUTHORIZED_COMMIT_GATE"
+}
