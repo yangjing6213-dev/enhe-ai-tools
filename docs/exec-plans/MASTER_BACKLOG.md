@@ -3,6 +3,7 @@
 Status: CONTROLLED_RECOVERY
 Worktree: `C:\Users\HU\Documents\New project 2\.worktrees\enhe-recovery-baseline`
 Base HEAD: `26b4f189d0d79d8e885e9f39205aca18bd2d04f1`
+Current development HEAD: `3c2a0f05c46b0f7160475794a47aed50cd339947`
 
 ## Current stage
 
@@ -12,6 +13,15 @@ Base HEAD: `26b4f189d0d79d8e885e9f39205aca18bd2d04f1`
 
 - `E1-NB-R16` Tutorials DB-free empty state：本地实现、focused test 4/4、目标 ESLint 和 localhost 验收已完成；仅本地关闭，不代表内容事实或生产发布已验证。
 - Recovery baseline：branch、HEAD、clean worktree 和 R16 focused baseline 已验证。
+- `E1-NB-R17` Skill-learning DB-free UNVERIFIED preview parity：
+  - `STATUS=COMPLETED_LOCAL_ONLY`
+  - `IMPLEMENTATION=GREEN_FOCUSED`
+  - `LOCAL_ACCEPTANCE=PASS`
+  - `COMMIT=3c2a0f05c46b0f7160475794a47aed50cd339947`
+  - `CONTENT_EVIDENCE=UNVERIFIED`
+  - `PUBLISH_STATUS=BLOCKED`
+  - DB-free settings/public-content guards 已通过；`/skill-learning`、`/en/skill-learning`、`/tutorials`、`/en/tutorials` 四个 localhost 路由已通过，R16 focused regression 已通过。
+  - R17 已本地提交；该结论不代表内容事实已验证，也不代表允许发布。
 
 ## Current blockers and gates
 
@@ -24,8 +34,9 @@ Base HEAD: `26b4f189d0d79d8e885e9f39205aca18bd2d04f1`
 
 | ID | State | Proposed scope | Acceptance |
 |---|---|---|---|
-| RECOVERY-BASELINE-DEVELOPMENT | ACTIVE / contract pending | Establish the clean recovery line and one approved next-task contract | Contract reviewed; no code change under baseline contract |
-| E1-NB-R17 | PROPOSED / not authorized | Skill-learning DB-free UNVERIFIED preview parity; proposed files: `src/app/skill-learning/page-shell.tsx`, one focused test, one receipt | TDD RED/GREEN, localhost route checks, noindex/follow for unverified English, no database/network, scoped receipt |
+| RECOVERY-BASELINE-DEVELOPMENT | COMPLETED | Established the clean recovery line and advanced the verified local baseline through R17 | `BASELINE_HEAD=3c2a0f05c46b0f7160475794a47aed50cd339947`; local-only acceptance; publication blocked |
+| E1-NB-R17 | COMPLETED_LOCAL_ONLY | Skill-learning DB-free UNVERIFIED preview parity with settings/public-content DB-free guards | Focused implementation and local acceptance passed; content remains unverified; commit `3c2a0f05c46b0f7160475794a47aed50cd339947` |
+| E1-NB-R18 | PROPOSED_WAITING_FOR_APPROVAL | Account Services DB-free UNVERIFIED preview parity | `BASE_HEAD=3c2a0f05c46b0f7160475794a47aed50cd339947`; separate owner approval required before implementation |
 | CONTENT-EVIDENCE-RECONCILIATION | BLOCKED | Reconcile first-party tutorial/content evidence only when an approved source is available | Source bytes/hash and publication approval independently verified |
 | PHASE-2C.6 RELEASE | NOT APPROVED | Production publication/deployment | Separate production, database, deployment and factual-evidence approvals |
 
@@ -33,5 +44,5 @@ Base HEAD: `26b4f189d0d79d8e885e9f39205aca18bd2d04f1`
 
 - `UNVERIFIED` is not `FAILED`, but it never authorizes publication.
 - Every implementation task needs a current contract with exact file ownership and tests before code changes.
-- Do not touch the frozen old worktree or automatically classify its 207 entries.
+- Do not touch the frozen old worktree or automatically classify its 207 entries; all 207 entries remain frozen after R17 closure.
 - No push, deployment, production database access, SSH or Docker without separate approval.
