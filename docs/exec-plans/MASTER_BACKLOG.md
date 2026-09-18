@@ -68,6 +68,7 @@ Content evidence: `UNVERIFIED`
 | E1-NB-R19 | COMPLETED_LOCAL_ONLY | Product Paths DB-free UNVERIFIED preview parity | `IMPLEMENTATION=GREEN_FOCUSED`; `LOCAL_ACCEPTANCE=PASS`; `OWNER_ACCEPTANCE=PASS_LOCAL_ONLY`; commit `b0a39e9f2ff4a8424484db29447eaa3e12213868`; content unverified and publication blocked |
 | E1-NB-R20 | COMPLETED_LOCAL_ONLY | Software Catalog DB-free UNVERIFIED preview parity | `IMPLEMENTATION=GREEN_FOCUSED`; `LOCAL_ACCEPTANCE=PASS`; commit `697ebd78fbd78b0cf786b30295936e52d451cf64`; content unverified and publication blocked |
 | E1-NB-R21 | COMPLETED_LOCAL_ONLY | Public Search DB-free UNVERIFIED preview parity | `IMPLEMENTATION=GREEN_FOCUSED`; `LOCAL_ACCEPTANCE=PASS`; commit `350ec0a3e0e1edd2b87de6cac391f1f6c197dd76`; content unverified and publication blocked |
+| E1-NB-R22 | AUTHORIZED | AI News Listing DB-free UNVERIFIED preview parity | Base HEAD `2ed781c36b37461ca560802fd90e9f9f837a0fa5`; focused TDD and bilingual localhost acceptance required; content unverified and publication blocked |
 | CONTENT-EVIDENCE-RECONCILIATION | BLOCKED | Reconcile first-party tutorial/content evidence only when an approved source is available | Source bytes/hash and publication approval independently verified |
 | PHASE-2C.6 RELEASE | NOT APPROVED | Production publication/deployment | Separate production, database, deployment and factual-evidence approvals |
 
