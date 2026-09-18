@@ -4,19 +4,20 @@
 
 - `task_id`: `E1-NB-R18`
 - `task_name`: `Account Services DB-free UNVERIFIED preview parity`
-- `base_head`: `3c2a0f05c46b0f7160475794a47aed50cd339947`
+- `base_head`: `960bc5ff971a1eb8fb87703bec07d31a36cbc71e`
 - `branch`: `codex/enhe-recovery-baseline`
 - `worktree`: `C:\Users\HU\Documents\New project 2\.worktrees\enhe-recovery-baseline`
 - `owner_acceptance`: `PENDING`
-- `status`: `PROPOSED_WAITING_FOR_APPROVAL`
+- `status`: `AUTHORIZED`
+- `execution_authorization`: `APPROVED`
 - `content_evidence`: `UNVERIFIED`
 - `publish_status`: `BLOCKED`
 
-No R18 implementation is authorized by this proposed contract until the owner separately approves it.
+R18 implementation is authorized within this contract's exact file and operation boundaries. Final owner acceptance remains pending until implementation and verification are complete.
 
 ## Allowed business files
 
-Only the following business/test/receipt paths may be changed after separate R18 approval:
+Only the following business/test/receipt paths may be changed during the authorized R18 implementation:
 
 1. `src/app/account-services/page-shell.tsx`
 2. `src/lib/e1-nb-r18-account-services-preview.test.tsx`
@@ -61,7 +62,7 @@ Provide a DB-free local preview for the Chinese and English Account Services lis
 
 ## Failure handling and stop conditions
 
-- Stop before implementation until `owner_acceptance` is explicitly granted.
+- Stop if `execution_authorization` is no longer `APPROVED`; `owner_acceptance` remains a post-implementation acceptance gate.
 - Stop and request scope review if a RED test proves a change outside the three allowed business/test/receipt files is required.
 - Stop without commit if either route is not HTTP 200, Prisma queries are nonzero, any focused verification fails, or an unexpected path changes.
 - Local acceptance never changes `CONTENT_EVIDENCE=UNVERIFIED` or `PUBLISH_STATUS=BLOCKED`.
