@@ -1,0 +1,155 @@
+{
+  "task_id": "E1-NB-R29",
+  "task_name": "AI Topic Hub human-facing answer copy",
+  "repository_root": "C:\\Users\\HU\\Documents\\New project 2\\.worktrees\\enhe-recovery-baseline",
+  "branch": "codex/enhe-recovery-baseline",
+  "contract_base_head": "3a3b385d854d104ef80051f74529e41802cde517",
+  "implementation_base_head": "32007459d397c6d66b43d7fff33b62d5a0a210fb",
+  "verification_time": "2026-09-18T21:06:57.5957164Z",
+  "allowed_files": [
+    "src/app/ai-topics/page-shell.tsx",
+    "src/lib/e1-nb-r29-ai-topic-hub-human-copy.test.tsx",
+    "docs/enhe-redesign/english-rewrite/e1-p3-d1/e1-nb-r29-ai-topic-hub-human-copy-receipt.json"
+  ],
+  "changed_files": [
+    {
+      "path": "src/app/ai-topics/page-shell.tsx",
+      "bytes": 14664,
+      "sha256": "b480c1b3237f9730eab879ce98587698f6d188c41755860b95614a92d44d7392",
+      "git_state_before_commit": "tracked_modified"
+    },
+    {
+      "path": "src/lib/e1-nb-r29-ai-topic-hub-human-copy.test.tsx",
+      "bytes": 2664,
+      "sha256": "0f98430c57a977646f4f0be6879ac5078795d023902823969abac2f1a786cf42",
+      "git_state_before_commit": "untracked"
+    },
+    {
+      "path": "docs/enhe-redesign/english-rewrite/e1-p3-d1/e1-nb-r29-ai-topic-hub-human-copy-receipt.json",
+      "bytes": null,
+      "sha256": null,
+      "git_state_before_commit": "untracked",
+      "self_hash_excluded": true,
+      "final_bytes_and_sha256_reported_externally": true
+    }
+  ],
+  "tdd": {
+    "red": {
+      "command": "rtk npx --no-install vitest run src/lib/e1-nb-r29-ai-topic-hub-human-copy.test.tsx --reporter=verbose",
+      "status": "PASS_EXPECTED_RED",
+      "exit_code": 1,
+      "passed": 0,
+      "failed": 5,
+      "failure_reason": "The detail labels and hub guidance still exposed machine-facing answer and answer-engine language."
+    },
+    "green": {
+      "command": "rtk npx --no-install vitest run src/lib/e1-nb-r29-ai-topic-hub-human-copy.test.tsx --reporter=verbose",
+      "status": "PASS",
+      "exit_code": 0,
+      "passed": 5,
+      "failed": 0
+    }
+  },
+  "direct_regression": {
+    "command": "rtk npx --no-install vitest run src/lib/e1-nb-r29-ai-topic-hub-human-copy.test.tsx src/lib/ai-topic-clusters.test.ts src/lib/home-redesign-source.test.ts src/lib/p1-content-reduction-source.test.ts src/lib/public-discovery-manifest.test.ts src/lib/seo-phase-two-source.test.ts src/lib/short-metadata-remediation-source.test.ts src/lib/site-audit-regressions.test.ts --reporter=verbose",
+    "status": "PASS",
+    "exit_code": 0,
+    "test_files": 8,
+    "passed": 50,
+    "failed": 0,
+    "topic_cluster_regression": "PASS",
+    "public_discovery_regression": "PASS",
+    "seo_and_metadata_regression": "PASS",
+    "site_audit_regression": "PASS"
+  },
+  "copy_contract": {
+    "detail_chinese_label": "核心结论",
+    "detail_english_label": "Key takeaway",
+    "hub_chinese_guidance": "帮助用户决定先学什么、试什么、继续查看什么",
+    "hub_english_guidance": "helps people decide what to learn, try, or explore next",
+    "machine_facing_copy_in_page_source": false,
+    "machine_facing_copy_in_rendered_routes": false,
+    "topic_records_modified": false,
+    "comparison_rows_modified": false,
+    "links_modified": false,
+    "factual_data_modified": false,
+    "json_ld_modified": false,
+    "metadata_modified": false,
+    "indexing_rules_modified": false
+  },
+  "eslint": {
+    "command": "rtk npx --no-install eslint src/app/ai-topics/page-shell.tsx src/lib/e1-nb-r29-ai-topic-hub-human-copy.test.tsx",
+    "status": "PASS",
+    "exit_code": 0
+  },
+  "typecheck": {
+    "command": "rtk npm run typecheck",
+    "status": "PASS",
+    "exit_code": 0
+  },
+  "localhost": {
+    "status": "PASS",
+    "host": "127.0.0.1",
+    "port": 3229,
+    "database_url": "UNSET",
+    "routes": [
+      {
+        "path": "/ai-topics",
+        "http_status": 200,
+        "robots": "index, follow",
+        "human_guidance_visible": true,
+        "machine_facing_copy_visible": false
+      },
+      {
+        "path": "/en/ai-topics",
+        "http_status": 200,
+        "robots": "index, follow",
+        "human_guidance_visible": true,
+        "machine_facing_copy_visible": false
+      },
+      {
+        "path": "/ai-topics/ai-content-creation-tools",
+        "http_status": 200,
+        "robots": "index, follow",
+        "human_detail_label_visible": true,
+        "machine_facing_copy_visible": false
+      },
+      {
+        "path": "/en/ai-topics/ai-content-creation-tools",
+        "http_status": 200,
+        "robots": "index, follow",
+        "human_detail_label_visible": true,
+        "machine_facing_copy_visible": false
+      }
+    ],
+    "indexing_behavior_unchanged": true,
+    "server_stopped": true,
+    "residual_listener_count": 0
+  },
+  "database_and_network": {
+    "DATABASE_URL": "UNSET",
+    "successful_database_connection_count": 0,
+    "database_write_count": 0,
+    "external_network_request_count": 0,
+    "ssh": "NOT_RUN",
+    "docker": "NOT_RUN",
+    "deployment": "NOT_RUN"
+  },
+  "scope_check": {
+    "status": "PASS",
+    "scope_expansion_count": 0,
+    "out_of_scope_changes": 0,
+    "production_configuration_modified": false,
+    "old_worktree_touched": false
+  },
+  "git_diff_check": "PASS",
+  "staged_paths_before_commit": [],
+  "receipt_self_hash_in_document": false,
+  "receipt_self_hash_policy": "excluded_from_self_hash",
+  "receipt_final_hash_reported_externally": true,
+  "local_acceptance": "PASS",
+  "content_evidence": "UNVERIFIED",
+  "publish_status": "BLOCKED",
+  "push_status": "NOT_PUSHED",
+  "commit_status": "PENDING_AUTHORIZED_COMMIT_GATE"
+}

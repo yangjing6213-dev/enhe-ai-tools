@@ -31,7 +31,7 @@ const hubText = {
       "ENHE AI 主题路径聚合内容创作、视频图像、本地部署、AI Agent、技能学习和账号合规指南，帮助创作者按目标选择工具、课程与服务。",
     answerTitle: "先按目标选路径，再进入工具和教程",
     answer:
-      "AI 用户常见问题不是缺少工具，而是不知道该先选软件、课程、项目还是服务。ENHE AI 主题路径把高频意图拆成六类，每一类提供可摘录答案、对比表、FAQ 和站内下一步链接，方便搜索引擎和 AI 回答引擎理解页面价值。",
+      "AI 用户常见问题不是缺少工具，而是不知道该先选软件、课程、项目还是服务。ENHE AI 主题路径把高频意图拆成六类，帮助你比较选项、查看常见问题，并沿着站内链接决定先学什么、试什么、继续查看什么。",
     updatedLabel: "最后更新",
   },
   en: {
@@ -42,14 +42,14 @@ const hubText = {
       "ENHE AI topic paths organize content creation, video and image workflows, local AI, agents, skill learning, and account compliance for creators.",
     answerTitle: "Choose a goal path before choosing a tool",
     answer:
-      "Most AI users do not lack tools. They lack a clear path from goal to software, course, project, or service. ENHE AI topic paths split high-intent needs into six pages with direct answers, comparison tables, FAQs, and internal next steps for people and AI answer engines.",
+      "Most AI users do not lack tools. They lack a clear path from goal to software, course, project, or service. ENHE AI topic paths split high-intent needs into six pages to help people compare options, answer common questions, and decide what to learn, try, or explore next.",
     updatedLabel: "Last updated",
   },
 } as const;
 
 const labels = {
   zh: {
-    directAnswer: "可摘录答案",
+    directAnswer: "核心结论",
     intents: "适合哪些需求",
     comparison: "决策对比",
     dimension: "比较维度",
@@ -61,7 +61,7 @@ const labels = {
     hub: "AI 主题路径",
   },
   en: {
-    directAnswer: "Direct answer",
+    directAnswer: "Key takeaway",
     intents: "Best-fit needs",
     comparison: "Decision comparison",
     dimension: "Dimension",
