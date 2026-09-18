@@ -27,18 +27,29 @@ export async function generateProductPathMetadata(
 ): Promise<Metadata> {
   const config = getProductPathConfig(slug);
   const copy = config?.[forceLocale];
+  const isDbFreePreview = !process.env.DATABASE_URL?.trim();
 
-  return buildPageMetadata({
+  const metadata = buildPageMetadata({
     title: copy
       ? `${copy.title} - ${forceLocale === "en" ? "ENHE AI" : "恩禾ENHE AI"}`
       : forceLocale === "en"
         ? "Product path - ENHE AI"
         : "产品路径 - 恩禾ENHE AI",
-    description: copy?.metaDescription ?? copy?.intro,
+    description: isDbFreePreview
+      ? forceLocale === "en"
+        ? "Product-path content is not available in this local preview."
+        : "产品路径内容尚未核验，当前本地预览不提供可发布的产品事实。"
+      : copy?.metaDescription ?? copy?.intro,
     path: `/product-paths/${slug}`,
     locale: forceLocale === "en" ? "en_US" : "zh_CN",
     localeKey: forceLocale,
   });
+
+  if (isDbFreePreview) {
+    metadata.robots = { index: false, follow: true };
+  }
+
+  return metadata;
 }
 
 export async function ProductPathPageShell({
@@ -53,6 +64,35 @@ export async function ProductPathPageShell({
 
   const copy = config[forceLocale];
   const tools = await getPublicToolsByCategoryNames(config.categoryNames);
+
+  if (!process.env.DATABASE_URL?.trim()) {
+    return (
+      <main>
+        <Container className="py-14">
+          <section
+            data-content-status="UNVERIFIED"
+            className="surface-panel p-8"
+          >
+            <SectionTitle
+              as="h1"
+              title={copy.title}
+              intro={
+                forceLocale === "en"
+                  ? "Product-path content is not available in this local preview."
+                  : "产品路径内容尚未核验，当前本地预览不展示产品卡片或产品事实。"
+              }
+            />
+            <p className="mt-6 text-sm font-semibold leading-7 text-[var(--marketing-muted)]">
+              {forceLocale === "en"
+                ? "UNVERIFIED — Product-path content has not been verified yet."
+                : "UNVERIFIED — 产品路径内容尚未核验。"}
+            </p>
+          </section>
+        </Container>
+      </main>
+    );
+  }
+
   const pagePath = `/product-paths/${config.slug}`;
   const breadcrumbSchema = buildBreadcrumbSchema({
     items: [

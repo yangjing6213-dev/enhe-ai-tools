@@ -1,0 +1,233 @@
+{
+  "task_id": "E1-NB-R19",
+  "task_name": "Product Paths DB-free UNVERIFIED preview parity",
+  "repository_root": "C:\\Users\\HU\\Documents\\New project 2\\.worktrees\\enhe-recovery-baseline",
+  "branch": "codex/enhe-recovery-baseline",
+  "base_head": "0d7742b26d1580b10e396b1ec0193a7289a0eb5f",
+  "verification_time": "2026-09-18T23:08:57.7199317+08:00",
+  "allowed_files": [
+    "src/app/product-paths/[slug]/page-shell.tsx",
+    "src/lib/e1-nb-r19-product-paths-preview.test.tsx",
+    "src/lib/public-content.ts",
+    "docs/enhe-redesign/english-rewrite/e1-p3-d1/e1-nb-r19-product-paths-preview-receipt.json"
+  ],
+  "changed_files": [
+    {
+      "path": "src/app/product-paths/[slug]/page-shell.tsx",
+      "bytes": 4937,
+      "sha256": "bc71b0dffe716fd63dba872b5af7a71e3373666e05e40a3f840dba7c591fac97",
+      "git_state_before_commit": "tracked_modified"
+    },
+    {
+      "path": "src/lib/e1-nb-r19-product-paths-preview.test.tsx",
+      "bytes": 5166,
+      "sha256": "d7c164a74b34d3f8f4157e14837565f9969c05a4c85db580d5d21805fde264e8",
+      "git_state_before_commit": "untracked"
+    },
+    {
+      "path": "src/lib/public-content.ts",
+      "bytes": 27508,
+      "sha256": "026bc12b6586ff161d732472f2eebf20ab3740405fb6c36af3a45de40ca32f84",
+      "git_state_before_commit": "tracked_modified"
+    },
+    {
+      "path": "docs/enhe-redesign/english-rewrite/e1-p3-d1/e1-nb-r19-product-paths-preview-receipt.json",
+      "bytes": null,
+      "sha256": null,
+      "git_state_before_commit": "untracked",
+      "self_hash_excluded": true,
+      "final_bytes_and_sha256_reported_externally": true
+    }
+  ],
+  "tdd": {
+    "shared_boundary_red": {
+      "status": "PASS_EXPECTED_RED",
+      "exit_code": 1,
+      "passed": 0,
+      "failed": 1,
+      "failure_reason": "With DATABASE_URL unset, getPublicToolsByCategoryNames returned an empty array but still called prisma.tool.findMany once."
+    },
+    "shared_boundary_green": {
+      "status": "PASS",
+      "exit_code": 0,
+      "passed": 1,
+      "failed": 0
+    },
+    "page_behavior_red": {
+      "status": "PASS_EXPECTED_RED",
+      "exit_code": 1,
+      "passed": 3,
+      "failed": 7,
+      "failure_reason": "All six DB-free variants lacked an explicit UNVERIFIED state and the configured-card fixture exposed the missing test router stub."
+    },
+    "final_green": {
+      "command": "rtk npx --no-install vitest run src/lib/e1-nb-r19-product-paths-preview.test.tsx --reporter=verbose",
+      "status": "PASS",
+      "exit_code": 0,
+      "test_files": 1,
+      "passed": 10,
+      "failed": 0
+    }
+  },
+  "focused_regression": {
+    "command": "rtk npx --no-install vitest run src/lib/e1-nb-r19-product-paths-preview.test.tsx src/lib/product-paths.test.ts src/lib/e1-nb-r18-account-services-preview.test.tsx src/lib/e1-nb-r17-skill-learning-preview.test.tsx src/lib/e1-nb-r16-tutorials-preview.test.tsx --reporter=verbose",
+    "status": "PASS",
+    "exit_code": 0,
+    "test_files": 5,
+    "passed": 27,
+    "failed": 0
+  },
+  "database_boundary_regression": {
+    "command": "rtk npx --no-install vitest run src/lib/settings-db-fallback.test.ts src/lib/public-content-db-fallback.test.ts --reporter=verbose",
+    "status": "PASS",
+    "exit_code": 0,
+    "test_files": 2,
+    "passed": 10,
+    "failed": 0
+  },
+  "eslint": {
+    "command": "rtk npx --no-install eslint \"src/app/product-paths/[slug]/page-shell.tsx\" src/lib/e1-nb-r19-product-paths-preview.test.tsx src/lib/public-content.ts",
+    "status": "PASS",
+    "exit_code": 0
+  },
+  "localhost": {
+    "status": "PASS",
+    "host": "127.0.0.1",
+    "port": 3219,
+    "database_url": "UNSET",
+    "next_telemetry_disabled": true,
+    "external_network_request_count": 0,
+    "routes": [
+      {
+        "path": "/product-paths/work-efficiency",
+        "http_status": 200,
+        "unverified_visible": true,
+        "robots": "noindex, follow",
+        "product_card_present": false,
+        "collection_page_schema_present": false,
+        "item_list_schema_present": false
+      },
+      {
+        "path": "/en/product-paths/work-efficiency",
+        "http_status": 200,
+        "unverified_visible": true,
+        "robots": "noindex, follow",
+        "product_card_present": false,
+        "collection_page_schema_present": false,
+        "item_list_schema_present": false
+      },
+      {
+        "path": "/product-paths/media-generation",
+        "http_status": 200,
+        "unverified_visible": true,
+        "robots": "noindex, follow",
+        "product_card_present": false,
+        "collection_page_schema_present": false,
+        "item_list_schema_present": false
+      },
+      {
+        "path": "/en/product-paths/media-generation",
+        "http_status": 200,
+        "unverified_visible": true,
+        "robots": "noindex, follow",
+        "product_card_present": false,
+        "collection_page_schema_present": false,
+        "item_list_schema_present": false
+      },
+      {
+        "path": "/product-paths/future-ai",
+        "http_status": 200,
+        "unverified_visible": true,
+        "robots": "noindex, follow",
+        "product_card_present": false,
+        "collection_page_schema_present": false,
+        "item_list_schema_present": false
+      },
+      {
+        "path": "/en/product-paths/future-ai",
+        "http_status": 200,
+        "unverified_visible": true,
+        "robots": "noindex, follow",
+        "product_card_present": false,
+        "collection_page_schema_present": false,
+        "item_list_schema_present": false
+      }
+    ],
+    "checker_note": "The first raw-string scan found product terms inside Next development scripts. The final checker excluded script source from visible-content checks and inspected emitted application/ld+json separately; no rendered product card, CollectionPage, or ItemList remained.",
+    "server_stopped": true,
+    "residual_listener_count": 0
+  },
+  "database_and_network": {
+    "DATABASE_URL": "UNSET",
+    "settings_prisma_query_count": 0,
+    "public_content_prisma_query_count": 0,
+    "query_count_evidence": "Focused Prisma-spy tests passed and the DB-free route call chain returns before either Prisma read boundary.",
+    "successful_database_connection_count": 0,
+    "database_write_count": 0,
+    "migration_count": 0,
+    "external_network_request_count": 0,
+    "ssh": "NOT_RUN",
+    "docker": "NOT_RUN",
+    "deployment": "NOT_RUN",
+    "production_validation": "NOT_RUN"
+  },
+  "configured_database_behavior": {
+    "status": "PRESERVED_BY_FOCUSED_TEST_WITHOUT_REAL_DATABASE_ACCESS",
+    "product_cards_rendered_from_configured_fixture": true,
+    "metadata_forced_noindex": false,
+    "p1001_fallback_preserved": true,
+    "unknown_error_rethrow_preserved": true,
+    "real_database_access": "NOT_RUN"
+  },
+  "git_before_commit": {
+    "branch": "codex/enhe-recovery-baseline",
+    "head": "0d7742b26d1580b10e396b1ec0193a7289a0eb5f",
+    "tracked_modified": 2,
+    "untracked": 2,
+    "staged": 0,
+    "porcelain_entries": 4,
+    "staged_paths": [],
+    "index_lock_present": false,
+    "git_diff_check": "PASS"
+  },
+  "scope_check": {
+    "status": "PASS",
+    "out_of_scope_changes": 0,
+    "settings_ts_modified": false,
+    "sitemap_modified": false,
+    "evidence_modified": false,
+    "production_configuration_modified": false,
+    "old_worktree_touched": false
+  },
+  "receipt_self_hash_in_document": false,
+  "receipt_self_hash_policy": "excluded_from_self_hash",
+  "receipt_final_hash_reported_externally": true,
+  "local_acceptance": "PASS",
+  "content_evidence": "UNVERIFIED",
+  "publish_status": "BLOCKED",
+  "push_status": "NOT_PUSHED",
+  "commit_status": "PENDING_AUTHORIZED_COMMIT_GATE",
+  "exact_commands_run": [
+    "rtk git branch --show-current",
+    "rtk git rev-parse HEAD",
+    "rtk git status --porcelain=v1 --untracked-files=all",
+    "rtk git diff --cached --name-only",
+    "rtk git diff --check",
+    "rtk node -e <DATABASE_URL state check>",
+    "rtk npx --no-install vitest run src/lib/e1-nb-r19-product-paths-preview.test.tsx --reporter=verbose",
+    "rtk npx --no-install vitest run src/lib/e1-nb-r19-product-paths-preview.test.tsx src/lib/product-paths.test.ts src/lib/e1-nb-r18-account-services-preview.test.tsx src/lib/e1-nb-r17-skill-learning-preview.test.tsx src/lib/e1-nb-r16-tutorials-preview.test.tsx --reporter=verbose",
+    "rtk npx --no-install vitest run src/lib/settings-db-fallback.test.ts src/lib/public-content-db-fallback.test.ts --reporter=verbose",
+    "rtk npx --no-install eslint \"src/app/product-paths/[slug]/page-shell.tsx\" src/lib/e1-nb-r19-product-paths-preview.test.tsx src/lib/public-content.ts",
+    "rtk npx --no-install next dev --hostname 127.0.0.1 --port 3219",
+    "HTTP GET six localhost product-path routes on 127.0.0.1:3219",
+    "git diff --check"
+  ],
+  "governance": {
+    "R19_IMPLEMENTATION": "GREEN_FOCUSED",
+    "R19_LOCAL_ACCEPTANCE": "PASS",
+    "R19_CONTENT_EVIDENCE": "UNVERIFIED",
+    "R19_COMMIT_CLOSED": "NO",
+    "PUBLISH_STATUS": "BLOCKED",
+    "PUSH_STATUS": "NOT_PUSHED"
+  }
+}

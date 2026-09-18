@@ -261,7 +261,9 @@ const getCachedPublicToolsByCategoryNames = unstable_cache(
       .map((name) => name.trim())
       .filter(Boolean);
 
-    if (!normalizedCategoryNames.length) return [];
+    if (!normalizedCategoryNames.length || !process.env.DATABASE_URL?.trim()) {
+      return [];
+    }
 
     try {
       return await prisma.tool.findMany({
