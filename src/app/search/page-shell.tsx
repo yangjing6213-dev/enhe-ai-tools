@@ -51,12 +51,17 @@ const searchCopy = {
 } as const;
 
 export function generateSearchPageMetadata(locale: Locale): Metadata {
+  const isDbFreeMode = !process.env.DATABASE_URL?.trim();
   const metadata = buildPageMetadata({
     title: locale === "en" ? "Search ENHE AI" : "搜索 ENHE AI",
     description:
-      locale === "en"
-        ? "Search published ENHE AI tools, news, trend briefings, tutorials, and public brand information."
-        : "搜索 ENHE AI 已发布的工具、资讯、趋势简报、教程和公开品牌信息。",
+      isDbFreeMode
+        ? locale === "en"
+          ? "Public search content is not available in this local preview because it has not been verified."
+          : "本地预览不提供公开搜索内容，因为相关内容尚未核验。"
+        : locale === "en"
+          ? "Search published ENHE AI tools, news, trend briefings, tutorials, and public brand information."
+          : "搜索 ENHE AI 已发布的工具、资讯、趋势简报、教程和公开品牌信息。",
     path: "/search",
     locale: locale === "en" ? "en_US" : "zh_CN",
     localeKey: locale,
@@ -73,6 +78,7 @@ export async function SearchPageShell({
   forceLocale: Locale;
 }) {
   const params = await searchParams;
+  const isDbFreeMode = !process.env.DATABASE_URL?.trim();
   const query = normalizePublicSearchQuery(
     Array.isArray(params.q) ? params.q[0] : params.q,
   );
@@ -88,14 +94,31 @@ export async function SearchPageShell({
   }
 
   return (
-    <main className="public-search-page">
+    <main
+      className="public-search-page"
+      data-content-status={isDbFreeMode ? "UNVERIFIED" : undefined}
+    >
       <PublicSearchDialog
         searchPath={buildLocalePath("/search", forceLocale)}
         homePath={buildLocalePath("/", forceLocale)}
         query={query}
         results={results}
         failed={failed}
-        labels={searchCopy[forceLocale]}
+        labels={
+          isDbFreeMode
+            ? {
+                ...searchCopy[forceLocale],
+                initialText:
+                  forceLocale === "en"
+                    ? "UNVERIFIED: Public search content has not been verified; this DB-free preview shows no results."
+                    : "UNVERIFIED：公开搜索内容尚未核验，本地无数据库预览不展示结果。",
+                emptyText:
+                  forceLocale === "en"
+                    ? "UNVERIFIED: Public search content has not been verified; this DB-free preview shows no results."
+                    : "UNVERIFIED：公开搜索内容尚未核验，本地无数据库预览不展示结果。",
+              }
+            : searchCopy[forceLocale]
+        }
       />
     </main>
   );

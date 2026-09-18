@@ -289,6 +289,7 @@ export async function searchPublicContent(
 ): Promise<PublicSearchResult[]> {
   const query = normalizePublicSearchQuery(rawQuery);
   if (!query) return [];
+  if (!process.env.DATABASE_URL?.trim()) return [];
 
   const [tools, tutorials, news, trends] = await Promise.all([
     searchTools(query, locale),
