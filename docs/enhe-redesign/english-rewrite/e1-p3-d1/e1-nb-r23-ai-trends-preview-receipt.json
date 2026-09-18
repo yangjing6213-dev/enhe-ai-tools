@@ -1,0 +1,144 @@
+{
+  "task_id": "E1-NB-R23",
+  "task_name": "AI Trends DB-free UNVERIFIED preview boundary",
+  "repository_root": "C:\\Users\\HU\\Documents\\New project 2\\.worktrees\\enhe-recovery-baseline",
+  "branch": "codex/enhe-recovery-baseline",
+  "contract_base_head": "ee6e0e112dc32f7ed37c2dfd17b20b5890b53c4d",
+  "implementation_base_head": "6507e0a06a55faed5e24c5c32084b53c48e2fe9e",
+  "verification_time": "2026-09-19T02:06:19.8735482+08:00",
+  "allowed_files": [
+    "src/lib/ai-trends.ts",
+    "src/app/ai-trends/page-shell.tsx",
+    "src/lib/e1-nb-r23-ai-trends-preview.test.tsx",
+    "docs/enhe-redesign/english-rewrite/e1-p3-d1/e1-nb-r23-ai-trends-preview-receipt.json"
+  ],
+  "changed_files": [
+    {
+      "path": "src/lib/ai-trends.ts",
+      "bytes": 23832,
+      "sha256": "010ff99875732b68eb38463bee812d6e9844e1f053fc8ff92e5fb2c3bd0ab7c5",
+      "git_state_before_commit": "tracked_modified"
+    },
+    {
+      "path": "src/app/ai-trends/page-shell.tsx",
+      "bytes": 33538,
+      "sha256": "3948c6d2c9dfed405a3dda6b467a7389222be804211b972623791e2eb3adefda",
+      "git_state_before_commit": "tracked_modified"
+    },
+    {
+      "path": "src/lib/e1-nb-r23-ai-trends-preview.test.tsx",
+      "bytes": 3872,
+      "sha256": "1bff663aea00b43d5fc837683acdde5e1e6a33605e8b97e31ef4d8db69a8d445",
+      "git_state_before_commit": "untracked"
+    },
+    {
+      "path": "docs/enhe-redesign/english-rewrite/e1-p3-d1/e1-nb-r23-ai-trends-preview-receipt.json",
+      "bytes": null,
+      "sha256": null,
+      "git_state_before_commit": "untracked",
+      "self_hash_excluded": true,
+      "final_bytes_and_sha256_reported_externally": true
+    }
+  ],
+  "tdd": {
+    "red": {
+      "status": "PASS_EXPECTED_RED",
+      "exit_code": 1,
+      "passed": 1,
+      "failed": 3,
+      "failure_reason": "DB-free readers queried Prisma and both localized topic pages rendered trend facts without an UNVERIFIED boundary."
+    },
+    "green": {
+      "command": "rtk npx --no-install vitest run src/lib/e1-nb-r23-ai-trends-preview.test.tsx --reporter=verbose",
+      "status": "PASS",
+      "exit_code": 0,
+      "passed": 4,
+      "failed": 0
+    }
+  },
+  "direct_regression": {
+    "command": "rtk npx --no-install vitest run src/lib/e1-nb-r23-ai-trends-preview.test.tsx src/lib/ai-trends.test.ts src/lib/ai-trends-source.test.ts src/lib/ai-trends-navigation-entry.test.ts --reporter=verbose",
+    "status": "PASS",
+    "exit_code": 0,
+    "test_files": 4,
+    "passed": 25,
+    "failed": 0,
+    "daily_archive_and_detail_source_contracts": "PASS"
+  },
+  "eslint": {
+    "command": "rtk npx --no-install eslint src/lib/ai-trends.ts src/app/ai-trends/page-shell.tsx src/lib/e1-nb-r23-ai-trends-preview.test.tsx",
+    "status": "PASS",
+    "exit_code": 0
+  },
+  "typecheck": {
+    "command": "rtk npm run typecheck",
+    "status": "PASS",
+    "exit_code": 0
+  },
+  "localhost": {
+    "status": "PASS",
+    "host": "127.0.0.1",
+    "port": 3223,
+    "database_url": "UNSET",
+    "routes": [
+      {
+        "path": "/ai-trends",
+        "http_status": 200,
+        "unverified_visible": true,
+        "robots": "noindex, follow",
+        "trend_ranking_present": false,
+        "source_claim_present": false,
+        "trend_fact_json_ld_present": false,
+        "prisma_error_present": false
+      },
+      {
+        "path": "/en/ai-trends",
+        "http_status": 200,
+        "unverified_visible": true,
+        "robots": "noindex, follow",
+        "trend_ranking_present": false,
+        "source_claim_present": false,
+        "trend_fact_json_ld_present": false,
+        "prisma_error_present": false
+      }
+    ],
+    "json_ld_method": "Parsed application/ld+json scripts; ignored serialized RSC source strings.",
+    "server_stopped": true,
+    "residual_listener_count": 0
+  },
+  "database_and_network": {
+    "DATABASE_URL": "UNSET",
+    "ai_trend_prisma_query_count": 0,
+    "successful_database_connection_count": 0,
+    "database_write_count": 0,
+    "migration_count": 0,
+    "external_network_request_count": 0,
+    "ssh": "NOT_RUN",
+    "docker": "NOT_RUN",
+    "deployment": "NOT_RUN"
+  },
+  "configured_database_behavior": {
+    "status": "PRESERVED_BY_MOCKED_FOCUSED_TEST_WITHOUT_REAL_DATABASE_ACCESS",
+    "find_many_called": true,
+    "find_first_called": true,
+    "indexable_metadata_preserved": true,
+    "real_database_access": "NOT_RUN"
+  },
+  "scope_check": {
+    "status": "PASS",
+    "scope_expansion_count": 0,
+    "out_of_scope_changes": 0,
+    "prisma_schema_modified": false,
+    "production_configuration_modified": false,
+    "old_worktree_touched": false
+  },
+  "git_diff_check": "PASS",
+  "receipt_self_hash_in_document": false,
+  "receipt_self_hash_policy": "excluded_from_self_hash",
+  "receipt_final_hash_reported_externally": true,
+  "local_acceptance": "PASS",
+  "content_evidence": "UNVERIFIED",
+  "publish_status": "BLOCKED",
+  "push_status": "NOT_PUSHED",
+  "commit_status": "PENDING_AUTHORIZED_COMMIT_GATE"
+}

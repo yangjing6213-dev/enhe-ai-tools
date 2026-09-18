@@ -360,8 +360,17 @@ const opportunityPriorities = [
 
 export function generateAiTrendTopicMetadata(locale: Locale = "zh"): Metadata {
   const copy = content[locale];
+  const isDbFree = !process.env.DATABASE_URL?.trim();
   const title = buildMetadataTitle({ pageTitle: copy.title, brand: siteName });
-  const description = buildMetaDescription(copy.description, undefined, 150);
+  const description = isDbFree
+    ? buildMetaDescription(
+        locale === "en"
+          ? "AI Trends content is not available in this local preview because no verified data source is configured."
+          : "本地预览未配置已核验的数据源，因此不提供 AI 趋势内容。",
+        undefined,
+        150,
+      )
+    : buildMetaDescription(copy.description, undefined, 150);
   const canonicalPath = buildLocalePath(topicPath, locale);
 
   return {
@@ -372,7 +381,7 @@ export function generateAiTrendTopicMetadata(locale: Locale = "zh"): Metadata {
       languages: buildLanguageAlternates(topicPath)
     },
     robots: {
-      index: true,
+      index: !isDbFree,
       follow: true
     },
     openGraph: {
@@ -395,6 +404,30 @@ export function generateAiTrendTopicMetadata(locale: Locale = "zh"): Metadata {
 
 export async function AiTrendTopicPageShell({ forceLocale = "zh" }: { forceLocale?: Locale } = {}) {
   const copy = content[forceLocale];
+  if (!process.env.DATABASE_URL?.trim()) {
+    return (
+      <main>
+        <Container className="py-14">
+          <section
+            className="surface-panel overflow-hidden p-7 md:p-10"
+            data-content-status="UNVERIFIED"
+          >
+            <Badge className="text-[var(--marketing-accent)]">UNVERIFIED</Badge>
+            <h1 className="mt-6 max-w-4xl text-4xl font-black leading-tight text-[var(--marketing-text)] md:text-6xl">
+              {forceLocale === "en"
+                ? "AI Trends content has not been verified"
+                : "AI 趋势内容尚未核验"}
+            </h1>
+            <p className="mt-5 max-w-3xl text-base font-medium leading-8 text-[var(--marketing-muted)] md:text-lg">
+              {forceLocale === "en"
+                ? "This local preview has no configured verified data source, so it does not show trend rankings, scores, source claims, or generated trend facts."
+                : "本地预览未配置已核验的数据源，因此不展示趋势排行、分数、来源声明或生成的趋势事实。"}
+            </p>
+          </section>
+        </Container>
+      </main>
+    );
+  }
   const [recentBriefingsRaw, latestVideoBriefingRaw] = await Promise.all([
     getAiTrendBriefingSummaries(3),
     getLatestPublishedAiTrendBriefingWithVideo()

@@ -656,14 +656,17 @@ const getCachedLatestPublishedAiTrendBriefingWithVideo = unstable_cache(
 );
 
 export async function getAiTrendBriefingSummaries(limit = 12) {
+  if (!process.env.DATABASE_URL?.trim()) return [];
   return getCachedAiTrendBriefingSummaries(Math.min(Math.max(1, limit), 60));
 }
 
 export async function getAiTrendBriefingByDateSlug(slug: string) {
   if (!isValidAiTrendDateSlug(slug)) return null;
+  if (!process.env.DATABASE_URL?.trim()) return null;
   return getCachedAiTrendBriefingByDateSlug(slug);
 }
 
 export async function getLatestPublishedAiTrendBriefingWithVideo() {
+  if (!process.env.DATABASE_URL?.trim()) return null;
   return getCachedLatestPublishedAiTrendBriefingWithVideo();
 }
