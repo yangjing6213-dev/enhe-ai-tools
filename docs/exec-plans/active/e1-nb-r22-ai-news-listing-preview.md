@@ -7,12 +7,25 @@
 - `base_head`: `2ed781c36b37461ca560802fd90e9f9f837a0fa5`
 - `branch`: `codex/enhe-recovery-baseline`
 - `worktree`: `C:\Users\HU\Documents\New project 2\.worktrees\enhe-recovery-baseline`
-- `status`: `AUTHORIZED`
+- `status`: `COMPLETED_LOCAL_ONLY`
 - `execution_authorization`: `APPROVED_BY_OWNER_STANDING_AUTHORIZATION`
-- `owner_acceptance`: `PENDING`
+- `owner_acceptance`: `PASS_LOCAL_ONLY`
 - `content_evidence`: `UNVERIFIED`
 - `publish_status`: `BLOCKED`
 - `push_status`: `NOT_PUSHED`
+- `implementation`: `GREEN_FOCUSED`
+- `local_acceptance`: `PASS`
+- `commit`: `d29e3dd88c0adf8c6c72764f3622572a1da89d7c`
+
+## Completion record
+
+- R22 focused tests passed 7/7; R16-R22 plus relevant AI News, public-content, search/navigation, and software wiring regressions passed 70/70.
+- Settings/public-content DB-free boundary regressions passed 10/10; target ESLint, typecheck, and `git diff --check` passed.
+- `/ai-news`, `/en/ai-news`, `/ai-news?q=ai`, and `/en/ai-news?q=ai` returned HTTP 200 with visible `UNVERIFIED`, `noindex, follow`, no AI News result/filter/topic components, and no AI News CollectionPage, ItemList, or FAQPage JSON-LD.
+- The standing-authorization expansion changed only the four named public-content entry guards and the three configured-path test fixtures recorded above; no assertion was weakened.
+- Receipt final external identity: 11159 bytes, SHA-256 `21b5dabdae003d20906b790615b64c2274d4d73efd3e4026f7b9cc67609be81e`.
+- Implementation commit `d29e3dd88c0adf8c6c72764f3622572a1da89d7c` contains exactly seven authorized files and has parent `7fd7275571d0e77bf26b94e087ba12738c67563b`.
+- `CONTENT_EVIDENCE=UNVERIFIED`, `PUBLISH_STATUS=BLOCKED`, and `PUSH_STATUS=NOT_PUSHED` remain unchanged.
 
 R22 applies the established DB-free local-preview safety pattern to the bilingual AI News listing. It does not verify article facts, change article details or topics, connect a real database, or authorize publication.
 
