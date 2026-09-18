@@ -3,7 +3,7 @@
 Status: CONTROLLED_RECOVERY
 Worktree: `C:\Users\HU\Documents\New project 2\.worktrees\enhe-recovery-baseline`
 Base HEAD: `26b4f189d0d79d8e885e9f39205aca18bd2d04f1`
-Current development HEAD: `5e04d35a53cc8c18df22d969556cef31b042ee1c`
+Current development HEAD: `b0a39e9f2ff4a8424484db29447eaa3e12213868`
 
 ## Current stage
 
@@ -33,6 +33,17 @@ Current development HEAD: `5e04d35a53cc8c18df22d969556cef31b042ee1c`
   - Focused tests 22/22、目标 ESLint、`/account-services` 与 `/en/account-services` localhost 验收均通过；DB-free settings/public-content Prisma 查询为 0。
   - R18 已本地提交；该结论不代表服务内容已验证，也不代表允许发布。
 
+- `E1-NB-R19` Product Paths DB-free UNVERIFIED preview parity:
+  - `STATUS=COMPLETED_LOCAL_ONLY`
+  - `IMPLEMENTATION=GREEN_FOCUSED`
+  - `LOCAL_ACCEPTANCE=PASS`
+  - `COMMIT=b0a39e9f2ff4a8424484db29447eaa3e12213868`
+  - `CONTENT_EVIDENCE=UNVERIFIED`
+  - `PUBLISH_STATUS=BLOCKED`
+  - `OWNER_ACCEPTANCE=PASS_LOCAL_ONLY`
+  - All six localized product-path routes passed localhost acceptance with DB-free Prisma query count 0, explicit UNVERIFIED state, noindex/follow, and no product cards or product-fact schemas.
+  - R19 is committed locally only; it does not verify product facts and does not authorize publication.
+
 ## Current blockers and gates
 
 - 教程一手内容仍未验证，`TUTORIAL_CONTENT_EVIDENCE=UNVERIFIED`。
@@ -44,10 +55,10 @@ Current development HEAD: `5e04d35a53cc8c18df22d969556cef31b042ee1c`
 
 | ID | State | Proposed scope | Acceptance |
 |---|---|---|---|
-| RECOVERY-BASELINE-DEVELOPMENT | COMPLETED | Established the clean recovery line and advanced the verified local baseline through R18 | `BASELINE_HEAD=5e04d35a53cc8c18df22d969556cef31b042ee1c`; local-only acceptance; publication blocked |
+| RECOVERY-BASELINE-DEVELOPMENT | COMPLETED | Established the clean recovery line and advanced the verified local baseline through R19 | `BASELINE_HEAD=b0a39e9f2ff4a8424484db29447eaa3e12213868`; local-only acceptance; publication blocked |
 | E1-NB-R17 | COMPLETED_LOCAL_ONLY | Skill-learning DB-free UNVERIFIED preview parity with settings/public-content DB-free guards | Focused implementation and local acceptance passed; content remains unverified; commit `3c2a0f05c46b0f7160475794a47aed50cd339947` |
 | E1-NB-R18 | COMPLETED_LOCAL_ONLY | Account Services DB-free UNVERIFIED preview parity | `IMPLEMENTATION=GREEN_FOCUSED`; `LOCAL_ACCEPTANCE=PASS`; `OWNER_ACCEPTANCE=PASS_LOCAL_ONLY`; commit `5e04d35a53cc8c18df22d969556cef31b042ee1c`; content unverified and publication blocked |
-| E1-NB-R19 | PROPOSED_WAITING_FOR_APPROVAL | Product Paths DB-free preview parity | `OWNER_ACCEPTANCE=PENDING`; `PUBLISH_STATUS=BLOCKED`; no implementation is authorized yet |
+| E1-NB-R19 | COMPLETED_LOCAL_ONLY | Product Paths DB-free UNVERIFIED preview parity | `IMPLEMENTATION=GREEN_FOCUSED`; `LOCAL_ACCEPTANCE=PASS`; `OWNER_ACCEPTANCE=PASS_LOCAL_ONLY`; commit `b0a39e9f2ff4a8424484db29447eaa3e12213868`; content unverified and publication blocked |
 | CONTENT-EVIDENCE-RECONCILIATION | BLOCKED | Reconcile first-party tutorial/content evidence only when an approved source is available | Source bytes/hash and publication approval independently verified |
 | PHASE-2C.6 RELEASE | NOT APPROVED | Production publication/deployment | Separate production, database, deployment and factual-evidence approvals |
 

@@ -7,13 +7,25 @@
 - `base_head`: `6e8b6352f4dee89c6acb69de67bdc5f403367184`
 - `branch`: `codex/enhe-recovery-baseline`
 - `worktree`: `C:\Users\HU\Documents\New project 2\.worktrees\enhe-recovery-baseline`
-- `status`: `AUTHORIZED`
+- `status`: `COMPLETED_LOCAL_ONLY`
 - `execution_authorization`: `APPROVED`
-- `owner_acceptance`: `PENDING`
+- `owner_acceptance`: `PASS_LOCAL_ONLY`
 - `content_evidence`: `UNVERIFIED`
 - `publish_status`: `BLOCKED`
+- `implementation`: `GREEN_FOCUSED`
+- `local_acceptance`: `PASS`
+- `commit`: `b0a39e9f2ff4a8424484db29447eaa3e12213868`
 
-R19 implementation is authorized only within this contract's initial file scope. This contract does not authorize publication, production access, or a shared public-content boundary change.
+## Completion record
+
+- R19 focused tests passed 10/10; R16-R19 and product-path focused regression passed 27/27.
+- Settings/public-content DB-free boundary regression passed 10/10; target ESLint and `git diff --check` passed.
+- All six localized product-path routes returned HTTP 200 with explicit `UNVERIFIED`, `noindex, follow`, no product cards, and no product-fact CollectionPage or ItemList schema.
+- The separately approved one-time scope expansion added `src/lib/public-content.ts` only to guard `getPublicToolsByCategoryNames` when `DATABASE_URL` is unset. Configured reads, P1001 fallback, and unknown-error rethrow behavior remain covered.
+- The local commit contains exactly the page shell, R19 focused test, public-content guard, and R19 receipt.
+- `CONTENT_EVIDENCE=UNVERIFIED`, `PUBLISH_STATUS=BLOCKED`, and `PUSH_STATUS=NOT_PUSHED` remain unchanged.
+
+R19 began within this contract's initial file scope. The owner later granted a one-time additive authorization for the recorded `src/lib/public-content.ts` guard; publication and production access remained unauthorized.
 
 ## Read-only path confirmation
 
