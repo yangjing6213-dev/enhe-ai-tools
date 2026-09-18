@@ -1,0 +1,189 @@
+{
+  "task_id": "E1-NB-R18",
+  "task_name": "Account Services DB-free UNVERIFIED preview parity",
+  "repository_root": "C:\\Users\\HU\\Documents\\New project 2\\.worktrees\\enhe-recovery-baseline",
+  "branch": "codex/enhe-recovery-baseline",
+  "base_head": "3f6baca816f4efc1f01ebb3b3c2b2831528e35dc",
+  "verification_time": "2026-09-18T22:05:27+08:00",
+  "allowed_files": [
+    "src/app/account-services/page-shell.tsx",
+    "src/lib/e1-nb-r18-account-services-preview.test.tsx",
+    "docs/enhe-redesign/english-rewrite/e1-p3-d1/e1-nb-r18-account-services-preview-receipt.json"
+  ],
+  "changed_files": [
+    {
+      "path": "src/app/account-services/page-shell.tsx",
+      "bytes": 20216,
+      "sha256": "80018de6dc71bb8e7743ff83a28ab0bf6c60a1c4660453ee3cf9ec786abdf068",
+      "git_state_before_commit": "tracked_modified"
+    },
+    {
+      "path": "src/lib/e1-nb-r18-account-services-preview.test.tsx",
+      "bytes": 3911,
+      "sha256": "36c231e665af1c02572e9fd0af70cfb427a0f91807232b3dc24f940f78a48699",
+      "git_state_before_commit": "untracked"
+    },
+    {
+      "path": "docs/enhe-redesign/english-rewrite/e1-p3-d1/e1-nb-r18-account-services-preview-receipt.json",
+      "bytes": null,
+      "sha256": null,
+      "git_state_before_commit": "untracked",
+      "self_hash_excluded": true,
+      "final_bytes_and_sha256_reported_externally": true
+    }
+  ],
+  "tdd": {
+    "red": {
+      "command": "npx --no-install vitest run src/lib/e1-nb-r18-account-services-preview.test.tsx --reporter=verbose",
+      "status": "PASS_EXPECTED_RED",
+      "exit_code": 1,
+      "test_files": 1,
+      "passed": 1,
+      "failed": 3,
+      "failure_reason": "The Chinese and English empty listings lacked an explicit UNVERIFIED state, and DB-free metadata lacked noindex, follow. The configured-data preservation test already passed."
+    },
+    "green": {
+      "command": "npx --no-install vitest run src/lib/e1-nb-r18-account-services-preview.test.tsx --reporter=verbose",
+      "status": "PASS",
+      "exit_code": 0,
+      "test_files": 1,
+      "passed": 4,
+      "failed": 0
+    }
+  },
+  "focused_regression": {
+    "command": "npx --no-install vitest run src/lib/e1-nb-r18-account-services-preview.test.tsx src/lib/settings-db-fallback.test.ts src/lib/public-content-db-fallback.test.ts src/lib/e1-nb-r17-skill-learning-preview.test.tsx src/lib/e1-nb-r16-tutorials-preview.test.tsx --reporter=verbose",
+    "status": "PASS",
+    "exit_code": 0,
+    "test_files": 5,
+    "passed": 22,
+    "failed": 0,
+    "r18_passed": 4,
+    "settings_guard_passed": 6,
+    "public_content_guard_passed": 4,
+    "r17_passed": 4,
+    "r16_passed": 4
+  },
+  "eslint": {
+    "command": "npx --no-install eslint src/app/account-services/page-shell.tsx src/lib/e1-nb-r18-account-services-preview.test.tsx",
+    "status": "PASS",
+    "exit_code": 0
+  },
+  "localhost": {
+    "status": "PASS",
+    "database_url": "UNSET",
+    "next_telemetry_disabled": true,
+    "external_network_request_count": 0,
+    "successful_localhost_response_count": 6,
+    "routes": [
+      {
+        "path": "/account-services",
+        "http_status": 200,
+        "unverified_visible": true,
+        "unverified_marker": true,
+        "robots": "noindex, follow",
+        "service_schema_present": false,
+        "faq_schema_present": false,
+        "collection_schema_present": false,
+        "fabricated_service_fact_present": false,
+        "verified_service_card_present": false,
+        "settings_prisma_query_count": 0,
+        "public_content_prisma_query_count": 0
+      },
+      {
+        "path": "/en/account-services",
+        "http_status": 200,
+        "unverified_visible": true,
+        "unverified_marker": true,
+        "robots": "noindex, follow",
+        "service_schema_present": false,
+        "faq_schema_present": false,
+        "collection_schema_present": false,
+        "fabricated_service_fact_present": false,
+        "verified_service_card_present": false,
+        "settings_prisma_query_count": 0,
+        "public_content_prisma_query_count": 0
+      }
+    ],
+    "global_structured_data_note": "The public root layout still emits site-wide JSON-LD. The DB-free Account Services shell emits no Service, FAQPage, or CollectionPage service claims.",
+    "initial_checker_false_positive": {
+      "status": "DIAGNOSTIC_ONLY",
+      "reason": "The first checker treated any site-wide JSON-LD as fabricated Account Services evidence. A second type-specific check confirmed that no Account Services service schema or facts were emitted."
+    },
+    "runtime_prisma_error_markers": 0,
+    "server_stopped": true,
+    "residual_listener_count": 0
+  },
+  "database_and_network": {
+    "DATABASE_URL": "UNSET",
+    "settings_prisma_query_count": 0,
+    "public_content_prisma_query_count": 0,
+    "query_count_evidence": "Focused guard tests use Prisma spies and passed; localhost logs contained no Prisma, P1001, or findMany error markers.",
+    "successful_database_connection_count": 0,
+    "database_write_count": 0,
+    "migration_count": 0,
+    "seed_count": 0,
+    "external_network_request_count": 0,
+    "ssh": "NOT_RUN",
+    "docker": "NOT_RUN",
+    "deployment": "NOT_RUN",
+    "production_validation": "NOT_RUN"
+  },
+  "configured_database_behavior": {
+    "status": "PRESERVED_BY_FOCUSED_TEST_WITHOUT_REAL_DATABASE_ACCESS",
+    "service_cards_rendered_from_configured_fixture": true,
+    "metadata_forced_noindex": false,
+    "real_database_access": "NOT_RUN"
+  },
+  "git_before_commit": {
+    "branch": "codex/enhe-recovery-baseline",
+    "head": "3f6baca816f4efc1f01ebb3b3c2b2831528e35dc",
+    "tracked_modified": 1,
+    "untracked": 2,
+    "staged": 0,
+    "porcelain_entries": 3,
+    "staged_paths": [],
+    "index_lock_present": false,
+    "git_diff_check": "PASS"
+  },
+  "scope_check": {
+    "status": "PASS",
+    "out_of_scope_changes": 0,
+    "settings_ts_modified": false,
+    "public_content_ts_modified": false,
+    "master_backlog_modified": false,
+    "active_contract_modified": false,
+    "old_worktree_touched": false
+  },
+  "receipt_self_hash_in_document": false,
+  "receipt_self_hash_policy": "excluded_from_self_hash",
+  "receipt_final_hash_reported_externally": true,
+  "local_acceptance": "PASS",
+  "content_evidence": "UNVERIFIED",
+  "publish_status": "BLOCKED",
+  "push_status": "NOT_PUSHED",
+  "commit_status": "PENDING_AUTHORIZED_COMMIT_GATE",
+  "exact_commands_run": [
+    "git branch --show-current",
+    "git rev-parse HEAD",
+    "git status --porcelain=v1 --untracked-files=all",
+    "npx --no-install vitest run src/lib/e1-nb-r18-account-services-preview.test.tsx --reporter=verbose",
+    "npx --no-install vitest run src/lib/e1-nb-r18-account-services-preview.test.tsx src/lib/settings-db-fallback.test.ts src/lib/public-content-db-fallback.test.ts src/lib/e1-nb-r17-skill-learning-preview.test.tsx src/lib/e1-nb-r16-tutorials-preview.test.tsx --reporter=verbose",
+    "npx --no-install eslint src/app/account-services/page-shell.tsx src/lib/e1-nb-r18-account-services-preview.test.tsx",
+    "node node_modules/next/dist/bin/next dev --hostname 127.0.0.1 --port 3272",
+    "HTTP GET http://127.0.0.1:3272/account-services",
+    "HTTP GET http://127.0.0.1:3272/en/account-services",
+    "node node_modules/next/dist/bin/next dev --hostname 127.0.0.1 --port 3273",
+    "HTTP GET http://127.0.0.1:3273/account-services",
+    "HTTP GET http://127.0.0.1:3273/en/account-services",
+    "git diff --check"
+  ],
+  "governance": {
+    "R18_IMPLEMENTATION": "GREEN_FOCUSED",
+    "R18_LOCAL_ACCEPTANCE": "PASS",
+    "R18_CONTENT_EVIDENCE": "UNVERIFIED",
+    "R18_COMMIT_CLOSED": "NO",
+    "PUBLISH_STATUS": "BLOCKED",
+    "PUSH_STATUS": "NOT_PUSHED"
+  }
+}
