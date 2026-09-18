@@ -53,6 +53,33 @@
   font-family: var(--enhe-font-en);
 }
 
+.redesign-skip-link {
+  position: fixed;
+  top: 12px;
+  left: 12px;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  padding: 0;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+.redesign-skip-link:focus-visible {
+  z-index: var(--enhe-z-focus);
+  width: auto;
+  height: auto;
+  padding: 10px 14px;
+  clip-path: none;
+  border: 2px solid var(--enhe-text);
+  border-radius: var(--enhe-button-r);
+  outline: 3px solid var(--enhe-focus);
+  outline-offset: 2px;
+  background: var(--enhe-page-bg);
+  color: var(--enhe-text);
+  font-weight: 800;
+}
+
 .redesign-header,
 .redesign-footer {
   font-family: var(--enhe-font-zh);

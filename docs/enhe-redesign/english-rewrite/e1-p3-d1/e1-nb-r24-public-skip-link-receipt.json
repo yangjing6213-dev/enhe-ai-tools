@@ -1,0 +1,158 @@
+{
+  "task_id": "E1-NB-R24",
+  "task_name": "Bilingual public-shell skip-to-content navigation",
+  "repository_root": "C:\\Users\\HU\\Documents\\New project 2\\.worktrees\\enhe-recovery-baseline",
+  "branch": "codex/enhe-recovery-baseline",
+  "contract_base_head": "ee6e0e112dc32f7ed37c2dfd17b20b5890b53c4d",
+  "implementation_base_head": "255a233b49efb7d3bc47e6bb7e7f795771dfb929",
+  "verification_time": "2026-09-18T18:19:09.495Z",
+  "allowed_files": [
+    "src/components/public-site-chrome.tsx",
+    "src/styles/redesign/shell.css",
+    "src/lib/e1-nb-r24-public-skip-link.test.tsx",
+    "docs/enhe-redesign/english-rewrite/e1-p3-d1/e1-nb-r24-public-skip-link-receipt.json"
+  ],
+  "changed_files": [
+    {
+      "path": "src/components/public-site-chrome.tsx",
+      "bytes": 2968,
+      "sha256": "2a323fc4260986584287340d9797e20b00eaa456b536f164f0acc2ad59195dfe",
+      "git_state_before_commit": "tracked_modified"
+    },
+    {
+      "path": "src/styles/redesign/shell.css",
+      "bytes": 16147,
+      "sha256": "21a36c6e6bf3771bd5847f7679e118ac3228e405f4a6cbec51a809a3d4af5034",
+      "git_state_before_commit": "tracked_modified"
+    },
+    {
+      "path": "src/lib/e1-nb-r24-public-skip-link.test.tsx",
+      "bytes": 3093,
+      "sha256": "258b7e9d79fcab9516a2540daea4c260ba8f178f406e4ea1163f2d4b077bc74a",
+      "git_state_before_commit": "untracked"
+    },
+    {
+      "path": "docs/enhe-redesign/english-rewrite/e1-p3-d1/e1-nb-r24-public-skip-link-receipt.json",
+      "bytes": null,
+      "sha256": null,
+      "git_state_before_commit": "untracked",
+      "self_hash_excluded": true,
+      "final_bytes_and_sha256_reported_externally": true
+    }
+  ],
+  "tdd": {
+    "red": {
+      "status": "PASS_EXPECTED_RED",
+      "exit_code": 1,
+      "passed": 0,
+      "failed": 3,
+      "failure_reason": "The public shell had no bilingual skip link, no unique focusable content target, and no focus-visible skip-link style."
+    },
+    "green": {
+      "command": "rtk npx --no-install vitest run src/lib/e1-nb-r24-public-skip-link.test.tsx --reporter=verbose",
+      "status": "PASS",
+      "exit_code": 0,
+      "passed": 3,
+      "failed": 0
+    }
+  },
+  "direct_regression": {
+    "command": "rtk npx --no-install vitest run src/lib/e1-nb-r24-public-skip-link.test.tsx src/lib/public-a11y-smoke-source.test.ts src/lib/customer-support-widget-source.test.ts --reporter=verbose",
+    "status": "PASS",
+    "exit_code": 0,
+    "test_files": 3,
+    "passed": 14,
+    "failed": 0,
+    "header_content_support_footer_order": "PASS",
+    "nested_main_check": "PASS"
+  },
+  "eslint": {
+    "command": "rtk npx --no-install eslint src/components/public-site-chrome.tsx src/lib/e1-nb-r24-public-skip-link.test.tsx",
+    "status": "PASS",
+    "exit_code": 0
+  },
+  "typecheck": {
+    "command": "rtk npm run typecheck",
+    "status": "PASS",
+    "exit_code": 0
+  },
+  "localhost": {
+    "status": "PASS",
+    "host": "127.0.0.1",
+    "port": 3224,
+    "database_url": "UNSET",
+    "viewports": [
+      {
+        "name": "desktop",
+        "width": 1440,
+        "height": 900
+      },
+      {
+        "name": "mobile",
+        "width": 390,
+        "height": 844
+      }
+    ],
+    "routes": [
+      {
+        "path": "/",
+        "http_status": 200,
+        "skip_link_label": "跳到主要内容"
+      },
+      {
+        "path": "/en",
+        "http_status": 200,
+        "skip_link_label": "Skip to main content"
+      },
+      {
+        "path": "/software",
+        "http_status": 200,
+        "skip_link_label": "跳到主要内容"
+      },
+      {
+        "path": "/en/software",
+        "http_status": 200,
+        "skip_link_label": "Skip to main content"
+      }
+    ],
+    "first_tab_focuses_skip_link": true,
+    "enter_hash": "#main-content",
+    "enter_active_element_id": "main-content",
+    "content_target_count": 1,
+    "main_landmark_count": 1,
+    "hidden_default": true,
+    "visible_on_focus_visible": true,
+    "horizontal_overflow_pixels": 0,
+    "header_geometry_shift_pixels": 0,
+    "server_stopped": true,
+    "residual_listener_count": 0
+  },
+  "database_and_network": {
+    "DATABASE_URL": "UNSET",
+    "successful_database_connection_count": 0,
+    "external_network_request_count": 0,
+    "analytics_endpoint_db_initialization_attempt_observed": true,
+    "analytics_endpoint_result": "LOCALHOST_503_CAUGHT_WITHOUT_DATABASE_CONNECTION",
+    "task_acceptance_impact": "NONE_PUBLIC_ROUTES_REMAINED_HTTP_200",
+    "ssh": "NOT_RUN",
+    "docker": "NOT_RUN",
+    "deployment": "NOT_RUN"
+  },
+  "scope_check": {
+    "status": "PASS",
+    "scope_expansion_count": 0,
+    "out_of_scope_changes": 0,
+    "production_configuration_modified": false,
+    "old_worktree_touched": false
+  },
+  "git_diff_check": "PASS",
+  "staged_paths_before_commit": [],
+  "receipt_self_hash_in_document": false,
+  "receipt_self_hash_policy": "excluded_from_self_hash",
+  "receipt_final_hash_reported_externally": true,
+  "local_acceptance": "PASS",
+  "content_evidence": "UNVERIFIED",
+  "publish_status": "BLOCKED",
+  "push_status": "NOT_PUSHED",
+  "commit_status": "PENDING_AUTHORIZED_COMMIT_GATE"
+}

@@ -63,11 +63,16 @@ export async function PublicSiteChrome({
   return (
     <div className="enhe-redesign-production" lang={forceLocale}>
       <StructuredData data={[websiteSchema, organizationSchema]} />
+      <a className="redesign-skip-link" href="#main-content">
+        {forceLocale === "en" ? "Skip to main content" : "跳到主要内容"}
+      </a>
       <EnheRedesignPublicHeader
         locale={forceLocale}
         languageHrefs={languageHrefs}
       />
-      {children}
+      <div id="main-content" tabIndex={-1}>
+        {children}
+      </div>
       <CustomerSupportWidget locale={forceLocale} faqs={getCustomerSupportFaqs(forceLocale)} />
       <EnheRedesignPublicFooter locale={forceLocale} />
     </div>
