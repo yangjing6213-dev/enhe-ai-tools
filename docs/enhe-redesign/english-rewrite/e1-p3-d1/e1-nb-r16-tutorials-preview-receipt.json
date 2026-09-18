@@ -1,0 +1,123 @@
+{
+  "task_id": "E1-NB-R16",
+  "task_name": "tutorials DB-free localhost preview acceptance",
+  "repository_root": "C:\\Users\\HU\\Documents\\New project 2\\.worktrees\\enhe-phase2c5b-p0-runtime-assets-v1",
+  "branch": "codex/enhe-phase2c5b-p0-runtime-assets-v1",
+  "head_sha": "f755fdd58b80cd32ad7de964c3d73b29fd9be8ac",
+  "verification_time": "2026-09-18T03:30:00+08:00",
+  "changed_files": [
+    {
+      "path": "src/app/tutorials/page-shell.tsx",
+      "bytes": 12310,
+      "sha256": "8ebddf0e415e20efa5337725794695ff0db11b694f41c99da45a127edad3aa9e",
+      "git_state": "tracked_modified"
+    },
+    {
+      "path": "src/lib/e1-nb-r16-tutorials-preview.test.tsx",
+      "bytes": 2992,
+      "sha256": "707383527f845b78460767553d53174bad4be9f81e7f558befc6a505fe4d2272",
+      "git_state": "untracked"
+    }
+  ],
+  "unchanged_route_wrapper": {
+    "path": "src/app/en/tutorials/page.tsx",
+    "bytes": 488,
+    "sha256": "53e846b9d46931d7272e93016653665e432846369a6966d3cbb360f3f799a332",
+    "git_state": "unchanged"
+  },
+  "localhost_routes": [
+    {
+      "path": "/tutorials",
+      "http_status": 200,
+      "content_status": "UNVERIFIED",
+      "noindex_follow": true,
+      "rendered_tutorial_facts": false,
+      "response_bytes": 112533
+    },
+    {
+      "path": "/en/tutorials",
+      "http_status": 200,
+      "content_status": "UNVERIFIED",
+      "noindex_follow": true,
+      "rendered_tutorial_facts": false,
+      "response_bytes": 111327
+    }
+  ],
+  "preview_server": {
+    "address": "http://127.0.0.1:3260",
+    "database_url": "UNSET",
+    "external_request_count": 0,
+    "database_connection_count": 0,
+    "database_write_count": 0,
+    "stopped": true,
+    "residual_listener_count": 0
+  },
+  "focused_test": {
+    "command": "npx --no-install vitest run src/lib/e1-nb-r16-tutorials-preview.test.tsx --reporter=verbose",
+    "status": "PASS",
+    "exit_code": 0,
+    "test_files": 1,
+    "passed": 4,
+    "failed": 0
+  },
+  "eslint": {
+    "command": "npx --no-install eslint src/app/tutorials/page-shell.tsx src/app/en/tutorials/page.tsx src/lib/e1-nb-r16-tutorials-preview.test.tsx",
+    "status": "PASS",
+    "exit_code": 0
+  },
+  "scope_check": {
+    "status": "PASS_WITH_PREEXISTING_DIRTY_WORKTREE",
+    "r16_files": [
+      "src/app/tutorials/page-shell.tsx",
+      "src/lib/e1-nb-r16-tutorials-preview.test.tsx",
+      "docs/enhe-redesign/english-rewrite/e1-p3-d1/e1-nb-r16-tutorials-preview-receipt.json"
+    ],
+    "preexisting_out_of_scope_status_entries": 207,
+    "new_concurrent_out_of_scope_changes_observed": false,
+    "old_r10_evidence_used": false
+  },
+  "evidence_status": "UNVERIFIED",
+  "acceptance_status": "PASS",
+  "publish_status": "BLOCKED",
+  "blockers": [
+    "Remote and first-party tutorial evidence remains unverified.",
+    "Production publishing and deployment remain outside this local acceptance scope.",
+    "The repository retains 207 pre-existing dirty or untracked status entries outside R16."
+  ],
+  "exact_commands_run": [
+    "git rev-parse --show-toplevel",
+    "git branch --show-current",
+    "git rev-parse HEAD",
+    "git status --porcelain=v1 --untracked-files=all",
+    "git diff --name-only --cached",
+    "Test-Path .git/index.lock",
+    "git diff --check",
+    "npx --no-install vitest run src/lib/e1-nb-r16-tutorials-preview.test.tsx --reporter=verbose",
+    "npx --no-install eslint src/app/tutorials/page-shell.tsx src/app/en/tutorials/page.tsx src/lib/e1-nb-r16-tutorials-preview.test.tsx",
+    "node .\\node_modules\\next\\dist\\bin\\next dev --hostname 127.0.0.1 --port 3260",
+    "Invoke-WebRequest http://127.0.0.1:3260/tutorials",
+    "Invoke-WebRequest http://127.0.0.1:3260/en/tutorials",
+    "Get-FileHash -Algorithm SHA256 on R16 target files"
+  ],
+  "governance": {
+    "P0_STATUS": "PARTIAL_FAIL_CLOSED",
+    "E1_TASK3": "PARTIAL_FAIL_CLOSED",
+    "PHASE_2C6_APPROVED": "NO"
+  },
+  "git_status": {
+    "tracked_modified": 69,
+    "untracked": 141,
+    "staged": 0,
+    "current_status_count": 210,
+    "porcelain_entries": 210,
+    "r16_owned_status_items": 3,
+    "preexisting_out_of_scope_status_items": 207,
+    "staged_paths": [],
+    "index_lock_present": false,
+    "git_diff_check": "PASS",
+    "old_r10_evidence_used": false
+  },
+  "receipt_self_hash_in_document": false,
+  "receipt_self_hash_policy": "excluded_from_self_hash",
+  "receipt_final_hash_reported_externally": true
+}

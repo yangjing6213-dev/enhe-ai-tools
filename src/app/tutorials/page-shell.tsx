@@ -13,21 +13,43 @@ import { publicPageCacheSeconds } from "@/lib/public-routes";
 import { buildBreadcrumbSchema, buildFaqSchema, buildListingMetadataTitle, buildListingMetaDescription, buildPageMetadata } from "@/lib/seo";
 
 export const tutorialsPageRevalidate = publicPageCacheSeconds;
+export const tutorialDetailGate = "BLOCKED_TUTORIAL_DETAIL_KEY";
 
 export async function generateTutorialsPageMetadata(forceLocale: Locale): Promise<Metadata> {
   const t = getDictionary(forceLocale);
-  return buildPageMetadata({
+  const isDbFreePreview = !process.env.DATABASE_URL;
+  const metadata = buildPageMetadata({
     title: buildListingMetadataTitle("tutorials", forceLocale, t.brand),
-    description: buildListingMetaDescription("tutorials", forceLocale),
+    description: isDbFreePreview
+      ? forceLocale === "en"
+        ? "English tutorial content is not available in this local preview."
+        : "教程内容尚未核验，当前本地预览不提供可发布教程事实。"
+      : buildListingMetaDescription("tutorials", forceLocale),
     path: "/tutorials",
     locale: forceLocale === "en" ? "en_US" : "zh_CN",
-    localeKey: forceLocale
+    localeKey: forceLocale,
   });
+  if (isDbFreePreview) metadata.robots = { index: false, follow: true };
+  return metadata;
 }
 
 export async function TutorialsPageShell({ forceLocale }: { forceLocale: Locale }) {
   const tutorials = await getPublicTutorials();
   const t = getDictionary(forceLocale);
+  if (tutorials.length === 0) {
+    return (
+      <Container className="py-14">
+        <main data-content-status="UNVERIFIED" className="surface-panel p-8">
+          <SectionTitle as="h1" title={t.tutorials.title} intro={t.tutorials.intro} />
+          <p className="mt-6 text-sm font-semibold leading-7 text-[var(--marketing-muted)]">
+            {forceLocale === "en"
+              ? "UNVERIFIED — English tutorial content is not available yet."
+              : "UNVERIFIED — 教程内容尚未核验。"}
+          </p>
+        </main>
+      </Container>
+    );
+  }
   const tutorialGuidance =
     forceLocale === "en"
       ? {
