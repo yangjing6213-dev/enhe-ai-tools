@@ -5,9 +5,10 @@
 - `task_id`: `E1-NB-R28`
 - `task_name`: `AI News Topic human-facing answer labels`
 - `contract_base_head`: `3a3b385d854d104ef80051f74529e41802cde517`
+- `execution_base_head`: `d186c7f2e74c85c702ce97bd3d4f2a74e8714f47`
 - `branch`: `codex/enhe-recovery-baseline`
 - `worktree`: `C:\Users\HU\Documents\New project 2\.worktrees\enhe-recovery-baseline`
-- `status`: `AUTHORIZED_WAITING_FOR_R27`
+- `status`: `AUTHORIZED`
 - `execution_authorization`: `APPROVED`
 - `owner_acceptance`: `PENDING`
 - `content_evidence`: `UNVERIFIED`
