@@ -7,12 +7,25 @@
 - `base_head`: `9f1bfd1ba6e9aa39cea421cd29c1f23fccb9ab56`
 - `branch`: `codex/enhe-recovery-baseline`
 - `worktree`: `C:\Users\HU\Documents\New project 2\.worktrees\enhe-recovery-baseline`
-- `status`: `AUTHORIZED`
+- `status`: `COMPLETED_LOCAL_ONLY`
 - `execution_authorization`: `APPROVED_BY_OWNER_STANDING_AUTHORIZATION`
-- `owner_acceptance`: `PENDING`
+- `owner_acceptance`: `PASS_LOCAL_ONLY`
 - `content_evidence`: `UNVERIFIED`
 - `publish_status`: `BLOCKED`
 - `push_status`: `NOT_PUSHED`
+- `implementation`: `GREEN_FOCUSED`
+- `local_acceptance`: `PASS`
+- `commit`: `350ec0a3e0e1edd2b87de6cac391f1f6c197dd76`
+
+## Completion record
+
+- R21 focused tests passed 6/6; R16-R21 plus existing public-search, navigation-search, and software wiring regressions passed 47/47.
+- Settings/public-content DB-free boundary regressions passed 10/10; target ESLint, typecheck, and `git diff --check` passed.
+- `/search`, `/en/search`, `/search?q=ai`, and `/en/search?q=ai` returned HTTP 200 with visible `UNVERIFIED`, `noindex, follow`, no result cards, no ItemList schema, and no Prisma error markers.
+- The standing-authorization scope expansion changed only the `searchPublicContent` entry boundary in `src/lib/public-search.ts`; configured multi-source reads remain covered.
+- Receipt final external identity: 8038 bytes, SHA-256 `aebfd797049ed17e16de5bda0cb4fc238f326a95f1505c45aa3fcd3af85ac365`.
+- Implementation commit `350ec0a3e0e1edd2b87de6cac391f1f6c197dd76` contains exactly four authorized files and has parent `0451e3d9e15226fd140ba40bbee60d9edca15ec2`.
+- `CONTENT_EVIDENCE=UNVERIFIED`, `PUBLISH_STATUS=BLOCKED`, and `PUSH_STATUS=NOT_PUSHED` remain unchanged.
 
 R21 applies the established DB-free local-preview safety pattern to the public search route. It does not verify search-result facts, connect a real database, or authorize publication.
 
