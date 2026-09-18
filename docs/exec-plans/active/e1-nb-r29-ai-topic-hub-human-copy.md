@@ -5,9 +5,10 @@
 - `task_id`: `E1-NB-R29`
 - `task_name`: `AI Topic Hub human-facing answer copy`
 - `contract_base_head`: `3a3b385d854d104ef80051f74529e41802cde517`
+- `execution_base_head`: `4f546434c01e4fbb9633ec826de1156dbbd844e3`
 - `branch`: `codex/enhe-recovery-baseline`
 - `worktree`: `C:\Users\HU\Documents\New project 2\.worktrees\enhe-recovery-baseline`
-- `status`: `AUTHORIZED_WAITING_FOR_R28`
+- `status`: `AUTHORIZED`
 - `execution_authorization`: `APPROVED`
 - `owner_acceptance`: `PENDING`
 - `content_evidence`: `UNVERIFIED`
