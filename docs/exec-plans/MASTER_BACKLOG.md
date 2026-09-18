@@ -3,7 +3,7 @@
 Status: CONTROLLED_RECOVERY
 Worktree: `C:\Users\HU\Documents\New project 2\.worktrees\enhe-recovery-baseline`
 Base HEAD: `26b4f189d0d79d8e885e9f39205aca18bd2d04f1`
-Current development HEAD: `b0a39e9f2ff4a8424484db29447eaa3e12213868`
+Current development HEAD: `697ebd78fbd78b0cf786b30295936e52d451cf64`
 
 Operating mode: `AUTONOMOUS_LOCAL_DEVELOPMENT`
 Owner standing authorization: `APPROVED`
@@ -66,7 +66,7 @@ Content evidence: `UNVERIFIED`
 | E1-NB-R17 | COMPLETED_LOCAL_ONLY | Skill-learning DB-free UNVERIFIED preview parity with settings/public-content DB-free guards | Focused implementation and local acceptance passed; content remains unverified; commit `3c2a0f05c46b0f7160475794a47aed50cd339947` |
 | E1-NB-R18 | COMPLETED_LOCAL_ONLY | Account Services DB-free UNVERIFIED preview parity | `IMPLEMENTATION=GREEN_FOCUSED`; `LOCAL_ACCEPTANCE=PASS`; `OWNER_ACCEPTANCE=PASS_LOCAL_ONLY`; commit `5e04d35a53cc8c18df22d969556cef31b042ee1c`; content unverified and publication blocked |
 | E1-NB-R19 | COMPLETED_LOCAL_ONLY | Product Paths DB-free UNVERIFIED preview parity | `IMPLEMENTATION=GREEN_FOCUSED`; `LOCAL_ACCEPTANCE=PASS`; `OWNER_ACCEPTANCE=PASS_LOCAL_ONLY`; commit `b0a39e9f2ff4a8424484db29447eaa3e12213868`; content unverified and publication blocked |
-| E1-NB-R20 | AUTHORIZED_IN_PROGRESS | Software Catalog DB-free UNVERIFIED preview parity | Base `7ff8d32b8295b94b40f42e333b15a9272cca9803`; focused TDD, `/software` and `/en/software` localhost acceptance; content unverified and publication blocked |
+| E1-NB-R20 | COMPLETED_LOCAL_ONLY | Software Catalog DB-free UNVERIFIED preview parity | `IMPLEMENTATION=GREEN_FOCUSED`; `LOCAL_ACCEPTANCE=PASS`; commit `697ebd78fbd78b0cf786b30295936e52d451cf64`; content unverified and publication blocked |
 | CONTENT-EVIDENCE-RECONCILIATION | BLOCKED | Reconcile first-party tutorial/content evidence only when an approved source is available | Source bytes/hash and publication approval independently verified |
 | PHASE-2C.6 RELEASE | NOT APPROVED | Production publication/deployment | Separate production, database, deployment and factual-evidence approvals |
 

@@ -7,12 +7,24 @@
 - `base_head`: `7ff8d32b8295b94b40f42e333b15a9272cca9803`
 - `branch`: `codex/enhe-recovery-baseline`
 - `worktree`: `C:\Users\HU\Documents\New project 2\.worktrees\enhe-recovery-baseline`
-- `status`: `AUTHORIZED`
+- `status`: `COMPLETED_LOCAL_ONLY`
 - `execution_authorization`: `APPROVED_BY_OWNER_STANDING_AUTHORIZATION`
-- `owner_acceptance`: `PENDING`
+- `owner_acceptance`: `PASS_LOCAL_ONLY`
 - `content_evidence`: `UNVERIFIED`
 - `publish_status`: `BLOCKED`
 - `push_status`: `NOT_PUSHED`
+- `implementation`: `GREEN_FOCUSED`
+- `local_acceptance`: `PASS`
+- `commit`: `697ebd78fbd78b0cf786b30295936e52d451cf64`
+
+## Completion record
+
+- R20 focused tests passed 6/6; R16-R20 plus existing software production wiring regression passed 33/33.
+- Settings/public-content DB-free boundary regression passed 10/10; target ESLint, typecheck, and `git diff --check` passed.
+- `/software` and `/en/software` returned HTTP 200 with visible `UNVERIFIED`, `noindex, follow`, no production catalog, no product grid, and no product-fact CollectionPage or ItemList schema.
+- The standing-authorization scope expansion changed only `getPublicSoftwareCatalogRows` in `src/lib/public-content.ts`; configured query and error behavior remain covered.
+- Implementation commit `697ebd78fbd78b0cf786b30295936e52d451cf64` contains exactly four authorized files.
+- `CONTENT_EVIDENCE=UNVERIFIED`, `PUBLISH_STATUS=BLOCKED`, and `PUSH_STATUS=NOT_PUSHED` remain unchanged.
 
 R20 applies the established DB-free local-preview safety pattern to the public software catalog. It does not verify product facts, connect a real database, or authorize publication.
 
