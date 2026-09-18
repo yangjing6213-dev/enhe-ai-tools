@@ -5,7 +5,7 @@
 - `task_id`: `E1-NB-R24`
 - `task_name`: `Bilingual public-shell skip-to-content navigation`
 - `contract_base_head`: `ee6e0e112dc32f7ed37c2dfd17b20b5890b53c4d`
-- `execution_base_head`: `0f304c46abf03ba1b9c6d1e928a7a04661c2f839`
+- `execution_base_head`: `255a233b49efb7d3bc47e6bb7e7f795771dfb929`
 - `branch`: `codex/enhe-recovery-baseline`
 - `worktree`: `C:\Users\HU\Documents\New project 2\.worktrees\enhe-recovery-baseline`
 - `status`: `COMPLETED_LOCAL_ONLY`

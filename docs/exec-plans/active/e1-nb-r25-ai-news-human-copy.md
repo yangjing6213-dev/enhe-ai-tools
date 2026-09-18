@@ -5,7 +5,7 @@
 - `task_id`: `E1-NB-R25`
 - `task_name`: `Replace machine-facing AI News answer labels`
 - `contract_base_head`: `ee6e0e112dc32f7ed37c2dfd17b20b5890b53c4d`
-- `execution_base_head`: `c35eb6e7ac0094a7e2286baecb16f249f1fa254c`
+- `execution_base_head`: `aa774cf0a40f975c6367961a9c6e0ce2c6fc73a7`
 - `branch`: `codex/enhe-recovery-baseline`
 - `worktree`: `C:\Users\HU\Documents\New project 2\.worktrees\enhe-recovery-baseline`
 - `status`: `COMPLETED_LOCAL_ONLY`
