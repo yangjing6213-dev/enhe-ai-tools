@@ -3,7 +3,7 @@
 Status: CONTROLLED_RECOVERY
 Worktree: `C:\Users\HU\Documents\New project 2\.worktrees\enhe-recovery-baseline`
 Base HEAD: `26b4f189d0d79d8e885e9f39205aca18bd2d04f1`
-Current development HEAD: `d29e3dd88c0adf8c6c72764f3622572a1da89d7c`
+Current development HEAD: `ee6e0e112dc32f7ed37c2dfd17b20b5890b53c4d`
 
 Operating mode: `AUTONOMOUS_LOCAL_DEVELOPMENT`
 Owner standing authorization: `APPROVED`
@@ -15,6 +15,9 @@ Content evidence: `UNVERIFIED`
 ## Current stage
 
 正常开发前的受控恢复阶段。新 recovery worktree 是唯一开发主线；旧 worktree 的 207 项 dirty/untracked 状态保持冻结，不清理、不迁移、不覆盖。
+
+Current local batch: `R23 -> R24 -> R25`
+Batch progress: `0/3`
 
 ## Completed
 
@@ -69,6 +72,9 @@ Content evidence: `UNVERIFIED`
 | E1-NB-R20 | COMPLETED_LOCAL_ONLY | Software Catalog DB-free UNVERIFIED preview parity | `IMPLEMENTATION=GREEN_FOCUSED`; `LOCAL_ACCEPTANCE=PASS`; commit `697ebd78fbd78b0cf786b30295936e52d451cf64`; content unverified and publication blocked |
 | E1-NB-R21 | COMPLETED_LOCAL_ONLY | Public Search DB-free UNVERIFIED preview parity | `IMPLEMENTATION=GREEN_FOCUSED`; `LOCAL_ACCEPTANCE=PASS`; commit `350ec0a3e0e1edd2b87de6cac391f1f6c197dd76`; content unverified and publication blocked |
 | E1-NB-R22 | COMPLETED_LOCAL_ONLY | AI News Listing DB-free UNVERIFIED preview parity | `IMPLEMENTATION=GREEN_FOCUSED`; `LOCAL_ACCEPTANCE=PASS`; commit `d29e3dd88c0adf8c6c72764f3622572a1da89d7c`; content unverified and publication blocked |
+| E1-NB-R23 | AUTHORIZED | AI Trends DB-free UNVERIFIED preview boundary | DB-free Prisma reads are zero; bilingual topic routes are HTTP 200 with UNVERIFIED and noindex/follow; configured mock path and daily regressions remain green |
+| E1-NB-R24 | AUTHORIZED_WAITING_FOR_R23 | Bilingual public-shell skip-to-content navigation | Bilingual skip link is first-focusable, targets one content boundary, preserves header/footer order, and passes desktop/mobile a11y checks |
+| E1-NB-R25 | AUTHORIZED_WAITING_FOR_R24 | Replace machine-facing AI News answer labels | Bilingual human-facing labels replace machine-facing copy without changing news facts, JSON-LD, or indexing behavior |
 | CONTENT-EVIDENCE-RECONCILIATION | BLOCKED | Reconcile first-party tutorial/content evidence only when an approved source is available | Source bytes/hash and publication approval independently verified |
 | PHASE-2C.6 RELEASE | NOT APPROVED | Production publication/deployment | Separate production, database, deployment and factual-evidence approvals |
 
