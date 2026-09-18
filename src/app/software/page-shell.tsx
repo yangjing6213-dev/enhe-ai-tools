@@ -5,6 +5,7 @@ import { notFound } from "next/navigation";
 
 import { EnheRedesignSoftwareCatalog } from "@/components/redesign/software/EnheRedesignSoftwareCatalog";
 import { StructuredData } from "@/components/structured-data";
+import { Container, SectionTitle } from "@/components/ui";
 import { getDictionary, type Locale } from "@/lib/dictionaries";
 import {
   getProductionSoftwareCatalog,
@@ -34,6 +35,7 @@ export async function generateSoftwarePageMetadata(
     (key) => Boolean(params[key]),
   );
   const hasCategoryParameter = params.category !== undefined;
+  const isDbFreeMode = !process.env.DATABASE_URL?.trim();
   const canonicalPath =
     request && !request.category && request.page > 1
       ? `/software?page=${request.page}`
@@ -41,7 +43,11 @@ export async function generateSoftwarePageMetadata(
   const t = getDictionary(forceLocale);
   const metadata = buildPageMetadata({
     title: buildListingMetadataTitle("software", forceLocale, t.brand),
-    description: buildListingMetaDescription("software", forceLocale),
+    description: isDbFreeMode
+      ? forceLocale === "en"
+        ? "Software catalog content is not available in this local preview."
+        : "软件目录内容尚未核验，当前本地预览不提供可发布的产品事实。"
+      : buildListingMetaDescription("software", forceLocale),
     path: canonicalPath,
     locale: forceLocale === "en" ? "en_US" : "zh_CN",
     localeKey: forceLocale,
@@ -51,7 +57,12 @@ export async function generateSoftwarePageMetadata(
         : undefined,
   });
 
-  if (!request || hasCategoryParameter || hasUnsupportedLegacyFilter) {
+  if (
+    isDbFreeMode ||
+    !request ||
+    hasCategoryParameter ||
+    hasUnsupportedLegacyFilter
+  ) {
     return {
       ...metadata,
       robots: { index: false, follow: true },
@@ -73,6 +84,35 @@ export async function SoftwarePageShell({
   const request = parseSoftwareCatalogSearchParams(await searchParams);
   if (!request) notFound();
 
+  const t = getDictionary(forceLocale);
+  if (!process.env.DATABASE_URL?.trim()) {
+    return (
+      <main>
+        <Container className="py-14">
+          <section
+            data-content-status="UNVERIFIED"
+            className="surface-panel p-8"
+          >
+            <SectionTitle
+              as="h1"
+              title={t.listing.softwareTitle}
+              intro={
+                forceLocale === "en"
+                  ? "Software catalog content is not available in this local preview."
+                  : "软件目录内容尚未核验，当前本地预览不展示产品卡片或产品事实。"
+              }
+            />
+            <p className="mt-6 text-sm font-semibold leading-7 text-[var(--marketing-muted)]">
+              {forceLocale === "en"
+                ? "UNVERIFIED — Software catalog content has not been verified yet."
+                : "UNVERIFIED — 软件目录内容尚未核验。"}
+            </p>
+          </section>
+        </Container>
+      </main>
+    );
+  }
+
   const listing =
     preloadedListing ??
     (await getProductionSoftwareCatalog({
@@ -82,7 +122,6 @@ export async function SoftwarePageShell({
     }));
   if (!listing) notFound();
 
-  const t = getDictionary(forceLocale);
   const breadcrumbSchema = buildBreadcrumbSchema({
     schemaType: "BreadcrumbList",
     items: [

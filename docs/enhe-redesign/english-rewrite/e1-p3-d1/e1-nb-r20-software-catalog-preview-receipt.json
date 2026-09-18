@@ -1,0 +1,201 @@
+{
+  "task_id": "E1-NB-R20",
+  "task_name": "Software Catalog DB-free UNVERIFIED preview parity",
+  "repository_root": "C:\\Users\\HU\\Documents\\New project 2\\.worktrees\\enhe-recovery-baseline",
+  "branch": "codex/enhe-recovery-baseline",
+  "contract_base_head": "7ff8d32b8295b94b40f42e333b15a9272cca9803",
+  "implementation_base_head": "25e91f4a65dc3b6f260307f57fe2a5d4d739b062",
+  "verification_time": "2026-09-18T23:39:18.1180577+08:00",
+  "allowed_files": [
+    "src/app/software/page-shell.tsx",
+    "src/lib/e1-nb-r20-software-catalog-preview.test.tsx",
+    "src/lib/public-content.ts",
+    "docs/enhe-redesign/english-rewrite/e1-p3-d1/e1-nb-r20-software-catalog-preview-receipt.json"
+  ],
+  "scope_expansion": {
+    "status": "APPROVED_BY_OWNER_STANDING_AUTHORIZATION",
+    "file": "src/lib/public-content.ts",
+    "call_chain": "locale software route -> SoftwarePageShell -> getProductionSoftwareCatalog -> getPublicSoftwareCatalogRows -> getCachedPublicSoftwareCatalogRows -> prisma.tool.findMany",
+    "red_evidence": "With DATABASE_URL unset, getPublicSoftwareCatalogRows returned an empty fixture result but called prisma.tool.findMany once.",
+    "change": "Added only a DATABASE_URL empty/unset early return to getCachedPublicSoftwareCatalogRows.",
+    "configured_behavior_preserved": true
+  },
+  "changed_files": [
+    {
+      "path": "src/app/software/page-shell.tsx",
+      "bytes": 6218,
+      "sha256": "9951f643d9e41a0ee0982ab534f3adb959a7c5864489198d0b50746bc0d608d3",
+      "git_state_before_commit": "tracked_modified"
+    },
+    {
+      "path": "src/lib/e1-nb-r20-software-catalog-preview.test.tsx",
+      "bytes": 4798,
+      "sha256": "6d4d1d9659602330f7b3a138add32e887a703322f594e8d4446411b54c9600cd",
+      "git_state_before_commit": "untracked"
+    },
+    {
+      "path": "src/lib/public-content.ts",
+      "bytes": 27587,
+      "sha256": "38e8053efe5ceb59a43aaf19400ccf777f41f8ef3e0552d43c11ea9792a6aa40",
+      "git_state_before_commit": "tracked_modified"
+    },
+    {
+      "path": "docs/enhe-redesign/english-rewrite/e1-p3-d1/e1-nb-r20-software-catalog-preview-receipt.json",
+      "bytes": null,
+      "sha256": null,
+      "git_state_before_commit": "untracked",
+      "self_hash_excluded": true,
+      "final_bytes_and_sha256_reported_externally": true
+    }
+  ],
+  "tdd": {
+    "shared_boundary_red": {
+      "status": "PASS_EXPECTED_RED",
+      "exit_code": 1,
+      "passed": 0,
+      "failed": 1,
+      "failure_reason": "getPublicSoftwareCatalogRows called prisma.tool.findMany once while DATABASE_URL was unset."
+    },
+    "shared_boundary_green": {
+      "status": "PASS",
+      "exit_code": 0,
+      "passed": 1,
+      "failed": 0
+    },
+    "page_behavior_red": {
+      "status": "PASS_EXPECTED_RED",
+      "exit_code": 1,
+      "passed": 4,
+      "failed": 2,
+      "failure_reason": "Both DB-free locale variants emitted the production catalog and product-fact schemas instead of an explicit UNVERIFIED state."
+    },
+    "final_green": {
+      "command": "rtk npx --no-install vitest run src/lib/e1-nb-r20-software-catalog-preview.test.tsx --reporter=verbose",
+      "status": "PASS",
+      "exit_code": 0,
+      "test_files": 1,
+      "passed": 6,
+      "failed": 0
+    }
+  },
+  "focused_regression": {
+    "command": "rtk npx --no-install vitest run src/lib/e1-nb-r20-software-catalog-preview.test.tsx src/app/software/software-production-wiring.test.tsx src/lib/e1-nb-r19-product-paths-preview.test.tsx src/lib/e1-nb-r18-account-services-preview.test.tsx src/lib/e1-nb-r17-skill-learning-preview.test.tsx src/lib/e1-nb-r16-tutorials-preview.test.tsx --reporter=verbose",
+    "status": "PASS",
+    "exit_code": 0,
+    "test_files": 6,
+    "passed": 33,
+    "failed": 0,
+    "intermediate_failure": "The existing static wiring test rejected the internal identifier isDbFreePreview because production source forbids candidate/preview terminology. Renaming it to isDbFreeMode preserved behavior and restored the unchanged legacy test."
+  },
+  "database_boundary_regression": {
+    "command": "rtk npx --no-install vitest run src/lib/settings-db-fallback.test.ts src/lib/public-content-db-fallback.test.ts --reporter=verbose",
+    "status": "PASS",
+    "exit_code": 0,
+    "test_files": 2,
+    "passed": 10,
+    "failed": 0
+  },
+  "eslint": {
+    "command": "rtk npx --no-install eslint src/app/software/page-shell.tsx src/lib/e1-nb-r20-software-catalog-preview.test.tsx src/lib/public-content.ts",
+    "status": "PASS",
+    "exit_code": 0
+  },
+  "typecheck": {
+    "command": "rtk npm run typecheck",
+    "status": "PASS",
+    "exit_code": 0,
+    "note": "The script regenerated the ignored local Prisma client and completed tsc --noEmit without repository file changes."
+  },
+  "localhost": {
+    "status": "PASS",
+    "host": "127.0.0.1",
+    "port": 3220,
+    "database_url": "UNSET",
+    "next_telemetry_disabled": true,
+    "external_network_request_count": 0,
+    "routes": [
+      {
+        "path": "/software",
+        "http_status": 200,
+        "unverified_visible": true,
+        "robots": "noindex, follow",
+        "production_catalog_present": false,
+        "product_grid_present": false,
+        "collection_page_schema_present": false,
+        "item_list_schema_present": false
+      },
+      {
+        "path": "/en/software",
+        "http_status": 200,
+        "unverified_visible": true,
+        "robots": "noindex, follow",
+        "production_catalog_present": false,
+        "product_grid_present": false,
+        "collection_page_schema_present": false,
+        "item_list_schema_present": false
+      }
+    ],
+    "server_stopped": true,
+    "residual_listener_count": 0
+  },
+  "database_and_network": {
+    "DATABASE_URL": "UNSET",
+    "settings_prisma_query_count": 0,
+    "public_content_prisma_query_count": 0,
+    "query_count_evidence": "Focused Prisma-spy tests passed and both DB-free route call chains return before the read boundary.",
+    "successful_database_connection_count": 0,
+    "database_write_count": 0,
+    "migration_count": 0,
+    "external_network_request_count": 0,
+    "ssh": "NOT_RUN",
+    "docker": "NOT_RUN",
+    "deployment": "NOT_RUN",
+    "production_validation": "NOT_RUN"
+  },
+  "configured_database_behavior": {
+    "status": "PRESERVED_BY_FOCUSED_TEST_WITHOUT_REAL_DATABASE_ACCESS",
+    "catalog_fixture_rendered": true,
+    "metadata_forced_noindex": false,
+    "configured_query_executed_once": true,
+    "unknown_error_rethrow_preserved": true,
+    "real_database_access": "NOT_RUN"
+  },
+  "git_before_commit": {
+    "branch": "codex/enhe-recovery-baseline",
+    "head": "25e91f4a65dc3b6f260307f57fe2a5d4d739b062",
+    "tracked_modified": 2,
+    "untracked": 2,
+    "staged": 0,
+    "porcelain_entries": 4,
+    "staged_paths": [],
+    "index_lock_present": false,
+    "git_diff_check": "PASS"
+  },
+  "scope_check": {
+    "status": "PASS",
+    "out_of_scope_changes": 0,
+    "settings_ts_modified": false,
+    "software_components_modified": false,
+    "existing_tests_modified": false,
+    "sitemap_modified": false,
+    "evidence_modified": false,
+    "production_configuration_modified": false,
+    "old_worktree_touched": false
+  },
+  "receipt_self_hash_in_document": false,
+  "receipt_self_hash_policy": "excluded_from_self_hash",
+  "receipt_final_hash_reported_externally": true,
+  "local_acceptance": "PASS",
+  "content_evidence": "UNVERIFIED",
+  "publish_status": "BLOCKED",
+  "push_status": "NOT_PUSHED",
+  "commit_status": "PENDING_AUTHORIZED_COMMIT_GATE",
+  "governance": {
+    "R20_IMPLEMENTATION": "GREEN_FOCUSED",
+    "R20_LOCAL_ACCEPTANCE": "PASS",
+    "R20_CONTENT_EVIDENCE": "UNVERIFIED",
+    "R20_COMMIT_CLOSED": "NO",
+    "PUBLISH_STATUS": "BLOCKED",
+    "PUSH_STATUS": "NOT_PUSHED"
+  }
+}

@@ -211,8 +211,12 @@ const getCachedPublicToolListing = unstable_cache(
 );
 
 const getCachedPublicSoftwareCatalogRows = unstable_cache(
-  async () =>
-    prisma.tool.findMany({
+  async () => {
+    if (!process.env.DATABASE_URL?.trim()) {
+      return [];
+    }
+
+    return prisma.tool.findMany({
         where: publicSoftwareCatalogWhere,
         select: {
           id: true,
@@ -240,7 +244,8 @@ const getCachedPublicSoftwareCatalogRows = unstable_cache(
           { createdAt: "desc" },
           { id: "asc" },
         ],
-    }),
+    });
+  },
   ["public-software-catalog-rows"],
   { revalidate: publicContentRevalidate, tags: ["public-tools"] },
 );
