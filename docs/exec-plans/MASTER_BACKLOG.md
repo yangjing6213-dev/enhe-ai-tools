@@ -3,7 +3,7 @@
 Status: CONTROLLED_RECOVERY
 Worktree: `C:\Users\HU\Documents\New project 2\.worktrees\enhe-recovery-baseline`
 Base HEAD: `26b4f189d0d79d8e885e9f39205aca18bd2d04f1`
-Current development HEAD: `0f304c46abf03ba1b9c6d1e928a7a04661c2f839`
+Current development HEAD: `c35eb6e7ac0094a7e2286baecb16f249f1fa254c`
 
 Operating mode: `AUTONOMOUS_LOCAL_DEVELOPMENT`
 Owner standing authorization: `APPROVED`
@@ -17,7 +17,7 @@ Content evidence: `UNVERIFIED`
 正常开发前的受控恢复阶段。新 recovery worktree 是唯一开发主线；旧 worktree 的 207 项 dirty/untracked 状态保持冻结，不清理、不迁移、不覆盖。
 
 Current local batch: `R23 -> R24 -> R25`
-Batch progress: `1/3`
+Batch progress: `2/3`
 
 ## Completed
 
@@ -73,8 +73,8 @@ Batch progress: `1/3`
 | E1-NB-R21 | COMPLETED_LOCAL_ONLY | Public Search DB-free UNVERIFIED preview parity | `IMPLEMENTATION=GREEN_FOCUSED`; `LOCAL_ACCEPTANCE=PASS`; commit `350ec0a3e0e1edd2b87de6cac391f1f6c197dd76`; content unverified and publication blocked |
 | E1-NB-R22 | COMPLETED_LOCAL_ONLY | AI News Listing DB-free UNVERIFIED preview parity | `IMPLEMENTATION=GREEN_FOCUSED`; `LOCAL_ACCEPTANCE=PASS`; commit `d29e3dd88c0adf8c6c72764f3622572a1da89d7c`; content unverified and publication blocked |
 | E1-NB-R23 | COMPLETED_LOCAL_ONLY | AI Trends DB-free UNVERIFIED preview boundary | `IMPLEMENTATION=GREEN_FOCUSED`; `LOCAL_ACCEPTANCE=PASS`; commit `0f304c46abf03ba1b9c6d1e928a7a04661c2f839`; content unverified and publication blocked |
-| E1-NB-R24 | AUTHORIZED | Bilingual public-shell skip-to-content navigation | Bilingual skip link is first-focusable, targets one content boundary, preserves header/footer order, and passes desktop/mobile a11y checks |
-| E1-NB-R25 | AUTHORIZED_WAITING_FOR_R24 | Replace machine-facing AI News answer labels | Bilingual human-facing labels replace machine-facing copy without changing news facts, JSON-LD, or indexing behavior |
+| E1-NB-R24 | COMPLETED_LOCAL_ONLY | Bilingual public-shell skip-to-content navigation | `IMPLEMENTATION=GREEN_FOCUSED`; `LOCAL_ACCEPTANCE=PASS`; commit `c35eb6e7ac0094a7e2286baecb16f249f1fa254c`; desktop/mobile keyboard and layout acceptance passed; publication remains blocked |
+| E1-NB-R25 | AUTHORIZED | Replace machine-facing AI News answer labels | Bilingual human-facing labels replace machine-facing copy without changing news facts, JSON-LD, or indexing behavior |
 | CONTENT-EVIDENCE-RECONCILIATION | BLOCKED | Reconcile first-party tutorial/content evidence only when an approved source is available | Source bytes/hash and publication approval independently verified |
 | PHASE-2C.6 RELEASE | NOT APPROVED | Production publication/deployment | Separate production, database, deployment and factual-evidence approvals |
 
