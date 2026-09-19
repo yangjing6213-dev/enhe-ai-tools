@@ -3,7 +3,7 @@
 Status: CONTROLLED_RECOVERY
 Worktree: `C:\Users\HU\Documents\New project 2\.worktrees\enhe-recovery-baseline`
 Base HEAD: `26b4f189d0d79d8e885e9f39205aca18bd2d04f1`
-Current development HEAD: `5f7dc711f1288fa1e425f32a81286ba7f037852c`
+Current development HEAD: `467bd6e50f8e8f1ffb5f77bdd39851501f1155e4`
 
 Operating mode: `AUTONOMOUS_LOCAL_DEVELOPMENT`
 Owner standing authorization: `APPROVED`
@@ -16,7 +16,7 @@ Content evidence: `UNVERIFIED`
 
 正常开发前的受控恢复阶段。新 recovery worktree 是唯一开发主线；旧 worktree 的 207 项 dirty/untracked 状态保持冻结，不清理、不迁移、不覆盖。
 
-Current local batch: `R27 -> R28 -> R29`
+Current local batch: `R27 -> R28 -> R29` (completed at `467bd6e50f8e8f1ffb5f77bdd39851501f1155e4`)
 Batch progress: `3/3`
 
 Analytics DB-free investigation: the observed `/api/analytics` 503 is the
