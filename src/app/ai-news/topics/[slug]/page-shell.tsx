@@ -4,6 +4,8 @@ import { notFound } from "next/navigation";
 import { StructuredData } from "@/components/structured-data";
 import { Badge, ButtonLink, Container, SectionTitle } from "@/components/ui";
 import {
+  aiNewsTopicSlugs,
+  getAiNewsTopic,
   getAiNewsTopicCopy,
   getAiNewsTopicPath,
   type AiNewsTopic,
@@ -35,6 +37,10 @@ import {
 export const aiNewsTopicPageRevalidate = 300;
 
 export async function generateAiNewsTopicStaticParams() {
+  if (!process.env.DATABASE_URL?.trim()) {
+    return aiNewsTopicSlugs.map((slug) => ({ slug }));
+  }
+
   const slugs = await getPublicAiNewsTopicSlugs();
   return slugs.map((slug) => ({ slug }));
 }
@@ -43,8 +49,29 @@ export async function generateAiNewsTopicMetadata(
   forceLocale: Locale,
   slug: string,
 ): Promise<Metadata> {
-  const topic = await getPublicAiNewsTopic(slug);
+  const isDbFreePreview = !process.env.DATABASE_URL?.trim();
+  const topic = isDbFreePreview
+    ? getAiNewsTopic(slug)
+    : await getPublicAiNewsTopic(slug);
   const t = getDictionary(forceLocale);
+
+  if (isDbFreePreview) {
+    const metadata = buildPageMetadata({
+      title: t.aiNews.title,
+      description:
+        "UNVERIFIED - AI News topic content is not available in this local preview.",
+      path: `/ai-news/topics/${slug}`,
+      locale: forceLocale === "en" ? "en_US" : "zh_CN",
+      localeKey: forceLocale,
+      languageAlternates: buildAvailableLanguageAlternates(
+        `/ai-news/topics/${slug}`,
+        ["zh", "en"],
+      ),
+    });
+    metadata.robots = { index: false, follow: true };
+    return metadata;
+  }
+
   if (!topic) {
     return buildPageMetadata({
       title: buildMetadataTitle({ pageTitle: t.aiNews.title, brand: t.brand }),
@@ -85,10 +112,38 @@ export async function AiNewsTopicPageShell({
   slug: string;
   forceLocale: Locale;
 }) {
-  const topic = await getPublicAiNewsTopic(slug);
+  const isDbFreePreview = !process.env.DATABASE_URL?.trim();
+  const topic = isDbFreePreview
+    ? getAiNewsTopic(slug)
+    : await getPublicAiNewsTopic(slug);
   if (!topic) notFound();
 
   const t = getDictionary(forceLocale);
+
+  if (isDbFreePreview) {
+    return (
+      <main data-content-status="UNVERIFIED">
+        <Container className="py-14">
+          <section className="glass rounded-[2rem] p-7 md:p-10">
+            <Badge className="text-[var(--marketing-accent)]">
+              {forceLocale === "en"
+                ? "AI News Topic Preview"
+                : "AI News Topic Preview"}
+            </Badge>
+            <h1 className="mt-6 text-4xl font-black leading-tight text-[var(--marketing-text)] md:text-6xl">
+              {t.aiNews.title}
+            </h1>
+            <p className="mt-5 max-w-3xl text-base font-medium leading-8 text-[var(--marketing-muted)] md:text-lg">
+              {forceLocale === "en"
+                ? "UNVERIFIED - Topic content is not available in this local preview yet."
+                : "UNVERIFIED - Topic content is not available in this local preview yet."}
+            </p>
+          </section>
+        </Container>
+      </main>
+    );
+  }
+
   const copy = getAiNewsTopicCopy(topic, forceLocale);
   const relatedCandidates = await getPublicNewsListing({
     q: copy.searchQuery,
