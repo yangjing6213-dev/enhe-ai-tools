@@ -1,21 +1,12 @@
 import { NextResponse } from "next/server";
 import { z } from "zod";
 import {
-  buildAnalyticsEventMetadata,
-  isAnalyticsEventName,
-  isClientWritableAnalyticsEventName,
-  isMissingAnalyticsStorageError,
-  toPrismaJson,
-} from "@/lib/analytics";
-import {
   analyticsClientStringLimits,
   analyticsTrafficMediumValues,
   normalizeAnalyticsPath,
   toSafeAnalyticsHostname,
   toSafeAnalyticsReferrerOrigin,
 } from "@/lib/analytics-client-payload";
-import { getCurrentUser } from "@/lib/auth";
-import { prisma } from "@/lib/db";
 
 export const runtime = "nodejs";
 
@@ -133,7 +124,25 @@ export async function POST(request: Request) {
   const body = await readBoundedJson(request);
   if (body === requestTooLarge) return jsonError("REQUEST_TOO_LARGE", 413);
   const envelope = eventEnvelopeSchema.safeParse(body);
-  if (!envelope.success || !isAnalyticsEventName(envelope.data.eventName)) {
+  if (!envelope.success) {
+    return jsonError("INVALID_REQUEST", 400);
+  }
+
+  if (!process.env.DATABASE_URL?.trim()) {
+    if (!analyticsPayloadSchema.safeParse(body).success) {
+      return jsonError("INVALID_REQUEST", 400);
+    }
+    return new Response(null, { status: 204 });
+  }
+
+  const {
+    buildAnalyticsEventMetadata,
+    isAnalyticsEventName,
+    isClientWritableAnalyticsEventName,
+    isMissingAnalyticsStorageError,
+    toPrismaJson,
+  } = await import("@/lib/analytics");
+  if (!isAnalyticsEventName(envelope.data.eventName)) {
     return jsonError("INVALID_REQUEST", 400);
   }
   if (!isClientWritableAnalyticsEventName(envelope.data.eventName)) {
@@ -145,6 +154,8 @@ export async function POST(request: Request) {
     return jsonError("INVALID_REQUEST", 400);
   }
 
+  const { getCurrentUser } = await import("@/lib/auth");
+  const { prisma } = await import("@/lib/db");
   const user = await getCurrentUser();
   const forwardedFor =
     request.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ?? null;

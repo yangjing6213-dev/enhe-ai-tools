@@ -1,24 +1,33 @@
-import { beforeEach, describe, expect, it, vi } from "vitest";
+import { afterAll, beforeEach, describe, expect, it, vi } from "vitest";
 
-const { createEventMock, getCurrentUserMock } = vi.hoisted(() => ({
+const {
+  authModuleLoadMock,
+  createEventMock,
+  dbModuleLoadMock,
+  getCurrentUserMock,
+} = vi.hoisted(() => ({
+  authModuleLoadMock: vi.fn(),
   createEventMock: vi.fn(),
+  dbModuleLoadMock: vi.fn(),
   getCurrentUserMock: vi.fn(),
 }));
 
-vi.mock("@/lib/auth", () => ({
-  getCurrentUser: () => getCurrentUserMock(),
-}));
+vi.mock("@/lib/auth", () => {
+  authModuleLoadMock();
+  return {
+    getCurrentUser: () => getCurrentUserMock(),
+  };
+});
 
-vi.mock("@/lib/db", () => ({
-  prisma: {
-    analyticsEvent: { create: (input: unknown) => createEventMock(input) },
-  },
-}));
+vi.mock("@/lib/db", () => {
+  dbModuleLoadMock();
+  return {
+    prisma: {
+      analyticsEvent: { create: (input: unknown) => createEventMock(input) },
+    },
+  };
+});
 
-import {
-  analyticsEventNames,
-  clientWritableAnalyticsEventNames,
-} from "@/lib/analytics";
 import { POST } from "./route";
 
 function request(body: unknown, contentType = "application/json") {
@@ -33,16 +42,59 @@ function request(body: unknown, contentType = "application/json") {
   });
 }
 
-const clientEventSet = new Set<string>(clientWritableAnalyticsEventNames);
-const serverOnlyEvents = analyticsEventNames.filter(
-  (eventName) => !clientEventSet.has(eventName),
-);
+const serverOnlyEvents = [
+  "create_order",
+  "payment_proof_submitted",
+  "payment_review_approved",
+  "payment_review_rejected",
+  "order_receipt_submitted",
+  "refund_request_submitted",
+  "seo_audit_submitted",
+  "seo_audit_completed",
+  "seo_audit_failed",
+  "seo_audit_checkout_started",
+  "seo_audit_purchased",
+  "seo_audit_report_downloaded",
+  "seo_audit_recheck_started",
+  "seo_audit_monitoring_purchased",
+  "seo_audit_schedule_enabled",
+  "seo_audit_schedule_paused",
+];
+
+const originalDatabaseUrl = process.env.DATABASE_URL;
 
 describe("POST /api/analytics", () => {
   beforeEach(() => {
+    process.env.DATABASE_URL = "postgresql://analytics-route-test.invalid/db";
     vi.clearAllMocks();
     getCurrentUserMock.mockResolvedValue(null);
     createEventMock.mockResolvedValue({ id: "event-1" });
+  });
+
+  afterAll(() => {
+    if (originalDatabaseUrl === undefined) {
+      delete process.env.DATABASE_URL;
+    } else {
+      process.env.DATABASE_URL = originalDatabaseUrl;
+    }
+  });
+
+  it("returns 204 in DB-free mode without loading or triggering storage/auth", async () => {
+    delete process.env.DATABASE_URL;
+
+    const response = await POST(
+      request({
+        eventName: "seo_audit_landing_view",
+        path: "/online-tools/seo-geo-audit",
+      }),
+    );
+
+    expect(response.status).toBe(204);
+    expect(await response.text()).toBe("");
+    expect(authModuleLoadMock).not.toHaveBeenCalled();
+    expect(dbModuleLoadMock).not.toHaveBeenCalled();
+    expect(getCurrentUserMock).not.toHaveBeenCalled();
+    expect(createEventMock).not.toHaveBeenCalled();
   });
 
   it.each(serverOnlyEvents)(
