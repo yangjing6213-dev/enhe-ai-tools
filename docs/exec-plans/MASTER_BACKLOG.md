@@ -3,7 +3,7 @@
 Status: CONTROLLED_RECOVERY
 Worktree: `C:\Users\HU\Documents\New project 2\.worktrees\enhe-recovery-baseline`
 Base HEAD: `26b4f189d0d79d8e885e9f39205aca18bd2d04f1`
-Current development HEAD: `467bd6e50f8e8f1ffb5f77bdd39851501f1155e4`
+Current development HEAD: `b6bb1c35d571610cd855765e845be27ef9974977`
 
 Operating mode: `AUTONOMOUS_LOCAL_DEVELOPMENT`
 Owner standing authorization: `APPROVED`
@@ -23,6 +23,20 @@ Analytics DB-free investigation: the observed `/api/analytics` 503 is the
 existing fail-closed storage contract. The route explicitly reports a dropped
 event as 503, while the browser sender ignores the response body and handles
 network rejection. `R26` was therefore not created; no analytics code changed.
+
+Latest local wave `NEXT-WAVE-TOPIC-CHECKPOINT-AND-ANALYTICS-DBFREE` is closed at
+`b6bb1c35d571610cd855765e845be27ef9974977`:
+
+- `TOPIC_DBFREE_STATUS=PASS`; commit `1f6600d3b90b5d5260af48fe6e924e75217a1b28`.
+- `ANALYTICS_DBFREE_STATUS=PASS`; commit `b6bb1c35d571610cd855765e845be27ef9974977`.
+- `FULL_BROWSER_ACCEPTANCE=PASS` with known-topic routes 200, unknown-topic 404,
+  `UNVERIFIED`, `noindex, follow`, no topic collection/FAQ schema, and DB-free
+  analytics responses without Prisma initialization errors.
+- `RECEIPT_PATH=C:\Users\HU\.codex\enhe-control\receipts\next-wave-topic-checkpoint-and-analytics-dbfree-final-2026-09-21.json`
+- `RECEIPT_SHA256=6f7c22ac0807371c105dff1b6f631cfb405c8a880122822f48581159d0438cdc`
+- `CONTENT_EVIDENCE=UNVERIFIED`; `PRODUCTION_CHANGED=NO`; `PUBLISH_STATUS=BLOCKED`.
+- `PRODUCT_NEXT_TASK=NONE`; no further standing-authorized local candidate is
+  currently recorded.
 
 ## Completed
 
@@ -83,6 +97,8 @@ network rejection. `R26` was therefore not created; no analytics code changed.
 | E1-NB-R27 | COMPLETED_LOCAL_ONLY | AI Trends human-facing answer labels | `IMPLEMENTATION=GREEN_FOCUSED`; `LOCAL_ACCEPTANCE=PASS`; commit `d186c7f2e74c85c702ce97bd3d4f2a74e8714f47`; trend facts, sources, JSON-LD, metadata, and DB-free behavior unchanged; content unverified and publication blocked |
 | E1-NB-R28 | COMPLETED_LOCAL_ONLY | AI News Topic human-facing answer labels | `IMPLEMENTATION=GREEN_FOCUSED`; `LOCAL_ACCEPTANCE=PASS`; commit `4f546434c01e4fbb9633ec826de1156dbbd844e3`; topic content, facts, JSON-LD, metadata, and indexing unchanged; content unverified and publication blocked |
 | E1-NB-R29 | COMPLETED_LOCAL_ONLY | AI Topic Hub human-facing answer copy | `IMPLEMENTATION=GREEN_FOCUSED`; `LOCAL_ACCEPTANCE=PASS`; commit `5f7dc711f1288fa1e425f32a81286ba7f037852c`; topic data, comparison rows, links, JSON-LD, metadata, and indexing unchanged; content unverified and publication blocked |
+| NEXT-WAVE-TOPIC-DBFREE | COMPLETED_LOCAL_ONLY | AI News topic DB-free preview boundary | `TOPIC_DBFREE_STATUS=PASS`; commit `1f6600d3b90b5d5260af48fe6e924e75217a1b28`; browser routes and content boundary passed; content unverified and publication blocked |
+| NEXT-WAVE-ANALYTICS-DBFREE | COMPLETED_LOCAL_ONLY | Analytics DB-free request boundary | `ANALYTICS_DBFREE_STATUS=PASS`; commit `b6bb1c35d571610cd855765e845be27ef9974977`; unset `DATABASE_URL` uses compatible empty `204`, configured-database behavior preserved; publication blocked |
 | CONTENT-EVIDENCE-RECONCILIATION | BLOCKED | Reconcile first-party tutorial/content evidence only when an approved source is available | Source bytes/hash and publication approval independently verified |
 | PHASE-2C.6 RELEASE | NOT APPROVED | Production publication/deployment | Separate production, database, deployment and factual-evidence approvals |
 
