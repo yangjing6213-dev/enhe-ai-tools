@@ -34,16 +34,6 @@ export function AdminContentShell({
   return <div className={`enhe-admin-content-shell${className ? ` ${className}` : ""}`}>{children}</div>;
 }
 
-export function AdminProvenanceNotice({ title = "首方来源与审批上下文" }: { title?: string }) {
-  return (
-    <aside className="enhe-admin-provenance-note" aria-label={title}>
-      <strong>{title}</strong>
-      <p>发布前必须具备原始字节、逐条来源 URL/日期、哈希和审批上下文。</p>
-      <span>当前状态：UNVERIFIED。没有首方内容包时不自动发布。</span>
-    </aside>
-  );
-}
-
 export const inputClass = "enhe-admin-input w-full rounded-xl border border-white/14 bg-white/7 px-4 py-3 text-sm outline-none placeholder:text-[var(--marketing-muted)]/75 focus:border-[var(--marketing-accent)]";
 export const selectClass = "enhe-admin-input w-full rounded-xl border border-white/14 bg-white/7 px-4 py-3 text-sm outline-none focus:border-[var(--marketing-accent)]";
 export const textareaClass = "enhe-admin-input min-h-28 w-full rounded-xl border border-white/14 bg-white/7 px-4 py-3 text-sm outline-none placeholder:text-[var(--marketing-muted)]/75 focus:border-[var(--marketing-accent)]";
