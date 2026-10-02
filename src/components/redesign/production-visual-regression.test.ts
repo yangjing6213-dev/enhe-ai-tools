@@ -17,7 +17,9 @@ describe("production public shell visual boundary", () => {
 
     expect(chrome).toContain('className="enhe-redesign-production"');
     expect(chrome).not.toContain('<div className="fade-in">{children}</div>');
-    expect(chrome).toMatch(/<EnheRedesignPublicHeader[\s\S]*?\/>\s*\{children\}/);
+    expect(chrome).toMatch(
+      /<EnheRedesignPublicHeader[\s\S]*?\/>\s*<div id="main-content" tabIndex=\{-1\}>\s*\{children\}\s*<\/div>/,
+    );
     expect(globals).toMatch(/\.fade-in\s*\{\s*animation:\s*fade-in\s+0\.45s/);
     expect(shell).toContain(".enhe-redesign-production");
     expect(shell).toContain(".enhe-redesign-production > .fade-in");

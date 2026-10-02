@@ -80,7 +80,7 @@ export function ToolProductImageManager({
               ) : (
                 <div className="absolute inset-0 bg-white/6" />
               )}
-              <span className="absolute left-2 top-2 rounded-full border border-black/20 bg-black/55 px-2.5 py-1 text-xs font-semibold text-white shadow-sm backdrop-blur">
+              <span className="enhe-admin-image-overlay absolute left-2 top-2 rounded-full border border-black/20 px-2.5 py-1 text-xs font-semibold shadow-sm">
                 {positionText}
               </span>
               <div className="absolute right-2 top-2 flex gap-1">
@@ -90,7 +90,7 @@ export function ToolProductImageManager({
                   title={copy.productImageMoveUp}
                   disabled={index === 0}
                   onClick={() => moveImage(index, -1)}
-                  className="grid h-8 w-8 place-items-center rounded-full border border-white/15 bg-black/55 text-white shadow-sm backdrop-blur transition hover:border-[var(--marketing-accent)]/60 hover:text-[var(--marketing-accent)] disabled:pointer-events-none disabled:opacity-35"
+                  className="enhe-admin-image-overlay grid h-8 w-8 place-items-center rounded-full border border-white/15 shadow-sm transition disabled:pointer-events-none disabled:opacity-35"
                 >
                   <ArrowUp size={15} aria-hidden="true" />
                 </button>
@@ -100,7 +100,7 @@ export function ToolProductImageManager({
                   title={copy.productImageMoveDown}
                   disabled={index === images.length - 1}
                   onClick={() => moveImage(index, 1)}
-                  className="grid h-8 w-8 place-items-center rounded-full border border-white/15 bg-black/55 text-white shadow-sm backdrop-blur transition hover:border-[var(--marketing-accent)]/60 hover:text-[var(--marketing-accent)] disabled:pointer-events-none disabled:opacity-35"
+                  className="enhe-admin-image-overlay grid h-8 w-8 place-items-center rounded-full border border-white/15 shadow-sm transition disabled:pointer-events-none disabled:opacity-35"
                 >
                   <ArrowDown size={15} aria-hidden="true" />
                 </button>

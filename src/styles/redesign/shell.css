@@ -463,8 +463,8 @@
 
 .redesign-menu-trigger {
   display: inline-grid;
-  width: 44px;
-  height: 44px;
+  width: 48px;
+  height: 48px;
   place-items: center;
   padding: 0;
   border: 1px solid var(--enhe-border);
@@ -754,7 +754,8 @@
 @media (prefers-reduced-motion: reduce) {
   .enhe-redesign-preview *,
   .redesign-header *,
-  .redesign-footer * {
+  .redesign-footer *,
+  .enhe-contentless-action {
     scroll-behavior: auto;
     transition: none !important;
   }
@@ -769,5 +770,2684 @@
 
   .enhe-redesign-production #customer-support-panel .animate-spin {
     animation: none;
+  }
+}
+
+
+.enhe-contentless-page {
+  min-height: 520px;
+  overflow: hidden;
+  background: var(--enhe-page-bg);
+  color: var(--enhe-text);
+}
+
+/* Shared editorial surface for the public route family. Legacy route
+   components still use marketing utility names; scoping the token bridge to
+   this page marker lets them inherit the approved light canvas without
+   changing their content or data contracts. */
+.enhe-redesign-production .enhe-editorial-page {
+  --marketing-bg: var(--enhe-page-bg);
+  --marketing-bg-soft: var(--enhe-surface);
+  --marketing-bg-warm: var(--enhe-surface);
+  --marketing-text: var(--enhe-text);
+  --marketing-muted: var(--enhe-text-muted);
+  --marketing-soft-text: var(--enhe-text-muted);
+  --marketing-accent: var(--enhe-action);
+  --marketing-card: var(--enhe-surface);
+  --marketing-card-soft: color-mix(in srgb, var(--enhe-surface) 72%, white);
+  --marketing-border: var(--enhe-border);
+  --marketing-border-strong: color-mix(in srgb, var(--enhe-text) 35%, var(--enhe-border));
+  --marketing-shadow: var(--enhe-shadow-panel);
+  min-height: 520px;
+  padding-block: clamp(48px, 8vw, 96px) clamp(64px, 10vw, 128px);
+  color: var(--enhe-text);
+  background: var(--enhe-page-bg);
+}
+
+.enhe-redesign-production .enhe-editorial-page::before {
+  position: absolute;
+  top: clamp(48px, 8vw, 96px);
+  bottom: clamp(64px, 10vw, 128px);
+  left: max(20px, calc((100vw - var(--enhe-content-max)) / 2 - 24px));
+  width: 1px;
+  background: var(--enhe-border);
+  content: "";
+  pointer-events: none;
+}
+
+.enhe-redesign-production .enhe-editorial-page {
+  position: relative;
+}
+
+.enhe-redesign-production .enhe-editorial-page > .mx-auto {
+  padding-top: 0;
+  padding-bottom: 0;
+}
+
+.enhe-redesign-production .enhe-editorial-page :is(.glass, .surface-panel, .surface-panel-soft) {
+  border-color: var(--enhe-border);
+  background-color: var(--enhe-surface);
+  background-image: none;
+  box-shadow: none;
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+}
+
+.enhe-redesign-production .enhe-editorial-page :is(.glass, .surface-panel, .surface-panel-soft) :is(.glass, .surface-panel, .surface-panel-soft) {
+  background-color: color-mix(in srgb, var(--enhe-page-bg) 72%, var(--enhe-surface));
+}
+
+.enhe-redesign-production .enhe-editorial-page :is(.form-control-dark, .form-select-dark) {
+  border-color: var(--enhe-border);
+  border-radius: var(--enhe-button-r);
+  background: var(--enhe-page-bg);
+  color: var(--enhe-text);
+  color-scheme: light;
+}
+
+.enhe-redesign-production .enhe-editorial-page :is(.form-control-dark, .form-select-dark)::placeholder {
+  color: var(--enhe-text-muted);
+}
+
+.enhe-redesign-production .enhe-editorial-page :is(.form-control-dark, .form-select-dark):focus {
+  border-color: var(--enhe-action);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--enhe-focus) 60%, transparent);
+}
+
+.enhe-redesign-production .enhe-editorial-page :is(a, button, summary, input, select, textarea):focus-visible {
+  outline-color: var(--enhe-focus);
+}
+
+.enhe-redesign-production .enhe-editorial-page.public-search-page .public-search-overlay {
+  background: var(--enhe-page-bg);
+  color: var(--enhe-text);
+}
+
+.enhe-redesign-production .enhe-editorial-page.public-search-page .public-search-overlay::before {
+  background: none;
+}
+
+.enhe-redesign-production .enhe-editorial-page.public-search-page .public-search-strands-stage {
+  opacity: 0.16;
+}
+
+.enhe-redesign-production .enhe-editorial-page.public-search-page .public-search-strands-static {
+  background: var(--enhe-surface);
+}
+
+.enhe-redesign-production .enhe-editorial-page.public-search-page .public-search-close {
+  border: 1px solid var(--enhe-border);
+  background: var(--enhe-surface);
+  color: var(--enhe-text);
+}
+
+.enhe-redesign-production .enhe-editorial-page.public-search-page .public-search-close:hover {
+  background: var(--enhe-page-bg);
+  color: var(--enhe-action);
+}
+
+.enhe-redesign-production .enhe-editorial-page.public-search-page .public-search-form::after {
+  background: var(--enhe-border);
+}
+
+.enhe-redesign-production .enhe-editorial-page.public-search-page .public-search-form:focus-within::after {
+  background: var(--enhe-action);
+}
+
+.enhe-redesign-production .enhe-editorial-page.public-search-page .public-search-submit {
+  background: var(--enhe-text);
+  color: var(--enhe-page-bg);
+}
+
+.enhe-redesign-production .enhe-editorial-page.public-search-page .public-search-submit:hover {
+  background: var(--enhe-action);
+  box-shadow: none;
+}
+
+.enhe-redesign-production .enhe-editorial-page.public-search-page .public-search-results,
+.enhe-redesign-production .enhe-editorial-page.public-search-page .public-search-result {
+  border-color: var(--enhe-border);
+}
+
+.enhe-redesign-production .enhe-editorial-page.public-search-page .public-search-result:hover,
+.enhe-redesign-production .enhe-editorial-page.public-search-page .public-search-result:focus-visible {
+  background: var(--enhe-surface);
+}
+
+.enhe-redesign-production .enhe-editorial-page.byox-page {
+  background: var(--enhe-page-bg);
+}
+
+.enhe-redesign-production .enhe-editorial-page.byox-page :is(
+    .byox-stat-card,
+    .byox-project-card,
+    .byox-route-card,
+    .byox-quick-card,
+    .byox-filter-panel,
+    .byox-route-panel,
+    .byox-prompt-card,
+    .byox-support-card
+  ) {
+  border-color: var(--enhe-border);
+  background: var(--enhe-surface);
+  box-shadow: none;
+}
+
+.enhe-redesign-production .enhe-editorial-page.byox-page :is(
+    .byox-primary-link,
+    .byox-copy-button
+  ) {
+  border-color: var(--enhe-action);
+  background: var(--enhe-action);
+  color: var(--enhe-page-bg);
+}
+
+.enhe-redesign-production .enhe-editorial-page.byox-page :is(
+    .byox-secondary-link,
+    .byox-reset-button,
+    .byox-related-links a,
+    .byox-route-card a,
+    .byox-language-chips a
+  ) {
+  border-color: var(--enhe-border);
+  background: var(--enhe-page-bg);
+  color: var(--enhe-text);
+}
+
+.enhe-redesign-production .enhe-editorial-page.byox-page :is(
+    .byox-primary-link,
+    .byox-secondary-link,
+    .byox-reset-button,
+    .byox-copy-button,
+    .byox-related-links a,
+    .byox-route-card a,
+    .byox-language-chips a
+  ):hover {
+  border-color: var(--enhe-action);
+  background: var(--enhe-surface);
+  color: var(--enhe-action);
+}
+
+.enhe-redesign-production .enhe-editorial-page.byox-page :is(
+    .byox-search,
+    .byox-controls select
+  ) {
+  border-color: var(--enhe-border);
+  background: var(--enhe-page-bg);
+  color: var(--enhe-text);
+}
+
+.enhe-redesign-production .enhe-editorial-page.byox-page .byox-search input::placeholder {
+  color: var(--enhe-text-muted);
+}
+
+.enhe-redesign-production .enhe-editorial-page.byox-page .byox-chip-row span {
+  border-color: var(--enhe-border);
+  background: var(--enhe-page-bg);
+  color: var(--enhe-text);
+}
+
+.enhe-redesign-production .enhe-editorial-page.byox-page .byox-project-card-top > span {
+  color: var(--enhe-action-hover);
+}
+
+.enhe-redesign-production .enhe-editorial-page.byox-page .byox-route-outcome,
+.enhe-redesign-production .enhe-editorial-page.byox-page .byox-route-seo-list article,
+.enhe-redesign-production .enhe-editorial-page.byox-page .byox-faq-list article {
+  border-color: var(--enhe-border);
+}
+
+.enhe-redesign-production .enhe-auth-page {
+  display: flex;
+  align-items: center;
+}
+
+@media (prefers-reduced-motion:reduce) {
+  .enhe-redesign-production .enhe-editorial-page *,
+  .enhe-redesign-production .enhe-editorial-page *::before,
+  .enhe-redesign-production .enhe-editorial-page *::after {
+    scroll-behavior: auto !important;
+    transition-duration: 0.01ms !important;
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+  }
+}
+
+@media (width <= 767px) {
+  .enhe-redesign-production .enhe-editorial-page::before {
+    top: 24px;
+    right: 20px;
+    bottom: auto;
+    left: 20px;
+    width: auto;
+    height: 1px;
+  }
+}
+
+@media (forced-colors: active) {
+  .enhe-redesign-production .enhe-editorial-page :is(.glass, .surface-panel, .surface-panel-soft, .form-control-dark, .form-select-dark) {
+    border: 2px solid CanvasText;
+    background: Canvas;
+    color: CanvasText;
+    box-shadow: none;
+  }
+}
+
+/* Typeshare-derived information architecture: quiet canvas, explicit rails,
+   and one accent. This is an ENHE adaptation; no reference assets or copy are
+   used. */
+.enhe-reference-editorial,
+.enhe-reference-workspace {
+  --reference-accent: var(--enhe-reference-brand);
+  --reference-accent-hover: var(--enhe-reference-brand-hover);
+  --reference-canvas: var(--enhe-reference-canvas);
+  --reference-border: var(--enhe-reference-border);
+  --enhe-surface: #ffffff;
+  --marketing-card: #ffffff;
+  --marketing-card-soft: #ffffff;
+  background: var(--reference-canvas);
+  color: var(--enhe-text);
+}
+
+.enhe-reference-editorial .enhe-reference-editorial-container,
+.enhe-reference-workspace .ai-news-workspace-container {
+  width: min(100% - 32px, var(--enhe-reference-content-max));
+  margin-inline: auto;
+}
+
+.enhe-reference-editorial .enhe-reference-editorial-hero,
+.enhe-reference-editorial .enhe-reference-editorial-card,
+.enhe-reference-editorial .enhe-reference-editorial-links,
+.enhe-reference-editorial .enhe-reference-editorial-faq,
+.enhe-reference-workspace .glass,
+.enhe-reference-workspace .surface-panel,
+.enhe-reference-workspace .surface-panel-soft,
+.enhe-reference-workspace .filter-surface {
+  border: 1px solid var(--reference-border);
+  border-radius: 12px;
+  background: #fff;
+  box-shadow: none;
+  backdrop-filter: none;
+}
+
+.enhe-redesign-production .enhe-reference-editorial .enhe-reference-editorial-hero {
+  border-top: 3px solid var(--reference-accent);
+  border-inline: 0;
+  border-bottom: 1px solid var(--reference-border);
+  border-radius: 0 0 12px 12px;
+  background: transparent;
+  padding-block: clamp(32px, 6vw, 72px);
+}
+
+.enhe-redesign-production .enhe-reference-editorial :is(.glass, .surface-panel, .surface-panel-soft, .enhe-reference-editorial-card, .enhe-reference-editorial-links, .enhe-reference-editorial-faq),
+.enhe-redesign-production .enhe-reference-workspace :is(.glass, .surface-panel, .surface-panel-soft, .filter-surface) {
+  background-color: #fff;
+  background-image: none;
+  box-shadow: none;
+}
+
+.enhe-redesign-production .enhe-reference-editorial .enhe-reference-editorial-hero h1 {
+  max-width: 780px;
+  font-size: clamp(2.75rem, 5vw, 3.75rem);
+  font-family: var(--enhe-font-display);
+  font-weight: 700;
+  letter-spacing: -0.025em;
+}
+
+.enhe-reference-editorial .enhe-reference-editorial-hero a {
+  border-color: var(--reference-accent);
+  background: var(--reference-accent);
+  color: #fff;
+  border-radius: 8px;
+}
+
+.enhe-redesign-production .enhe-reference-editorial .enhe-reference-editorial-hero a {
+  border-color: var(--reference-border);
+  background: #fff;
+  color: var(--reference-accent-hover);
+}
+
+.enhe-redesign-production .enhe-reference-editorial .enhe-reference-editorial-hero a:hover {
+  border-color: var(--reference-accent);
+  background: color-mix(in srgb, var(--reference-accent) 7%, #fff);
+  color: var(--reference-accent-hover);
+}
+
+.enhe-reference-editorial .enhe-reference-editorial-hero a:hover {
+  border-color: var(--reference-accent-hover);
+  background: var(--reference-accent-hover);
+}
+
+.enhe-reference-editorial .enhe-reference-editorial-sections {
+  border-top: 1px solid var(--reference-border);
+  padding-top: 32px;
+}
+
+.enhe-reference-editorial .enhe-reference-editorial-card {
+  border-radius: 0;
+  border-width: 0 0 1px;
+  padding: 0 0 24px;
+}
+
+.enhe-reference-editorial .enhe-reference-editorial-links a {
+  border-color: var(--reference-border);
+  border-radius: 8px;
+  background: #fff;
+}
+
+.enhe-reference-editorial .enhe-reference-editorial-links a:hover {
+  border-color: var(--reference-accent);
+  background: color-mix(in srgb, var(--reference-accent) 7%, #fff);
+}
+
+.enhe-reference-workspace .ai-news-workspace-hero {
+  border: 0;
+  border-bottom: 1px solid var(--reference-border);
+  border-radius: 0;
+  padding: 28px 0 32px;
+  background: transparent;
+}
+
+.enhe-redesign-production .enhe-reference-workspace .ai-news-workspace-hero h1 {
+  max-width: 760px;
+  font-size: clamp(2.75rem, 5vw, 3.75rem);
+  font-family: var(--enhe-font-display);
+  font-weight: 700;
+  letter-spacing: -0.025em;
+}
+
+.enhe-reference-workspace .ai-news-workspace-takeaway {
+  border-left: 3px solid var(--reference-accent);
+  border-radius: 0;
+  background: color-mix(in srgb, var(--reference-accent) 6%, #fff);
+}
+
+.enhe-reference-workspace .ai-news-workspace-grid {
+  align-items: start;
+}
+
+.enhe-reference-workspace .ai-news-workspace-grid > div > .section-title,
+.enhe-reference-workspace .ai-news-workspace-grid > div > h2,
+.enhe-reference-workspace .ai-news-workspace-grid > section > h2 {
+  border-bottom: 1px solid var(--reference-border);
+  padding-bottom: 12px;
+}
+
+.enhe-reference-workspace .ai-news-workspace-grid > section {
+  position: sticky;
+  top: calc(var(--enhe-reference-topbar-height) + 16px);
+}
+
+.enhe-reference-workspace .ai-news-workspace-grid .glass,
+.enhe-reference-workspace .ai-news-workspace-grid .surface-panel,
+.enhe-reference-workspace .ai-news-workspace-grid .surface-panel-soft {
+  border-radius: 8px;
+}
+
+.enhe-reference-workspace .ai-news-workspace-grid a:hover {
+  color: var(--reference-accent-hover);
+}
+
+.enhe-reference-workspace .enhe-contentless-container {
+  width: min(100% - 32px, var(--enhe-reference-content-max));
+}
+
+.enhe-reference-workspace.enhe-contentless-page .enhe-contentless-hero {
+  border: 0;
+  border-bottom: 1px solid var(--reference-border);
+  border-radius: 0;
+  background: transparent;
+}
+
+.enhe-redesign-production .enhe-reference-workspace.enhe-contentless-page .enhe-contentless-hero h1 {
+  max-width: 760px;
+  font-size: clamp(2.75rem, 5vw, 3.75rem);
+  font-family: var(--enhe-font-display);
+  font-weight: 700;
+  letter-spacing: -0.025em;
+}
+
+.enhe-reference-workspace.enhe-contentless-page .enhe-contentless-state {
+  border-left: 3px solid var(--reference-accent);
+  border-radius: 0;
+}
+
+.enhe-admin-shell .admin-topbar {
+  min-height: var(--enhe-reference-topbar-height);
+  border-bottom: 1px solid var(--reference-border);
+  background: color-mix(in srgb, var(--enhe-reference-canvas) 92%, transparent);
+  backdrop-filter: blur(12px);
+  position: sticky;
+  top: 0;
+  z-index: var(--enhe-z-header);
+}
+
+.enhe-admin-shell .admin-topbar-inner {
+  width: min(100% - 32px, var(--enhe-reference-app-max));
+  min-height: var(--enhe-reference-topbar-height);
+  margin-inline: auto;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.enhe-admin-shell .admin-topbar-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.enhe-admin-shell .admin-topbar-brand,
+.enhe-admin-shell .admin-topbar-home {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  text-decoration: none;
+}
+
+.enhe-admin-shell .admin-topbar-brand {
+  gap: 10px;
+  color: var(--enhe-text);
+  font-weight: 900;
+  letter-spacing: -0.04em;
+}
+
+.enhe-admin-shell .admin-topbar-brand small {
+  padding: 4px 8px;
+  border-radius: 4px;
+  background: color-mix(in srgb, var(--enhe-reference-brand) 15%, #fff);
+  color: var(--enhe-reference-brand-hover);
+  font-size: 11px;
+  letter-spacing: 0;
+}
+
+.enhe-admin-shell .admin-topbar-home {
+  padding-inline: 12px;
+  border: 1px solid var(--reference-border);
+  border-radius: 8px;
+  color: var(--enhe-text-muted);
+  font-size: var(--enhe-font-size-sm);
+  font-weight: 800;
+}
+
+.enhe-admin-shell .admin-topbar-home:hover {
+  border-color: var(--enhe-reference-brand);
+  color: var(--enhe-reference-brand-hover);
+}
+
+@media (width < 640px) {
+  .enhe-admin-shell .admin-topbar-inner {
+    width: min(100% - 16px, var(--enhe-reference-app-max));
+    gap: 8px;
+  }
+
+  .enhe-admin-shell .admin-topbar-brand {
+    gap: 4px;
+  }
+
+  .enhe-admin-shell .admin-topbar-brand small {
+    padding-inline: 5px;
+  }
+
+  .enhe-admin-shell .admin-topbar-actions {
+    gap: 4px;
+  }
+
+  .enhe-admin-shell .admin-topbar-actions .site-user-chip {
+    display: inline-flex;
+    max-width: 72px;
+    gap: 4px;
+    padding-inline: 6px;
+  }
+
+  .enhe-admin-shell .admin-topbar-actions .site-language-switcher {
+    display: flex;
+    flex: 0 0 auto;
+  }
+
+  .enhe-admin-shell .admin-topbar-home {
+    display: none;
+  }
+}
+
+.enhe-admin-shell .enhe-admin-container {
+  width: min(100% - 32px, var(--enhe-reference-app-max));
+  grid-template-columns: var(--enhe-reference-sidebar-width) minmax(0, 1fr);
+  gap: 32px;
+  padding-block: 32px;
+}
+
+.enhe-admin-shell .admin-sidebar {
+  position: sticky;
+  top: calc(var(--enhe-reference-topbar-height) + 16px);
+  max-height: calc(100vh - var(--enhe-reference-topbar-height) - 32px);
+  overflow-y: auto;
+  border: 0;
+  border-right: 1px solid var(--reference-border);
+  border-radius: 0;
+  background: var(--enhe-reference-sidebar);
+  box-shadow: none;
+}
+
+.enhe-admin-shell .admin-sidebar-title {
+  padding-inline: 0;
+  color: var(--enhe-text);
+}
+
+/* Content-management routes reuse the same quiet workspace as the tool lists. */
+.enhe-admin-shell .enhe-admin-content-management {
+  display: grid;
+  min-width: 0;
+  gap: 24px;
+  color: var(--enhe-text);
+}
+
+.enhe-admin-shell .enhe-admin-content-toolbar {
+  align-items: center;
+  padding-bottom: 20px;
+  border-bottom: 1px solid var(--enhe-border);
+}
+
+.enhe-admin-shell .enhe-admin-content-filters,
+.enhe-admin-shell .enhe-admin-content-form {
+  color: var(--enhe-text);
+}
+
+.enhe-admin-shell .enhe-admin-content-filters {
+  align-items: end;
+  border-color: var(--enhe-border);
+  background: var(--enhe-surface);
+  box-shadow: var(--enhe-shadow-panel);
+}
+
+.enhe-admin-shell :is(.enhe-admin-content-table, .enhe-admin-content-records) {
+  width: 100%;
+  max-width: 100%;
+  border-color: var(--enhe-border);
+  background: var(--enhe-surface);
+  box-shadow: var(--enhe-shadow-panel);
+  overscroll-behavior-inline: contain;
+}
+
+.enhe-admin-shell .enhe-admin-content-table-heading {
+  background: var(--enhe-reference-sidebar);
+  color: var(--enhe-text-muted);
+}
+
+.enhe-admin-shell .enhe-admin-content-record-rows {
+  width: max-content;
+}
+
+.enhe-admin-shell .enhe-admin-content-row {
+  min-height: 72px;
+  align-items: center;
+  border-color: var(--enhe-border);
+  color: var(--enhe-text);
+}
+
+.enhe-admin-shell .enhe-admin-content-row:hover {
+  background: color-mix(in srgb, var(--enhe-action) 6%, var(--enhe-surface));
+}
+
+.enhe-admin-shell .enhe-admin-content-primary-action {
+  display: inline-flex;
+  min-height: 44px;
+  align-items: center;
+  justify-content: center;
+  background: var(--enhe-action);
+  color: #fff;
+  text-decoration: none;
+  transition: background-color 140ms ease, box-shadow 140ms ease;
+}
+
+.enhe-admin-shell .enhe-admin-content-primary-action:hover {
+  background: var(--enhe-action-hover);
+  color: #fff;
+  box-shadow: 0 6px 18px color-mix(in srgb, var(--enhe-action) 22%, transparent);
+}
+
+.enhe-admin-shell .enhe-admin-content-management :is(a, button, input, select, textarea):focus-visible {
+  outline: 3px solid var(--enhe-focus);
+  outline-offset: 2px;
+}
+
+.enhe-admin-shell .enhe-admin-product-demo-editor {
+  min-width: 0;
+  align-items: start;
+}
+
+.enhe-admin-shell :is(.enhe-admin-product-demo-form, .enhe-admin-tutorial-editor-form) {
+  min-width: 0;
+  border: 1px solid var(--enhe-border);
+  background: var(--enhe-surface);
+  box-shadow: var(--enhe-shadow-panel);
+}
+
+.enhe-admin-shell .enhe-admin-product-demo-sidebar {
+  min-width: 0;
+}
+
+.enhe-admin-shell :is(.enhe-admin-product-demo-danger-form, .enhe-admin-tutorial-danger-form) {
+  border: 1px solid color-mix(in srgb, #a33a2b 26%, var(--enhe-border));
+  border-radius: var(--enhe-card-r);
+  background: var(--enhe-surface);
+}
+
+@media (width <= 767px) {
+  .enhe-admin-shell .enhe-admin-content-toolbar {
+    align-items: stretch;
+  }
+
+  .enhe-admin-shell .enhe-admin-content-filters {
+    grid-template-columns: minmax(0, 1fr);
+    padding: 16px;
+  }
+
+  .enhe-admin-shell .enhe-admin-content-table {
+    overflow-x: auto;
+  }
+
+  .enhe-admin-shell :is(.enhe-admin-product-demo-form, .enhe-admin-tutorial-editor-form) {
+    padding: 18px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .enhe-admin-shell .enhe-admin-content-primary-action {
+    transition: none;
+  }
+}
+
+@media (forced-colors: active) {
+  .enhe-admin-shell :is(.enhe-admin-content-table, .enhe-admin-content-filters, .enhe-admin-product-demo-form, .enhe-admin-tutorial-editor-form, .enhe-admin-product-demo-danger-form, .enhe-admin-tutorial-danger-form) {
+    border-color: CanvasText;
+    background: Canvas;
+    color: CanvasText;
+    box-shadow: none;
+  }
+
+  .enhe-admin-shell .enhe-admin-content-primary-action {
+    border: 1px solid ButtonText;
+    background: Highlight;
+    color: HighlightText;
+  }
+}
+
+/* The four tool families share one quiet, light management workspace while
+   keeping their existing server actions and upload controls intact. */
+.enhe-admin-shell .enhe-admin-tool-workflow {
+  align-content: start;
+  min-width: 0;
+  gap: 24px;
+  color: var(--enhe-text);
+}
+
+.enhe-admin-shell .enhe-admin-tool-workflow .enhe-admin-content-toolbar {
+  padding-bottom: 24px;
+}
+
+.enhe-admin-shell .enhe-admin-tool-workflow [class*="text-[#F6FAFF]"] {
+  color: var(--enhe-text) !important;
+}
+
+.enhe-admin-shell .enhe-admin-tool-workflow [class*="text-[#d8f8ff]"] {
+  color: var(--enhe-action) !important;
+}
+
+.enhe-admin-shell .enhe-admin-tool-workflow [class*="text-amber-100"] {
+  color: #744b00 !important;
+}
+
+.enhe-admin-shell .enhe-admin-tool-workflow [class*="bg-white/"] {
+  background-color: var(--enhe-page-bg) !important;
+  background-image: none !important;
+}
+
+.enhe-admin-shell .enhe-admin-tool-workflow [class*="bg-[#0B1220]"],
+.enhe-admin-shell .enhe-admin-tool-workflow [class*="bg-[#07101E]"] {
+  background-color: color-mix(in srgb, var(--enhe-reference-sidebar) 72%, var(--enhe-surface)) !important;
+  background-image: none !important;
+}
+
+.enhe-admin-shell .enhe-admin-tool-workflow :is(a, button) {
+  min-height: 44px;
+  align-items: center;
+}
+
+.enhe-admin-shell .enhe-admin-tool-workflow :is(a, button, input, select, textarea):focus-visible {
+  outline: 3px solid var(--enhe-focus);
+  outline-offset: 2px;
+}
+
+.enhe-admin-shell .enhe-admin-tool-workflow .enhe-admin-tool-filter-form {
+  padding: 16px;
+}
+
+.enhe-admin-shell .enhe-admin-tool-workflow .enhe-admin-tool-table {
+  max-width: 100%;
+  background: var(--enhe-surface);
+}
+
+.enhe-admin-shell .enhe-admin-tool-workflow .enhe-admin-tool-table-heading {
+  background: var(--enhe-reference-sidebar);
+  color: var(--enhe-text-muted) !important;
+}
+
+.enhe-admin-shell .enhe-admin-tool-list-row {
+  border-color: var(--enhe-border);
+  color: var(--enhe-text);
+}
+
+.enhe-admin-shell .enhe-admin-tool-list-row:hover {
+  background: color-mix(in srgb, var(--enhe-action) 6%, var(--enhe-surface));
+}
+
+.enhe-admin-shell .enhe-admin-tool-empty-image {
+  background: linear-gradient(135deg, color-mix(in srgb, var(--enhe-action) 8%, white), var(--enhe-reference-sidebar));
+}
+
+.enhe-admin-shell .enhe-admin-tool-status--draft,
+.enhe-admin-shell .enhe-admin-tool-status--published,
+.enhe-admin-shell .enhe-admin-tool-status--offline,
+.enhe-admin-shell .enhe-admin-tool-status--warning,
+.enhe-admin-shell .enhe-admin-tool-price {
+  display: inline-flex;
+  min-height: 28px;
+  align-items: center;
+  border: 1px solid var(--enhe-border);
+  background: var(--enhe-reference-sidebar);
+  color: var(--enhe-text-muted);
+}
+
+.enhe-admin-shell .enhe-admin-tool-status--published {
+  border-color: color-mix(in srgb, var(--enhe-action) 45%, var(--enhe-border));
+  background: color-mix(in srgb, var(--enhe-action) 9%, white);
+  color: var(--enhe-action-hover);
+}
+
+.enhe-admin-shell .enhe-admin-tool-status--offline,
+.enhe-admin-shell .enhe-admin-tool-status--warning {
+  border-color: color-mix(in srgb, #a66a00 35%, var(--enhe-border));
+  background: #fff7e5;
+  color: #744b00;
+}
+
+.enhe-admin-shell .enhe-admin-tool-price {
+  border-color: color-mix(in srgb, var(--enhe-action) 30%, var(--enhe-border));
+  background: color-mix(in srgb, var(--enhe-action) 8%, white);
+  color: var(--enhe-text);
+}
+
+.enhe-admin-shell .enhe-admin-tool-editor-form {
+  min-width: 0;
+}
+
+.enhe-admin-shell .enhe-admin-tool-workflow .enhe-admin-tool-editor-section {
+  border: 1px solid var(--enhe-border);
+  border-radius: var(--enhe-card-r);
+  background: var(--enhe-surface);
+  box-shadow: none;
+}
+
+.enhe-admin-shell .enhe-admin-tool-danger-form + p {
+  border-color: color-mix(in srgb, #a33a2b 30%, var(--enhe-border));
+  background: #fff2ef;
+  color: #8b2e22;
+}
+
+@media (width <= 767px) {
+  .enhe-admin-shell .enhe-admin-tool-workflow .enhe-admin-tool-filter-form {
+    grid-template-columns: minmax(0, 1fr);
+    padding: 16px;
+  }
+
+  .enhe-admin-shell .enhe-admin-tool-table {
+    overflow-x: auto;
+    overscroll-behavior-inline: contain;
+  }
+
+  .enhe-admin-shell .enhe-admin-tool-workflow .enhe-admin-tool-editor-section {
+    padding: 20px;
+  }
+}
+
+@media (forced-colors: active) {
+  .enhe-admin-shell .enhe-admin-tool-table,
+  .enhe-admin-shell .enhe-admin-tool-editor-section,
+  .enhe-admin-shell .enhe-admin-tool-workflow .enhe-admin-tool-status--draft,
+  .enhe-admin-shell .enhe-admin-tool-workflow .enhe-admin-tool-status--published,
+  .enhe-admin-shell .enhe-admin-tool-workflow .enhe-admin-tool-status--offline,
+  .enhe-admin-shell .enhe-admin-tool-workflow .enhe-admin-tool-status--warning,
+  .enhe-admin-shell .enhe-admin-tool-workflow .enhe-admin-tool-price {
+    border-color: CanvasText;
+    background: Canvas;
+    color: CanvasText;
+    box-shadow: none;
+  }
+}
+
+/* Content workflows share one quiet canvas and keep the first-party evidence
+   boundary visible without changing any form, action, or publication semantics. */
+.enhe-admin-shell .enhe-admin-content-shell {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  min-width: 0;
+  gap: 20px;
+}
+
+.enhe-admin-shell .enhe-admin-content-toolbar {
+  align-items: center;
+  border-bottom: 1px solid var(--reference-border);
+  padding-bottom: 20px;
+}
+
+.enhe-admin-shell .enhe-admin-content-form,
+.enhe-admin-shell .enhe-admin-content-table {
+  border: 1px solid var(--reference-border);
+  border-radius: 8px;
+  background: var(--enhe-reference-canvas);
+  background-image: none;
+  box-shadow: none;
+}
+
+.enhe-admin-shell .enhe-admin-content-form {
+  padding: 20px;
+}
+
+.enhe-admin-shell .enhe-admin-content-table {
+  min-width: 0;
+}
+
+.enhe-admin-shell .enhe-admin-provenance-note {
+  display: grid;
+  gap: 6px;
+  border: 1px solid var(--reference-border);
+  border-left: 3px solid var(--reference-accent);
+  border-radius: 4px;
+  padding: 14px 16px;
+  background: var(--enhe-reference-sidebar);
+  color: var(--enhe-text-muted);
+  font-size: 13px;
+  line-height: 1.6;
+}
+
+.enhe-admin-shell .enhe-admin-provenance-note strong {
+  color: var(--enhe-text);
+  font-size: 14px;
+}
+
+.enhe-admin-shell .enhe-admin-provenance-note p,
+.enhe-admin-shell .enhe-admin-provenance-note span {
+  margin: 0;
+}
+
+@media (width <= 767px) {
+  .enhe-admin-shell .enhe-admin-content-form {
+    padding: 16px;
+  }
+
+  .enhe-admin-shell .enhe-admin-content-table {
+    overflow-x: auto;
+  }
+}
+
+@media (forced-colors: active) {
+  .enhe-admin-shell .enhe-admin-content-form,
+  .enhe-admin-shell .enhe-admin-content-table,
+  .enhe-admin-shell .enhe-admin-provenance-note {
+    border-color: CanvasText;
+    background: Canvas;
+    box-shadow: none;
+  }
+}
+
+.enhe-redesign-production .ai-news-section-shell,
+.enhe-redesign-production .ai-news-section-content {
+  min-width: 0;
+}
+
+.enhe-redesign-production .ai-news-section-nav {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  width: min(100% - 96px, var(--enhe-reference-content-max));
+  margin: 0 auto 24px;
+  border-bottom: 1px solid var(--enhe-border);
+}
+
+.enhe-redesign-production .ai-news-section-nav a {
+  display: inline-flex;
+  min-height: 44px;
+  align-items: center;
+  margin-bottom: -1px;
+  padding-inline: 12px;
+  border-bottom: 2px solid transparent;
+  color: var(--enhe-text-muted);
+  font-size: 13px;
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.enhe-redesign-production .ai-news-section-nav a:hover {
+  background: var(--enhe-surface-elevated);
+  color: var(--enhe-text);
+}
+
+.enhe-redesign-production .ai-news-section-nav a[aria-current="page"],
+.enhe-redesign-production .ai-news-section-nav a[aria-current="location"] {
+  border-bottom-color: var(--enhe-action);
+  color: var(--enhe-text);
+}
+
+.enhe-redesign-production .ai-news-section-nav a:focus-visible {
+  z-index: 1;
+  border-radius: 2px;
+  outline: 3px solid var(--enhe-focus);
+  outline-offset: 2px;
+  box-shadow: 0 0 0 5px var(--enhe-text);
+}
+
+.enhe-redesign-production .ai-news-section-content .ai-news-workspace-container {
+  width: min(100% - 96px, var(--enhe-reference-content-max));
+}
+
+@media (width <= 1023px) {
+  .enhe-redesign-production .ai-news-section-nav {
+    width: min(100% - 64px, var(--enhe-reference-content-max));
+  }
+
+  .enhe-redesign-production .ai-news-section-content .ai-news-workspace-container {
+    width: min(100% - 64px, var(--enhe-reference-content-max));
+  }
+}
+
+@media (width <= 767px) {
+  .enhe-redesign-production .ai-news-section-nav {
+    width: min(100% - 40px, var(--enhe-reference-content-max));
+  }
+
+  .enhe-redesign-production .ai-news-section-content .ai-news-workspace-container {
+    width: min(100% - 40px, var(--enhe-reference-content-max));
+  }
+}
+
+@media (max-width: 1023px) {
+  .enhe-admin-shell .enhe-admin-container {
+    grid-template-columns: 1fr;
+  }
+
+  .enhe-admin-shell .admin-sidebar {
+    position: static;
+    max-height: none;
+    border-right: 0;
+    border-bottom: 1px solid var(--reference-border);
+  }
+}
+
+@media (width <= 767px) {
+  .enhe-reference-editorial .enhe-reference-editorial-container,
+  .enhe-reference-workspace .ai-news-workspace-container,
+  .enhe-reference-workspace .enhe-contentless-container,
+  .enhe-admin-shell .admin-topbar-inner,
+  .enhe-admin-shell .enhe-admin-container {
+    width: min(100% - 16px, var(--enhe-reference-content-max));
+  }
+
+  .enhe-reference-workspace .ai-news-workspace-grid > section {
+    position: static;
+  }
+}
+
+@media (forced-colors: active) {
+  .enhe-redesign-production .ai-news-section-nav {
+    border-color: CanvasText;
+  }
+
+  .enhe-redesign-production .ai-news-section-nav a {
+    color: LinkText;
+  }
+
+  .enhe-redesign-production .ai-news-section-nav a[aria-current="page"],
+  .enhe-redesign-production .ai-news-section-nav a[aria-current="location"] {
+    border-bottom-color: Highlight;
+    color: Highlight;
+  }
+
+  .enhe-redesign-production .ai-news-section-nav a:focus-visible {
+    outline: 3px solid Highlight;
+    box-shadow: none;
+  }
+}
+
+@media (prefers-reduced-motion:reduce) {
+  .enhe-admin-shell .admin-topbar,
+  .enhe-reference-workspace,
+  .enhe-reference-editorial {
+    scroll-behavior: auto;
+  }
+}
+
+.enhe-contentless-container {
+  padding-top: clamp(48px, 8vw, 96px);
+  padding-bottom: clamp(64px, 10vw, 128px);
+}
+
+.enhe-contentless-hero {
+  display: grid;
+  grid-template-columns: minmax(0, 1.4fr) minmax(220px, 0.6fr);
+  gap: clamp(32px, 8vw, 112px);
+  align-items: end;
+  padding-bottom: clamp(32px, 5vw, 56px);
+  border-bottom: 1px solid var(--enhe-border);
+}
+
+.enhe-contentless-hero-copy {
+  max-width: 780px;
+}
+
+.enhe-contentless-eyebrow,
+.enhe-contentless-status-label {
+  margin: 0;
+  color: var(--enhe-action);
+  font-size: 0.72rem;
+  font-weight: 900;
+  letter-spacing: 0.13em;
+  line-height: 1.3;
+  text-transform: uppercase;
+}
+
+.enhe-contentless-hero h1 {
+  max-width: 15ch;
+  margin: 14px 0 0;
+  font-size: clamp(2.65rem, 7vw, 6.5rem);
+  font-weight: 950;
+  letter-spacing: -0.07em;
+  line-height: 0.92;
+  text-wrap: balance;
+}
+
+.enhe-contentless-intro {
+  max-width: 56ch;
+  margin: 24px 0 0;
+  color: var(--enhe-text-muted);
+  font-size: clamp(1rem, 1.6vw, 1.2rem);
+  line-height: 1.75;
+}
+
+.enhe-contentless-rail {
+  min-width: 0;
+  padding: 10px 0 0 24px;
+  border-left: 3px solid var(--enhe-yellow);
+}
+
+.enhe-contentless-rail p,
+.enhe-contentless-state p {
+  max-width: 46ch;
+  margin: 12px 0 0;
+  color: var(--enhe-text-muted);
+  line-height: 1.7;
+}
+
+.enhe-contentless-state {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 32px;
+  align-items: end;
+  margin-top: clamp(32px, 5vw, 64px);
+  padding: clamp(24px, 5vw, 48px);
+  border: 1px solid var(--enhe-border);
+  border-radius: var(--enhe-card-r);
+  background: var(--enhe-surface);
+  box-shadow: var(--enhe-shadow-panel);
+}
+
+.enhe-contentless-state h2 {
+  margin: 16px 0 0;
+  font-size: clamp(1.5rem, 3vw, 2.3rem);
+  font-weight: 900;
+  letter-spacing: -0.045em;
+  line-height: 1.1;
+}
+
+.enhe-contentless-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  justify-content: flex-end;
+}
+
+.enhe-contentless-action {
+  display: inline-flex;
+  min-height: 48px;
+  max-width: 100%;
+  align-items: center;
+  justify-content: center;
+  padding: 0 18px;
+  border: 1px solid var(--enhe-text);
+  border-radius: var(--enhe-button-r);
+  overflow-wrap: anywhere;
+  font-size: 0.9rem;
+  font-weight: 800;
+  line-height: 1.25;
+  text-align: center;
+  transition: background-color 160ms ease, color 160ms ease, border-color 160ms ease;
+}
+
+.enhe-contentless-action:focus-visible {
+  outline: 3px solid var(--enhe-focus);
+  outline-offset: 3px;
+  box-shadow: 0 0 0 2px var(--enhe-text);
+}
+
+.enhe-contentless-action-primary {
+  background: var(--enhe-text);
+  color: var(--enhe-page-bg);
+}
+
+.enhe-contentless-action-primary:hover {
+  border-color: var(--enhe-action);
+  background: var(--enhe-action);
+  color: var(--enhe-page-bg);
+}
+
+.enhe-contentless-action-secondary {
+  background: transparent;
+  color: var(--enhe-text);
+}
+
+.enhe-contentless-action-secondary:hover {
+  border-color: var(--enhe-action);
+  color: var(--enhe-action);
+}
+
+@media (max-width: 720px) {
+  .enhe-contentless-hero,
+  .enhe-contentless-state {
+    grid-template-columns: 1fr;
+  }
+
+  .enhe-contentless-rail {
+    padding: 18px 0 0;
+    border-top: 3px solid var(--enhe-yellow);
+    border-left: 0;
+  }
+
+  .enhe-contentless-actions {
+    justify-content: flex-start;
+  }
+
+  .enhe-contentless-action {
+    flex: 1 1 180px;
+  }
+}
+
+@media (forced-colors: active) {
+  .enhe-contentless-state,
+  .enhe-contentless-action {
+    border: 2px solid CanvasText;
+    box-shadow: none;
+  }
+
+  .enhe-contentless-action-primary {
+    background: ButtonText;
+    color: ButtonFace;
+  }
+}
+
+/* Private admin shell: reuse the locked ENHE light tokens without changing
+   authorization, data actions, or the public navigation contract. */
+.enhe-redesign-production.enhe-admin-shell {
+  --marketing-bg: var(--enhe-page-bg);
+  --marketing-bg-soft: var(--enhe-surface);
+  --marketing-text: var(--enhe-text);
+  --marketing-muted: var(--enhe-text-muted);
+  --marketing-accent: var(--enhe-action);
+  --marketing-accent-strong: var(--enhe-action-hover);
+  min-height: 100vh;
+  background: var(--enhe-page-bg);
+  color: var(--enhe-text);
+}
+
+.enhe-admin-shell .enhe-admin-container {
+  width: min(100%, var(--enhe-content-max));
+}
+
+.enhe-admin-shell .admin-sidebar {
+  border: 1px solid var(--enhe-border);
+  border-radius: var(--enhe-card-r);
+  background: var(--enhe-surface);
+  box-shadow: var(--enhe-shadow-panel);
+}
+
+.enhe-admin-shell .admin-sidebar::after {
+  display: none;
+}
+
+.enhe-admin-shell .admin-sidebar-title,
+.enhe-admin-shell .enhe-admin-title,
+.enhe-admin-shell .enhe-admin-field,
+.enhe-admin-shell .enhe-admin-intro {
+  color: var(--enhe-text);
+}
+
+.enhe-admin-shell .enhe-admin-intro {
+  color: var(--enhe-text-muted);
+}
+
+.enhe-admin-shell .admin-nav {
+  display: grid;
+  gap: 4px;
+  margin-top: 12px;
+}
+
+.enhe-admin-shell .admin-nav-link {
+  min-height: 44px;
+  align-items: center;
+  border: 1px solid transparent;
+  border-radius: var(--enhe-button-r);
+  color: var(--enhe-text-muted);
+  font-family: inherit;
+  font-size: var(--enhe-font-size-sm);
+  font-weight: 800;
+  line-height: 1.3;
+  padding: 10px 12px;
+  text-decoration: none;
+  transition: background-color var(--enhe-motion-fast) var(--enhe-ease-ui-move),
+    border-color var(--enhe-motion-fast) var(--enhe-ease-ui-move),
+    color var(--enhe-motion-fast) var(--enhe-ease-ui-move),
+    transform var(--enhe-motion-fast) var(--enhe-ease-ui-move);
+}
+
+.enhe-admin-shell .admin-nav-link:hover {
+  background: color-mix(in srgb, var(--enhe-action) 10%, var(--enhe-page-bg));
+  border-color: var(--enhe-border);
+  color: var(--enhe-text);
+  transform: translateX(2px);
+}
+
+.enhe-admin-shell .admin-nav-link[aria-current="page"] {
+  background: var(--enhe-action);
+  border-color: var(--enhe-action);
+  color: #fff;
+}
+
+.enhe-admin-shell .admin-nav-link:focus-visible,
+.enhe-admin-shell :is(input, select, textarea, button, a):focus-visible {
+  outline: 3px solid var(--enhe-focus);
+  outline-offset: 3px;
+  box-shadow: 0 0 0 7px var(--enhe-text);
+}
+
+.enhe-admin-shell .enhe-admin-input {
+  border: 1px solid var(--enhe-border);
+  border-radius: var(--enhe-button-r);
+  background: var(--enhe-page-bg);
+  color: var(--enhe-text);
+  min-height: 44px;
+}
+
+.enhe-admin-shell textarea.enhe-admin-input {
+  min-height: 112px;
+}
+
+.enhe-admin-shell .enhe-admin-input::placeholder {
+  color: var(--enhe-text-muted);
+}
+
+.enhe-admin-shell .enhe-admin-input:focus {
+  border-color: var(--enhe-action);
+  box-shadow:
+    0 0 0 3px color-mix(in srgb, var(--enhe-focus) 48%, transparent),
+    0 0 0 7px var(--enhe-text);
+}
+
+@media (max-width: 1023px) {
+  .enhe-admin-shell .enhe-admin-container {
+    grid-template-columns: 1fr;
+  }
+
+  .enhe-admin-shell .admin-nav {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 520px) {
+  .enhe-admin-shell .enhe-admin-container {
+    padding-inline: 16px;
+  }
+
+  .enhe-admin-shell .admin-nav {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (prefers-reduced-motion:reduce) {
+  .enhe-admin-shell .admin-nav-link {
+    transition: none;
+  }
+}
+
+@media (forced-colors: active) {
+  .enhe-admin-shell .admin-sidebar,
+  .enhe-admin-shell .enhe-admin-input,
+  .enhe-admin-shell .admin-nav-link {
+    border: 1px solid CanvasText;
+    box-shadow: none;
+  }
+
+  .enhe-admin-shell .admin-nav-link[aria-current="page"] {
+    background: Highlight;
+    color: HighlightText;
+  }
+}
+
+/* Component-local populated and feedback states in the light admin shell. */
+.enhe-admin-shell .enhe-admin-image-overlay {
+  background-color: var(--enhe-text);
+  color: var(--enhe-page-bg);
+}
+
+.enhe-admin-shell button.enhe-admin-image-overlay:hover:not(:disabled) {
+  background-color: var(--enhe-action-hover);
+}
+
+.enhe-admin-shell .enhe-admin-audit-warning {
+  color: #8b3b13;
+}
+
+.enhe-admin-shell .enhe-admin-file-storage-warning {
+  color: #8b3b13;
+}
+
+.enhe-admin-shell .enhe-admin-translation-success {
+  color: var(--enhe-action-hover);
+}
+
+.enhe-admin-shell .enhe-admin-package-picker:has(input:focus-visible) {
+  outline: 3px solid var(--enhe-focus);
+  outline-offset: 3px;
+}
+
+/* Operations-family compatibility: existing admin pages keep their server
+   markup and action semantics while these legacy utility classes inherit the
+   same light presentation inside the private shell. */
+.enhe-admin-shell .glass,
+.enhe-admin-shell .surface-panel,
+.enhe-admin-shell .surface-panel-soft,
+.enhe-admin-shell .filter-surface,
+.enhe-admin-shell .admin-data-panel {
+  border: 1px solid var(--enhe-border);
+  border-radius: var(--enhe-card-r);
+  background: var(--enhe-surface);
+  background-image: none;
+  box-shadow: var(--enhe-shadow-panel);
+  color: var(--enhe-text);
+}
+
+.enhe-admin-shell .glass::after,
+.enhe-admin-shell .surface-panel::after,
+.enhe-admin-shell .surface-panel-soft::after,
+.enhe-admin-shell .admin-data-panel::after {
+  display: none;
+}
+
+.enhe-admin-shell :is(table, .admin-data-table) {
+  border-collapse: collapse;
+  color: var(--enhe-text);
+}
+
+.enhe-admin-shell :is(table, .admin-data-table) :is(th, td) {
+  border-color: var(--enhe-border);
+}
+
+.enhe-admin-shell :is(table, .admin-data-table) thead {
+  color: var(--enhe-text-muted);
+}
+
+.enhe-admin-shell :is(table, .admin-data-table) tbody tr {
+  border-color: var(--enhe-border);
+}
+
+.enhe-admin-shell [class*="text-[#E8EEF8]"],
+.enhe-admin-shell [class*="text-[#C5D0E2]"],
+.enhe-admin-shell [class*="text-[#8B95A7]"],
+.enhe-admin-shell [class*="text-red-100"],
+.enhe-admin-shell [class*="text-red-200"] {
+  color: var(--enhe-text) !important;
+}
+
+.enhe-admin-shell [class*="text-[#48F5D3]"],
+.enhe-admin-shell [class*="text-[#7AA7FF]"],
+.enhe-admin-shell [class*="text-[#A78BFA]"] {
+  color: var(--enhe-action) !important;
+}
+
+.enhe-admin-shell [class*="text-[#FFB86B]"],
+.enhe-admin-shell [class*="text-red-"] {
+  color: #a33a2b !important;
+}
+
+.enhe-admin-shell [class*="bg-white/"],
+.enhe-admin-shell [class*="bg-black/"] {
+  background-color: var(--enhe-page-bg) !important;
+  background-image: none !important;
+}
+
+.enhe-admin-shell [class*="border-white/"],
+.enhe-admin-shell [class*="divide-white/"] {
+  border-color: var(--enhe-border) !important;
+}
+
+.enhe-admin-shell [class*="bg-gradient-to-r"] {
+  background: var(--enhe-action) !important;
+}
+
+.enhe-admin-shell [class*="hover:text-[#48F5D3]"]:hover {
+  color: var(--enhe-action-hover) !important;
+}
+
+.enhe-admin-shell .admin-table-scroll,
+.enhe-admin-shell :is(.overflow-x-auto, .overflow-auto) {
+  max-width: 100%;
+  overscroll-behavior-inline: contain;
+}
+
+@media (forced-colors: active) {
+  .enhe-admin-shell .glass,
+  .enhe-admin-shell .surface-panel,
+  .enhe-admin-shell .surface-panel-soft,
+  .enhe-admin-shell :is(table, .admin-data-table) :is(th, td) {
+    border-color: CanvasText;
+    background: Canvas;
+    box-shadow: none;
+  }
+}
+
+/* Keep the application geometry authoritative after legacy admin compatibility
+   rules further down this file. */
+.enhe-redesign-production.enhe-admin-shell .enhe-admin-container {
+  width: min(100% - 32px, var(--enhe-reference-app-max));
+  grid-template-columns: var(--enhe-reference-sidebar-width) minmax(0, 1fr);
+  gap: 32px;
+}
+
+.enhe-redesign-production.enhe-admin-shell .admin-main {
+  min-width: 0;
+}
+
+.enhe-redesign-production.enhe-admin-shell .admin-sidebar {
+  position: sticky;
+  top: calc(var(--enhe-reference-topbar-height) + 16px);
+  max-height: calc(100vh - var(--enhe-reference-topbar-height) - 32px);
+  overflow-y: auto;
+  border: 0;
+  border-right: 1px solid var(--reference-border);
+  border-radius: 0;
+  background: var(--enhe-reference-sidebar);
+  box-shadow: none;
+}
+
+@media (max-width: 1023px) {
+  .enhe-redesign-production.enhe-admin-shell .enhe-admin-container {
+    grid-template-columns: 1fr;
+  }
+
+  .enhe-redesign-production.enhe-admin-shell .admin-sidebar {
+    position: static;
+    max-height: none;
+    border-right: 0;
+    border-bottom: 1px solid var(--reference-border);
+  }
+}
+
+@media (width <= 767px) {
+.enhe-redesign-production.enhe-admin-shell .enhe-admin-container {
+    width: min(100% - 16px, var(--enhe-reference-content-max));
+  }
+}
+
+/* Editorial taxonomy stays inside the same responsive admin content canvas. */
+.enhe-admin-shell .enhe-admin-content-management {
+  grid-template-columns: minmax(0, 1fr);
+}
+
+.enhe-admin-shell :is(.enhe-admin-topic-editor-form, .enhe-admin-keyword-create-form) {
+  min-width: 0;
+  border: 1px solid var(--reference-border);
+  border-radius: 8px;
+  background: var(--enhe-reference-canvas);
+  color: var(--enhe-text);
+  box-shadow: none;
+}
+
+.enhe-admin-shell .enhe-admin-topic-editor-form {
+  padding: 20px;
+}
+
+.enhe-admin-shell .enhe-admin-keyword-preview-grid {
+  min-width: 0;
+}
+
+.enhe-admin-shell .enhe-admin-keyword-preview-card,
+.enhe-admin-shell .enhe-admin-keyword-rule-card {
+  min-width: 0;
+  border: 1px solid var(--reference-border);
+  border-radius: 8px;
+  background: var(--enhe-reference-canvas);
+  color: var(--enhe-text);
+  box-shadow: none;
+}
+
+.enhe-admin-shell .enhe-admin-keyword-rule-form {
+  min-width: 0;
+}
+
+.enhe-admin-shell .enhe-admin-keyword-delete-form {
+  border-top: 1px solid var(--reference-border);
+  padding-top: 12px;
+}
+
+@media (width <= 767px) {
+  .enhe-admin-shell .enhe-admin-topic-editor-form {
+    padding: 16px;
+  }
+
+  .enhe-admin-shell .enhe-admin-keyword-preview-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+@media (forced-colors: active) {
+  .enhe-admin-shell :is(.enhe-admin-topic-editor-form, .enhe-admin-keyword-create-form, .enhe-admin-keyword-preview-card, .enhe-admin-keyword-rule-card) {
+    border-color: CanvasText;
+    background: Canvas;
+    color: CanvasText;
+    box-shadow: none;
+  }
+}
+
+/* Reference-aligned surfaces for FAQ, catalog, tag, and release notes. */
+.enhe-admin-shell :is(.enhe-admin-faq-editor-form, .enhe-admin-changelog-editor-form, .enhe-admin-category-create-form, .enhe-admin-tag-create-form) {
+  min-width: 0;
+  border: 1px solid var(--reference-border);
+  border-radius: 8px;
+  background: var(--enhe-reference-canvas);
+  color: var(--enhe-text);
+  box-shadow: none;
+}
+
+.enhe-admin-shell .enhe-admin-content-card-grid {
+  min-width: 0;
+  align-items: start;
+}
+
+.enhe-admin-shell :is(.enhe-admin-category-card, .enhe-admin-tag-card) {
+  min-width: 0;
+  border: 1px solid var(--reference-border);
+  border-radius: 8px;
+  background: var(--enhe-reference-canvas);
+  color: var(--enhe-text);
+  box-shadow: none;
+}
+
+.enhe-admin-shell .enhe-admin-tag-binding-form {
+  min-width: 0;
+}
+
+.enhe-admin-shell :is(.enhe-admin-category-danger-form, .enhe-admin-faq-danger-form) {
+  border-top: 1px solid var(--reference-border);
+  padding-top: 12px;
+}
+
+@media (width <= 767px) {
+  .enhe-admin-shell :is(.enhe-admin-faq-editor-form, .enhe-admin-changelog-editor-form, .enhe-admin-category-create-form, .enhe-admin-tag-create-form) {
+    padding: 16px;
+  }
+
+  .enhe-admin-shell .enhe-admin-content-card-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+@media (forced-colors: active) {
+  .enhe-admin-shell :is(.enhe-admin-faq-editor-form, .enhe-admin-changelog-editor-form, .enhe-admin-category-create-form, .enhe-admin-tag-create-form, .enhe-admin-category-card, .enhe-admin-tag-card) {
+    border-color: CanvasText;
+    background: Canvas;
+    color: CanvasText;
+    box-shadow: none;
+  }
+}
+
+/* Moderation, file, and documentation workspaces keep controls legible and contained. */
+.enhe-admin-shell .enhe-admin-comments,
+.enhe-admin-shell .enhe-admin-files,
+.enhe-admin-shell .enhe-admin-manuals {
+  grid-template-columns: minmax(0, 1fr);
+}
+
+.enhe-admin-shell .enhe-admin-comment-filter-form,
+.enhe-admin-shell .enhe-admin-file-filter-form,
+.enhe-admin-shell .enhe-admin-file-create-form {
+  min-width: 0;
+  border: 1px solid var(--reference-border);
+  border-radius: 8px;
+  background: var(--enhe-reference-canvas);
+  color: var(--enhe-text);
+  box-shadow: none;
+}
+
+.enhe-admin-shell .enhe-admin-comment-card,
+.enhe-admin-shell .enhe-admin-file-card,
+.enhe-admin-shell .enhe-admin-file-upload-panel,
+.enhe-admin-shell .enhe-admin-file-storage-diagnostics,
+.enhe-admin-shell .enhe-admin-manual-card {
+  min-width: 0;
+  border: 1px solid var(--reference-border);
+  border-radius: 8px;
+  background: var(--enhe-reference-canvas);
+  color: var(--enhe-text);
+  box-shadow: none;
+}
+
+.enhe-admin-shell .enhe-admin-comment-actions {
+  align-items: center;
+}
+
+.enhe-admin-shell .enhe-admin-file-editor-form,
+.enhe-admin-shell .enhe-admin-file-danger-form {
+  min-width: 0;
+}
+
+.enhe-admin-shell .enhe-admin-file-danger-form {
+  border-color: var(--reference-border);
+}
+
+.enhe-admin-shell .enhe-admin-manual-grid {
+  min-width: 0;
+  align-items: stretch;
+}
+
+.enhe-admin-shell .enhe-admin-manual-card {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+}
+
+.enhe-admin-shell .enhe-admin-manual-card a {
+  margin-top: auto;
+}
+
+.enhe-admin-shell .enhe-admin-files :is(a, button, input, select, textarea):focus-visible,
+.enhe-admin-shell .enhe-admin-comments :is(a, button, input, select, textarea):focus-visible,
+.enhe-admin-shell .enhe-admin-manuals :is(a, button):focus-visible {
+  outline: 3px solid var(--enhe-focus);
+  outline-offset: 2px;
+}
+
+@media (width <= 767px) {
+  .enhe-admin-shell .enhe-admin-comment-filter-form,
+  .enhe-admin-shell .enhe-admin-file-filter-form,
+  .enhe-admin-shell .enhe-admin-file-create-form,
+  .enhe-admin-shell .enhe-admin-file-card,
+  .enhe-admin-shell .enhe-admin-file-upload-panel,
+  .enhe-admin-shell .enhe-admin-file-storage-diagnostics,
+  .enhe-admin-shell .enhe-admin-manual-card {
+    padding: 16px;
+  }
+
+  .enhe-admin-shell .enhe-admin-comment-actions form {
+    flex: 1 1 140px;
+  }
+
+  .enhe-admin-shell .enhe-admin-file-create-form,
+  .enhe-admin-shell .enhe-admin-file-editor-form {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .enhe-admin-shell .enhe-admin-manual-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .enhe-admin-shell .enhe-admin-manual-card a {
+    transition: none;
+  }
+}
+
+@media (forced-colors: active) {
+  .enhe-admin-shell :is(.enhe-admin-comment-filter-form, .enhe-admin-file-filter-form, .enhe-admin-file-create-form, .enhe-admin-comment-card, .enhe-admin-file-card, .enhe-admin-file-upload-panel, .enhe-admin-file-storage-diagnostics, .enhe-admin-manual-card) {
+    border-color: CanvasText;
+    background: Canvas;
+    color: CanvasText;
+    box-shadow: none;
+  }
+}
+
+/* User administration keeps identity data readable and high-impact controls distinct. */
+.enhe-admin-shell .enhe-admin-users {
+  min-width: 0;
+  grid-template-columns: minmax(0, 1fr);
+  color: var(--enhe-text);
+}
+
+.enhe-admin-shell .enhe-admin-user-filter-form,
+.enhe-admin-shell .enhe-admin-user-summary-card,
+.enhe-admin-shell .enhe-admin-user-profile-form,
+.enhe-admin-shell .enhe-admin-user-reset-form {
+  min-width: 0;
+  border: 1px solid var(--enhe-border);
+  border-radius: var(--enhe-card-r);
+  background: var(--enhe-surface);
+  color: var(--enhe-text);
+  box-shadow: var(--enhe-shadow-panel);
+}
+
+.enhe-admin-shell .enhe-admin-user-filter-form {
+  align-items: end;
+}
+
+.enhe-admin-shell .enhe-admin-user-records {
+  min-width: 0;
+  overflow-x: auto;
+}
+
+.enhe-admin-shell .enhe-admin-user-table-heading {
+  min-width: 920px;
+  border-color: var(--enhe-border);
+  background: var(--enhe-reference-sidebar);
+  color: var(--enhe-text-muted);
+}
+
+.enhe-admin-shell .enhe-admin-user-record-rows {
+  width: max-content;
+}
+
+.enhe-admin-shell .enhe-admin-user-row {
+  min-height: 76px;
+  border-color: var(--enhe-border);
+  color: var(--enhe-text);
+}
+
+.enhe-admin-shell .enhe-admin-user-row:hover {
+  background: color-mix(in srgb, var(--enhe-action) 5%, var(--enhe-surface));
+}
+
+.enhe-admin-shell .enhe-admin-user-primary,
+.enhe-admin-shell .enhe-admin-user-display-name {
+  color: var(--enhe-text);
+}
+
+.enhe-admin-shell .enhe-admin-user-secondary,
+.enhe-admin-shell .enhe-admin-user-contact,
+.enhe-admin-shell .enhe-admin-user-metadata {
+  color: var(--enhe-text-muted);
+}
+
+.enhe-admin-shell .enhe-admin-user-badge,
+.enhe-admin-shell .enhe-admin-user-meta-item {
+  display: inline-flex;
+  min-height: 28px;
+  align-items: center;
+  border: 1px solid var(--enhe-border);
+  border-radius: 999px;
+  background: var(--enhe-reference-sidebar);
+  padding: 4px 10px;
+  color: var(--enhe-text-muted);
+  font-size: 12px;
+  line-height: 1.4;
+}
+
+.enhe-admin-shell .enhe-admin-user-badge.is-active {
+  border-color: color-mix(in srgb, #187b57 26%, var(--enhe-border));
+  background: color-mix(in srgb, #187b57 8%, var(--enhe-surface));
+  color: #166345;
+}
+
+.enhe-admin-shell .enhe-admin-user-badge.is-disabled {
+  border-color: color-mix(in srgb, #a33a2b 24%, var(--enhe-border));
+  background: color-mix(in srgb, #a33a2b 7%, var(--enhe-surface));
+  color: #8a2c23;
+}
+
+.enhe-admin-shell .enhe-admin-user-empty {
+  color: var(--enhe-text-muted);
+}
+
+.enhe-admin-shell .enhe-admin-user-summary-card {
+  padding: 24px;
+}
+
+.enhe-admin-shell .enhe-admin-user-metadata {
+  max-width: 100%;
+  justify-items: end;
+  gap: 8px;
+}
+
+.enhe-admin-shell .enhe-admin-user-meta-item {
+  max-width: 100%;
+  overflow-wrap: anywhere;
+  text-align: right;
+}
+
+.enhe-admin-shell .enhe-admin-user-action-grid,
+.enhe-admin-shell .enhe-admin-user-profile-form,
+.enhe-admin-shell .enhe-admin-user-reset-form {
+  align-items: start;
+}
+
+.enhe-admin-shell .enhe-admin-user-profile-form,
+.enhe-admin-shell .enhe-admin-user-reset-form {
+  padding: 20px;
+}
+
+.enhe-admin-shell .enhe-admin-user-detail .enhe-admin-field > span {
+  color: var(--enhe-text-muted);
+}
+
+.enhe-admin-shell .enhe-admin-user-detail .enhe-admin-input {
+  border-color: var(--enhe-border);
+  background: var(--enhe-reference-canvas);
+  color: var(--enhe-text);
+}
+
+.enhe-admin-shell .enhe-admin-user-detail .enhe-admin-input::placeholder {
+  color: var(--enhe-text-muted);
+}
+
+.enhe-admin-shell .enhe-admin-user-back {
+  min-height: 44px;
+  align-items: center;
+  justify-content: center;
+  border-color: var(--enhe-border);
+  background: var(--enhe-surface);
+  color: var(--enhe-text);
+  text-decoration: none;
+}
+
+.enhe-admin-shell .enhe-admin-user-danger-panel {
+  border-color: color-mix(in srgb, #a33a2b 28%, var(--enhe-border));
+  background: color-mix(in srgb, #a33a2b 5%, var(--enhe-surface));
+  color: #742a22;
+}
+
+.enhe-admin-shell .enhe-admin-user-danger-panel :is(h3, p, label, span) {
+  color: #742a22;
+}
+
+.enhe-admin-shell .enhe-admin-user-state {
+  border-radius: var(--enhe-card-r);
+}
+
+.enhe-admin-shell .enhe-admin-user-state-success {
+  border-color: color-mix(in srgb, #187b57 28%, var(--enhe-border));
+  background: color-mix(in srgb, #187b57 7%, var(--enhe-surface));
+  color: #166345;
+}
+
+.enhe-admin-shell .enhe-admin-user-state-error {
+  border-color: color-mix(in srgb, #a33a2b 28%, var(--enhe-border));
+  background: color-mix(in srgb, #a33a2b 6%, var(--enhe-surface));
+  color: #742a22;
+}
+
+.enhe-admin-shell .enhe-admin-users :is(a, button, input, select):focus-visible {
+  outline: 3px solid var(--enhe-focus);
+  outline-offset: 2px;
+}
+
+@media (width <= 767px) {
+  .enhe-admin-shell .enhe-admin-user-filter-form,
+  .enhe-admin-shell .enhe-admin-user-summary-card,
+  .enhe-admin-shell .enhe-admin-user-profile-form,
+  .enhe-admin-shell .enhe-admin-user-reset-form {
+    padding: 16px;
+  }
+
+  .enhe-admin-shell .enhe-admin-user-filter-form,
+  .enhe-admin-shell .enhe-admin-user-action-grid,
+  .enhe-admin-shell .enhe-admin-user-profile-form {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .enhe-admin-shell .enhe-admin-user-metadata {
+    justify-items: start;
+    text-align: left;
+  }
+
+  .enhe-admin-shell .enhe-admin-user-meta-item {
+    text-align: left;
+  }
+}
+
+@media (forced-colors: active) {
+  .enhe-admin-shell :is(.enhe-admin-user-filter-form, .enhe-admin-user-records, .enhe-admin-user-summary-card, .enhe-admin-user-profile-form, .enhe-admin-user-reset-form, .enhe-admin-user-danger-panel, .enhe-admin-user-meta-item) {
+    border-color: CanvasText;
+    background: Canvas;
+    color: CanvasText;
+    box-shadow: none;
+  }
+
+  .enhe-admin-shell .enhe-admin-user-badge {
+    border-color: CanvasText;
+    color: CanvasText;
+  }
+}
+
+/* Commerce screens separate routine reading from payment and refund decisions. */
+.enhe-admin-shell :is(.enhe-admin-order-list, .enhe-admin-payment-list, .enhe-admin-order-detail, .enhe-admin-payment-detail) {
+  min-width: 0;
+  grid-template-columns: minmax(0, 1fr);
+  color: var(--enhe-text);
+}
+
+.enhe-admin-shell .enhe-admin-order-filter-form,
+.enhe-admin-shell .enhe-admin-commerce-records,
+.enhe-admin-shell .enhe-admin-order-summary-card,
+.enhe-admin-shell .enhe-admin-order-refunds-card,
+.enhe-admin-shell .enhe-admin-payment-summary-card,
+.enhe-admin-shell .enhe-admin-payment-preview {
+  min-width: 0;
+  border: 1px solid var(--enhe-border);
+  border-radius: var(--enhe-card-r);
+  background: var(--enhe-surface);
+  color: var(--enhe-text);
+  box-shadow: var(--enhe-shadow-panel);
+}
+
+.enhe-admin-shell .enhe-admin-order-filter-form {
+  align-items: end;
+}
+
+.enhe-admin-shell .enhe-admin-commerce-records {
+  overflow-x: auto;
+  overscroll-behavior-inline: contain;
+}
+
+.enhe-admin-shell .enhe-admin-commerce-table-heading {
+  min-width: 1120px;
+  border-color: var(--enhe-border);
+  background: var(--enhe-reference-sidebar);
+  color: var(--enhe-text-muted);
+}
+
+.enhe-admin-shell .enhe-admin-commerce-record-rows {
+  width: max-content;
+}
+
+.enhe-admin-shell .enhe-admin-commerce-row {
+  min-height: 72px;
+  border-color: var(--enhe-border);
+  color: var(--enhe-text);
+}
+
+.enhe-admin-shell .enhe-admin-commerce-row:hover {
+  background: color-mix(in srgb, var(--enhe-action) 5%, var(--enhe-surface));
+}
+
+.enhe-admin-shell .enhe-admin-commerce-primary,
+.enhe-admin-shell .enhe-admin-commerce-status {
+  color: var(--enhe-text);
+}
+
+.enhe-admin-shell .enhe-admin-commerce-secondary,
+.enhe-admin-shell .enhe-admin-commerce-empty {
+  color: var(--enhe-text-muted);
+}
+
+.enhe-admin-shell .enhe-admin-commerce-amount {
+  color: #31558c;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+
+.enhe-admin-shell .enhe-admin-commerce-action,
+.enhe-admin-shell .enhe-admin-commerce-back {
+  display: inline-flex;
+  min-height: 40px;
+  align-items: center;
+  justify-content: center;
+  border-color: var(--enhe-border);
+  background: var(--enhe-surface);
+  color: var(--enhe-text);
+  text-decoration: none;
+}
+
+.enhe-admin-shell .enhe-admin-commerce-secondary-link {
+  color: var(--enhe-action);
+}
+
+.enhe-admin-shell .enhe-admin-commerce-info-grid {
+  min-width: 0;
+}
+
+.enhe-admin-shell .enhe-admin-commerce-info-card {
+  min-width: 0;
+  overflow-wrap: anywhere;
+  border-color: var(--enhe-border);
+  border-radius: var(--enhe-card-r);
+  background: var(--enhe-reference-canvas);
+  color: var(--enhe-text);
+}
+
+.enhe-admin-shell .enhe-admin-commerce-info-card p:first-child {
+  color: var(--enhe-text-muted);
+}
+
+.enhe-admin-shell .enhe-admin-commerce-info-card p + p {
+  color: var(--enhe-text);
+}
+
+.enhe-admin-shell .enhe-admin-order-update-form,
+.enhe-admin-shell .enhe-admin-order-refund-form,
+.enhe-admin-shell .enhe-admin-order-refund-process-form,
+.enhe-admin-shell .enhe-admin-payment-review-form {
+  min-width: 0;
+  border-color: var(--enhe-border);
+}
+
+.enhe-admin-shell :is(.enhe-admin-order-detail, .enhe-admin-payment-detail) .enhe-admin-field > span {
+  color: var(--enhe-text-muted);
+}
+
+.enhe-admin-shell :is(.enhe-admin-order-detail, .enhe-admin-payment-detail) .enhe-admin-input {
+  border-color: var(--enhe-border);
+  background: var(--enhe-reference-canvas);
+  color: var(--enhe-text);
+}
+
+.enhe-admin-shell :is(.enhe-admin-order-detail, .enhe-admin-payment-detail) .enhe-admin-input::placeholder {
+  color: var(--enhe-text-muted);
+}
+
+.enhe-admin-shell .enhe-admin-order-refund-record {
+  min-width: 0;
+  border-color: var(--enhe-border);
+  background: var(--enhe-reference-canvas);
+  color: var(--enhe-text-muted);
+}
+
+.enhe-admin-shell .enhe-admin-order-refund-record .font-semibold {
+  color: var(--enhe-text);
+}
+
+.enhe-admin-shell .enhe-admin-order-danger-panel {
+  border: 1px solid color-mix(in srgb, #a33a2b 28%, var(--enhe-border));
+  border-radius: var(--enhe-card-r);
+  background: color-mix(in srgb, #a33a2b 5%, var(--enhe-surface));
+  color: #742a22;
+}
+
+.enhe-admin-shell .enhe-admin-order-danger-panel p {
+  color: #742a22;
+  overflow-wrap: anywhere;
+}
+
+.enhe-admin-shell .enhe-admin-commerce-state {
+  border-radius: var(--enhe-card-r);
+}
+
+.enhe-admin-shell .enhe-admin-commerce-state-warning {
+  border-color: color-mix(in srgb, #91600f 28%, var(--enhe-border));
+  background: color-mix(in srgb, #91600f 7%, var(--enhe-surface));
+  color: #704808;
+}
+
+.enhe-admin-shell .enhe-admin-commerce-state-success {
+  border-color: color-mix(in srgb, #187b57 28%, var(--enhe-border));
+  background: color-mix(in srgb, #187b57 7%, var(--enhe-surface));
+  color: #166345;
+}
+
+.enhe-admin-shell .enhe-admin-commerce-state-error {
+  border-color: color-mix(in srgb, #a33a2b 28%, var(--enhe-border));
+  background: color-mix(in srgb, #a33a2b 6%, var(--enhe-surface));
+  color: #742a22;
+}
+
+.enhe-admin-shell :is(.enhe-admin-order-list, .enhe-admin-payment-list, .enhe-admin-order-detail, .enhe-admin-payment-detail) :is(a, button, input, select, textarea):focus-visible {
+  outline: 3px solid var(--enhe-focus);
+  outline-offset: 2px;
+}
+
+@media (width <= 767px) {
+  .enhe-admin-shell .enhe-admin-order-filter-form {
+    grid-template-columns: minmax(0, 1fr);
+    padding: 16px;
+  }
+
+  .enhe-admin-shell :is(.enhe-admin-order-summary-card, .enhe-admin-order-refunds-card, .enhe-admin-payment-summary-card) {
+    padding: 16px;
+  }
+
+  .enhe-admin-shell .enhe-admin-commerce-info-grid,
+  .enhe-admin-shell .enhe-admin-order-update-form,
+  .enhe-admin-shell .enhe-admin-order-refund-form,
+  .enhe-admin-shell .enhe-admin-order-refund-process-form,
+  .enhe-admin-shell .enhe-admin-payment-review-form {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .enhe-admin-shell .enhe-admin-commerce-toolbar {
+    align-items: stretch;
+  }
+
+  .enhe-admin-shell .enhe-admin-commerce-back {
+    flex: 1 1 160px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .enhe-admin-shell .enhe-admin-commerce-action {
+    transition: none;
+  }
+}
+
+@media (forced-colors: active) {
+  .enhe-admin-shell :is(.enhe-admin-order-filter-form, .enhe-admin-commerce-records, .enhe-admin-order-summary-card, .enhe-admin-order-refunds-card, .enhe-admin-payment-summary-card, .enhe-admin-payment-preview, .enhe-admin-order-danger-panel, .enhe-admin-commerce-info-card) {
+    border-color: CanvasText;
+    background: Canvas;
+    color: CanvasText;
+    box-shadow: none;
+  }
+
+  .enhe-admin-shell .enhe-admin-commerce-action {
+    border-color: CanvasText;
+    color: CanvasText;
+  }
+}
+
+/* Refund decisions and configuration tools share the light admin content surfaces. */
+.enhe-admin-shell :is(.enhe-admin-refund-filter-form, .enhe-admin-refund-records, .enhe-admin-refund-summary-card, .enhe-admin-refund-action-form, .enhe-admin-payment-codes-form, .enhe-admin-payment-code-editor, .enhe-admin-license-generator-form, .enhe-admin-license-generator-output) {
+  min-width: 0;
+  border: 1px solid var(--enhe-border);
+  border-radius: var(--enhe-card-r);
+  background: var(--enhe-surface);
+  color: var(--enhe-text);
+  box-shadow: var(--enhe-shadow-panel);
+}
+
+.enhe-admin-shell :is(.enhe-admin-refund-list, .enhe-admin-refund-detail, .enhe-admin-payment-codes, .enhe-admin-license-generator, .enhe-admin-license-generator-panel) {
+  min-width: 0;
+  color: var(--enhe-text);
+}
+
+.enhe-admin-shell .enhe-admin-refund-filter-form {
+  align-items: end;
+  padding: 20px;
+}
+
+.enhe-admin-shell .enhe-admin-refund-list-summary {
+  color: var(--enhe-text-muted);
+}
+
+.enhe-admin-shell .enhe-admin-refund-records {
+  overflow-x: auto;
+  overscroll-behavior-inline: contain;
+}
+
+.enhe-admin-shell .enhe-admin-refund-table-heading {
+  border-color: var(--enhe-border);
+  background: var(--enhe-reference-sidebar);
+  color: var(--enhe-text-muted);
+}
+
+.enhe-admin-shell .enhe-admin-refund-record-rows {
+  width: max-content;
+}
+
+.enhe-admin-shell .enhe-admin-refund-row {
+  min-height: 68px;
+  border-color: var(--enhe-border);
+  color: var(--enhe-text-muted);
+}
+
+.enhe-admin-shell .enhe-admin-refund-row:hover {
+  background: color-mix(in srgb, var(--enhe-action) 5%, var(--enhe-surface));
+}
+
+.enhe-admin-shell .enhe-admin-refund-primary,
+.enhe-admin-shell .enhe-admin-refund-toolbar a {
+  color: var(--enhe-action);
+}
+
+.enhe-admin-shell .enhe-admin-refund-empty {
+  color: var(--enhe-text-muted);
+}
+
+.enhe-admin-shell .enhe-admin-refund-toolbar a,
+.enhe-admin-shell .enhe-admin-payment-codes :is(input, button),
+.enhe-admin-shell .enhe-admin-license-generator :is(button, select, input, textarea) {
+  border-color: var(--enhe-border);
+}
+
+.enhe-admin-shell .enhe-admin-refund-summary-card {
+  padding: 24px;
+}
+
+.enhe-admin-shell .enhe-admin-refund-info-card {
+  min-width: 0;
+  overflow-wrap: anywhere;
+  border-color: var(--enhe-border);
+  border-radius: var(--enhe-card-r);
+  background: var(--enhe-reference-canvas);
+  color: var(--enhe-text);
+}
+
+.enhe-admin-shell .enhe-admin-refund-info-card p:first-child {
+  color: var(--enhe-text-muted);
+}
+
+.enhe-admin-shell .enhe-admin-refund-info-card p + p {
+  color: var(--enhe-text);
+}
+
+.enhe-admin-shell .enhe-admin-refund-entitlement-warning {
+  border-color: color-mix(in srgb, #91600f 28%, var(--enhe-border));
+  background: color-mix(in srgb, #91600f 7%, var(--enhe-surface));
+  color: #704808;
+}
+
+.enhe-admin-shell .enhe-admin-refund-entitlement-warning p:first-child {
+  color: #704808;
+}
+
+.enhe-admin-shell .enhe-admin-refund-action-form,
+.enhe-admin-shell .enhe-admin-refund-action-panel {
+  min-width: 0;
+  border-color: var(--enhe-border);
+  color: var(--enhe-text);
+}
+
+.enhe-admin-shell .enhe-admin-refund-action-form {
+  padding: 20px;
+}
+
+.enhe-admin-shell .enhe-admin-refund-detail .enhe-admin-field > span,
+.enhe-admin-shell .enhe-admin-payment-codes .enhe-admin-field > span,
+.enhe-admin-shell .enhe-admin-license-generator label > span {
+  color: var(--enhe-text-muted);
+}
+
+.enhe-admin-shell :is(.enhe-admin-refund-detail, .enhe-admin-payment-codes, .enhe-admin-license-generator) .enhe-admin-input {
+  border-color: var(--enhe-border);
+  background: var(--enhe-reference-canvas);
+  color: var(--enhe-text);
+}
+
+.enhe-admin-shell :is(.enhe-admin-refund-detail, .enhe-admin-payment-codes, .enhe-admin-license-generator) .enhe-admin-input::placeholder {
+  color: var(--enhe-text-muted);
+}
+
+.enhe-admin-shell .enhe-admin-refund-detail .status-warning {
+  border-color: color-mix(in srgb, #91600f 28%, var(--enhe-border));
+  background: color-mix(in srgb, #91600f 7%, var(--enhe-surface));
+  color: #704808;
+}
+
+.enhe-admin-shell .enhe-admin-payment-codes-form,
+.enhe-admin-shell .enhe-admin-license-generator-form,
+.enhe-admin-shell .enhe-admin-license-generator-output {
+  padding: 24px;
+}
+
+.enhe-admin-shell .enhe-admin-payment-code-editor {
+  padding: 20px;
+  background: var(--enhe-reference-canvas);
+  box-shadow: none;
+}
+
+.enhe-admin-shell .enhe-admin-payment-code-editor h2,
+.enhe-admin-shell .enhe-admin-license-generator-output h2 {
+  color: var(--enhe-text);
+}
+
+.enhe-admin-shell .enhe-admin-payment-code-preview {
+  border-color: var(--enhe-border);
+  background: var(--enhe-surface);
+  color: var(--enhe-text-muted);
+}
+
+.enhe-admin-shell .enhe-admin-payment-codes-hint {
+  border-color: color-mix(in srgb, #91600f 28%, var(--enhe-border));
+  background: color-mix(in srgb, #91600f 7%, var(--enhe-surface));
+  color: #704808;
+}
+
+.enhe-admin-shell .enhe-admin-payment-codes-form button[type="submit"] {
+  border-color: var(--enhe-action);
+  background: var(--enhe-action);
+  color: #fff;
+}
+
+.enhe-admin-shell .enhe-admin-payment-codes-notice {
+  border-color: color-mix(in srgb, #187b57 28%, var(--enhe-border));
+  background: color-mix(in srgb, #187b57 7%, var(--enhe-surface));
+  color: #166345;
+}
+
+.enhe-admin-shell .enhe-admin-payment-codes-error {
+  border-color: color-mix(in srgb, #a33a2b 28%, var(--enhe-border));
+  background: color-mix(in srgb, #a33a2b 6%, var(--enhe-surface));
+  color: #742a22;
+}
+
+.enhe-admin-shell .enhe-admin-license-generator-form > p,
+.enhe-admin-shell .enhe-admin-license-generator-output > div > div + p,
+.enhe-admin-shell .enhe-admin-license-generator-output > div > div p {
+  color: var(--enhe-text-muted);
+}
+
+.enhe-admin-shell .enhe-admin-license-generator-output textarea {
+  min-height: 260px;
+  border-color: var(--enhe-border);
+  background: var(--enhe-reference-canvas);
+  color: var(--enhe-text);
+}
+
+.enhe-admin-shell .enhe-admin-license-generator-output button[type="button"] {
+  border: 1px solid var(--enhe-border);
+  background: var(--enhe-surface);
+  color: var(--enhe-action);
+}
+
+.enhe-admin-shell .enhe-admin-license-generator-form button[type="button"] {
+  border: 1px solid var(--enhe-border);
+  background: var(--enhe-surface);
+  color: var(--enhe-action);
+  white-space: nowrap;
+}
+
+.enhe-admin-shell .enhe-admin-license-generator-status.is-success {
+  border-color: color-mix(in srgb, #187b57 28%, var(--enhe-border));
+  background: color-mix(in srgb, #187b57 7%, var(--enhe-surface));
+  color: #166345;
+}
+
+.enhe-admin-shell .enhe-admin-license-generator-status.is-error {
+  border-color: color-mix(in srgb, #a33a2b 28%, var(--enhe-border));
+  background: color-mix(in srgb, #a33a2b 6%, var(--enhe-surface));
+  color: #742a22;
+}
+
+.enhe-admin-shell :is(.enhe-admin-refund-list, .enhe-admin-refund-detail, .enhe-admin-payment-codes, .enhe-admin-license-generator) :is(a, button, input, select, textarea):focus-visible {
+  outline: 3px solid var(--enhe-focus);
+  outline-offset: 2px;
+}
+
+@media (width <= 767px) {
+  .enhe-admin-shell :is(.enhe-admin-refund-filter-form, .enhe-admin-refund-summary-card, .enhe-admin-refund-action-form, .enhe-admin-payment-codes-form, .enhe-admin-payment-code-editor, .enhe-admin-license-generator-form, .enhe-admin-license-generator-output) {
+    padding: 16px;
+  }
+
+  .enhe-admin-shell :is(.enhe-admin-refund-filter-form, .enhe-admin-refund-order-facts, .enhe-admin-refund-payment-facts, .enhe-admin-refund-facts, .enhe-admin-refund-action-form, .enhe-admin-payment-code-editor, .enhe-admin-license-generator-panel) {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+@media (forced-colors: active) {
+  .enhe-admin-shell :is(.enhe-admin-refund-filter-form, .enhe-admin-refund-records, .enhe-admin-refund-summary-card, .enhe-admin-refund-info-card, .enhe-admin-refund-action-form, .enhe-admin-payment-codes-form, .enhe-admin-payment-code-editor, .enhe-admin-license-generator-form, .enhe-admin-license-generator-output) {
+    border-color: CanvasText;
+    background: Canvas;
+    color: CanvasText;
+    box-shadow: none;
+  }
+}
+
+.enhe-admin-shell .enhe-admin-settings {
+  display: grid;
+  min-width: 0;
+  gap: 24px;
+  color: var(--enhe-text);
+}
+
+.enhe-admin-shell :is(.enhe-admin-settings-create-card, .enhe-admin-setting-card) {
+  min-width: 0;
+  border: 1px solid var(--enhe-border);
+  border-radius: var(--enhe-card-r);
+  background: var(--enhe-surface);
+  box-shadow: var(--enhe-shadow-panel);
+}
+
+.enhe-admin-shell .enhe-admin-settings-create-card {
+  padding: 24px;
+}
+
+.enhe-admin-shell .enhe-admin-settings-section-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 20px;
+}
+
+.enhe-admin-shell .enhe-admin-settings-section-heading h2 {
+  margin: 0;
+  color: var(--enhe-text);
+  font-size: 18px;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+}
+
+.enhe-admin-shell .enhe-admin-settings-eyebrow {
+  margin: 0 0 4px;
+  color: var(--enhe-action);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.enhe-admin-shell .enhe-admin-settings-create-form,
+.enhe-admin-shell .enhe-admin-setting-form {
+  display: grid;
+  min-width: 0;
+  gap: 16px;
+}
+
+.enhe-admin-shell .enhe-admin-settings-create-form .enhe-admin-field,
+.enhe-admin-shell .enhe-admin-setting-form .enhe-admin-field {
+  min-width: 0;
+}
+
+.enhe-admin-shell .enhe-admin-settings .enhe-admin-field > span {
+  color: var(--enhe-text-muted);
+}
+
+.enhe-admin-shell .enhe-admin-settings .enhe-admin-input {
+  border-color: var(--enhe-border);
+  background: var(--enhe-reference-canvas);
+  color: var(--enhe-text);
+}
+
+.enhe-admin-shell .enhe-admin-settings .enhe-admin-input::placeholder {
+  color: var(--enhe-text-muted);
+}
+
+.enhe-admin-shell .enhe-admin-settings-create-form textarea {
+  min-height: 160px;
+}
+
+.enhe-admin-shell .enhe-admin-settings-list-section {
+  min-width: 0;
+}
+
+.enhe-admin-shell .enhe-admin-settings-count {
+  display: inline-flex;
+  min-height: 30px;
+  align-items: center;
+  border: 1px solid var(--enhe-border);
+  border-radius: 999px;
+  background: var(--enhe-reference-sidebar);
+  padding: 4px 12px;
+  color: var(--enhe-text-muted);
+  font-size: 12px;
+  font-weight: 650;
+}
+
+.enhe-admin-shell .enhe-admin-settings-list {
+  display: grid;
+  min-width: 0;
+  gap: 16px;
+}
+
+.enhe-admin-shell .enhe-admin-setting-card {
+  padding: 22px;
+}
+
+.enhe-admin-shell .enhe-admin-setting-heading {
+  display: grid;
+  min-width: 0;
+  gap: 6px;
+  margin-bottom: 4px;
+}
+
+.enhe-admin-shell .enhe-admin-setting-heading span {
+  color: var(--enhe-text-muted);
+  font-size: 12px;
+}
+
+.enhe-admin-shell .enhe-admin-setting-heading code {
+  width: fit-content;
+  max-width: 100%;
+  overflow-wrap: anywhere;
+  border: 1px solid var(--enhe-border);
+  border-radius: 8px;
+  background: var(--enhe-reference-sidebar);
+  padding: 6px 9px;
+  color: var(--enhe-text);
+  font-size: 13px;
+}
+
+.enhe-admin-shell .enhe-admin-setting-form textarea {
+  min-height: 180px;
+}
+
+.enhe-admin-shell .enhe-admin-settings-empty {
+  margin: 0;
+  border: 1px dashed var(--enhe-border);
+  border-radius: var(--enhe-card-r);
+  background: var(--enhe-reference-canvas);
+  padding: 28px 20px;
+  color: var(--enhe-text-muted);
+  text-align: center;
+}
+
+.enhe-admin-shell .enhe-admin-settings :is(a, button, input, textarea):focus-visible {
+  outline: 3px solid var(--enhe-focus);
+  outline-offset: 2px;
+}
+
+@media (width <= 767px) {
+  .enhe-admin-shell :is(.enhe-admin-settings-create-card, .enhe-admin-setting-card) {
+    padding: 16px;
+  }
+
+  .enhe-admin-shell .enhe-admin-settings-section-heading {
+    align-items: flex-start;
+  }
+}
+
+@media (forced-colors: active) {
+  .enhe-admin-shell :is(.enhe-admin-settings-create-card, .enhe-admin-setting-card, .enhe-admin-settings-count, .enhe-admin-settings-empty, .enhe-admin-setting-heading code) {
+    border-color: CanvasText;
+    background: Canvas;
+    color: CanvasText;
+    box-shadow: none;
+  }
+}
+
+.enhe-admin-shell .enhe-admin-plans {
+  min-width: 0;
+  color: var(--enhe-text);
+}
+
+.enhe-admin-shell .enhe-admin-plans-disabled-card {
+  display: flex;
+  min-width: 0;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+  border: 1px solid var(--enhe-border);
+  border-radius: var(--enhe-card-r);
+  background: var(--enhe-surface);
+  padding: 24px;
+  box-shadow: var(--enhe-shadow-panel);
+}
+
+.enhe-admin-shell .enhe-admin-plans-status {
+  display: grid;
+  gap: 6px;
+}
+
+.enhe-admin-shell .enhe-admin-plans-status > span {
+  color: var(--enhe-text-muted);
+  font-size: 12px;
+}
+
+.enhe-admin-shell .enhe-admin-plans-status > strong {
+  width: fit-content;
+  border: 1px solid var(--enhe-border);
+  border-radius: 999px;
+  background: var(--enhe-reference-sidebar);
+  padding: 5px 12px;
+  color: var(--enhe-text-muted);
+  font-size: 13px;
+}
+
+.enhe-admin-shell .enhe-admin-plans-cta {
+  display: inline-flex;
+  min-height: 44px;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  border: 1px solid var(--enhe-action);
+  border-radius: 999px;
+  background: var(--enhe-action);
+  padding: 10px 18px;
+  color: #fff;
+  font-size: 14px;
+  font-weight: 650;
+  text-decoration: none;
+  transition: background-color 160ms ease, transform 160ms ease;
+}
+
+.enhe-admin-shell .enhe-admin-plans-cta:hover {
+  background: color-mix(in srgb, var(--enhe-action) 88%, #000);
+  transform: translateY(-1px);
+}
+
+.enhe-admin-shell .enhe-admin-plans :is(a, button):focus-visible {
+  outline: 3px solid var(--enhe-focus);
+  outline-offset: 2px;
+}
+
+@media (width <= 767px) {
+  .enhe-admin-shell .enhe-admin-plans-disabled-card {
+    align-items: stretch;
+    flex-direction: column;
+    padding: 16px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .enhe-admin-shell .enhe-admin-plans-cta {
+    transition: none;
+  }
+}
+
+@media (forced-colors: active) {
+  .enhe-admin-shell .enhe-admin-plans-disabled-card {
+    border-color: CanvasText;
+    background: Canvas;
+    color: CanvasText;
+    box-shadow: none;
+  }
+
+  .enhe-admin-shell .enhe-admin-plans-cta {
+    border-color: ButtonText;
+    background: ButtonFace;
+    color: ButtonText;
   }
 }

@@ -57,9 +57,12 @@
 }
 
 .redesign-software-category-trigger,
-.redesign-software-category-button,
 .redesign-software-load-more-button,
 .redesign-software-next-link {
+  min-height: 48px;
+}
+
+.redesign-software-category-button {
   min-height: 44px;
 }
 
@@ -238,6 +241,7 @@
   font-size: 1.2rem;
   letter-spacing: -0.03em;
   line-height: 1.25;
+  overflow-wrap: anywhere;
 }
 
 .redesign-software-card-description {
@@ -280,7 +284,43 @@
 }
 
 .redesign-software-card-link[data-support-exclusion] {
-  min-height: var(--support-trigger-icon-size);
+  min-height: var(--enhe-button-h, 48px);
+}
+
+.redesign-software-empty {
+  display: grid;
+  gap: 16px;
+  padding: 24px;
+  border: 1px solid var(--enhe-border, #dfe5df);
+  border-radius: var(--enhe-card-r, 12px);
+  background: #fff;
+}
+
+.redesign-software-empty p {
+  margin: 0;
+  color: var(--enhe-text-muted, #5f665f);
+  line-height: 1.7;
+}
+
+.redesign-software-empty h2 {
+  margin: 0;
+  font-size: clamp(1.5rem, 3vw, 2.25rem);
+  letter-spacing: -0.03em;
+  line-height: 1.15;
+}
+
+.redesign-software-empty-action {
+  display: inline-flex;
+  width: fit-content;
+  min-height: 48px;
+  align-items: center;
+  justify-content: center;
+  padding: 10px 18px;
+  border: 1px solid var(--enhe-action, #527e54);
+  border-radius: 999px;
+  background: var(--enhe-action, #527e54);
+  color: #fff;
+  font-weight: 700;
 }
 
 .redesign-software-load-row {
@@ -289,6 +329,13 @@
   align-items: center;
   gap: 16px 24px;
   margin-top: 28px;
+}
+
+.redesign-software-pagination {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 16px 24px;
 }
 
 .redesign-software-load-more-wrap {
@@ -319,10 +366,16 @@
 .redesign-software-category-button:focus-visible,
 .redesign-software-load-more-button:focus-visible,
 .redesign-software-next-link:focus-visible,
+.redesign-software-empty-action:focus-visible,
 .redesign-software-card-link:focus-visible,
 .redesign-software-rail:focus-visible {
   outline: 3px solid var(--enhe-focus, #ffd60a);
   outline-offset: 4px;
+  box-shadow: 0 0 0 3px var(--enhe-text, #080808);
+}
+
+.redesign-software-empty-action:focus-visible {
+  box-shadow: 0 0 0 3px var(--enhe-text, #080808);
 }
 
 @media (width < 768px) {
@@ -336,6 +389,8 @@
     z-index: 21;
     inset: auto 0 0;
     width: auto;
+    box-sizing: border-box;
+    max-width: 100vw;
     border-radius: 24px 24px 0 0;
   }
 

@@ -89,11 +89,13 @@ describe("next-wave AI News topic DB-free boundary", () => {
       const staticParams = await generateAiNewsTopicStaticParams();
 
       expect(html).toContain('data-content-status="UNVERIFIED"');
-      expect(html).toContain("UNVERIFIED");
+      expect(html).toContain(
+        `<span class="enhe-contentless-status-label">${locale === "en" ? "Unverified" : "待核验"}</span>`,
+      );
       expect(html).not.toContain("<script");
       expect(html).not.toContain("CollectionPage");
       expect(html).not.toContain("FAQPage");
-      expect(html).not.toContain(aiNewsTopics[0]!.en.title);
+      expect(html).toContain(aiNewsTopics[0]![locale].title);
       expect(html).not.toContain("Related AI news");
       expect(metadata.robots).toEqual({ index: false, follow: true });
       expect(staticParams).toContainEqual({ slug: aiNewsTopics[0]!.slug });

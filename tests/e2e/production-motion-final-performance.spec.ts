@@ -3,6 +3,8 @@ import { join } from "node:path";
 
 import { expect, test, type Page } from "@playwright/test";
 
+const isDatabaseFree = !process.env.DATABASE_URL?.trim();
+
 type MotionMetric = {
   activeAnimations: number;
   animatedProperties: string[];
@@ -88,6 +90,22 @@ async function openFormalRoute(page: Page, route: string) {
   );
   const response = await page.goto(route, { waitUntil: "load" });
   expect(response?.status()).toBe(200);
+}
+
+async function openSoftwareCategoryRoute(page: Page) {
+  if (!isDatabaseFree) {
+    await openFormalRoute(page, "/software");
+    return;
+  }
+
+  await page.context().addCookies([
+    {
+      name: "enhe_locale",
+      value: "zh",
+      url: `http://127.0.0.1:${process.env.PORT ?? "3000"}/`,
+    },
+  ]);
+  await openFormalRoute(page, "/redesign-preview/software");
 }
 
 async function layoutShift(page: Page) {
@@ -218,9 +236,13 @@ function expectPerformanceMetric(metric: MotionMetric) {
 test("category layer has no relevant layout shift or animation residue", async ({
   page,
 }) => {
+  test.skip(
+    isDatabaseFree && process.env.PLAYWRIGHT_USE_PRODUCTION_SERVER === "1",
+    "The production build excludes local previews, while the formal DB-free route has no catalogue category layer.",
+  );
   await page.setViewportSize({ width: 1440, height: 900 });
   await installPerformanceCapture(page);
-  await openFormalRoute(page, "/software");
+  await openSoftwareCategoryRoute(page);
   await prepareInteractionBaseline(page);
   const before = await layoutShift(page);
   const trigger = page.locator(".redesign-software-category-trigger");
@@ -294,6 +316,10 @@ test("standalone formal routes exclude prototype code and preview routes", async
   page,
   request,
 }) => {
+  test.skip(
+    process.env.PLAYWRIGHT_USE_PRODUCTION_SERVER !== "1",
+    "This bundle and route check requires the dedicated production-server Playwright mode.",
+  );
   expect(process.env.PLAYWRIGHT_USE_PRODUCTION_SERVER).toBe("1");
   const formalRoutes = [
     "/",

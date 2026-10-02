@@ -3,6 +3,7 @@ import {
   generateAiNewsDetailPageMetadata
 } from "@/app/ai-news/[slug]/page-shell";
 import { PublicSiteChrome } from "@/components/public-site-chrome";
+import { AiNewsWorkspaceShell } from "@/components/redesign/ai-news-workspace-shell";
 
 export const revalidate = 300;
 
@@ -15,7 +16,9 @@ export default async function EnglishAiNewsDetailPage({ params }: { params: Prom
   const { slug } = await params;
   return (
     <PublicSiteChrome forceLocale="en">
-      <AiNewsDetailPageShell slug={slug} forceLocale="en" />
+      <AiNewsWorkspaceShell locale="en" currentPathname={`/en/ai-news/${slug}`}>
+        <AiNewsDetailPageShell slug={slug} forceLocale="en" />
+      </AiNewsWorkspaceShell>
     </PublicSiteChrome>
   );
 }

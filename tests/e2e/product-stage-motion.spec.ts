@@ -318,7 +318,7 @@ test("reduced motion stays 80ms opacity-only", async ({ page }) => {
 });
 
 for (const locale of locales) {
-  test(`server HTML keeps only the default product on ${locale.route}`, async ({
+  test(`server HTML marks only the default product current on ${locale.route}`, async ({
     request,
   }) => {
     const response = await request.get(locale.route);
@@ -328,10 +328,12 @@ for (const locale of locales) {
       /<script\b[^>]*>[\s\S]*?<\/script>/gi,
       "",
     );
-    const productIds = [
-      ...serverMarkup.matchAll(/data-product-id="([^"]+)"/g),
+    const currentProductIds = [
+      ...serverMarkup.matchAll(
+        /<div\b(?=[^>]*\bdata-product-current="true")[^>]*\bdata-product-id="([^"]+)"/g,
+      ),
     ].map((match) => match[1]);
 
-    expect(productIds).toEqual(["ultimate-edition"]);
+    expect(currentProductIds).toEqual(["ultimate-edition"]);
   });
 }

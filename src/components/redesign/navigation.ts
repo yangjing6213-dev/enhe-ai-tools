@@ -1,5 +1,9 @@
 import type { RedesignLocale, RedesignNavItem } from "./types";
 
+export function isExactCurrentPage(pathname: string | undefined, href: string) {
+  return pathname === href;
+}
+
 export const REDESIGN_NAV_ITEMS = {
   zh: [
     { label: "AI工具", href: "/software" },

@@ -47,8 +47,10 @@ describe("global night glass UI source contract", () => {
     const toolCard = readFileSync(new URL("../components/tool-card.tsx", import.meta.url), "utf8");
     const adminUi = readFileSync(new URL("../app/admin/admin-ui.tsx", import.meta.url), "utf8");
     const adminLayout = readFileSync(new URL("../app/admin/layout.tsx", import.meta.url), "utf8");
+    const adminNav = readFileSync(new URL("../app/admin/admin-nav.tsx", import.meta.url), "utf8");
     const adminToolList = readFileSync(new URL("../app/admin/tool-admin-list.tsx", import.meta.url), "utf8");
     const productImageManager = readFileSync(new URL("../app/admin/tool-product-image-manager.tsx", import.meta.url), "utf8");
+    const adminShellCss = readFileSync(new URL("../styles/redesign/shell.css", import.meta.url), "utf8");
 
     expect(toolCard).toContain("surface-panel");
     expect(toolCard).toContain("text-[var(--marketing-accent)]");
@@ -62,7 +64,8 @@ describe("global night glass UI source contract", () => {
     expect(adminUi).not.toContain("#7AA7FF");
 
     expect(adminLayout).toContain("admin-shell-card");
-    expect(adminLayout).toContain("admin-nav-link");
+    expect(adminLayout).toContain("AdminNav");
+    expect(adminNav).toContain("admin-nav-link");
 
     expect(adminToolList).toContain("surface-panel");
     expect(adminToolList).toContain("var(--marketing-accent)");
@@ -70,7 +73,9 @@ describe("global night glass UI source contract", () => {
     expect(adminToolList).not.toContain("#7AA7FF");
     expect(adminToolList).not.toContain("#48F5D3");
 
-    expect(productImageManager).toContain("var(--marketing-accent)");
+    expect(productImageManager).toContain("enhe-admin-image-overlay");
+    expect(adminShellCss).toMatch(/\.enhe-admin-shell \.enhe-admin-image-overlay\s*\{[^}]*background-color: var\(--enhe-text\);[^}]*color: var\(--enhe-page-bg\);/);
+    expect(adminShellCss).toMatch(/button\.enhe-admin-image-overlay:hover:not\(:disabled\)\s*\{[^}]*background-color: var\(--enhe-action-hover\);/);
     expect(productImageManager).not.toContain("#48F5D3");
   });
 });

@@ -68,7 +68,7 @@ export function AiNewsTranslationPanel({
         <p
           className={`mt-3 rounded-xl border px-4 py-3 text-sm ${
             state.ok
-              ? "border-[#5EF1C7]/30 bg-[#5EF1C7]/10 text-[#5EF1C7]"
+              ? "enhe-admin-translation-success border-[#5EF1C7]/30 bg-[#5EF1C7]/10"
               : "border-red-400/30 bg-red-400/10 text-red-100"
           }`}
         >

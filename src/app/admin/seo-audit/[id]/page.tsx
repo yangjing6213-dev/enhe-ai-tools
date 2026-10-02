@@ -492,7 +492,7 @@ function Notice({
   const t = copy[locale];
   if (params.error) {
     return (
-      <p className="mb-5 rounded-lg border border-[#FFB86B]/35 bg-[#FFB86B]/10 px-4 py-3 text-sm text-[#FFD6A5]">
+      <p className="enhe-admin-audit-warning mb-5 rounded-lg border border-[#FFB86B]/35 bg-[#FFB86B]/10 px-4 py-3 text-sm">
         {t.actionFailed}
         <span className="font-mono">{params.error}</span>
       </p>
@@ -635,7 +635,7 @@ function StatusBadge({ status, label }: { status: string; label: string }) {
     status === "completed"
       ? "border-[#48F5D3]/35 bg-[#48F5D3]/10 text-[#48F5D3]"
       : status === "failed" || status === "cancelled"
-        ? "border-[#FFB86B]/35 bg-[#FFB86B]/10 text-[#FFD6A5]"
+        ? "enhe-admin-audit-warning border-[#FFB86B]/35 bg-[#FFB86B]/10"
         : "border-white/15 bg-white/6 text-[#C5D0E2]";
   return (
     <span
@@ -652,7 +652,7 @@ function FindingBadge({ severity }: { severity: string }) {
     normalized === "critical"
       ? "border-red-400/35 bg-red-400/10 text-red-200"
       : normalized === "high"
-        ? "border-[#FFB86B]/35 bg-[#FFB86B]/10 text-[#FFD6A5]"
+        ? "enhe-admin-audit-warning border-[#FFB86B]/35 bg-[#FFB86B]/10"
         : "border-white/15 bg-white/6 text-[#C5D0E2]";
   return (
     <span

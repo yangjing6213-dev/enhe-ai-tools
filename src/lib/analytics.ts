@@ -1,10 +1,23 @@
 import type { Prisma } from "@prisma/client";
 import { headers } from "next/headers";
 import {
-  clientWritableAnalyticsEventNames,
   getPageViewEventName,
-  isClientWritableAnalyticsEventName,
 } from "@/lib/analytics-client";
+import {
+  analyticsEventNames,
+  clientAnalyticsEventNames,
+  clientWritableAnalyticsEventNames,
+  isAnalyticsEventName,
+  isClientAnalyticsEventName,
+  isClientWritableAnalyticsEvent,
+  isClientWritableAnalyticsEventName,
+  isSeoAuditAnalyticsEventName,
+  seoAuditEventNames,
+  serverOnlyAnalyticsEventNames,
+  type AnalyticsEventName,
+  type ClientAnalyticsEventName,
+  type SeoAuditAnalyticsEventName,
+} from "@/lib/analytics-event-registry";
 import {
   parseAnalyticsAttribution,
   parseAnalyticsAttributionCookieValue,
@@ -14,12 +27,23 @@ import {
 import { prisma } from "@/lib/db";
 
 export {
+  analyticsEventNames,
+  clientAnalyticsEventNames,
   clientWritableAnalyticsEventNames,
   getPageViewEventName,
+  isAnalyticsEventName,
+  isClientAnalyticsEventName,
+  isClientWritableAnalyticsEvent,
   isClientWritableAnalyticsEventName,
+  isSeoAuditAnalyticsEventName,
+  seoAuditEventNames,
+  serverOnlyAnalyticsEventNames,
 };
-
-export const clientAnalyticsEventNames = clientWritableAnalyticsEventNames;
+export type {
+  AnalyticsEventName,
+  ClientAnalyticsEventName,
+  SeoAuditAnalyticsEventName,
+};
 
 export const analyticsFunnelSteps = [
   "visit_home",
@@ -50,24 +74,6 @@ export const productEngagementEventNames = [
   "product_download_click",
 ] as const;
 
-export const seoAuditEventNames = [
-  "seo_audit_landing_view",
-  "seo_audit_submitted",
-  "seo_audit_completed",
-  "seo_audit_failed",
-  "seo_audit_summary_viewed",
-  "seo_audit_paywall_viewed",
-  "seo_audit_checkout_started",
-  "seo_audit_purchased",
-  "seo_audit_report_downloaded",
-  "seo_audit_prompt_copied",
-  "seo_audit_recheck_started",
-  "seo_audit_monitoring_viewed",
-  "seo_audit_monitoring_purchased",
-  "seo_audit_schedule_enabled",
-  "seo_audit_schedule_paused",
-] as const;
-
 export const seoAuditFunnelSteps = [
   "seo_audit_landing_view",
   "seo_audit_submitted",
@@ -78,38 +84,6 @@ export const seoAuditFunnelSteps = [
   "seo_audit_report_downloaded",
 ] as const;
 
-const seoAuditServerEventNames = [
-  "seo_audit_submitted",
-  "seo_audit_completed",
-  "seo_audit_failed",
-  "seo_audit_checkout_started",
-  "seo_audit_purchased",
-  "seo_audit_report_downloaded",
-  "seo_audit_recheck_started",
-  "seo_audit_monitoring_purchased",
-  "seo_audit_schedule_enabled",
-  "seo_audit_schedule_paused",
-] as const;
-
-export const serverOnlyAnalyticsEventNames = [
-  "create_order",
-  "payment_proof_submitted",
-  "payment_review_approved",
-  "payment_review_rejected",
-  "order_receipt_submitted",
-  "refund_request_submitted",
-] as const;
-
-export const analyticsEventNames = [
-  ...clientAnalyticsEventNames,
-  ...serverOnlyAnalyticsEventNames,
-  ...seoAuditServerEventNames,
-] as const;
-
-export type AnalyticsEventName = (typeof analyticsEventNames)[number];
-export type ClientAnalyticsEventName =
-  (typeof clientAnalyticsEventNames)[number];
-export type SeoAuditAnalyticsEventName = (typeof seoAuditEventNames)[number];
 export type SeoAuditFunnelEventName = (typeof seoAuditFunnelSteps)[number];
 
 export type AnalyticsCorrelationContext = {
@@ -197,38 +171,6 @@ const clientMetadataRules: Partial<
     promptId: stringRule(128, identifierPattern),
   },
 };
-
-export function isAnalyticsEventName(
-  value: unknown,
-): value is AnalyticsEventName {
-  return (
-    typeof value === "string" &&
-    (analyticsEventNames as readonly string[]).includes(value)
-  );
-}
-
-export function isSeoAuditAnalyticsEventName(
-  value: unknown,
-): value is SeoAuditAnalyticsEventName {
-  return (
-    typeof value === "string" &&
-    (seoAuditEventNames as readonly string[]).includes(value)
-  );
-}
-
-export function isClientWritableAnalyticsEvent(
-  value: unknown,
-): value is AnalyticsEventName {
-  return (
-    isAnalyticsEventName(value) && isClientWritableAnalyticsEventName(value)
-  );
-}
-
-export function isClientAnalyticsEventName(
-  value: unknown,
-): value is ClientAnalyticsEventName {
-  return isClientWritableAnalyticsEventName(value);
-}
 
 export function sanitizeClientAnalyticsMetadata(
   eventName: AnalyticsEventName,

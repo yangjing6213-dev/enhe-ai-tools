@@ -554,6 +554,20 @@
   color: var(--enhe-text);
 }
 
+/* Keep visible review text readable; scale and position provide the hierarchy. */
+.enhe-redesign-production .redesign-home-reviews-window {
+  mask-image: none;
+  -webkit-mask-image: none;
+}
+
+.enhe-redesign-production .redesign-home-review-card {
+  opacity: 1;
+}
+
+.enhe-redesign-production .redesign-home-review-stars {
+  color: #8b6617;
+}
+
 .redesign-home-reviews-control:hover {
   background: var(--enhe-text, #080808);
   color: #fff;

@@ -79,6 +79,48 @@ describe("E1-NB-R20 software catalog DB-free preview", () => {
         expect(html).toContain("软件目录内容尚未核验");
       }
     },
+    10000,
+  );
+
+  it.each([
+    ["zh", undefined, "暂时没有已公开产品。"],
+    ["en", undefined, "No published products are available yet."],
+    ["zh", "efficiency", "该分类暂时没有已公开产品。"],
+    ["en", "efficiency", "No published products are available in this category yet."],
+  ] as const)(
+    "keeps the %s empty-state message outside the semantic product list",
+    async (locale, category, expectedMessage) => {
+      process.env.DATABASE_URL = "postgresql://configured.invalid/enhe";
+      const { SoftwarePageShell } = await import("@/app/software/page-shell");
+      const html = renderToStaticMarkup(
+        await SoftwarePageShell({
+          searchParams: Promise.resolve(category ? { category } : {}),
+          forceLocale: locale,
+          preloadedListing: {
+            items: [],
+            newReleases: [],
+            featuredProducts: [],
+            total: 0,
+            page: 1,
+            pageSize: 12,
+            totalPages: 1,
+            hasPrevious: false,
+            hasNext: false,
+            previousHref: null,
+            nextHref: null,
+          } as never,
+        }),
+      );
+      const listStart = html.indexOf("data-all-products-root");
+      const listClose = html.indexOf("</div>", listStart);
+      const status = html.indexOf('role="status"', listStart);
+
+      expect(listStart).toBeGreaterThanOrEqual(0);
+      expect(listClose).toBeGreaterThan(listStart);
+      expect(status).toBeGreaterThan(listClose);
+      expect(html.match(/role="status"/g) ?? []).toHaveLength(1);
+      expect(html).toContain(expectedMessage);
+    },
   );
 
   it("preserves configured catalog rendering and indexable metadata", async () => {

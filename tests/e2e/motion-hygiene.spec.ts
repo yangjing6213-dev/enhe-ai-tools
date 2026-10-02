@@ -1,6 +1,8 @@
 import { expect, test, type Page } from "@playwright/test";
 
 const formalRoutes = ["/", "/en", "/software", "/en/software"] as const;
+const isDatabaseFree = !process.env.DATABASE_URL?.trim();
+const isProductionServer = process.env.PLAYWRIGHT_USE_PRODUCTION_SERVER === "1";
 
 async function openFormalRoute(page: Page, route: string) {
   await page.route("**/api/analytics", (request) => request.fulfill({ status: 204 }));
@@ -62,12 +64,29 @@ test("formal redesign routes do not inherit the legacy 450ms page entrance", asy
   }
 });
 
-test("formal software fixed layers stay viewport-anchored", async ({ page }) => {
+test("software category panel fixed layers stay viewport-anchored", async ({ page }) => {
+  test.skip(
+    isDatabaseFree && isProductionServer,
+    "The standalone production bundle excludes local previews, and DB-free formal software routes have no category layer.",
+  );
   await page.setViewportSize({ width: 390, height: 844 });
 
-  for (const route of ["/software", "/en/software"] as const) {
+  for (const locale of ["zh", "en"] as const) {
+    const route = isDatabaseFree
+      ? "/redesign-preview/software"
+      : locale === "en"
+        ? "/en/software"
+        : "/software";
+    if (isDatabaseFree) {
+      await page.context().addCookies([
+        {
+          name: "enhe_locale",
+          value: locale,
+          url: `http://127.0.0.1:${process.env.PORT ?? "3000"}/`,
+        },
+      ]);
+    }
     await openFormalRoute(page, route);
-    await page.waitForLoadState("networkidle");
     await page.locator(".redesign-software-category-trigger").click();
     const panel = page.locator(".redesign-software-category-panel");
     await expect(panel).toBeVisible();

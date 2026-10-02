@@ -1,4 +1,4 @@
-import { beforeEach, describe, expect, it, vi } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 const db = vi.hoisted(() => ({
   toolFindMany: vi.fn(),
@@ -18,6 +18,11 @@ describe("production software public query", () => {
   beforeEach(() => {
     vi.resetModules();
     vi.clearAllMocks();
+    vi.stubEnv("DATABASE_URL", "postgresql://localhost:5432/enhe_test");
+  });
+
+  afterEach(() => {
+    vi.unstubAllEnvs();
   });
 
   it("selects published Tool data without file or delivery fields", async () => {
@@ -28,7 +33,16 @@ describe("production software public query", () => {
 
     expect(db.toolFindMany).toHaveBeenCalledOnce();
     const query = db.toolFindMany.mock.calls[0]?.[0];
-    expect(query.where).toMatchObject({ status: "published" });
+    expect(query.where).toMatchObject({
+      status: "published",
+      OR: [
+        { type: { in: ["software", "online", "ai_skill"] } },
+        {
+          type: "skill_learning",
+          tutorials: { some: { status: "active" } },
+        },
+      ],
+    });
     expect(query.select).toMatchObject({
       id: true,
       slug: true,
@@ -68,7 +82,16 @@ describe("production software public query", () => {
 
     expect(db.toolFindMany).toHaveBeenCalledOnce();
     const query = db.toolFindMany.mock.calls[0]?.[0];
-    expect(query.where).toMatchObject({ status: "published" });
+    expect(query.where).toMatchObject({
+      status: "published",
+      OR: [
+        { type: { in: ["software", "online", "ai_skill"] } },
+        {
+          type: "skill_learning",
+          tutorials: { some: { status: "active" } },
+        },
+      ],
+    });
     expect(query.select).toEqual({ id: true, coverImage: true });
   });
 });

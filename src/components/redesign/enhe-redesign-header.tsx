@@ -1,6 +1,7 @@
 import { EnheBrandLockup } from "./enhe-brand-lockup";
 import { EnheRedesignLanguageSwitch } from "./enhe-redesign-language-switch";
 import { EnheRedesignMobileMenu } from "./enhe-redesign-mobile-menu";
+import { isExactCurrentPage } from "./navigation";
 import type { RedesignAccount, RedesignLanguageHrefs, RedesignLocale, RedesignNavItem } from "./types";
 
 export function EnheRedesignHeader({
@@ -8,6 +9,7 @@ export function EnheRedesignHeader({
   homeHref,
   brandLabel,
   navItems,
+  currentPathname,
   languageHrefs,
   languageAriaLabel = "中文 / EN",
   account,
@@ -21,6 +23,7 @@ export function EnheRedesignHeader({
   homeHref: string;
   brandLabel: string;
   navItems: ReadonlyArray<RedesignNavItem>;
+  currentPathname?: string;
   languageHrefs: RedesignLanguageHrefs;
   languageAriaLabel?: string;
   account: RedesignAccount;
@@ -30,30 +33,48 @@ export function EnheRedesignHeader({
   menuTriggerLabel: string;
   menuCloseLabel: string;
 }) {
+  const isCurrentPath = (href: string) => {
+    return isExactCurrentPage(currentPathname, href);
+  };
+
   return (
     <header className="redesign-header" data-sticky={sticky} data-locale={locale}>
       <div className="redesign-header-inner">
         <div className="redesign-brand-region">
-          <EnheBrandLockup href={homeHref} label={brandLabel} />
+          <EnheBrandLockup
+            href={homeHref}
+            label={locale === "en" ? "ENHE AI home" : "ENHE AI 首页"}
+          />
           <span className="redesign-brand-label">{brandLabel}</span>
         </div>
         <nav className="redesign-desktop-nav" aria-label={locale === "en" ? "Primary navigation" : "主导航"}>
           {navItems.map((item) =>
             item.children?.length ? (
               <details key={item.href} className="redesign-nav-dropdown">
-                <summary className="redesign-nav-link">
+                <summary
+                  className="redesign-nav-link"
+                >
                   <span>{item.label}</span>
                 </summary>
                 <div className="redesign-nav-dropdown-panel">
                   {item.children.map((child) => (
-                    <a key={child.href} href={child.href}>
+                    <a
+                      key={child.href}
+                      href={child.href}
+                      aria-current={isCurrentPath(child.href) ? "page" : undefined}
+                    >
                       {child.label}
                     </a>
                   ))}
                 </div>
               </details>
             ) : (
-              <a key={item.href} className="redesign-nav-link" href={item.href}>
+              <a
+                key={item.href}
+                className="redesign-nav-link"
+                href={item.href}
+                aria-current={isCurrentPath(item.href) ? "page" : undefined}
+              >
                 {item.kind === "search" ? <span className="redesign-search-icon" aria-hidden="true" /> : null}
                 <span>{item.label}</span>
               </a>
@@ -94,6 +115,7 @@ export function EnheRedesignHeader({
             closeLabel={menuCloseLabel}
             navItems={navItems}
             account={account}
+            pathname={currentPathname}
           />
         </div>
       </div>

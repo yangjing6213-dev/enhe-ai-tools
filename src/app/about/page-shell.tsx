@@ -216,10 +216,10 @@ export function AboutPageShell({ forceLocale }: { forceLocale: Locale }) {
   };
 
   return (
-    <main>
-      <Container className="py-14">
+    <main className="enhe-editorial-page enhe-reference-editorial">
+      <Container className="enhe-reference-editorial-container py-14">
         <StructuredData data={[breadcrumbSchema, aboutPageSchema, faqSchema]} />
-        <section className="glass relative overflow-hidden rounded-[2rem] p-7 md:p-10">
+        <section className="enhe-reference-editorial-hero relative overflow-hidden rounded-[2rem] p-7 md:p-10">
           <div className="relative max-w-4xl">
             <Badge>{copy.eyebrow}</Badge>
             <h1 className="mt-6 text-4xl font-black leading-tight text-[var(--marketing-text)] md:text-6xl">
@@ -240,16 +240,16 @@ export function AboutPageShell({ forceLocale }: { forceLocale: Locale }) {
           </div>
         </section>
 
-        <section className="mt-8 grid gap-5 lg:grid-cols-2">
+        <section className="enhe-reference-editorial-sections mt-8 grid gap-5 lg:grid-cols-2">
           {copy.sections.map((section) => (
-            <article key={section.title} className="glass rounded-2xl p-6">
+            <article key={section.title} className="enhe-reference-editorial-card rounded-2xl p-6">
               <h2 className="text-2xl font-black text-[var(--marketing-text)]">{section.title}</h2>
               <p className="mt-4 text-sm leading-7 text-[var(--marketing-muted)]">{section.body}</p>
             </article>
           ))}
         </section>
 
-        <section className="glass mt-8 rounded-2xl p-6">
+        <section className="enhe-reference-editorial-links mt-8 rounded-2xl p-6">
           <SectionTitle title={copy.topicLinksTitle} />
           <div className="mt-6 grid gap-4 md:grid-cols-2 lg:grid-cols-3">
             {copy.topicLinks.map((item) => (
@@ -265,7 +265,7 @@ export function AboutPageShell({ forceLocale }: { forceLocale: Locale }) {
           </div>
         </section>
 
-        <details className="content-fold glass mt-8">
+        <details className="content-fold enhe-reference-editorial-faq mt-8">
           <summary>
             <div className="content-fold-summary-copy">
               <h2 className="text-2xl font-black text-[var(--marketing-text)]">{copy.faqTitle}</h2>

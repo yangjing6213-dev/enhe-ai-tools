@@ -1,6 +1,6 @@
 ﻿import { prisma } from "@/lib/db";
 import { deleteFileAdminAction, upsertFileAction } from "@/app/admin/actions";
-import { AdminSection, Field, inputClass, selectClass, SubmitButton } from "@/app/admin/admin-ui";
+import { AdminContentShell, AdminSection, Field, inputClass, selectClass, SubmitButton } from "@/app/admin/admin-ui";
 import { buildAdminFilePageHref, buildAdminFileWhere, parseAdminFileListParams } from "@/lib/admin-list";
 import { getStorageDiagnostics } from "@/lib/storage-diagnostics";
 import { parseCosFilePath } from "@/lib/storage";
@@ -27,6 +27,7 @@ export default async function AdminFilesPage({ searchParams }: { searchParams: P
 
   return (
     <AdminSection title="文件管理" intro="上传后会自动创建文件记录；配置腾讯云 COS 环境变量后会上传到 COS，否则落到本地 uploads 目录。">
+      <AdminContentShell className="enhe-admin-content-management enhe-admin-files">
       {params.uploaded ? (
         <p className="mb-5 rounded-xl border border-[#48F5D3]/30 bg-[#48F5D3]/10 px-4 py-3 text-sm text-[#48F5D3]">
           上传成功，已自动创建文件记录。
@@ -48,7 +49,7 @@ export default async function AdminFilesPage({ searchParams }: { searchParams: P
         </p>
       ) : null}
 
-      <div className="glass mb-8 grid gap-4 rounded-2xl p-6 md:grid-cols-4">
+      <div className="enhe-admin-file-storage-diagnostics glass mb-8 grid gap-4 rounded-2xl p-6 md:grid-cols-4">
         <div>
           <p className="text-xs text-[#8B95A7]">当前存储模式</p>
           <p className="mt-2 text-lg font-semibold text-[#E8EEF8]">{storageDiagnostics.mode === "cos" ? "腾讯云 COS" : "本地 uploads"}</p>
@@ -69,7 +70,7 @@ export default async function AdminFilesPage({ searchParams }: { searchParams: P
           <p className="mt-2 text-lg font-semibold text-[#E8EEF8]">{storageDiagnostics.signedUrlExpiresSeconds} 秒</p>
         </div>
         {!storageDiagnostics.cosConfigured ? (
-          <div className="md:col-span-4 rounded-xl border border-[#FFB86B]/30 bg-[#FFB86B]/10 px-4 py-3 text-sm text-[#FFD6A5]">
+          <div className="enhe-admin-file-storage-warning md:col-span-4 rounded-xl border border-[#FFB86B]/30 bg-[#FFB86B]/10 px-4 py-3 text-sm">
             COS 未启用，缺少：{storageDiagnostics.missingCosEnvKeys.join("、") || "无"}。未配置完整时会自动保存到本地 uploads。
           </div>
         ) : null}
@@ -85,7 +86,7 @@ export default async function AdminFilesPage({ searchParams }: { searchParams: P
         </div>
       </div>
 
-      <div className="glass mb-8 rounded-2xl p-6">
+      <div className="enhe-admin-file-upload-panel glass mb-8 rounded-2xl p-6">
         <h2 className="text-xl font-semibold">上传文件</h2>
         <AdminFileUploadForm />
         <p className="mt-3 text-xs text-[#8B95A7]">推荐软件安装包命名包含工具名和版本号。COS 环境变量完整时自动使用 COS。</p>
@@ -93,7 +94,7 @@ export default async function AdminFilesPage({ searchParams }: { searchParams: P
 
       <FileForm tools={tools} />
 
-      <form className="glass mt-8 grid gap-3 rounded-2xl p-5 md:grid-cols-[1fr_180px_220px_auto]" action="/admin/files">
+      <form className="enhe-admin-content-form enhe-admin-file-filter-form glass mt-8 grid gap-3 rounded-2xl p-5 md:grid-cols-[1fr_180px_220px_auto]" action="/admin/files">
         <input name="q" defaultValue={filters.q} placeholder="搜索文件名、路径、URL 或工具名" className={inputClass} />
         <select name="storage" defaultValue={filters.storage ?? ""} className={selectClass}>
           <option value="">全部存储</option>
@@ -107,7 +108,7 @@ export default async function AdminFilesPage({ searchParams }: { searchParams: P
         <button className="rounded-full border border-white/12 px-5 py-3 text-sm font-semibold text-[#E8EEF8]">筛选文件</button>
       </form>
 
-      <div className="mt-6 flex flex-wrap items-center justify-between gap-3 text-sm text-[#8B95A7]">
+      <div className="enhe-admin-content-toolbar mt-6 flex flex-wrap items-center justify-between gap-3 text-sm text-[#8B95A7]">
         <span>共 {total} 个文件，当前第 {filters.page} / {pageCount} 页</span>
         <div className="flex gap-2">
           <Link
@@ -127,9 +128,9 @@ export default async function AdminFilesPage({ searchParams }: { searchParams: P
         </div>
       </div>
 
-      <div className="mt-4 space-y-3">
+      <div className="enhe-admin-file-list mt-4 space-y-3">
         {files.map((file) => (
-          <div key={file.id} className="glass rounded-2xl p-5">
+          <article key={file.id} className="enhe-admin-file-card glass rounded-2xl p-5">
             <div className="mb-4 flex flex-wrap items-center justify-between gap-3 text-xs text-[#8B95A7]">
               <span>{file.primaryFor ? `作为下载文件：${file.primaryFor.name}` : "未作为主下载文件"}</span>
               <span className={`rounded-full border px-2 py-1 ${
@@ -142,7 +143,7 @@ export default async function AdminFilesPage({ searchParams }: { searchParams: P
               <span>{file.createdAt.toLocaleString("zh-CN")}</span>
             </div>
 
-            <form action={upsertFileAction} className="grid gap-3 md:grid-cols-2">
+            <form action={upsertFileAction} className="enhe-admin-file-editor-form grid gap-3 md:grid-cols-2">
               <input type="hidden" name="id" value={file.id} />
               <Field label="文件名"><input name="fileName" defaultValue={file.fileName} className={inputClass} /></Field>
               <Field label="绑定工具">
@@ -159,7 +160,7 @@ export default async function AdminFilesPage({ searchParams }: { searchParams: P
               <div className="flex items-end"><SubmitButton>保存文件</SubmitButton></div>
             </form>
 
-            <form action={deleteFileAdminAction} className="mt-4 border-t border-white/10 pt-4">
+            <form action={deleteFileAdminAction} className="enhe-admin-file-danger-form mt-4 border-t border-white/10 pt-4">
               <input type="hidden" name="id" value={file.id} />
               <SubmitButton variant="danger" pendingLabel="删除中...">
                 删除文件
@@ -168,16 +169,17 @@ export default async function AdminFilesPage({ searchParams }: { searchParams: P
                 删除时会解绑作为下载文件使用的工具，并清理该文件的下载记录。
               </span>
             </form>
-          </div>
+          </article>
         ))}
       </div>
+      </AdminContentShell>
     </AdminSection>
   );
 }
 
 function FileForm({ tools }: { tools: { id: string; name: string }[] }) {
   return (
-    <form action={upsertFileAction} className="glass grid gap-4 rounded-2xl p-6 md:grid-cols-2">
+    <form action={upsertFileAction} className="enhe-admin-content-form enhe-admin-file-create-form glass grid gap-4 rounded-2xl p-6 md:grid-cols-2">
       <Field label="文件名"><input name="fileName" required className={inputClass} /></Field>
       <Field label="绑定工具">
         <select name="toolId" className={selectClass}>

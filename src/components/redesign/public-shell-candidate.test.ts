@@ -13,11 +13,11 @@ describe("ENHE redesign public shell candidate", () => {
   it("defines the approved independent visual tokens without forbidden effects", () => {
     const tokens = readCandidate("styles/redesign/tokens.css");
 
-    expect(tokens).toContain("--enhe-page-bg: #fdfdfd");
-    expect(tokens).toContain("--enhe-text: #080808");
-    expect(tokens).toContain("--enhe-action: #527e54");
-    expect(tokens).toContain("--enhe-footer: #071512");
-    expect(tokens).toContain("--enhe-focus: #ffd60a");
+    expect(tokens).toContain("--enhe-page-bg: #f8faf7");
+    expect(tokens).toContain("--enhe-text: #101612");
+    expect(tokens).toContain("--enhe-action: #2f6f44");
+    expect(tokens).toContain("--enhe-footer: #0b2119");
+    expect(tokens).toContain("--enhe-focus: #f6c945");
     expect(tokens).toContain("--enhe-motion-fast: 170ms");
     expect(tokens).toContain("--enhe-z-focus: 60");
     expect(tokens).not.toMatch(/gradient|glow|glass|glitch|neon/i);
@@ -89,6 +89,37 @@ describe("ENHE redesign public shell candidate", () => {
     expect(redundantCloseGuard).toBeGreaterThan(-1);
     expect(closeIntentUpdate).toBeGreaterThan(redundantCloseGuard);
     expect(animationFreeze).toBeGreaterThan(closeIntentUpdate);
+  });
+
+  it("keeps the mobile menu trigger at the locked 48px touch target", () => {
+    const shellStyles = readCandidate("styles/redesign/shell.css");
+
+    expect(shellStyles).toMatch(
+      /\.redesign-menu-trigger\s*\{[\s\S]*?width:\s*48px;[\s\S]*?height:\s*48px;/,
+    );
+  });
+
+  it("marks the active route and keeps the mobile overlay non-interactive", () => {
+    const header = readCandidate("components/redesign/enhe-redesign-header.tsx");
+    const adapter = readCandidate("components/redesign/enhe-production-public-shell.tsx");
+    const menu = readCandidate("components/redesign/enhe-redesign-mobile-menu.tsx");
+
+    expect(adapter).toContain("currentPathname={pathname}");
+    expect(header).toContain("currentPathname");
+    expect(header).toContain('aria-current={isCurrentPath(item.href) ? "page" : undefined}');
+    expect(menu).toContain("pathname");
+    expect(menu).toContain('aria-current={isCurrentPath(item.href) ? "page" : undefined}');
+    expect(menu).toMatch(/<div[\s\S]*?className="redesign-menu-overlay"/);
+    expect(menu).not.toMatch(/<button\s+[^>]*className="redesign-menu-overlay"/);
+  });
+
+  it("gives the locale-aware brand home link a home-specific accessible name", () => {
+    const lockup = readCandidate("components/redesign/enhe-brand-lockup.tsx");
+    const header = readCandidate("components/redesign/enhe-redesign-header.tsx");
+
+    expect(lockup).toContain("aria-label={label}");
+    expect(header).toContain('label={locale === "en" ? "ENHE AI home" : "ENHE AI 首页"}');
+    expect(header).not.toContain("label={brandLabel}");
   });
 
   it("keeps the footer as four flat semantic columns without shell duplication", () => {

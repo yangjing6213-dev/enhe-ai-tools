@@ -4,6 +4,7 @@ import {
   generateAiNewsTopicStaticParams,
 } from "@/app/ai-news/topics/[slug]/page-shell";
 import { PublicSiteChrome } from "@/components/public-site-chrome";
+import { AiNewsWorkspaceShell } from "@/components/redesign/ai-news-workspace-shell";
 
 export const revalidate = 300;
 
@@ -26,7 +27,9 @@ export default async function EnglishAiNewsTopicPage({
   const { slug } = await params;
   return (
     <PublicSiteChrome forceLocale="en">
-      <AiNewsTopicPageShell slug={slug} forceLocale="en" />
+      <AiNewsWorkspaceShell locale="en" currentPathname={`/en/ai-news/topics/${slug}`}>
+        <AiNewsTopicPageShell slug={slug} forceLocale="en" />
+      </AiNewsWorkspaceShell>
     </PublicSiteChrome>
   );
 }

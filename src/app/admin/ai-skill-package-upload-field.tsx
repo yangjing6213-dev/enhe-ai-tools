@@ -64,7 +64,7 @@ export function AiSkillPackageUploadField({
       <p className="text-sm font-semibold text-[#F6FAFF]">{labels.title}</p>
       <p className="mt-2 text-xs leading-5 text-[#8B95A7]">{labels.hint}</p>
       <div className="mt-4 flex flex-wrap items-center gap-3">
-        <label className="inline-flex cursor-pointer items-center gap-2 rounded-full bg-[var(--marketing-accent)] px-5 py-3 text-sm font-semibold text-white transition hover:bg-[#56bfd0]">
+        <label className="enhe-admin-package-picker inline-flex cursor-pointer items-center gap-2 rounded-full bg-[var(--marketing-accent)] px-5 py-3 text-sm font-semibold text-white transition hover:bg-[#56bfd0]">
           <Upload size={16} aria-hidden="true" />
           {uploading ? labels.uploading : labels.choose}
           <input

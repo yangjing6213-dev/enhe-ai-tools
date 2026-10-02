@@ -2,9 +2,19 @@ import { generateAccountServicesPageMetadata } from "@/app/account-services/page
 import { generateProductDemoListingMetadata } from "@/app/product-demos/page-shell";
 import { generateSkillLearningPageMetadata } from "@/app/skill-learning/page-shell";
 import { generateSoftwarePageMetadata } from "@/app/software/page-shell";
-import { describe, expect, it } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+
+vi.mock("@/lib/db", () => ({ prisma: {} }));
 
 describe("search platform indexing remediation", () => {
+  beforeEach(() => {
+    vi.stubEnv("DATABASE_URL", "postgresql://localhost:5432/enhe_test");
+  });
+
+  afterEach(() => {
+    vi.unstubAllEnvs();
+  });
+
   it.each([
     {
       generate: generateSoftwarePageMetadata,

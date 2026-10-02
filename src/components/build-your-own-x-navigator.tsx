@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Check, Copy, ExternalLink, Filter, Search, Sparkles } from "lucide-react";
 import type {
   BuildYourOwnXDifficulty,
@@ -132,8 +132,37 @@ export function BuildYourOwnXNavigator({
   const [time, setTime] = useState<BuildYourOwnXTime | "">("");
   const [language, setLanguage] = useState("");
   const [category, setCategory] = useState("");
-  const [routeSlug, setRouteSlug] = useState(routes[0]?.slug ?? "");
+  const [routeSelection, setRouteSelection] = useState({
+    slug: routes[0]?.slug ?? "",
+    scrollToRoute: false,
+  });
+  const routeSlug = routeSelection.slug;
   const [copied, setCopied] = useState(false);
+
+  useEffect(() => {
+    const selectLinkedRoute = () => {
+      if (!window.location.hash) {
+        setRouteSelection({ slug: routes[0]?.slug ?? "", scrollToRoute: false });
+        return;
+      }
+      const linkedRoute = routes.find((route) => window.location.hash === `#route-${route.slug}`);
+      if (linkedRoute) setRouteSelection({ slug: linkedRoute.slug, scrollToRoute: true });
+    };
+    selectLinkedRoute();
+    window.addEventListener("hashchange", selectLinkedRoute);
+    return () => window.removeEventListener("hashchange", selectLinkedRoute);
+  }, [routes]);
+
+  useEffect(() => {
+    if (routeSelection.scrollToRoute && window.location.hash === `#route-${routeSelection.slug}`) {
+      document.getElementById(`route-${routeSelection.slug}`)?.scrollIntoView({ behavior: "instant" });
+    }
+  }, [routeSelection]);
+
+  const selectRoute = (slug: string) => {
+    setRouteSelection({ slug, scrollToRoute: false });
+    window.history.replaceState(window.history.state, "", `#route-${slug}`);
+  };
 
   const selectedRoute = routes.find((route) => route.slug === routeSlug) ?? null;
 
@@ -182,7 +211,7 @@ export function BuildYourOwnXNavigator({
     setTime("");
     setLanguage("");
     setCategory("");
-    setRouteSlug(routes[0]?.slug ?? "");
+    selectRoute(routes[0]?.slug ?? "");
   };
 
   const text =
@@ -262,7 +291,7 @@ export function BuildYourOwnXNavigator({
             />
           </label>
 
-          <select value={routeSlug} onChange={(event) => setRouteSlug(event.target.value)} aria-label={text.route}>
+          <select value={routeSlug} onChange={(event) => selectRoute(event.target.value)} aria-label={text.route}>
             {routes.map((route) => (
               <option key={route.slug} value={route.slug}>
                 {locale === "en" ? route.titleEn : route.title}

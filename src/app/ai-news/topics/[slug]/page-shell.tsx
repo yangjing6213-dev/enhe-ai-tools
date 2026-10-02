@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { StructuredData } from "@/components/structured-data";
+import { ContentlessState } from "@/components/redesign/contentless-state";
 import { Badge, ButtonLink, Container, SectionTitle } from "@/components/ui";
 import {
   aiNewsTopicSlugs,
@@ -17,12 +18,6 @@ import {
 } from "@/lib/ai-news-localization";
 import { getDictionary, type Locale } from "@/lib/dictionaries";
 import { buildCanonicalAiNewsPath } from "@/lib/public-slugs";
-import {
-  filterAiNewsTopicArticles,
-  getPublicAiNewsTopic,
-  getPublicAiNewsTopicSlugs,
-  getPublicNewsListing,
-} from "@/lib/public-content";
 import {
   absoluteUrl,
   buildAvailableLanguageAlternates,
@@ -41,6 +36,7 @@ export async function generateAiNewsTopicStaticParams() {
     return aiNewsTopicSlugs.map((slug) => ({ slug }));
   }
 
+  const { getPublicAiNewsTopicSlugs } = await import("@/lib/public-content");
   const slugs = await getPublicAiNewsTopicSlugs();
   return slugs.map((slug) => ({ slug }));
 }
@@ -50,16 +46,19 @@ export async function generateAiNewsTopicMetadata(
   slug: string,
 ): Promise<Metadata> {
   const isDbFreePreview = !process.env.DATABASE_URL?.trim();
-  const topic = isDbFreePreview
-    ? getAiNewsTopic(slug)
-    : await getPublicAiNewsTopic(slug);
+  let topic;
+  if (isDbFreePreview) {
+    topic = getAiNewsTopic(slug);
+  } else {
+    const { getPublicAiNewsTopic } = await import("@/lib/public-content");
+    topic = await getPublicAiNewsTopic(slug);
+  }
   const t = getDictionary(forceLocale);
 
   if (isDbFreePreview) {
     const metadata = buildPageMetadata({
       title: t.aiNews.title,
-      description:
-        "UNVERIFIED - AI News topic content is not available in this local preview.",
+      description: t.aiNews.dbFreeTopicMetaDescription,
       path: `/ai-news/topics/${slug}`,
       locale: forceLocale === "en" ? "en_US" : "zh_CN",
       localeKey: forceLocale,
@@ -113,38 +112,49 @@ export async function AiNewsTopicPageShell({
   forceLocale: Locale;
 }) {
   const isDbFreePreview = !process.env.DATABASE_URL?.trim();
-  const topic = isDbFreePreview
-    ? getAiNewsTopic(slug)
-    : await getPublicAiNewsTopic(slug);
+  let topic;
+  if (isDbFreePreview) {
+    topic = getAiNewsTopic(slug);
+  } else {
+    const { getPublicAiNewsTopic } = await import("@/lib/public-content");
+    topic = await getPublicAiNewsTopic(slug);
+  }
   if (!topic) notFound();
 
   const t = getDictionary(forceLocale);
+  const copy = getAiNewsTopicCopy(topic, forceLocale);
 
   if (isDbFreePreview) {
     return (
-      <main data-content-status="UNVERIFIED">
-        <Container className="py-14">
-          <section className="glass rounded-[2rem] p-7 md:p-10">
-            <Badge className="text-[var(--marketing-accent)]">
-              {forceLocale === "en"
-                ? "AI News Topic Preview"
-                : "AI News Topic Preview"}
-            </Badge>
-            <h1 className="mt-6 text-4xl font-black leading-tight text-[var(--marketing-text)] md:text-6xl">
-              {t.aiNews.title}
-            </h1>
-            <p className="mt-5 max-w-3xl text-base font-medium leading-8 text-[var(--marketing-muted)] md:text-lg">
-              {forceLocale === "en"
-                ? "UNVERIFIED - Topic content is not available in this local preview yet."
-                : "UNVERIFIED - Topic content is not available in this local preview yet."}
-            </p>
-          </section>
-        </Container>
-      </main>
+      <ContentlessState
+        locale={forceLocale}
+        className="ai-news-page ai-news-workspace enhe-reference-workspace ai-news-topic-page"
+        eyebrow={t.aiNews.title}
+        title={copy.title}
+        intro={
+          forceLocale === "en"
+            ? "The topic shell is ready while verified content is prepared."
+            : "专题页面结构和导航已就绪，内容核验后再展示。"
+        }
+        statusLabel={forceLocale === "en" ? "Unverified" : "待核验"}
+        railStatusText={
+          forceLocale === "en"
+            ? "Verified topic content is pending."
+            : "专题内容等待核验。"
+        }
+        stateTitle={t.aiNews.dbFreeTopicPreviewLabel}
+        statusText={t.aiNews.dbFreeTopicPreviewText}
+        primaryAction={{
+          href: buildLocalePath("/ai-news", forceLocale),
+          label: t.aiNews.latestTitle,
+        }}
+      />
     );
   }
 
-  const copy = getAiNewsTopicCopy(topic, forceLocale);
+  const { filterAiNewsTopicArticles, getPublicNewsListing } = await import(
+    "@/lib/public-content"
+  );
   const relatedCandidates = await getPublicNewsListing({
     q: copy.searchQuery,
     sort: "latest",
@@ -171,12 +181,11 @@ export async function AiNewsTopicPageShell({
   const topicSchema = buildTopicCollectionSchema(topic, forceLocale);
 
   return (
-    <main>
-      <Container className="py-14">
+    <main className="ai-news-page ai-news-workspace enhe-reference-workspace ai-news-topic-page">
+      <Container className="ai-news-workspace-container py-14">
         <StructuredData data={[breadcrumbSchema, topicSchema, faqSchema]} />
 
         <section className="glass relative overflow-hidden rounded-[2rem] p-7 md:p-10">
-          <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_18%_10%,rgba(65,197,219,0.18),transparent_30%),radial-gradient(circle_at_80%_18%,rgba(122,167,255,0.14),transparent_34%)]" />
           <div className="relative max-w-4xl">
             <Badge className="text-[var(--marketing-accent)]">
               AI News Topic
@@ -237,7 +246,7 @@ export async function AiNewsTopicPageShell({
                   <Link
                     key={item.href}
                     href={buildLocalePath(item.href, forceLocale)}
-              className="rounded-full border border-white/14 bg-white/7 px-4 py-2 text-sm font-bold text-[var(--marketing-text)] transition-[border-color,color] hover:border-[var(--marketing-accent)] hover:text-[var(--marketing-accent)]"
+              className="min-h-11 rounded-full border border-[var(--marketing-border)] bg-[var(--marketing-card-soft)] px-4 py-2 text-sm font-bold text-[var(--marketing-text)] transition-[border-color,color] hover:border-[var(--marketing-accent)] hover:text-[var(--marketing-accent)]"
                   >
                     {item.label}
                   </Link>
@@ -253,7 +262,7 @@ export async function AiNewsTopicPageShell({
                 {copy.faqs.map((item) => (
                   <article
                     key={item.question}
-                    className="rounded-2xl border border-white/10 bg-white/7 p-5"
+                    className="rounded-2xl border border-[var(--marketing-border)] bg-[var(--marketing-card-soft)] p-5"
                   >
                     <h3 className="text-base font-black text-[var(--marketing-text)]">
                       {item.question}
@@ -288,7 +297,7 @@ export async function AiNewsTopicPageShell({
                           )}
                         </Badge>
                       ) : null}
-                      <h2 className="mt-4 text-lg font-black leading-snug text-[var(--marketing-text)]">
+                      <h2 className="mt-4 break-words text-lg font-black leading-snug text-[var(--marketing-text)]">
                         {forceLocale === "en"
                           ? buildLocalizedNewsTitle(
                               {
@@ -300,7 +309,7 @@ export async function AiNewsTopicPageShell({
                             )
                           : article.title}
                       </h2>
-                      <p className="mt-3 line-clamp-3 text-sm leading-7 text-[var(--marketing-muted)]">
+                      <p className="mt-3 break-words text-sm leading-7 text-[var(--marketing-muted)]">
                         {forceLocale === "en"
                           ? buildLocalizedNewsSummary(
                               {
@@ -331,7 +340,7 @@ export async function AiNewsTopicPageShell({
             </section>
           </div>
 
-          <section className="space-y-6 lg:sticky lg:top-28 lg:self-start" aria-label="Topic support links">
+          <section className="space-y-6 lg:sticky lg:top-28 lg:self-start" aria-label={t.aiNews.topicSupportLabel}>
             <section className="glass rounded-2xl p-5">
               <h2 className="text-lg font-black text-[var(--marketing-text)]">
                 {forceLocale === "en" ? "Keywords" : "专题关键词"}
@@ -341,7 +350,7 @@ export async function AiNewsTopicPageShell({
                   <Link
                     key={keyword}
                     href={`${buildLocalePath("/ai-news", forceLocale)}?q=${encodeURIComponent(keyword)}`}
-                  className="rounded-full border border-white/14 bg-white/7 px-3 py-1 text-xs font-semibold text-[var(--marketing-muted)] transition-[border-color,color] hover:border-[var(--marketing-accent)] hover:text-[var(--marketing-accent)]"
+                  className="min-h-11 rounded-full border border-[var(--marketing-border)] bg-[var(--marketing-card-soft)] px-3 py-1 text-xs font-semibold text-[var(--marketing-muted)] transition-[border-color,color] hover:border-[var(--marketing-accent)] hover:text-[var(--marketing-accent)]"
                   >
                     {keyword}
                   </Link>
@@ -360,7 +369,7 @@ export async function AiNewsTopicPageShell({
                     href={source.url}
                     target="_blank"
                     rel="nofollow noopener noreferrer"
-                  className="rounded-xl border border-white/10 bg-white/7 p-4 text-sm font-semibold text-[var(--marketing-text)] transition-[border-color,color] hover:border-[var(--marketing-accent)]/45 hover:text-[var(--marketing-accent)]"
+                  className="rounded-xl border border-[var(--marketing-border)] bg-[var(--marketing-card-soft)] p-4 text-sm font-semibold text-[var(--marketing-text)] transition-[border-color,color] hover:border-[var(--marketing-accent)]/45 hover:text-[var(--marketing-accent)]"
                   >
                     {source.title}
                   </a>

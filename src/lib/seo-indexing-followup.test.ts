@@ -1,10 +1,20 @@
-import { describe, expect, it } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { generateLoginPageMetadata } from "@/app/(auth)/login/page-shell";
 import { generateAiNewsPageMetadata } from "@/app/ai-news/page-shell";
 import { buildAiNewsSerpTitle } from "@/lib/ai-news";
 import { shouldIndexEnglishToolPage } from "@/lib/tool-localization";
 
+vi.mock("@/lib/db", () => ({ prisma: {} }));
+
 describe("SEO indexing follow-up", () => {
+  beforeEach(() => {
+    vi.stubEnv("DATABASE_URL", "postgresql://localhost:5432/enhe_test");
+  });
+
+  afterEach(() => {
+    vi.unstubAllEnvs();
+  });
+
   it("keeps long English AI news titles unique after SERP truncation", () => {
     const titles = [
       "How ENHE AI Helps Users Understand Claude-Style AI Workflows",

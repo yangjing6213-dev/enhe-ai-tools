@@ -1,20 +1,49 @@
 import { expect, test, type Page } from "@playwright/test";
 
 const viewports = [1440, 1024, 768, 480, 390, 320] as const;
+const isDatabaseFree = !process.env.DATABASE_URL?.trim();
+const isProductionServer = process.env.PLAYWRIGHT_USE_PRODUCTION_SERVER === "1";
 const locales = [
-  { route: "/software", closeLabel: "关闭分类" },
-  { route: "/en/software", closeLabel: "Close categories" },
+  {
+    locale: "zh",
+    route: isDatabaseFree ? "/redesign-preview/software" : "/software",
+    closeLabel: "关闭分类",
+  },
+  {
+    locale: "en",
+    route: isDatabaseFree ? "/redesign-preview/software" : "/en/software",
+    closeLabel: "Close categories",
+  },
 ] as const;
 
-async function openFormalRoute(page: Page, route: string) {
+async function openCategoryRoute(
+  page: Page,
+  route: string,
+  locale: "zh" | "en",
+) {
+  test.skip(
+    isDatabaseFree && isProductionServer,
+    "The standalone production bundle excludes local previews, and DB-free formal software routes have no category layer.",
+  );
+
+  if (isDatabaseFree) {
+    await page.context().addCookies([
+      {
+        name: "enhe_locale",
+        value: locale,
+        url: `http://127.0.0.1:${process.env.PORT ?? "3000"}/`,
+      },
+    ]);
+  }
+
   await page.route("**/api/analytics", (request) => request.fulfill({ status: 204 }));
   const response = await page.goto(route, { waitUntil: "domcontentloaded" });
   expect(response?.status(), `${route} response status`).toBe(200);
 }
 
 for (const width of viewports) {
-  for (const { route, closeLabel } of locales) {
-    test(`origin-aware category layer passes ${route} at ${width}px`, async ({ page }) => {
+  for (const { locale, route, closeLabel } of locales) {
+    test(`origin-aware category layer passes ${route} (${locale}) at ${width}px`, async ({ page }) => {
       const consoleErrors: string[] = [];
       const pageErrors: string[] = [];
       page.on("console", (message) => {
@@ -24,7 +53,7 @@ for (const width of viewports) {
 
       const isMobile = width < 768;
       await page.setViewportSize({ width, height: isMobile ? 844 : 900 });
-      await openFormalRoute(page, route);
+      await openCategoryRoute(page, route, locale);
       const trigger = page.locator(".redesign-software-category-trigger");
       await trigger.click();
 
@@ -78,7 +107,7 @@ for (const width of viewports) {
         expect(state.originDelta, `${route} ${width}px trigger origin`).toBeLessThanOrEqual(1);
       }
 
-      if (width === 390 || width === 320) {
+      if (!isDatabaseFree && (width === 390 || width === 320)) {
         const launcher = page.locator(
           'button[aria-controls="customer-support-panel"]',
         );
@@ -119,7 +148,7 @@ test("pre-navigation reduced motion hydrates cleanly and stays opacity-only", as
 
   await page.emulateMedia({ reducedMotion: "reduce" });
   await page.setViewportSize({ width: 390, height: 844 });
-  await openFormalRoute(page, "/software");
+  await openCategoryRoute(page, locales[0].route, locales[0].locale);
 
   const trigger = page.locator(".redesign-software-category-trigger");
   const panel = page.locator(".redesign-software-category-panel");
@@ -137,9 +166,9 @@ test("pre-navigation reduced motion hydrates cleanly and stays opacity-only", as
 test("keyboard and reduced-motion profiles stay fast, transform-free, and focus-safe", async ({
   page,
 }) => {
-  for (const { route, closeLabel } of locales) {
+  for (const { locale, route, closeLabel } of locales) {
     await page.setViewportSize({ width: 390, height: 844 });
-    await openFormalRoute(page, route);
+    await openCategoryRoute(page, route, locale);
 
     const trigger = page.locator(".redesign-software-category-trigger");
     const panel = page.locator(".redesign-software-category-panel");

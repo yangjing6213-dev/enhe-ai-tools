@@ -129,6 +129,16 @@ export async function POST(request: Request) {
   }
 
   if (!process.env.DATABASE_URL?.trim()) {
+    const {
+      isAnalyticsEventName,
+      isClientWritableAnalyticsEventName,
+    } = await import("@/lib/analytics-event-registry");
+    if (!isAnalyticsEventName(envelope.data.eventName)) {
+      return jsonError("INVALID_REQUEST", 400);
+    }
+    if (!isClientWritableAnalyticsEventName(envelope.data.eventName)) {
+      return jsonError("SERVER_ONLY_EVENT", 403);
+    }
     if (!analyticsPayloadSchema.safeParse(body).success) {
       return jsonError("INVALID_REQUEST", 400);
     }

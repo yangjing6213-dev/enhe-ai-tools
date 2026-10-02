@@ -2,6 +2,15 @@ import { expect, test, type Browser, type Locator, type Page } from "@playwright
 
 import { HOME_PRODUCTS } from "@/lib/redesign/home/home-products";
 
+const hasProductCatalogTestDatabase = Boolean(process.env.DATABASE_URL?.trim());
+const isProductionServer = process.env.PLAYWRIGHT_USE_PRODUCTION_SERVER === "1";
+const databaseFreePreviewUnavailable =
+  !hasProductCatalogTestDatabase && isProductionServer;
+const productCatalogSkipReason =
+  "Requires a configured test database; DB-free public routes intentionally render contentless shells.";
+const productionPreviewSkipReason =
+  "The standalone production bundle excludes local previews, and DB-free formal software routes have no category layer.";
+
 type Modality = "keyboard" | "pointer" | "reduced";
 type FormalRoute = {
   closeCategory?: string;
@@ -147,6 +156,25 @@ async function openFormalRoute(page: Page, route: string) {
   );
   const response = await page.goto(route, { waitUntil: "domcontentloaded" });
   expect(response?.status(), `${route} response status`).toBe(200);
+}
+
+async function openSoftwareInteractionRoute(page: Page, route: string) {
+  test.skip(databaseFreePreviewUnavailable, productionPreviewSkipReason);
+
+  if (!hasProductCatalogTestDatabase) {
+    const locale = route.startsWith("/en/") ? "en" : "zh";
+    await page.context().addCookies([
+      {
+        name: "enhe_locale",
+        value: locale,
+        url: `http://127.0.0.1:${process.env.PORT ?? "3000"}/`,
+      },
+    ]);
+    await openFormalRoute(page, "/redesign-preview/software");
+    return;
+  }
+
+  await openFormalRoute(page, route);
 }
 
 async function rootOverflow(page: Page) {
@@ -540,7 +568,13 @@ for (const route of routes) {
         if (route.kind === "home") {
           await exerciseHome(page, route, modality);
         } else {
+          if (!hasProductCatalogTestDatabase) {
+            await openSoftwareInteractionRoute(page, route.path);
+          }
           await exerciseSoftware(page, modality, viewport.width);
+          if (!hasProductCatalogTestDatabase) {
+            await openFormalRoute(page, route.path);
+          }
         }
 
         if (viewport.width < 768) {
@@ -588,6 +622,25 @@ for (const route of routes) {
   }
 }
 
+for (const route of routes.filter(({ kind }) => kind === "software")) {
+  test(`DB-free formal shell stays contentless on ${route.path}`, async ({ page }) => {
+    test.skip(hasProductCatalogTestDatabase, productCatalogSkipReason);
+    await openFormalRoute(page, route.path);
+
+    await expect(page.locator(".redesign-software-empty")).toBeVisible();
+    await expect(page.locator("[data-production-catalog]")).toHaveCount(0);
+    await expect(page.locator("[data-section], [data-catalog-card]")).toHaveCount(0);
+    await expect(
+      page.locator(
+        ".redesign-software-category-button, .redesign-software-category-trigger, .redesign-software-category-panel",
+      ),
+    ).toHaveCount(0);
+    await expect(
+      page.locator('.redesign-software-load-row, a[rel="prev"], a[rel="next"]'),
+    ).toHaveCount(0);
+  });
+}
+
 for (const supportWidth of [483, 484] as const) {
   test(`support exclusions keep formal controls clear at ${supportWidth}px`, async ({
     page,
@@ -609,11 +662,7 @@ for (const supportWidth of [483, 484] as const) {
               ".redesign-home-brand-value-cta",
               "footer a",
             ]
-          : [
-              '[data-section="all-products"] .redesign-software-card-link',
-              '.redesign-software-load-row a[rel="next"]',
-              "footer a",
-            ];
+          : ["footer a"];
 
       for (const selector of targets) {
         await expectSupportClearOf(
@@ -631,10 +680,48 @@ for (const supportWidth of [483, 484] as const) {
   });
 }
 
+for (const supportWidth of [483, 484] as const) {
+  test(`support exclusions keep software catalogue clear at ${supportWidth}px`, async ({
+    page,
+  }) => {
+    test.skip(!hasProductCatalogTestDatabase, productCatalogSkipReason);
+    await page.setViewportSize({ width: supportWidth, height: 844 });
+
+    for (const route of routes.filter(({ kind }) => kind === "software")) {
+      await openFormalRoute(page, route.path);
+      const support = page.getByRole("button", {
+        name: route.support,
+        exact: true,
+      });
+      await expect(support).toBeVisible();
+      await expectSupportClearOf(
+        page,
+        support,
+        '[data-section="all-products"] .redesign-software-card-link',
+        `${route.path} ${supportWidth}px product cards`,
+      );
+      await expectSupportClearOf(
+        page,
+        support,
+        '.redesign-software-load-row a[rel="next"]',
+        `${route.path} ${supportWidth}px next page control`,
+      );
+      expect(
+        await rootOverflow(page),
+        `${route.path} ${supportWidth}px catalogue root overflow`,
+      ).toBe(0);
+    }
+  });
+}
+
 for (const route of routes) {
   test(`SSR without JavaScript keeps core content on ${route.path}`, async ({
     browser,
   }) => {
+    test.skip(
+      route.kind === "software" && !hasProductCatalogTestDatabase,
+      productCatalogSkipReason,
+    );
     const context = await browser.newContext({ javaScriptEnabled: false });
     const page = await context.newPage();
     await page.setViewportSize({ width: 390, height: 844 });
@@ -874,6 +961,7 @@ for (const route of categorySupportRoutes) {
       test(`category support matrix ${route.path} ${viewport.width}px ${modality}`, async ({
         page,
       }) => {
+        test.skip(!hasProductCatalogTestDatabase, productCatalogSkipReason);
         const errors = monitorErrors(page);
         await page.emulateMedia({
           reducedMotion: modality === "reduced" ? "reduce" : "no-preference",
@@ -959,6 +1047,7 @@ for (const route of categorySupportRoutes) {
   test(`category support suppression cleans up on route unmount from ${route.path}`, async ({
     page,
   }) => {
+    test.skip(!hasProductCatalogTestDatabase, productCatalogSkipReason);
     const errors = monitorErrors(page);
     await page.setViewportSize({ width: 390, height: 844 });
     await openFormalRoute(page, route.path);
@@ -1037,6 +1126,7 @@ for (const locale of [
   test(`software category and mobile navigation keep one active modal on ${locale.path}`, async ({
     page,
   }) => {
+    test.skip(!hasProductCatalogTestDatabase, productCatalogSkipReason);
     const errors = monitorErrors(page);
     await page.setViewportSize({ width: 390, height: 844 });
     await openFormalRoute(page, locale.path);
@@ -1110,15 +1200,19 @@ for (const locale of [
 test("category layer survives 30 rapid interruption rounds", async ({ page }) => {
   const errors = monitorErrors(page);
   await page.setViewportSize({ width: 390, height: 844 });
-  await openFormalRoute(page, "/software");
+  await openSoftwareInteractionRoute(page, "/software");
   const trigger = page.locator(".redesign-software-category-trigger");
   const panel = page.locator(".redesign-software-category-panel");
-  const supportBaseline = await captureSupportBaseline(page, "客服");
+  const supportBaseline = hasProductCatalogTestDatabase
+    ? await captureSupportBaseline(page, "客服")
+    : null;
 
   for (let run = 0; run < 30; run += 1) {
     await trigger.click();
     await expect(panel).toBeVisible();
-    await expectSupportSuppressed(page, "客服", supportBaseline, panel);
+    if (supportBaseline) {
+      await expectSupportSuppressed(page, "客服", supportBaseline, panel);
+    }
     if (run % 3 === 0) {
       await page.keyboard.press("Escape");
     } else if (run % 3 === 1) {
@@ -1128,7 +1222,9 @@ test("category layer survives 30 rapid interruption rounds", async ({ page }) =>
     }
     await expect(panel).toBeHidden();
     await expect(trigger).toBeFocused();
-    await expectSupportRestored(page, "客服", supportBaseline);
+    if (supportBaseline) {
+      await expectSupportRestored(page, "客服", supportBaseline);
+    }
   }
 
   await waitForRelevantAnimations(page);

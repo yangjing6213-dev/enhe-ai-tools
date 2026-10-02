@@ -1,7 +1,30 @@
 import type { NextConfig } from "next";
+import path from "node:path";
 import { adminFileUploadBodySizeLimit } from "./src/lib/upload-limits";
 
 const defaultAppUrl = "https://www.enhe-tech.com.cn";
+const adminVisualFixtureEnabled = process.env.ENHE_ADMIN_VISUAL_FIXTURE === "1";
+
+if (adminVisualFixtureEnabled) {
+  const fixtureOrigin = process.env.NEXT_PUBLIC_APP_URL ?? "";
+  let fixtureUrl: URL;
+  try {
+    fixtureUrl = new URL(fixtureOrigin);
+  } catch {
+    throw new Error("The admin visual fixture requires a loopback NEXT_PUBLIC_APP_URL.");
+  }
+
+  if (
+    process.env.NODE_ENV === "production" ||
+    ["DATABASE_URL", "DIRECT_URL", "SEO_AUDIT_TEST_DATABASE_URL"].some((key) =>
+      Boolean(process.env[key]?.trim()),
+    ) ||
+    (fixtureUrl.protocol !== "http:" && fixtureUrl.protocol !== "https:") ||
+    !["localhost", "127.0.0.1", "::1"].includes(fixtureUrl.hostname)
+  ) {
+    throw new Error("The admin visual fixture is limited to local database-free HTTP(S) development.");
+  }
+}
 
 function getCspReportingEndpoint() {
   try {
@@ -51,7 +74,9 @@ const securityHeaders = [
 ];
 
 const nextConfig: NextConfig = {
+  ...(adminVisualFixtureEnabled ? { distDir: ".next-admin-visual" } : {}),
   output: "standalone",
+  outputFileTracingRoot: path.resolve(process.cwd()),
   htmlLimitedBots: /.*/,
   async redirects() {
     return [
@@ -205,6 +230,21 @@ const nextConfig: NextConfig = {
     serverActions: {
       bodySizeLimit: adminFileUploadBodySizeLimit
     }
+  },
+  webpack(config, { isServer, webpack }) {
+    if (!adminVisualFixtureEnabled || !isServer) return config;
+
+    config.plugins.push(
+      new webpack.NormalModuleReplacementPlugin(
+        /^@\/lib\/auth$/,
+        path.resolve(process.cwd(), "tests/fixtures/admin-visual-auth.ts")
+      ),
+      new webpack.NormalModuleReplacementPlugin(
+        /^@\/lib\/db$/,
+        path.resolve(process.cwd(), "tests/fixtures/admin-visual-db.ts")
+      )
+    );
+    return config;
   }
 };
 

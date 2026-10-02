@@ -111,7 +111,30 @@ export async function loginAction(formData: FormData) {
       userAgent: requestInfo.userAgent
     });
   }
-  redirect(user.role === "admin" ? "/admin" : returnTo);
+  redirect(resolvePostLoginDestination(user.role, returnTo, defaultReturnTo));
+}
+
+function resolvePostLoginDestination(
+  role: "admin" | "user",
+  returnTo: string,
+  defaultReturnTo: string,
+) {
+  const normalizedReturnTo = normalizeEnglishAdminReturnPath(returnTo);
+  const isAdminReturnPath =
+    normalizedReturnTo === "/admin" ||
+    normalizedReturnTo.startsWith("/admin/");
+
+  if (role === "admin") return isAdminReturnPath ? normalizedReturnTo : "/admin";
+  return isAdminReturnPath ? defaultReturnTo : normalizedReturnTo;
+}
+
+function normalizeEnglishAdminReturnPath(returnTo: string) {
+  if (returnTo !== "/en/admin" && !returnTo.startsWith("/en/admin/")) return returnTo;
+
+  const destination = new URL(returnTo, "https://enhe.invalid");
+  destination.pathname = destination.pathname.replace(/^\/en(?=\/admin(?:\/|$))/, "");
+  destination.searchParams.set("locale", "en");
+  return `${destination.pathname}${destination.search}${destination.hash}`;
 }
 
 export async function logoutAction() {

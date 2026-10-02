@@ -408,7 +408,15 @@ const getCachedPublicNewsListing = unstable_cache(
       if (filters.locale === "en") {
         const candidateArticles = await prisma.newsArticle.findMany({
           where,
-          include: { category: true, tagLinks: { include: { tag: true } } },
+          include: {
+            category: true,
+            tagLinks: { include: { tag: true } },
+            externalSources: {
+              select: { id: true },
+              orderBy: [{ sortOrder: "asc" }, { createdAt: "asc" }],
+              take: 1,
+            },
+          },
           orderBy,
         });
         const indexableArticles = candidateArticles.filter(
@@ -426,7 +434,15 @@ const getCachedPublicNewsListing = unstable_cache(
       const [articles, total] = await Promise.all([
         prisma.newsArticle.findMany({
           where,
-          include: { category: true, tagLinks: { include: { tag: true } } },
+          include: {
+            category: true,
+            tagLinks: { include: { tag: true } },
+            externalSources: {
+              select: { id: true },
+              orderBy: [{ sortOrder: "asc" }, { createdAt: "asc" }],
+              take: 1,
+            },
+          },
           orderBy,
           skip: filters.skip ?? 0,
           take: filters.take ?? 9,
@@ -878,10 +894,18 @@ export async function getPublicToolListing(
 }
 
 export async function getPublicSoftwareCatalogRows() {
+  if (!process.env.DATABASE_URL?.trim()) {
+    return [];
+  }
+
   return getCachedPublicSoftwareCatalogRows();
 }
 
 export async function getPublicSoftwareCatalogCovers() {
+  if (!process.env.DATABASE_URL?.trim()) {
+    return [];
+  }
+
   return getCachedPublicSoftwareCatalogCovers();
 }
 
@@ -915,6 +939,7 @@ export async function getPublicNewsTags(locale: "zh" | "en" = "zh") {
 }
 
 export async function getPublicNewsArticleBySlug(slug: string) {
+  if (!process.env.DATABASE_URL?.trim()) return null;
   return getCachedPublicNewsArticleBySlug(slug);
 }
 
@@ -933,11 +958,13 @@ export {
 } from "@/lib/ai-news-topic-config";
 
 export async function resolvePublicToolSlug(slug: string) {
+  if (!process.env.DATABASE_URL?.trim()) return null;
   const items = await getCachedPublicToolSlugIndex();
   return findSlugMatch(items, slug);
 }
 
 export async function resolvePublicNewsArticleSlug(slug: string) {
+  if (!process.env.DATABASE_URL?.trim()) return null;
   const items = await getCachedPublicNewsSlugIndex();
   return findSlugMatch(items, slug);
 }

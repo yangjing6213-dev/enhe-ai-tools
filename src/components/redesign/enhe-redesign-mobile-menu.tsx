@@ -15,6 +15,7 @@ import {
   type MobileNavMotionPhase,
   type MobileNavMotionProfile,
 } from "@/lib/motion/mobile-nav-motion";
+import { isExactCurrentPage } from "./navigation";
 import type { RedesignAccount, RedesignNavItem } from "./types";
 
 const MOBILE_NAV_QUERY = "(width < 768px)";
@@ -33,12 +34,14 @@ export function EnheRedesignMobileMenu({
   closeLabel,
   navItems,
   account,
+  pathname,
 }: {
   menuId: string;
   triggerLabel: string;
   closeLabel: string;
   navItems: ReadonlyArray<RedesignNavItem>;
   account: RedesignAccount;
+  pathname?: string;
 }) {
   const [open, setOpen] = useState(false);
   const [layerRendered, setLayerRendered] = useState(false);
@@ -46,7 +49,7 @@ export function EnheRedesignMobileMenu({
     useState<MobileNavInputModality>("pointer");
   const [prefersReducedMotion, setPrefersReducedMotion] = useState(false);
   const triggerRef = useRef<HTMLButtonElement>(null);
-  const overlayRef = useRef<HTMLButtonElement>(null);
+  const overlayRef = useRef<HTMLDivElement>(null);
   const panelRef = useRef<HTMLElement>(null);
   const openRef = useRef(false);
   const desktopFocusTargetRef = useRef<HTMLElement | null>(null);
@@ -59,6 +62,9 @@ export function EnheRedesignMobileMenu({
     : inputModality;
   const motionPhase: MobileNavMotionPhase = open ? "open" : "close";
   const motionContract = resolveMobileNavMotion(motionProfile, motionPhase);
+  const isCurrentPath = (href: string) => {
+    return isExactCurrentPage(pathname, href);
+  };
 
   const stopActiveAnimations = useCallback(() => {
     for (const control of activeAnimationsRef.current) {
@@ -409,12 +415,11 @@ export function EnheRedesignMobileMenu({
       </button>
       {layerRendered ? (
         <>
-          <button
+          <div
             ref={overlayRef}
-            type="button"
             className="redesign-menu-overlay"
+            role="presentation"
             aria-hidden="true"
-            tabIndex={-1}
             data-motion-duration-ms={motionContract.overlay.durationMs}
             data-motion-modality={motionProfile}
             data-motion-phase={motionPhase}
@@ -457,6 +462,7 @@ export function EnheRedesignMobileMenu({
                         <a
                           key={child.href}
                           href={child.href}
+                          aria-current={isCurrentPath(child.href) ? "page" : undefined}
                           onClick={(event) => close(getClickModality(event))}
                         >
                           {child.label}
@@ -468,6 +474,7 @@ export function EnheRedesignMobileMenu({
                   <a
                     key={item.href}
                     href={item.href}
+                    aria-current={isCurrentPath(item.href) ? "page" : undefined}
                     onClick={(event) => close(getClickModality(event))}
                   >
                     {item.kind === "search" ? (

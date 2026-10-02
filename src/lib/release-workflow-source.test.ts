@@ -102,7 +102,7 @@ describe("production release workflow", () => {
     expect(wrapper).toContain("ToLowerInvariant");
     expect(playwright).toContain("PLAYWRIGHT_USE_PRODUCTION_SERVER");
     expect(playwright).toContain("start-production-e2e.cjs");
-    expect(playwright).toContain("workers: useProductionServer ? 2 : undefined");
+    expect(playwright).toContain("workers: useProductionServer ? 2 : isDatabaseFree ? 1 : undefined");
     expect(read("scripts/start-production-e2e.cjs")).toContain("fetch-cache");
     expect(vitest).toContain('".next/**"');
   });

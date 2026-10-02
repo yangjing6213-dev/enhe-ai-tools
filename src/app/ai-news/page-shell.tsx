@@ -3,6 +3,8 @@ import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { StructuredData } from "@/components/structured-data";
+import { ContentlessState } from "@/components/redesign/contentless-state";
+import { AiNewsWorkspaceShell } from "@/components/redesign/ai-news-workspace-shell";
 import {
   Badge,
   ButtonLink,
@@ -255,31 +257,47 @@ export async function AiNewsPageShell({
   if (!isNewsPaginationPageQueryable(filters.page)) notFound();
   const filtered = hasActiveNewsFilters(filters);
   const t = getDictionary(forceLocale);
+  const currentPathname = buildLocalePath(
+    pageOverride && pageOverride > 1 ? `/ai-news/page/${pageOverride}` : "/ai-news",
+    forceLocale,
+  );
   if (!process.env.DATABASE_URL?.trim()) {
     return (
-      <main>
-        <Container className="py-14">
-          <section
-            data-content-status="UNVERIFIED"
-            className="surface-panel p-8"
-          >
-            <SectionTitle
-              as="h1"
-              title={t.aiNews.title}
-              intro={
-                forceLocale === "en"
-                  ? "AI News content is not available in this local preview."
-                  : "AI 资讯内容尚未核验，当前本地预览不展示资讯卡片或资讯事实。"
-              }
-            />
-            <p className="mt-6 text-sm font-semibold leading-7 text-[var(--marketing-muted)]">
-              {forceLocale === "en"
-                ? "UNVERIFIED — AI News content has not been verified yet."
-                : "UNVERIFIED — AI 资讯内容尚未核验。"}
-            </p>
-          </section>
-        </Container>
-      </main>
+      <AiNewsWorkspaceShell locale={forceLocale} currentPathname={currentPathname}>
+        <ContentlessState
+          locale={forceLocale}
+          className="ai-news-page ai-news-workspace enhe-reference-workspace"
+          dataStatusTarget="panel"
+          eyebrow={forceLocale === "en" ? "AI News" : "AI 前沿资讯"}
+          title={t.aiNews.title}
+          intro={
+            forceLocale === "en"
+              ? "AI News content is not available in this local preview."
+              : "AI 资讯内容尚未核验，当前本地预览不展示资讯卡片或资讯事实。"
+          }
+          statusLabel={forceLocale === "en" ? "Unverified" : "待核验"}
+          stateTitle={forceLocale === "en" ? "Content is being prepared" : "内容准备中"}
+          statusText={
+            forceLocale === "en"
+              ? "Unverified — AI News content has not been verified yet."
+              : "待核验：AI 资讯内容尚未核验。"
+          }
+          primaryAction={{
+            href: buildLocalePath("/", forceLocale),
+            label: forceLocale === "en" ? "Return home" : "返回首页",
+          }}
+          secondaryActions={[
+            {
+              href: buildLocalePath("/software", forceLocale),
+              label: forceLocale === "en" ? "Browse software" : "浏览 AI 软件",
+            },
+            {
+              href: buildLocalePath("/skill-learning", forceLocale),
+              label: forceLocale === "en" ? "Learn skills" : "学习 AI 技能",
+            },
+          ]}
+        />
+      </AiNewsWorkspaceShell>
     );
   }
   const [{ articles, total }, featured, hot, categories, tags, discovery, topics] =
@@ -296,6 +314,20 @@ export async function AiNewsPageShell({
       getPublicAiNewsTopics(),
     ]);
   const pageCount = getNewsPageCount(total);
+  const configuredLeadArticle = featured.articles[0];
+  const leadArticle =
+    filters.page > 1
+      ? undefined
+      : filtered
+        ? articles[0]
+        : configuredLeadArticle &&
+            articles.some((article) => article.id === configuredLeadArticle.id)
+          ? configuredLeadArticle
+          : articles[0];
+  const latestArticles = articles.filter(
+    (article) => article.id !== leadArticle?.id,
+  );
+  const showLatestRegion = latestArticles.length > 0 || articles.length === 0;
   if (
     pageOverride &&
     !isNewsPaginationPageInRange(pageOverride, total)
@@ -338,30 +370,52 @@ export async function AiNewsPageShell({
   });
 
   return (
-    <main>
-      <Container className="py-14">
+    <AiNewsWorkspaceShell locale={forceLocale} currentPathname={currentPathname}>
+      <main className="ai-news-page ai-news-workspace enhe-reference-workspace">
+      <Container className="ai-news-workspace-container py-14">
         <StructuredData data={[breadcrumbSchema, collectionSchema, webPageSchema, faqSchema]} />
-        <section className="glass relative overflow-hidden rounded-[2rem] p-7 md:p-10">
-          <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_16%_10%,rgba(65,197,219,0.22),transparent_30%),radial-gradient(circle_at_82%_20%,rgba(122,167,255,0.16),transparent_32%)]" />
-          <div className="relative max-w-4xl">
-            <p className="text-sm font-bold tracking-[0.08em] text-[var(--marketing-accent)]">
-              ENHE AI INSIGHTS
-            </p>
-            <h1 className="mt-5 text-4xl font-black leading-tight text-[var(--marketing-text)] md:text-6xl">
-              {t.aiNews.title}
-            </h1>
-            <p className="mt-5 max-w-3xl text-base font-medium leading-8 text-[var(--marketing-muted)] md:text-lg">
-              {t.aiNews.intro}
-            </p>
-            <p className="mt-4 text-sm font-semibold text-[var(--marketing-accent)]">
-              {t.aiNews.support}
-            </p>
+        <section
+          className={`ai-news-workspace-lead-grid mt-8 ${leadArticle ? "" : "ai-news-workspace-lead-grid--empty"}`}
+          data-ai-news-region="lead"
+        >
+          <div
+            className={
+              leadArticle
+                ? "ai-news-workspace-lead-copy"
+                : "glass ai-news-workspace-hero relative overflow-hidden rounded-[2rem] p-7 md:p-10"
+            }
+          >
+            <div className="relative max-w-4xl">
+              <p className="text-sm font-bold tracking-[0.08em] text-[var(--marketing-accent)]">
+                ENHE AI INSIGHTS
+              </p>
+              <h1 className="mt-5 text-4xl font-black leading-tight text-[var(--marketing-text)] md:text-6xl">
+                {t.aiNews.title}
+              </h1>
+              <p className="mt-5 max-w-3xl text-base font-medium leading-8 text-[var(--marketing-muted)] md:text-lg">
+                {t.aiNews.intro}
+              </p>
+              <p className="mt-4 text-sm font-semibold text-[var(--marketing-accent)]">
+                {t.aiNews.support}
+              </p>
+            </div>
           </div>
+          {leadArticle ? (
+            <div
+              className="ai-news-workspace-lead-story"
+              data-ai-news-lead-story
+            >
+              <p className="ai-news-workspace-lead-label">
+                {forceLocale === "en" ? "Lead story" : "本期导读"}
+              </p>
+              <NewsCard article={leadArticle} locale={forceLocale} featured />
+            </div>
+          ) : null}
         </section>
 
         <AiNewsGeoBlock forceLocale={forceLocale} />
 
-        <section className="glass mt-8 rounded-2xl p-6">
+        <section className="glass ai-news-workspace-takeaway mt-8 rounded-2xl p-6">
           <p className="text-xs font-bold uppercase tracking-[0.16em] text-[var(--marketing-accent)]">
             {forceLocale === "en" ? "Key takeaway" : "核心结论"}
           </p>
@@ -380,52 +434,41 @@ export async function AiNewsPageShell({
           locale={forceLocale}
         />
 
-        {featured.articles.length ? (
-          <section className="mt-10">
-            <SectionTitle title={t.aiNews.featuredTitle} />
-            <div className="grid gap-5 lg:grid-cols-3">
-              {featured.articles.map((article, index) => (
-                <NewsCard
-                  key={article.id}
-                  article={article}
-                  locale={forceLocale}
-                  featured={index === 0}
+        <div className="ai-news-workspace-grid mt-12 grid gap-8 lg:grid-cols-[1fr_320px]">
+          {showLatestRegion ? (
+            <div>
+              <SectionTitle title={t.aiNews.latestTitle} />
+              {latestArticles.length ? (
+                <>
+                  <div className="grid gap-5 md:grid-cols-2">
+                    {latestArticles.map((article) => (
+                      <NewsCard
+                        key={article.id}
+                        article={article}
+                        locale={forceLocale}
+                      />
+                    ))}
+                  </div>
+                  <Pagination
+                    page={filters.page}
+                    pageCount={pageCount}
+                    locale={forceLocale}
+                    filters={filters}
+                  />
+                </>
+              ) : (
+                <EmptyState
+                  title={t.aiNews.emptyTitle}
+                  text={t.aiNews.emptyText}
                 />
-              ))}
+              )}
             </div>
-          </section>
-        ) : null}
+          ) : null}
 
-        <div className="mt-12 grid gap-8 lg:grid-cols-[1fr_320px]">
-          <div>
-            <SectionTitle title={t.aiNews.latestTitle} />
-            {articles.length ? (
-              <>
-                <div className="grid gap-5 md:grid-cols-2">
-                  {articles.map((article) => (
-                    <NewsCard
-                      key={article.id}
-                      article={article}
-                      locale={forceLocale}
-                    />
-                  ))}
-                </div>
-                <Pagination
-                  page={filters.page}
-                  pageCount={pageCount}
-                  locale={forceLocale}
-                  filters={filters}
-                />
-              </>
-            ) : (
-              <EmptyState
-                title={t.aiNews.emptyTitle}
-                text={t.aiNews.emptyText}
-              />
-            )}
-          </div>
-
-          <section className="space-y-6" aria-label="AI news filters">
+          <section
+            className={`space-y-6 ${showLatestRegion ? "" : "lg:col-span-2"}`}
+            aria-label={t.aiNews.discoveryRegionLabel}
+          >
             <TrendPanel articles={hot.articles} locale={forceLocale} />
             <KeywordCloud
               locale={forceLocale}
@@ -464,7 +507,7 @@ export async function AiNewsPageShell({
           </h2>
           <div className="mt-5 grid gap-4 md:grid-cols-3">
             {aiNewsFaqItems[forceLocale].map((item) => (
-              <article key={item.question} className="rounded-2xl border border-white/10 bg-white/7 p-5">
+              <article key={item.question} className="rounded-2xl border border-[var(--marketing-border)] bg-[var(--marketing-card)] p-5">
                 <h3 className="text-base font-black leading-snug text-[var(--marketing-text)]">
                   {item.question}
                 </h3>
@@ -476,7 +519,8 @@ export async function AiNewsPageShell({
           </div>
         </section>
       </Container>
-    </main>
+      </main>
+    </AiNewsWorkspaceShell>
   );
 }
 
@@ -503,7 +547,7 @@ function AiNewsGeoBlock({ forceLocale }: { forceLocale: Locale }) {
         {sections.map((section) => (
           <article
             key={section.title}
-            className="rounded-2xl border border-white/10 bg-white/8 p-5"
+            className="rounded-2xl border border-[var(--marketing-border)] bg-[var(--marketing-card)] p-5"
           >
             <h2 className="text-lg font-black leading-snug text-[var(--marketing-text)]">
               {section.title}
@@ -519,7 +563,7 @@ function AiNewsGeoBlock({ forceLocale }: { forceLocale: Locale }) {
           <Link
             key={item.href}
             href={item.href}
-                  className="rounded-full border border-white/14 bg-white/7 px-4 py-2 text-sm font-bold text-[var(--marketing-text)] transition-[border-color,color] hover:border-[var(--marketing-accent)] hover:text-[var(--marketing-accent)]"
+                  className="rounded-full border border-[var(--marketing-border)] bg-[var(--marketing-card)] px-4 py-2 text-sm font-bold text-[var(--marketing-text)] transition-[border-color,color] hover:border-[var(--marketing-accent)] hover:text-[var(--marketing-accent)]"
           >
             {item.label[forceLocale]}
           </Link>
@@ -545,6 +589,7 @@ function FilterBar({
   return (
     <form
       className="filter-surface mt-8 grid gap-3 lg:grid-cols-[1fr_180px_160px_140px]"
+      aria-label={t.aiNews.filterFormLabel}
       data-analytics-event="search_ai_news"
       data-analytics-meta-locale={locale}
       data-analytics-meta-query={filters.q ?? ""}
@@ -615,7 +660,7 @@ function FilterBar({
         <option value="hot">{t.aiNews.hot}</option>
         <option value="featured">{t.aiNews.featured}</option>
       </select>
-              <button className="rounded-full bg-[#050505] px-5 py-3 font-bold text-white transition-colors hover:bg-[#161616] lg:col-span-4">
+               <button className="rounded-full bg-[var(--marketing-button)] px-5 py-3 font-bold text-[var(--marketing-card)] transition-colors hover:bg-[var(--marketing-accent)] lg:col-span-4">
         {t.aiNews.filter}
       </button>
     </form>
@@ -659,13 +704,15 @@ function NewsCard({
       : article.summary;
   const coverImage = normalizeImageSrc(article.coverImage);
   const href = buildCanonicalAiNewsPath(article, locale);
+  const hasExternalSources = Boolean(article.externalSources?.length);
+  const evidenceState = hasExternalSources ? "unverified" : "source-missing";
 
   return (
     <article
-      className={`glass group overflow-hidden rounded-2xl transition-[border-color,transform] duration-200 hover:-translate-y-1 hover:border-[var(--marketing-accent)]/45 ${featured ? "lg:col-span-1" : ""}`}
+      className={`glass group overflow-hidden rounded-2xl transition-[border-color,transform] duration-200 hover:-translate-y-1 hover:border-[var(--marketing-accent)]/45 ${featured ? "ai-news-lead-card" : ""}`}
     >
       <Link href={href} className="block">
-        <div className="relative aspect-[16/9] overflow-hidden bg-white/6">
+         <div className="relative aspect-[16/9] overflow-hidden bg-[var(--marketing-card-soft)]">
           {coverImage ? (
             <Image
               src={coverImage}
@@ -676,7 +723,7 @@ function NewsCard({
               unoptimized
             />
           ) : (
-            <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_20%,rgba(65,197,219,0.24),transparent_34%),radial-gradient(circle_at_80%_70%,rgba(122,167,255,0.18),transparent_36%),linear-gradient(135deg,rgba(255,255,255,0.08),transparent)]" />
+             <div className="absolute inset-0 bg-[var(--marketing-card-soft)]" />
           )}
         </div>
         <div className="p-5">
@@ -695,10 +742,10 @@ function NewsCard({
               </Badge>
             ) : null}
           </div>
-          <h2 className="mt-4 text-xl font-black leading-snug text-[var(--marketing-text)]">
+          <h2 className="mt-4 break-words text-xl font-black leading-snug text-[var(--marketing-text)]">
             {title}
           </h2>
-          <p className="mt-3 line-clamp-3 text-sm leading-7 text-[var(--marketing-muted)]">
+            <p className="mt-3 break-words text-sm leading-7 text-[var(--marketing-muted)]">
             {summary}
           </p>
           <div className="mt-5 flex flex-wrap items-center gap-x-4 gap-y-2 text-xs text-[var(--marketing-muted)]">
@@ -707,6 +754,19 @@ function NewsCard({
             </span>
             <span className="tabular-nums">{article.readingTime} min</span>
             <span className="tabular-nums">{article.viewCount} views</span>
+          </div>
+          <div
+            className="mt-3 flex flex-wrap items-center gap-x-3 gap-y-1 text-xs font-semibold text-[var(--marketing-muted)]"
+            data-evidence-state={evidenceState}
+          >
+            <span>
+              {hasExternalSources
+                ? t.aiNews.evidenceUnverified
+                : t.aiNews.evidenceSourceMissing}
+            </span>
+            {hasExternalSources ? (
+              <span>{t.aiNews.evidenceSourceAvailable}</span>
+            ) : null}
           </div>
           <div className="mt-5 flex flex-wrap gap-2">
             {article.tagLinks.slice(0, 3).map(({ tag }) => (
@@ -744,7 +804,7 @@ function TrendPanel({
             <Link
               key={article.id}
               href={buildCanonicalAiNewsPath(article, locale)}
-              className="block rounded-xl border border-white/10 bg-white/7 p-4 transition-colors hover:border-[var(--marketing-accent)]/45"
+               className="block rounded-xl border border-[var(--marketing-border)] bg-[var(--marketing-card)] p-4 transition-colors hover:border-[var(--marketing-accent)]/45"
             >
               <span className="text-xs font-bold text-[var(--marketing-accent)]">
                 #{index + 1}
@@ -792,7 +852,7 @@ function KeywordCloud({
           <Link
             key={item.keyword}
             href={`${buildLocalePath("/ai-news", locale)}?q=${encodeURIComponent(item.query)}`}
-                    className="rounded-full border border-white/14 bg-white/7 px-3 py-1 text-xs font-semibold text-[var(--marketing-muted)] transition-[border-color,color] hover:border-[var(--marketing-accent)] hover:text-[var(--marketing-accent)]"
+                     className="rounded-full border border-[var(--marketing-border)] bg-[var(--marketing-card)] px-3 py-1 text-xs font-semibold text-[var(--marketing-muted)] transition-[border-color,color] hover:border-[var(--marketing-accent)] hover:text-[var(--marketing-accent)]"
           >
             {localizeAiNewsDiscoveryLabel(
               item.displayName,
@@ -849,7 +909,7 @@ function TopicCollections({
           <Link
             key={item.key}
             href={item.href}
-                    className="rounded-xl border border-white/10 bg-white/7 p-4 text-sm font-semibold text-[var(--marketing-text)] transition-[border-color,color] hover:border-[var(--marketing-accent)]/45 hover:text-[var(--marketing-accent)]"
+                     className="rounded-xl border border-[var(--marketing-border)] bg-[var(--marketing-card)] p-4 text-sm font-semibold text-[var(--marketing-text)] transition-[border-color,color] hover:border-[var(--marketing-accent)]/45 hover:text-[var(--marketing-accent)]"
           >
             {item.title}
           </Link>
@@ -858,7 +918,7 @@ function TopicCollections({
           <Link
             key={item.key}
             href={`${buildLocalePath("/ai-news", locale)}?q=${encodeURIComponent(item.query)}`}
-                    className="rounded-xl border border-white/10 bg-white/7 p-4 text-sm font-semibold text-[var(--marketing-muted)] transition-[border-color,color] hover:border-[var(--marketing-accent)]/45 hover:text-[var(--marketing-accent)]"
+                     className="rounded-xl border border-[var(--marketing-border)] bg-[var(--marketing-card)] p-4 text-sm font-semibold text-[var(--marketing-muted)] transition-[border-color,color] hover:border-[var(--marketing-accent)]/45 hover:text-[var(--marketing-accent)]"
           >
             {localizeAiNewsDiscoveryLabel(
               item.title,
@@ -908,7 +968,7 @@ function Pagination({
           <Link
             key={nextPage}
             href={href}
-            className={`rounded-full border px-4 py-2 text-sm font-semibold transition-[background-color,border-color,color] ${page === nextPage ? "border-[var(--marketing-accent)] bg-[var(--marketing-accent)]/14 text-[var(--marketing-accent)]" : "border-white/14 bg-white/7 text-[var(--marketing-muted)] hover:border-[var(--marketing-accent)] hover:text-[var(--marketing-accent)]"}`}
+             className={`rounded-full border px-4 py-2 text-sm font-semibold transition-[background-color,border-color,color] ${page === nextPage ? "border-[var(--marketing-accent)] bg-[var(--marketing-accent)]/14 text-[var(--marketing-accent)]" : "border-[var(--marketing-border)] bg-[var(--marketing-card)] text-[var(--marketing-muted)] hover:border-[var(--marketing-accent)] hover:text-[var(--marketing-accent)]"}`}
           >
             {nextPage}
           </Link>

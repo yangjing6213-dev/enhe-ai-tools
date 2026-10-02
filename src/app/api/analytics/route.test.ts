@@ -97,6 +97,22 @@ describe("POST /api/analytics", () => {
     expect(createEventMock).not.toHaveBeenCalled();
   });
 
+  it("rejects unknown and server-only events in DB-free mode", async () => {
+    delete process.env.DATABASE_URL;
+
+    const unknown = await POST(request({ eventName: "unknown_event" }));
+    const serverOnly = await POST(request({ eventName: "create_order" }));
+
+    expect(unknown.status).toBe(400);
+    expect(await unknown.json()).toEqual({ ok: false, code: "INVALID_REQUEST" });
+    expect(serverOnly.status).toBe(403);
+    expect(await serverOnly.json()).toEqual({ ok: false, code: "SERVER_ONLY_EVENT" });
+    expect(authModuleLoadMock).not.toHaveBeenCalled();
+    expect(dbModuleLoadMock).not.toHaveBeenCalled();
+    expect(getCurrentUserMock).not.toHaveBeenCalled();
+    expect(createEventMock).not.toHaveBeenCalled();
+  });
+
   it.each(serverOnlyEvents)(
     "rejects anonymous attempts to forge authoritative %s events",
     async (eventName) => {

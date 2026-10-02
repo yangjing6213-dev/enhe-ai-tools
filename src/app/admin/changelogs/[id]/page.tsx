@@ -1,7 +1,7 @@
 ﻿import Link from "next/link";
 import { notFound } from "next/navigation";
 import { deleteToolChangelogAction, upsertToolChangelogAction } from "@/app/admin/actions";
-import { AdminSection, DangerButton, Field, inputClass, selectClass, SubmitButton, textareaClass } from "@/app/admin/admin-ui";
+import { AdminContentShell, AdminSection, DangerButton, Field, inputClass, selectClass, SubmitButton, textareaClass } from "@/app/admin/admin-ui";
 import { prisma } from "@/lib/db";
 
 type AdminChangelogDetailPageProps = {
@@ -14,12 +14,13 @@ export default async function AdminChangelogDetailPage({ params, searchParams }:
   const isNew = id === "new";
   const [changelog, tools] = await Promise.all([
     isNew ? null : prisma.toolChangelog.findUnique({ where: { id }, include: { tool: true } }),
-    prisma.tool.findMany({ orderBy: { name: "asc" } })
+    prisma.tool.findMany({ select: { id: true, name: true }, orderBy: { name: "asc" } })
   ]);
   if (!isNew && !changelog) notFound();
 
   return (
     <AdminSection title={isNew ? "新增工具版本记录" : "编辑工具版本记录"} intro="维护单个工具详情页中的版本更新记录。">
+      <AdminContentShell className="enhe-admin-content-management">
       <div className="mb-6">
         <Link href="/admin/changelogs" className="rounded-full border border-white/15 px-4 py-2 text-sm transition hover:border-[#48F5D3]/50 hover:text-[#48F5D3]">
           返回版本清单
@@ -30,7 +31,17 @@ export default async function AdminChangelogDetailPage({ params, searchParams }:
         <p className="mb-5 rounded-xl border border-[#48F5D3]/30 bg-[#48F5D3]/10 px-4 py-3 text-sm text-[#48F5D3]">保存成功。</p>
       ) : null}
 
-      <form action={upsertToolChangelogAction} className="glass grid gap-4 rounded-2xl p-6 md:grid-cols-2">
+      {tools.length === 0 ? (
+        <p role="status" className="mb-4 text-sm leading-6 text-[var(--enhe-text-muted)]">
+          当前还没有可关联的 AI 软件应用。请先{" "}
+          <Link href="/admin/software/new" className="font-semibold text-[var(--enhe-action)] underline underline-offset-4 hover:text-[var(--enhe-action-hover)]">
+            新增 AI 软件应用
+          </Link>
+          ，再回来填写此表。
+        </p>
+      ) : null}
+
+      <form action={upsertToolChangelogAction} className="enhe-admin-content-form enhe-admin-changelog-editor-form glass grid gap-4 rounded-2xl p-6 md:grid-cols-2">
         {changelog ? <input type="hidden" name="id" value={changelog.id} /> : null}
         <Field label="工具">
           <select name="toolId" defaultValue={changelog?.toolId ?? ""} required className={selectClass}>
@@ -58,6 +69,7 @@ export default async function AdminChangelogDetailPage({ params, searchParams }:
           <DangerButton>删除版本记录</DangerButton>
         </form>
       ) : null}
+      </AdminContentShell>
     </AdminSection>
   );
 }

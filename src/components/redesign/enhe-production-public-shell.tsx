@@ -47,6 +47,7 @@ export async function EnheRedesignPublicHeader({
       homeHref={buildLocalePath("/", locale)}
       brandLabel={HOME_COPY[redesignLocale].label}
       navItems={REDESIGN_NAV_ITEMS[redesignLocale]}
+      currentPathname={pathname}
       languageHrefs={
         languageHrefs ?? {
           zh: buildLanguageSwitcherHref(pathname, "zh"),

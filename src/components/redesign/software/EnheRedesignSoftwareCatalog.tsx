@@ -89,6 +89,18 @@ function renderProductionCatalog({
         : `${basePath}?category=${category.id}`,
     ]),
   ) as Record<SoftwareCategoryId, string>;
+  const emptyRecoveryHref = selectedCategory
+    ? basePath
+    : locale === "en"
+      ? "/en"
+      : "/";
+  const emptyRecoveryLabel = selectedCategory
+    ? locale === "en"
+      ? "Clear filter"
+      : "清除筛选"
+    : locale === "en"
+      ? "Return to ENHE AI home"
+      : "返回 ENHE AI 首页";
 
   return (
     <main
@@ -114,35 +126,39 @@ function renderProductionCatalog({
         categoryHrefs={categoryHrefs}
       />
 
-      <CatalogSection
-        locale={locale}
-        heading={copy.sections.newReleases.heading}
-        description={
-          locale === "en"
-            ? "The newest published entries, ordered by their public release record."
-            : "按公开发布时间展示最新上架的工具入口。"
-        }
-        items={listing.newReleases}
-        sectionId="new-releases"
-        rail="new"
-      />
+      {listing.newReleases.length > 0 ? (
+        <CatalogSection
+          locale={locale}
+          heading={copy.sections.newReleases.heading}
+          description={
+            locale === "en"
+              ? "The newest published entries, ordered by their public release record."
+              : "按公开发布时间展示最新上架的工具入口。"
+          }
+          items={listing.newReleases}
+          sectionId="new-releases"
+          rail="new"
+        />
+      ) : null}
 
-      <CatalogSection
-        locale={locale}
-        heading={copy.sections.featuredProducts.heading}
-        description={
-          locale === "en"
-            ? "Published products selected through the tracked editorial field."
-            : "通过已跟踪的编辑推荐字段筛选公开产品。"
-        }
-        items={listing.featuredProducts}
-        sectionId="featured-products"
-        rail="featured"
-      />
+      {listing.featuredProducts.length > 0 ? (
+        <CatalogSection
+          locale={locale}
+          heading={copy.sections.featuredProducts.heading}
+          description={
+            locale === "en"
+              ? "Published products selected through the tracked editorial field."
+              : "通过已跟踪的编辑推荐字段筛选公开产品。"
+          }
+          items={listing.featuredProducts}
+          sectionId="featured-products"
+          rail="featured"
+        />
+      ) : null}
 
       <section className="redesign-software-section" data-section="all-products">
         <header className="redesign-software-section-header">
-          <h2>{copy.sections.allProducts.heading}</h2>
+          <h2 id="all-products-heading">{copy.sections.allProducts.heading}</h2>
           <p>
             {locale === "en"
               ? `Showing page ${listing.page} of ${Math.max(1, listing.totalPages)} across ${listing.total} published products.`
@@ -152,6 +168,8 @@ function renderProductionCatalog({
         <div
           id={ALL_PRODUCTS_ROOT_ID}
           className="redesign-software-grid redesign-software-grid-all"
+          role="list"
+          aria-labelledby="all-products-heading"
           data-all-products-root
           data-loaded="true"
         >
@@ -163,44 +181,61 @@ function renderProductionCatalog({
               categoryLabel={getCategoryLabel(locale, product.categoryId)}
               detailLabel={copy.actions.detail}
               sectionId="all-products"
+              listItem
             />
           ))}
-          {listing.items.length === 0 ? (
-            <p className="redesign-software-empty" role="status">
-              {locale === "en"
-                ? "No published products are available in this category yet."
-                : "该分类暂时没有已公开产品。"}
-            </p>
-          ) : null}
         </div>
-        <nav
-          className="redesign-software-load-row"
-          aria-label={locale === "en" ? "Catalog pagination" : "产品分页"}
-        >
-          {listing.previousHref ? (
-            <a
-              className="redesign-software-next-link"
-              href={listing.previousHref}
-              rel="prev"
-            >
-              {locale === "en" ? "Previous page" : "上一页"}
+        {listing.items.length === 0 ? (
+          <div className="redesign-software-empty">
+            <p role="status" aria-live="polite">
+              {locale === "en"
+                ? selectedCategory
+                  ? "No published products are available in this category yet."
+                  : "No published products are available yet."
+                : selectedCategory
+                  ? "该分类暂时没有已公开产品。"
+                  : "暂时没有已公开产品。"}
+            </p>
+            <a className="redesign-software-empty-action" href={emptyRecoveryHref}>
+              {emptyRecoveryLabel}
             </a>
-          ) : null}
-          {listing.nextHref ? (
-            <a
-              className="redesign-software-load-more-button"
-              href={listing.nextHref}
-              rel="next"
+          </div>
+        ) : null}
+        <div className="redesign-software-load-row">
+          {listing.previousHref || listing.nextHref ? (
+            <nav
+              className="redesign-software-pagination"
+              aria-label={locale === "en" ? "Catalog pagination" : "产品分页"}
             >
-              {copy.actions.loadMore}
-            </a>
+              {listing.previousHref ? (
+                <a
+                  className="redesign-software-next-link"
+                  href={listing.previousHref}
+                  rel="prev"
+                >
+                  {locale === "en" ? "Previous page" : "上一页"}
+                </a>
+              ) : null}
+              {listing.nextHref ? (
+                <a
+                  className="redesign-software-load-more-button"
+                  href={listing.nextHref}
+                  rel="next"
+                >
+                  {copy.actions.loadMore}
+                </a>
+              ) : null}
+            </nav>
           ) : null}
-          <p className="redesign-software-load-more-status" role="status">
+          <p
+            className="redesign-software-load-more-status"
+            role={listing.items.length > 0 ? "status" : undefined}
+          >
             {locale === "en"
               ? `Page ${listing.page}; ${listing.items.length} of ${listing.total} products in this result.`
               : `第 ${listing.page} 页；本页 ${listing.items.length} 款，共 ${listing.total} 款。`}
           </p>
-        </nav>
+        </div>
       </section>
     </main>
   );
@@ -307,12 +342,14 @@ function renderPreviewCatalog({
 
       <section className="redesign-software-section" data-section="all-products">
         <header className="redesign-software-section-header">
-          <h2>{copy.sections.allProducts.heading}</h2>
+          <h2 id="all-products-heading">{copy.sections.allProducts.heading}</h2>
           <p>{copy.sections.allProducts.description}</p>
         </header>
         <div
           id={ALL_PRODUCTS_ROOT_ID}
           className="redesign-software-grid redesign-software-grid-all"
+          role="list"
+          aria-labelledby="all-products-heading"
           data-all-products-root
           data-loaded="false"
         >
@@ -325,6 +362,7 @@ function renderPreviewCatalog({
               detailLabel={copy.actions.detail}
               sectionId="all-products"
               extraHidden={index >= INITIAL_VISIBLE_ALL_PRODUCTS}
+              listItem
             />
           ))}
         </div>

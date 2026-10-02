@@ -13,6 +13,7 @@ export function EnheRedesignSoftwareCard({
   detailLabel,
   sectionId,
   extraHidden = false,
+  listItem = false,
 }: {
   locale: RedesignLocale;
   product: SoftwareCatalogItem;
@@ -20,6 +21,7 @@ export function EnheRedesignSoftwareCard({
   detailLabel: string;
   sectionId: "new-releases" | "featured-products" | "all-products";
   extraHidden?: boolean;
+  listItem?: boolean;
 }) {
   const [mediaFailed, setMediaFailed] = useState(false);
   const showTextCover = product.media === null || mediaFailed;
@@ -34,6 +36,7 @@ export function EnheRedesignSoftwareCard({
       data-section={sectionId}
       data-extra-card={extraHidden ? "true" : undefined}
       hidden={extraHidden}
+      role={listItem ? "listitem" : undefined}
       aria-labelledby={headingId}
       aria-describedby={descriptionId}
     >

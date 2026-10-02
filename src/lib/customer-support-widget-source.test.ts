@@ -78,19 +78,50 @@ describe("customer support widget source", () => {
       new URL("../styles/redesign/shell.css", import.meta.url),
       "utf8",
     );
-    const reducedMotion = shell.slice(
-      shell.lastIndexOf("@media (prefers-reduced-motion: reduce)"),
+    const supportMotionSelector =
+      ".enhe-redesign-production .customer-support-launcher {";
+    const reducedMotionStart = [
+      ...shell.matchAll(/@media \(prefers-reduced-motion: reduce\) \{/g),
+    ]
+      .map((match) => match.index ?? -1)
+      .find((start) => {
+        const end = shell.indexOf("\n}\n", start);
+        return end > start && shell.slice(start, end).includes(supportMotionSelector);
+      }) ?? -1;
+    const reducedMotionEnd = shell.indexOf("\n}\n", reducedMotionStart);
+    const reducedMotion = shell.slice(reducedMotionStart, reducedMotionEnd);
+    const readRuleBody = (selector: string) => {
+      const selectorStart = reducedMotion.indexOf(selector);
+      if (selectorStart < 0) return "";
+
+      const ruleStart = reducedMotion.indexOf("{", selectorStart);
+      if (ruleStart < 0) return "";
+
+      const ruleEnd = reducedMotion.indexOf("}", ruleStart);
+
+      return ruleEnd > ruleStart
+        ? reducedMotion.slice(ruleStart + 1, ruleEnd)
+        : "";
+    };
+    const launcherRule = readRuleBody(
+      ".enhe-redesign-production .customer-support-launcher {",
+    );
+    const launcherHoverRule = readRuleBody(
+      ".enhe-redesign-production .customer-support-launcher:hover {",
+    );
+    const spinnerRule = readRuleBody(
+      ".enhe-redesign-production #customer-support-panel .animate-spin {",
     );
 
     expect(widget).not.toContain("transition-[filter,opacity]");
     expect(widget).not.toContain("hover:brightness-110");
     expect(widget).toContain("transition-opacity");
     expect(widget).toContain("hover:opacity-90");
-    expect(reducedMotion).toContain(".enhe-redesign-production .customer-support-launcher");
-    expect(reducedMotion).toContain("transition-property: border-color");
-    expect(reducedMotion).toContain("transform: none");
-    expect(reducedMotion).toContain("#customer-support-panel .animate-spin");
-    expect(reducedMotion).toContain("animation: none");
+    expect(reducedMotionStart).toBeGreaterThan(-1);
+    expect(reducedMotionEnd).toBeGreaterThan(reducedMotionStart);
+    expect(launcherRule).toContain("transition-property: border-color");
+    expect(launcherHoverRule).toContain("transform: none");
+    expect(spinnerRule).toContain("animation: none");
   });
 
   it("scopes the shared exclusion to approved product, footer, and home targets", () => {

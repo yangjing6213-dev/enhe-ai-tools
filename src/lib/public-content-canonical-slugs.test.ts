@@ -1,4 +1,4 @@
-import { beforeEach, describe, expect, it, vi } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 const db = vi.hoisted(() => ({
   toolFindMany: vi.fn(),
@@ -24,6 +24,11 @@ describe("public content canonical slug resolution", () => {
   beforeEach(() => {
     vi.resetModules();
     vi.clearAllMocks();
+    vi.stubEnv("DATABASE_URL", "postgresql://localhost:5432/enhe_test");
+  });
+
+  afterEach(() => {
+    vi.unstubAllEnvs();
   });
 
   it("resolves tool detail requests by raw or canonical slug", async () => {

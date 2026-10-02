@@ -102,10 +102,16 @@ describe("ENHE Phase 2C.1 production wiring", () => {
     const admin = readSource("app/admin/layout.tsx");
     const orders = readSource("app/orders/layout.tsx");
 
-    for (const layout of [auth, enAuth, user, admin, orders]) {
+    for (const layout of [auth, enAuth, user, orders]) {
       expect(layout).toContain("SiteHeader");
       expect(layout).toContain("SiteFooter");
     }
+
+    expect(admin).toContain("requireAdmin");
+    expect(admin).toContain("admin-topbar");
+    expect(admin).toContain("AdminNav");
+    expect(admin).not.toContain("SiteHeader");
+    expect(admin).not.toContain("SiteFooter");
   });
 
   it("does not move preview-only markers into production call sites", () => {
