@@ -1,6 +1,37 @@
 # ENHE AI News single-masthead acceptance
 
-Status: `PASS_LOCAL_ONLY`; the selected masthead acceptance was rechecked on 2026-10-02. The current closure receipt has a fresh local self-audit; its independent review remains limited to a prior snapshot.
+Status: `PASS_LOCAL_ONLY` for the masthead contract. Overall release-candidate
+acceptance is `PARTIAL`; see the 2026-10-03 candidate reconciliation in
+`docs/exec-plans/MASTER_BACKLOG.md`.
+
+## 2026-10-03 final candidate verification
+
+- A fresh read-only candidate overlay review found 0 Critical, 0 Important,
+  and 0 Minor findings. It rechecked the seven normalized content-difference
+  paths and the single-masthead, bilingual pagination, and local database-free
+  boundaries. Its focused AI News and release-workflow checks passed 36/36;
+  PowerShell and Node syntax checks passed. No files were changed by the
+  reviewer, and the protected D4R scope failure remains separate.
+- The one shared masthead and local Latest/Topics navigation passed the
+  AI News/Topics/deep-route browser suite: 32/32. Six focused suites passed
+  38/38 after the final admin copy cleanup.
+- The latest split Vitest checks are `PARTIAL`: excluding the protected D4R
+  file, 485 files passed, 9 skipped, and 2,457 tests passed with no failures;
+  the protected file was run separately and had 7 passed, 1 failed. Together
+  these runs account for 2,464 passed, 90 skipped, and 1 failed; this is a
+  reconciled total, not the output of one invocation. The sole failure is the
+  frozen D4R worktree-scope assertion at
+  `src/lib/production-motion-final-source.test.ts`; that protected file was
+  left unchanged. This does not invalidate the scoped masthead browser result,
+  but it prevents claiming a fully green release candidate.
+- The historical guard already sees 220 paths (212 outside its allowlist) from
+  its old baseline to source HEAD `41b7af3`; the candidate range sees 317 (309
+  outside). The test file is byte-identical at both heads, showing this is a
+  stale history-scope contract rather than a failure introduced only here.
+- Targeted ESLint, `npm run typecheck`, and `git diff --check` passed. The
+  database-free build exited 0 and generated 121/121 pages while all three
+  database URL variables were empty. Prisma logged empty-URL validation errors
+  on unrelated data-backed pages; live database behavior remains unverified.
 
 ## Goal
 
@@ -71,6 +102,17 @@ the live browser acceptance; a runtime UI change is not presumed.
   requests.
 - Fresh verification on 2026-10-02: targeted ESLint, `npm run typecheck`, and
   `git diff --check` PASS.
+
+## 2026-10-03 candidate-worktree recheck
+
+- `npm test -- src/lib/typeshare-alignment.test.ts`: PASS, 7/7.
+- With `DATABASE_URL`, `DIRECT_URL`, and `SEO_AUDIT_TEST_DATABASE_URL` empty,
+  `npm run test:e2e -- tests/e2e/typeshare-alignment.spec.ts`: PASS, 24/24.
+  This freshly verifies the single shared masthead, local Latest/Topics links,
+  no duplicate account/language controls, bilingual routes, responsive layout,
+  and keyboard navigation.
+- Targeted ESLint and `git diff --check`: PASS. No runtime masthead change was
+  needed because the candidate already matches the selected structure.
 - The browser server was loopback-only; `DATABASE_URL`, `DIRECT_URL`, and
   `SEO_AUDIT_TEST_DATABASE_URL` were empty in the local test process. No runtime
   page source changed.

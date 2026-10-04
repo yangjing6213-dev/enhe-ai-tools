@@ -21,7 +21,7 @@ const config: ZpayConfig = {
   mode: "live",
   apiBase: "https://zpayz.cn",
   pid: "2026061115080760",
-  key: "test_secret_32_chars_1234567890",
+  key: "unit-key",
   defaultType: "wxpay",
   channelId: "18680",
   siteUrl: "https://www.enhe-tech.com.cn"

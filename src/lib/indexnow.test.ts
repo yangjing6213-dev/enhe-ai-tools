@@ -1,9 +1,8 @@
-import { existsSync, readFileSync } from "node:fs";
+import { existsSync, readFileSync, readdirSync } from "node:fs";
 import { join } from "node:path";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import {
   buildIndexNowPayload,
-  defaultIndexNowKey,
   getIndexNowKey,
   getIndexNowKeyFileName,
   getIndexNowKeyLocation,
@@ -13,6 +12,12 @@ import {
 
 const originalIndexNowKey = process.env.INDEXNOW_KEY;
 const originalAppUrl = process.env.NEXT_PUBLIC_APP_URL;
+const publicDir = join(process.cwd(), "public");
+const publicIndexNowKeyFileNames = readdirSync(publicDir).filter((fileName) => /^[A-Za-z0-9-]{32,128}\.txt$/.test(fileName));
+const publicIndexNowKeyFileName = publicIndexNowKeyFileNames[0];
+const publicIndexNowKey = publicIndexNowKeyFileName
+  ? readFileSync(join(publicDir, publicIndexNowKeyFileName), "utf8").trim()
+  : "";
 
 afterEach(() => {
   vi.restoreAllMocks();
@@ -29,27 +34,42 @@ afterEach(() => {
 });
 
 describe("IndexNow integration", () => {
-  it("publishes a root key file whose content matches the configured key", () => {
-    const keyFileName = getIndexNowKeyFileName();
-    const keyFilePath = join(process.cwd(), "public", keyFileName);
+  it("fails closed until an explicit key is configured", () => {
+    delete process.env.INDEXNOW_KEY;
 
-    expect(keyFileName).toBe(`${defaultIndexNowKey}.txt`);
+    expect(getIndexNowKey()).toBe("");
+    expect(getIndexNowKeyFileName()).toBe("");
+    expect(getIndexNowKeyLocation()).toBe("");
+  });
+
+  it("publishes a root key file whose content matches the explicitly configured key", () => {
+    expect(publicIndexNowKeyFileNames).toHaveLength(1);
+    expect(publicIndexNowKeyFileName).toBeTruthy();
+    expect(publicIndexNowKey).toMatch(/^[A-Za-z0-9-]{32,128}$/);
+    process.env.INDEXNOW_KEY = publicIndexNowKey;
+
+    const keyFileName = getIndexNowKeyFileName();
+    const keyFilePath = join(publicDir, keyFileName);
+
+    expect(keyFileName).toBe(publicIndexNowKeyFileName);
     expect(existsSync(keyFilePath)).toBe(true);
-    expect(readFileSync(keyFilePath, "utf8").trim()).toBe(defaultIndexNowKey);
+    expect(readFileSync(keyFilePath, "utf8").trim()).toBe(publicIndexNowKey);
   });
 
   it("builds an official IndexNow payload with absolute public URLs", () => {
+    process.env.INDEXNOW_KEY = publicIndexNowKey;
     process.env.NEXT_PUBLIC_APP_URL = "https://www.enhe-tech.com.cn/";
 
     expect(buildIndexNowPayload(["/ai-news/new-story", "https://www.enhe-tech.com.cn/software/tool"])).toEqual({
       host: "www.enhe-tech.com.cn",
-      key: defaultIndexNowKey,
-      keyLocation: `https://www.enhe-tech.com.cn/${defaultIndexNowKey}.txt`,
+      key: publicIndexNowKey,
+      keyLocation: `https://www.enhe-tech.com.cn/${publicIndexNowKey}.txt`,
       urlList: ["https://www.enhe-tech.com.cn/ai-news/new-story", "https://www.enhe-tech.com.cn/software/tool"]
     });
   });
 
   it("deduplicates URLs and excludes admin, api, checkout, user, and external URLs", () => {
+    process.env.INDEXNOW_KEY = publicIndexNowKey;
     process.env.NEXT_PUBLIC_APP_URL = "https://www.enhe-tech.com.cn";
 
     expect(
@@ -77,6 +97,7 @@ describe("IndexNow integration", () => {
   });
 
   it("posts to the IndexNow endpoint when URLs are valid", async () => {
+    process.env.INDEXNOW_KEY = publicIndexNowKey;
     process.env.NEXT_PUBLIC_APP_URL = "https://www.enhe-tech.com.cn";
     const fetchMock = vi.fn().mockResolvedValue(new Response("", { status: 200 }));
     vi.stubGlobal("fetch", fetchMock);
@@ -91,8 +112,8 @@ describe("IndexNow integration", () => {
         headers: { "Content-Type": "application/json; charset=utf-8" },
         body: JSON.stringify({
           host: "www.enhe-tech.com.cn",
-          key: defaultIndexNowKey,
-          keyLocation: `https://www.enhe-tech.com.cn/${defaultIndexNowKey}.txt`,
+          key: publicIndexNowKey,
+          keyLocation: `https://www.enhe-tech.com.cn/${publicIndexNowKey}.txt`,
           urlList: ["https://www.enhe-tech.com.cn/ai-news/story"]
         })
       })
@@ -100,6 +121,7 @@ describe("IndexNow integration", () => {
   });
 
   it("uses best-effort notification without throwing when IndexNow fails", async () => {
+    process.env.INDEXNOW_KEY = publicIndexNowKey;
     const consoleWarnSpy = vi.spyOn(console, "warn").mockImplementation(() => undefined);
     vi.stubGlobal("fetch", vi.fn().mockRejectedValue(new Error("network down")));
 

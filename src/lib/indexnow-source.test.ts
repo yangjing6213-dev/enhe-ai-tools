@@ -1,11 +1,16 @@
-import { readFileSync } from "node:fs";
+import { readdirSync, readFileSync } from "node:fs";
 import { describe, expect, it } from "vitest";
 
 describe("IndexNow source wiring", () => {
   it("serves the IndexNow key file from public", () => {
-    const key = readFileSync(new URL("../../public/b689ebc55640682df41b6721a64881dae8f81beecc0b5591525747a6d9a01751.txt", import.meta.url), "utf8").trim();
+    const publicUrl = new URL("../../public/", import.meta.url);
+    const fileNames = readdirSync(publicUrl).filter((entry) => /^[A-Za-z0-9-]{32,128}\.txt$/.test(entry));
+    const fileName = fileNames[0];
+    const key = fileName ? readFileSync(new URL(`../../public/${fileName}`, import.meta.url), "utf8").trim() : "";
 
-    expect(key).toBe("b689ebc55640682df41b6721a64881dae8f81beecc0b5591525747a6d9a01751");
+    expect(fileNames).toHaveLength(1);
+    expect(fileName).toBe(`${key}.txt`);
+    expect(key).toMatch(/^[A-Za-z0-9-]{32,128}$/);
   });
 
   it("submits newly published or updated public content through admin actions and import API", () => {

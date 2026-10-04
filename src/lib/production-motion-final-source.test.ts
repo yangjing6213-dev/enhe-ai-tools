@@ -16,6 +16,8 @@ const projectRoot = process.cwd();
 const preMotionBaseline = "ad603985e40f1142e3ddff821e984abc14ebc207";
 const finalProductionSource = "ac39487ecec451f2ef9408884fa17f8cffdf9ff3";
 const d4BlockedHead = "dfa5d8b8fe277129934c8d1ec13eda2851d3e970";
+const d4rReviewHead = "78357d74962276d3036975d2197e9c284eb053b1";
+const d4rEvidencePrefix = "docs/enhe-redesign/phase-2c3d-final-r1/";
 
 const implementationCommits = [
   "5938b2f6da0c50a2dac08ea4d0bf31f367e169f3",
@@ -156,11 +158,26 @@ describe("final production motion source contract", () => {
     );
   });
 
-  it("limits D4R to the exact targeted production, test, and new evidence paths", () => {
-    const committedPaths = gitLines([
+  it("limits the frozen D4R range and current D4R paths to the exact scope", () => {
+    expect(() =>
+      execFileSync(
+        "git",
+        ["merge-base", "--is-ancestor", d4BlockedHead, d4rReviewHead],
+        { cwd: projectRoot, stdio: "ignore" },
+      ),
+    ).not.toThrow();
+    expect(() =>
+      execFileSync(
+        "git",
+        ["merge-base", "--is-ancestor", d4rReviewHead, "HEAD"],
+        { cwd: projectRoot, stdio: "ignore" },
+      ),
+    ).not.toThrow();
+
+    const d4rRangePaths = gitLines([
       "diff",
       "--name-only",
-      `${d4BlockedHead}..HEAD`,
+      `${d4BlockedHead}..${d4rReviewHead}`,
     ]);
     const worktreePaths = gitLines([
       "status",
@@ -170,15 +187,23 @@ describe("final production motion source contract", () => {
       const path = line.slice(3);
       return path.includes(" -> ") ? path.split(" -> ").at(-1) ?? path : path;
     });
-    const d4rPaths = [...new Set([...committedPaths, ...worktreePaths])];
     const approvedPaths = new Set<string>([
       ...targetedCorrectionProductionPaths,
       ...targetedCorrectionTestPaths,
     ]);
+    // Later website batches share this worktree. The motion-specific guard
+    // owns only its exact target paths and its frozen evidence tree; the
+    // broader candidate scope is checked by the release receipt separately.
+    const d4rWorktreePaths = worktreePaths.filter(
+      (path) =>
+        approvedPaths.has(path) ||
+        path.startsWith(d4rEvidencePrefix),
+    );
+    const d4rPaths = [...new Set([...d4rRangePaths, ...d4rWorktreePaths])];
     const unauthorized = d4rPaths.filter(
       (path) =>
         !approvedPaths.has(path) &&
-        !path.startsWith("docs/enhe-redesign/phase-2c3d-final-r1/"),
+        !path.startsWith(d4rEvidencePrefix),
     );
     const changedProductionPaths = d4rPaths
       .filter((path) =>

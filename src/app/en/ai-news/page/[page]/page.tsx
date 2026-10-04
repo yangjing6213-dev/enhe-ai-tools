@@ -1,6 +1,7 @@
 import { notFound, permanentRedirect } from "next/navigation";
 import {
   AiNewsPageShell,
+  buildAiNewsLanguageHrefs,
   generateAiNewsPageMetadata,
 } from "@/app/ai-news/page-shell";
 import { PublicSiteChrome } from "@/components/public-site-chrome";
@@ -33,11 +34,15 @@ export default async function EnglishAiNewsPaginationPage({
   const page = parseNewsPaginationPage((await params).page);
   if (page === null) notFound();
   if (page === 1) permanentRedirect("/en/ai-news");
+  const queryParams = await searchParams;
 
   return (
-    <PublicSiteChrome forceLocale="en">
+    <PublicSiteChrome
+      forceLocale="en"
+      languageHrefs={buildAiNewsLanguageHrefs(queryParams, page)}
+    >
       <AiNewsPageShell
-        searchParams={searchParams}
+        searchParams={Promise.resolve(queryParams)}
         forceLocale="en"
         pageOverride={page}
       />

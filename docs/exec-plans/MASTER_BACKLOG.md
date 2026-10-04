@@ -2,7 +2,329 @@
 
 Status: CONTROLLED_RECOVERY
 
-## 2026-10-03 current verification checkpoint
+## 2026-10-04 local secret-hit classification and cleanup
+
+- The owner authorized only local Gitleaks classification and cleanup. No
+  `.env`, production environment/database, remote history, GitHub, SSH, Tencent
+  Cloud, commit, push, or deployment operation occurred.
+- Six source/test secret-shaped findings were removed: IndexNow now requires an
+  explicit environment key, the Lumi license fixture generates an ephemeral
+  Ed25519 key pair, and ZPAY fixtures use short local-only values. Three
+  additional PostgreSQL test fixtures were normalized, and
+  `src/lib/secret-hygiene-source.test.ts` prevents those patterns returning.
+- The ignored `.next/` build output was removed after a successful build. Fresh
+  Gitleaks now reports one retained SHA-256 route-fingerprint false positive in
+  the evidence document and 31 immutable local-history findings. The values were
+  never emitted; history was not rewritten. Publication remains blocked until a
+  separately approved scanner allowlist/history decision.
+- `.env.example` now has only an empty `INDEXNOW_KEY` placeholder, and the
+  Tencent Cloud runbook requires the server value to match the tracked public
+  verification filename before deployment. No active environment value was read
+  or changed.
+- Focused security checks passed 47/47. Controlled full Vitest passed 487 files
+  / 2,468 tests with 9 files / 90 database-dependent tests skipped; lint,
+  typecheck, and the DB-free build passed with 121/121 pages. The current
+  receipt records 132 base-to-worktree paths (80 modified, 52 added) and
+  manifest `a42eb66a620786f9904b9c3f8a6861c85459e718648e458864065fbde97920ba`.
+
+## 2026-10-04 exact Gitleaks exception and local release seal
+
+- The owner approved one exact local exception for the confirmed SHA-256 route
+  fingerprint false positive. `.gitleaksignore` contains only
+  `docs/enhe-redesign/phase-1b1/04-PRODUCTION-ROUTE-FINGERPRINT.md:generic-api-key:7`,
+  and `src/lib/secret-hygiene-source.test.ts` rejects any broader entry.
+- With that exception, the current-tree Gitleaks scan returns zero findings.
+  The historical scan remains non-zero at 29 findings: 22
+  `generic-api-key`, 6 `curl-auth-header`, and 1 `private-key`. The raw
+  pre-exception count was 31; only the two exact matching historical
+  occurrences are suppressed, and no history is rewritten.
+- The local release seal is recorded in the current JSON receipt with
+  path/status inventory, raw-byte hashes, focused and full database-free tests,
+  lint, typecheck, build, and diff-check. GitHub and Tencent Cloud remain
+  preparation-only; no target branch or remote write is selected.
+
+## 2026-10-04 D4R scope closure and controlled full test
+
+- The owner-authorized D4R adjustment now separates the frozen motion review
+  range (`dfa5d8b8..78357d749`) from later website batches in the same
+  candidate worktree. The guard still requires both commits to be in the
+  current ancestry, keeps the three approved production paths and five direct
+  test paths, and admits only the phase-2C3D4R evidence directory. Other dirty
+  website paths remain governed by the candidate receipt and are not silently
+  treated as motion changes.
+- TDD reproduced the old 7/8 failure before the change. The isolated protected
+  test now passes 8/8. The controlled full Vitest run then passed 486 files and
+  2,465 tests; 9 files and 90 database-dependent tests were skipped, with 0
+  failures. It used one worker and disabled file parallelism to avoid the
+  resource-induced timeouts seen in the first unconstrained run.
+- Full lint, typecheck, and `git diff --check` passed. The candidate is now
+  locally test-green under the database-free gate, but remains
+  `READY_TO_PUBLISH=NO` because the worktree is dirty and the exact GitHub
+  target/write authorization are still unselected. No production database,
+  `.env`, remote write, commit, push, SSH, publication, or deployment occurred.
+
+## 2026-10-04 read-only release preflight and Docker compatibility fix
+
+- The live read-only remote check still shows `codex/ai-news-publishing-v2` as
+  the GitHub default and `codex/enhe-recovery-baseline` as the existing recovery
+  branch; the candidate branch is absent. The authenticated CLI owner matches
+  the remote owner, origin uses HTTPS with Git Credential Manager, no environment
+  token is set, and no workflow files are present, so the workflow-scope gate is
+  not applicable. No GitHub write, SSH connection, or Tencent Cloud operation
+  occurred.
+- The local Docker context is `desktop-linux` and exposes the local
+  `dockerDesktopLinuxEngine` named pipe. TDD reproduced the wrapper's false
+  rejection, then the PowerShell runner and standalone migration drill were
+  aligned to accept both Docker Desktop local engine pipes while retaining
+  remote TCP/named-pipe rejection. The focused release suite passes 29/29 and
+  the controlled full Vitest remains 486/2,465 with 90 database tests skipped.
+- Gitleaks 8.30.1 found 464 redacted current-worktree hits and 31 local-history
+  hits. Values were not emitted or changed; this is a hard pre-publish security
+  stop pending classification. The candidate remains dirty and
+  `READY_TO_PUBLISH=NO`.
+
+## 2026-10-04 scoped candidate overlay review
+
+- A fresh read-only review of the current candidate overlay completed with 0
+  Critical, 0 Important, and 0 Minor findings. The review covered AI News
+  bilingual pagination and language switching, the single shared masthead,
+  release safety scripts, migration checks, database-free E2E isolation, and
+  the seven normalized content-difference paths. CRLF/LF-only differences were
+  not treated as code changes.
+- The scoped review's focused checks passed 7/7 for AI News and 29/29 for the
+  release-workflow source suite; the combined reviewed checks were 36/36.
+  PowerShell and Node syntax checks also passed. This review was read-only and
+  made no database, Docker, network, GitHub, SSH, commit, push, publication, or
+  deployment operation.
+- The D4R historical-scope assertion remains the only full-suite blocker at
+  7/8. The candidate remains `READY_TO_PUBLISH=NO`; the documented operator
+  precondition about checking for SSH port forwarding before local database
+  tests remains in force.
+
+## 2026-10-04 current verification recheck
+
+- Fresh database-free Vitest recheck excluding the protected D4R file passed:
+  485 test files and 2,457 tests passed; 9 files and 90 tests were skipped by
+  the existing database/environment conditions, with no failures in this
+  portion. The focused release-workflow source suite passed 29/29, and the
+  official `npm run typecheck` passed. These are fresh local checks, not a
+  release or deployment approval.
+- The protected `src/lib/production-motion-final-source.test.ts` was rerun
+  separately on 2026-10-04: 7/8 passed and the same single assertion failed,
+  `limits D4R to the exact targeted production, test, and new evidence paths`.
+  It still combines 317 committed paths since the historical checkpoint with
+  17 current worktree paths (327 unique), so the failure is the unchanged
+  historical scope conflict. The protected file remains byte-identical and
+  was not edited.
+- The candidate remains `PARTIAL`, dirty, and `READY_TO_PUBLISH=NO`. The
+  118-path local selection, raw hashes, and this verification are refreshed in
+  `docs/handoffs/ENHE-RELEASE-CANDIDATE-2026-10-03.json`; the receipt itself is
+  excluded from its own manifest. No production database, `.env`, GitHub write,
+  commit, push, SSH, Tencent Cloud access, content publication, or deployment
+  occurred.
+- A fresh read-only `git ls-remote` recheck at 2026-10-03 22:51 UTC returned
+  the same remote default `codex/ai-news-publishing-v2` at
+  `b0288210215ef0e54f39ed93d66def931d8c7af6` and recovery branch at
+  `2af4a0534add5fa3eb094a943177327f9b919ce1`; `main` and the candidate branch
+  are still absent. This does not select a push target or authorize a write.
+- The candidate commit-tree hash audit is now corrected: all 109 `candidate.paths`
+  hashes match the latest runtime commit `df482044266fccc6be7e3818b70c5117abc8dc38`.
+  The current worktree has 60 raw-byte differences from that commit; after
+  CRLF-to-LF normalization, seven paths contain content differences and the
+  remaining 53 are line-ending representation differences. The 118-path
+  `worktreeSelection` hashes match those live files. The receipt now separates
+  committed-tree evidence from dirty-worktree evidence.
+- The schedule therefore stays fail-closed: complete the owner-directed D4R
+  scope decision and exact candidate review before any remote write; only then
+  perform read-only Tencent Cloud preflight and a separately approved deploy.
+  If a gate passes early, advance immediately; do not bypass a failed gate.
+
+## 2026-10-03 current gate audit and adjusted targets
+
+- The planned Oct 3 GitHub update did not proceed: the candidate worktree is
+  still dirty, the publish branch and exact write approval are not selected,
+  and the protected D4R suite guard remains the only full-Vitest failure. No
+  GitHub or Tencent Cloud operation was attempted.
+- The candidate overlay review initially reported two regex issues, then
+  withdrew both after checking the unescaped source. Fresh PowerShell .NET
+  checks accepted `ubuntu`, `codex/ai-news-publishing-v2`, and both local
+  Docker Desktop named-pipe forms; remote TCP and remote named-pipe forms were
+  rejected. No release script or Docker command was run.
+- The release-workflow source suite passed 29/29; targeted ESLint and the
+  official typecheck passed. With database URL variables empty, all Vitest
+  files except the protected D4R file passed: 485 files, 2,457 tests; 9 files
+  and 90 tests were skipped, with 0 failures. The protected file was run
+  separately: 7/8 tests passed; its historical path-scope assertion remains
+  unauthorized to change. The two split runs reconcile to 2,464 passed, 90
+  skipped, and 1 failed; this combined count is not from one test invocation.
+  Overall status remains `PARTIAL`.
+- Schedule correction, with no holiday pause: Oct 4 is now the target to close
+  local acceptance and perform the exact GitHub update only if all gates and
+  approvals are satisfied; Oct 5 is the read-only Tencent preflight; Oct 6 is
+  the deployment gate; Oct 7–9 are post-deployment checks and corrections.
+  Advance to the next stage immediately if its dependencies pass early. These
+  dates supersede the Oct 3–8 targets recorded in the historical checkpoint
+  below; a missing owner approval or failed gate moves dependent stages rather
+  than being bypassed.
+- `READY_TO_PUBLISH=NO`. The 118-path local receipt records the current
+  manifest and raw file hashes; the final refresh follows this audit-note
+  update. No production database, `.env`, staging, commit, push, SSH, content
+  publication, or deployment was used.
+
+## 2026-10-03 AI News locale preservation and current verification
+
+- The local E2E rerun exposed a regression in AI News language switching: the
+  shared masthead dropped supported filters. The fix passes allow-listed
+  `q/category/tag/sort/page` values to the global switcher on the four zh/en
+  index and pagination routes; unrecognized query keys are omitted, and a
+  paginated path does not repeat its page number in the query. TDD added two
+  helper cases before implementation. The stale DB-free software assertion now
+  checks the existing `data-content-status="UNVERIFIED"` shell marker; runtime
+  software behavior was not changed.
+- The owner-selected masthead contract was rechecked in the candidate worktree: the source test passed 7/7 and the TypeShare browser suite passed 24/24 across bilingual public routes, responsive widths, unique account/language controls, and keyboard navigation. Targeted ESLint and git diff --check also passed; browser-test database URL variables were explicitly empty.
+- The reviewed worktree selection now contains 118 paths (69 modified, 49 added), SHA-256 `f74623a167ab723dfc0d5a2c2a5937115675495bdb6ee764f1e6c2a1ea767fef`. This reconciles five AI News route/test paths; the committed candidate manifest remains 109 paths and is unchanged. The local candidate stays `READY_TO_PUBLISH=NO`.
+- Focused unit verification passed 7/7. AI News locale E2E passed 4/4; DB-free
+  software empty-state E2E passed 2/2; the 767px pointer category case passed
+  5/5 repeated runs. A fresh full E2E rerun on 2026-10-03 discovered 369 tests
+  and exited 0; Playwright's last-run receipt reports `passed` with no failed
+  tests. The exact pass/skip totals were not retained by the shell capture, so
+  this records the suite status and failure count only. The earlier 303 passed,
+  56 skipped, 10 failed run and 51/51 selected rerun remain historical evidence.
+- Latest Vitest split-run accounting is `PARTIAL`: outside the protected D4R
+  file, 485 files and 2,457 tests passed with 9 files/90 tests skipped and no
+  failures; the isolated D4R run had 7 passed and 1 failed. The reconciled
+  total is 2,464 passed, 90 skipped, 1 failed, not one invocation. The sole
+  failure remains the unchanged protected D4R worktree-scope assertion. Full
+  ESLint, typecheck, and
+  empty-database-address production build passed; the build generated 121/121
+  static pages and Prisma emitted the expected missing-`DATABASE_URL` messages.
+- Fresh isolated rerun of `src/lib/production-motion-final-source.test.ts`
+  reproduced exactly 1 failure and 7 passes. The failed case is
+  `limits D4R to the exact targeted production, test, and new evidence paths`;
+  it builds its scope from every committed path since the old D4R checkpoint
+  plus every current worktree path. The current candidate contributes 317
+  committed paths and 17 dirty paths (327 unique), so the guard sees unrelated
+  accumulated website work as D4R scope. Its other seven checks pass. The
+  candidate copy of the protected test remains clean; no change is authorized.
+- Fresh read-only GitHub inspection on 2026-10-03 returned the same remote
+  default branch `codex/ai-news-publishing-v2` at `b0288210215ef0e54f39ed93d66def931d8c7af6`
+  and recovery branch `codex/enhe-recovery-baseline` at
+  `2af4a0534add5fa3eb094a943177327f9b919ce1`. Neither `main` nor the candidate
+  branch exists remotely. Local `origin/HEAD` still points to stale `origin/main`
+  at `12503ec50069f500c52b1d7107e530627791f262`; candidate vs. remote recovery
+  remains 5 ahead/0 behind, while the remote default has no merge base (629/8
+  divergent commits). No write was attempted; target and integration strategy
+  remain unselected.
+- The five route/test files newly touched for the authorized local AI News fix
+  are added to the local worktree selection. This scope update does not approve
+  their remote publication. The candidate remains dirty and
+  `READY_TO_PUBLISH=NO`; do not proceed to GitHub or Tencent Cloud while full
+  acceptance and the protected D4R gate remain unresolved. No production DB,
+  `.env`, remote write, content publication, or deployment was used.
+
+## 2026-10-03 release safety and live path refresh
+
+- Read-only GitHub preflight found remote HEAD `codex/ai-news-publishing-v2`
+  at `b0288210215ef0e54f39ed93d66def931d8c7af6`, remote recovery branch
+  `codex/enhe-recovery-baseline` at `2af4a0534add5fa3eb094a943177327f9b919ce1`,
+  and no remote `main` or candidate branch. Local `origin/HEAD` is stale and
+  still points to `origin/main` at `12503ec50069f500c52b1d7107e530627791f262`.
+  The candidate is five commits ahead of the existing recovery branch and has
+  no merge base with the remote default branch (629 candidate-only, 8
+  remote-only commits). Do not infer a push target or merge strategy.
+- A fresh read-only `git ls-remote` recheck at 2026-10-02 23:33 UTC returned
+  the same remote HEAD and recovery branch; `main` and the candidate branch
+  are still absent.
+- The selected candidate working tree now contains 113 paths relative to source
+  HEAD `41b7af32fa7a3a9fccfd8512c0d20ffda029458c`: 64 modified and 49 added;
+  current path/status manifest SHA-256 is
+  `57cbd00ba4c4b3330f2d360917bedc00f14275e538e57e3bf8175c13beb7b60b`. This
+  is distinct from the 109-path committed runtime candidate at `df482…`. The
+  four additional paths are the release runner, migration-check helper, its
+  browser integration guard, and the workflow document. Nine tracked paths
+  are modified in the worktree and zero are staged; the untracked JSON receipt
+  is governance evidence and is excluded from that candidate manifest.
+- The four added safety paths were previously marked
+  `reviewed_defer_separate_stage`, with a prior independent hunk review
+  recorded. They are included only for the separate local release-safety task
+  listed in `enhe-release-safety-gates-2026-10-01.md`; the old disposition is
+  preserved in the refreshed receipt. This does not authorize release
+  inclusion by itself.
+- TDD caught an unsafe default in the old release runner: running it without
+  switches could push to GitHub and continue to server deployment. The local
+  version now requires `-Push`, and `-Deploy` requires `-Push`; with no switch,
+  it stops after local checks. The runner was only syntax-parsed, not executed.
+- At that earlier safety checkpoint, a direct full Vitest invocation reported
+  2,462 passed, 90 skipped, and 1 failed. That result is historical and is
+  superseded by the split-run accounting in the current gate audit above. The
+  focused release workflow source suite now passes 29/29 after the review-
+  driven corrections. Full ESLint and `npm run typecheck`, Node syntax,
+  PowerShell parsing, and `git diff --check` passed. The latest full Vitest is
+  `PARTIAL`: 485 files passed, 9 skipped, 1 failed; 2,462 tests passed, 90
+  skipped, 1 failed. The sole failure is the unchanged protected D4R
+  worktree-scope assertion; changing its contract needs owner direction. The
+  independent review of the corrected release-safety code found no Critical
+  or Important issue. It confirmed the fetch refspec, loopback-only E2E guard,
+  and local Docker endpoint allowlist. A local port-forward cannot be
+  detected by URL checks and remains an explicit operator precondition. The
+  reported encoding concern was not reproduced: strict UTF-8 decoding passed
+  and the visible ellipsis is U+2026.
+  No database, `.env`, GitHub write, SSH, publication, or Tencent Cloud
+  operation occurred. The earlier 28/28 and 2,461 counts are superseded.
+
+## 2026-10-03 release-candidate reconciliation
+
+- The isolated release candidate is `codex/enhe-release-candidate-20261003`.
+  Its latest runtime commit is `df482044266fccc6be7e3818b70c5117abc8dc38`,
+  based on source HEAD `41b7af32fa7a3a9fccfd8512c0d20ffda029458c`. The
+  implementation candidate contains 109 unique paths: 60 modified and 49
+  added, with path/status manifest SHA-256
+  `8a9d8583f17dd594078beccf79a3e8f75b3936d74ca97d51b340684cf8f976cf`. Raw
+  per-file hashes and classifications are in
+  `docs/handoffs/ENHE-RELEASE-CANDIDATE-2026-10-03.json`.
+- These 109 paths are a selected subset of the separate recovery worktree's
+  291-path dirty snapshot, not a replacement for it. The recovery worktree
+  remains at `41b7af32fa7a3a9fccfd8512c0d20ffda029458c` with 145 modified and
+  146 untracked paths, zero staged; its manifest SHA-256 is
+  `54eceb54cd1c2d0be24d838f741279c971792cf2f02f4cd2f5882f0d00ec2ee2`.
+  All candidate paths were present in that source snapshot.
+- A focused independent path review reconciled 13 paths whose older purpose
+  labels said “not authorized”: the current owner-approved scope supports all
+  13 path changes. It also found one unused `AdminProvenanceNotice` hunk outside
+  scope; that hunk was removed. The historical labels remain recorded in the
+  source receipt and are not silently rewritten.
+- The selected one-masthead UI contract remains in force. The AI News, Topics,
+  and deep-route browser checks passed 32/32. Six relevant suites passed
+  38/38 after the final admin copy cleanup. Targeted ESLint, `npm run
+  typecheck`, and `git diff --check` passed. The final database-free build
+  exited 0 and generated 121/121 pages with
+  `DATABASE_URL`, `DIRECT_URL`, and `SEO_AUDIT_TEST_DATABASE_URL` empty.
+  Prisma logged empty-URL validation errors on data-backed pages; those calls
+  failed locally before a database connection, so this does not verify live
+  content or production data access.
+- The DB-free listing and Topics metadata are marked `noindex`; absent article
+  slugs resolve to `notFound()` rather than rendering fabricated article data.
+- An earlier candidate full-suite run was `PARTIAL`: 485 files passed, 9
+  skipped, 1 failed; 2,446 tests passed, 90 skipped, 1 failed. Later split-run
+  accounting is recorded in the current gate audit above. The sole failure is
+  the explicitly frozen
+  `src/lib/production-motion-final-source.test.ts` D4R worktree-scope assertion.
+  Its candidate bytes remain at the protected SHA-256
+  `81f00b3349ee2f1fc3f66e7d71307d672646eb8490bdf3159f52eec1d074dd8d`. Changing
+  that acceptance contract requires owner approval; do not report the full
+  suite as passing. The test compares all paths from historical commit
+  `dfa5d8b` to `HEAD`: the source baseline already has 220 changed paths, 212
+  outside its eight-path D4R allowlist; this candidate has 317 changed paths,
+  309 outside it. The test blob is identical at source and candidate, so this
+  historical-scope failure predates the current candidate and is not solely
+  caused by it.
+- `/admin/geo-monitoring` remains untouched and unaccepted. No real database,
+  `.env`, GitHub write, publication, Tencent Cloud access, or deployment was
+  used. The next release steps remain exact-scope review, read-only remote and
+  host preflights, then a reviewed GitHub push and deployment of the same
+  verified SHA after the test gate is resolved.
+
+## Historical 2026-10-03 checkpoint — superseded by the candidate reconciliation above
 
 - This local batch follows the owner-selected single shared masthead, keeping
   AI News/Topics as local navigation. Review found that an older global lead
@@ -52,9 +374,10 @@ Status: CONTROLLED_RECOVERY
   Two failures were metadata tests whose mocked “configured database” mode did
   not isolate Prisma; hoisted DB mocks and local-only URL stubs now make those
   test assumptions explicit. Eight focused source suites passed 49/49, and the
-  tightened reduced-motion contract passed 6/6. The full suite must be rerun
-  after the exact candidate commit because its protected D4R scope assertion
-  requires a clean worktree.
+  tightened reduced-motion contract passed 6/6. A later full run on the current
+  worktree still has the single protected D4R historical-scope failure; it is
+  recorded separately above and requires owner direction before changing its
+  test contract.
 - Full ESLint and TypeScript checks passed. `npm run build` exited 0 and
   generated 121/121 pages with the three database URL variables empty; Prisma
   printed expected empty-URL validation messages, so live database content is

@@ -1,6 +1,5 @@
 import { absoluteUrl, getSiteBaseUrl } from "@/lib/seo";
 
-export const defaultIndexNowKey = "b689ebc55640682df41b6721a64881dae8f81beecc0b5591525747a6d9a01751";
 const indexNowEndpoint = "https://api.indexnow.org/indexnow";
 const indexNowKeyPattern = /^[A-Za-z0-9-]{8,128}$/;
 const blockedPathPattern = /^\/(?:admin|api|login|register|user|user-center|dashboard|checkout|orders|payment)(?:\/|$)/;
@@ -17,7 +16,7 @@ export type IndexNowSubmissionResult =
   | { ok: false; submitted: 0; reason: "invalid-key" | "no-urls" | "request-failed"; status?: number; error?: unknown };
 
 export function getIndexNowKey() {
-  const key = (process.env.INDEXNOW_KEY ?? defaultIndexNowKey).trim();
+  const key = (process.env.INDEXNOW_KEY ?? "").trim();
   return indexNowKeyPattern.test(key) ? key : "";
 }
 

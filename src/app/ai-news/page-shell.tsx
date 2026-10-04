@@ -72,6 +72,40 @@ type AiNewsPageSearchParams = Record<string, string | undefined>;
 
 const aiNewsFilterParamNames = ["q", "category", "tag", "sort"] as const;
 
+export function buildAiNewsLanguageHrefs(
+  searchParams: AiNewsPageSearchParams,
+  pageOverride?: number,
+) {
+  const path =
+    pageOverride && pageOverride > 1
+      ? `/ai-news/page/${pageOverride}`
+      : "/ai-news";
+  const query = new URLSearchParams();
+
+  for (const name of aiNewsFilterParamNames) {
+    const value = String(searchParams[name] ?? "").trim();
+    if (value) query.set(name, value);
+  }
+
+  if (!pageOverride) {
+    const queryPage = Number.parseInt(String(searchParams.page ?? ""), 10);
+    if (Number.isSafeInteger(queryPage) && queryPage > 1) {
+      query.set("page", String(queryPage));
+    }
+  }
+
+  const queryString = query.toString();
+  const buildHref = (locale: Locale) => {
+    const href = buildLocalePath(path, locale);
+    return queryString ? `${href}?${queryString}` : href;
+  };
+
+  return {
+    zh: buildHref("zh"),
+    en: buildHref("en"),
+  };
+}
+
 function getAiNewsPageNumber(searchParams: AiNewsPageSearchParams) {
   return Math.max(
     1,

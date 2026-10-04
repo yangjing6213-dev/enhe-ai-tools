@@ -5,13 +5,31 @@ import { join, resolve } from "node:path";
 import { spawnSync } from "node:child_process";
 
 const repoRoot = resolve(import.meta.dirname, "..");
+const migrationBaseBranch = process.argv[2];
+if (!migrationBaseBranch) {
+  throw new Error("Pass the explicitly selected release branch to the migration drill.");
+}
+const branchCheck = spawnSync("git", ["check-ref-format", "--branch", migrationBaseBranch], {
+  cwd: repoRoot,
+  encoding: "utf8",
+  stdio: "ignore",
+});
+if (branchCheck.status !== 0) {
+  throw new Error("The migration drill requires a valid Git branch name.");
+}
+const migrationBaseRef = `origin/${migrationBaseBranch}`;
 const temporaryRoot = mkdtempSync(join(tmpdir(), "enhe-migration-drill-"));
-const mainWorktree = join(temporaryRoot, "origin-main");
+const baseWorktree = join(temporaryRoot, "branch-base");
 const containerName = `enhe-migration-drill-${process.pid}-${Date.now()}`;
 const postgresPassword = randomBytes(24).toString("hex");
 const prismaCli = join(repoRoot, "node_modules", "prisma", "build", "index.js");
+const LOCAL_DOCKER_ENDPOINT_PATTERN =
+  "^(?:unix:///(?!/).+|npipe:////\\./pipe/(?:docker_engine|dockerDesktopLinuxEngine)|npipe://\\./pipe/(?:docker_engine|dockerDesktopLinuxEngine))$";
 let containerStarted = false;
 let worktreeAdded = false;
+let operationError;
+let operationFailed = false;
+const cleanupFailures = [];
 
 function run(command, args, options = {}) {
   const result = spawnSync(command, args, {
@@ -29,6 +47,22 @@ function run(command, args, options = {}) {
   return options.capture ? result.stdout.trim() : "";
 }
 
+function assertLocalDockerContext() {
+  if (process.env.DOCKER_HOST?.trim()) {
+    throw new Error("DOCKER_HOST overrides are not allowed for the migration drill.");
+  }
+
+  const contextName = run("docker", ["context", "show"], { capture: true });
+  const endpoint = run(
+    "docker",
+    ["context", "inspect", contextName, "--format", "{{.Endpoints.docker.Host}}"],
+    { capture: true },
+  );
+  if (!new RegExp(LOCAL_DOCKER_ENDPOINT_PATTERN, "i").test(endpoint)) {
+    throw new Error("Docker endpoint must be a local named pipe or Unix socket; remote Docker contexts are not allowed.");
+  }
+}
+
 function sleep(milliseconds) {
   Atomics.wait(new Int32Array(new SharedArrayBuffer(4)), 0, 0, milliseconds);
 }
@@ -37,9 +71,19 @@ function databaseUrl(port, database) {
   return `postgresql://codex:${postgresPassword}@127.0.0.1:${port}/${database}?schema=public`;
 }
 
+function localDatabaseEnvironment(url) {
+  return { DATABASE_URL: url, DIRECT_URL: url };
+}
+
 function migrate(schema, url) {
   run(process.execPath, [prismaCli, "migrate", "deploy", "--schema", schema], {
-    env: { DATABASE_URL: url },
+    env: localDatabaseEnvironment(url),
+  });
+}
+
+function assertMigrationStatus(schema, url) {
+  run(process.execPath, [prismaCli, "migrate", "status", "--schema", schema], {
+    env: localDatabaseEnvironment(url),
   });
 }
 
@@ -53,14 +97,16 @@ function assertNoSchemaDrift(schema, url) {
     "--to-schema-datamodel",
     schema,
     "--exit-code",
-  ]);
+  ], { env: localDatabaseEnvironment(url) });
 }
 
 try {
+  assertLocalDockerContext();
   run("docker", [
     "run",
     "-d",
     "--rm",
+    "--pull=never",
     "--name",
     containerName,
     "-e",
@@ -106,34 +152,62 @@ try {
   const currentSchema = join(repoRoot, "prisma", "schema.prisma");
   const freshUrl = databaseUrl(port, "migration_fresh");
   migrate(currentSchema, freshUrl);
-  run(process.execPath, [prismaCli, "migrate", "status", "--schema", currentSchema], {
-    env: { DATABASE_URL: freshUrl },
-  });
+  assertMigrationStatus(currentSchema, freshUrl);
   assertNoSchemaDrift(currentSchema, freshUrl);
 
-  run("git", ["worktree", "add", "--detach", mainWorktree, "origin/main"]);
+  run("git", ["worktree", "add", "--detach", baseWorktree, migrationBaseRef]);
   worktreeAdded = true;
-  const mainSchema = join(mainWorktree, "prisma", "schema.prisma");
-  if (!existsSync(mainSchema)) throw new Error("origin/main does not contain prisma/schema.prisma.");
+  const baseSchema = join(baseWorktree, "prisma", "schema.prisma");
+  if (!existsSync(baseSchema)) throw new Error("The selected migration base does not contain prisma/schema.prisma.");
 
   const upgradeUrl = databaseUrl(port, "migration_upgrade");
-  migrate(mainSchema, upgradeUrl);
+  migrate(baseSchema, upgradeUrl);
   migrate(currentSchema, upgradeUrl);
-  run(process.execPath, [prismaCli, "migrate", "status", "--schema", currentSchema], {
-    env: { DATABASE_URL: upgradeUrl },
-  });
+  assertMigrationStatus(currentSchema, upgradeUrl);
   assertNoSchemaDrift(currentSchema, upgradeUrl);
 
-  console.log("Fresh and origin/main upgrade migration paths passed.");
+} catch (error) {
+  operationFailed = true;
+  operationError = error;
 } finally {
   if (worktreeAdded) {
-    spawnSync("git", ["worktree", "remove", "--force", mainWorktree], {
+    const cleanupResult = spawnSync("git", ["worktree", "remove", "--force", baseWorktree], {
       cwd: repoRoot,
       stdio: "ignore",
     });
+    if (cleanupResult.error || cleanupResult.status !== 0) {
+      cleanupFailures.push(
+        cleanupResult.error ?? new Error(`git worktree remove exited with status ${cleanupResult.status}`),
+      );
+    }
   }
   if (containerStarted) {
-    spawnSync("docker", ["rm", "-f", containerName], { stdio: "ignore" });
+    const cleanupResult = spawnSync("docker", ["rm", "-f", containerName], { stdio: "ignore" });
+    if (cleanupResult.error || cleanupResult.status !== 0) {
+      cleanupFailures.push(
+        cleanupResult.error ?? new Error(`docker rm exited with status ${cleanupResult.status}`),
+      );
+    }
   }
-  rmSync(temporaryRoot, { recursive: true, force: true });
+  try {
+    rmSync(temporaryRoot, { recursive: true, force: true });
+  } catch (error) {
+    cleanupFailures.push(error);
+  }
 }
+
+const cleanupDetail = cleanupFailures
+  .map((error) => (error instanceof Error ? error.message : String(error)))
+  .join("; ");
+if (operationFailed && cleanupFailures.length > 0) {
+  throw new AggregateError(
+    [operationError, ...cleanupFailures],
+    `Migration drill failed and cleanup failed: ${cleanupDetail}`,
+  );
+}
+if (operationFailed) throw operationError;
+if (cleanupFailures.length > 0) {
+  throw new AggregateError(cleanupFailures, `Migration drill cleanup failed: ${cleanupDetail}`);
+}
+
+console.log(`Fresh and ${migrationBaseRef} upgrade migration paths passed.`);

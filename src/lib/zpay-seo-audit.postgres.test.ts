@@ -19,7 +19,7 @@ const config: ZpayConfig = {
   mode: "live",
   apiBase: "https://zpayz.cn",
   pid: "task6-test-merchant",
-  key: "task6_test_secret_32_chars_1234567890",
+  key: "unit-key",
   defaultType: "wxpay",
   channelId: "task6-channel",
   siteUrl: "https://www.enhe-tech.com.cn",

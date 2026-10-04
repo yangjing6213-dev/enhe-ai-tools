@@ -16,6 +16,67 @@ let softwareToolId = "";
 let downloadFileId = "";
 let downloadFilePath = "";
 
+function hasLocalPlaywrightDatabase() {
+  const rawUrl = process.env.DATABASE_URL?.trim();
+  if (!rawUrl) return false;
+  try {
+    const database = new URL(rawUrl);
+    const databaseName = decodeURIComponent(database.pathname.replace(/^\/+/, ""));
+    return (
+      ["postgres:", "postgresql:"].includes(database.protocol) &&
+      ["localhost", "127.0.0.1", "::1", "[::1]"].includes(database.hostname) &&
+      /(?:^|[_-])(test|e2e)(?:[_-]|$)/i.test(databaseName) &&
+      !/(?:^|[_-])(prod|production|live)(?:[_-]|$)/i.test(databaseName)
+    );
+  } catch {
+    return false;
+  }
+}
+
+const localBaseUrl =
+  process.env.PLAYWRIGHT_BASE_URL ?? `http://127.0.0.1:${process.env.PORT ?? "3000"}`;
+function getLocalPlaywrightBaseOrigin(rawUrl: string): string | null {
+  try {
+    const url = new URL(rawUrl);
+    if (
+      !["http:", "https:"].includes(url.protocol) ||
+      !["localhost", "127.0.0.1", "::1", "[::1]"].includes(url.hostname) ||
+      url.username ||
+      url.password
+    ) {
+      return null;
+    }
+    return url.origin;
+  } catch {
+    return null;
+  }
+}
+const localBaseOrigin = getLocalPlaywrightBaseOrigin(localBaseUrl);
+
+function isLocalPlaywrightRequest(requestUrl: string) {
+  if (!localBaseOrigin) return false;
+  try {
+    const url = new URL(requestUrl);
+    return (
+      ["http:", "https:"].includes(url.protocol) &&
+      url.origin === localBaseOrigin
+    );
+  } catch {
+    return false;
+  }
+}
+
+const databaseMutatingE2eEnabled =
+  process.env.ENHE_E2E_ALLOW_DATABASE_MUTATION === "1" &&
+  hasLocalPlaywrightDatabase() &&
+  localBaseOrigin !== null;
+
+test.describe("commercial flow database integration", () => {
+test.skip(
+  !databaseMutatingE2eEnabled,
+  "Requires explicit opt-in and a dedicated local PostgreSQL test/e2e database.",
+);
+
 test.describe.configure({ mode: "serial" });
 
 test.beforeAll(async () => {
@@ -149,6 +210,13 @@ test.afterAll(async () => {
 
 test.beforeEach(async ({ context }) => {
   await context.clearCookies();
+  await context.route("**/*", async (route) => {
+    if (isLocalPlaywrightRequest(route.request().url())) {
+      await route.continue();
+      return;
+    }
+    await route.abort();
+  });
 });
 
 async function login(page: Page) {
@@ -229,4 +297,5 @@ test("paid software stays locked until a purchase is activated", async ({
   await expect(page).toHaveURL(
     new RegExp(`/uploads/e2e-download-${suffix}\\.txt$`),
   );
+});
 });

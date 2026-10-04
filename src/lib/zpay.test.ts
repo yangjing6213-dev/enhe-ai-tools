@@ -12,7 +12,7 @@ import {
 import * as zpayConfigModule from "@/lib/zpay-config";
 import { loadZpayConfig } from "@/lib/zpay-config";
 
-const merchantKey = "test_secret_32_chars_1234567890";
+const merchantKey = "unit-key";
 
 describe("zpay signing", () => {
   it("sorts non-empty fields, excludes sign_type, and appends the merchant key", () => {
@@ -32,7 +32,7 @@ describe("zpay signing", () => {
       merchantKey
     );
 
-    expect(signed.sign).toBe("8d6418fde7dca138de26c2d1f25bb49a");
+    expect(signed.sign).toBe("3678d5ff08808a577366a7ab4ed874e0");
     expect(signed.sign_type).toBe("MD5");
   });
 
@@ -46,7 +46,7 @@ describe("zpay signing", () => {
       param: "order123",
       trade_status: "TRADE_SUCCESS",
       type: "wxpay",
-      sign: "2ec5a62c0ae6eef480e1d8d8a3d9fb91",
+      sign: "4f9a4d7d0b6e7a7e6f9d995f1f61f524",
       sign_type: "MD5"
     };
 
@@ -91,7 +91,7 @@ describe("zpay config", () => {
       [
         "ZPAY_API_BASE=https://zpayz.cn",
         "ZPAY_PID=2026061115080760",
-        "ZPAY_KEY=from-file-key-123456789012",
+        "ZPAY_KEY=file-config",
         "ZPAY_DEFAULT_TYPE=wxpay",
         "ZPAY_CHANNEL_ID=18680",
         "NEXT_PUBLIC_SITE_URL=https://www.enhe-tech.com.cn"
@@ -103,7 +103,7 @@ describe("zpay config", () => {
       env: {
         ZPAY_MODE: "live",
         ZPAY_ENV_FILE: join(tempDir, "zpay.env"),
-        ZPAY_KEY: "from-env-key-1234567890123"
+        ZPAY_KEY: "env-config"
       }
     });
 
@@ -111,7 +111,7 @@ describe("zpay config", () => {
       mode: "live",
       apiBase: "https://zpayz.cn",
       pid: "2026061115080760",
-      key: "from-env-key-1234567890123",
+      key: "env-config",
       defaultType: "wxpay",
       channelId: "18680",
       siteUrl: "https://www.enhe-tech.com.cn"

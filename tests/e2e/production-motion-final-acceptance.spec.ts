@@ -627,7 +627,9 @@ for (const route of routes.filter(({ kind }) => kind === "software")) {
     test.skip(hasProductCatalogTestDatabase, productCatalogSkipReason);
     await openFormalRoute(page, route.path);
 
-    await expect(page.locator(".redesign-software-empty")).toBeVisible();
+    await expect(
+      page.locator('[data-content-status="UNVERIFIED"]'),
+    ).toBeVisible();
     await expect(page.locator("[data-production-catalog]")).toHaveCount(0);
     await expect(page.locator("[data-section], [data-catalog-card]")).toHaveCount(0);
     await expect(

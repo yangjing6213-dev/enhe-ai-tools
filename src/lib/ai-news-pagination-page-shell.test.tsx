@@ -27,6 +27,7 @@ vi.stubGlobal("React", React);
 
 import {
   AiNewsPageShell,
+  buildAiNewsLanguageHrefs,
   generateAiNewsPageMetadata,
 } from "@/app/ai-news/page-shell";
 import { StructuredData } from "@/components/structured-data";
@@ -55,6 +56,41 @@ describe("AI news pagination page shell", () => {
 
   afterEach(() => {
     vi.unstubAllEnvs();
+  });
+
+  it("preserves only supported listing filters when switching locales", () => {
+    expect(
+      buildAiNewsLanguageHrefs({
+        q: " agent workflow ",
+        category: "category-a",
+        tag: "tag-a",
+        sort: "hot",
+        page: "2",
+        ignored: "drop",
+      }),
+    ).toEqual({
+      zh: "/ai-news?q=agent+workflow&category=category-a&tag=tag-a&sort=hot&page=2",
+      en: "/en/ai-news?q=agent+workflow&category=category-a&tag=tag-a&sort=hot&page=2",
+    });
+  });
+
+  it("keeps paginated paths and avoids duplicating the page query", () => {
+    expect(
+      buildAiNewsLanguageHrefs(
+        {
+          q: "agent workflow",
+          category: "category-a",
+          tag: "tag-a",
+          sort: "hot",
+          page: "2",
+          ignored: "drop",
+        },
+        2,
+      ),
+    ).toEqual({
+      zh: "/ai-news/page/2?q=agent+workflow&category=category-a&tag=tag-a&sort=hot",
+      en: "/en/ai-news/page/2?q=agent+workflow&category=category-a&tag=tag-a&sort=hot",
+    });
   });
 
   it("returns not found when the requested page exceeds the actual page count", async () => {

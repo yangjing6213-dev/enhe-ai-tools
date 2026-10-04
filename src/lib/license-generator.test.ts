@@ -1,4 +1,4 @@
-import { createPublicKey, verify } from "node:crypto";
+import { createPublicKey, generateKeyPairSync, verify } from "node:crypto";
 import { describe, expect, test } from "vitest";
 import {
   createLicenseCode,
@@ -64,12 +64,9 @@ describe("license generator", () => {
     expect(isUnlimitedLicenseKeyValid("wrong-key")).toBe(false);
   });
 });
-const lumiPrivateKey = `-----BEGIN PRIVATE KEY-----
-MC4CAQAwBQYDK2VwBCIEIEPo59ziC7AE1Gb6zouuBnk3OSfoP8fMY5yumW4J30+H
------END PRIVATE KEY-----`;
-const lumiPublicKey = `-----BEGIN PUBLIC KEY-----
-MCowBQYDK2VwAyEAwghF0LMYAX8HbNHkPep2LtHegM/5ZGvnCET7tW3fy/8=
------END PUBLIC KEY-----`;
+const lumiKeyPair = generateKeyPairSync("ed25519");
+const lumiPrivateKey = lumiKeyPair.privateKey.export({ format: "pem", type: "pkcs8" }).toString();
+const lumiPublicKey = lumiKeyPair.publicKey.export({ format: "pem", type: "spki" }).toString();
 
 function parseLumiCode(code: string) {
   const [payloadSegment, signatureSegment] = code.slice("LUMI1-".length).split(".");

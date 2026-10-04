@@ -1,5 +1,6 @@
 import {
   AiNewsPageShell,
+  buildAiNewsLanguageHrefs,
   generateAiNewsPageMetadata,
   getAiNewsPageOneRedirectPath,
 } from "@/app/ai-news/page-shell";
@@ -31,7 +32,10 @@ export default async function EnglishAiNewsPage({ searchParams }: { searchParams
   }
 
   return (
-    <PublicSiteChrome forceLocale="en">
+    <PublicSiteChrome
+      forceLocale="en"
+      languageHrefs={buildAiNewsLanguageHrefs(params)}
+    >
       <AiNewsPageShell searchParams={Promise.resolve(params)} forceLocale="en" />
     </PublicSiteChrome>
   );
