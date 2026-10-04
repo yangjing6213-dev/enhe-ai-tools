@@ -79,7 +79,7 @@ for (const route of routes) {
         muted: "#536057",
         action: "#2f6f44",
         actionHover: "#245a36",
-        surface: "#fff",
+        surface: "#ffffff",
         elevated: "#f0f5ef",
         border: "#d3ddd5",
         focus: "#f6c945",

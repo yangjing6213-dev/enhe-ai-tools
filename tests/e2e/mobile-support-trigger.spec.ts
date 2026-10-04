@@ -781,6 +781,15 @@ test("retains the exact desktop launcher baseline from 768px upward", async ({ p
         const wrapperBounds = wrapper.getBoundingClientRect();
         const buttonStyle = getComputedStyle(button);
         const wrapperStyle = getComputedStyle(wrapper);
+        const colorToRgba = (value: string) => {
+          const canvas = document.createElement("canvas");
+          const context = canvas.getContext("2d");
+          if (!context) throw new Error("Color measurement requires a canvas context.");
+          context.clearRect(0, 0, 1, 1);
+          context.fillStyle = value;
+          context.fillRect(0, 0, 1, 1);
+          return Array.from(context.getImageData(0, 0, 1, 1).data);
+        };
         return {
           width: bounds.width,
           height: bounds.height,
@@ -789,6 +798,8 @@ test("retains the exact desktop launcher baseline from 768px upward", async ({ p
           wrapperWidth: wrapperBounds.width,
           padding: buttonStyle.padding,
           backgroundColor: buttonStyle.backgroundColor,
+          backgroundRgba: colorToRgba(buttonStyle.backgroundColor),
+          expectedBackgroundRgba: colorToRgba("rgb(16 24 33 / 0.95)"),
           color: buttonStyle.color,
           zIndex: wrapperStyle.zIndex,
         };
@@ -802,7 +813,7 @@ test("retains the exact desktop launcher baseline from 768px upward", async ({ p
       expect(Math.abs(metrics.bottom - viewportSize.offset)).toBeLessThanOrEqual(0.1);
       expect(metrics.wrapperWidth).toBe(360);
       expect(metrics.padding).toBe("12px 16px");
-      expect(metrics.backgroundColor).toBe("lab(7.78901 -1.45968 -7.55699 / 0.95)");
+      expect(metrics.backgroundRgba).toEqual(metrics.expectedBackgroundRgba);
       expect(metrics.color).toBe("rgb(255, 255, 255)");
       expect(metrics.zIndex).toBe("70");
     }
