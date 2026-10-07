@@ -27,6 +27,7 @@
 - `verified`: clean release worktree and branch match deployed HEAD `d794f4022083a5e23c776c41e3a1c8e2546c6e91`; another checkout contains unrelated dirty changes and will remain untouched.
 - `verified`: AppSumo reference and upstream `emilkowalski/skills` were checked. The relevant Emil design/motion skills are already installed in the active Codex skill environment.
 - `verified`: acceptance tests were first run against the unchanged baseline and failed as expected; the focused component suite now passes 39 tests across 5 files.
-- `verified`: database-free Chromium acceptance passed at 1440, 1024, 900, 768, 390, and 320 pixels, including layout overflow, brand alignment, account-menu contrast, arrow placement/clickability, footer disclosure, hover feedback, and back-to-top behavior.
-- `in_progress`: final read-only code review and complete release checks.
+- `verified`: database-free Chromium acceptance passed at 1440, 1024, 900, 768, 390, and 320 pixels, including layout overflow, brand alignment, account-menu contrast, arrow placement, product/review previous-next switching, footer disclosure, hover feedback, and back-to-top behavior.
+- `verified`: independent code review found no P1/P2 blockers; its minor finding about missing review-arrow switching coverage was addressed with product and review previous-next assertions and a passing six-width browser rerun. The final test-only addendum review is pending.
+- `in_progress`: complete project release checks.
 - `pending`: guarded exact-ref GitHub push and Tencent Cloud deployment after every release gate passes.

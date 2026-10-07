@@ -84,9 +84,16 @@ test("homepage polish stays readable, responsive, and interactive without extern
       ) <= 8 && previousRect.right <= cardRect.left && nextRect.left >= cardRect.right;
     });
     expect(productArrowAlignment, `product arrows sit outside and center on the cover at ${width}px`).toBe(true);
+    const currentProductTitle = page.locator('[data-product-current="true"] .redesign-home-product-detail h3');
+    const initialProductTitle = await currentProductTitle.textContent();
+    await page.getByRole("button", { name: "下一款产品" }).click();
+    await expect.poll(() => currentProductTitle.textContent()).not.toBe(initialProductTitle);
+    await page.getByRole("button", { name: "上一款产品" }).click();
+    await expect.poll(() => currentProductTitle.textContent()).toBe(initialProductTitle);
 
     const reviews = page.locator(".redesign-home-reviews");
     await reviews.scrollIntoViewIfNeeded();
+    await reviews.hover();
     await expect(reviews.locator(".redesign-home-review-triangle")).toHaveCount(2);
     const reviewArrowAlignment = await reviews.evaluate((section) => {
       const arrows = section.querySelectorAll<HTMLElement>(".redesign-home-reviews-control");
@@ -115,6 +122,12 @@ test("homepage polish stays readable, responsive, and interactive without extern
       background: "rgb(255, 255, 255)",
       receivesPointer: true,
     });
+    const activeReviewQuote = reviews.locator('.redesign-home-review-card[data-position="0"] blockquote');
+    const initialReviewQuote = await activeReviewQuote.textContent();
+    await reviews.getByRole("button", { name: "下一条评价" }).click();
+    await expect.poll(() => activeReviewQuote.textContent()).not.toBe(initialReviewQuote);
+    await reviews.getByRole("button", { name: "上一条评价" }).click();
+    await expect.poll(() => activeReviewQuote.textContent()).toBe(initialReviewQuote);
 
     const footer = page.locator(".redesign-footer");
     await expect(footer).toHaveCSS("background-color", "rgb(0, 21, 18)");
