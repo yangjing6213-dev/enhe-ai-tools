@@ -1293,6 +1293,9 @@ test("mobile navigation survives 30 rapid close and resize rounds", async ({ pag
     } else {
       await page.setViewportSize({ width: 768, height: 900 });
       await expect(drawer).toBeHidden();
+      // Desktop CSS can hide the layer before the media-query close is processed.
+      await expect(page.locator(".redesign-menu-trigger")).toHaveAttribute("aria-expanded", "false");
+      await expect(drawer).toHaveCount(0);
       await page.setViewportSize({ width: 390, height: 844 });
     }
     await expect(drawer).toBeHidden();
