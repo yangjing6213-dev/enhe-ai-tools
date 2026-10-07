@@ -1,14 +1,18 @@
 import { readFileSync } from "node:fs";
 import { describe, expect, it } from "vitest";
 
-describe("global night glass UI source contract", () => {
-  it("shares the approved ENHE night glass tokens and utility surfaces", () => {
+describe("global white and blue UI source contract", () => {
+  it("shares the approved white and blue tokens and forces public cards onto white surfaces", () => {
     const css = readFileSync(new URL("../app/globals.css", import.meta.url), "utf8");
+    const refresh = readFileSync(new URL("../styles/redesign/site-refresh.css", import.meta.url), "utf8");
 
-    expect(css).toContain("--marketing-bg: #101821");
-    expect(css).toContain("--marketing-accent: #41c5db");
-    expect(css).toContain("--font-sans: 'Montserrat', 'Microsoft YaHei', 'Microsoft YaHei UI'");
-    expect(css).toContain("--font-heading-zh: 'Montserrat', 'Microsoft YaHei', 'Microsoft YaHei UI'");
+    expect(css).toContain("color-scheme: light");
+    expect(css).toContain("--marketing-bg: #ffffff");
+    expect(css).toContain("--marketing-accent: #246bfe");
+    expect(css).toContain("--font-sans: 'Alimama Fang Yuan Ti', 'Microsoft YaHei', Arial, sans-serif");
+    expect(css).toContain("--font-heading-zh: 'Alimama Fang Yuan Ti', 'Microsoft YaHei', Arial, sans-serif");
+    expect(refresh).toContain(".enhe-redesign-production :is(.glass, .evidence-card, .dossier-card, .surface-panel");
+    expect(refresh).toContain("background: #fff;");
     expect(css).toContain(".surface-panel");
     expect(css).toContain(".surface-panel-soft");
     expect(css).toContain(".filter-surface");

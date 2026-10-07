@@ -110,14 +110,12 @@ describe("homepage SaaS redesign source", () => {
     expect(dictionaries).toContain('metricsExplore: "Open More Possibilities with AI"');
     expect(dictionaries).toContain('featuredContentTitle: "Featured Content"');
 
-    expect(css).toContain("color-scheme: dark");
-    expect(css).toContain("--marketing-bg: #101821");
-    expect(css).not.toContain("color-scheme: light");
-    expect(css).not.toContain("--marketing-bg: #ffffff");
+    expect(css).toContain("color-scheme: light");
+    expect(css).toContain("--marketing-bg: #ffffff");
     expect(css).not.toContain(".site-brand-logo-light");
-    expect(css).toContain("--marketing-accent: #41c5db");
-    expect(css).toContain("--font-sans: 'Montserrat', 'Microsoft YaHei', 'Microsoft YaHei UI'");
-    expect(css).toContain("--font-heading-zh: 'Montserrat', 'Microsoft YaHei', 'Microsoft YaHei UI'");
+    expect(css).toContain("--marketing-accent: #246bfe");
+    expect(css).toContain("--font-sans: 'Alimama Fang Yuan Ti', 'Microsoft YaHei', Arial, sans-serif");
+    expect(css).toContain("--font-heading-zh: 'Alimama Fang Yuan Ti', 'Microsoft YaHei', Arial, sans-serif");
     expect(css).toContain(".home-page-shell {\n  position: relative;\n  background: #101821;");
     expect(css).toContain(".home-hero-liquid-layer");
     expect(css).toContain(".particles-container");

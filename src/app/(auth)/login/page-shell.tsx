@@ -94,7 +94,7 @@ export async function LoginPageShell({
         <p id="login-password-help" className="mt-2 text-xs leading-5 text-[var(--marketing-muted)]">
           {locale === "en" ? "Required. Password validation happens after submission." : "必填，提交后会校验密码是否正确。"}
         </p>
-        <FormSubmitButton className="login-submit-button mt-8 w-full text-base !text-[#050505]" pendingLabel={t.auth.loggingIn}>
+        <FormSubmitButton className="login-submit-button mt-8 w-full text-base" pendingLabel={t.auth.loggingIn}>
           {t.auth.loginButton}
         </FormSubmitButton>
         <p className="mt-5 text-center text-sm text-[var(--marketing-muted)]">

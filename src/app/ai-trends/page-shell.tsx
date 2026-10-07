@@ -470,7 +470,7 @@ export async function AiTrendTopicPageShell({ forceLocale = "zh" }: { forceLocal
     })),
   });
   return (
-    <main>
+    <main className="ai-trends-page">
       <Container className="py-14">
         <StructuredData
           data={[breadcrumbSchema, collectionSchema, webPageSchema, faqSchema]}
@@ -485,8 +485,8 @@ export async function AiTrendTopicPageShell({ forceLocale = "zh" }: { forceLocal
             {copy.hero}
           </p>
           <div className="mt-7 flex flex-wrap gap-3">
-            <ButtonLink href={buildLocalePath("/ai-trends/daily", forceLocale)}>{copy.dailyButton}</ButtonLink>
-            <ButtonLink href={buildLocalePath("/ai-news", forceLocale)} variant="ghost">
+            <ButtonLink className="ai-trends-primary-action" href={buildLocalePath("/ai-trends/daily", forceLocale)}>{copy.dailyButton}</ButtonLink>
+            <ButtonLink className="ai-trends-secondary-action" href={buildLocalePath("/ai-news", forceLocale)} variant="ghost">
               {copy.newsButton}
             </ButtonLink>
           </div>
@@ -544,7 +544,7 @@ export async function AiTrendTopicPageShell({ forceLocale = "zh" }: { forceLocal
                 </div>
                 <strong className="text-2xl font-black text-[var(--marketing-accent)]">{item.heat}</strong>
               </div>
-              <div className="mt-4 h-2 rounded-full bg-white/8">
+              <div className="mt-4 h-2 rounded-full bg-slate-100">
                 <div className="h-full rounded-full bg-[var(--marketing-accent)]" style={{ width: `${item.heat}%` }} />
               </div>
             </article>
@@ -581,7 +581,7 @@ export async function AiTrendTopicPageShell({ forceLocale = "zh" }: { forceLocal
                       </span>
                     </div>
                   </div>
-                  <div className="mt-4 h-2 rounded-full bg-white/8">
+                  <div className="mt-4 h-2 rounded-full bg-slate-100">
                     <div className="h-full rounded-full bg-[var(--marketing-accent)]" style={{ width: `${scenario.heat}%` }} />
                   </div>
                   <p className="mt-4 text-sm leading-7 text-[var(--marketing-muted)]">
@@ -622,7 +622,7 @@ export async function AiTrendTopicPageShell({ forceLocale = "zh" }: { forceLocal
               {aiTrendsFaqItems[forceLocale].map((item) => (
                 <article
                   key={item.question}
-                  className="rounded-2xl border border-white/10 bg-white/7 p-5"
+                  className="rounded-2xl border border-[var(--marketing-border)] bg-white p-5"
                 >
                   <h3 className="text-base font-black text-[var(--marketing-text)]">
                     {item.question}
@@ -645,7 +645,7 @@ export async function AiTrendTopicPageShell({ forceLocale = "zh" }: { forceLocal
                   href={source.href}
                   target="_blank"
                   rel="nofollow noopener noreferrer"
-                  className="rounded-xl border border-white/10 bg-white/7 p-4 text-sm font-semibold text-[var(--marketing-text)] transition-[border-color,color] hover:border-[var(--marketing-accent)]/45 hover:text-[var(--marketing-accent)]"
+                  className="rounded-xl border border-[var(--marketing-border)] bg-white p-4 text-sm font-semibold text-[var(--marketing-text)] transition-[border-color,color] hover:border-[var(--marketing-accent)]/45 hover:text-[var(--marketing-accent)]"
                 >
                   {source.title}
                 </a>
@@ -698,7 +698,7 @@ function AiTrendsGeoBlock({ forceLocale }: { forceLocale: Locale }) {
     <section className="glass mt-8 rounded-2xl p-6">
       <div className="grid gap-4 lg:grid-cols-3">
         {sections.map((section) => (
-          <article key={section.title} className="rounded-2xl border border-white/10 bg-white/8 p-5">
+            <article key={section.title} className="rounded-2xl border border-[var(--marketing-border)] bg-white p-5">
             <h2 className="text-lg font-black leading-snug text-[var(--marketing-text)]">{section.title}</h2>
             <p className="mt-3 text-sm leading-7 text-[var(--marketing-muted)]">{section.body}</p>
           </article>
@@ -709,7 +709,7 @@ function AiTrendsGeoBlock({ forceLocale }: { forceLocale: Locale }) {
           <Link
             key={item.href}
             href={item.href}
-                className="rounded-full border border-white/14 bg-white/7 px-4 py-2 text-sm font-bold text-[var(--marketing-text)] transition-[border-color,color] hover:border-[var(--marketing-accent)] hover:text-[var(--marketing-accent)]"
+                className="rounded-full border border-[var(--marketing-border)] bg-white px-4 py-2 text-sm font-bold text-[var(--marketing-text)] transition-[border-color,color] hover:border-[var(--marketing-accent)] hover:text-[var(--marketing-accent)]"
           >
             {item.label[forceLocale]}
           </Link>

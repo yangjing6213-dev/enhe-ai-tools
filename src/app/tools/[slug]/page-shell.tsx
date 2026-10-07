@@ -597,7 +597,7 @@ export async function ToolDetailPageShell({
   ];
 
   return (
-    <Container className="py-14">
+    <Container className="tool-detail-page py-14">
       <StructuredData
         data={[
           breadcrumbSchema,

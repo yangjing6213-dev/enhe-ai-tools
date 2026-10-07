@@ -28,7 +28,7 @@ describe("site header brand source", () => {
     expect(css).toContain("height: 30px");
     expect(css).toContain(".site-brand-logo-dark");
     expect(css).not.toContain(".site-brand-logo-light");
-    expect(css).toContain("color-scheme: dark");
+    expect(css).toContain("color-scheme: light");
     expect(css).toContain("filter: brightness(0) invert(1)");
   });
 });

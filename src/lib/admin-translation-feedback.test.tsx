@@ -35,11 +35,9 @@ describe("admin translation feedback", () => {
     expect(hex).toBeDefined();
     const rgb = (value: string) => [1, 3, 5].map((index) => parseInt(value.slice(index, index + 2), 16));
     const base = rgb(tokens.match(/--enhe-page-bg:\s*(#[a-fA-F0-9]{6})/)![1]);
-    // globals.css maps the feedback utility to marketing-card-soft (white at
-    // 8% opacity); the enclosing admin panel is mapped to enhe-page-bg.
-    const globals = readFileSync("src/app/globals.css", "utf8");
-    const soft = globals.match(/--marketing-card-soft:\s*rgba\(([^)]+)\)/)![1].split(",").map(Number);
-    const background = soft.slice(0, 3).map((channel, index) => channel * soft[3] + base[index] * (1 - soft[3]));
+    // Admin feedback now sits on the shared white surface, so verify the
+    // success text against the page surface instead of the retired dark glass.
+    const background = base;
     const luminance = (channels: number[]) => channels.map((value) => {
       const channel = value / 255;
       return channel <= 0.04045 ? channel / 12.92 : ((channel + 0.055) / 1.055) ** 2.4;

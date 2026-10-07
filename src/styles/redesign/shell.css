@@ -373,26 +373,6 @@
   color: var(--enhe-action);
 }
 
-.redesign-search-icon {
-  width: 17px;
-  height: 17px;
-  display: inline-block;
-  border: 2px solid currentColor;
-  border-radius: 50%;
-  position: relative;
-}
-
-.redesign-search-icon::after {
-  position: absolute;
-  right: -5px;
-  bottom: -2px;
-  width: 7px;
-  height: 2px;
-  content: "";
-  background: currentColor;
-  transform: rotate(45deg);
-}
-
 .redesign-language-switch {
   display: inline-flex;
   align-items: center;

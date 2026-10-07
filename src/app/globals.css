@@ -1,6 +1,14 @@
 @import "tailwindcss";
 
 @font-face {
+  font-family: 'Alimama Fang Yuan Ti';
+  src: url('/fonts/alimama/AlimamaFangYuanTiVF-Thin.woff2') format('woff2');
+  font-display: swap;
+  font-style: normal;
+  font-weight: 100 900;
+}
+
+@font-face {
   font-family: 'Montserrat';
   src: url('/fonts/montserrat/montserrat-latin-400-normal.woff2') format('woff2');
   font-display: swap;
@@ -57,55 +65,60 @@
 }
 
 @theme {
-  --font-sans: 'Montserrat', 'Microsoft YaHei', 'Microsoft YaHei UI', Arial, Helvetica, sans-serif;
+  --font-sans: 'Alimama Fang Yuan Ti', 'Microsoft YaHei', Arial, sans-serif;
 }
 
 :root {
-  color-scheme: dark;
-  --font-sans: 'Montserrat', 'Microsoft YaHei', 'Microsoft YaHei UI', Arial, Helvetica, sans-serif;
-  --font-heading-en: 'Montserrat', var(--font-sans);
-  --font-heading-zh: 'Montserrat', 'Microsoft YaHei', 'Microsoft YaHei UI', Arial, Helvetica, sans-serif;
+  color-scheme: light;
+  --font-sans: 'Alimama Fang Yuan Ti', 'Microsoft YaHei', Arial, sans-serif;
+  --font-heading-en: 'Alimama Fang Yuan Ti', var(--font-sans);
+  --font-heading-zh: 'Alimama Fang Yuan Ti', 'Microsoft YaHei', Arial, sans-serif;
   --mouse-x: 72vw;
   --mouse-y: 18vh;
-  --marketing-bg: #101821;
-  --marketing-bg-soft: #141f2a;
-  --marketing-bg-warm: #16232d;
-  --marketing-text: #ffffff;
-  --marketing-muted: #aebdcc;
-  --marketing-soft-text: #d8e5ee;
-  --marketing-accent: #41c5db;
-  --marketing-button: #050505;
-  --marketing-card: rgba(18, 30, 40, 0.56);
-  --marketing-card-soft: rgba(255, 255, 255, 0.08);
-  --marketing-border: rgba(218, 244, 255, 0.15);
-  --marketing-border-strong: rgba(218, 244, 255, 0.25);
-  --marketing-shadow: 0 30px 100px rgba(0, 10, 18, 0.42);
+  --marketing-bg: #ffffff;
+  --marketing-bg-soft: #ffffff;
+  --marketing-bg-warm: #ffffff;
+  --marketing-text: #101828;
+  --marketing-muted: #526174;
+  --marketing-soft-text: #344256;
+  --marketing-accent: #246bfe;
+  --marketing-button: #246bfe;
+  --marketing-card: #ffffff;
+  --marketing-card-soft: #ffffff;
+  --marketing-border: #d8e0eb;
+  --marketing-border-strong: #9baabe;
+  --marketing-shadow: 0 16px 42px rgba(18, 42, 79, 0.1);
   --background: var(--marketing-bg);
-  --background-deep: #0b1118;
-  --background-soft: #16232d;
-  --card: rgba(255, 255, 255, 0.075);
-  --card-strong: rgba(255, 255, 255, 0.11);
-  --card-soft: rgba(255, 255, 255, 0.055);
-  --border: rgba(218, 244, 255, 0.13);
-  --border-strong: rgba(218, 244, 255, 0.21);
-  --border-focus: rgba(65, 197, 219, 0.58);
-  --foreground: #ffffff;
-  --foreground-soft: #f3f4f7;
-  --muted: #aebdcc;
-  --dim: #7f91a1;
+  --background-deep: #ffffff;
+  --background-soft: #ffffff;
+  --card: #ffffff;
+  --card-strong: #ffffff;
+  --card-soft: #ffffff;
+  --border: #d8e0eb;
+  --border-strong: #9baabe;
+  --border-focus: #246bfe;
+  --foreground: #101828;
+  --foreground-soft: #344256;
+  --muted: #526174;
+  --dim: #66758a;
   --primary: var(--marketing-accent);
-  --primary-bright: #56bfd0;
+  --primary-bright: #0b57e3;
   --cyan: var(--marketing-accent);
-  --cyan-bright: #8feaff;
+  --cyan-bright: #246bfe;
   --accent: var(--marketing-accent);
-  --purple: #c4b5fd;
-  --price: #8feaff;
-  --alert: #ff6b7a;
-  --warning: #8feaff;
+  --purple: #246bfe;
+  --price: #101828;
+  --alert: #c62828;
+  --warning: #9a6700;
 }
 
 * {
   box-sizing: border-box;
+}
+
+svg :is(path, line, polyline, circle, rect, ellipse) {
+  stroke-linecap: round;
+  stroke-linejoin: round;
 }
 
 html {
@@ -122,9 +135,7 @@ body {
   margin: 0;
   overflow-x: clip;
   background:
-    radial-gradient(circle at 78% 12%, rgba(65, 197, 219, 0.12), transparent 26rem),
-    radial-gradient(circle at 14% 84%, rgba(86, 191, 208, 0.08), transparent 28rem),
-    linear-gradient(180deg, #101821 0%, #101821 58%, #0b1118 100%);
+    #ffffff;
   color: var(--foreground);
   font-family: var(--font-sans);
 }
@@ -168,7 +179,7 @@ html[lang='en-US'] :is(h1, h2, h3, .home-hero-title) {
   .site-user-center-cta,
   .site-language-switcher a
 ) {
-  font-family: 'Microsoft YaHei', 'Microsoft YaHei UI', sans-serif;
+  font-family: var(--font-sans);
   font-weight: 400;
 }
 
@@ -182,12 +193,12 @@ body::after {
 }
 
 body::before {
-  background: radial-gradient(circle at 10% 78%, rgba(65, 197, 219, 0.055), transparent 28rem);
+  background: none;
 }
 
 body::after {
-  background: radial-gradient(circle at 12% 82%, rgba(255, 255, 255, 0.035), transparent 26rem);
-  opacity: 1;
+  background: none;
+  opacity: 0;
 }
 
 .interactive-backdrop {
@@ -318,7 +329,7 @@ a {
 }
 
 select {
-  color-scheme: dark;
+  color-scheme: light;
   background-color: var(--marketing-card);
   color: var(--foreground);
 }

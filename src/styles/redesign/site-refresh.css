@@ -1,0 +1,608 @@
+/* Shared light-and-blue refresh for the public ENHE experience. */
+.enhe-redesign-production,
+.enhe-redesign-production :is(.enhe-auth-page, .ai-trends-page) {
+  background-color: #fff;
+  color: var(--enhe-text);
+  font-family: var(--enhe-font-zh);
+}
+
+.enhe-redesign-production:lang(en),
+.enhe-redesign-production:lang(en) :is(.enhe-auth-page, .ai-trends-page) {
+  font-family: var(--enhe-font-en);
+}
+
+.enhe-redesign-production :is(.glass, .evidence-card, .dossier-card, .surface-panel, .surface-panel-soft, .filter-surface, .admin-shell-card) {
+  border: 1px solid var(--enhe-border);
+  background: #fff;
+  color: var(--enhe-text);
+  box-shadow: 0 12px 32px rgba(18, 42, 79, 0.08);
+  -webkit-backdrop-filter: none;
+  backdrop-filter: none;
+}
+
+.enhe-redesign-production [class*="text-[#F6FAFF]"],
+.enhe-redesign-production [class*="text-[#C5D0E2]"],
+.enhe-redesign-production [class*="text-[#8F9DB2]"] {
+  color: var(--enhe-text) !important;
+}
+
+.enhe-redesign-production [class*="border-white/"] {
+  border-color: var(--enhe-border) !important;
+}
+
+.redesign-header[data-home="true"] {
+  position: absolute;
+  inset: 0 0 auto;
+  z-index: var(--enhe-z-header);
+  border-bottom-color: transparent;
+  background: transparent;
+  color: #fff;
+}
+
+.redesign-header[data-home="true"] .redesign-language-switch {
+  color: #fff;
+}
+
+.redesign-header[data-home="true"] .redesign-login-link,
+.redesign-header[data-home="true"] .redesign-avatar-trigger,
+.redesign-header[data-home="true"] .redesign-menu-trigger {
+  border-color: rgba(255, 255, 255, 0.76);
+  background: transparent;
+  color: #fff;
+}
+
+.redesign-header-inner {
+  width: min(100% - 48px, 1320px);
+}
+
+.redesign-brand-lockup {
+  width: 154px;
+  min-height: 48px;
+  gap: 0;
+  font-size: 0;
+  letter-spacing: 0;
+}
+
+.redesign-brand-mark {
+  width: 154px;
+  height: auto;
+  filter: brightness(0) saturate(100%);
+  object-fit: contain;
+}
+
+.redesign-header[data-home="true"] .redesign-brand-mark {
+  filter: none;
+}
+
+.redesign-brand-label {
+  display: none;
+}
+
+.redesign-header[data-home="true"] .redesign-desktop-nav {
+  color: #fff;
+}
+
+.redesign-home-hero {
+  min-height: clamp(520px, 48vw, 660px);
+  display: flex;
+  align-items: stretch;
+  background-color: #061432;
+  background-image:
+    linear-gradient(90deg, rgba(3, 11, 34, 0.92) 0%, rgba(3, 11, 34, 0.76) 34%, rgba(3, 11, 34, 0.16) 78%),
+    linear-gradient(0deg, rgba(3, 11, 34, 0.28), rgba(3, 11, 34, 0.06)),
+    url("/redesign/home/blue-energy-city.webp");
+  background-position: center;
+  background-size: cover;
+  color: #fff;
+}
+
+.redesign-home .redesign-home-hero-inner {
+  width: min(100%, 1320px);
+  max-width: none;
+  margin-inline: auto;
+  padding: clamp(160px, 18vw, 208px) 24px clamp(84px, 10vw, 132px);
+  text-align: left;
+}
+
+.redesign-home .redesign-home-mobile-label {
+  display: inline-flex;
+  margin-bottom: 22px;
+  color: #a9ccff;
+  letter-spacing: 0.02em;
+}
+
+.redesign-home .redesign-home-mobile-label::before {
+  background: #62a2ff;
+}
+
+.redesign-home .redesign-home-hero-inner h1 {
+  max-width: 700px;
+  margin: 0;
+  color: #fff;
+  font-size: clamp(2.75rem, 5.6vw, 5.25rem);
+  font-weight: 750;
+  letter-spacing: -0.035em;
+  line-height: 1.1;
+  text-wrap: balance;
+}
+
+.redesign-home .redesign-home-subtitle {
+  max-width: 610px;
+  margin: 24px 0 0;
+  color: rgba(255, 255, 255, 0.84);
+  font-size: clamp(1rem, 1.3vw, 1.2rem);
+  line-height: 1.65;
+}
+
+.redesign-home .redesign-home-cta,
+.redesign-home-brand-value-cta {
+  border: 1px solid #246bfe;
+  border-radius: 999px;
+  background: #246bfe;
+  color: #fff;
+}
+
+.redesign-home .redesign-home-cta:hover,
+.redesign-home-brand-value-cta:hover {
+  border-color: #0b57e3;
+  background: #0b57e3;
+  color: #fff;
+}
+
+.redesign-home-features {
+  background: #fff;
+  color: var(--enhe-text);
+}
+
+.redesign-home-features-inner {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  width: min(100% - 48px, 1220px);
+  margin-inline: auto;
+  padding: 36px 0;
+  border-bottom: 1px solid var(--enhe-border);
+}
+
+.redesign-home-feature-card {
+  display: flex;
+  min-height: 88px;
+  align-items: center;
+  gap: 14px;
+  padding: 12px 18px;
+  border: 1px solid transparent;
+  border-right-color: var(--enhe-border);
+  color: var(--enhe-text);
+  text-decoration: none;
+}
+
+.redesign-home-feature-card:last-child {
+  border-right-color: transparent;
+}
+
+.redesign-home-feature-card > svg {
+  flex: 0 0 auto;
+  color: var(--enhe-action);
+}
+
+.redesign-home-feature-copy {
+  display: grid;
+  gap: 4px;
+}
+
+.redesign-home-feature-copy strong {
+  font-size: 1rem;
+  font-weight: 700;
+}
+
+.redesign-home-feature-copy > span {
+  color: var(--enhe-text-muted);
+  font-size: 0.875rem;
+  line-height: 1.5;
+}
+
+.redesign-home-feature-card:hover {
+  border-color: var(--enhe-border);
+  border-radius: var(--enhe-card-r);
+  background: #fff;
+  box-shadow: 0 10px 26px rgba(18, 42, 79, 0.08);
+}
+
+.redesign-home-products,
+.redesign-home-reviews {
+  border-top-color: var(--enhe-border);
+  background: #fff;
+}
+
+.redesign-home-products-inner,
+.redesign-home-reviews-inner {
+  padding-block: clamp(64px, 8vw, 104px);
+}
+
+.redesign-home-products-heading h2,
+.redesign-home-reviews-inner h2,
+.redesign-home-brand-value-inner h2 {
+  color: var(--enhe-text);
+  letter-spacing: -0.035em;
+}
+
+.redesign-home-product-content,
+.redesign-home-product-card,
+.redesign-home-review-card {
+  border-color: var(--enhe-border);
+  border-radius: 16px;
+  background: #fff;
+  color: var(--enhe-text);
+}
+
+.redesign-home-review-card {
+  box-shadow: 0 10px 30px rgba(18, 42, 79, 0.07);
+}
+
+.redesign-home-reviews-disclosure {
+  max-width: 760px;
+  margin: -20px auto 32px;
+  color: var(--enhe-text-muted);
+  font-size: 0.9rem;
+  line-height: 1.65;
+  text-align: center;
+}
+
+.redesign-home-review-avatar {
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+.redesign-home-reviews-control {
+  border-color: var(--enhe-text);
+  background: #fff;
+  color: var(--enhe-text);
+  transition:
+    background-color var(--enhe-motion-fast) var(--enhe-ease-ui-move),
+    border-color var(--enhe-motion-fast) var(--enhe-ease-ui-move),
+    color var(--enhe-motion-fast) var(--enhe-ease-ui-move),
+    transform var(--enhe-motion-fast) var(--enhe-ease-ui-move);
+}
+
+.redesign-home-reviews-control svg {
+  width: 22px;
+  height: 22px;
+}
+
+.redesign-home-reviews-control:hover {
+  border-color: var(--enhe-action);
+  background: var(--enhe-action);
+  color: #fff;
+}
+
+.redesign-home-brand-value {
+  border-top: 0;
+  background: #fff;
+  color: var(--enhe-text);
+}
+
+.redesign-home-brand-value-inner {
+  width: min(100%, 1160px);
+  padding: clamp(72px, 9vw, 112px) 24px;
+}
+
+.redesign-home-brand-value-inner h2 {
+  max-width: 1120px;
+  color: var(--enhe-text);
+  font-size: clamp(1.25rem, 3.5vw, 3.75rem);
+  letter-spacing: -0.035em;
+  line-height: 1.18;
+  text-wrap: balance;
+}
+
+.redesign-home-brand-value-cta {
+  margin-top: 32px;
+  padding-inline: 28px;
+  font-weight: 700;
+}
+
+.redesign-footer {
+  background:
+    radial-gradient(ellipse at 78% 0%, rgba(36, 107, 254, 0.34), transparent 42%),
+    linear-gradient(130deg, #071635 0%, #09265d 52%, #06183f 100%);
+  color: #fff;
+}
+
+.footer-grid p,
+.footer-grid a {
+  color: #d7e3fb;
+}
+
+.footer-grid a:hover,
+.footer-bottom a:hover {
+  color: #fff;
+}
+
+.footer-bottom {
+  border-top-color: rgba(213, 228, 255, 0.26);
+  color: #c0d0ed;
+}
+
+.enhe-redesign-production .ai-trends-page {
+  min-height: 60vh;
+  background: #fff;
+  color: var(--enhe-text);
+}
+
+.enhe-redesign-production .ai-trends-page :is(.glass, .evidence-card, .dossier-card, .surface-panel, .surface-panel-soft, .filter-surface, .admin-shell-card) {
+  border-color: var(--enhe-border);
+  background: #fff;
+  color: var(--enhe-text);
+}
+
+.enhe-redesign-production .ai-trends-page .ai-trends-primary-action {
+  border-color: var(--enhe-action) !important;
+  background: var(--enhe-action) !important;
+  color: #fff !important;
+  box-shadow: 0 8px 22px rgba(36, 107, 254, 0.2) !important;
+}
+
+.enhe-redesign-production .ai-trends-page .ai-trends-primary-action:hover {
+  border-color: var(--enhe-action-hover) !important;
+  background: var(--enhe-action-hover) !important;
+}
+
+.enhe-redesign-production .ai-trends-page .ai-trends-secondary-action {
+  border-color: var(--enhe-border) !important;
+  background: #fff !important;
+  color: var(--enhe-text) !important;
+  box-shadow: none !important;
+}
+
+.enhe-redesign-production .ai-trends-page .ai-trends-secondary-action:hover {
+  border-color: var(--enhe-action) !important;
+  background: #fff !important;
+  color: var(--enhe-action) !important;
+}
+
+.enhe-redesign-production .enhe-contentless-page .enhe-contentless-action-primary {
+  border-color: var(--enhe-action);
+  background: var(--enhe-action);
+  color: #fff;
+}
+
+.enhe-redesign-production .enhe-contentless-page .enhe-contentless-action-primary:hover {
+  border-color: var(--enhe-action-hover);
+  background: var(--enhe-action-hover);
+  color: #fff;
+}
+
+.enhe-redesign-production .enhe-contentless-page .enhe-contentless-action-secondary {
+  border-color: var(--enhe-border);
+  background: #fff;
+  color: var(--enhe-text);
+}
+
+.enhe-redesign-production .enhe-contentless-page .enhe-contentless-action-secondary:hover {
+  border-color: var(--enhe-action);
+  background: #fff;
+  color: var(--enhe-action);
+}
+
+.enhe-redesign-production .tool-detail-page {
+  background: #fff;
+  color: var(--enhe-text);
+}
+
+.enhe-redesign-production .tool-detail-page :is(.glass, .evidence-card, .dossier-card, .surface-panel, .surface-panel-soft, .filter-surface, .admin-shell-card) {
+  border-color: var(--enhe-border);
+  background: #fff;
+  color: var(--enhe-text);
+}
+
+.enhe-redesign-production .tool-detail-page [class*="text-[#F6FAFF]"],
+.enhe-redesign-production .tool-detail-page [class*="text-[#C5D0E2]"],
+.enhe-redesign-production .tool-detail-page [class*="text-[#8F9DB2]"] {
+  color: var(--enhe-text) !important;
+}
+
+.enhe-redesign-production .tool-detail-page [class*="text-[#FFB86B]"],
+.enhe-redesign-production .tool-detail-page [class*="text-[#5EF1C7]"] {
+  color: var(--enhe-action) !important;
+}
+
+.enhe-redesign-production .tool-detail-page [class*="bg-[#07101E]"],
+.enhe-redesign-production .tool-detail-page [class*="bg-white/"],
+.enhe-redesign-production .tool-detail-page [class*="bg-[rgba("],
+.enhe-redesign-production .tool-detail-page [class*="bg-[radial-gradient"] {
+  background: #fff !important;
+}
+
+.enhe-redesign-production .tool-detail-page [class*="border-white/"],
+.enhe-redesign-production .tool-detail-page [class*="border-[rgba("] {
+  border-color: var(--enhe-border) !important;
+}
+
+.enhe-redesign-production .tool-detail-hero-stack,
+.enhe-redesign-production .tool-detail-hero-stack :is(.glass, .evidence-card, .dossier-card, .surface-panel, .surface-panel-soft, .filter-surface, .admin-shell-card) {
+  color: var(--enhe-text);
+}
+
+.enhe-redesign-production .tool-detail-hero-stack :is(.glass, .evidence-card, .dossier-card, .surface-panel, .surface-panel-soft, .filter-surface, .admin-shell-card) {
+  border-color: var(--enhe-border);
+  background: #fff;
+}
+
+.enhe-redesign-production .tool-detail-hero-stack [class*="bg-[#07101E]"],
+.enhe-redesign-production .tool-detail-hero-stack [class*="bg-white/"],
+.enhe-redesign-production .tool-detail-hero-stack [class*="bg-[radial-gradient"] {
+  background: #fff !important;
+}
+
+.enhe-redesign-production .tool-detail-hero-stack [class*="text-[#FFB86B]"] {
+  color: var(--enhe-action) !important;
+}
+
+.enhe-redesign-production .tool-detail-hero-stack :is(input, select, textarea) {
+  border-color: var(--enhe-border);
+  background-color: #fff;
+  color: var(--enhe-text);
+}
+
+.enhe-redesign-production .enhe-auth-page {
+  min-height: calc(100vh - var(--enhe-header-h));
+  background: #fff;
+  color: var(--enhe-text);
+}
+
+.enhe-redesign-production .enhe-auth-page .surface-panel {
+  border-color: var(--enhe-border);
+  border-radius: 20px;
+  background: #fff;
+  box-shadow: 0 18px 48px rgba(18, 42, 79, 0.1);
+}
+
+.enhe-redesign-production .enhe-auth-page :is(.form-control-dark, input, textarea) {
+  border: 1px solid var(--enhe-border);
+  border-radius: 10px;
+  background: #fff;
+  color: var(--enhe-text);
+}
+
+.enhe-redesign-production .enhe-auth-page :is(.form-control-dark, input, textarea)::placeholder {
+  color: #66758a;
+  opacity: 1;
+}
+
+.enhe-redesign-production .enhe-auth-page .login-submit-button {
+  border-color: var(--enhe-action) !important;
+  border-radius: 999px;
+  background: var(--enhe-action) !important;
+  box-shadow: 0 8px 22px rgba(36, 107, 254, 0.2) !important;
+  color: #fff !important;
+}
+
+.enhe-redesign-production .enhe-auth-page .login-submit-button:hover {
+  border-color: var(--enhe-action-hover) !important;
+  background: var(--enhe-action-hover) !important;
+}
+
+.enhe-redesign-production :is(button, [role="button"], a[class*="button"], a[class*="cta"], a[class*="card"], a[class*="control"], .enhe-contentless-action) {
+  transition:
+    background-color var(--enhe-motion-fast) var(--enhe-ease-ui-move),
+    border-color var(--enhe-motion-fast) var(--enhe-ease-ui-move),
+    box-shadow var(--enhe-motion-fast) var(--enhe-ease-ui-move),
+    color var(--enhe-motion-fast) var(--enhe-ease-ui-move),
+    transform var(--enhe-motion-fast) var(--enhe-ease-ui-move);
+}
+
+.enhe-redesign-production :is(button:not(:disabled), [role="button"], a[class*="button"], a[class*="cta"], a[class*="card"], a[class*="control"], .enhe-contentless-action):hover {
+  transform: translateY(-2px);
+}
+
+.enhe-redesign-production :is(button:not(:disabled), [role="button"], a[class*="button"], a[class*="cta"], a[class*="card"], a[class*="control"], .enhe-contentless-action):active {
+  transform: translateY(0) scale(0.985);
+}
+
+.enhe-redesign-production :is(button, [role="button"], a[class*="button"], a[class*="cta"], a[class*="card"], a[class*="control"], .enhe-contentless-action):focus-visible {
+  outline: 3px solid var(--enhe-focus);
+  outline-offset: 3px;
+}
+
+.enhe-redesign-production article[class*="card"]:not(.redesign-home-review-card) {
+  transition:
+    border-color var(--enhe-motion-standard) var(--enhe-ease-ui-move),
+    box-shadow var(--enhe-motion-standard) var(--enhe-ease-ui-move),
+    transform var(--enhe-motion-standard) var(--enhe-ease-ui-move);
+}
+
+.enhe-redesign-production article[class*="card"]:not(.redesign-home-review-card):hover {
+  border-color: #a9bad3;
+  box-shadow: 0 14px 34px rgba(18, 42, 79, 0.11);
+  transform: translateY(-3px);
+}
+
+@media (width < 900px) {
+  .redesign-home-features-inner {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .redesign-home-feature-card:nth-child(2) {
+    border-right-color: transparent;
+  }
+
+  .redesign-home-feature-card:nth-child(-n + 2) {
+    border-bottom-color: var(--enhe-border);
+  }
+}
+
+@media (width < 768px) {
+  .redesign-header-inner {
+    width: min(100% - 32px, 1320px);
+  }
+
+  .redesign-brand-lockup,
+  .redesign-brand-mark {
+    width: 128px;
+  }
+
+  .redesign-home-hero {
+    min-height: 660px;
+    background-position: 62% center;
+  }
+
+  .redesign-home .redesign-home-hero-inner {
+    padding: 154px 22px 82px;
+  }
+
+  .redesign-home .redesign-home-hero-inner h1 {
+    max-width: 560px;
+    font-size: clamp(2.5rem, 11vw, 4rem);
+    line-height: 1.12;
+  }
+
+  .redesign-home .redesign-home-subtitle {
+    max-width: 520px;
+    margin-top: 20px;
+  }
+
+  .redesign-home .redesign-home-cta {
+    width: auto;
+    min-width: 176px;
+    margin-top: 26px;
+  }
+
+  .redesign-home-features-inner {
+    width: min(100% - 32px, 1220px);
+    padding-block: 22px;
+  }
+
+  .redesign-home-feature-card {
+    min-height: 92px;
+    gap: 10px;
+    padding: 10px 8px;
+    border-right: 0;
+  }
+
+  .redesign-home-feature-copy > span {
+    font-size: 0.8rem;
+  }
+
+  .redesign-home-reviews-disclosure {
+    margin: -12px auto 22px;
+  }
+
+  .redesign-home-brand-value-inner {
+    padding: 72px 20px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .enhe-redesign-production :is(button, [role="button"], a[class*="button"], a[class*="cta"], a[class*="card"], a[class*="control"], .enhe-contentless-action, article[class*="card"]:not(.redesign-home-review-card)) {
+    scroll-behavior: auto;
+    transition-duration: 0.01ms !important;
+  }
+
+  .enhe-redesign-production :is(button:not(:disabled), [role="button"], a[class*="button"], a[class*="cta"], a[class*="card"], a[class*="control"], .enhe-contentless-action):hover,
+  .enhe-redesign-production :is(button:not(:disabled), [role="button"], a[class*="button"], a[class*="cta"], a[class*="card"], a[class*="control"], .enhe-contentless-action):active {
+    transform: none;
+  }
+
+  .enhe-redesign-production article[class*="card"]:not(.redesign-home-review-card):hover {
+    transform: none;
+  }
+}

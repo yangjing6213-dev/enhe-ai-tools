@@ -6,6 +6,7 @@ export function isExactCurrentPage(pathname: string | undefined, href: string) {
 
 export const REDESIGN_NAV_ITEMS = {
   zh: [
+    { label: "首页", href: "/" },
     { label: "AI工具", href: "/software" },
     {
       label: "AI Skill",
@@ -18,9 +19,10 @@ export const REDESIGN_NAV_ITEMS = {
     { label: "AI资讯", href: "/ai-news" },
     { label: "AI趋势", href: "/ai-trends" },
     { label: "关于我们", href: "/about" },
-    { label: "搜索", href: "/search", kind: "search" },
+    { label: "搜索", href: "/search" },
   ],
   en: [
+    { label: "Home", href: "/en" },
     { label: "AI Tools", href: "/en/software" },
     {
       label: "AI Skills",
@@ -33,7 +35,7 @@ export const REDESIGN_NAV_ITEMS = {
     { label: "AI News", href: "/en/ai-news" },
     { label: "AI Trends", href: "/en/ai-trends" },
     { label: "About", href: "/en/about" },
-    { label: "Search", href: "/en/search", kind: "search" },
+    { label: "Search", href: "/en/search" },
   ],
 } as const satisfies Record<RedesignLocale, ReadonlyArray<RedesignNavItem>>;
 

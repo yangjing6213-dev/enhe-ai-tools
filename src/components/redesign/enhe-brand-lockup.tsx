@@ -5,13 +5,12 @@ export function EnheBrandLockup({ href, label }: { href: string; label: string }
     <a className="redesign-brand-lockup" href={href} aria-label={label}>
       <Image
         className="redesign-brand-mark"
-        src="/images/enhe-logo.svg"
+        src="/images/enhe-logo-white.png"
         alt=""
-        width={32}
-        height={32}
+        width={434}
+        height={145}
         unoptimized
       />
-      <span>ENHE AI</span>
     </a>
   );
 }

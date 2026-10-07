@@ -478,9 +478,6 @@ export function EnheRedesignMobileMenu({
                     aria-current={isCurrentPath(item.href) ? "page" : undefined}
                     onClick={(event) => close(getClickModality(event))}
                   >
-                    {item.kind === "search" ? (
-                      <span className="redesign-search-icon" aria-hidden="true" />
-                    ) : null}
                     <span>{item.label}</span>
                   </a>
                 ),

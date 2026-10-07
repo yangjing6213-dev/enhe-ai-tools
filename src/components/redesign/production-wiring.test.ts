@@ -103,7 +103,11 @@ describe("ENHE Phase 2C.1 production wiring", () => {
     const admin = readSource("app/admin/layout.tsx");
     const orders = readSource("app/orders/layout.tsx");
 
-    for (const layout of [auth, enAuth, user, orders]) {
+    for (const layout of [auth, enAuth]) {
+      expect(layout).toContain("EnheRedesignPublicHeader");
+      expect(layout).toContain("EnheRedesignPublicFooter");
+    }
+    for (const layout of [user, orders]) {
       expect(layout).toContain("SiteHeader");
       expect(layout).toContain("SiteFooter");
     }

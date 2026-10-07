@@ -13,11 +13,11 @@ describe("ENHE redesign public shell candidate", () => {
   it("defines the approved independent visual tokens without forbidden effects", () => {
     const tokens = readCandidate("styles/redesign/tokens.css");
 
-    expect(tokens).toContain("--enhe-page-bg: #f8faf7");
-    expect(tokens).toContain("--enhe-text: #101612");
-    expect(tokens).toContain("--enhe-action: #2f6f44");
-    expect(tokens).toContain("--enhe-footer: #0b2119");
-    expect(tokens).toContain("--enhe-focus: #f6c945");
+    expect(tokens).toContain("--enhe-page-bg: #ffffff");
+    expect(tokens).toContain("--enhe-text: #101828");
+    expect(tokens).toContain("--enhe-action: #246bfe");
+    expect(tokens).toContain("--enhe-footer: #06183f");
+    expect(tokens).toContain("--enhe-focus: #73a0ff");
     expect(tokens).toContain("--enhe-motion-fast: 170ms");
     expect(tokens).toContain("--enhe-z-focus: 60");
     expect(tokens).not.toMatch(/gradient|glow|glass|glitch|neon/i);
@@ -26,8 +26,11 @@ describe("ENHE redesign public shell candidate", () => {
   it("keeps the approved desktop navigation order and explicit account boundary", () => {
     const header = readCandidate("components/redesign/enhe-redesign-header.tsx");
     const navigation = readCandidate("components/redesign/navigation.ts");
+    const desktopNavStart = header.indexOf('<nav className="redesign-desktop-nav"');
+    const desktopNav = header.slice(desktopNavStart, header.indexOf("</nav>", desktopNavStart));
 
     const expectedOrder = [
+      "首页",
       "AI工具",
       "AI Skill",
       "AI资讯",
@@ -43,7 +46,7 @@ describe("ENHE redesign public shell candidate", () => {
     }
 
     expect(header).toContain('languageAriaLabel = "中文 / EN"');
-    expect(header.indexOf("EnheRedesignLanguageSwitch")).toBeLessThan(header.indexOf("account.loginLabel"));
+    expect(desktopNav.indexOf("EnheRedesignLanguageSwitch")).toBeGreaterThan(desktopNav.indexOf("account.loginLabel"));
     expect(header).toContain("account.isAdmin");
     expect(header).toContain("adminHref");
     expect(header).toContain("account.isAdmin ?");

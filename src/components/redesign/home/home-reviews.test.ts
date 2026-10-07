@@ -25,13 +25,7 @@ describe("homepage experience review candidate", () => {
       "faceswap-studio",
     ]);
     expect(HOME_REVIEWS.map((review) => review.stars)).toEqual([5, 4, 5, 5, 4]);
-    expect(HOME_REVIEWS.map((review) => review.exampleLabel)).toEqual([
-      { zh: "示例体验反馈", en: "Example experience feedback" },
-      { zh: "示例体验反馈", en: "Example experience feedback" },
-      { zh: "示例体验反馈", en: "Example experience feedback" },
-      { zh: "示例体验反馈", en: "Example experience feedback" },
-      { zh: "示例体验反馈", en: "Example experience feedback" },
-    ]);
+    expect(HOME_REVIEWS.every((review) => !("exampleLabel" in review))).toBe(true);
     expect(HOME_REVIEWS.map((review) => review.displayName)).toEqual([
       { zh: "林小满", en: "Lin Xiaoman" },
       { zh: "周一然", en: "Zhou Yiran" },
@@ -47,18 +41,18 @@ describe("homepage experience review candidate", () => {
       { zh: "FaceSwap Studio", en: "FaceSwap Studio" },
     ]);
     expect(HOME_REVIEWS.map((review) => review.avatarAlt)).toEqual([
-      { zh: "插画头像：林小满", en: "Illustrated avatar for Lin Xiaoman" },
-      { zh: "插画头像：周一然", en: "Illustrated avatar for Zhou Yiran" },
-      { zh: "插画头像：陈知夏", en: "Illustrated avatar for Chen Zhixia" },
-      { zh: "插画头像：Mia Carter", en: "Illustrated avatar for Mia Carter" },
-      { zh: "插画头像：Ethan Brooks", en: "Illustrated avatar for Ethan Brooks" },
+      { zh: "AI 生成的虚构人物林小满头像", en: "AI-generated fictional portrait of Lin Xiaoman" },
+      { zh: "AI 生成的虚构人物周一然头像", en: "AI-generated fictional portrait of Zhou Yiran" },
+      { zh: "AI 生成的虚构人物陈知夏头像", en: "AI-generated fictional portrait of Chen Zhixia" },
+      { zh: "AI 生成的虚构人物 Mia Carter 头像", en: "AI-generated fictional portrait of Mia Carter" },
+      { zh: "AI 生成的虚构人物 Ethan Brooks 头像", en: "AI-generated fictional portrait of Ethan Brooks" },
     ]);
     expect(HOME_REVIEWS.map((review) => review.avatarSrc)).toEqual([
-      "/redesign/home/avatar-1.svg",
-      "/redesign/home/avatar-2.svg",
-      "/redesign/home/avatar-3.svg",
-      "/redesign/home/avatar-4.svg",
-      "/redesign/home/avatar-5.svg",
+      "/redesign/home/avatar-1.webp",
+      "/redesign/home/avatar-2.webp",
+      "/redesign/home/avatar-3.webp",
+      "/redesign/home/avatar-4.webp",
+      "/redesign/home/avatar-5.webp",
     ]);
     expect(HOME_REVIEWS.map((review) => review.quote)).toEqual([
       {
@@ -88,14 +82,21 @@ describe("homepage experience review candidate", () => {
         zh: "无所不能版｜AI生成视频应用",
         en: "Ultimate Edition | AI Video Generation Suite",
       },
-      avatarSrc: "/redesign/home/avatar-1.svg",
-      avatarAlt: { zh: "插画头像：林小满", en: "Illustrated avatar for Lin Xiaoman" },
+      avatarSrc: "/redesign/home/avatar-1.webp",
+      avatarAlt: { zh: "AI 生成的虚构人物林小满头像", en: "AI-generated fictional portrait of Lin Xiaoman" },
       quote: {
         zh: "以前看到本地 AI 视频工具就觉得很复杂，按照教程操作了一遍，第一次就生成出了可以使用的视频。最明显的感受是，不需要在多个平台之间来回切换，创作自由了很多。",
         en: "Local AI video tools used to look complicated. I followed the guide and created a usable video on the first try. Not having to move between several platforms made the creative process much freer.",
       },
     });
     expect(HOME_REVIEWS.every((review) => review.stars === 4 || review.stars === 5)).toBe(true);
+  });
+
+  it("labels the carousel as generated illustrative content and removes the old sample-feedback label", () => {
+    expect(reviewSource).toContain("copy.disclosure");
+    expect(reviewSource).not.toContain("exampleLabel");
+    expect(reviewSource).not.toContain("示例体验反馈");
+    expect(reviewSource).not.toContain("Example experience feedback");
   });
 
   it("keeps the approved automatic and manual-resume timings", () => {
@@ -107,25 +108,10 @@ describe("homepage experience review candidate", () => {
     expect(reviewSource).toMatch(/const isActive = offset === 0;[\s\S]*aria-hidden=\{!isActive\}/);
   });
 
-  it("clears a pending manual resume before explicit pause and continue", () => {
-    const togglePauseSource = reviewSource.slice(
-      reviewSource.indexOf("const togglePause"),
-      reviewSource.indexOf("\n\n  useEffect"),
-    );
-
-    expect(togglePauseSource).toContain("clearPendingResume");
-    expect(togglePauseSource).toMatch(/if \(nextPaused\) \{[\s\S]*clearPendingResume\(\)[\s\S]*pause\(\)/);
-    expect(togglePauseSource).toMatch(/else \{[\s\S]*clearPendingResume\(\)[\s\S]*resume\(\)/);
-  });
-
-  it("latches focus pauses until explicit continue and limits live announcements", () => {
+  it("pauses while focus is inside the carousel and resumes when focus leaves", () => {
     const focusSource = reviewSource.slice(
       reviewSource.indexOf("const handleFocusIn"),
       reviewSource.indexOf("const handlePointerDown"),
-    );
-    const togglePauseSource = reviewSource.slice(
-      reviewSource.indexOf("const togglePause"),
-      reviewSource.indexOf("\n\n  useEffect"),
     );
 
     expect(reviewSource).toContain("const focusPausedRef = useRef(false)");
@@ -133,13 +119,10 @@ describe("homepage experience review candidate", () => {
       "const [isAutoRotating, setIsAutoRotating] = useState(true)",
     );
     expect(focusSource).toContain("focusPausedRef.current = true");
-    expect(focusSource).toContain("clearResumeTimeout()");
-    expect(focusSource).toContain("setIsPaused(true)");
     expect(focusSource).toContain("pause()");
-    expect(reviewSource).not.toContain('section.addEventListener("focusout"');
-    expect(togglePauseSource).toMatch(
-      /else \{[\s\S]*focusPausedRef\.current = false[\s\S]*clearPendingResume\(\)[\s\S]*resume\(\)/,
-    );
+    expect(reviewSource).toContain('section.addEventListener("focusout"');
+    expect(reviewSource).toContain("focusPausedRef.current = false");
+    expect(reviewSource).toContain('section.removeEventListener("focusout"');
     expect(reviewSource).toContain(
       'aria-live={isAutoRotating ? "off" : "polite"}',
     );
@@ -190,7 +173,7 @@ describe("homepage experience review candidate", () => {
     expect(reviewCardRule).not.toContain("will-change");
   });
 
-  it("keeps the review island accessible and timer-controlled", () => {
+  it("keeps only previous/next rounded triangle controls and timer-controlled rotation", () => {
     expect(reviewSource).toContain('"use client"');
     expect(reviewSource).toContain("useEffect");
     expect(reviewSource).toContain("setInterval");
@@ -206,7 +189,14 @@ describe("homepage experience review candidate", () => {
     expect(reviewSource).toContain("ArrowLeft");
     expect(reviewSource).toContain("ArrowRight");
     expect(reviewSource).toContain("aria-label");
-    expect(reviewSource).toContain("aria-pressed");
+    expect(reviewSource).toContain('aria-label={copy.previous}');
+    expect(reviewSource).toContain('aria-label={copy.next}');
+    expect(reviewSource).not.toContain("togglePause");
+    expect(reviewSource).not.toContain("aria-pressed");
+    expect(reviewSource).toContain('strokeLinecap="round"');
+    expect(reviewSource).toContain('strokeLinejoin="round"');
+    expect(reviewSource).toContain('d="M16 5.5 7.5 12 16 18.5Z"');
+    expect(reviewSource).toContain('d="M8 5.5 16.5 12 8 18.5Z"');
     expect(reviewSource).toContain("REVIEW_INITIAL_INDEX");
     expect(reviewSource).toContain("tabIndex={0}");
     expect(reviewSource).toContain('role="region"');

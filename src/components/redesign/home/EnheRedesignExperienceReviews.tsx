@@ -2,7 +2,6 @@
 
 import Image from "next/image";
 import { useEffect, useRef, useState, type KeyboardEvent } from "react";
-import { ArrowLeft, ArrowRight, Pause, Play } from "lucide-react";
 import type { RedesignLocale } from "@/components/redesign/types";
 import {
   HOME_REVIEWS,
@@ -10,30 +9,22 @@ import {
   REVIEW_INITIAL_INDEX,
   REVIEW_MANUAL_RESUME_MS,
 } from "@/lib/redesign/home/home-reviews";
+import { HOME_COPY } from "@/lib/redesign/home/home-copy";
 
 const REVIEW_COPY = {
   zh: {
-    heading: "产品体验示例",
     previous: "上一条评价",
     next: "下一条评价",
-    pause: "暂停自动播放",
-    resume: "继续自动播放",
     stars: (count: number) => `${count} 星`,
   },
   en: {
-    heading: "Product experience examples",
-    previous: "Previous example",
-    next: "Next example",
-    pause: "Pause automatic rotation",
-    resume: "Continue automatic rotation",
+    previous: "Previous review",
+    next: "Next review",
     stars: (count: number) => `${count} stars`,
   },
-} satisfies Record<RedesignLocale, { heading: string; previous: string; next: string; pause: string; resume: string; stars: (count: number) => string }>;
+} satisfies Record<RedesignLocale, { previous: string; next: string; stars: (count: number) => string }>;
 
 type ReviewTimerActions = {
-  clearPendingResume: () => void;
-  pause: () => void;
-  resume: () => void;
   scheduleManualResume: () => void;
 };
 
@@ -50,13 +41,11 @@ function getReviewOffset(index: number, activeIndex: number) {
 }
 
 export function EnheRedesignExperienceReviews({ locale }: { locale: RedesignLocale }) {
-  const copy = REVIEW_COPY[locale];
+  const copy = { ...HOME_COPY[locale].review, ...REVIEW_COPY[locale] };
   const reviewSectionRef = useRef<HTMLElement | null>(null);
   const timerActionsRef = useRef<ReviewTimerActions | null>(null);
-  const userPausedRef = useRef(false);
   const focusPausedRef = useRef(false);
   const [index, setIndex] = useState(REVIEW_INITIAL_INDEX);
-  const [isPaused, setIsPaused] = useState(false);
   const [isAutoRotating, setIsAutoRotating] = useState(true);
 
   const move = (delta: -1 | 1) => {
@@ -72,20 +61,6 @@ export function EnheRedesignExperienceReviews({ locale }: { locale: RedesignLoca
     if (event.key === "ArrowRight") {
       event.preventDefault();
       move(1);
-    }
-  };
-
-  const togglePause = () => {
-    const nextPaused = !isPaused;
-    userPausedRef.current = nextPaused;
-    setIsPaused(nextPaused);
-    if (nextPaused) {
-      timerActionsRef.current?.clearPendingResume();
-      timerActionsRef.current?.pause();
-    } else {
-      focusPausedRef.current = false;
-      timerActionsRef.current?.clearPendingResume();
-      timerActionsRef.current?.resume();
     }
   };
 
@@ -126,7 +101,6 @@ export function EnheRedesignExperienceReviews({ locale }: { locale: RedesignLoca
       !isHovered &&
       !focusPausedRef.current &&
       !hasPointer &&
-      !userPausedRef.current &&
       resumeTimeoutId === null;
 
     const startAutoInterval = () => {
@@ -158,8 +132,7 @@ export function EnheRedesignExperienceReviews({ locale }: { locale: RedesignLoca
       if (
         reducedMotion ||
         document.hidden ||
-        focusPausedRef.current ||
-        userPausedRef.current
+        focusPausedRef.current
       ) {
         return;
       }
@@ -180,8 +153,14 @@ export function EnheRedesignExperienceReviews({ locale }: { locale: RedesignLoca
     const handleFocusIn = () => {
       focusPausedRef.current = true;
       clearResumeTimeout();
-      setIsPaused(true);
       pause();
+    };
+    const handleFocusOut = (event: FocusEvent) => {
+      const nextTarget = event.relatedTarget;
+      if (!(nextTarget instanceof Node) || !section.contains(nextTarget)) {
+        focusPausedRef.current = false;
+        resume();
+      }
     };
     const handlePointerDown = (event: PointerEvent) => {
       hasPointer = true;
@@ -228,14 +207,12 @@ export function EnheRedesignExperienceReviews({ locale }: { locale: RedesignLoca
     };
 
     timerActionsRef.current = {
-      clearPendingResume: clearResumeTimeout,
-      pause,
-      resume,
       scheduleManualResume,
     };
     section.addEventListener("mouseenter", handleMouseEnter);
     section.addEventListener("mouseleave", handleMouseLeave);
     section.addEventListener("focusin", handleFocusIn);
+    section.addEventListener("focusout", handleFocusOut);
     section.addEventListener("pointerdown", handlePointerDown);
     section.addEventListener("pointerup", handlePointerUp);
     section.addEventListener("pointercancel", handlePointerCancel);
@@ -253,6 +230,7 @@ export function EnheRedesignExperienceReviews({ locale }: { locale: RedesignLoca
       section.removeEventListener("mouseenter", handleMouseEnter);
       section.removeEventListener("mouseleave", handleMouseLeave);
       section.removeEventListener("focusin", handleFocusIn);
+      section.removeEventListener("focusout", handleFocusOut);
       section.removeEventListener("pointerdown", handlePointerDown);
       section.removeEventListener("pointerup", handlePointerUp);
       section.removeEventListener("pointercancel", handlePointerCancel);
@@ -272,6 +250,7 @@ export function EnheRedesignExperienceReviews({ locale }: { locale: RedesignLoca
     >
       <div className="redesign-home-reviews-inner">
         <h2 id="redesign-home-reviews-heading">{copy.heading}</h2>
+        <p className="redesign-home-reviews-disclosure">{copy.disclosure}</p>
         <div className="redesign-home-reviews-window">
           <div
             className="redesign-home-reviews-track"
@@ -288,7 +267,7 @@ export function EnheRedesignExperienceReviews({ locale }: { locale: RedesignLoca
                   data-active={isActive}
                   data-position={offset}
                   aria-hidden={!isActive}
-                  aria-label={`${review.productLabel[locale]} — ${review.exampleLabel[locale]}`}
+                  aria-label={`${review.productLabel[locale]} — ${copy.heading}`}
                 >
                   <div className="redesign-home-review-top">
                     <Image
@@ -306,7 +285,6 @@ export function EnheRedesignExperienceReviews({ locale }: { locale: RedesignLoca
                       {"★".repeat(review.stars)}{"☆".repeat(5 - review.stars)}
                     </span>
                   </div>
-                  <p className="redesign-home-review-example-label">{review.exampleLabel[locale]}</p>
                   <blockquote>{review.quote[locale]}</blockquote>
                 </article>
               );
@@ -315,19 +293,14 @@ export function EnheRedesignExperienceReviews({ locale }: { locale: RedesignLoca
         </div>
         <div className="redesign-home-reviews-controls">
           <button type="button" className="redesign-home-reviews-control" onClick={() => move(-1)} aria-label={copy.previous}>
-            <ArrowLeft aria-hidden="true" />
-          </button>
-          <button
-            type="button"
-            className="redesign-home-reviews-control"
-            onClick={togglePause}
-            aria-label={isPaused ? copy.resume : copy.pause}
-            aria-pressed={isPaused}
-          >
-            {isPaused ? <Play aria-hidden="true" /> : <Pause aria-hidden="true" />}
+            <svg aria-hidden="true" viewBox="0 0 24 24" fill="none">
+              <path d="M16 5.5 7.5 12 16 18.5Z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+            </svg>
           </button>
           <button type="button" className="redesign-home-reviews-control" onClick={() => move(1)} aria-label={copy.next}>
-            <ArrowRight aria-hidden="true" />
+            <svg aria-hidden="true" viewBox="0 0 24 24" fill="none">
+              <path d="M8 5.5 16.5 12 8 18.5Z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+            </svg>
           </button>
         </div>
       </div>

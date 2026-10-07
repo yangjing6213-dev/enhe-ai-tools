@@ -5,7 +5,6 @@ export type RedesignLanguageHrefs = Readonly<Record<RedesignLocale, string>>;
 export type RedesignNavItem = {
   label: string;
   href: string;
-  kind?: "link" | "search";
   children?: ReadonlyArray<RedesignNavChild>;
 };
 

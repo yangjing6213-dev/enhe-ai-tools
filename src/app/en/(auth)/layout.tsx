@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
-import { SiteFooter } from "@/components/site-footer";
-import { SiteHeader } from "@/components/site-header";
+import {
+  EnheRedesignPublicFooter,
+  EnheRedesignPublicHeader,
+} from "@/components/redesign/enhe-production-public-shell";
 
 export const metadata: Metadata = {
   title: "Sign in to ENHE AI for purchases, downloads, and learning",
@@ -12,10 +14,13 @@ export const metadata: Metadata = {
 
 export default async function EnglishAuthLayout({ children }: { children: React.ReactNode }) {
   return (
-    <>
-      <SiteHeader forceLocale="en" />
-      <div className="fade-in">{children}</div>
-      <SiteFooter forceLocale="en" />
-    </>
+    <div className="enhe-redesign-production" lang="en">
+      <a className="redesign-skip-link" href="#main-content">Skip to main content</a>
+      <EnheRedesignPublicHeader locale="en" />
+      <div id="main-content" tabIndex={-1}>
+        <div className="fade-in">{children}</div>
+      </div>
+      <EnheRedesignPublicFooter locale="en" />
+    </div>
   );
 }

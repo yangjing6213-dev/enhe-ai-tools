@@ -9,11 +9,11 @@ function read(path: string) {
 }
 
 describe("ENHE visual polish contract", () => {
-  it("uses Microsoft YaHei for Chinese and Montserrat for English", () => {
+  it("uses the approved rounded font for Chinese and English", () => {
     const tokens = read("src/styles/redesign/tokens.css");
 
-    expect(tokens).toMatch(/--enhe-font-zh:\s*"Microsoft YaHei",\s*"微软雅黑",\s*"Montserrat"/);
-    expect(tokens).toMatch(/--enhe-font-en:\s*"Montserrat"/);
+    expect(tokens).toMatch(/--enhe-font-zh:\s*"Alimama Fang Yuan Ti"/);
+    expect(tokens).toMatch(/--enhe-font-en:\s*"Alimama Fang Yuan Ti"/);
     expect(tokens).not.toContain('"Source Sans 3"');
   });
 

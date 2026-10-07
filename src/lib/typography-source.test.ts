@@ -17,19 +17,19 @@ describe("ENHE typography source contract", () => {
     expect(existsSync(join(publicFontsPath, "misans", "MiSans-Bold.min.css"))).toBe(true);
   });
 
-  it("sets English to Montserrat and Chinese UI/body to Microsoft YaHei", () => {
+  it("sets the approved rounded font as the shared Chinese and English UI family", () => {
     const css = readFileSync(cssPath, "utf8");
 
     expect(css).toContain("@font-face");
-    expect(css).toContain("font-family: 'Montserrat'");
-    expect(css).toContain("/fonts/montserrat/montserrat-latin-800-normal.woff2");
+    expect(css).toContain("font-family: 'Alimama Fang Yuan Ti'");
+    expect(css).toContain("/fonts/alimama/AlimamaFangYuanTiVF-Thin.woff2");
     expect(css).not.toContain('@import "../../public/fonts/misans/MiSans-Regular.min.css"');
     expect(css).not.toContain('@import "../../public/fonts/misans/MiSans-Semibold.min.css"');
     expect(css).not.toContain('@import "../../public/fonts/misans/MiSans-Bold.min.css"');
     expect(css).not.toContain("@import url('/fonts/misans/MiSans-Regular.min.css')");
     expect(css).not.toContain("@import url('/fonts/misans/MiSans-Bold.min.css')");
-    expect(css).toContain("--font-sans: 'Montserrat', 'Microsoft YaHei', 'Microsoft YaHei UI'");
-    expect(css).toContain("--font-heading-zh: 'Montserrat', 'Microsoft YaHei', 'Microsoft YaHei UI'");
+    expect(css).toContain("--font-sans: 'Alimama Fang Yuan Ti', 'Microsoft YaHei', Arial, sans-serif");
+    expect(css).toContain("--font-heading-zh: 'Alimama Fang Yuan Ti', 'Microsoft YaHei', Arial, sans-serif");
     expect(css).toContain("font-family: var(--font-sans)");
     expect(css).not.toContain("fonts.googleapis.com");
   });

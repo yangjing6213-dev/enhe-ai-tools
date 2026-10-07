@@ -79,7 +79,7 @@ export async function RegisterPageShell({
         <p id="register-newsletter-email-help" className="mt-2 text-xs leading-5 text-[var(--marketing-muted)]">
           {locale === "en" ? "Optional. Leave blank to use your account email when needed." : "选填，留空时可继续使用账号邮箱。"}
         </p>
-        <FormSubmitButton className="mt-8 w-full text-base" pendingLabel={t.auth.creatingAccount}>
+        <FormSubmitButton className="login-submit-button mt-8 w-full text-base" pendingLabel={t.auth.creatingAccount}>
           {t.auth.createAccount}
         </FormSubmitButton>
         <p className="mt-5 text-center text-sm text-[var(--marketing-muted)]">

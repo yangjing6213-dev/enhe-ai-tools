@@ -49,7 +49,7 @@ describe("public route family editorial shell contract", () => {
     expect(shellStyles).toContain(".byox-project-card-top > span");
   });
 
-  it("marks auth forms for the next private-boundary shell without changing layout", () => {
+  it("keeps auth forms inside the redesigned public shell", () => {
     for (const route of [
       "src/app/(auth)/login/page-shell.tsx",
       "src/app/(auth)/register/page-shell.tsx",
@@ -60,7 +60,7 @@ describe("public route family editorial shell contract", () => {
       expect(source, route).toContain("form-control-dark");
     }
 
-    expect(read("src/app/(auth)/layout.tsx")).toContain("SiteHeader");
-    expect(read("src/app/(auth)/layout.tsx")).toContain("SiteFooter");
+    expect(read("src/app/(auth)/layout.tsx")).toContain("EnheRedesignPublicHeader");
+    expect(read("src/app/(auth)/layout.tsx")).toContain("EnheRedesignPublicFooter");
   });
 });

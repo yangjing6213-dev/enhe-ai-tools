@@ -1,15 +1,15 @@
 :root {
-  --enhe-page-bg: #f8faf7;
-  --enhe-text: #101612;
-  --enhe-text-muted: #536057;
-  --enhe-action: #2f6f44;
-  --enhe-action-hover: #245a36;
+  --enhe-page-bg: #ffffff;
+  --enhe-text: #101828;
+  --enhe-text-muted: #526174;
+  --enhe-action: #246bfe;
+  --enhe-action-hover: #0b57e3;
   --enhe-surface: #ffffff;
-  --enhe-surface-elevated: #f0f5ef;
-  --enhe-yellow: #f6c945;
-  --enhe-footer: #0b2119;
-  --enhe-border: #d3ddd5;
-  --enhe-focus: #f6c945;
+  --enhe-surface-elevated: #ffffff;
+  --enhe-yellow: #246bfe;
+  --enhe-footer: #06183f;
+  --enhe-border: #d8e0eb;
+  --enhe-focus: #73a0ff;
   --enhe-content-max: 1200px;
   --enhe-button-h: 48px;
   --enhe-button-r: 4px;
@@ -30,7 +30,7 @@
   --enhe-font-size-xl: 28px;
   --enhe-line-tight: 1.1;
   --enhe-line-body: 1.55;
-  --enhe-shadow-panel: 0 24px 64px rgba(7, 21, 18, 0.18);
+  --enhe-shadow-panel: 0 18px 48px rgba(18, 42, 79, 0.14);
   --enhe-motion-fast: 170ms;
   --enhe-motion-panel: 200ms;
   --enhe-motion-standard: 240ms;
@@ -38,10 +38,10 @@
   --enhe-z-header: 20;
   --enhe-z-layer: 40;
   --enhe-z-focus: 60;
-  --enhe-font-zh: "Microsoft YaHei", "微软雅黑", "Montserrat", Arial, sans-serif;
-  --enhe-font-en: "Montserrat", Arial, sans-serif;
-  --enhe-font-display: "Montserrat", "Microsoft YaHei", "微软雅黑", Arial, sans-serif;
-  --enhe-font-utility: "Montserrat", "Microsoft YaHei", "微软雅黑", Arial, sans-serif;
+  --enhe-font-zh: "Alimama Fang Yuan Ti", "Microsoft YaHei", Arial, sans-serif;
+  --enhe-font-en: "Alimama Fang Yuan Ti", "Microsoft YaHei", Arial, sans-serif;
+  --enhe-font-display: "Alimama Fang Yuan Ti", "Microsoft YaHei", Arial, sans-serif;
+  --enhe-font-utility: "Alimama Fang Yuan Ti", "Microsoft YaHei", Arial, sans-serif;
 
   /* Typeshare comparison tokens: layout rhythm only, never reference-brand assets. */
   --enhe-reference-brand: var(--enhe-action);

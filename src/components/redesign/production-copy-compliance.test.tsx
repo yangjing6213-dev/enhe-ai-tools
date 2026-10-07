@@ -42,6 +42,7 @@ function visibleText(html: string) {
 describe("ENHE Phase 2C.1.2 production copy compliance", () => {
   it("uses the exact Chinese and English main navigation labels in order", () => {
     expect(REDESIGN_ZH_NAV_ITEMS.map(({ label }) => label)).toEqual([
+      "首页",
       "AI工具",
       "AI Skill",
       "AI资讯",
@@ -50,6 +51,7 @@ describe("ENHE Phase 2C.1.2 production copy compliance", () => {
       "搜索",
     ]);
     expect(REDESIGN_EN_NAV_ITEMS.map(({ label }) => label)).toEqual([
+      "Home",
       "AI Tools",
       "AI Skills",
       "AI News",
@@ -60,11 +62,11 @@ describe("ENHE Phase 2C.1.2 production copy compliance", () => {
   });
 
   it("uses the exact localized AI Skills dropdown labels", () => {
-    expect(REDESIGN_ZH_NAV_ITEMS[1].children?.map(({ label }) => label)).toEqual([
+    expect(REDESIGN_ZH_NAV_ITEMS[2].children?.map(({ label }) => label)).toEqual([
       "AI 提示词",
       "AI Skill",
     ]);
-    expect(REDESIGN_EN_NAV_ITEMS[1].children?.map(({ label }) => label)).toEqual([
+    expect(REDESIGN_EN_NAV_ITEMS[2].children?.map(({ label }) => label)).toEqual([
       "AI Prompts",
       "AI Skills",
     ]);

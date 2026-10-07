@@ -12,7 +12,7 @@ export type RedesignHomeCopy = {
   cta: RedesignHomeCta;
   review: {
     heading: string;
-    exampleLabel: string;
+    disclosure: string;
   };
   value: {
     heading: string;
@@ -22,22 +22,28 @@ export type RedesignHomeCopy = {
 
 export const HOME_COPY: Record<RedesignLocale, RedesignHomeCopy> = {
   zh: {
-    label: "给人生加一个 AI 外挂",
-    h1: "一站式AI平台",
-    subtitle: "发现真正好用的 AI 工具、智能体与实战方法，让工作更快、创作更自由，把每个灵感变成看得见的成果。",
-    cta: { label: "开始探索AI", href: "/software" },
-    review: { heading: "体验反馈", exampleLabel: "示例体验反馈" },
+    label: "把 AI 变成每天可用的力量",
+    h1: "让 AI 创意，落地为真实成果",
+    subtitle: "发现值得使用的 AI 工具、实用方法与行业动态，让工作更高效，让创作更自由。",
+    cta: { label: "探索 AI 工具", href: "/software" },
+    review: {
+      heading: "产品用户评价",
+      disclosure: "以下人物与评价内容由 AI 生成，仅作页面展示示意，并非真实用户评价。",
+    },
     value: {
       heading: "让每一个普通人，都能借助 AI，创造过去做不到的事。",
       cta: { label: "探索 AI 工具", href: "/software" },
     },
   },
   en: {
-    label: "An AI upgrade for everyday life",
-    h1: "The All-in-One AI Platform.",
-    subtitle: "Find genuinely useful AI tools, agents, and practical methods to work faster, create more freely, and turn every spark into a visible result.",
-    cta: { label: "Start exploring AI", href: "/en/software" },
-    review: { heading: "Experience feedback", exampleLabel: "Example experience feedback" },
+    label: "Useful AI, within reach",
+    h1: "Turn AI ideas into real results.",
+    subtitle: "Discover practical AI tools, skills, and industry signals to work faster and create with confidence.",
+    cta: { label: "Explore AI tools", href: "/en/software" },
+    review: {
+      heading: "Product user reviews",
+      disclosure: "These people and review texts are AI-generated illustrations, not real customer reviews.",
+    },
     value: {
       heading: "Let everyone use AI to create what once felt out of reach.",
       cta: { label: "Explore AI tools", href: "/en/software" },

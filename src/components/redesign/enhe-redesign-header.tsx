@@ -38,7 +38,12 @@ export function EnheRedesignHeader({
   };
 
   return (
-    <header className="redesign-header" data-sticky={sticky} data-locale={locale}>
+    <header
+      className="redesign-header"
+      data-sticky={sticky}
+      data-locale={locale}
+      data-home={isExactCurrentPage(currentPathname, homeHref)}
+    >
       <div className="redesign-header-inner">
         <div className="redesign-brand-region">
           <EnheBrandLockup
@@ -75,16 +80,10 @@ export function EnheRedesignHeader({
                 href={item.href}
                 aria-current={isCurrentPath(item.href) ? "page" : undefined}
               >
-                {item.kind === "search" ? <span className="redesign-search-icon" aria-hidden="true" /> : null}
                 <span>{item.label}</span>
               </a>
             ),
           )}
-          <EnheRedesignLanguageSwitch
-            localeHrefs={languageHrefs}
-            currentLocale={locale}
-            ariaLabel={languageAriaLabel}
-          />
           {account.status === "guest" ? (
             <a className="redesign-login-link" href={account.loginHref}>
               {account.loginLabel}
@@ -102,13 +101,13 @@ export function EnheRedesignHeader({
               </div>
             </details>
           )}
-        </nav>
-        <div className="redesign-mobile-actions">
           <EnheRedesignLanguageSwitch
             localeHrefs={languageHrefs}
             currentLocale={locale}
             ariaLabel={languageAriaLabel}
           />
+        </nav>
+        <div className="redesign-mobile-actions">
           <EnheRedesignMobileMenu
             menuId={menuId}
             triggerLabel={menuTriggerLabel}
@@ -116,6 +115,11 @@ export function EnheRedesignHeader({
             navItems={navItems}
             account={account}
             pathname={currentPathname}
+          />
+          <EnheRedesignLanguageSwitch
+            localeHrefs={languageHrefs}
+            currentLocale={locale}
+            ariaLabel={languageAriaLabel}
           />
         </div>
       </div>
