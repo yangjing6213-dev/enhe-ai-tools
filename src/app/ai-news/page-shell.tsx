@@ -4,7 +4,6 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { StructuredData } from "@/components/structured-data";
 import { ContentlessState } from "@/components/redesign/contentless-state";
-import { AiNewsWorkspaceShell } from "@/components/redesign/ai-news-workspace-shell";
 import {
   Badge,
   ButtonLink,
@@ -297,41 +296,39 @@ export async function AiNewsPageShell({
   );
   if (!process.env.DATABASE_URL?.trim()) {
     return (
-      <AiNewsWorkspaceShell locale={forceLocale} currentPathname={currentPathname}>
-        <ContentlessState
-          locale={forceLocale}
-          className="ai-news-page ai-news-workspace enhe-reference-workspace"
-          dataStatusTarget="panel"
-          eyebrow={forceLocale === "en" ? "AI News" : "AI 前沿资讯"}
-          title={t.aiNews.title}
-          intro={
-            forceLocale === "en"
-              ? "AI News content is not available in this local preview."
-              : "AI 资讯内容尚未核验，当前本地预览不展示资讯卡片或资讯事实。"
-          }
-          statusLabel={forceLocale === "en" ? "Unverified" : "待核验"}
-          stateTitle={forceLocale === "en" ? "Content is being prepared" : "内容准备中"}
-          statusText={
-            forceLocale === "en"
-              ? "Unverified — AI News content has not been verified yet."
-              : "待核验：AI 资讯内容尚未核验。"
-          }
-          primaryAction={{
-            href: buildLocalePath("/", forceLocale),
-            label: forceLocale === "en" ? "Return home" : "返回首页",
-          }}
-          secondaryActions={[
-            {
-              href: buildLocalePath("/software", forceLocale),
-              label: forceLocale === "en" ? "Browse software" : "浏览 AI 软件",
-            },
-            {
-              href: buildLocalePath("/skill-learning", forceLocale),
-              label: forceLocale === "en" ? "Learn skills" : "学习 AI 技能",
-            },
-          ]}
-        />
-      </AiNewsWorkspaceShell>
+      <ContentlessState
+        locale={forceLocale}
+        className="ai-news-page ai-news-workspace enhe-reference-workspace"
+        dataStatusTarget="panel"
+        eyebrow={forceLocale === "en" ? "AI News" : "AI 前沿资讯"}
+        title={t.aiNews.title}
+        intro={
+          forceLocale === "en"
+            ? "AI News content is not available in this local preview."
+            : "AI 资讯内容尚未核验，当前本地预览不展示资讯卡片或资讯事实。"
+        }
+        statusLabel={forceLocale === "en" ? "Unverified" : "待核验"}
+        stateTitle={forceLocale === "en" ? "Content is being prepared" : "内容准备中"}
+        statusText={
+          forceLocale === "en"
+            ? "Unverified — AI News content has not been verified yet."
+            : "待核验：AI 资讯内容尚未核验。"
+        }
+        primaryAction={{
+          href: buildLocalePath("/", forceLocale),
+          label: forceLocale === "en" ? "Return home" : "返回首页",
+        }}
+        secondaryActions={[
+          {
+            href: buildLocalePath("/software", forceLocale),
+            label: forceLocale === "en" ? "Browse software" : "浏览 AI 软件",
+          },
+          {
+            href: buildLocalePath("/skill-learning", forceLocale),
+            label: forceLocale === "en" ? "Learn skills" : "学习 AI 技能",
+          },
+        ]}
+      />
     );
   }
   const [{ articles, total }, featured, hot, categories, tags, discovery, topics] =
@@ -404,8 +401,7 @@ export async function AiNewsPageShell({
   });
 
   return (
-    <AiNewsWorkspaceShell locale={forceLocale} currentPathname={currentPathname}>
-      <main className="ai-news-page ai-news-workspace enhe-reference-workspace">
+    <main className="ai-news-page ai-news-workspace enhe-reference-workspace">
       <Container className="ai-news-workspace-container py-14">
         <StructuredData data={[breadcrumbSchema, collectionSchema, webPageSchema, faqSchema]} />
         <section
@@ -554,7 +550,6 @@ export async function AiNewsPageShell({
         </section>
       </Container>
       </main>
-    </AiNewsWorkspaceShell>
   );
 }
 
@@ -743,7 +738,7 @@ function NewsCard({
 
   return (
     <article
-      className={`glass group overflow-hidden rounded-2xl transition-[border-color,transform] duration-200 hover:-translate-y-1 hover:border-[var(--marketing-accent)]/45 ${featured ? "ai-news-lead-card" : ""}`}
+      className={`ai-news-interactive-card glass group overflow-hidden rounded-2xl ${featured ? "ai-news-lead-card" : ""}`}
     >
       <Link href={href} className="block">
          <div className="relative aspect-[16/9] overflow-hidden bg-[var(--marketing-card-soft)]">
@@ -838,7 +833,7 @@ function TrendPanel({
             <Link
               key={article.id}
               href={buildCanonicalAiNewsPath(article, locale)}
-               className="block rounded-xl border border-[var(--marketing-border)] bg-[var(--marketing-card)] p-4 transition-colors hover:border-[var(--marketing-accent)]/45"
+              className="ai-news-interactive-link block rounded-xl border border-[var(--marketing-border)] bg-[var(--marketing-card)] p-4"
             >
               <span className="text-xs font-bold text-[var(--marketing-accent)]">
                 #{index + 1}
@@ -886,7 +881,7 @@ function KeywordCloud({
           <Link
             key={item.keyword}
             href={`${buildLocalePath("/ai-news", locale)}?q=${encodeURIComponent(item.query)}`}
-                     className="rounded-full border border-[var(--marketing-border)] bg-[var(--marketing-card)] px-3 py-1 text-xs font-semibold text-[var(--marketing-muted)] transition-[border-color,color] hover:border-[var(--marketing-accent)] hover:text-[var(--marketing-accent)]"
+            className="ai-news-interactive-link rounded-full border border-[var(--marketing-border)] bg-[var(--marketing-card)] px-3 py-1 text-xs font-semibold text-[var(--marketing-muted)]"
           >
             {localizeAiNewsDiscoveryLabel(
               item.displayName,

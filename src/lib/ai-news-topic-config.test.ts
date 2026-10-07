@@ -239,7 +239,8 @@ describe("AI news topic backend configuration", () => {
     expect(actions).toContain("deleteNewsTopicAction");
     expect(adminLayout).toContain("/admin/ai-news/topics");
     expect(read("src/lib/admin-i18n.ts")).toContain("aiNewsTopics");
-    expect(read("src/app/admin/ai-news/topics/page.tsx")).toContain("upsertNewsTopicAction");
+    expect(read("src/app/admin/ai-news/topics/page.tsx")).toContain("deleteNewsTopicAction");
+    expect(read("src/app/admin/ai-news/topics/[id]/page.tsx")).toContain("upsertNewsTopicAction");
     expect(topicPage).toContain("getPublicAiNewsTopic");
     expect(topicPage).toContain("getPublicAiNewsTopicSlugs");
     expect(listingPage).toContain("getPublicAiNewsTopics");

@@ -1,6 +1,6 @@
 import Link from "next/link";
 import type { Prisma } from "@prisma/client";
-import { AdminSection, inputClass, selectClass } from "@/app/admin/admin-ui";
+import { AdminContentShell, AdminSection, inputClass, selectClass } from "@/app/admin/admin-ui";
 import { DeleteProductDemoForm } from "@/app/admin/product-demo-editor";
 import { prisma } from "@/lib/db";
 import { buildProductDemoPath, getProductDemoCategoryLabel } from "@/lib/product-demos";
@@ -53,9 +53,10 @@ export default async function AdminProductDemosPage({ searchParams }: AdminProdu
 
   return (
     <AdminSection title="产品演示管理" intro="维护首页产品效果演示、视频详情页、FAQ、文字稿、关联产品和 SEO/GEO 信息。">
-      <div className="mb-6 flex flex-wrap items-center justify-between gap-3">
+      <AdminContentShell className="enhe-admin-content-management">
+      <div className="enhe-admin-content-toolbar mb-6 flex flex-wrap items-center justify-between gap-3">
         <div className="text-sm text-[#8B95A7]">共 {total} 条产品演示</div>
-        <Link href="/admin/product-demos/new" className="rounded-full bg-[#7AA7FF] px-5 py-3 text-sm font-semibold text-[#07101f]">
+        <Link href="/admin/product-demos/new" className="enhe-admin-content-primary-action rounded-full px-5 py-3 text-sm font-semibold">
           新增视频演示
         </Link>
       </div>
@@ -64,7 +65,7 @@ export default async function AdminProductDemosPage({ searchParams }: AdminProdu
       {params.deleted ? <p className="status-success mb-5">产品演示已删除。</p> : null}
       {params.error ? <p className="status-danger mb-5">{params.error}</p> : null}
 
-      <form className="mb-6 grid gap-3 rounded-2xl border border-white/12 bg-white/6 p-4 lg:grid-cols-[1fr_150px_180px_150px_130px]">
+      <form className="enhe-admin-content-form enhe-admin-content-filters mb-6 grid gap-3 rounded-2xl border border-white/12 bg-white/6 p-4 lg:grid-cols-[1fr_150px_180px_150px_130px]">
         <input name="q" defaultValue={q} placeholder="搜索标题、slug、描述、标签" className={inputClass} />
         <select name="status" defaultValue={status} className={selectClass}>
           <option value="">全部状态</option>
@@ -86,8 +87,8 @@ export default async function AdminProductDemosPage({ searchParams }: AdminProdu
         <button className="rounded-full bg-[#050505] px-5 py-3 text-sm font-bold text-white lg:col-span-5">筛选演示</button>
       </form>
 
-      <div className="overflow-x-auto rounded-2xl border border-white/12 bg-white/6">
-        <div className="grid min-w-[1120px] grid-cols-[1.25fr_0.65fr_0.55fr_0.55fr_0.55fr_0.65fr_0.8fr] gap-4 border-b border-white/10 px-5 py-3 text-xs uppercase tracking-wide text-[#8B95A7]">
+      <div className="enhe-admin-content-table enhe-admin-content-records overflow-x-auto rounded-2xl border border-white/12 bg-white/6">
+        <div className="enhe-admin-content-table-heading grid min-w-[1120px] grid-cols-[1.25fr_0.65fr_0.55fr_0.55fr_0.55fr_0.65fr_0.8fr] gap-4 border-b border-white/10 px-5 py-3 text-xs uppercase tracking-wide text-[#8B95A7]">
           <span>标题</span>
           <span>类型/标签</span>
           <span>状态</span>
@@ -96,9 +97,9 @@ export default async function AdminProductDemosPage({ searchParams }: AdminProdu
           <span>更新时间</span>
           <span className="text-right">操作</span>
         </div>
-        <div className="min-w-[1120px] divide-y divide-white/10">
+        <div className="enhe-admin-content-record-rows min-w-[1120px] divide-y divide-white/10">
           {demos.map((demo) => (
-            <div key={demo.id} className="grid grid-cols-[1.25fr_0.65fr_0.55fr_0.55fr_0.55fr_0.65fr_0.8fr] gap-4 px-5 py-4 text-sm transition hover:bg-white/5">
+            <div key={demo.id} className="enhe-admin-content-row grid grid-cols-[1.25fr_0.65fr_0.55fr_0.55fr_0.55fr_0.65fr_0.8fr] gap-4 px-5 py-4 text-sm transition">
               <div>
                 <p className="font-semibold text-[#E8EEF8]">{demo.title}</p>
                 <p className="mt-1 line-clamp-1 text-xs text-[#8B95A7]">/{demo.slug}</p>
@@ -141,6 +142,7 @@ export default async function AdminProductDemosPage({ searchParams }: AdminProdu
           })}
         </div>
       ) : null}
+      </AdminContentShell>
     </AdminSection>
   );
 }

@@ -1,7 +1,7 @@
 import Link from "next/link";
 import Image from "next/image";
 import { deleteToolAction, upsertToolAction } from "@/app/admin/actions";
-import { DangerButton, Field, inputClass, selectClass, SubmitButton, textareaClass } from "@/app/admin/admin-ui";
+import { AdminContentShell, DangerButton, Field, inputClass, selectClass, SubmitButton, textareaClass } from "@/app/admin/admin-ui";
 import { ToolMediaUploadGuard } from "@/app/admin/tool-media-upload-guard";
 import { ToolProductImageManager } from "@/app/admin/tool-product-image-manager";
 import { ToolVideoUploadField } from "@/app/admin/tool-video-upload-field";
@@ -72,9 +72,9 @@ const statusTextEn: Record<string, string> = {
 };
 
 const statusClass: Record<string, string> = {
-  draft: "border-white/15 bg-white/8 text-[#8B95A7]",
-  published: "border-[var(--marketing-accent)]/35 bg-[var(--marketing-accent)]/12 text-[#d8f8ff]",
-  offline: "border-amber-300/30 bg-amber-300/10 text-amber-100"
+  draft: "enhe-admin-tool-status--draft",
+  published: "enhe-admin-tool-status--published",
+  offline: "enhe-admin-tool-status--offline"
 };
 
 function NoticeBar({ notice, locale }: { notice?: Notice; locale: Locale }) {
@@ -170,15 +170,15 @@ export function ToolAdminList({
   const isAiSkill = type === "ai_skill";
 
   return (
-    <div>
-      <div className="flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
+    <AdminContentShell className="enhe-admin-tool-workflow">
+      <div className="enhe-admin-content-toolbar flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
         <div>
-          <h1 className="text-3xl font-semibold">{title}</h1>
-          <p className="mt-3 max-w-3xl text-sm leading-6 text-[#8B95A7]">
+          <h1 className="enhe-admin-title text-3xl font-semibold">{title}</h1>
+          <p className="enhe-admin-intro mt-3 max-w-3xl text-sm leading-6 text-[#8B95A7]">
             {isAiSkill ? copy.aiSkillListIntro : isSkillLearning ? copy.courseListIntro : isAccountService ? copy.serviceListIntro : copy.listIntro}
           </p>
         </div>
-        <Link href={getAdminToolNewPath(type)} className="rounded-full bg-[var(--marketing-accent)] px-5 py-3 text-sm font-semibold text-white transition hover:bg-[#56bfd0]">
+        <Link href={getAdminToolNewPath(type)} className="enhe-admin-tool-primary-action rounded-full bg-[var(--marketing-accent)] px-5 py-3 text-sm font-semibold text-white transition hover:bg-[#56bfd0]">
           {isAiSkill ? copy.newAiSkill : isSkillLearning ? copy.newCourse : isAccountService ? copy.newService : copy.newTool}
         </Link>
       </div>
@@ -187,7 +187,7 @@ export function ToolAdminList({
 
       {filters && buildPageHref ? (
         <>
-          <form className="filter-surface mt-6 grid gap-3 md:grid-cols-[1fr_180px_220px_auto]" action={listPath}>
+          <form className="filter-surface enhe-admin-content-form enhe-admin-tool-filter-form mt-6 grid gap-3 md:grid-cols-[1fr_180px_220px_auto]" action={listPath}>
             <input name="q" defaultValue={filters.q} placeholder={isSkillLearning ? copy.courseSearchPlaceholder : isAccountService ? copy.serviceSearchPlaceholder : copy.searchPlaceholder} className={inputClass} />
             <select name="status" defaultValue={filters.status ?? ""} className={selectClass}>
               <option value="">{copy.allStatus}</option>
@@ -226,8 +226,8 @@ export function ToolAdminList({
         </>
       ) : null}
 
-      <div className="mt-8 overflow-x-auto rounded-2xl border border-white/12 bg-white/6">
-        <div className="grid min-w-[1080px] grid-cols-[1.4fr_0.8fr_0.6fr_0.8fr_1.1fr_0.6fr] gap-4 border-b border-white/10 px-5 py-3 text-xs uppercase tracking-wide text-[#8B95A7]">
+      <div className="enhe-admin-content-table enhe-admin-tool-table mt-8 overflow-x-auto rounded-2xl border border-white/12 bg-white/6">
+        <div className="enhe-admin-tool-table-heading grid min-w-[1080px] grid-cols-[1.4fr_0.8fr_0.6fr_0.8fr_1.1fr_0.6fr] gap-4 border-b border-white/10 px-5 py-3 text-xs uppercase tracking-wide text-[#8B95A7]">
           <span>{isSkillLearning ? copy.course : isAccountService ? copy.service : copy.tool}</span>
           <span>{copy.category}</span>
           <span>{copy.status}</span>
@@ -239,20 +239,20 @@ export function ToolAdminList({
         {tools.length === 0 ? (
           <div className="px-5 py-10 text-center text-sm text-[#8B95A7]">{isSkillLearning ? copy.noCourses : isAccountService ? copy.noServices : copy.noTools}</div>
         ) : (
-          <div className="min-w-[1080px] divide-y divide-white/10">
+          <div className="enhe-admin-tool-list-rows min-w-[1080px] divide-y divide-white/10">
             {tools.map((tool) => {
               const publishIssues = getToolPublishIssues(tool);
               const coverImage = resolveToolImageSrc(tool.coverImage);
               const displayPrice = getToolDisplayPrice(tool);
 
               return (
-                <div key={tool.id} className="grid grid-cols-[1.4fr_0.8fr_0.6fr_0.8fr_1.1fr_0.6fr] items-center gap-4 px-5 py-4 text-sm transition hover:bg-white/5">
+                <div key={tool.id} className="enhe-admin-tool-list-row grid grid-cols-[1.4fr_0.8fr_0.6fr_0.8fr_1.1fr_0.6fr] items-center gap-4 px-5 py-4 text-sm transition-colors">
                   <div className="flex items-center gap-3">
                     <div className="relative h-14 w-24 shrink-0 overflow-hidden rounded-xl border border-white/10 bg-[#0B1220]">
                       {coverImage ? (
                         <Image src={coverImage} alt={tool.name} fill className="object-cover" sizes="96px" unoptimized />
                       ) : (
-                        <div className="absolute inset-0 bg-[radial-gradient(circle_at_35%_30%,rgba(65,197,219,0.22),transparent_38%),linear-gradient(135deg,rgba(255,255,255,0.12),transparent)]" />
+                        <div className="enhe-admin-tool-empty-image absolute inset-0" />
                       )}
                     </div>
                     <div>
@@ -267,25 +267,25 @@ export function ToolAdminList({
                   </div>
                   <div className="flex flex-wrap items-center gap-2 self-center">
                     {hasToolPrice(tool) ? (
-                      <Badge className="border-[#FFB86B]/40 bg-[#FFB86B]/10 text-[#FFB86B]">{formatPrice(displayPrice)}</Badge>
+                      <Badge className="enhe-admin-tool-price">{formatPrice(displayPrice)}</Badge>
                     ) : (
-                      <Badge className="border-white/15 bg-white/8 text-[#C5D0E2]">{copy.free}</Badge>
+                      <Badge className="enhe-admin-tool-status--draft">{copy.free}</Badge>
                     )}
                   </div>
                   <div className="flex flex-wrap items-center gap-2 self-center">
                     {publishIssues.length ? (
                       <>
                         {publishIssues.slice(0, 3).map((issue) => (
-                          <Badge key={issue} className="border-[#FFB86B]/30 bg-[#FFB86B]/10 text-[#FFB86B]">{localizePublishIssue(issue, locale)}</Badge>
+                          <Badge key={issue} className="enhe-admin-tool-status--warning">{localizePublishIssue(issue, locale)}</Badge>
                         ))}
-                        {publishIssues.length > 3 ? <Badge className="border-white/15 bg-white/8 text-[#8B95A7]">+{publishIssues.length - 3}</Badge> : null}
+                        {publishIssues.length > 3 ? <Badge className="enhe-admin-tool-status--draft">+{publishIssues.length - 3}</Badge> : null}
                       </>
                     ) : (
-                      <Badge className="border-[var(--marketing-accent)]/35 bg-[var(--marketing-accent)]/12 text-[#d8f8ff]">{copy.publishable}</Badge>
+                      <Badge className="enhe-admin-tool-status--published">{copy.publishable}</Badge>
                     )}
                   </div>
                   <div className="text-right">
-                    <Link href={getAdminToolEditPath(type, tool.id)} className="rounded-full border border-white/15 px-4 py-2 text-xs font-semibold text-[#E8EEF8] transition hover:border-[var(--marketing-accent)]/50 hover:text-[var(--marketing-accent)]">
+                    <Link href={getAdminToolEditPath(type, tool.id)} className="enhe-admin-tool-edit-action rounded-full border border-white/15 px-4 py-2 text-xs font-semibold text-[#E8EEF8] transition hover:border-[var(--marketing-accent)]/50 hover:text-[var(--marketing-accent)]">
                       {copy.viewEdit}
                     </Link>
                   </div>
@@ -295,7 +295,7 @@ export function ToolAdminList({
           </div>
         )}
       </div>
-    </div>
+    </AdminContentShell>
   );
 }
 
@@ -339,22 +339,22 @@ export function ToolEditor({
     : null;
 
   return (
-    <div>
-      <div className="flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
+    <AdminContentShell className="enhe-admin-tool-workflow">
+      <div className="enhe-admin-content-toolbar flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
         <div>
-          <h1 className="text-3xl font-semibold">{title}</h1>
-          <p className="mt-3 max-w-3xl text-sm leading-6 text-[#8B95A7]">
+          <h1 className="enhe-admin-title text-3xl font-semibold">{title}</h1>
+          <p className="enhe-admin-intro mt-3 max-w-3xl text-sm leading-6 text-[#8B95A7]">
             {isAiSkill ? copy.aiSkillEditorIntro : isSkillLearning ? copy.courseEditorIntro : isAccountService ? copy.serviceEditorIntro : copy.editorIntro}
           </p>
         </div>
-        <Link href={listPath} className="rounded-full border border-white/15 px-5 py-3 text-sm font-semibold text-[#E8EEF8] transition hover:border-[var(--marketing-accent)]/50 hover:text-[var(--marketing-accent)]">
+        <Link href={listPath} className="enhe-admin-tool-back-action rounded-full border border-white/15 px-5 py-3 text-sm font-semibold text-[#E8EEF8] transition hover:border-[var(--marketing-accent)]/50 hover:text-[var(--marketing-accent)]">
           {copy.backToList}
         </Link>
       </div>
 
       <NoticeBar notice={notice} locale={locale} />
 
-      <form action={upsertToolAction} className="mt-8 grid gap-6">
+      <form action={upsertToolAction} className="enhe-admin-tool-editor-form mt-8 grid gap-6">
         {tool ? <input type="hidden" name="id" value={tool.id} /> : null}
         <input type="hidden" name="type" value={type} />
         <input type="hidden" name="returnTo" value={editorPath} />
@@ -623,7 +623,7 @@ export function ToolEditor({
       </form>
 
       {tool && deleteDecision?.allowed ? (
-        <form action={deleteToolAction} className="mt-4">
+        <form action={deleteToolAction} className="enhe-admin-tool-danger-form mt-4">
           <input type="hidden" name="id" value={tool.id} />
           <input type="hidden" name="type" value={type} />
           <DangerButton>{isSkillLearning ? copy.deleteCourse : isAccountService ? copy.deleteService : copy.deleteTool}</DangerButton>
@@ -635,13 +635,13 @@ export function ToolEditor({
             : `硬删除已阻止（${deleteDecision?.code}）。订单和购买权益会保留。`}
         </p>
       ) : null}
-    </div>
+    </AdminContentShell>
   );
 }
 
 function EditorSection({ title, intro, children }: React.PropsWithChildren<{ title: string; intro: string }>) {
   return (
-    <section className="surface-panel p-6">
+    <section className="enhe-admin-tool-editor-section surface-panel p-6">
       <div className="mb-5">
         <h2 className="text-xl font-semibold text-[#F6FAFF]">{title}</h2>
         <p className="mt-2 text-sm leading-6 text-[#8B95A7]">{intro}</p>

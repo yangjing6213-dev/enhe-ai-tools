@@ -14,6 +14,7 @@ import {
   WalletCards
 } from "lucide-react";
 import { StructuredData } from "@/components/structured-data";
+import { ContentlessState } from "@/components/redesign/contentless-state";
 import { AiTrendVideoBriefing } from "@/components/ai-trend-video-briefing";
 import { Badge, ButtonLink, Container, SectionTitle } from "@/components/ui";
 import {
@@ -406,26 +407,18 @@ export async function AiTrendTopicPageShell({ forceLocale = "zh" }: { forceLocal
   const copy = content[forceLocale];
   if (!process.env.DATABASE_URL?.trim()) {
     return (
-      <main>
-        <Container className="py-14">
-          <section
-            className="surface-panel overflow-hidden p-7 md:p-10"
-            data-content-status="UNVERIFIED"
-          >
-            <Badge className="text-[var(--marketing-accent)]">UNVERIFIED</Badge>
-            <h1 className="mt-6 max-w-4xl text-4xl font-black leading-tight text-[var(--marketing-text)] md:text-6xl">
-              {forceLocale === "en"
-                ? "AI Trends content has not been verified"
-                : "AI 趋势内容尚未核验"}
-            </h1>
-            <p className="mt-5 max-w-3xl text-base font-medium leading-8 text-[var(--marketing-muted)] md:text-lg">
-              {forceLocale === "en"
-                ? "This local preview has no configured verified data source, so it does not show trend rankings, scores, source claims, or generated trend facts."
-                : "本地预览未配置已核验的数据源，因此不展示趋势排行、分数、来源声明或生成的趋势事实。"}
-            </p>
-          </section>
-        </Container>
-      </main>
+      <ContentlessState
+        locale={forceLocale}
+        className="ai-trends-page"
+        eyebrow={forceLocale === "en" ? "AI Trends" : "AI 趋势"}
+        title={forceLocale === "en" ? "AI Trends content has not been verified" : "AI 趋势内容尚未核验"}
+        intro={forceLocale === "en" ? "This local preview has no configured verified data source, so it does not show trend rankings, scores, source claims, or generated trend facts." : "本地预览未配置已核验的数据源，因此不展示趋势排行、分数、来源声明或生成的趋势事实。"}
+        statusLabel="UNVERIFIED"
+        stateTitle={forceLocale === "en" ? "Trend content is being prepared" : "趋势内容准备中"}
+        statusText={forceLocale === "en" ? "AI Trends remain hidden until verified source data is available." : "AI 趋势内容将在已核验数据源可用后再展示。"}
+        primaryAction={{ href: forceLocale === "en" ? "/en" : "/", label: forceLocale === "en" ? "Return home" : "返回首页" }}
+        secondaryActions={[{ href: forceLocale === "en" ? "/en/ai-news" : "/ai-news", label: forceLocale === "en" ? "Read AI News" : "阅读 AI 资讯" }]}
+      />
     );
   }
   const [recentBriefingsRaw, latestVideoBriefingRaw] = await Promise.all([

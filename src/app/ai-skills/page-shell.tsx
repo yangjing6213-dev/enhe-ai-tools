@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { StructuredData } from "@/components/structured-data";
+import { ContentlessState } from "@/components/redesign/contentless-state";
 import { ToolCard } from "@/components/tool-card";
 import { Container, EmptyState, SectionTitle } from "@/components/ui";
 import { getDictionary, type Locale } from "@/lib/dictionaries";
@@ -44,13 +45,15 @@ const pageCopy = {
 
 export function generateAiSkillsPageMetadata(locale: Locale): Metadata {
   const copy = pageCopy[locale];
-  return buildPageMetadata({
+  const metadata = buildPageMetadata({
     title: `${copy.title} - ENHE AI`,
     description: copy.intro,
     path: buildLocalePath("/ai-skills", locale),
     locale: locale === "en" ? "en_US" : "zh_CN",
     localeKey: locale,
   });
+  if (!process.env.DATABASE_URL?.trim()) metadata.robots = { index: false, follow: true };
+  return metadata;
 }
 
 export async function AiSkillsPageShell({
@@ -73,6 +76,38 @@ export async function AiSkillsPageShell({
       params.sort,
     ),
   ]);
+  if (!process.env.DATABASE_URL?.trim()) {
+    return (
+      <ContentlessState
+        locale={forceLocale}
+        className="ai-skills-page"
+        eyebrow={forceLocale === "en" ? "AI Skills" : "AI Skill"}
+        title={copy.title}
+        intro={copy.intro}
+        statusLabel="UNVERIFIED"
+        stateTitle={forceLocale === "en" ? "Skills are being prepared" : "Skill 内容准备中"}
+        statusText={
+          forceLocale === "en"
+            ? "UNVERIFIED — English AI Skill content is not available yet."
+            : "UNVERIFIED — AI Skill 内容尚未核验。"
+        }
+        primaryAction={{
+          href: buildLocalePath("/", forceLocale),
+          label: forceLocale === "en" ? "Return home" : "返回首页",
+        }}
+        secondaryActions={[
+          {
+            href: buildLocalePath("/skill-learning", forceLocale),
+            label: forceLocale === "en" ? "View tutorials" : "查看 AI 教程",
+          },
+          {
+            href: buildLocalePath("/software", forceLocale),
+            label: forceLocale === "en" ? "Browse software" : "浏览 AI 软件",
+          },
+        ]}
+      />
+    );
+  }
   const listingPath = buildLocalePath("/ai-skills", forceLocale);
   const breadcrumbSchema = buildBreadcrumbSchema({
     schemaType: "BreadcrumbList",

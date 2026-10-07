@@ -3,6 +3,7 @@ import Link from "next/link";
 import { connection } from "next/server";
 import { ArrowRight, PackageOpen } from "lucide-react";
 import { StructuredData } from "@/components/structured-data";
+import { ContentlessState } from "@/components/redesign/contentless-state";
 import { Container, SectionTitle } from "@/components/ui";
 import { getDictionary, type Locale } from "@/lib/dictionaries";
 import {
@@ -23,13 +24,22 @@ export const pricingPageRevalidate = publicPageCacheSeconds;
 
 export async function generatePricingPageMetadata(forceLocale: Locale): Promise<Metadata> {
   const t = getDictionary(forceLocale);
-  return buildPageMetadata({
+  const isDbFreeMode = !process.env.DATABASE_URL?.trim();
+  const metadata = buildPageMetadata({
     title: buildListingMetadataTitle("pricing", forceLocale, t.brand),
-    description: buildListingMetaDescription("pricing", forceLocale),
+    description: isDbFreeMode
+      ? forceLocale === "en"
+        ? "Pricing content is not available in this local preview."
+        : "报价内容尚未核验，当前本地预览不提供可发布的价格事实。"
+      : buildListingMetaDescription("pricing", forceLocale),
     path: "/pricing",
     locale: forceLocale === "en" ? "en_US" : "zh_CN",
     localeKey: forceLocale
   });
+
+  return isDbFreeMode
+    ? { ...metadata, robots: { index: false, follow: true } }
+    : metadata;
 }
 
 function getSchemaItemType(type: "software" | "ai_skill" | "account_service" | "course") {
@@ -84,6 +94,36 @@ export function buildPricingOfferCatalogSchema(
 export async function PricingPageShell({ forceLocale }: { forceLocale: Locale }) {
   await connection();
   const t = getDictionary(forceLocale);
+  if (!process.env.DATABASE_URL?.trim()) {
+    return (
+      <ContentlessState
+        locale={forceLocale}
+        eyebrow={forceLocale === "en" ? "Pricing" : "AI 报价"}
+        title={forceLocale === "en" ? "Pricing preview" : "AI 报价预览"}
+        intro={
+          forceLocale === "en"
+            ? "Pricing content is not available in this local preview. The product and service catalog will appear after verified content is connected."
+            : "当前本地预览尚未接入可核验的报价内容。产品和服务目录将在接入经过核验的内容后展示。"
+        }
+        statusLabel="UNVERIFIED"
+        statusText={
+          forceLocale === "en"
+            ? "UNVERIFIED — Pricing content has not been verified yet."
+            : "UNVERIFIED — 报价内容尚未核验。"
+        }
+        primaryAction={{
+          href: forceLocale === "en" ? "/en" : "/",
+          label: forceLocale === "en" ? "Return to ENHE AI home" : "返回 ENHE AI 首页",
+        }}
+        secondaryActions={[
+          {
+            href: forceLocale === "en" ? "/en/about" : "/about",
+            label: forceLocale === "en" ? "Read about ENHE AI" : "了解 ENHE AI",
+          },
+        ]}
+      />
+    );
+  }
   const pricingOfferItemsForLocale = await getPricingOfferItems(forceLocale);
   const copy =
     forceLocale === "en"
@@ -136,7 +176,7 @@ export async function PricingPageShell({ forceLocale }: { forceLocale: Locale })
   );
 
   return (
-    <main>
+    <main className="enhe-editorial-page">
       <Container className="py-14">
         <StructuredData data={[breadcrumbSchema, pricingOfferCatalogSchema]} />
         <SectionTitle as="h1" title={copy.title} intro={copy.intro} />

@@ -145,7 +145,7 @@ export function AiTopicsHubPageShell({ forceLocale }: { forceLocale: Locale }) {
   };
 
   return (
-    <main>
+    <main className="enhe-editorial-page">
       <Container className="py-14">
         <StructuredData data={[breadcrumbSchema, hubSchema]} />
         <SectionTitle as="h1" title={text.title} intro={text.intro} />
@@ -207,7 +207,7 @@ export function AiTopicDetailPageShell({
   const faqSchema = buildFaqSchema({ items: content.faqs });
 
   return (
-    <main>
+    <main className="enhe-editorial-page">
       <Container className="py-14">
         <StructuredData data={[breadcrumbSchema, collectionSchema, faqSchema]} />
         <div className="mb-6">

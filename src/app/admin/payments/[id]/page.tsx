@@ -2,7 +2,7 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { reviewPaymentProofAction } from "@/app/actions";
-import { AdminSection, SubmitButton, inputClass } from "@/app/admin/admin-ui";
+import { AdminContentShell, AdminSection, SubmitButton, inputClass } from "@/app/admin/admin-ui";
 import { prisma } from "@/lib/db";
 import { getCurrentLocale, type Locale } from "@/lib/i18n";
 import { getPaymentProofImageSrc, isRenderablePaymentProofImage } from "@/lib/payment-proof-image";
@@ -87,23 +87,24 @@ export default async function AdminPaymentDetailPage({ params, searchParams }: A
 
   return (
     <AdminSection title={t.title} intro={t.intro}>
-      <div className="mb-6 flex flex-wrap gap-3">
-        <Link href="/admin/payments" className="rounded-full border border-white/15 px-4 py-2 text-sm transition hover:border-[#48F5D3]/50 hover:text-[#48F5D3]">
+      <AdminContentShell className="enhe-admin-content-management enhe-admin-payment-detail">
+      <div className="enhe-admin-content-toolbar enhe-admin-commerce-toolbar mb-6 flex flex-wrap gap-3">
+        <Link href="/admin/payments" className="enhe-admin-commerce-back rounded-full border border-white/15 px-4 py-2 text-sm transition hover:border-[#48F5D3]/50 hover:text-[#48F5D3]">
           {t.back}
         </Link>
-        <Link href={`/admin/orders/${proof.order.id}`} className="rounded-full border border-[#48F5D3]/30 px-4 py-2 text-sm text-[#48F5D3]">
+        <Link href={`/admin/orders/${proof.order.id}`} className="enhe-admin-commerce-back enhe-admin-commerce-secondary-link rounded-full border border-[#48F5D3]/30 px-4 py-2 text-sm text-[#48F5D3]">
           {t.orderDetail}
         </Link>
       </div>
 
       {reviewNotice ? (
-        <p className="mb-5 rounded-xl border border-[#48F5D3]/30 bg-[#48F5D3]/10 px-4 py-3 text-sm font-semibold text-[#48F5D3]">
+        <p className="enhe-admin-commerce-state enhe-admin-commerce-state-success mb-5 rounded-xl border border-[#48F5D3]/30 bg-[#48F5D3]/10 px-4 py-3 text-sm font-semibold text-[#48F5D3]">
           {reviewNotice}
         </p>
       ) : null}
 
-      <div className="glass rounded-2xl p-6">
-        <div className="grid gap-4 md:grid-cols-3">
+      <div className="enhe-admin-payment-summary-card glass rounded-2xl p-6">
+        <div className="enhe-admin-commerce-info-grid grid gap-4 md:grid-cols-3">
           <Info label={t.orderNo} value={proof.order.orderNo} />
           <Info label={t.user} value={proof.user.email ?? proof.user.phone ?? proof.user.id} />
           <Info label={t.item} value={proof.order.plan?.name ?? proof.order.tool?.name ?? t.orderItem} />
@@ -116,7 +117,7 @@ export default async function AdminPaymentDetailPage({ params, searchParams }: A
         </div>
 
         {proofImage ? (
-          <div className="mt-6 rounded-2xl border border-white/10 bg-white/8 p-4">
+          <div className="enhe-admin-payment-preview mt-6 rounded-2xl border border-white/10 bg-white/8 p-4">
             <p className="mb-3 text-sm text-[#8B95A7]">{t.proofPreview}</p>
             {isRenderablePaymentProofImage(proofImage) ? (
               <Image src={proofImage} alt={t.proofAlt} width={820} height={520} className="max-h-[520px] w-full rounded-xl object-contain" unoptimized />
@@ -126,7 +127,7 @@ export default async function AdminPaymentDetailPage({ params, searchParams }: A
           </div>
         ) : null}
 
-        <form action={reviewPaymentProofAction} className="mt-6 grid gap-3 border-t border-white/10 pt-6 md:grid-cols-[1fr_120px_120px]">
+        <form action={reviewPaymentProofAction} className="enhe-admin-payment-review-form mt-6 grid gap-3 border-t border-white/10 pt-6 md:grid-cols-[1fr_120px_120px]">
           <input type="hidden" name="orderId" value={proof.orderId} />
           <input name="reviewNote" placeholder={t.reviewPlaceholder} className={inputClass} />
           <SubmitButton name="decision" value="approved" variant="success" pendingLabel={t.approving}>
@@ -137,13 +138,14 @@ export default async function AdminPaymentDetailPage({ params, searchParams }: A
           </SubmitButton>
         </form>
       </div>
+      </AdminContentShell>
     </AdminSection>
   );
 }
 
 function Info({ label, value }: { label: string; value: string }) {
   return (
-    <div className="rounded-xl border border-white/10 bg-white/5 p-4">
+    <div className="enhe-admin-commerce-info-card rounded-xl border border-white/10 bg-white/5 p-4">
       <p className="text-xs text-[#8B95A7]">{label}</p>
       <p className="mt-2 break-all font-semibold text-[#E8EEF8]">{value}</p>
     </div>

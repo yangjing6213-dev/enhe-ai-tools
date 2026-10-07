@@ -18,4 +18,5 @@
 .closeButton:focus-visible {
   outline: 3px solid var(--enhe-focus, #ffd60a);
   outline-offset: 4px;
+  box-shadow: 0 0 0 3px var(--enhe-text, #080808);
 }

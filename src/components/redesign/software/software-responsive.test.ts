@@ -34,6 +34,65 @@ describe("AI tools candidate responsive browsing", () => {
     expect(css).toContain("margin-inline: calc(50% - 50vw)");
   });
 
+  it("keeps primary and secondary catalogue controls at the locked 48px height", () => {
+    const css = readCandidate("styles/redesign/software.css");
+
+    expect(css).toMatch(
+      /\.redesign-software-category-trigger,\s*\.redesign-software-load-more-button,\s*\.redesign-software-next-link\s*\{\s*min-height:\s*48px;/,
+    );
+    expect(css).toMatch(
+      /\.redesign-software-category-button\s*\{[\s\S]*?min-height:\s*44px;/,
+    );
+  });
+
+  it("uses the shared 48px button token for the primary card action", () => {
+    const css = readCandidate("styles/redesign/software.css");
+
+    expect(css).toMatch(
+      /\.redesign-software-card-link\[data-support-exclusion\]\s*\{\s*min-height:\s*var\(--enhe-button-h,\s*48px\);/,
+    );
+  });
+
+  it("wraps long card titles at arbitrary word boundaries", () => {
+    const css = readCandidate("styles/redesign/software.css");
+    const titleBlock = css.match(
+      /\.redesign-software-card-body h3\s*\{([^}]*)\}/,
+    )?.[1] ?? "";
+
+    expect(titleBlock).toMatch(/overflow-wrap:\s*anywhere;/);
+  });
+
+  it("contains the mobile category sheet within the viewport box", () => {
+    const css = readCandidate("styles/redesign/software.css");
+    const mobilePanelBlock = css.match(
+      /@media\s*\(width\s*<\s*768px\)[\s\S]*?\.redesign-software-category-panel\s*\{([^}]*)\}/,
+    )?.[1] ?? "";
+
+    expect(mobilePanelBlock).toMatch(/box-sizing:\s*border-box;/);
+    expect(mobilePanelBlock).toMatch(/max-width:\s*100vw;/);
+  });
+
+  it("keeps catalogue controls on the locked focus ring and dark guard", () => {
+    const css = readCandidate("styles/redesign/software.css");
+    const focusBlock = css.match(
+      /\.redesign-software-category-trigger:focus-visible,[\s\S]*?\.redesign-software-rail:focus-visible\s*\{([^}]*)\}/,
+    )?.[1] ?? "";
+
+    expect(focusBlock).toMatch(/outline:\s*3px solid var\(--enhe-focus,\s*#ffd60a\);/);
+    expect(focusBlock).toMatch(/outline-offset:\s*4px;/);
+    expect(focusBlock).toMatch(/box-shadow:\s*0 0 0 3px var\(--enhe-text,\s*#080808\);/);
+  });
+
+  it("keeps the category sheet close control on the same focus guard", () => {
+    const css = readCandidate(
+      "components/redesign/software/EnheRedesignSoftwareCategoryMotion.module.css",
+    );
+
+    expect(css).toMatch(
+      /\.closeButton:focus-visible\s*\{[\s\S]*?outline:\s*3px solid var\(--enhe-focus,\s*#ffd60a\);[\s\S]*?outline-offset:\s*4px;[\s\S]*?box-shadow:\s*0 0 0 3px var\(--enhe-text,\s*#080808\);/,
+    );
+  });
+
   it("uses the rail only for new releases and featured products", () => {
     const catalog = readCandidate("components/redesign/software/EnheRedesignSoftwareCatalog.tsx");
 

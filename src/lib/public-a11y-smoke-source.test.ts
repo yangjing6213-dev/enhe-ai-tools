@@ -52,7 +52,7 @@ describe("public a11y smoke source contract", () => {
     expect(tutorials).toContain("<main>");
     expect(tutorials).toContain("<StructuredData");
     expect(tutorials).toContain('<SectionTitle as="h1"');
-    expect(newsDetail).toContain("<main>");
+    expect(newsDetail).toMatch(/<main(?:\s[^>]*)?>/);
     expect(newsDetail).toContain("<article>");
     expect(newsDetail).not.toContain('<main className="space-y-8">');
     expect(newsDetail).toContain('<div className="space-y-8">');

@@ -35,13 +35,8 @@ import {
   resolveLocalizedNewsCategoryName,
   resolveLocalizedNewsTagName,
 } from "@/lib/ai-news-localization";
-import { prisma } from "@/lib/db";
 import { getDictionary, type Locale } from "@/lib/dictionaries";
 import { normalizeImageSrc } from "@/lib/media";
-import {
-  getPublicNewsArticleBySlug,
-  resolvePublicNewsArticleSlug,
-} from "@/lib/public-content";
 import {
   buildCanonicalAiNewsPath,
   buildCanonicalToolPath,
@@ -59,8 +54,13 @@ import {
   siteName,
 } from "@/lib/seo";
 
+type PublicNewsContentModule = typeof import("@/lib/public-content");
 type NewsArticle = NonNullable<
-  Awaited<ReturnType<typeof getPublicNewsArticleBySlug>>
+  Awaited<
+    ReturnType<
+      PublicNewsContentModule["getPublicNewsArticleBySlug"]
+    >
+  >
 >;
 
 const removedProductHrefReplacements: Record<string, string> = {
@@ -77,6 +77,23 @@ export async function generateAiNewsDetailPageMetadata(
   slug: string,
 ): Promise<Metadata> {
   const t = getDictionary(forceLocale);
+  if (!process.env.DATABASE_URL?.trim()) {
+    const metadata = buildPageMetadata({
+      title: buildMetadataTitle({ pageTitle: t.aiNews.title, brand: t.brand }),
+      description: t.aiNews.dbFreeDetailMetaDescription,
+      path: `/ai-news/${slug}`,
+      locale: forceLocale === "en" ? "en_US" : "zh_CN",
+      localeKey: forceLocale,
+    });
+    metadata.robots = {
+      index: false,
+      follow: true,
+    };
+    return metadata;
+  }
+
+  const { getPublicNewsArticleBySlug, resolvePublicNewsArticleSlug } =
+    await import("@/lib/public-content");
   const slugMatch = await resolvePublicNewsArticleSlug(slug);
   const article = slugMatch
     ? await getPublicNewsArticleBySlug(slugMatch.slug)
@@ -144,6 +161,10 @@ export async function AiNewsDetailPageShell({
   slug: string;
   forceLocale: Locale;
 }) {
+  if (!process.env.DATABASE_URL?.trim()) notFound();
+
+  const { getPublicNewsArticleBySlug, resolvePublicNewsArticleSlug } =
+    await import("@/lib/public-content");
   const slugMatch = await resolvePublicNewsArticleSlug(slug);
   if (!slugMatch) notFound();
 
@@ -203,7 +224,7 @@ export async function AiNewsDetailPageShell({
     : buildFaqSchema({ items: articleFaqItems });
 
   return (
-    <Container className="py-14">
+    <Container className="ai-news-workspace-container py-14">
       <StructuredData
         data={[
           breadcrumbSchema,
@@ -211,7 +232,7 @@ export async function AiNewsDetailPageShell({
           ...(faqSchema ? [faqSchema] : []),
         ]}
       />
-      <main>
+      <main className="ai-news-page ai-news-workspace enhe-reference-workspace ai-news-detail-page">
         <article>
         <section className="glass overflow-hidden rounded-[2rem] p-5 md:p-8">
           <div className="flex flex-wrap gap-2">
@@ -234,11 +255,11 @@ export async function AiNewsDetailPageShell({
               </Badge>
             ))}
           </div>
-          <h1 className="mt-6 max-w-5xl text-4xl font-black leading-tight text-[var(--marketing-text)] md:text-6xl">
+          <h1 className="mt-6 break-words max-w-5xl text-4xl font-black leading-tight text-[var(--marketing-text)] md:text-6xl">
             {localized.title}
           </h1>
           {localized.subtitle ? (
-            <p className="mt-5 max-w-3xl text-lg font-medium leading-8 text-[var(--marketing-muted)]">
+            <p className="mt-5 break-words max-w-3xl text-lg font-medium leading-8 text-[var(--marketing-muted)]">
               {localized.subtitle}
             </p>
           ) : null}
@@ -251,7 +272,7 @@ export async function AiNewsDetailPageShell({
             <span className="tabular-nums">{article.viewCount} views</span>
           </div>
           {coverImage ? (
-            <div className="relative mt-8 aspect-[16/9] overflow-hidden rounded-2xl border border-white/12 bg-white/6">
+            <div className="relative mt-8 aspect-[16/9] overflow-hidden rounded-2xl border border-[var(--marketing-border)] bg-[var(--marketing-card-soft)]">
               <Image
                 src={coverImage}
                 alt={localized.title}
@@ -271,7 +292,7 @@ export async function AiNewsDetailPageShell({
               <h2 className="text-xl font-black text-[var(--marketing-text)]">
                 {t.aiNews.keyTakeaways}
               </h2>
-              <p className="mt-4 text-base leading-8 text-[var(--marketing-muted)]">
+              <p className="mt-4 break-words text-base leading-8 text-[var(--marketing-muted)]">
                 {localized.summary}
               </p>
               {localized.keyTakeaways.length ? (
@@ -279,7 +300,7 @@ export async function AiNewsDetailPageShell({
                   {localized.keyTakeaways.map((item) => (
                     <div
                       key={item}
-                      className="rounded-xl border border-white/10 bg-white/7 p-4 text-sm leading-6 text-[var(--marketing-text)]"
+                      className="rounded-xl border border-[var(--marketing-border)] bg-[var(--marketing-card)] p-4 text-sm leading-6 text-[var(--marketing-text)]"
                     >
                       {item}
                     </div>
@@ -355,9 +376,9 @@ export async function AiNewsDetailPageShell({
                     <Link
                       key={tutorial.id}
                       href={buildCanonicalToolPath(tutorial.tool, forceLocale)}
-                    className="rounded-xl border border-white/10 bg-white/7 p-4 transition-colors hover:border-[var(--marketing-accent)]/45"
+                    className="rounded-xl border border-[var(--marketing-border)] bg-[var(--marketing-card)] p-4 transition-colors hover:border-[var(--marketing-accent)]/45"
                     >
-                      <p className="font-semibold text-[var(--marketing-text)]">
+                      <p className="break-words font-semibold text-[var(--marketing-text)]">
                         {buildLocalizedTutorialPreviewTitle(
                           tutorial.title,
                           tutorial.tool,
@@ -405,7 +426,7 @@ export async function AiNewsDetailPageShell({
                   <Link
                     key={item.href}
                     href={item.href}
-                    className="rounded-xl border border-white/10 bg-white/7 p-4 text-sm font-bold text-[var(--marketing-text)] transition-[border-color,color] hover:border-[var(--marketing-accent)]/45 hover:text-[var(--marketing-accent)]"
+                    className="rounded-xl border border-[var(--marketing-border)] bg-[var(--marketing-card)] p-4 text-sm font-bold text-[var(--marketing-text)] transition-[border-color,color] hover:border-[var(--marketing-accent)]/45 hover:text-[var(--marketing-accent)]"
                   >
                     {item.label}
                   </Link>
@@ -424,9 +445,9 @@ export async function AiNewsDetailPageShell({
                     <Link
                       key={item.id}
                       href={buildCanonicalAiNewsPath(item, forceLocale)}
-                      className="rounded-xl border border-white/10 bg-white/7 p-4 transition-colors hover:border-[var(--marketing-accent)]/45"
+                      className="rounded-xl border border-[var(--marketing-border)] bg-[var(--marketing-card)] p-4 transition-colors hover:border-[var(--marketing-accent)]/45"
                     >
-                      <p className="font-semibold text-[var(--marketing-text)]">
+                      <p className="break-words font-semibold text-[var(--marketing-text)]">
                         {forceLocale === "en"
                           ? buildLocalizedNewsTitle(
                               {
@@ -438,7 +459,7 @@ export async function AiNewsDetailPageShell({
                             )
                           : item.title}
                       </p>
-                      <p className="mt-2 line-clamp-2 text-sm leading-6 text-[var(--marketing-muted)]">
+                      <p className="mt-2 break-words text-sm leading-6 text-[var(--marketing-muted)]">
                         {forceLocale === "en"
                           ? buildLocalizedNewsSummary(
                               {
@@ -483,7 +504,7 @@ export async function AiNewsDetailPageShell({
                       href={source.url}
                       target="_blank"
                       rel="nofollow noopener noreferrer"
-                  className="rounded-xl border border-white/10 bg-white/7 p-4 transition-colors hover:border-[var(--marketing-accent)]/45"
+                      className="rounded-xl border border-[var(--marketing-border)] bg-[var(--marketing-card)] p-4 transition-colors hover:border-[var(--marketing-accent)]/45"
                     >
                       <p className="font-semibold text-[var(--marketing-text)]">
                         {source.title}
@@ -506,7 +527,7 @@ export async function AiNewsDetailPageShell({
               </h2>
               <div className="mt-5 grid gap-3">
                 {articleFaqItems.map((item) => (
-                  <details key={item.question} className="rounded-xl border border-white/10 bg-white/7 p-4">
+                    <details key={item.question} className="rounded-xl border border-[var(--marketing-border)] bg-[var(--marketing-card)] p-4">
                     <summary className="cursor-pointer list-none font-semibold text-[var(--marketing-text)] [&::-webkit-details-marker]:hidden">
                       {item.question}
                     </summary>
@@ -532,7 +553,7 @@ export async function AiNewsDetailPageShell({
             />
           </div>
 
-          <section className="space-y-5 lg:sticky lg:top-28 lg:self-start" aria-label="Article support links">
+          <section className="space-y-5 lg:sticky lg:top-28 lg:self-start" aria-label={t.aiNews.articleSupportLabel}>
             {!embeddedSections.tableOfContents ? (
             <section className="glass rounded-2xl p-5">
               <h2 className="text-lg font-black text-[var(--marketing-text)]">
@@ -544,7 +565,7 @@ export async function AiNewsDetailPageShell({
                     <a
                       key={item.id}
                       href={`#${item.id}`}
-                          className={`rounded-lg px-3 py-2 text-sm transition-colors hover:bg-white/8 hover:text-[var(--marketing-accent)] ${item.level === 3 ? "ml-4 text-[var(--marketing-muted)]" : "text-[var(--marketing-text)]"}`}
+                          className={`rounded-lg px-3 py-2 text-sm transition-colors hover:bg-[var(--marketing-card-soft)] hover:text-[var(--marketing-accent)] ${item.level === 3 ? "ml-4 text-[var(--marketing-muted)]" : "text-[var(--marketing-text)]"}`}
                     >
                       {item.title}
                     </a>
@@ -707,7 +728,7 @@ function NewsContent({ blocks }: { blocks: NewsContentBlock[] }) {
           return (
             <figure
               key={`${block.src}-${index}`}
-              className="overflow-hidden rounded-2xl border border-white/10 bg-white/6"
+              className="overflow-hidden rounded-2xl border border-[var(--marketing-border)] bg-[var(--marketing-card-soft)]"
             >
               <Image
                 src={block.src}
@@ -731,7 +752,7 @@ function NewsContent({ blocks }: { blocks: NewsContentBlock[] }) {
           return (
             <pre
               key={index}
-              className="overflow-x-auto rounded-2xl border border-white/10 bg-[#05070B] p-4 text-sm leading-6 text-[#C5D0E2]"
+              className="overflow-x-auto rounded-2xl border border-[var(--marketing-border)] bg-[#05070B] p-4 text-sm leading-6 text-[#C5D0E2]"
             >
               <code>{block.code}</code>
             </pre>
@@ -905,6 +926,7 @@ function buildNewsKeywordOr(keywords: string[]) {
 }
 
 async function getRelatedTools(ids: string[], keywords: string[]) {
+  const { prisma } = await import("@/lib/db");
   const include = {
     category: true,
     priceSpecs: {
@@ -948,6 +970,7 @@ async function getRelatedTools(ids: string[], keywords: string[]) {
 }
 
 async function getRelatedTutorials(ids: string[], keywords: string[]) {
+  const { prisma } = await import("@/lib/db");
   const [explicit, keywordMatched, fallback] = await Promise.all([
     ids.length
       ? prisma.tutorial.findMany({
@@ -987,6 +1010,7 @@ async function getRelatedNewsArticles(
   article: NewsArticle,
   keywords: string[],
 ) {
+  const { prisma } = await import("@/lib/db");
   const explicit = article.relatedArticleIds.length
     ? await prisma.newsArticle.findMany({
         where: { id: { in: article.relatedArticleIds }, status: "published" },

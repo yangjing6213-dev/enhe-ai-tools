@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { ContentlessState } from "@/components/redesign/contentless-state";
 import { StructuredData } from "@/components/structured-data";
 import { Container, EmptyState, SectionTitle } from "@/components/ui";
 import { ToolCard } from "@/components/tool-card";
@@ -13,13 +14,19 @@ const accountServicesBasePath = "/account-services";
 
 export async function generateOnlineToolsPageMetadata(forceLocale: Locale): Promise<Metadata> {
   const t = getDictionary(forceLocale);
-  return buildPageMetadata({
+  const metadata = buildPageMetadata({
     title: buildMetadataTitle({ pageTitle: t.listing.onlineTitle, brand: t.brand }),
-    description: buildListingMetaDescription("account-services", forceLocale),
+    description: !process.env.DATABASE_URL?.trim()
+      ? forceLocale === "en"
+        ? "Online-tool content is not available in this local preview."
+        : "在线工具内容尚未核验，当前本地预览不提供可发布的工具事实。"
+      : buildListingMetaDescription("account-services", forceLocale),
     path: accountServicesBasePath,
     locale: forceLocale === "en" ? "en_US" : "zh_CN",
     localeKey: forceLocale
   });
+  if (!process.env.DATABASE_URL?.trim()) metadata.robots = { index: false, follow: true };
+  return metadata;
 }
 
 export async function OnlineToolsPageShell({
@@ -44,6 +51,37 @@ export async function OnlineToolsPageShell({
     getPublicToolCategories("online"),
     getPublicToolListing("online", categoryId, keyword, undefined, sort)
   ]);
+
+  if (!process.env.DATABASE_URL?.trim()) {
+    return (
+      <ContentlessState
+        locale={forceLocale}
+        className="online-tools-page"
+        eyebrow={forceLocale === "en" ? "Online tools" : "在线工具"}
+        title={t.listing.onlineTitle}
+        intro={
+          forceLocale === "en"
+            ? "Online-tool content is not available in this local preview."
+            : "在线工具内容尚未核验，当前本地预览不提供可发布的工具事实。"
+        }
+        statusLabel="UNVERIFIED"
+        stateTitle={forceLocale === "en" ? "Tools are being prepared" : "工具内容准备中"}
+        statusText={
+          forceLocale === "en"
+            ? "UNVERIFIED — Online-tool content is not available yet."
+            : "UNVERIFIED — 在线工具内容尚未核验。"
+        }
+        primaryAction={{
+          href: forceLocale === "en" ? "/en" : "/",
+          label: forceLocale === "en" ? "Return home" : "返回首页",
+        }}
+        secondaryActions={[{
+          href: forceLocale === "en" ? "/en/software" : "/software",
+          label: forceLocale === "en" ? "Browse software" : "浏览 AI 软件",
+        }]}
+      />
+    );
+  }
 
   return (
     <Container className="py-14">

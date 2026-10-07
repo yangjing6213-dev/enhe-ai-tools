@@ -123,3 +123,62 @@
     align-items: center;
   }
 }
+
+.enhe-redesign-production .ai-news-page .ai-news-action {
+  border-color: var(--marketing-border);
+  background: var(--marketing-card);
+  color: var(--marketing-text);
+  transition:
+    border-color var(--enhe-motion-fast) var(--enhe-ease-ui-move),
+    background-color var(--enhe-motion-fast) var(--enhe-ease-ui-move),
+    box-shadow var(--enhe-motion-fast) var(--enhe-ease-ui-move),
+    color var(--enhe-motion-fast) var(--enhe-ease-ui-move),
+    transform var(--enhe-motion-fast) var(--enhe-ease-ui-move);
+}
+
+.enhe-redesign-production .ai-news-page .ai-news-interactive-card {
+  transition:
+    border-color var(--enhe-motion-panel) var(--enhe-ease-ui-move),
+    box-shadow var(--enhe-motion-panel) var(--enhe-ease-ui-move),
+    transform var(--enhe-motion-panel) var(--enhe-ease-ui-move);
+}
+
+.enhe-redesign-production .ai-news-page .ai-news-interactive-link {
+  transition:
+    border-color var(--enhe-motion-fast) var(--enhe-ease-ui-move),
+    box-shadow var(--enhe-motion-fast) var(--enhe-ease-ui-move),
+    transform var(--enhe-motion-fast) var(--enhe-ease-ui-move);
+}
+
+@media (hover: hover) and (prefers-reduced-motion: no-preference) {
+  .enhe-redesign-production .ai-news-page .ai-news-action:hover {
+    border-color: var(--enhe-action);
+    box-shadow: 0 6px 16px rgba(7, 21, 18, 0.1);
+    color: var(--enhe-action-hover);
+    transform: translateY(-1px);
+  }
+
+  .enhe-redesign-production .ai-news-page .ai-news-interactive-card:hover {
+    border-color: color-mix(in srgb, var(--enhe-action) 44%, var(--enhe-border));
+    box-shadow: 0 18px 36px rgba(7, 21, 18, 0.1);
+    transform: translateY(-3px);
+  }
+
+  .enhe-redesign-production .ai-news-page .ai-news-interactive-link:hover {
+    border-color: color-mix(in srgb, var(--enhe-action) 48%, var(--enhe-border));
+    box-shadow: 0 6px 16px rgba(7, 21, 18, 0.08);
+    transform: translateY(-1px);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .enhe-redesign-production .ai-news-page :is(
+      .ai-news-action,
+      .ai-news-interactive-card,
+      .ai-news-interactive-link
+    ),
+  .enhe-redesign-production .ai-news-page .ai-news-interactive-card :is(img, svg) {
+    transition: none !important;
+    transform: none !important;
+  }
+}

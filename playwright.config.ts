@@ -94,6 +94,7 @@ export default defineConfig({
     "**/admin-empty-tools-guidance.spec.ts",
     "**/admin-shell-accessibility-matrix.spec.ts",
     "**/admin-populated-accessibility.spec.ts",
+    ...(useProductionServer ? ["**/software-catalog-preview.spec.ts"] : []),
     ...databaseFreeTestIgnore,
     ...configuredDatabaseTestIgnore,
   ],

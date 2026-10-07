@@ -1,5 +1,5 @@
 ﻿import Link from "next/link";
-import { AdminSection, inputClass, selectClass } from "@/app/admin/admin-ui";
+import { AdminContentShell, AdminSection, inputClass, selectClass } from "@/app/admin/admin-ui";
 import { buildAdminUserPageHref, buildAdminUserWhere, parseAdminUserListParams } from "@/lib/admin-list";
 import { prisma } from "@/lib/db";
 import { getCurrentLocale, type Locale } from "@/lib/i18n";
@@ -86,18 +86,19 @@ export default async function AdminUsersPage({ searchParams }: { searchParams: A
 
   return (
     <AdminSection title={t.title} intro={t.intro}>
+      <AdminContentShell className="enhe-admin-content-management enhe-admin-users">
       {params.deleted ? (
-        <p className="mb-5 rounded-xl border border-[#48F5D3]/30 bg-[#48F5D3]/10 px-4 py-3 text-sm text-[#48F5D3]">
+        <p className="enhe-admin-user-state enhe-admin-user-state-success mb-5 rounded-xl border border-[#48F5D3]/30 bg-[#48F5D3]/10 px-4 py-3 text-sm text-[#48F5D3]">
           {t.deleted}
         </p>
       ) : null}
       {params.error ? (
-        <p className="mb-5 rounded-xl border border-red-400/30 bg-red-400/10 px-4 py-3 text-sm text-red-100">
+        <p className="enhe-admin-user-state enhe-admin-user-state-error mb-5 rounded-xl border border-red-400/30 bg-red-400/10 px-4 py-3 text-sm text-red-100">
           {t.error.replace("{error}", params.error)}
         </p>
       ) : null}
 
-      <form className="glass grid gap-4 rounded-2xl p-6 md:grid-cols-[1fr_160px_160px_120px]">
+      <form className="enhe-admin-user-filter-form enhe-admin-content-filters glass grid gap-4 rounded-2xl p-6 md:grid-cols-[1fr_160px_160px_120px]">
         <input name="q" defaultValue={filters.q} placeholder={t.search} className={inputClass} />
         <select name="role" defaultValue={filters.role ?? ""} className={selectClass}>
           <option value="">{t.allRoles}</option>
@@ -112,7 +113,7 @@ export default async function AdminUsersPage({ searchParams }: { searchParams: A
         <button className="rounded-full bg-[#7AA7FF] px-5 py-3 text-sm font-semibold text-[#07101f]">{t.filter}</button>
       </form>
 
-      <div className="mt-5 flex flex-wrap items-center justify-between gap-3 text-sm text-[#8B95A7]">
+      <div className="enhe-admin-content-toolbar mt-5 flex flex-wrap items-center justify-between gap-3 text-sm text-[#8B95A7]">
         <span>{formatTotal(t.total, total, filters.page, pageCount)}</span>
         <div className="flex gap-2">
           <Link
@@ -132,8 +133,8 @@ export default async function AdminUsersPage({ searchParams }: { searchParams: A
         </div>
       </div>
 
-      <div className="mt-8 overflow-x-auto rounded-2xl border border-white/12 bg-white/6">
-        <div className="grid min-w-[920px] grid-cols-[1.6fr_0.8fr_0.8fr_1.1fr_0.6fr] gap-4 border-b border-white/10 px-5 py-3 text-xs uppercase tracking-wide text-[#8B95A7]">
+      <div className="enhe-admin-user-records enhe-admin-content-records mt-8 overflow-x-auto rounded-2xl border border-white/12 bg-white/6">
+        <div className="enhe-admin-user-table-heading enhe-admin-content-table-heading grid min-w-[920px] grid-cols-[1.6fr_0.8fr_0.8fr_1.1fr_0.6fr] gap-4 border-b border-white/10 px-5 py-3 text-xs uppercase tracking-wide text-[#8B95A7]">
           <span>{t.user}</span>
           <span>{t.role}</span>
           <span>{t.status}</span>
@@ -141,21 +142,21 @@ export default async function AdminUsersPage({ searchParams }: { searchParams: A
           <span className="text-right">{t.action}</span>
         </div>
         {users.length ? (
-          <div className="min-w-[920px] divide-y divide-white/10">
+          <div className="enhe-admin-user-record-rows min-w-[920px] divide-y divide-white/10">
             {users.map((user) => (
-              <div key={user.id} className="grid grid-cols-[1.6fr_0.8fr_0.8fr_1.1fr_0.6fr] gap-4 px-5 py-4 text-sm transition hover:bg-white/5">
+              <div key={user.id} className="enhe-admin-user-row enhe-admin-content-row grid grid-cols-[1.6fr_0.8fr_0.8fr_1.1fr_0.6fr] gap-4 px-5 py-4 text-sm transition hover:bg-white/5">
                 <div>
-                  <p className="font-semibold text-[#E8EEF8]">{user.nickname || user.email || user.phone || user.id}</p>
-                  <p className="mt-1 text-xs text-[#8B95A7]">{user.email ?? t.noEmail} · {user.phone ?? t.noPhone}</p>
-                  <p className="mt-1 text-xs text-[#8B95A7]">{t.registeredAt.replace("{date}", formatDate(user.createdAt, locale))}</p>
+                  <p className="enhe-admin-user-primary font-semibold text-[#E8EEF8]">{user.nickname || user.email || user.phone || user.id}</p>
+                  <p className="enhe-admin-user-secondary mt-1 text-xs text-[#8B95A7]">{user.email ?? t.noEmail} · {user.phone ?? t.noPhone}</p>
+                  <p className="enhe-admin-user-secondary mt-1 text-xs text-[#8B95A7]">{t.registeredAt.replace("{date}", formatDate(user.createdAt, locale))}</p>
                 </div>
-                <div className="text-[#C5D0E2]">{roleLabel(user.role, locale)}</div>
-                <div className="text-[#C5D0E2]">{statusLabel(user.status, locale)}</div>
-                <div className="text-xs leading-6 text-[#8B95A7]">
+                <div><span className="enhe-admin-user-badge">{roleLabel(user.role, locale)}</span></div>
+                <div><span className={`enhe-admin-user-badge ${user.status === "active" ? "is-active" : "is-disabled"}`}>{statusLabel(user.status, locale)}</span></div>
+                <div className="enhe-admin-user-secondary text-xs leading-6 text-[#8B95A7]">
                   {formatCounts(t.counts, user._count.orders, user._count.comments, user._count.downloadLogs, user._count.toolUsageLogs)}
                 </div>
                 <div className="text-right">
-                  <Link href={`/admin/users/${user.id}`} className="rounded-full border border-white/15 px-4 py-2 text-xs font-semibold text-[#E8EEF8] transition hover:border-[#48F5D3]/50 hover:text-[#48F5D3]">
+                  <Link href={`/admin/users/${user.id}`} className="enhe-admin-content-primary-action rounded-full border border-white/15 px-4 py-2 text-xs font-semibold text-[#E8EEF8] transition hover:border-[#48F5D3]/50 hover:text-[#48F5D3]">
                     {t.viewEdit}
                   </Link>
                 </div>
@@ -163,9 +164,10 @@ export default async function AdminUsersPage({ searchParams }: { searchParams: A
             ))}
           </div>
         ) : (
-          <div className="px-5 py-10 text-center text-sm text-[#8B95A7]">{t.empty}</div>
+          <div className="enhe-admin-user-empty px-5 py-10 text-center text-sm text-[#8B95A7]">{t.empty}</div>
         )}
       </div>
+      </AdminContentShell>
     </AdminSection>
   );
 }

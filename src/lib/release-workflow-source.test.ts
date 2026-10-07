@@ -45,6 +45,22 @@ describe("production release workflow", () => {
     expect(audit).toBeLessThan(wrapper.indexOf('Invoke-Native -FilePath git -Arguments @("push", "origin"'));
   });
 
+  it("generates the local Prisma client before the clean-install test suite", () => {
+    const wrapper = read("scripts/push-and-deploy.ps1");
+    const testPhase = wrapper.indexOf('Invoke-Native -FilePath npm -Arguments @("test")');
+    const generatedClient = wrapper.indexOf(
+      'Invoke-Native -FilePath npm -Arguments @("run", "prisma:client")',
+    );
+    const testDatabaseReset = wrapper.lastIndexOf(
+      "$env:DATABASE_URL = $null",
+      testPhase,
+    );
+
+    expect(testDatabaseReset).toBeGreaterThan(-1);
+    expect(generatedClient).toBeGreaterThan(testDatabaseReset);
+    expect(generatedClient).toBeLessThan(testPhase);
+  });
+
   it("pins standalone output tracing to the current worktree root", () => {
     expect(nextConfig.output).toBe("standalone");
     expect(nextConfig.outputFileTracingRoot).toBe(root);
@@ -749,5 +765,45 @@ describe("production release workflow", () => {
       expect(script).not.toContain("ENHE_ZPAY_ENV_FILE");
     }
     expect(stop).not.toContain("docker compose");
+  });
+
+  it("isolates DATABASE_URL changes in DB-free Vitest suites", () => {
+    const dbFreeSuites = [
+      "src/lib/prisma-client-lazy.test.ts",
+      "src/lib/ai-news-detail-dbfree-module.test.ts",
+      "src/lib/ai-news-detail-dbfree.test.ts",
+      "src/lib/ai-news-topic-dbfree-module.test.ts",
+      "src/lib/pricing-page-shell-dbfree.test.tsx",
+      "src/lib/tool-detail-dbfree.test.ts",
+    ];
+
+    for (const path of dbFreeSuites) {
+      const source = read(path);
+
+      expect(source).toContain('vi.stubEnv("DATABASE_URL", undefined)');
+      expect(source).toContain("vi.unstubAllEnvs()");
+      expect(source).not.toMatch(/delete process\.env\.DATABASE_URL/);
+      expect(source).not.toMatch(/process\.env\.DATABASE_URL\s*=/);
+    }
+  });
+
+  it("pins the SSH host key and preserves old backups during release deployment", () => {
+    const wrapper = read("scripts/push-and-deploy.ps1");
+    const elevatedDeploy = wrapper.indexOf(
+      "sudo -n env RETENTION_DAYS=36500 ENHE_OPERATION_LOCK_HELD=1",
+    );
+
+    expect(wrapper.match(/StrictHostKeyChecking=yes/g) ?? []).toHaveLength(2);
+    expect(wrapper).not.toContain("StrictHostKeyChecking=accept-new");
+    expect(elevatedDeploy).toBeGreaterThan(-1);
+    expect(wrapper.indexOf("ENHE_OPERATION_LOCK_FILE=", elevatedDeploy)).toBeGreaterThan(
+      elevatedDeploy,
+    );
+    expect(wrapper.indexOf("PREVIOUS_RELEASE_REF=", elevatedDeploy)).toBeGreaterThan(
+      elevatedDeploy,
+    );
+    expect(wrapper.indexOf("sh ./deploy.sh", elevatedDeploy)).toBeGreaterThan(
+      elevatedDeploy,
+    );
   });
 });

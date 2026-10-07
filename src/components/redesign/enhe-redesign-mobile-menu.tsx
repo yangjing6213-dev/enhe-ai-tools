@@ -116,8 +116,9 @@ export function EnheRedesignMobileMenu({
 
   useEffect(() => {
     const mediaQuery = window.matchMedia(MOBILE_NAV_QUERY);
-    const closeOnDesktop = () => {
-      if (mediaQuery.matches || !openRef.current) return;
+    const closeOnDesktop = (event?: MediaQueryListEvent) => {
+      const isMobile = event?.matches ?? mediaQuery.matches;
+      if (isMobile || !openRef.current) return;
 
       desktopFocusTargetRef.current = document.querySelector<HTMLElement>(
         ".redesign-desktop-nav a[href]",

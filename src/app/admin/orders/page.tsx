@@ -1,5 +1,5 @@
 ﻿import Link from "next/link";
-import { AdminSection, inputClass, selectClass } from "@/app/admin/admin-ui";
+import { AdminContentShell, AdminSection, inputClass, selectClass } from "@/app/admin/admin-ui";
 import { buildAdminOrderPageHref, buildAdminOrderWhere, parseAdminOrderListParams } from "@/lib/admin-order";
 import { prisma } from "@/lib/db";
 import { getCurrentLocale, type Locale } from "@/lib/i18n";
@@ -112,17 +112,18 @@ export default async function AdminOrdersPage({ searchParams }: AdminOrdersPageP
 
   return (
     <AdminSection title={t.title} intro={t.intro}>
+      <AdminContentShell className="enhe-admin-content-management enhe-admin-order-list">
       {params.error ? (
-        <p className="mb-5 rounded-xl border border-[#FFB86B]/30 bg-[#FFB86B]/10 px-4 py-3 text-sm text-[#FFB86B]">{params.error}</p>
+        <p className="enhe-admin-commerce-state enhe-admin-commerce-state-warning mb-5 rounded-xl border border-[#FFB86B]/30 bg-[#FFB86B]/10 px-4 py-3 text-sm text-[#FFB86B]">{params.error}</p>
       ) : null}
       {params.deleted ? (
-        <p className="mb-5 rounded-xl border border-[#48F5D3]/30 bg-[#48F5D3]/10 px-4 py-3 text-sm text-[#48F5D3]">{t.deleted}</p>
+        <p className="enhe-admin-commerce-state enhe-admin-commerce-state-success mb-5 rounded-xl border border-[#48F5D3]/30 bg-[#48F5D3]/10 px-4 py-3 text-sm text-[#48F5D3]">{t.deleted}</p>
       ) : null}
       {params.refund ? (
-        <p className="mb-5 rounded-xl border border-[#48F5D3]/30 bg-[#48F5D3]/10 px-4 py-3 text-sm text-[#48F5D3]">{t.refundSaved}</p>
+        <p className="enhe-admin-commerce-state enhe-admin-commerce-state-success mb-5 rounded-xl border border-[#48F5D3]/30 bg-[#48F5D3]/10 px-4 py-3 text-sm text-[#48F5D3]">{t.refundSaved}</p>
       ) : null}
 
-      <form className="glass mb-5 grid gap-3 rounded-2xl p-5 md:grid-cols-[1fr_220px_auto]" action="/admin/orders">
+      <form className="enhe-admin-order-filter-form enhe-admin-content-filters glass mb-5 grid gap-3 rounded-2xl p-5 md:grid-cols-[1fr_220px_auto]" action="/admin/orders">
         <input name="q" defaultValue={filters.q} placeholder={t.search} className={inputClass} />
         <select name="status" defaultValue={filters.status ?? ""} className={selectClass}>
           <option value="">{t.allStatus}</option>
@@ -133,7 +134,7 @@ export default async function AdminOrdersPage({ searchParams }: AdminOrdersPageP
         <button className="rounded-full border border-white/12 px-5 py-3 text-sm font-semibold text-[#E8EEF8]">{t.filter}</button>
       </form>
 
-      <div className="mb-4 flex flex-wrap items-center justify-between gap-3 text-sm text-[#8B95A7]">
+      <div className="enhe-admin-content-toolbar mb-4 flex flex-wrap items-center justify-between gap-3 text-sm text-[#8B95A7]">
         <span>{formatTotal(t.total, total, filters.page, pageCount)}</span>
         <div className="flex gap-2">
           <Link
@@ -153,8 +154,8 @@ export default async function AdminOrdersPage({ searchParams }: AdminOrdersPageP
         </div>
       </div>
 
-      <div className="overflow-x-auto rounded-2xl border border-white/12 bg-white/6">
-        <div className="grid min-w-[1120px] grid-cols-[1.25fr_1.05fr_0.8fr_0.75fr_0.75fr_0.85fr_0.55fr] gap-4 border-b border-white/10 px-5 py-3 text-xs uppercase tracking-wide text-[#8B95A7]">
+      <div className="enhe-admin-commerce-records enhe-admin-content-records overflow-x-auto rounded-2xl border border-white/12 bg-white/6">
+        <div className="enhe-admin-commerce-table-heading grid min-w-[1120px] grid-cols-[1.25fr_1.05fr_0.8fr_0.75fr_0.75fr_0.85fr_0.55fr] gap-4 border-b border-white/10 px-5 py-3 text-xs uppercase tracking-wide text-[#8B95A7]">
           <span>{t.orderNo}</span>
           <span>{t.user}</span>
           <span>{t.item}</span>
@@ -163,30 +164,31 @@ export default async function AdminOrdersPage({ searchParams }: AdminOrdersPageP
           <span>{t.refundDate}</span>
           <span className="text-right">{t.action}</span>
         </div>
-        <div className="min-w-[1120px] divide-y divide-white/10">
+        <div className="enhe-admin-commerce-record-rows min-w-[1120px] divide-y divide-white/10">
           {orders.map((order) => (
-            <div key={order.id} className="grid grid-cols-[1.25fr_1.05fr_0.8fr_0.75fr_0.75fr_0.85fr_0.55fr] gap-4 px-5 py-4 text-sm transition hover:bg-white/5">
+            <div key={order.id} className="enhe-admin-commerce-row grid grid-cols-[1.25fr_1.05fr_0.8fr_0.75fr_0.75fr_0.85fr_0.55fr] gap-4 px-5 py-4 text-sm transition hover:bg-white/5">
               <div>
-                <Link href={`/admin/orders/${order.id}`} className="font-semibold text-[#E8EEF8] transition hover:text-[#48F5D3]">
+                <Link href={`/admin/orders/${order.id}`} className="enhe-admin-commerce-primary font-semibold text-[#E8EEF8] transition hover:text-[#48F5D3]">
                   {order.orderNo}
                 </Link>
                 <p className="mt-1 text-xs text-[#8B95A7]">{t.proof}: {getStatusLabel(proofStatusLabels, order.paymentProof?.reviewStatus, locale)}</p>
               </div>
-              <span className="truncate text-[#C5D0E2]">{order.user.email ?? order.user.phone ?? order.user.id}</span>
-              <span className="truncate text-[#C5D0E2]">{order.plan?.name ?? order.tool?.name ?? t.orderItem}</span>
-              <span className="text-[#FFB86B]">{formatCurrency(order.amount.toString())}</span>
-              <span>{getStatusLabel(orderStatusLabels, order.orderStatus, locale)}</span>
-              <span className="text-[#8B95A7]">{formatOptionalDateTime(order.refundRecords[0]?.completedAt, locale)}</span>
+              <span className="enhe-admin-commerce-secondary truncate text-[#C5D0E2]">{order.user.email ?? order.user.phone ?? order.user.id}</span>
+              <span className="enhe-admin-commerce-secondary truncate text-[#C5D0E2]">{order.plan?.name ?? order.tool?.name ?? t.orderItem}</span>
+              <span className="enhe-admin-commerce-amount">{formatCurrency(order.amount.toString())}</span>
+              <span className="enhe-admin-commerce-status">{getStatusLabel(orderStatusLabels, order.orderStatus, locale)}</span>
+              <span className="enhe-admin-commerce-secondary">{formatOptionalDateTime(order.refundRecords[0]?.completedAt, locale)}</span>
               <span className="text-right">
-                <Link href={`/admin/orders/${order.id}`} className="rounded-full border border-white/15 px-4 py-2 text-xs font-semibold transition hover:border-[#48F5D3]/50 hover:text-[#48F5D3]">
+                <Link href={`/admin/orders/${order.id}`} className="enhe-admin-commerce-action rounded-full border border-white/15 px-4 py-2 text-xs font-semibold transition hover:border-[#48F5D3]/50 hover:text-[#48F5D3]">
                   {t.viewDetail}
                 </Link>
               </span>
             </div>
           ))}
-          {orders.length === 0 ? <div className="px-5 py-10 text-center text-sm text-[#8B95A7]">{t.empty}</div> : null}
+          {orders.length === 0 ? <div className="enhe-admin-commerce-empty px-5 py-10 text-center text-sm text-[#8B95A7]">{t.empty}</div> : null}
         </div>
       </div>
+      </AdminContentShell>
     </AdminSection>
   );
 }

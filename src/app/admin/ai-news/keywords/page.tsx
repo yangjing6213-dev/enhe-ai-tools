@@ -3,6 +3,7 @@ import {
   upsertNewsKeywordInterventionAction
 } from "@/app/admin/actions";
 import {
+  AdminContentShell,
   AdminSection,
   DangerButton,
   Field,
@@ -50,6 +51,10 @@ export default async function AdminAiNewsKeywordsPage({
       title="AI 前沿资讯关键词"
       intro="管理热门关键词的人工干预规则。专题合集仍保持自动生成，这里只负责关键词的置顶、隐藏、改名和权重提升。"
     >
+      <AdminContentShell className="enhe-admin-content-management enhe-admin-ai-news-keywords">
+      <div className="enhe-admin-content-toolbar flex flex-wrap items-center justify-between gap-3">
+        <p className="text-sm text-[var(--marketing-muted)]">共 {interventions.length} 条人工关键词规则</p>
+      </div>
       {params.saved ? (
         <p className="mb-5 rounded-xl border border-[#48F5D3]/30 bg-[#48F5D3]/10 px-4 py-3 text-sm text-[#48F5D3]">
           关键词干预规则已保存。
@@ -61,7 +66,7 @@ export default async function AdminAiNewsKeywordsPage({
         </p>
       ) : null}
 
-      <form action={upsertNewsKeywordInterventionAction} className="glass mb-8 grid gap-4 rounded-2xl p-6 md:grid-cols-2 xl:grid-cols-3">
+      <form action={upsertNewsKeywordInterventionAction} className="enhe-admin-content-form enhe-admin-keyword-create-form glass mb-8 grid gap-4 rounded-2xl p-6 md:grid-cols-2 xl:grid-cols-3">
         <Field label="关键词">
           <input name="keyword" required placeholder="例如：AI Agent" className={inputClass} />
         </Field>
@@ -90,8 +95,8 @@ export default async function AdminAiNewsKeywordsPage({
         </div>
       </form>
 
-      <div className="grid gap-6 xl:grid-cols-2">
-        <section className="glass rounded-2xl p-6">
+      <div className="enhe-admin-keyword-preview-grid grid gap-6 xl:grid-cols-2">
+        <section className="enhe-admin-keyword-preview-card glass rounded-2xl p-6">
           <h2 className="text-xl font-black text-[var(--marketing-text)]">中文热门关键词预览</h2>
           <div className="mt-4 flex flex-wrap gap-2">
             {zhDiscovery.keywordCloudItems.length ? (
@@ -109,7 +114,7 @@ export default async function AdminAiNewsKeywordsPage({
           </div>
         </section>
 
-        <section className="glass rounded-2xl p-6">
+        <section className="enhe-admin-keyword-preview-card glass rounded-2xl p-6">
           <h2 className="text-xl font-black text-[var(--marketing-text)]">英文热门关键词预览</h2>
           <div className="mt-4 flex flex-wrap gap-2">
             {enDiscovery.keywordCloudItems.length ? (
@@ -128,13 +133,13 @@ export default async function AdminAiNewsKeywordsPage({
         </section>
       </div>
 
-      <section className="mt-8">
+      <section className="enhe-admin-keyword-rules mt-8">
         <h2 className="text-xl font-black text-[var(--marketing-text)]">现有干预规则</h2>
         <div className="mt-4 grid gap-4 xl:grid-cols-2">
           {interventions.length ? (
             interventions.map((item) => (
-              <div key={item.id} className="glass rounded-2xl p-6">
-                <form action={upsertNewsKeywordInterventionAction} className="grid gap-3">
+              <div key={item.id} className="enhe-admin-keyword-rule-card glass rounded-2xl p-6">
+                <form action={upsertNewsKeywordInterventionAction} className="enhe-admin-keyword-rule-form grid gap-3">
                   <input type="hidden" name="id" value={item.id} />
                   <Field label="关键词">
                     <input name="keyword" defaultValue={item.keyword} required className={inputClass} />
@@ -161,19 +166,20 @@ export default async function AdminAiNewsKeywordsPage({
                   </label>
                   <SubmitButton>保存规则</SubmitButton>
                 </form>
-                <form action={deleteNewsKeywordInterventionAction} className="mt-3">
+                <form action={deleteNewsKeywordInterventionAction} className="enhe-admin-keyword-delete-form mt-3">
                   <input type="hidden" name="id" value={item.id} />
                   <DangerButton>删除规则</DangerButton>
                 </form>
               </div>
             ))
           ) : (
-            <div className="glass rounded-2xl p-6 text-sm text-[var(--marketing-muted)]">
+            <div className="enhe-admin-keyword-rule-card glass rounded-2xl p-6 text-sm text-[var(--marketing-muted)]">
               还没有人工干预规则，当前前台将完全使用自动生成结果。
             </div>
           )}
         </div>
       </section>
+      </AdminContentShell>
     </AdminSection>
   );
 }

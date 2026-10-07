@@ -6,11 +6,15 @@ const copy = {
   zh: {
     title: "套餐功能已停用",
     intro: "当前项目已取消统一套餐功能，后台不再维护套餐。需要收费的软件请在 AI软件应用 或 AI账号服务 管理中设置价格。",
+    stateLabel: "功能状态",
+    status: "已停用",
     cta: "去管理应用"
   },
   en: {
     title: "Plans are disabled",
     intro: "Membership sales are no longer active. Configure paid software and prices from the tool management pages instead.",
+    stateLabel: "Feature status",
+    status: "Disabled",
     cta: "Manage tools"
   }
 } as const;
@@ -21,9 +25,18 @@ export default async function AdminPlansPage() {
 
   return (
     <AdminSection title={t.title} intro={t.intro}>
-      <Link href="/admin/software" className="inline-flex rounded-full bg-[#7AA7FF] px-5 py-3 text-sm font-semibold text-[#07101f]">
-        {t.cta}
-      </Link>
+      <div className="enhe-admin-content-management enhe-admin-plans">
+        <section className="enhe-admin-plans-disabled-card" aria-label={t.title}>
+          <div className="enhe-admin-plans-status">
+            <span>{t.stateLabel}</span>
+            <strong>{t.status}</strong>
+          </div>
+          <Link href="/admin/software" className="enhe-admin-plans-cta">
+            {t.cta}
+            <span aria-hidden="true">→</span>
+          </Link>
+        </section>
+      </div>
     </AdminSection>
   );
 }

@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { updateCommentPinAction, updateCommentStatusAction } from "@/app/actions";
-import { SubmitButton, inputClass, selectClass } from "@/app/admin/admin-ui";
+import { AdminContentShell, SubmitButton, inputClass, selectClass } from "@/app/admin/admin-ui";
 import { buildAdminCommentPageHref, buildAdminCommentWhere, parseAdminCommentListParams } from "@/lib/admin-list";
 import { prisma } from "@/lib/db";
 import { getCurrentLocale, type Locale } from "@/lib/i18n";
@@ -82,10 +82,10 @@ export default async function AdminCommentsPage({ searchParams }: AdminCommentsP
   const pageCount = Math.max(1, Math.ceil(total / filters.pageSize));
 
   return (
-    <div>
-      <h1 className="text-3xl font-semibold">{t.title}</h1>
+    <AdminContentShell className="enhe-admin-content-management enhe-admin-comments">
+      <h1 className="enhe-admin-title text-3xl font-semibold">{t.title}</h1>
 
-      <form className="glass mt-6 grid gap-3 rounded-2xl p-5 md:grid-cols-[1fr_180px_160px_auto]" action="/admin/comments">
+      <form className="enhe-admin-content-form enhe-admin-comment-filter-form glass mt-6 grid gap-3 rounded-2xl p-5 md:grid-cols-[1fr_180px_160px_auto]" action="/admin/comments">
         <input name="q" defaultValue={filters.q} placeholder={t.search} className={inputClass} />
         <select name="status" defaultValue={filters.status ?? ""} className={selectClass}>
           <option value="">{t.allStatus}</option>
@@ -102,7 +102,7 @@ export default async function AdminCommentsPage({ searchParams }: AdminCommentsP
         <button className="rounded-full border border-white/12 px-5 py-3 text-sm font-semibold text-[#E8EEF8]">{t.filter}</button>
       </form>
 
-      <div className="mt-5 flex flex-wrap items-center justify-between gap-3 text-sm text-[#8B95A7]">
+      <div className="enhe-admin-content-toolbar mt-5 flex flex-wrap items-center justify-between gap-3 text-sm text-[#8B95A7]">
         <span>{formatTotal(t.total, total, filters.page, pageCount)}</span>
         <div className="flex gap-2">
           <Link
@@ -122,15 +122,15 @@ export default async function AdminCommentsPage({ searchParams }: AdminCommentsP
         </div>
       </div>
 
-      <div className="mt-8 space-y-4">
+      <div className="enhe-admin-comment-list mt-8 space-y-4">
         {comments.map((comment) => (
-          <div key={comment.id} className="glass rounded-2xl p-6">
+          <article key={comment.id} className="enhe-admin-comment-card glass rounded-2xl p-6">
             <p className="text-sm text-[#8B95A7]">
               {comment.tool.name} · {comment.user.email ?? comment.user.phone ?? comment.user.id ?? t.userFallback} · {statusLabel(comment.status, locale)}
               {comment.isPinned ? ` · ${t.pinnedSuffix}` : ""}
             </p>
             <p className="mt-3 leading-7">{comment.content}</p>
-            <div className="mt-5 flex flex-wrap gap-3">
+            <div className="enhe-admin-comment-actions mt-5 flex flex-wrap gap-3">
               <CommentStatusForm id={comment.id} status="approved" label={t.approve} primary />
               <CommentStatusForm id={comment.id} status="rejected" label={t.reject} />
               <CommentStatusForm id={comment.id} status="deleted" label={t.delete} />
@@ -142,11 +142,11 @@ export default async function AdminCommentsPage({ searchParams }: AdminCommentsP
                 </SubmitButton>
               </form>
             </div>
-          </div>
+          </article>
         ))}
-        {comments.length === 0 ? <div className="glass rounded-2xl p-8 text-center text-sm text-[#8B95A7]">{t.empty}</div> : null}
+        {comments.length === 0 ? <div className="enhe-admin-comment-card enhe-admin-comment-empty glass rounded-2xl p-8 text-center text-sm text-[#8B95A7]">{t.empty}</div> : null}
       </div>
-    </div>
+    </AdminContentShell>
   );
 }
 

@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { importNewsArticleHtmlAction } from "@/app/admin/actions";
-import { AdminSection, Field, SubmitButton, inputClass, selectClass, textareaClass } from "@/app/admin/admin-ui";
+import { AdminContentShell, AdminProvenanceNotice, AdminSection, Field, SubmitButton, inputClass, selectClass, textareaClass } from "@/app/admin/admin-ui";
 
 type AdminAiNewsImportPageProps = {
   searchParams: Promise<Record<string, string | undefined>>;
@@ -11,6 +11,8 @@ export default async function AdminAiNewsImportPage({ searchParams }: AdminAiNew
 
   return (
     <AdminSection title="导入 AI 资讯 HTML" intro="上传或粘贴无 CSS 的 HTML 新闻文章，导入后可继续在编辑页调整。">
+      <AdminContentShell>
+      <AdminProvenanceNotice title="导入前的首方来源与审批上下文" />
       <div className="mb-6 flex flex-wrap gap-3">
         <Link href="/admin/ai-news" className="rounded-full border border-white/15 px-4 py-2 text-sm transition hover:border-[#48F5D3]/50 hover:text-[#48F5D3]">
           返回资讯列表
@@ -19,7 +21,7 @@ export default async function AdminAiNewsImportPage({ searchParams }: AdminAiNew
 
       {params.error ? <p className="mb-5 rounded-xl border border-red-400/30 bg-red-400/10 px-4 py-3 text-sm text-red-100">{params.error}</p> : null}
 
-      <form action={importNewsArticleHtmlAction} className="grid gap-5 rounded-2xl border border-white/12 bg-white/6 p-5">
+      <form action={importNewsArticleHtmlAction} className="enhe-admin-content-form grid gap-5 rounded-2xl border border-white/12 bg-white/6 p-5">
         <div className="grid gap-5 lg:grid-cols-2">
           <Field label="HTML 文件">
             <input name="htmlFile" type="file" accept=".html,.htm,text/html" className={inputClass} />
@@ -56,6 +58,7 @@ export default async function AdminAiNewsImportPage({ searchParams }: AdminAiNew
           <SubmitButton pendingLabel="导入中...">导入</SubmitButton>
         </div>
       </form>
+      </AdminContentShell>
     </AdminSection>
   );
 }

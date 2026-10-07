@@ -25,7 +25,7 @@ export async function RegisterPageShell({
   );
 
   return (
-    <main>
+    <main className="enhe-editorial-page enhe-auth-page">
       <Container className="flex min-h-[calc(100vh-4rem)] items-center justify-center py-16">
         <form action={registerAction} className="surface-panel w-full max-w-md p-8">
         <input type="hidden" name="csrfToken" value={csrfToken} />

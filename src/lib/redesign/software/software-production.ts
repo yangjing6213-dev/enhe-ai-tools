@@ -193,8 +193,11 @@ export async function getProductionSoftwareRouteData({
   const request = parseSoftwareCatalogSearchParams(searchParams);
   if (!request) return null;
 
-  const { getPublicSoftwareCatalogRows } = await import("@/lib/public-content");
-  const rows = await getPublicSoftwareCatalogRows();
+  let rows: PublicSoftwareCatalogRow[] = [];
+  if (process.env.DATABASE_URL?.trim()) {
+    const { getPublicSoftwareCatalogRows } = await import("@/lib/public-content");
+    rows = await getPublicSoftwareCatalogRows();
+  }
   const listing = buildSoftwareCatalogPage({ rows, locale, ...request });
   if (!listing) return null;
 

@@ -5,7 +5,7 @@ export const revalidate = 300;
 
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
-  return generateToolDetailPageMetadata("en", slug);
+  return generateToolDetailPageMetadata("en", slug, "/skill-learning");
 }
 
 export default async function EnglishSkillLearningDetailPage({ params }: { params: Promise<{ slug: string }> }) {

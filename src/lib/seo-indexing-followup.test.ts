@@ -45,6 +45,7 @@ describe("SEO indexing follow-up", () => {
   });
 
   it("gives AI news pagination unique metadata and self-canonical alternates", async () => {
+    vi.stubEnv("DATABASE_URL", "postgresql://configured.invalid/enhe");
     const metadata = await generateAiNewsPageMetadata(
       "en",
       Promise.resolve({ page: "2" }),

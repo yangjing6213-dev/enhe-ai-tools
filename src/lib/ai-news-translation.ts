@@ -58,6 +58,10 @@ function buildTranslationPrompt(input: z.output<typeof translationInputSchema>) 
 }
 
 export async function generateAiNewsEnglishDraft(input: AiNewsTranslationInput): Promise<AiNewsTranslationDraft> {
+  if (process.env.ENHE_ADMIN_VISUAL_FIXTURE === "1") {
+    throw new Error("AI news translation is disabled in the admin visual fixture.");
+  }
+
   const payload = translationInputSchema.parse(input);
   const { apiKey, baseUrl, model } = getTranslationConfig();
 

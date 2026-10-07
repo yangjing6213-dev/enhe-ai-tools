@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { AdminSection } from "@/app/admin/admin-ui";
+import { AdminContentShell, AdminSection } from "@/app/admin/admin-ui";
 import { operationManuals } from "@/lib/operation-manuals";
 
 export default function AdminManualsPage() {
@@ -8,9 +8,10 @@ export default function AdminManualsPage() {
       title="操作说明"
       intro="统一存放网站运营、SEO、GEO、后台使用和交付流程说明。后续新增说明书放入 docs/operation-manuals 并登记配置后，会出现在这里。"
     >
-      <div className="grid gap-4 lg:grid-cols-2">
+      <AdminContentShell className="enhe-admin-content-management enhe-admin-manuals">
+      <div className="enhe-admin-manual-grid grid gap-4 lg:grid-cols-2">
         {operationManuals.map((manual) => (
-          <article key={manual.slug} className="surface-panel p-6">
+          <article key={manual.slug} className="enhe-admin-manual-card surface-panel p-6">
             <div className="flex flex-wrap items-center justify-between gap-3">
               <span className="rounded-full border border-white/10 bg-white/8 px-3 py-1 text-xs font-semibold text-[var(--marketing-muted)]">
                 {manual.category}
@@ -31,6 +32,7 @@ export default function AdminManualsPage() {
           </article>
         ))}
       </div>
+      </AdminContentShell>
     </AdminSection>
   );
 }

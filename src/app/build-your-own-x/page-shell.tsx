@@ -334,7 +334,7 @@ export function BuildYourOwnXPageShell({ forceLocale }: { forceLocale: Locale })
   const topLanguages = getBuildYourOwnXTopLanguages();
 
   return (
-    <main className="byox-page">
+    <main className="enhe-editorial-page byox-page">
       <StructuredData data={[breadcrumbSchema, jsonLd.webApplication, jsonLd.itemList, routeListSchema, faqSchema]} />
       <Container className="byox-container">
         <section className="byox-hero">

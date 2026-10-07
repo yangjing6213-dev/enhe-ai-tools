@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { StructuredData } from "@/components/structured-data";
+import { ContentlessState } from "@/components/redesign/contentless-state";
 import { Container, SectionTitle } from "@/components/ui";
 import {
   buildLocalizedTutorialPreviewTitle,
@@ -38,16 +39,30 @@ export async function TutorialsPageShell({ forceLocale }: { forceLocale: Locale 
   const t = getDictionary(forceLocale);
   if (tutorials.length === 0) {
     return (
-      <Container className="py-14">
-        <main data-content-status="UNVERIFIED" className="surface-panel p-8">
-          <SectionTitle as="h1" title={t.tutorials.title} intro={t.tutorials.intro} />
-          <p className="mt-6 text-sm font-semibold leading-7 text-[var(--marketing-muted)]">
-            {forceLocale === "en"
-              ? "UNVERIFIED — English tutorial content is not available yet."
-              : "UNVERIFIED — 教程内容尚未核验。"}
-          </p>
-        </main>
-      </Container>
+      <ContentlessState
+        locale={forceLocale}
+        className="tutorials-page"
+        eyebrow={forceLocale === "en" ? "Tutorials" : "教程"}
+        title={t.tutorials.title}
+        intro={t.tutorials.intro}
+        statusLabel="UNVERIFIED"
+        stateTitle={forceLocale === "en" ? "Tutorials are being prepared" : "教程内容准备中"}
+        statusText={
+          forceLocale === "en"
+            ? "UNVERIFIED — English tutorial content is not available yet."
+            : "UNVERIFIED — 教程内容尚未核验。"
+        }
+        primaryAction={{
+          href: forceLocale === "en" ? "/en" : "/",
+          label: forceLocale === "en" ? "Return home" : "返回首页",
+        }}
+        secondaryActions={[
+          {
+            href: forceLocale === "en" ? "/en/software" : "/software",
+            label: forceLocale === "en" ? "Browse software" : "浏览 AI 软件",
+          },
+        ]}
+      />
     );
   }
   const tutorialGuidance =

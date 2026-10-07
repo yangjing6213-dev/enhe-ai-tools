@@ -1,6 +1,8 @@
 import { describe, expect, it } from "vitest";
 import {
   buildAiNewsDescriptionFallback,
+  buildAiNewsLanguageHrefs,
+  buildAiNewsPaginationLanguageHrefs,
   buildAiNewsRelatedKeywords,
   buildAiNewsSerpTitle,
   truncateAiNewsMetaDescription,
@@ -26,6 +28,49 @@ import {
 import { buildMetadataTitle } from "@/lib/seo";
 
 describe("AI news helpers", () => {
+  it("preserves only allowlisted listing filters across locale links", () => {
+    expect(
+      buildAiNewsLanguageHrefs({
+        q: "agent workflow",
+        category: "category-a",
+        tag: "tag-a",
+        sort: "hot",
+        page: "2",
+        ignored: "must-not-cross-locales",
+      }),
+    ).toEqual({
+      zh: "/ai-news?q=agent+workflow&category=category-a&tag=tag-a&sort=hot&page=2",
+      en: "/en/ai-news?q=agent+workflow&category=category-a&tag=tag-a&sort=hot&page=2",
+    });
+
+    expect(
+      buildAiNewsLanguageHrefs({
+        q: " ",
+        sort: "latest",
+        ignored: "drop",
+      }),
+    ).toEqual({
+      zh: "/ai-news?sort=latest",
+      en: "/en/ai-news?sort=latest",
+    });
+  });
+
+  it("preserves allowlisted filters and the current path page across pagination locale links", () => {
+    expect(
+      buildAiNewsPaginationLanguageHrefs(2, {
+        q: "agent workflow",
+        category: "category-a",
+        tag: "tag-a",
+        sort: "hot",
+        page: "99",
+        ignored: "must-not-cross-locales",
+      }),
+    ).toEqual({
+      zh: "/ai-news/page/2?q=agent+workflow&category=category-a&tag=tag-a&sort=hot",
+      en: "/en/ai-news/page/2?q=agent+workflow&category=category-a&tag=tag-a&sort=hot",
+    });
+  });
+
   it("calculates stable pagination and detects filtered result pages", () => {
     expect(getNewsPageCount(0)).toBe(1);
     expect(getNewsPageCount(9)).toBe(1);

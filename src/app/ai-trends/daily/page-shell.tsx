@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
+import React from "react";
 import Link from "next/link";
 import { ArrowUpRight, CalendarDays, LockKeyhole, Signal } from "lucide-react";
+import { ContentlessState } from "@/components/redesign/contentless-state";
 import { Badge, ButtonLink, Container, EmptyState, SectionTitle } from "@/components/ui";
 import { buildAiTrendLoginUrl, getAiTrendBriefingSummaries, localizeAiTrendBriefingView } from "@/lib/ai-trends";
 import { getCurrentUser } from "@/lib/auth";
@@ -77,9 +79,38 @@ export function generateAiTrendDailyArchiveMetadata(locale: Locale = "zh"): Meta
 }
 
 export async function AiTrendDailyArchivePageShell({ forceLocale = "zh" }: { forceLocale?: Locale } = {}) {
+  const text = copy[forceLocale];
+  if (!process.env.DATABASE_URL?.trim()) {
+    return (
+      <ContentlessState
+        locale={forceLocale}
+        className="ai-trends-daily-page"
+        eyebrow={forceLocale === "en" ? "Daily Analysis" : "每日趋势分析"}
+        title={text.title}
+        intro={text.intro}
+        statusLabel="UNVERIFIED"
+        stateTitle={forceLocale === "en" ? "Daily analysis is being prepared" : "每日分析准备中"}
+        statusText={
+          forceLocale === "en"
+            ? "Verified trend summaries will appear after the source data and reports are reviewed."
+            : "趋势数据和报告完成核验后，再展示公开摘要。"
+        }
+        primaryAction={{
+          href: buildLocalePath("/ai-trends", forceLocale),
+          label: text.back,
+        }}
+        secondaryActions={[
+          {
+            href: buildLocalePath("/ai-news", forceLocale),
+            label: forceLocale === "en" ? "Read AI News" : "阅读 AI 资讯",
+          },
+        ]}
+      />
+    );
+  }
+
   const [briefings, user] = await Promise.all([getAiTrendBriefingSummaries(30), getCurrentUser()]);
   const isLoggedIn = Boolean(user);
-  const text = copy[forceLocale];
   const localizedBriefings = briefings.map((briefing) => localizeAiTrendBriefingView(briefing, forceLocale));
 
   return (

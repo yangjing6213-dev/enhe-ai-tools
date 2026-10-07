@@ -97,8 +97,11 @@ for (const route of routes) {
         titleColor: "rgb(16, 22, 18)",
         titleTrackingRatio: -0.025,
       });
-      expect(designTokens.bodyFont).toContain("Source Sans 3");
-      expect(designTokens.titleFont).toContain("Source Serif 4");
+      const expectedLocaleFont = route.startsWith("/en/")
+        ? "Montserrat"
+        : "Microsoft YaHei";
+      expect(designTokens.bodyFont).toContain(expectedLocaleFont);
+      expect(designTokens.titleFont).toContain(expectedLocaleFont);
       expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBeLessThanOrEqual(width);
       const masthead = page.locator("header.redesign-header");
       await expect(masthead).toHaveCount(1);

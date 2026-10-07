@@ -627,9 +627,8 @@ for (const route of routes.filter(({ kind }) => kind === "software")) {
     test.skip(hasProductCatalogTestDatabase, productCatalogSkipReason);
     await openFormalRoute(page, route.path);
 
-    await expect(
-      page.locator('[data-content-status="UNVERIFIED"]'),
-    ).toBeVisible();
+    await expect(page.locator('[data-content-status="UNVERIFIED"]')).toBeVisible();
+    await expect(page.locator(".redesign-software-empty")).toBeVisible();
     await expect(page.locator("[data-production-catalog]")).toHaveCount(0);
     await expect(page.locator("[data-section], [data-catalog-card]")).toHaveCount(0);
     await expect(
@@ -1271,11 +1270,71 @@ test("product stage survives 30 rapid latest-intent rounds", async ({ page }) =>
   expect(errors.pageErrors).toEqual([]);
 });
 
+test("mobile navigation closes for a delayed desktop breakpoint event", async ({ page }) => {
+  await page.addInitScript(() => {
+    const originalMatchMedia = window.matchMedia.bind(window);
+    window.matchMedia = (query: string) => {
+      const mediaQuery = originalMatchMedia(query);
+      if (query !== "(width < 768px)") return mediaQuery;
+
+      return new Proxy(mediaQuery, {
+        get(target, property) {
+          if (property === "addEventListener") {
+            return (
+              type: string,
+              listener: EventListenerOrEventListenerObject,
+              options?: boolean | AddEventListenerOptions,
+            ) => {
+              if (type === "change") {
+                (
+                  window as Window & {
+                    __enheMobileNavBreakpointListener?: EventListenerOrEventListenerObject;
+                  }
+                ).__enheMobileNavBreakpointListener = listener;
+              }
+              return target.addEventListener(type, listener, options);
+            };
+          }
+          return Reflect.get(target, property, target);
+        },
+      });
+    };
+  });
+
+  await page.setViewportSize({ width: 390, height: 844 });
+  await openFormalRoute(page, "/software");
+  const trigger = page.locator(".redesign-menu-trigger");
+  const drawer = page.locator(".redesign-mobile-drawer");
+  await trigger.click();
+  await expect(trigger).toHaveAttribute("aria-expanded", "true");
+  await expect(drawer).toBeVisible();
+
+  await page.evaluate(() => {
+    const testWindow = window as Window & {
+      __enheMobileNavBreakpointListener?: EventListenerOrEventListenerObject;
+    };
+    const listener = testWindow.__enheMobileNavBreakpointListener;
+    if (!listener) throw new Error("Mobile navigation breakpoint listener was not registered.");
+
+    const delayedDesktopEvent = new Event("change");
+    Object.defineProperty(delayedDesktopEvent, "matches", { value: false });
+    if (typeof listener === "function") {
+      listener.call(window, delayedDesktopEvent);
+    } else {
+      listener.handleEvent(delayedDesktopEvent);
+    }
+  });
+
+  await expect(trigger).toHaveAttribute("aria-expanded", "false");
+  await expect(drawer).toHaveCount(0);
+  await expect.poll(() => page.evaluate(() => document.body.style.overflow)).toBe("");
+});
+
 test("mobile navigation survives 30 rapid close and resize rounds", async ({ page }) => {
   const errors = monitorErrors(page);
   await page.setViewportSize({ width: 390, height: 844 });
   await openFormalRoute(page, "/software");
-  const trigger = page.getByRole("button", { name: "菜单", exact: true });
+  const trigger = page.locator(".redesign-menu-trigger");
   const drawer = page.locator(".redesign-mobile-drawer");
 
   for (let run = 0; run < 30; run += 1) {
@@ -1293,11 +1352,17 @@ test("mobile navigation survives 30 rapid close and resize rounds", async ({ pag
     } else {
       await page.setViewportSize({ width: 768, height: 900 });
       await expect(drawer).toBeHidden();
-      // Desktop CSS can hide the layer before the media-query close is processed.
-      await expect(page.locator(".redesign-menu-trigger")).toHaveAttribute("aria-expanded", "false");
+      await expect(trigger, `round ${run} at desktop`).toHaveAttribute(
+        "aria-expanded",
+        "false",
+      );
       await expect(drawer).toHaveCount(0);
       await page.setViewportSize({ width: 390, height: 844 });
     }
+    await expect(trigger, `round ${run}`).toHaveAttribute(
+      "aria-expanded",
+      "false",
+    );
     await expect(drawer).toBeHidden();
     await expect.poll(() => page.evaluate(() => document.body.style.overflow)).toBe("");
   }

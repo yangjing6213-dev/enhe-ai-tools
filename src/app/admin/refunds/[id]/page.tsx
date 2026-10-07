@@ -196,7 +196,8 @@ export default async function AdminRefundDetailPage({ params, searchParams }: Ad
 
   return (
     <AdminSection title={t.title} intro={t.intro}>
-      <div className="mb-6 flex flex-wrap gap-3">
+      <div className="enhe-admin-content-management enhe-admin-refund-detail">
+      <div className="enhe-admin-refund-toolbar mb-6 flex flex-wrap gap-3">
         <Link href="/admin/refunds" className="rounded-full border border-white/15 px-4 py-2 text-sm transition hover:border-[#48F5D3]/50 hover:text-[#48F5D3]">
           {t.back}
         </Link>
@@ -223,8 +224,8 @@ export default async function AdminRefundDetailPage({ params, searchParams }: Ad
         </p>
       ) : null}
 
-      <div className="glass rounded-2xl p-6">
-        <div className="grid gap-4 md:grid-cols-3">
+      <div className="enhe-admin-refund-summary-card glass rounded-2xl p-6">
+        <div className="enhe-admin-refund-order-facts grid gap-4 md:grid-cols-3">
           <Info label={t.orderNumber} value={refund.order.orderNo} />
           <Info label={t.orderStatus} value={getStatusLabel(orderStatusLabels, refund.order.orderStatus, locale)} />
           <Info label={t.refundStatus} value={getStatusLabel(refundStatusLabels, refund.status, locale)} />
@@ -237,7 +238,7 @@ export default async function AdminRefundDetailPage({ params, searchParams }: Ad
         </div>
 
         {paymentTransaction ? (
-          <div className="mt-6 grid gap-4 border-t border-white/10 pt-6 md:grid-cols-3">
+          <div className="enhe-admin-refund-payment-facts mt-6 grid gap-4 border-t border-white/10 pt-6 md:grid-cols-3">
             <Info label={t.paymentRefundState} value={getPaymentRefundStateLabel(paymentTransaction.refundState, locale)} />
             <Info label={t.refundRequestedAt} value={formatDateTime(paymentTransaction.refundRequestedAt, locale)} />
             <Info label={t.refundDispatchStartedAt} value={formatDateTime(paymentTransaction.refundDispatchStartedAt, locale)} />
@@ -251,14 +252,14 @@ export default async function AdminRefundDetailPage({ params, searchParams }: Ad
           </div>
         ) : null}
 
-        <div className="mt-6 grid gap-4 md:grid-cols-2">
+        <div className="enhe-admin-refund-facts mt-6 grid gap-4 md:grid-cols-2">
           <Info label={t.reason} value={refund.reason} />
           <Info label={t.receiverInfo} value={refund.refundReceiverQr ?? t.notSubmitted} />
           <Info label={t.refundProof} value={refund.refundProofImage ?? t.notSubmitted} />
           <Info label={t.reviewNote} value={refund.note ?? "-"} />
         </div>
 
-        <div className="mt-6 rounded-2xl border border-[#FFB86B]/25 bg-[#FFB86B]/10 p-4 text-sm leading-6 text-[#FFD6A5]">
+        <div className="enhe-admin-refund-entitlement-warning mt-6 rounded-2xl border border-[#FFB86B]/25 bg-[#FFB86B]/10 p-4 text-sm leading-6 text-[#FFD6A5]">
           <p className="font-semibold text-[#FFB86B]">{t.entitlementTitle}</p>
           <p className="mt-2">
             {benefitUsageScopes.isVerifiable
@@ -269,7 +270,7 @@ export default async function AdminRefundDetailPage({ params, searchParams }: Ad
         </div>
 
         {reviewMode === "standard" ? (
-          <form action={processRefundRecordAdminAction} className="mt-6 grid gap-4 border-t border-white/10 pt-6 md:grid-cols-2">
+          <form action={processRefundRecordAdminAction} className="enhe-admin-refund-action-form mt-6 grid gap-4 border-t border-white/10 pt-6 md:grid-cols-2">
             <input type="hidden" name="refundId" value={refund.id} />
             <Field label={t.proofUrl}>
               <input name="refundProofImage" defaultValue={refund.refundProofImage ?? ""} placeholder={t.proofPlaceholder} className={inputClass} />
@@ -290,7 +291,7 @@ export default async function AdminRefundDetailPage({ params, searchParams }: Ad
             </div>
           </form>
         ) : reviewMode === "resolve_ambiguous" ? (
-          <form action={resolveAmbiguousRefundAdminAction} className="mt-6 grid gap-4 border-t border-white/10 pt-6 md:grid-cols-2">
+          <form action={resolveAmbiguousRefundAdminAction} className="enhe-admin-refund-action-form mt-6 grid gap-4 border-t border-white/10 pt-6 md:grid-cols-2">
             <input type="hidden" name="refundId" value={refund.id} />
             <p className="status-warning md:col-span-2">
               {canResolveAsProviderRejected ? t.ambiguousNotice : t.latePaymentNotice}
@@ -334,7 +335,7 @@ export default async function AdminRefundDetailPage({ params, searchParams }: Ad
             </div>
           </form>
         ) : reviewMode === "retry_finalization" ? (
-          <form action={retryRefundFinalizationAdminAction} className="mt-6 grid gap-4 border-t border-white/10 pt-6 md:grid-cols-2">
+          <form action={retryRefundFinalizationAdminAction} className="enhe-admin-refund-action-form mt-6 grid gap-4 border-t border-white/10 pt-6 md:grid-cols-2">
             <input type="hidden" name="refundId" value={refund.id} />
             <p className="status-warning md:col-span-2">{t.finalizationNotice}</p>
             <div className="md:col-span-2">
@@ -344,10 +345,10 @@ export default async function AdminRefundDetailPage({ params, searchParams }: Ad
             </div>
           </form>
         ) : reviewMode === "dispatching" ? (
-          <div className="mt-6 grid gap-4 border-t border-white/10 pt-6">
+          <div className="enhe-admin-refund-action-panel mt-6 grid gap-4 border-t border-white/10 pt-6">
             <p className="status-warning">{t.dispatchingNotice}</p>
             {canRecoverDispatch ? (
-              <form action={recoverStaleRefundDispatchAdminAction} className="grid gap-3">
+              <form action={recoverStaleRefundDispatchAdminAction} className="enhe-admin-refund-action-form grid gap-3">
                 <input type="hidden" name="refundId" value={refund.id} />
                 <p className="text-sm text-[#FFD6A5]">{t.dispatchingRecoveryNotice}</p>
                 <div>
@@ -359,7 +360,7 @@ export default async function AdminRefundDetailPage({ params, searchParams }: Ad
             ) : null}
           </div>
         ) : (
-          <div className="mt-6 grid gap-4 border-t border-white/10 pt-6 md:grid-cols-2">
+          <div className="enhe-admin-refund-action-panel mt-6 grid gap-4 border-t border-white/10 pt-6 md:grid-cols-2">
             <Field label={t.proofUrl}>
               <input defaultValue={refund.refundProofImage ?? ""} className={inputClass} disabled />
             </Field>
@@ -370,13 +371,14 @@ export default async function AdminRefundDetailPage({ params, searchParams }: Ad
           </div>
         )}
       </div>
+      </div>
     </AdminSection>
   );
 }
 
 function Info({ label, value }: { label: string; value: string }) {
   return (
-    <div className="rounded-xl border border-white/10 bg-white/5 p-4">
+    <div className="enhe-admin-refund-info-card rounded-xl border border-white/10 bg-white/5 p-4">
       <p className="text-xs text-[#8B95A7]">{label}</p>
       <p className="mt-2 break-all font-semibold text-[#E8EEF8]">{value}</p>
     </div>

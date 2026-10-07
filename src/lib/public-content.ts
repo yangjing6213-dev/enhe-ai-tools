@@ -59,13 +59,7 @@ type PublicToolType = "software" | "online" | "skill_learning" | "ai_skill";
 
 const publicSoftwareCatalogWhere = {
   status: "published",
-  OR: [
-    { type: { in: ["software", "online", "ai_skill"] } },
-    {
-      type: "skill_learning",
-      tutorials: { some: { status: "active" } },
-    },
-  ],
+  type: "software",
 } satisfies Prisma.ToolWhereInput;
 
 export type PublicNewsListingFilters = {

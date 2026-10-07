@@ -44,8 +44,8 @@ export function ProductDemoEditor({ demo, tools }: ProductDemoEditorProps) {
   const publishedAt = toDatetimeLocal(demo?.publishedAt);
 
   return (
-    <div className="grid gap-8 xl:grid-cols-[minmax(0,1fr)_340px]">
-      <form action={upsertProductDemoAction} className="glass grid gap-5 rounded-2xl p-6 md:grid-cols-2">
+    <div className="enhe-admin-product-demo-editor grid gap-8 xl:grid-cols-[minmax(0,1fr)_340px]">
+      <form action={upsertProductDemoAction} className="enhe-admin-content-form enhe-admin-product-demo-form glass grid gap-5 rounded-2xl p-6 md:grid-cols-2">
         {demo ? <input type="hidden" name="id" value={demo.id} /> : null}
         <input type="hidden" name="returnTo" value={demo ? `/admin/product-demos/${demo.id}` : "/admin/product-demos/new"} />
 
@@ -157,7 +157,7 @@ export function ProductDemoEditor({ demo, tools }: ProductDemoEditorProps) {
         </div>
       </form>
 
-      <aside className="space-y-5">
+      <aside className="enhe-admin-product-demo-sidebar space-y-5">
         <div className="glass rounded-2xl p-5">
           <h2 className="text-lg font-black text-[var(--marketing-text)]">发布校验</h2>
           <p className="mt-2 text-sm leading-6 text-[var(--marketing-muted)]">
@@ -169,7 +169,7 @@ export function ProductDemoEditor({ demo, tools }: ProductDemoEditorProps) {
           items={tools.map((tool) => `${tool.name}\n${tool.id}\n${buildCanonicalToolPath(tool, "zh")}`)}
         />
         {demo ? (
-          <form action={archiveProductDemoAction} className="glass rounded-2xl p-5">
+          <form action={archiveProductDemoAction} className="enhe-admin-content-form enhe-admin-product-demo-danger-form glass rounded-2xl p-5">
             <input type="hidden" name="id" value={demo.id} />
             <h2 className="text-lg font-black text-[var(--marketing-text)]">下架演示</h2>
             <p className="mt-2 text-sm leading-6 text-[var(--marketing-muted)]">

@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { StructuredData } from "@/components/structured-data";
+import { ContentlessState } from "@/components/redesign/contentless-state";
 import { ToolCard } from "@/components/tool-card";
 import { Badge, Container, EmptyState, SectionTitle } from "@/components/ui";
 import type { Locale } from "@/lib/dictionaries";
@@ -67,29 +68,18 @@ export async function ProductPathPageShell({
 
   if (!process.env.DATABASE_URL?.trim()) {
     return (
-      <main>
-        <Container className="py-14">
-          <section
-            data-content-status="UNVERIFIED"
-            className="surface-panel p-8"
-          >
-            <SectionTitle
-              as="h1"
-              title={copy.title}
-              intro={
-                forceLocale === "en"
-                  ? "Product-path content is not available in this local preview."
-                  : "产品路径内容尚未核验，当前本地预览不展示产品卡片或产品事实。"
-              }
-            />
-            <p className="mt-6 text-sm font-semibold leading-7 text-[var(--marketing-muted)]">
-              {forceLocale === "en"
-                ? "UNVERIFIED — Product-path content has not been verified yet."
-                : "UNVERIFIED — 产品路径内容尚未核验。"}
-            </p>
-          </section>
-        </Container>
-      </main>
+      <ContentlessState
+        locale={forceLocale}
+        className="product-path-page"
+        eyebrow={forceLocale === "en" ? "Product path" : "产品路径"}
+        title={copy.title}
+        intro={forceLocale === "en" ? "Product-path content is not available in this local preview." : "产品路径内容尚未核验，当前本地预览不展示产品卡片或产品事实。"}
+        statusLabel="UNVERIFIED"
+        stateTitle={forceLocale === "en" ? "Product path is being prepared" : "产品路径准备中"}
+        statusText={forceLocale === "en" ? "UNVERIFIED — Product-path content has not been verified yet." : "UNVERIFIED — 产品路径内容尚未核验。"}
+        primaryAction={{ href: forceLocale === "en" ? "/en" : "/", label: forceLocale === "en" ? "Return home" : "返回首页" }}
+        secondaryActions={[{ href: forceLocale === "en" ? "/en/software" : "/software", label: forceLocale === "en" ? "Browse software" : "浏览 AI 软件" }]}
+      />
     );
   }
 

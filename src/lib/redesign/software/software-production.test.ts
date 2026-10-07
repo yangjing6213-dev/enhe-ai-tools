@@ -1,4 +1,4 @@
-import { describe, expect, it } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 import {
   SOFTWARE_CATALOG_PAGE_SIZE,
@@ -264,5 +264,84 @@ describe("production software catalog adapter", () => {
     expect(parseSoftwareCatalogSearchParams({ page: "1.5" })).toBeNull();
     expect(parseSoftwareCatalogSearchParams({ page: ["1", "2"] })).toBeNull();
     expect(parseSoftwareCatalogSearchParams({ category: "unknown" })).toBeNull();
+  });
+});
+
+describe("software route data boundary", () => {
+  const loadContentModule = vi.fn();
+  const getRows = vi.fn();
+
+  beforeEach(() => {
+    vi.resetModules();
+    loadContentModule.mockReset();
+    getRows.mockReset();
+    vi.doMock("@/lib/public-content", () => {
+      loadContentModule();
+      return { getPublicSoftwareCatalogRows: getRows };
+    });
+  });
+
+  afterEach(() => {
+    vi.unstubAllEnvs();
+    vi.doUnmock("@/lib/public-content");
+  });
+
+  it.each([undefined, "", " \t "])(
+    "does not load content for either DB-free locale (DATABASE_URL=%s)",
+    async (databaseUrl) => {
+      vi.stubEnv("DATABASE_URL", databaseUrl);
+      const { getProductionSoftwareRouteData } = await import("./software-production");
+
+      for (const locale of ["zh", "en"] as const) {
+        for (const category of [undefined, "video"]) {
+          const result = await getProductionSoftwareRouteData({
+            locale,
+            searchParams: { category },
+          });
+          expect(result).toMatchObject({
+            listing: { items: [], total: 0, page: 1, totalPages: 0 },
+            languageHrefs: {
+              zh: `/software${category ? "?category=video" : ""}`,
+              en: `/en/software${category ? "?category=video" : ""}`,
+            },
+          });
+        }
+      }
+      expect(loadContentModule).not.toHaveBeenCalled();
+      expect(getRows).not.toHaveBeenCalled();
+    },
+  );
+
+  it("preserves DB-free invalid and out-of-range route rejection without loading content", async () => {
+    vi.stubEnv("DATABASE_URL", undefined);
+    const { getProductionSoftwareRouteData } = await import("./software-production");
+    for (const locale of ["zh", "en"] as const) {
+      for (const searchParams of [{ page: "2" }, { page: "0" }, { category: "unknown" }]) {
+        await expect(getProductionSoftwareRouteData({ locale, searchParams })).resolves.toBeNull();
+      }
+    }
+    expect(loadContentModule).not.toHaveBeenCalled();
+    expect(getRows).not.toHaveBeenCalled();
+  });
+
+  it("preserves configured pagination, locale fallback, empty catalogs and outage rejection", async () => {
+    vi.stubEnv("DATABASE_URL", "postgresql://configured.invalid/enhe");
+    const rows: PublicSoftwareCatalogRow[] = buildRows(13);
+    rows[12] = { ...rows[12], englishName: null, shortDescription: "仅中文说明", content: "仅中文内容" };
+    getRows.mockResolvedValue(rows);
+    const { getProductionSoftwareRouteData } = await import("./software-production");
+    const result = await getProductionSoftwareRouteData({ locale: "zh", searchParams: { page: "2" } });
+    expect(result?.listing?.items.map((item) => item.id)).toEqual(["tool-13"]);
+    expect(result?.languageHrefs).toEqual({ zh: "/software?page=2", en: "/en/software" });
+    expect(loadContentModule).toHaveBeenCalledOnce();
+    expect(getRows).toHaveBeenCalledOnce();
+
+    getRows.mockResolvedValue([]);
+    await expect(getProductionSoftwareRouteData({ locale: "en", searchParams: {} })).resolves.toMatchObject({
+      listing: { items: [], total: 0 },
+    });
+    const outage = new Error("catalog unavailable");
+    getRows.mockRejectedValue(outage);
+    await expect(getProductionSoftwareRouteData({ locale: "en", searchParams: {} })).rejects.toBe(outage);
   });
 });

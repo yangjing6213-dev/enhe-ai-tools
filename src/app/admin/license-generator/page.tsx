@@ -10,7 +10,9 @@ export default async function AdminLicenseGeneratorPage() {
 
   return (
     <AdminSection title={t.title} intro={t.intro}>
-      <LicenseGeneratorPanel labels={t} serverMachineId={getServerMachineId()} />
+      <div className="enhe-admin-content-management enhe-admin-license-generator">
+        <LicenseGeneratorPanel labels={t} serverMachineId={getServerMachineId()} />
+      </div>
     </AdminSection>
   );
 }

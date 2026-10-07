@@ -21,9 +21,28 @@ export function middleware(request: NextRequest) {
 
   const requestHeaders = new Headers(request.headers);
   const pathname = request.nextUrl.pathname;
+  const isEnglishPath = pathname === "/en" || pathname.startsWith("/en/");
+  const isAdminPath =
+    pathname === "/admin" ||
+    pathname.startsWith("/admin/") ||
+    pathname === "/en/admin" ||
+    pathname.startsWith("/en/admin/");
   const cookieLocale = request.cookies.get(localeCookieName)?.value;
   const requestedLocale = getRequestedLocaleSwitch(request.nextUrl.searchParams);
-  const isEnglishPath = pathname === "/en" || pathname.startsWith("/en/");
+
+  // Stop unauthenticated admin requests before the route tree starts rendering
+  // database-backed pages. This keeps DB-free local previews free of leaked
+  // Prisma errors while requireAdmin remains the server authorization boundary.
+  const authCookieName = process.env.AUTH_COOKIE_NAME ?? "enhe_session";
+  if (isAdminPath && !request.cookies.get(authCookieName)?.value) {
+    const redirectUrl = request.nextUrl.clone();
+    redirectUrl.pathname = isEnglishPath ? "/en/login" : "/login";
+    redirectUrl.search = "";
+    redirectUrl.searchParams.set("returnTo", `${pathname}${request.nextUrl.search}`);
+    const redirectStatus = request.method === "GET" || request.method === "HEAD" ? 307 : 303;
+    return NextResponse.redirect(redirectUrl, redirectStatus);
+  }
+
   const isChinesePublicPath =
     pathname === "/" ||
     [

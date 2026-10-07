@@ -2,6 +2,7 @@ import "../globals.css";
 import "@/styles/redesign/tokens.css";
 import "@/styles/redesign/shell.css";
 import "@/styles/redesign/home.css";
+import "@/styles/redesign/ai-news.css";
 import { headers } from "next/headers";
 import { RootDocument, sharedRootMetadata } from "@/app/root-layout-shared";
 
@@ -12,7 +13,7 @@ function isEnglishPublicPath(pathname: string) {
     (pathname === "/en" || pathname.startsWith("/en/")) &&
     !pathname.startsWith("/en/login") &&
     !pathname.startsWith("/en/register") &&
-    !pathname.startsWith("/en/user")
+    (!pathname.startsWith("/en/user") || pathname === "/en/user")
   );
 }
 

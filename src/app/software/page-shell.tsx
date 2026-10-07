@@ -5,7 +5,6 @@ import { notFound } from "next/navigation";
 
 import { EnheRedesignSoftwareCatalog } from "@/components/redesign/software/EnheRedesignSoftwareCatalog";
 import { StructuredData } from "@/components/structured-data";
-import { Container, SectionTitle } from "@/components/ui";
 import { getDictionary, type Locale } from "@/lib/dictionaries";
 import {
   getProductionSoftwareCatalog,
@@ -87,28 +86,46 @@ export async function SoftwarePageShell({
   const t = getDictionary(forceLocale);
   if (!process.env.DATABASE_URL?.trim()) {
     return (
-      <main>
-        <Container className="py-14">
-          <section
-            data-content-status="UNVERIFIED"
-            className="surface-panel p-8"
+      <main
+        className="redesign-software redesign-software-page"
+        data-locale={forceLocale}
+      >
+        <section className="redesign-software-hero">
+          <p className="redesign-software-label">
+            {forceLocale === "en" ? "Software catalog" : "软件目录"}
+          </p>
+          <h1>{t.listing.softwareTitle}</h1>
+          <p className="redesign-software-intro">
+            {forceLocale === "en"
+              ? "Software catalog content is not available in this local preview."
+              : "软件目录内容尚未核验，当前本地预览不展示产品卡片或产品事实。"}
+          </p>
+        </section>
+        <section
+          data-content-status="UNVERIFIED"
+          className="redesign-software-empty redesign-software-dbfree-state"
+        >
+          <div
+            role="status"
+            aria-live="polite"
+            aria-labelledby="software-dbfree-state-title"
           >
-            <SectionTitle
-              as="h1"
-              title={t.listing.softwareTitle}
-              intro={
-                forceLocale === "en"
-                  ? "Software catalog content is not available in this local preview."
-                  : "软件目录内容尚未核验，当前本地预览不展示产品卡片或产品事实。"
-              }
-            />
-            <p className="mt-6 text-sm font-semibold leading-7 text-[var(--marketing-muted)]">
+            <h2 id="software-dbfree-state-title">
+              {forceLocale === "en" ? "Software catalog preview" : "软件目录预览"}
+            </h2>
+            <p>
               {forceLocale === "en"
                 ? "UNVERIFIED — Software catalog content has not been verified yet."
                 : "UNVERIFIED — 软件目录内容尚未核验。"}
             </p>
-          </section>
-        </Container>
+          </div>
+          <a
+            className="redesign-software-empty-action"
+            href={forceLocale === "en" ? "/en" : "/"}
+          >
+            {forceLocale === "en" ? "Return to ENHE AI home" : "返回 ENHE AI 首页"}
+          </a>
+        </section>
       </main>
     );
   }
@@ -137,10 +154,13 @@ export async function SoftwarePageShell({
     listing,
     Boolean(request.category),
   );
+  const structuredSchemas = listing.items.length
+    ? [breadcrumbSchema, collectionSchema]
+    : [breadcrumbSchema];
 
   return (
     <>
-      <StructuredData data={[breadcrumbSchema, collectionSchema]} />
+      <StructuredData data={structuredSchemas} />
       <EnheRedesignSoftwareCatalog
         locale={forceLocale}
         mode="production"

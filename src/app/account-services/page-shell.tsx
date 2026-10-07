@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { StructuredData } from "@/components/structured-data";
+import { ContentlessState } from "@/components/redesign/contentless-state";
 import { Container, EmptyState, SectionTitle } from "@/components/ui";
 import { ToolCard } from "@/components/tool-card";
 import { enheOrganizationReference } from "@/lib/brand-entity";
@@ -196,31 +197,36 @@ export async function AccountServicesPageShell({
     getPublicToolListing("online", categoryId, keyword, undefined, sort),
   ]);
 
-  if (isDbFreePreview && tools.length === 0) {
+  if (isDbFreePreview) {
     return (
-      <main>
-        <Container className="py-14">
-          <section
-            data-content-status="UNVERIFIED"
-            className="surface-panel p-8"
-          >
-            <SectionTitle
-              as="h1"
-              title={t.listing.onlineTitle}
-              intro={
-                forceLocale === "en"
-                  ? "Account-service content is unavailable in this DB-free local preview."
-                  : "当前 DB-free 本地预览没有可核验的账号服务内容。"
-              }
-            />
-            <p className="mt-6 text-sm font-semibold leading-7 text-[var(--marketing-muted)]">
-              {forceLocale === "en"
-                ? "UNVERIFIED — English account-service content is not available yet."
-                : "UNVERIFIED — 账号服务内容尚未核验。"}
-            </p>
-          </section>
-        </Container>
-      </main>
+      <ContentlessState
+        locale={forceLocale}
+        className="account-services-page"
+        eyebrow={forceLocale === "en" ? "Account services" : "账号服务"}
+        title={t.listing.onlineTitle}
+        intro={
+          forceLocale === "en"
+            ? "Account-service content is unavailable in this DB-free local preview."
+            : "当前 DB-free 本地预览没有可核验的账号服务内容。"
+        }
+        statusLabel="UNVERIFIED"
+        stateTitle={forceLocale === "en" ? "Service guidance is being prepared" : "服务内容准备中"}
+        statusText={
+          forceLocale === "en"
+            ? "UNVERIFIED — English account-service content is not available yet."
+            : "UNVERIFIED — 账号服务内容尚未核验。"
+        }
+        primaryAction={{
+          href: forceLocale === "en" ? "/en" : "/",
+          label: forceLocale === "en" ? "Return home" : "返回首页",
+        }}
+        secondaryActions={[
+          {
+            href: forceLocale === "en" ? "/en/software" : "/software",
+            label: forceLocale === "en" ? "Browse software" : "浏览 AI 软件",
+          },
+        ]}
+      />
     );
   }
 

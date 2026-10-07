@@ -1,7 +1,7 @@
 import Link from "next/link";
 import type { Prisma } from "@prisma/client";
 import { deleteNewsArticleAction } from "@/app/admin/actions";
-import { AdminSection, DangerButton, inputClass, selectClass } from "@/app/admin/admin-ui";
+import { AdminContentShell, AdminProvenanceNotice, AdminSection, DangerButton, inputClass, selectClass } from "@/app/admin/admin-ui";
 import { prisma } from "@/lib/db";
 import { buildCanonicalAiNewsPath } from "@/lib/public-slugs";
 
@@ -53,7 +53,9 @@ export default async function AdminAiNewsPage({ searchParams }: { searchParams: 
 
   return (
     <AdminSection title="AI资讯管理" intro="维护 AI 资讯、趋势解读、工具落地引导和中英文 SEO 内容。">
-      <div className="mb-6 flex flex-wrap items-center justify-between gap-3">
+      <AdminContentShell>
+      <AdminProvenanceNotice title="首方来源与审批上下文" />
+      <div className="enhe-admin-content-toolbar mb-6 flex flex-wrap items-center justify-between gap-3">
         <div className="text-sm text-[#8B95A7]">共 {total} 篇资讯</div>
         <div className="flex flex-wrap gap-3">
           <Link href="/admin/ai-news/import" className="rounded-full border border-white/15 px-5 py-3 text-sm font-semibold transition hover:border-[#48F5D3]/50 hover:text-[#48F5D3]">
@@ -101,7 +103,7 @@ export default async function AdminAiNewsPage({ searchParams }: { searchParams: 
         <button className="rounded-full bg-[#050505] px-5 py-3 text-sm font-bold text-white lg:col-span-5">筛选资讯</button>
       </form>
 
-      <div className="overflow-x-auto rounded-2xl border border-white/12 bg-white/6">
+      <div className="enhe-admin-content-table overflow-x-auto rounded-2xl border border-white/12 bg-white/6">
         <div className="grid min-w-[1120px] grid-cols-[1.45fr_0.65fr_0.55fr_0.6fr_0.45fr_0.65fr_0.7fr] gap-4 border-b border-white/10 px-5 py-3 text-xs uppercase tracking-wide text-[#8B95A7]">
           <span>标题</span>
           <span>分类/标签</span>
@@ -158,6 +160,7 @@ export default async function AdminAiNewsPage({ searchParams }: { searchParams: 
           })}
         </div>
       ) : null}
+      </AdminContentShell>
     </AdminSection>
   );
 }

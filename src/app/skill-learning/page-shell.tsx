@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { StructuredData } from "@/components/structured-data";
+import { ContentlessState } from "@/components/redesign/contentless-state";
 import { Container, EmptyState, SectionTitle } from "@/components/ui";
 import { ToolCard } from "@/components/tool-card";
 import { getDictionary, type Locale } from "@/lib/dictionaries";
@@ -199,28 +200,51 @@ export async function SkillLearningPageShell({
     ),
   ]);
 
-  if (tools.length === 0) {
+  if (!process.env.DATABASE_URL?.trim()) {
     return (
-      <main>
-        <Container className="py-14">
-          <section
-            data-content-status="UNVERIFIED"
-            className="surface-panel p-8"
-          >
-            <SectionTitle
-              as="h1"
-              title={t.listing.skillLearningTitle}
-              intro={t.listing.skillLearningIntro}
-            />
-            <p className="mt-6 text-sm font-semibold leading-7 text-[var(--marketing-muted)]">
-              {forceLocale === "en"
-                ? "UNVERIFIED — English skill-learning content is not available yet."
-                : "UNVERIFIED — 技能学习内容尚未核验。"}
-            </p>
-          </section>
-        </Container>
-      </main>
+      <ContentlessState
+        locale={forceLocale}
+        className="skill-learning-page"
+        eyebrow={forceLocale === "en" ? "Skill learning" : "技能学习"}
+        title={t.listing.skillLearningTitle}
+        intro={t.listing.skillLearningIntro}
+        statusLabel="UNVERIFIED"
+        stateTitle={forceLocale === "en" ? "Learning content is being prepared" : "学习内容准备中"}
+        statusText={
+          forceLocale === "en"
+            ? "UNVERIFIED — English skill-learning content is not available yet."
+            : "UNVERIFIED — 技能学习内容尚未核验。"
+        }
+        primaryAction={{
+          href: forceLocale === "en" ? "/en" : "/",
+          label: forceLocale === "en" ? "Return home" : "返回首页",
+        }}
+        secondaryActions={[
+          {
+            href: forceLocale === "en" ? "/en/software" : "/software",
+            label: forceLocale === "en" ? "Browse software" : "浏览 AI 软件",
+          },
+          {
+            href: forceLocale === "en" ? "/en/ai-news" : "/ai-news",
+            label: forceLocale === "en" ? "Read AI News" : "阅读 AI 资讯",
+          },
+        ]}
+      />
     );
+  }
+
+  if (tools.length === 0) {
+    return <ContentlessState
+      locale={forceLocale}
+      className="skill-learning-page"
+      eyebrow={forceLocale === "en" ? "Skill learning" : "技能学习"}
+      title={t.listing.skillLearningTitle}
+      intro={t.listing.skillLearningIntro}
+      statusLabel="UNVERIFIED"
+      stateTitle={forceLocale === "en" ? "Learning content is being prepared" : "学习内容准备中"}
+      statusText={forceLocale === "en" ? "UNVERIFIED — English skill-learning content is not available yet." : "UNVERIFIED — 技能学习内容尚未核验。"}
+      primaryAction={{ href: forceLocale === "en" ? "/en" : "/", label: forceLocale === "en" ? "Return home" : "返回首页" }}
+    />;
   }
 
   const categoryOptions = buildThemedToolCategories(categories, "futureAi");

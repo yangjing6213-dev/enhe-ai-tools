@@ -212,6 +212,7 @@ try {
   $env:DATABASE_URL = $null
   $env:DIRECT_URL = $null
   $env:NEXT_TELEMETRY_DISABLED = "1"
+  Invoke-Native -FilePath npm -Arguments @("run", "prisma:client")
   if ($AllowDatabaseMutatingVitest) {
     $env:SEO_AUDIT_TEST_DATABASE_URL = $TestDatabaseUrl
     $env:DATABASE_URL = $TestDatabaseUrl
@@ -296,7 +297,7 @@ if ($deployRequested) {
   Invoke-Native -FilePath ssh -Arguments @(
     "-i", $resolvedKey,
     "-p", "$SshPort",
-    "-o", "StrictHostKeyChecking=accept-new",
+    "-o", "StrictHostKeyChecking=yes",
     "$ServerUser@$ServerHost",
     $prePushRemoteCommand
   )
@@ -332,13 +333,13 @@ $remoteCommand = @(
   "git fetch --depth=1 origin '$Branch'"
   "test `"`$(git rev-parse FETCH_HEAD)`" = '$ReleaseRef'"
   "git checkout --detach '$ReleaseRef'"
-  "PREVIOUS_RELEASE_REF=`"`$previous_release_ref`" RELEASE_REF='$ReleaseRef' sh ./deploy.sh"
+  "sudo -n env RETENTION_DAYS=36500 ENHE_OPERATION_LOCK_HELD=1 ENHE_OPERATION_LOCK_FILE=`"`$remote_lock_file`" PREVIOUS_RELEASE_REF=`"`$previous_release_ref`" RELEASE_REF='$ReleaseRef' sh ./deploy.sh"
 ) -join "; "
 
 Invoke-Native -FilePath ssh -Arguments @(
   "-i", $resolvedKey,
   "-p", "$SshPort",
-  "-o", "StrictHostKeyChecking=accept-new",
+  "-o", "StrictHostKeyChecking=yes",
   "$ServerUser@$ServerHost",
   $remoteCommand
 )

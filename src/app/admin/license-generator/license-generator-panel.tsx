@@ -86,9 +86,13 @@ export function LicenseGeneratorPanel({ labels, serverMachineId }: LicenseGenera
   }
 
   return (
-    <div className="grid gap-6 xl:grid-cols-[minmax(0,0.85fr)_minmax(0,1.15fr)]">
-      <form action={formAction} className="dossier-card grid gap-5 p-6">
-        {state.message ? <p className={`rounded-xl border px-4 py-3 text-sm ${statusClass}`}>{state.message}</p> : null}
+    <div className="enhe-admin-license-generator-panel grid gap-6 xl:grid-cols-[minmax(0,0.85fr)_minmax(0,1.15fr)]">
+      <form action={formAction} className="enhe-admin-license-generator-form dossier-card grid gap-5 p-6">
+        {state.message ? (
+          <p className={`enhe-admin-license-generator-status ${state.ok ? "is-success" : "is-error"} rounded-xl border px-4 py-3 text-sm ${statusClass}`}>
+            {state.message}
+          </p>
+        ) : null}
 
         <label>
           <span className="mb-2 block text-sm text-[#F6FAFF]">{labels.product}</span>
@@ -122,7 +126,7 @@ export function LicenseGeneratorPanel({ labels, serverMachineId }: LicenseGenera
 
         <label>
           <span className="mb-2 block text-sm text-[#F6FAFF]">{labels.machineId}</span>
-          <div className="grid gap-3 md:grid-cols-[1fr_auto]">
+          <div className="grid gap-3 2xl:grid-cols-[minmax(0,1fr)_auto]">
             <input
               name="machineId"
               value={machineId}
@@ -184,7 +188,7 @@ export function LicenseGeneratorPanel({ labels, serverMachineId }: LicenseGenera
         </button>
       </form>
 
-      <section className="dossier-card grid gap-4 p-6">
+      <section className="enhe-admin-license-generator-output dossier-card grid gap-4 p-6">
         <div className="flex flex-wrap items-center justify-between gap-3">
           <div>
             <h2 className="text-xl font-semibold text-[#F6FAFF]">{labels.output}</h2>

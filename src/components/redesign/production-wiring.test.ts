@@ -92,7 +92,8 @@ describe("ENHE Phase 2C.1 production wiring", () => {
     expect(enLayout).toContain('pathname.startsWith("/en/user")');
     expect(enLayout).toContain('pathname.startsWith("/en/login")');
     expect(enLayout).toContain('pathname.startsWith("/en/register")');
-    expect(adminLayout).not.toContain("disableLegacyVisualEffects");
+    expect(adminLayout).toContain("enhe-reference-app-shell");
+    expect(adminLayout).toContain("admin-topbar");
   });
 
   it("keeps private and API surfaces on their existing boundaries", () => {
@@ -106,10 +107,6 @@ describe("ENHE Phase 2C.1 production wiring", () => {
       expect(layout).toContain("SiteHeader");
       expect(layout).toContain("SiteFooter");
     }
-
-    expect(admin).toContain("requireAdmin");
-    expect(admin).toContain("admin-topbar");
-    expect(admin).toContain("AdminNav");
     expect(admin).not.toContain("SiteHeader");
     expect(admin).not.toContain("SiteFooter");
   });

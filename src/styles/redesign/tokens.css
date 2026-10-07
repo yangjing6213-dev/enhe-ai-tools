@@ -38,10 +38,10 @@
   --enhe-z-header: 20;
   --enhe-z-layer: 40;
   --enhe-z-focus: 60;
-  --enhe-font-zh: "Source Sans 3", "Noto Sans SC", sans-serif;
-  --enhe-font-en: "Source Sans 3", "Noto Sans", sans-serif;
-  --enhe-font-display: "Source Serif 4", "Noto Serif SC", Georgia, serif;
-  --enhe-font-utility: "IBM Plex Mono", "Noto Sans Mono", monospace;
+  --enhe-font-zh: "Microsoft YaHei", "微软雅黑", "Montserrat", Arial, sans-serif;
+  --enhe-font-en: "Montserrat", Arial, sans-serif;
+  --enhe-font-display: "Montserrat", "Microsoft YaHei", "微软雅黑", Arial, sans-serif;
+  --enhe-font-utility: "Montserrat", "Microsoft YaHei", "微软雅黑", Arial, sans-serif;
 
   /* Typeshare comparison tokens: layout rhythm only, never reference-brand assets. */
   --enhe-reference-brand: var(--enhe-action);

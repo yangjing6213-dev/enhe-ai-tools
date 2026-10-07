@@ -5,7 +5,12 @@ import {
   generateAiNewsPageMetadata,
 } from "@/app/ai-news/page-shell";
 import { PublicSiteChrome } from "@/components/public-site-chrome";
-import { parseNewsPaginationPage } from "@/lib/ai-news";
+import { AiNewsWorkspaceShell } from "@/components/redesign/ai-news-workspace-shell";
+import {
+  buildAiNewsPaginationLanguageHrefs,
+  parseNewsPaginationPage,
+} from "@/lib/ai-news";
+import type { RedesignLanguageHrefs } from "@/components/redesign/types";
 
 export const revalidate = 300;
 
@@ -34,18 +39,21 @@ export default async function AiNewsPaginationPage({
   const page = parseNewsPaginationPage((await params).page);
   if (page === null) notFound();
   if (page === 1) permanentRedirect("/ai-news");
-  const queryParams = await searchParams;
+  const resolvedSearchParams = await searchParams;
+  const languageHrefs: RedesignLanguageHrefs = buildAiNewsPaginationLanguageHrefs(
+    page,
+    resolvedSearchParams,
+  );
 
   return (
-    <PublicSiteChrome
-      forceLocale="zh"
-      languageHrefs={buildAiNewsLanguageHrefs(queryParams, page)}
-    >
-      <AiNewsPageShell
-        searchParams={Promise.resolve(queryParams)}
-        forceLocale="zh"
-        pageOverride={page}
-      />
+    <PublicSiteChrome forceLocale="zh" languageHrefs={languageHrefs}>
+      <AiNewsWorkspaceShell locale="zh" currentPathname={`/ai-news/page/${page}`}>
+        <AiNewsPageShell
+          searchParams={Promise.resolve(resolvedSearchParams)}
+          forceLocale="zh"
+          pageOverride={page}
+        />
+      </AiNewsWorkspaceShell>
     </PublicSiteChrome>
   );
 }

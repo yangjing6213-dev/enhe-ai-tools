@@ -13,6 +13,22 @@ function readSource(relativePath: string) {
   return readFileSync(new URL(relativePath, import.meta.url), "utf8").replace(/\r\n/g, "\n");
 }
 
+function emptyListing(): SoftwareCatalogPage {
+  return {
+    items: [],
+    newReleases: [],
+    featuredProducts: [],
+    total: 0,
+    page: 1,
+    pageSize: 12,
+    totalPages: 0,
+    hasPrevious: false,
+    hasNext: false,
+    previousHref: null,
+    nextHref: null,
+  };
+}
+
 describe("production software route wiring", () => {
   it("wires both formal routes to the redesigned server catalog and keeps the preview fixture isolated", () => {
     const shell = readSource("./page-shell.tsx");
@@ -105,8 +121,44 @@ describe("production software route wiring", () => {
     expect(html).toContain("data-production-catalog");
     expect(html).toContain("Public AI Video Tool");
     expect(html).toContain('href="/en/software/public-ai-video-tool"');
+    expect(html).toContain('role="list"');
+    expect(html).toContain('aria-labelledby="all-products-heading"');
+    expect(html).toContain('role="listitem"');
     expect(html).not.toMatch(/<article[^>]*hidden/i);
     expect(html).not.toMatch(/LOCAL CANDIDATE|Preview|fileUrl|filePath|delivery/i);
+  });
+
+  it("renders a clean empty state with a home recovery link and no empty rails or pagination nav", () => {
+    const html = renderToStaticMarkup(
+      React.createElement(EnheRedesignSoftwareCatalog, {
+        locale: "en",
+        mode: "production",
+        listing: emptyListing(),
+      }),
+    );
+
+    expect(html).toContain("No published products are available yet.");
+    expect(html).toContain('href="/en"');
+    expect(html).toContain("Return to ENHE AI home");
+    expect(html).not.toContain('data-horizontal-cards="new"');
+    expect(html).not.toContain('data-horizontal-cards="featured"');
+    expect(html).not.toContain('aria-label="Catalog pagination"');
+  });
+
+  it("renders a filtered empty state with a localized clear-filter link", () => {
+    const html = renderToStaticMarkup(
+      React.createElement(EnheRedesignSoftwareCatalog, {
+        locale: "zh",
+        mode: "production",
+        listing: emptyListing(),
+        selectedCategory: "video",
+      }),
+    );
+
+    expect(html).toContain("清除筛选");
+    expect(html).toContain('href="/software"');
+    expect(html).not.toContain('href="/"');
+    expect(html).not.toContain('aria-label="产品分页"');
   });
 
   it("builds page-aware canonicals and noindex-follow category metadata", async () => {

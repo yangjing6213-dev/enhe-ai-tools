@@ -1,7 +1,7 @@
 ﻿import Link from "next/link";
 import { notFound } from "next/navigation";
 import { createRefundRecordAdminAction, deleteOrderAdminAction, processRefundRecordAdminAction, updateOrderAdminAction } from "@/app/admin/actions";
-import { AdminSection, Field, inputClass, selectClass, SubmitButton, textareaClass } from "@/app/admin/admin-ui";
+import { AdminContentShell, AdminSection, Field, inputClass, selectClass, SubmitButton, textareaClass } from "@/app/admin/admin-ui";
 import { decideAdminOrderHardDelete } from "@/lib/admin-delete-protection";
 import { prisma } from "@/lib/db";
 import { canRecordRefundForOrder, getRefundRecordActorLabel } from "@/lib/order-rules";
@@ -59,33 +59,34 @@ export default async function AdminOrderDetailPage({ params, searchParams }: Adm
 
   return (
     <AdminSection title="订单详情" intro="在单独详情页处理订单状态、付款记录、售后退款和删除风险确认。">
-      <div className="mb-6 flex flex-wrap gap-3">
-        <Link href="/admin/orders" className="rounded-full border border-white/15 px-4 py-2 text-sm transition hover:border-[#48F5D3]/50 hover:text-[#48F5D3]">
+      <AdminContentShell className="enhe-admin-content-management enhe-admin-order-detail">
+      <div className="enhe-admin-content-toolbar enhe-admin-commerce-toolbar mb-6 flex flex-wrap gap-3">
+        <Link href="/admin/orders" className="enhe-admin-commerce-back rounded-full border border-white/15 px-4 py-2 text-sm transition hover:border-[#48F5D3]/50 hover:text-[#48F5D3]">
           返回订单清单
         </Link>
         {order.paymentProof ? (
-          <Link href={`/admin/payments/${order.paymentProof.id}`} className="rounded-full border border-[#48F5D3]/30 px-4 py-2 text-sm text-[#48F5D3]">
+          <Link href={`/admin/payments/${order.paymentProof.id}`} className="enhe-admin-commerce-back enhe-admin-commerce-secondary-link rounded-full border border-[#48F5D3]/30 px-4 py-2 text-sm text-[#48F5D3]">
             查看付款记录
           </Link>
         ) : null}
       </div>
 
       {query.refund ? (
-        <p className="mb-5 rounded-xl border border-[#48F5D3]/30 bg-[#48F5D3]/10 px-4 py-3 text-sm text-[#48F5D3]">售后/退款记录已保存。</p>
+        <p className="enhe-admin-commerce-state enhe-admin-commerce-state-success mb-5 rounded-xl border border-[#48F5D3]/30 bg-[#48F5D3]/10 px-4 py-3 text-sm text-[#48F5D3]">售后/退款记录已保存。</p>
       ) : null}
 
       {query.saved ? (
-        <p className="mb-5 rounded-xl border border-[#48F5D3]/30 bg-[#48F5D3]/10 px-4 py-3 text-sm font-semibold text-[#48F5D3]">订单已保存。</p>
+        <p className="enhe-admin-commerce-state enhe-admin-commerce-state-success mb-5 rounded-xl border border-[#48F5D3]/30 bg-[#48F5D3]/10 px-4 py-3 text-sm font-semibold text-[#48F5D3]">订单已保存。</p>
       ) : null}
 
       {query.error ? (
-        <p className="mb-5 rounded-xl border border-red-400/30 bg-red-400/10 px-4 py-3 text-sm text-red-100">
+        <p className="enhe-admin-commerce-state enhe-admin-commerce-state-error mb-5 rounded-xl border border-red-400/30 bg-red-400/10 px-4 py-3 text-sm text-red-100">
           操作失败：{query.error}
         </p>
       ) : null}
 
-      <div className="glass rounded-2xl p-6">
-        <div className="grid gap-4 md:grid-cols-3">
+      <div className="enhe-admin-order-summary-card glass rounded-2xl p-6">
+        <div className="enhe-admin-commerce-info-grid grid gap-4 md:grid-cols-3">
           <Info label="订单号" value={order.orderNo} />
           <Info label="用户" value={order.user.email ?? order.user.phone ?? order.user.id} />
           <Info label="项目" value={order.seoAuditOffer?.name ?? order.plan?.name ?? order.tool?.name ?? "订单项目"} />
@@ -104,7 +105,7 @@ export default async function AdminOrderDetailPage({ params, searchParams }: Adm
           <Info label="受保护记录" value={formatProtectedCounts(protectedCounts)} />
         </div>
 
-        <form action={updateOrderAdminAction} className="mt-6 grid gap-4 border-t border-white/10 pt-6 md:grid-cols-[180px_160px_160px_1fr]">
+        <form action={updateOrderAdminAction} className="enhe-admin-order-update-form mt-6 grid gap-4 border-t border-white/10 pt-6 md:grid-cols-[180px_160px_160px_1fr]">
           <input type="hidden" name="id" value={order.id} />
           <Field label="订单状态">
             <select name="orderStatus" defaultValue={order.orderStatus} className={selectClass}>
@@ -131,15 +132,15 @@ export default async function AdminOrderDetailPage({ params, searchParams }: Adm
         </form>
       </div>
 
-      <div className="glass mt-6 rounded-2xl p-6">
+      <div className="enhe-admin-order-refunds-card glass mt-6 rounded-2xl p-6">
         <div className="flex flex-wrap items-center justify-between gap-3">
           <h2 className="text-xl font-semibold">售后/退款记录</h2>
           <span className="text-xs text-[#8B95A7]">用户申请退款需提交收款码；确认退款后会同步撤销该订单的软件授权。</span>
         </div>
 
-        <div className="mt-4 space-y-3">
+        <div className="enhe-admin-order-refund-list mt-4 space-y-3">
           {order.refundRecords.map((refund) => (
-            <div key={refund.id} className="rounded-xl border border-white/10 bg-white/5 p-4 text-sm text-[#8B95A7]">
+            <div key={refund.id} className="enhe-admin-order-refund-record rounded-xl border border-white/10 bg-white/5 p-4 text-sm text-[#8B95A7]">
               <p>
                 <span className="font-semibold text-[#E8EEF8]">{formatCurrency(refund.amount.toString())}</span>
                 <span> · {getStatusLabel(refundStatusLabels, refund.status)} · {refund.reason}</span>
@@ -157,7 +158,7 @@ export default async function AdminOrderDetailPage({ params, searchParams }: Adm
                 查看退款详情
               </Link>
               {refund.status === "pending" ? (
-                <form action={processRefundRecordAdminAction} className="mt-3 grid gap-2 md:grid-cols-[1fr_120px_120px]">
+              <form action={processRefundRecordAdminAction} className="enhe-admin-order-refund-process-form mt-3 grid gap-2 md:grid-cols-[1fr_120px_120px]">
                   <input type="hidden" name="refundId" value={refund.id} />
                   <input name="note" placeholder="处理备注" className={inputClass} />
                   <SubmitButton name="status" value="completed" variant="success" pendingLabel="处理中..." className="px-4 py-2 text-xs">确认退款</SubmitButton>
@@ -170,7 +171,7 @@ export default async function AdminOrderDetailPage({ params, searchParams }: Adm
         </div>
 
         {canRecordRefundForOrder(order.orderStatus) ? (
-          <form action={createRefundRecordAdminAction} className="mt-5 grid gap-3 rounded-2xl border border-white/10 bg-white/5 p-4 md:grid-cols-[160px_160px_1fr]">
+          <form action={createRefundRecordAdminAction} className="enhe-admin-order-refund-form mt-5 grid gap-3 rounded-2xl border border-white/10 bg-white/5 p-4 md:grid-cols-[160px_160px_1fr]">
             <input type="hidden" name="orderId" value={order.id} />
             <Field label="退款金额">
               <input name="amount" required type="number" step="0.01" min="0.01" max={order.amount.toString()} defaultValue={order.amount.toString()} className={inputClass} />
@@ -203,7 +204,7 @@ export default async function AdminOrderDetailPage({ params, searchParams }: Adm
         )}
       </div>
 
-      <div className="mt-6 rounded-2xl border border-red-400/30 bg-red-400/5 p-5">
+      <div className="enhe-admin-order-danger-panel mt-6 rounded-2xl border border-red-400/30 bg-red-400/5 p-5">
         {deleteDecision.allowed ? (
           <form action={deleteOrderAdminAction}>
             <input type="hidden" name="id" value={order.id} />
@@ -216,13 +217,14 @@ export default async function AdminOrderDetailPage({ params, searchParams }: Adm
           </p>
         )}
       </div>
+      </AdminContentShell>
     </AdminSection>
   );
 }
 
 function Info({ label, value }: { label: string; value: string }) {
   return (
-    <div className="rounded-xl border border-white/10 bg-white/5 p-4">
+    <div className="enhe-admin-commerce-info-card rounded-xl border border-white/10 bg-white/5 p-4">
       <p className="text-xs text-[#8B95A7]">{label}</p>
       <p className="mt-2 break-all font-semibold text-[#E8EEF8]">{value}</p>
     </div>

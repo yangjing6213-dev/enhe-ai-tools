@@ -1,4 +1,5 @@
 ﻿import Link from "next/link";
+import { AdminContentShell, AdminSection } from "@/app/admin/admin-ui";
 import { prisma } from "@/lib/db";
 import { getCurrentLocale, type Locale } from "@/lib/i18n";
 import { getStatusLabel, proofStatusLabels } from "@/lib/status-labels";
@@ -48,12 +49,11 @@ export default async function AdminPaymentsPage() {
   });
 
   return (
-    <div>
-      <h1 className="text-3xl font-semibold">{t.title}</h1>
-      <p className="mt-3 text-sm text-[#8B95A7]">{t.intro}</p>
+    <AdminSection title={t.title} intro={t.intro}>
+      <AdminContentShell className="enhe-admin-content-management enhe-admin-payment-list">
 
-      <div className="mt-8 overflow-x-auto rounded-2xl border border-white/12 bg-white/6">
-        <div className="grid min-w-[1120px] grid-cols-[1.15fr_1fr_0.9fr_0.65fr_0.7fr_0.8fr_0.75fr] items-center gap-4 border-b border-white/10 px-5 py-3 text-xs uppercase tracking-wide text-[#8B95A7]">
+      <div className="enhe-admin-commerce-records enhe-admin-content-records mt-8 overflow-x-auto rounded-2xl border border-white/12 bg-white/6">
+        <div className="enhe-admin-commerce-table-heading grid min-w-[1120px] grid-cols-[1.15fr_1fr_0.9fr_0.65fr_0.7fr_0.8fr_0.75fr] items-center gap-4 border-b border-white/10 px-5 py-3 text-xs uppercase tracking-wide text-[#8B95A7]">
           <span>{t.orderNo}</span>
           <span>{t.user}</span>
           <span>{t.item}</span>
@@ -62,28 +62,29 @@ export default async function AdminPaymentsPage() {
           <span>{t.proofStatus}</span>
           <span className="text-right">{t.action}</span>
         </div>
-        <div className="min-w-[1120px] divide-y divide-white/10">
+        <div className="enhe-admin-commerce-record-rows min-w-[1120px] divide-y divide-white/10">
           {proofs.map((proof) => (
-            <div key={proof.id} className="grid grid-cols-[1.15fr_1fr_0.9fr_0.65fr_0.7fr_0.8fr_0.75fr] items-center gap-4 px-5 py-4 text-sm transition hover:bg-white/5">
-              <Link href={`/admin/orders/${proof.order.id}`} className="font-semibold text-[#E8EEF8] transition hover:text-[#48F5D3]">
+            <div key={proof.id} className="enhe-admin-commerce-row grid grid-cols-[1.15fr_1fr_0.9fr_0.65fr_0.7fr_0.8fr_0.75fr] items-center gap-4 px-5 py-4 text-sm transition hover:bg-white/5">
+              <Link href={`/admin/orders/${proof.order.id}`} className="enhe-admin-commerce-primary font-semibold text-[#E8EEF8] transition hover:text-[#48F5D3]">
                 {proof.order.orderNo}
               </Link>
-              <span className="truncate text-[#C5D0E2]">{proof.user.email ?? proof.user.phone ?? proof.user.id}</span>
-              <span className="truncate text-[#C5D0E2]">{proof.order.plan?.name ?? proof.order.tool?.name ?? t.orderItem}</span>
-              <span className="text-[#FFB86B]">{formatCurrency(proof.order.amount.toString())}</span>
-              <span>{paymentMethodLabel(proof.paymentMethod, locale)}</span>
-              <span className="text-[#FFB86B]">{getStatusLabel(proofStatusLabels, proof.reviewStatus, locale)}</span>
+              <span className="enhe-admin-commerce-secondary truncate text-[#C5D0E2]">{proof.user.email ?? proof.user.phone ?? proof.user.id}</span>
+              <span className="enhe-admin-commerce-secondary truncate text-[#C5D0E2]">{proof.order.plan?.name ?? proof.order.tool?.name ?? t.orderItem}</span>
+              <span className="enhe-admin-commerce-amount">{formatCurrency(proof.order.amount.toString())}</span>
+              <span className="enhe-admin-commerce-secondary">{paymentMethodLabel(proof.paymentMethod, locale)}</span>
+              <span className="enhe-admin-commerce-status">{getStatusLabel(proofStatusLabels, proof.reviewStatus, locale)}</span>
               <span className="flex justify-end">
-                <Link href={`/admin/payments/${proof.id}`} className="inline-flex whitespace-nowrap rounded-full border border-white/15 px-4 py-2 text-xs font-semibold leading-none transition hover:border-[#48F5D3]/50 hover:text-[#48F5D3]">
+                <Link href={`/admin/payments/${proof.id}`} className="enhe-admin-commerce-action inline-flex whitespace-nowrap rounded-full border border-white/15 px-4 py-2 text-xs font-semibold leading-none transition hover:border-[#48F5D3]/50 hover:text-[#48F5D3]">
                   {t.viewPayment}
                 </Link>
               </span>
             </div>
           ))}
-          {proofs.length === 0 ? <div className="px-5 py-10 text-center text-sm text-[#8B95A7]">{t.empty}</div> : null}
+          {proofs.length === 0 ? <div className="enhe-admin-commerce-empty px-5 py-10 text-center text-sm text-[#8B95A7]">{t.empty}</div> : null}
         </div>
       </div>
-    </div>
+      </AdminContentShell>
+    </AdminSection>
   );
 }
 

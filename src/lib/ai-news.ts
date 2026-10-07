@@ -1,4 +1,5 @@
 import { isWeakSeoSlug, slugify } from "@/lib/admin-form";
+import { buildLocalePath } from "@/lib/seo";
 
 export type NewsSort = "latest" | "hot" | "featured";
 
@@ -153,6 +154,43 @@ export function parseNewsSearchParams(
       ? (page - 1) * newsPageSize
       : 0,
   };
+}
+
+const aiNewsLocaleQueryKeys = ["q", "category", "tag", "sort", "page"] as const;
+const aiNewsPaginationLocaleQueryKeys = ["q", "category", "tag", "sort"] as const;
+
+export function buildAiNewsLanguageHrefs(
+  params: Record<string, string | undefined>,
+) {
+  const query = new URLSearchParams();
+  for (const key of aiNewsLocaleQueryKeys) {
+    const value = String(params[key] ?? "").trim();
+    if (value) query.set(key, value);
+  }
+
+  const suffix = query.toString() ? `?${query.toString()}` : "";
+  return {
+    zh: `${buildLocalePath("/ai-news", "zh")}${suffix}`,
+    en: `${buildLocalePath("/ai-news", "en")}${suffix}`,
+  } as const;
+}
+
+export function buildAiNewsPaginationLanguageHrefs(
+  page: number,
+  params: Record<string, string | undefined>,
+) {
+  const query = new URLSearchParams();
+  for (const key of aiNewsPaginationLocaleQueryKeys) {
+    const value = String(params[key] ?? "").trim();
+    if (value) query.set(key, value);
+  }
+
+  const suffix = query.toString() ? `?${query.toString()}` : "";
+  const path = `/ai-news/page/${page}`;
+  return {
+    zh: `${buildLocalePath(path, "zh")}${suffix}`,
+    en: `${buildLocalePath(path, "en")}${suffix}`,
+  } as const;
 }
 
 export function escapeNewsText(value: string) {

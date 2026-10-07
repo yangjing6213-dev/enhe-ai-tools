@@ -1,7 +1,9 @@
 import type { Metadata } from "next";
+import React from "react";
 import { StructuredData } from "@/components/structured-data";
 import { ProductDemoCard } from "@/components/product-demo-card";
 import { ProductDemoFilterGrid } from "@/components/product-demo-filter-grid";
+import { ContentlessState } from "@/components/redesign/contentless-state";
 import { Container, EmptyState, SectionTitle } from "@/components/ui";
 import type { Locale } from "@/lib/dictionaries";
 import {
@@ -49,6 +51,7 @@ export async function generateProductDemoListingMetadata(
   searchParams: Promise<Record<string, string | undefined>> = Promise.resolve({}),
 ): Promise<Metadata> {
   const copy = listingCopy[forceLocale];
+  const isDbFreePreview = !process.env.DATABASE_URL?.trim();
   const metadata = buildPageMetadata({
     title: forceLocale === "en" ? "Tool Function Demos - ENHE AI" : "工具功能演示 - 恩禾ENHE AI",
     description: copy.description,
@@ -57,7 +60,14 @@ export async function generateProductDemoListingMetadata(
     localeKey: forceLocale,
   });
 
-  return applyFilteredListingRobots(metadata, await searchParams, ["type"]);
+  const filteredMetadata = applyFilteredListingRobots(
+    metadata,
+    await searchParams,
+    ["type"],
+  );
+  return isDbFreePreview
+    ? { ...filteredMetadata, robots: { index: false, follow: true } }
+    : filteredMetadata;
 }
 
 export async function ProductDemoListingPageShell({
@@ -67,10 +77,39 @@ export async function ProductDemoListingPageShell({
   forceLocale: Locale;
   searchParams: Promise<Record<string, string | undefined>>;
 }) {
+  const copy = listingCopy[forceLocale];
+  if (!process.env.DATABASE_URL?.trim()) {
+    return (
+      <ContentlessState
+        locale={forceLocale}
+        className="product-demo-page"
+        eyebrow={copy.title}
+        title={copy.title}
+        intro={copy.intro}
+        statusLabel="UNVERIFIED"
+        stateTitle={forceLocale === "en" ? "Demo content is being prepared" : "演示内容准备中"}
+        statusText={
+          forceLocale === "en"
+            ? "Published product demos will appear after their content and media are verified."
+            : "产品演示内容和媒体完成核验后，再展示可访问的演示。"
+        }
+        primaryAction={{
+          href: buildLocalePath("/", forceLocale),
+          label: forceLocale === "en" ? "Return to ENHE AI home" : "返回 ENHE AI 首页",
+        }}
+        secondaryActions={[
+          {
+            href: buildLocalePath("/ai-news", forceLocale),
+            label: forceLocale === "en" ? "Read AI News" : "阅读 AI 资讯",
+          },
+        ]}
+      />
+    );
+  }
+
   const params = await searchParams;
   const activeCategory = normalizeProductDemoCategory(params.type);
   const demos = await getPublicProductDemos(activeCategory);
-  const copy = listingCopy[forceLocale];
   const breadcrumbSchema = buildBreadcrumbSchema({
     items: [
       { name: forceLocale === "en" ? "Home" : "首页", path: buildLocalePath("/", forceLocale) },

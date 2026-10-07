@@ -1,5 +1,5 @@
 ﻿import Link from "next/link";
-import { AdminSection } from "@/app/admin/admin-ui";
+import { AdminContentShell, AdminSection } from "@/app/admin/admin-ui";
 import { prisma } from "@/lib/db";
 
 export default async function AdminTutorialsPage({ searchParams }: { searchParams: Promise<Record<string, string | undefined>> }) {
@@ -11,9 +11,10 @@ export default async function AdminTutorialsPage({ searchParams }: { searchParam
 
   return (
     <AdminSection title="教程管理" intro="教程记录以清单方式展示，点击查看详情进入单独编辑页维护正文、图片、视频、注意事项和常见错误。">
-      <div className="mb-6 flex flex-wrap items-center justify-between gap-3">
+      <AdminContentShell className="enhe-admin-content-management">
+      <div className="enhe-admin-content-toolbar mb-6 flex flex-wrap items-center justify-between gap-3">
         <div className="text-sm text-[#8B95A7]">共 {tutorials.length} 条教程</div>
-        <Link href="/admin/tutorials/new" className="rounded-full bg-[#7AA7FF] px-5 py-3 text-sm font-semibold text-[#07101f]">
+        <Link href="/admin/tutorials/new" className="enhe-admin-content-primary-action rounded-full px-5 py-3 text-sm font-semibold">
           新增教程
         </Link>
       </div>
@@ -22,8 +23,8 @@ export default async function AdminTutorialsPage({ searchParams }: { searchParam
         <p className="mb-5 rounded-xl border border-[#48F5D3]/30 bg-[#48F5D3]/10 px-4 py-3 text-sm text-[#48F5D3]">教程已删除。</p>
       ) : null}
 
-      <div className="overflow-x-auto rounded-2xl border border-white/12 bg-white/6">
-        <div className="grid min-w-[920px] grid-cols-[1.2fr_1fr_0.55fr_0.55fr_0.65fr_0.55fr] gap-4 border-b border-white/10 px-5 py-3 text-xs uppercase tracking-wide text-[#8B95A7]">
+      <div className="enhe-admin-content-table enhe-admin-content-records overflow-x-auto rounded-2xl border border-white/12 bg-white/6">
+        <div className="enhe-admin-content-table-heading grid min-w-[920px] grid-cols-[1.2fr_1fr_0.55fr_0.55fr_0.65fr_0.55fr] gap-4 border-b border-white/10 px-5 py-3 text-xs uppercase tracking-wide text-[#8B95A7]">
           <span>教程标题</span>
           <span>绑定工具</span>
           <span>排序</span>
@@ -31,9 +32,9 @@ export default async function AdminTutorialsPage({ searchParams }: { searchParam
           <span>创建时间</span>
           <span className="text-right">操作</span>
         </div>
-        <div className="min-w-[920px] divide-y divide-white/10">
+        <div className="enhe-admin-content-record-rows min-w-[920px] divide-y divide-white/10">
           {tutorials.map((tutorial) => (
-            <div key={tutorial.id} className="grid grid-cols-[1.2fr_1fr_0.55fr_0.55fr_0.65fr_0.55fr] gap-4 px-5 py-4 text-sm transition hover:bg-white/5">
+            <div key={tutorial.id} className="enhe-admin-content-row grid grid-cols-[1.2fr_1fr_0.55fr_0.55fr_0.65fr_0.55fr] gap-4 px-5 py-4 text-sm transition">
               <span className="font-semibold text-[#E8EEF8]">{tutorial.title}</span>
               <span className="truncate text-[#C5D0E2]">{tutorial.tool.name}</span>
               <span>{tutorial.sortOrder}</span>
@@ -49,6 +50,7 @@ export default async function AdminTutorialsPage({ searchParams }: { searchParam
           {tutorials.length === 0 ? <div className="px-5 py-10 text-center text-sm text-[#8B95A7]">暂无教程。</div> : null}
         </div>
       </div>
+      </AdminContentShell>
     </AdminSection>
   );
 }

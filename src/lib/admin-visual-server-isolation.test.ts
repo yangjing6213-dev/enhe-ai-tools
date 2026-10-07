@@ -248,4 +248,17 @@ describe("admin visual fixture server binding", () => {
 
     expect(config.testIgnore).toContain("**/admin-empty-tools-guidance.spec.ts");
   });
+
+  it("excludes local-only redesign preview routes from standalone production E2E", async () => {
+    vi.stubEnv("ENHE_ADMIN_VISUAL_FIXTURE", "0");
+    vi.stubEnv("DATABASE_URL", "");
+    vi.stubEnv("NODE_ENV", "test");
+    vi.stubEnv("PLAYWRIGHT_USE_PRODUCTION_SERVER", "1");
+    vi.stubEnv("PORT", "43298");
+    vi.stubEnv("PLAYWRIGHT_BASE_URL", "http://127.0.0.1:43298");
+
+    const { default: config } = await import("../../playwright.config");
+
+    expect(config.testIgnore).toContain("**/software-catalog-preview.spec.ts");
+  });
 });

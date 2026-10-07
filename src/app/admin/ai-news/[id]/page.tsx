@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { AdminSection } from "@/app/admin/admin-ui";
+import { AdminContentShell, AdminProvenanceNotice, AdminSection } from "@/app/admin/admin-ui";
 import { NewsArticleEditor } from "@/app/admin/ai-news-editor";
 import { prisma } from "@/lib/db";
 import { buildCanonicalAiNewsPath } from "@/lib/public-slugs";
@@ -48,6 +48,8 @@ export default async function AdminAiNewsDetailPage({ params, searchParams }: Ad
 
   return (
     <AdminSection title={isNew ? "新增 AI 资讯" : "编辑 AI 资讯"} intro="从资讯、趋势解读、工具落地和站内引导四个层面维护文章内容。">
+      <AdminContentShell>
+      <AdminProvenanceNotice title="编辑前的首方来源与审批上下文" />
       <div className="mb-6 flex flex-wrap gap-3">
         <Link href="/admin/ai-news" className="rounded-full border border-white/15 px-4 py-2 text-sm transition hover:border-[#48F5D3]/50 hover:text-[#48F5D3]">
           返回资讯清单
@@ -62,7 +64,10 @@ export default async function AdminAiNewsDetailPage({ params, searchParams }: Ad
       {query.saved ? <p className="mb-5 rounded-xl border border-[#48F5D3]/30 bg-[#48F5D3]/10 px-4 py-3 text-sm text-[#48F5D3]">保存成功。</p> : null}
       {query.error ? <p className="mb-5 rounded-xl border border-red-400/30 bg-red-400/10 px-4 py-3 text-sm text-red-100">{query.error}</p> : null}
 
-      <NewsArticleEditor article={article} categories={categories} relatedArticles={relatedArticles} tools={tools} tutorials={tutorials} />
+      <div className="enhe-admin-content-form">
+        <NewsArticleEditor article={article} categories={categories} relatedArticles={relatedArticles} tools={tools} tutorials={tutorials} />
+      </div>
+      </AdminContentShell>
     </AdminSection>
   );
 }

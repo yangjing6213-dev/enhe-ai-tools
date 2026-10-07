@@ -5,6 +5,12 @@ import { getUploadDiskPath } from "@/lib/upload-path";
 
 type StorageEnv = Record<string, string | undefined>;
 
+function assertStorageEnabled() {
+  if (process.env.ENHE_ADMIN_VISUAL_FIXTURE === "1") {
+    throw new Error("File storage is disabled in the admin visual fixture.");
+  }
+}
+
 export type StoredUpload = {
   fileName: string;
   filePath: string;
@@ -137,6 +143,7 @@ export function resolvePrivateLocalUploadPath(filePath: string, env: StorageEnv 
 }
 
 export async function deleteStoredLocalFileIfSafe(filePath: string, env: StorageEnv = process.env, cwd = process.cwd()) {
+  assertStorageEnabled();
   const target = resolveDeletableLocalUploadPath(filePath, env, cwd);
   if (!target) return false;
   try {
@@ -245,6 +252,7 @@ export async function getSecureCosMediaUrl(source: string, env: StorageEnv = pro
 }
 
 export async function saveUploadedFile(file: File, options: SaveUploadOptions): Promise<StoredUpload> {
+  assertStorageEnabled();
   if (file.size > options.maxBytes) throw new Error(`文件超过 ${Math.floor(options.maxBytes / 1024 / 1024)}MB，请压缩后重新上传。`);
   if (options.accept && !options.accept(file)) throw new Error(options.invalidTypeMessage ?? "文件格式不支持。");
 
@@ -297,6 +305,7 @@ export async function saveUploadedFile(file: File, options: SaveUploadOptions): 
 }
 
 export async function deleteStoredCosObjectIfConfigured(filePath: string, env: StorageEnv = process.env) {
+  assertStorageEnabled();
   const plan = getCosDeletePlan(filePath, env);
   if (plan.storage !== "cos") return { attempted: false, deleted: false, reason: "not_cos" as const };
   if (!plan.canDelete) throw new Error(`腾讯云 COS 删除配置不完整，缺少：${plan.missingEnvKeys.join("、")}`);

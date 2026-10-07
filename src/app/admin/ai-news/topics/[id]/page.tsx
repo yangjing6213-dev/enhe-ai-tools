@@ -2,6 +2,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { upsertNewsTopicAction } from "@/app/admin/actions";
 import {
+  AdminContentShell,
   AdminSection,
   Field,
   inputClass,
@@ -31,6 +32,7 @@ export default async function AdminAiNewsTopicDetailPage({
       title={isNew ? "新增 AI 资讯专题" : "编辑 AI 资讯专题"}
       intro="配置专题内容、关键词规则、FAQ、来源和推荐内链。前台专题页、AI 资讯列表侧栏与 sitemap 会优先读取这里的配置。"
     >
+      <AdminContentShell className="enhe-admin-content-management">
       <div className="mb-6 flex flex-wrap gap-3">
         <Link
           href="/admin/ai-news/topics"
@@ -51,7 +53,7 @@ export default async function AdminAiNewsTopicDetailPage({
         </p>
       ) : null}
 
-      <form action={upsertNewsTopicAction} className="grid gap-6">
+      <form action={upsertNewsTopicAction} className="enhe-admin-content-form enhe-admin-topic-editor-form grid gap-6">
         {topic ? <input type="hidden" name="id" value={topic.id} /> : null}
         <input type="hidden" name="returnTo" value={`/admin/ai-news/topics/${id}`} />
 
@@ -231,6 +233,7 @@ export default async function AdminAiNewsTopicDetailPage({
           <SubmitButton pendingLabel="保存中...">保存专题配置</SubmitButton>
         </div>
       </form>
+      </AdminContentShell>
     </AdminSection>
   );
 }

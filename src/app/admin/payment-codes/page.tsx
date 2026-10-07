@@ -52,23 +52,25 @@ export default async function AdminPaymentCodesPage({ searchParams }: AdminPayme
 
   return (
     <AdminSection title={t.title} intro={t.intro}>
+      <div className="enhe-admin-content-management enhe-admin-payment-codes">
       {query.saved ? (
-        <p className="mb-5 rounded-2xl border border-[#48F5D3]/30 bg-[#48F5D3]/10 px-5 py-4 text-sm text-[#A8FFF0]">{t.saved}</p>
+        <p className="enhe-admin-payment-codes-notice mb-5 rounded-2xl border border-[#48F5D3]/30 bg-[#48F5D3]/10 px-5 py-4 text-sm text-[#A8FFF0]">{t.saved}</p>
       ) : null}
       {query.error ? (
-        <p className="mb-5 rounded-2xl border border-red-300/30 bg-red-400/10 px-5 py-4 text-sm text-red-100">{query.error}</p>
+        <p className="enhe-admin-payment-codes-error mb-5 rounded-2xl border border-red-300/30 bg-red-400/10 px-5 py-4 text-sm text-red-100">{query.error}</p>
       ) : null}
 
-      <form action={updatePaymentQrCodesAction} className="dossier-card grid gap-6 p-6">
+      <form action={updatePaymentQrCodesAction} className="enhe-admin-payment-codes-form dossier-card grid gap-6 p-6">
         <div className="grid gap-5 lg:grid-cols-2">
           <PaymentCodeEditor title={t.alipay} value={settingsMap.alipay_qr ?? ""} preview={alipayQr} urlLabel={t.url} uploadLabel={t.upload} currentLabel={t.current} name="alipayQr" fileName="alipayQrFile" />
           <PaymentCodeEditor title={t.wechat} value={settingsMap.wechat_qr ?? ""} preview={wechatQr} urlLabel={t.url} uploadLabel={t.upload} currentLabel={t.current} name="wechatQr" fileName="wechatQrFile" />
         </div>
-        <p className="rounded-2xl border border-[#FFB86B]/25 bg-[#FFB86B]/10 px-4 py-3 text-sm leading-6 text-[#FFD6A5]">{t.hint}</p>
+        <p className="enhe-admin-payment-codes-hint rounded-2xl border border-[#FFB86B]/25 bg-[#FFB86B]/10 px-4 py-3 text-sm leading-6 text-[#FFD6A5]">{t.hint}</p>
         <div>
           <SubmitButton>{t.submit}</SubmitButton>
         </div>
       </form>
+      </div>
     </AdminSection>
   );
 }
@@ -93,7 +95,7 @@ function PaymentCodeEditor({
   fileName: string;
 }) {
   return (
-    <section className="rounded-2xl border border-[rgba(210,230,255,0.16)] bg-[rgba(238,246,255,0.05)] p-5">
+    <section className="enhe-admin-payment-code-editor rounded-2xl border border-[rgba(210,230,255,0.16)] bg-[rgba(238,246,255,0.05)] p-5">
       <h2 className="text-lg font-semibold text-[#F6FAFF]">{title}</h2>
       <div className="mt-4 grid gap-4 sm:grid-cols-[190px_1fr]">
         <QrPreview title={`${title} ${currentLabel}`} value={preview} />
@@ -113,7 +115,7 @@ function PaymentCodeEditor({
 function QrPreview({ title, value }: { title: string; value: string }) {
   const src = normalizeImageSrc(value);
   return (
-    <div className="rounded-2xl border border-white/10 bg-white/8 p-3 text-center">
+    <div className="enhe-admin-payment-code-preview rounded-2xl border border-white/10 bg-white/8 p-3 text-center">
       <div className="relative mx-auto flex aspect-[3/4] w-full max-w-[170px] items-center justify-center overflow-hidden rounded-xl bg-white p-2 text-xs text-slate-900">
         {src && isImagePath(src) ? (
           <Image src={src} alt={title} width={240} height={320} className="h-full w-full object-contain" unoptimized />

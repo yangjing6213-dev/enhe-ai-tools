@@ -1,5 +1,5 @@
 ﻿import Link from "next/link";
-import { AdminSection } from "@/app/admin/admin-ui";
+import { AdminContentShell, AdminSection } from "@/app/admin/admin-ui";
 import { prisma } from "@/lib/db";
 
 export default async function AdminFaqsPage({ searchParams }: { searchParams: Promise<Record<string, string | undefined>> }) {
@@ -11,9 +11,10 @@ export default async function AdminFaqsPage({ searchParams }: { searchParams: Pr
 
   return (
     <AdminSection title="FAQ 管理" intro="FAQ 以清单方式展示，点击查看详情后再编辑问题、答案、状态或删除记录。">
-      <div className="mb-6 flex flex-wrap items-center justify-between gap-3">
+      <AdminContentShell className="enhe-admin-content-management">
+      <div className="enhe-admin-content-toolbar mb-6 flex flex-wrap items-center justify-between gap-3">
         <div className="text-sm text-[#8B95A7]">共 {faqs.length} 条 FAQ</div>
-        <Link href="/admin/faqs/new" className="rounded-full bg-[#7AA7FF] px-5 py-3 text-sm font-semibold text-[#07101f]">
+        <Link href="/admin/faqs/new" className="enhe-admin-content-primary-action rounded-full px-5 py-3 text-sm font-semibold">
           新增 FAQ
         </Link>
       </div>
@@ -22,17 +23,17 @@ export default async function AdminFaqsPage({ searchParams }: { searchParams: Pr
         <p className="mb-5 rounded-xl border border-[#48F5D3]/30 bg-[#48F5D3]/10 px-4 py-3 text-sm text-[#48F5D3]">FAQ 已删除。</p>
       ) : null}
 
-      <div className="overflow-x-auto rounded-2xl border border-white/12 bg-white/6">
-        <div className="grid min-w-[920px] grid-cols-[1.4fr_1fr_0.55fr_0.55fr_0.55fr] gap-4 border-b border-white/10 px-5 py-3 text-xs uppercase tracking-wide text-[#8B95A7]">
+      <div className="enhe-admin-content-table enhe-admin-content-records overflow-x-auto rounded-2xl border border-white/12 bg-white/6">
+        <div className="enhe-admin-content-table-heading grid min-w-[920px] grid-cols-[1.4fr_1fr_0.55fr_0.55fr_0.55fr] gap-4 border-b border-white/10 px-5 py-3 text-xs uppercase tracking-wide text-[#8B95A7]">
           <span>问题</span>
           <span>绑定工具</span>
           <span>排序</span>
           <span>状态</span>
           <span className="text-right">操作</span>
         </div>
-        <div className="min-w-[920px] divide-y divide-white/10">
+        <div className="enhe-admin-content-record-rows min-w-[920px] divide-y divide-white/10">
           {faqs.map((faq) => (
-            <div key={faq.id} className="grid grid-cols-[1.4fr_1fr_0.55fr_0.55fr_0.55fr] gap-4 px-5 py-4 text-sm transition hover:bg-white/5">
+            <div key={faq.id} className="enhe-admin-content-row grid grid-cols-[1.4fr_1fr_0.55fr_0.55fr_0.55fr] gap-4 px-5 py-4 text-sm transition">
               <span className="truncate font-semibold text-[#E8EEF8]">{faq.question}</span>
               <span className="truncate text-[#C5D0E2]">{faq.tool.name}</span>
               <span>{faq.sortOrder}</span>
@@ -47,6 +48,7 @@ export default async function AdminFaqsPage({ searchParams }: { searchParams: Pr
           {faqs.length === 0 ? <div className="px-5 py-10 text-center text-sm text-[#8B95A7]">暂无 FAQ。</div> : null}
         </div>
       </div>
+      </AdminContentShell>
     </AdminSection>
   );
 }

@@ -1,7 +1,7 @@
 ﻿import Link from "next/link";
 import { notFound } from "next/navigation";
 import { deleteUserAdminAction, resetUserPasswordAction, updateUserAdminAction } from "@/app/admin/actions";
-import { AdminSection, DangerButton, Field, inputClass, selectClass, SubmitButton } from "@/app/admin/admin-ui";
+import { AdminContentShell, AdminSection, DangerButton, Field, inputClass, selectClass, SubmitButton } from "@/app/admin/admin-ui";
 import { PasswordInput } from "@/components/password-input";
 import { decideAdminUserHardDelete } from "@/lib/admin-delete-protection";
 import { prisma } from "@/lib/db";
@@ -132,38 +132,39 @@ export default async function AdminUserDetailPage({ params, searchParams }: Admi
 
   return (
     <AdminSection title={t.title} intro={t.intro}>
+      <AdminContentShell className="enhe-admin-content-management enhe-admin-users enhe-admin-user-detail">
       {query.error ? (
-        <p className="mb-5 rounded-xl border border-red-400/30 bg-red-400/10 px-4 py-3 text-sm text-red-100">
+        <p className="enhe-admin-user-state enhe-admin-user-state-error mb-5 rounded-xl border border-red-400/30 bg-red-400/10 px-4 py-3 text-sm text-red-100">
           {t.error.replace("{error}", query.error)}
         </p>
       ) : null}
 
-      <div className="mb-6">
-        <Link href="/admin/users" className="rounded-full border border-white/15 px-5 py-3 text-sm font-semibold text-[#E8EEF8] transition hover:border-[#48F5D3]/50 hover:text-[#48F5D3]">
+      <div className="enhe-admin-content-toolbar mb-6 flex flex-wrap items-center justify-between gap-3">
+        <Link href="/admin/users" className="enhe-admin-user-back enhe-admin-content-primary-action rounded-full border border-white/15 px-5 py-3 text-sm font-semibold text-[#E8EEF8] transition hover:border-[#48F5D3]/50 hover:text-[#48F5D3]">
           {t.back}
         </Link>
       </div>
 
-      <div className="glass rounded-2xl p-6">
+      <div className="enhe-admin-user-summary-card glass rounded-2xl p-6">
         <div className="flex flex-wrap items-start justify-between gap-4">
           <div>
-            <p className="text-lg font-semibold">{user.nickname || user.email || user.phone || user.id}</p>
-            <p className="mt-2 text-sm text-[#8B95A7]">
+            <p className="enhe-admin-user-display-name text-lg font-semibold">{user.nickname || user.email || user.phone || user.id}</p>
+            <p className="enhe-admin-user-contact mt-2 text-sm text-[#8B95A7]">
               {user.email ?? t.noEmail} · {user.phone ?? t.noPhone}
             </p>
           </div>
-          <div className="grid gap-1 text-right text-sm text-[#8B95A7]">
-            <span>{roleLabel(user.role, locale)} · {statusLabel(user.status, locale)}</span>
-            <span>{formatCounts(t.counts, user._count.orders, user._count.comments)}</span>
-            <span>{formatUsageCounts(t.usageCounts, user._count.downloadLogs, user._count.toolUsageLogs)}</span>
-            <span>{user.isTestData ? (locale === "en" ? "Test data" : "测试数据") : (locale === "en" ? "Production data" : "生产数据")}</span>
-            <span>{formatProtectedCounts(protectedCounts, locale)}</span>
-            <span>{t.registeredAt.replace("{date}", formatDate(user.createdAt, locale))}</span>
+          <div className="enhe-admin-user-metadata grid gap-1 text-right text-sm text-[#8B95A7]">
+            <span className="enhe-admin-user-meta-item">{roleLabel(user.role, locale)} · {statusLabel(user.status, locale)}</span>
+            <span className="enhe-admin-user-meta-item">{formatCounts(t.counts, user._count.orders, user._count.comments)}</span>
+            <span className="enhe-admin-user-meta-item">{formatUsageCounts(t.usageCounts, user._count.downloadLogs, user._count.toolUsageLogs)}</span>
+            <span className="enhe-admin-user-meta-item">{user.isTestData ? (locale === "en" ? "Test data" : "测试数据") : (locale === "en" ? "Production data" : "生产数据")}</span>
+            <span className="enhe-admin-user-meta-item">{formatProtectedCounts(protectedCounts, locale)}</span>
+            <span className="enhe-admin-user-meta-item">{t.registeredAt.replace("{date}", formatDate(user.createdAt, locale))}</span>
           </div>
         </div>
 
-        <div className="mt-6 grid gap-4 lg:grid-cols-[1fr_320px]">
-          <form action={updateUserAdminAction} className="grid gap-4 md:grid-cols-3">
+        <div className="enhe-admin-user-action-grid mt-6 grid gap-4 lg:grid-cols-[1fr_320px]">
+          <form action={updateUserAdminAction} className="enhe-admin-user-profile-form grid gap-4 md:grid-cols-3">
             <input type="hidden" name="id" value={user.id} />
             <Field label={t.nickname}>
               <input name="nickname" defaultValue={user.nickname ?? ""} className={inputClass} />
@@ -185,7 +186,7 @@ export default async function AdminUserDetailPage({ params, searchParams }: Admi
             </div>
           </form>
 
-          <form action={resetUserPasswordAction} className="rounded-2xl border border-white/10 bg-white/5 p-4">
+          <form action={resetUserPasswordAction} className="enhe-admin-user-reset-form rounded-2xl border border-white/10 bg-white/5 p-4">
             <input type="hidden" name="id" value={user.id} />
             <Field label={t.resetPassword}>
               <PasswordInput
@@ -202,7 +203,7 @@ export default async function AdminUserDetailPage({ params, searchParams }: Admi
           </form>
         </div>
 
-        <div className="mt-5 rounded-2xl border border-red-400/30 bg-red-400/10 p-4">
+        <div className="enhe-admin-user-danger-panel mt-5 rounded-2xl border border-red-400/30 bg-red-400/10 p-4">
           <h3 className="font-semibold text-red-100">{t.deleteTitle}</h3>
           <p className="mt-2 text-sm leading-6 text-red-100/80">{t.deleteIntro}</p>
           {deleteDecision.allowed ? (
@@ -223,6 +224,7 @@ export default async function AdminUserDetailPage({ params, searchParams }: Admi
           )}
         </div>
       </div>
+      </AdminContentShell>
     </AdminSection>
   );
 }

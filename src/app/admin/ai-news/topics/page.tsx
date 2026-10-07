@@ -1,6 +1,6 @@
 import Link from "next/link";
-import { deleteNewsTopicAction, upsertNewsTopicAction } from "@/app/admin/actions";
-import { AdminSection, DangerButton, SubmitButton } from "@/app/admin/admin-ui";
+import { deleteNewsTopicAction } from "@/app/admin/actions";
+import { AdminContentShell, AdminSection, DangerButton } from "@/app/admin/admin-ui";
 import { getAiNewsTopicPath } from "@/lib/ai-news-topics";
 import { prisma } from "@/lib/db";
 
@@ -42,13 +42,14 @@ export default async function AdminAiNewsTopicsPage({
       title="AI 资讯专题管理"
       intro="维护专题页、关键词匹配规则、FAQ、来源引用和站内推荐内链。文章会按专题关键词、标题、摘要、描述与标签自动归类到对应专题页。"
     >
-      <div className="mb-6 flex flex-wrap items-center justify-between gap-3">
+      <AdminContentShell className="enhe-admin-content-management">
+      <div className="enhe-admin-content-toolbar mb-6 flex flex-wrap items-center justify-between gap-3">
         <div className="text-sm text-[var(--marketing-muted)]">
           共 {topics.length} 个专题。默认专题会在部署种子脚本中自动补齐，后台配置优先于静态兜底。
         </div>
         <Link
           href="/admin/ai-news/topics/new"
-          className="rounded-full bg-[#7AA7FF] px-5 py-3 text-sm font-semibold text-[#07101f]"
+          className="enhe-admin-content-primary-action rounded-full px-5 py-3 text-sm font-semibold"
         >
           新增专题
         </Link>
@@ -70,8 +71,8 @@ export default async function AdminAiNewsTopicsPage({
         </p>
       ) : null}
 
-      <div className="overflow-x-auto rounded-2xl border border-white/12 bg-white/6">
-        <div className="grid min-w-[980px] grid-cols-[1.1fr_0.9fr_0.6fr_0.55fr_0.8fr_0.8fr] gap-4 border-b border-white/10 px-5 py-3 text-xs uppercase tracking-wide text-[#8B95A7]">
+      <div className="enhe-admin-content-table enhe-admin-content-records overflow-x-auto rounded-2xl border border-white/12 bg-white/6">
+        <div className="enhe-admin-content-table-heading grid min-w-[980px] grid-cols-[1.1fr_0.9fr_0.6fr_0.55fr_0.8fr_0.8fr] gap-4 border-b border-white/10 px-5 py-3 text-xs uppercase tracking-wide text-[#8B95A7]">
           <span>专题</span>
           <span>关键词规则</span>
           <span>状态</span>
@@ -79,11 +80,11 @@ export default async function AdminAiNewsTopicsPage({
           <span>更新时间</span>
           <span className="text-right">操作</span>
         </div>
-        <div className="min-w-[980px] divide-y divide-white/10">
+        <div className="enhe-admin-content-record-rows min-w-[980px] divide-y divide-white/10">
           {topics.map((topic) => (
             <div
               key={topic.id}
-              className="grid grid-cols-[1.1fr_0.9fr_0.6fr_0.55fr_0.8fr_0.8fr] gap-4 px-5 py-4 text-sm transition hover:bg-white/5"
+              className="enhe-admin-content-row grid grid-cols-[1.1fr_0.9fr_0.6fr_0.55fr_0.8fr_0.8fr] gap-4 px-5 py-4 text-sm transition"
             >
               <div>
                 <p className="font-semibold text-[#E8EEF8]">{topic.title}</p>
@@ -129,21 +130,12 @@ export default async function AdminAiNewsTopicsPage({
           ))}
           {topics.length === 0 ? (
             <div className="px-5 py-10 text-center text-sm text-[#8B95A7]">
-              暂无后台专题配置。部署后默认专题种子会自动补齐；前台会继续使用静态专题兜底。
-              <form action={upsertNewsTopicAction} className="mt-5">
-                <input type="hidden" name="title" value="AI 智能体专题" />
-                <input type="hidden" name="slug" value="ai-agent" />
-                <input type="hidden" name="description" value="关注 AI 智能体与工作流自动化。" />
-                <input type="hidden" name="intro" value="用于快速创建一个可编辑的 AI 智能体专题。" />
-                <input type="hidden" name="answer" value="AI 智能体专题帮助用户判断自动化能力是否可落地。" />
-                <input type="hidden" name="searchQuery" value="AI智能体 AI Agent" />
-                <input type="hidden" name="keywords" value={"AI智能体\nAI Agent"} />
-                <SubmitButton>快速创建示例专题</SubmitButton>
-              </form>
+              暂无后台专题配置。你可以从上方新增专题；前台继续使用现有静态专题页面。
             </div>
           ) : null}
         </div>
       </div>
+      </AdminContentShell>
     </AdminSection>
   );
 }

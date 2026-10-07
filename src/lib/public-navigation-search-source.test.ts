@@ -64,7 +64,7 @@ describe("public navigation and search source contract", () => {
     expect(publicContent).toContain('where: { status: "active", tool: { status: "published" } }');
     expect(publicContent).toContain('tutorials: { some: { status: "active" } }');
     expect(publicContent).toContain('type,\n          status: "published"');
-    expect(publicContent).toContain('{ type: { in: ["software", "online", "ai_skill"] } }');
+    expect(publicContent).toContain('status: "published",\n  type: "software"');
     expect(trendData).toContain('status: "published" as const');
     expect(trendData).toContain('publishedAt: { not: null }');
   });

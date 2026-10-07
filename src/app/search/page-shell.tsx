@@ -95,7 +95,7 @@ export async function SearchPageShell({
 
   return (
     <main
-      className="public-search-page"
+      className="enhe-editorial-page public-search-page"
       data-content-status={isDbFreeMode ? "UNVERIFIED" : undefined}
     >
       <PublicSearchDialog

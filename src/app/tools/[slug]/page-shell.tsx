@@ -97,8 +97,27 @@ export function buildFreeToolDetailOffer(url: string) {
 export async function generateToolDetailPageMetadata(
   forceLocale: Locale,
   slug: string,
+  routeBasePath = "/software",
 ): Promise<Metadata> {
   const t = getDictionary(forceLocale);
+  if (!process.env.DATABASE_URL?.trim()) {
+    const metadata = buildPageMetadata({
+      title: `${t.toolDetail.introTitle} - ${t.brand}`,
+      description:
+        forceLocale === "en"
+          ? "UNVERIFIED - Product detail content is not available in this local preview."
+          : "UNVERIFIED - 产品详情内容尚未在此本地预览中验证。",
+      path: `${routeBasePath}/${slug}`,
+      locale: forceLocale === "en" ? "en_US" : "zh_CN",
+      localeKey: forceLocale,
+    });
+    metadata.robots = {
+      index: false,
+      follow: true,
+    };
+    return metadata;
+  }
+
   const slugMatch = await resolvePublicToolSlug(slug);
   const tool = slugMatch
     ? await prisma.tool.findUnique({
@@ -118,7 +137,7 @@ export async function generateToolDetailPageMetadata(
   const canonicalSlug = slugMatch?.canonicalSlug ?? slug;
   const canonical = tool
     ? buildCanonicalToolPath(tool, forceLocale)
-    : buildLocalePath(`/software/${canonicalSlug}`, forceLocale);
+    : buildLocalePath(`${routeBasePath}/${canonicalSlug}`, forceLocale);
   if (!tool || tool.status !== "published") {
     return buildPageMetadata({
       title: `${t.toolDetail.introTitle} - ${t.brand}`,
@@ -191,6 +210,8 @@ export async function ToolDetailPageShell({
   forceLocale: Locale;
   expectedType?: "software" | "online" | "skill_learning" | "ai_skill";
 }) {
+  if (!process.env.DATABASE_URL?.trim()) notFound();
+
   const [user, slugMatch] = await Promise.all([
     getCurrentUser(),
     resolvePublicToolSlug(slug),

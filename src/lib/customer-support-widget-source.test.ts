@@ -78,18 +78,27 @@ describe("customer support widget source", () => {
       new URL("../styles/redesign/shell.css", import.meta.url),
       "utf8",
     );
+    const normalizedShell = shell.replace(/\r\n/g, "\n");
     const supportMotionSelector =
       ".enhe-redesign-production .customer-support-launcher {";
     const reducedMotionStart = [
-      ...shell.matchAll(/@media \(prefers-reduced-motion: reduce\) \{/g),
+      ...normalizedShell.matchAll(
+        /@media \(prefers-reduced-motion: reduce\) \{/g,
+      ),
     ]
       .map((match) => match.index ?? -1)
       .find((start) => {
-        const end = shell.indexOf("\n}\n", start);
-        return end > start && shell.slice(start, end).includes(supportMotionSelector);
+        const end = normalizedShell.indexOf("\n}\n", start);
+        return (
+          end > start &&
+          normalizedShell.slice(start, end).includes(supportMotionSelector)
+        );
       }) ?? -1;
-    const reducedMotionEnd = shell.indexOf("\n}\n", reducedMotionStart);
-    const reducedMotion = shell.slice(reducedMotionStart, reducedMotionEnd);
+    const reducedMotionEnd = normalizedShell.indexOf("\n}\n", reducedMotionStart);
+    const reducedMotion = normalizedShell.slice(
+      reducedMotionStart,
+      reducedMotionEnd,
+    );
     const readRuleBody = (selector: string) => {
       const selectorStart = reducedMotion.indexOf(selector);
       if (selectorStart < 0) return "";

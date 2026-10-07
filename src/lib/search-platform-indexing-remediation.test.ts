@@ -47,6 +47,7 @@ describe("search platform indexing remediation", () => {
   );
 
   it("keeps clean listing URLs indexable", async () => {
+    vi.stubEnv("DATABASE_URL", "postgresql://configured.invalid/enhe");
     const metadata = await generateSoftwarePageMetadata(
       "zh",
       Promise.resolve({}),

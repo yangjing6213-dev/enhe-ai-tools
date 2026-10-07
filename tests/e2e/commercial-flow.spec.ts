@@ -55,6 +55,7 @@ const localBaseOrigin = getLocalPlaywrightBaseOrigin(localBaseUrl);
 
 function isLocalPlaywrightRequest(requestUrl: string) {
   if (!localBaseOrigin) return false;
+
   try {
     const url = new URL(requestUrl);
     return (
