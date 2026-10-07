@@ -290,18 +290,40 @@ export function EnheRedesignExperienceReviews({ locale }: { locale: RedesignLoca
               );
             })}
           </div>
-        </div>
-        <div className="redesign-home-reviews-controls">
-          <button type="button" className="redesign-home-reviews-control" onClick={() => move(-1)} aria-label={copy.previous}>
-            <svg aria-hidden="true" viewBox="0 0 24 24" fill="none">
-              <path d="M16 5.5 7.5 12 16 18.5Z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-            </svg>
-          </button>
-          <button type="button" className="redesign-home-reviews-control" onClick={() => move(1)} aria-label={copy.next}>
-            <svg aria-hidden="true" viewBox="0 0 24 24" fill="none">
-              <path d="M8 5.5 16.5 12 8 18.5Z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-            </svg>
-          </button>
+          <div className="redesign-home-reviews-controls">
+            <button
+              type="button"
+              className="redesign-home-reviews-control"
+              onClick={() => move(-1)}
+              aria-label={copy.previous}
+            >
+              <svg
+                className="redesign-home-review-triangle"
+                data-direction="previous"
+                aria-hidden="true"
+                viewBox="0 0 24 24"
+                focusable="false"
+              >
+                <path d="M7.2 4.8 18 10.9a1.25 1.25 0 0 1 0 2.2L7.2 19.2A1.35 1.35 0 0 1 5.2 18V6a1.35 1.35 0 0 1 2-1.2Z" fill="currentColor" />
+              </svg>
+            </button>
+            <button
+              type="button"
+              className="redesign-home-reviews-control"
+              onClick={() => move(1)}
+              aria-label={copy.next}
+            >
+              <svg
+                className="redesign-home-review-triangle"
+                data-direction="next"
+                aria-hidden="true"
+                viewBox="0 0 24 24"
+                focusable="false"
+              >
+                <path d="M7.2 4.8 18 10.9a1.25 1.25 0 0 1 0 2.2L7.2 19.2A1.35 1.35 0 0 1 5.2 18V6a1.35 1.35 0 0 1 2-1.2Z" fill="currentColor" />
+              </svg>
+            </button>
+          </div>
         </div>
       </div>
     </section>

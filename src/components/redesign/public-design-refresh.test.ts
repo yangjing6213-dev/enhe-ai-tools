@@ -36,14 +36,15 @@ describe("ENHE public visual refresh contract", () => {
     expect(featureCards).toContain('aria-label=');
   });
 
-  it("uses a generated blue-energy city hero, white cards, and a blue footer", () => {
+  it("uses a white, image-free hero, white cards, and a dark green footer", () => {
     expect(brandLockup).toContain("/images/enhe-logo-white.png");
-    expect(refreshStyles).toContain("blue-energy-city.webp");
-    expect(refreshStyles).toMatch(/\.redesign-home-hero[^{]*\{[\s\S]*?background[\s\S]*?blue-energy-city\.webp/);
+    expect(refreshStyles).toMatch(/\.redesign-home-hero\s*\{[^}]*background-image:\s*none/);
+    expect(refreshStyles).toMatch(/\.redesign-home-hero\s*\{[^}]*color:\s*var\(--enhe-text\)/);
     expect(tokens).toMatch(/--enhe-page-bg:\s*#fff/i);
     expect(tokens).toMatch(/--enhe-surface-elevated:\s*#fff/i);
     expect(tokens).toMatch(/--enhe-action:\s*#(?:[0-9a-f]{3}|[0-9a-f]{6})/i);
     expect(refreshStyles).toContain(".redesign-footer");
+    expect(tokens).toContain("--enhe-footer: #001512");
     expect(refreshStyles).toContain(".enhe-redesign-production :is(.glass, .evidence-card, .dossier-card, .surface-panel");
     expect(globalStyles).toContain("select {\n  color-scheme: light;");
     expect(refreshStyles).toContain("font-size: clamp(1.25rem, 3.5vw, 3.75rem);");
@@ -73,6 +74,7 @@ describe("ENHE public visual refresh contract", () => {
     expect(refreshStyles).toContain(".enhe-redesign-production .customer-support-launcher-label");
     expect(refreshStyles).toMatch(/\.enhe-redesign-production \.customer-support-launcher\s*\{[^}]*transition-property:\s*border-color\s*!important/);
     expect(refreshStyles).toContain(".enhe-redesign-production .enhe-contentless-page .enhe-contentless-action-primary");
-    expect(refreshStyles).toContain(".enhe-redesign-production :is(button:not(:disabled), [role=\"button\"], a[class*=\"button\"], a[class*=\"cta\"], a[class*=\"card\"], a[class*=\"control\"], .enhe-contentless-action):hover");
+    expect(refreshStyles).toContain(".enhe-redesign-production :is(button:not(:disabled)");
+    expect(refreshStyles).toMatch(/\.enhe-redesign-production :is\(button:not\(:disabled\)[\s\S]*?\.enhe-contentless-action,[\s\S]*?:hover\s*\{/);
   });
 });

@@ -88,8 +88,8 @@ describe("homepage approved product showcase", () => {
   });
 
   it.each([
-    ["zh", "查看产品 →"],
-    ["en", "View product →"],
+    ["zh", "查看产品"],
+    ["en", "View product"],
   ] as const)("renders all approved %s product content in a semantic no-script fallback", (locale, cta) => {
     const html = renderToStaticMarkup(
       createElement(EnheRedesignProductShowcase, { locale }),
@@ -131,15 +131,15 @@ describe("homepage approved product showcase", () => {
     expect(showcaseSource).not.toMatch(/setInterval|setTimeout|autoplay|Audio\(|fetch\(|prisma|database|delivery/i);
   });
 
-  it("keeps product detail links touchable and mobile controls below full-width media", () => {
+  it("keeps product detail links touchable and mobile controls beside the card", () => {
     const mobileStyles = homeStyles.slice(homeStyles.lastIndexOf("@media (width < 768px)"));
 
     expect(homeStyles).toMatch(
       /\.redesign-home-product-detail a\s*\{[\s\S]*?min-height:\s*44px[\s\S]*?display:\s*inline-flex[\s\S]*?align-items:\s*center[\s\S]*?padding:/,
     );
-    expect(mobileStyles).toContain("grid-template-areas:");
-    expect(mobileStyles).toContain('"content content content content"');
-    expect(mobileStyles).toContain('". previous next ."');
+    expect(homeStyles).toMatch(/\.redesign-home-product-control\s*\{[\s\S]*?position:\s*absolute;[\s\S]*?top:\s*50%/);
+    expect(mobileStyles).toMatch(/\.redesign-home-product-content\s*\{[^}]*margin-inline:\s*40px/);
+    expect(mobileStyles).toMatch(/\.redesign-home-product-control\s*\{[^}]*width:\s*32px/);
   });
 
   it("removes product loading scale under reduced motion", () => {

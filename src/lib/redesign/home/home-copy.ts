@@ -22,7 +22,7 @@ export type RedesignHomeCopy = {
 
 export const HOME_COPY: Record<RedesignLocale, RedesignHomeCopy> = {
   zh: {
-    label: "把 AI 变成每天可用的力量",
+    label: "给你的人生添加AI外挂",
     h1: "让 AI 创意，落地为真实成果",
     subtitle: "发现值得使用的 AI 工具、实用方法与行业动态，让工作更高效，让创作更自由。",
     cta: { label: "探索 AI 工具", href: "/software" },
@@ -36,7 +36,7 @@ export const HOME_COPY: Record<RedesignLocale, RedesignHomeCopy> = {
     },
   },
   en: {
-    label: "Useful AI, within reach",
+    label: "Give your life an AI superpower",
     h1: "Turn AI ideas into real results.",
     subtitle: "Discover practical AI tools, skills, and industry signals to work faster and create with confidence.",
     cta: { label: "Explore AI tools", href: "/en/software" },

@@ -16,7 +16,7 @@ describe("ENHE redesign public shell candidate", () => {
     expect(tokens).toContain("--enhe-page-bg: #ffffff");
     expect(tokens).toContain("--enhe-text: #101828");
     expect(tokens).toContain("--enhe-action: #246bfe");
-    expect(tokens).toContain("--enhe-footer: #06183f");
+    expect(tokens).toContain("--enhe-footer: #001512");
     expect(tokens).toContain("--enhe-focus: #73a0ff");
     expect(tokens).toContain("--enhe-motion-fast: 170ms");
     expect(tokens).toContain("--enhe-z-focus: 60");
@@ -46,7 +46,7 @@ describe("ENHE redesign public shell candidate", () => {
     }
 
     expect(header).toContain('languageAriaLabel = "中文 / EN"');
-    expect(desktopNav.indexOf("EnheRedesignLanguageSwitch")).toBeGreaterThan(desktopNav.indexOf("account.loginLabel"));
+    expect(desktopNav.indexOf("EnheRedesignLanguageSwitch")).toBeLessThan(desktopNav.indexOf("account.loginLabel"));
     expect(header).toContain("account.isAdmin");
     expect(header).toContain("adminHref");
     expect(header).toContain("account.isAdmin ?");
@@ -125,13 +125,15 @@ describe("ENHE redesign public shell candidate", () => {
     expect(header).not.toContain("label={brandLabel}");
   });
 
-  it("keeps the footer as four flat semantic columns without shell duplication", () => {
+  it("keeps the footer as accessible expandable groups without shell duplication", () => {
     const footer = readCandidate("components/redesign/enhe-redesign-footer.tsx");
 
     for (const label of ["ENHE AI", "帮助与服务", "合规条款", "公司信息"]) {
       expect(footer).toContain(label);
     }
     expect(footer).toContain("footer-grid");
+    expect(footer).toContain('<details className="footer-group" open>');
+    expect(footer).toContain('href="#top"');
     expect(footer).not.toContain("AI工具");
     expect(footer).not.toContain("中文 / EN");
     expect(footer).not.toContain("电话");

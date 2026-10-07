@@ -210,29 +210,18 @@
 }
 
 .redesign-home-products-heading h2 {
-  max-width: 680px;
+  max-width: none;
   margin: 0;
   color: var(--enhe-text, #080808);
-  font-size: clamp(2rem, 5vw, 4.5rem);
+  font-size: clamp(1rem, 2.2vw, 2.25rem);
   letter-spacing: -0.05em;
   line-height: 1;
-}
-
-.redesign-home-product-counter {
-  flex: 0 0 auto;
-  margin: 0 0 4px;
-  color: var(--enhe-text-muted, #5f665f);
-  font-variant-numeric: tabular-nums;
-  font-size: 0.875rem;
-  font-weight: 700;
-  letter-spacing: 0.08em;
+  white-space: nowrap;
 }
 
 .redesign-home-product-stage {
-  display: grid;
-  grid-template-columns: 44px minmax(0, 1fr) 44px;
-  align-items: center;
-  gap: clamp(12px, 3vw, 36px);
+  position: relative;
+  display: block;
   min-width: 0;
   padding: 4px;
 }
@@ -242,24 +231,57 @@
   outline-offset: 4px;
 }
 
+.redesign-home-product-controls {
+  position: absolute;
+  z-index: 3;
+  top: 4px;
+  right: calc(4px + clamp(44px, 6vw, 80px));
+  left: calc(4px + clamp(44px, 6vw, 80px));
+  aspect-ratio: 16 / 9;
+  pointer-events: none;
+}
+
 .redesign-home-product-control {
+  position: absolute;
+  top: 50%;
   display: inline-flex;
-  width: 44px;
-  min-width: 44px;
+  width: 40px;
+  min-width: 40px;
   height: 44px;
   align-items: center;
   justify-content: center;
   padding: 0;
-  border: 1px solid var(--enhe-text, #080808);
-  border-radius: 50%;
+  border: 0;
+  border-radius: 0;
   background: transparent;
   color: var(--enhe-text, #080808);
   cursor: pointer;
+  translate: 0 -50%;
+  pointer-events: auto;
+}
+
+.redesign-home-product-control:first-child {
+  left: calc(-1 * clamp(44px, 6vw, 80px));
+}
+
+.redesign-home-product-control:last-child {
+  right: calc(-1 * clamp(44px, 6vw, 80px));
+}
+
+.redesign-home-product-triangle,
+.redesign-home-product-link-triangle {
+  width: 22px;
+  height: 22px;
+}
+
+.redesign-home-product-triangle[data-direction="previous"],
+.redesign-home-review-triangle[data-direction="previous"] {
+  rotate: 180deg;
 }
 
 .redesign-home-product-control:hover {
-  background: var(--enhe-text, #080808);
-  color: #fff;
+  background: transparent;
+  color: var(--enhe-action, #246bfe);
 }
 
 .redesign-home-product-control:focus-visible {
@@ -269,6 +291,7 @@
 
 .redesign-home-product-content {
   min-width: 0;
+  margin-inline: clamp(44px, 6vw, 80px);
 }
 
 .redesign-home-product-media-frame {
@@ -345,6 +368,10 @@
   white-space: nowrap;
 }
 
+.redesign-home-product-detail-link {
+  gap: 8px;
+}
+
 .redesign-home-product-detail a:focus-visible {
   outline: 3px solid var(--enhe-focus, #ffd60a);
   outline-offset: 4px;
@@ -363,23 +390,35 @@
   }
 
   .redesign-home-product-stage {
-    grid-template-columns: minmax(0, 1fr) 44px 44px minmax(0, 1fr);
-    grid-template-areas:
-      "content content content content"
-      ". previous next .";
-    gap: 8px;
+    padding-inline: 0;
+  }
+
+  .redesign-home-product-controls {
+    right: 40px;
+    left: 40px;
   }
 
   .redesign-home-product-control:first-child {
-    grid-area: previous;
-  }
-
-  .redesign-home-product-content {
-    grid-area: content;
+    left: -40px;
   }
 
   .redesign-home-product-control:last-child {
-    grid-area: next;
+    right: -40px;
+  }
+
+  .redesign-home-product-content {
+    margin-inline: 40px;
+  }
+
+  .redesign-home-product-control {
+    width: 32px;
+    min-width: 32px;
+    height: 40px;
+  }
+
+  .redesign-home-product-triangle {
+    width: 18px;
+    height: 18px;
   }
 
   .redesign-home-product-detail {
@@ -433,7 +472,7 @@
 
 .redesign-home-review-card {
   position: absolute;
-  top: 0;
+  top: 50%;
   left: 50%;
   box-sizing: border-box;
   width: min(78vw, 680px);
@@ -444,7 +483,7 @@
   background: #fff;
   opacity: 0.12;
   pointer-events: none;
-  transform: translateX(calc(-50% - 164%)) scale(0.9);
+  transform: translate(calc(-50% - 164%), -50%) scale(0.9);
   transition:
     transform var(--enhe-motion-standard) var(--enhe-ease-ui-move),
     opacity var(--enhe-motion-standard) var(--enhe-ease-ui-move);
@@ -453,23 +492,23 @@
 .redesign-home-review-card[data-position="-1"] {
   z-index: 1;
   opacity: 0.36;
-  transform: translateX(calc(-50% - 84%)) scale(0.94);
+  transform: translate(calc(-50% - 84%), -50%) scale(0.94);
 }
 
 .redesign-home-review-card[data-position="0"] {
   z-index: 2;
   opacity: 1;
-  transform: translateX(-50%) scale(1);
+  transform: translate(-50%, -50%) scale(1);
 }
 
 .redesign-home-review-card[data-position="1"] {
   z-index: 1;
   opacity: 0.36;
-  transform: translateX(calc(-50% + 84%)) scale(0.94);
+  transform: translate(calc(-50% + 84%), -50%) scale(0.94);
 }
 
 .redesign-home-review-card[data-position="2"] {
-  transform: translateX(calc(-50% + 164%)) scale(0.9);
+  transform: translate(calc(-50% + 164%), -50%) scale(0.9);
 }
 
 .redesign-home-review-top {
@@ -529,10 +568,13 @@
 }
 
 .redesign-home-reviews-controls {
+  position: absolute;
+  z-index: 3;
+  inset: 0;
   display: flex;
-  justify-content: center;
-  gap: 12px;
-  margin-top: 28px;
+  align-items: center;
+  justify-content: space-between;
+  pointer-events: none;
 }
 
 .redesign-home-reviews-control {
@@ -543,11 +585,17 @@
   align-items: center;
   justify-content: center;
   padding: 0;
-  border: 1px solid var(--enhe-text, #080808);
-  border-radius: 50%;
-  background: transparent;
+  border: 0;
+  border-radius: 0;
+  background: var(--enhe-page-bg, #fff);
   color: var(--enhe-text, #080808);
   cursor: pointer;
+  pointer-events: auto;
+}
+
+.redesign-home-review-triangle {
+  width: 22px;
+  height: 22px;
 }
 
 .enhe-redesign-production .redesign-home-reviews-control {
@@ -569,8 +617,8 @@
 }
 
 .redesign-home-reviews-control:hover {
-  background: var(--enhe-text, #080808);
-  color: #fff;
+  background: var(--enhe-page-bg, #fff);
+  color: var(--enhe-action, #246bfe);
 }
 
 .redesign-home-reviews-control:focus-visible {
@@ -594,9 +642,14 @@
   }
 
   .redesign-home-review-card {
-    width: 92%;
+    width: 68%;
     min-height: 408px;
     padding: 22px;
+  }
+
+  .redesign-home-review-triangle {
+    width: 18px;
+    height: 18px;
   }
 
   .redesign-home-review-top {
@@ -610,11 +663,11 @@
   }
 
   .redesign-home-review-card[data-position="-1"] {
-    transform: translateX(calc(-50% - 88%)) scale(0.94);
+    transform: translate(calc(-50% - 88%), -50%) scale(0.94);
   }
 
   .redesign-home-review-card[data-position="1"] {
-    transform: translateX(calc(-50% + 88%)) scale(0.94);
+    transform: translate(calc(-50% + 88%), -50%) scale(0.94);
   }
 }
 

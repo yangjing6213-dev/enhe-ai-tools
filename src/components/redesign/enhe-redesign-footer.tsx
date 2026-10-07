@@ -1,4 +1,5 @@
 import { Fragment } from "react";
+import { ArrowUp, ChevronDown } from "lucide-react";
 import type { ProductionFiling } from "@/lib/production-filing";
 import type { RedesignFooterCopy, RedesignLocale } from "./types";
 
@@ -97,12 +98,19 @@ export function EnheRedesignFooter({
           </div>
           {copy.columns.map((column) => (
             <nav key={column.title} aria-label={column.title}>
-              <h3>{column.title}</h3>
-              {column.links.map((link) => (
-                <a key={link.href} href={link.href}>
-                  {link.label}
-                </a>
-              ))}
+              <details className="footer-group" open>
+                <summary className="footer-group-trigger">
+                  <h3>{column.title}</h3>
+                  <ChevronDown aria-hidden="true" size={18} />
+                </summary>
+                <div className="footer-group-links">
+                  {column.links.map((link) => (
+                    <a key={link.href} href={link.href}>
+                      {link.label}
+                    </a>
+                  ))}
+                </div>
+              </details>
             </nav>
           ))}
         </div>
@@ -124,6 +132,14 @@ export function EnheRedesignFooter({
               ))}
             </p>
           ) : null}
+          <a
+            className="footer-back-to-top footer-back-to-top-button"
+            href="#top"
+            aria-label={locale === "en" ? "Back to top" : "回到顶部"}
+          >
+            {locale === "en" ? "Back to top" : "回到顶部"}
+            <ArrowUp aria-hidden="true" size={16} />
+          </a>
         </div>
       </div>
     </footer>

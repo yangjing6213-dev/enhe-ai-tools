@@ -91,7 +91,7 @@ for (const route of routes) {
         border: "#d8e0eb",
         focus: "#73a0ff",
         yellow: "#246bfe",
-        footer: "#06183f",
+        footer: "#001512",
         referenceAccent: "#246bfe",
         referenceCanvas: "#ffffff",
         titleColor: "rgb(16, 24, 40)",

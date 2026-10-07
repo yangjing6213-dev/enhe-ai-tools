@@ -93,14 +93,14 @@ const homeSsrRoutes = [
     path: "/",
     locale: "zh",
     h1: routes[0].h1,
-    cta: "查看产品 →",
+    cta: "查看产品",
     next: "下一款产品",
   },
   {
     path: "/en",
     locale: "en",
     h1: routes[1].h1,
-    cta: "View product →",
+    cta: "View product",
     next: "Next product",
   },
 ] as const;
@@ -503,8 +503,9 @@ async function exerciseHome(
   await expect(currentProduct(page)).toHaveAttribute("data-product-id", "infinitetalk");
   await expect(stage.locator('[aria-selected="true"]')).toHaveCount(0);
   await expect(
-    page.locator('.redesign-home-product-counter[aria-live="polite"][aria-atomic="true"]'),
-  ).toHaveCount(1);
+    page.locator(".redesign-home-product-counter"),
+  ).toHaveCount(0);
+  await expect(stage.locator('[aria-live="polite"][aria-atomic="true"]')).toHaveCount(1);
 }
 
 async function exerciseSoftware(

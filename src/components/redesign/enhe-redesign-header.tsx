@@ -40,6 +40,7 @@ export function EnheRedesignHeader({
   return (
     <header
       className="redesign-header"
+      id="top"
       data-sticky={sticky}
       data-locale={locale}
       data-home={isExactCurrentPage(currentPathname, homeHref)}
@@ -84,6 +85,11 @@ export function EnheRedesignHeader({
               </a>
             ),
           )}
+          <EnheRedesignLanguageSwitch
+            localeHrefs={languageHrefs}
+            currentLocale={locale}
+            ariaLabel={languageAriaLabel}
+          />
           {account.status === "guest" ? (
             <a className="redesign-login-link" href={account.loginHref}>
               {account.loginLabel}
@@ -101,11 +107,6 @@ export function EnheRedesignHeader({
               </div>
             </details>
           )}
-          <EnheRedesignLanguageSwitch
-            localeHrefs={languageHrefs}
-            currentLocale={locale}
-            ariaLabel={languageAriaLabel}
-          />
         </nav>
         <div className="redesign-mobile-actions">
           <EnheRedesignMobileMenu

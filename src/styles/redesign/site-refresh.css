@@ -31,24 +31,24 @@
 }
 
 .redesign-header[data-home="true"] {
-  position: absolute;
-  inset: 0 0 auto;
+  position: relative;
+  inset: auto;
   z-index: var(--enhe-z-header);
   border-bottom-color: transparent;
-  background: transparent;
-  color: #fff;
+  background: var(--enhe-page-bg);
+  color: var(--enhe-text);
 }
 
 .redesign-header[data-home="true"] .redesign-language-switch {
-  color: #fff;
+  color: var(--enhe-text);
 }
 
 .redesign-header[data-home="true"] .redesign-login-link,
 .redesign-header[data-home="true"] .redesign-avatar-trigger,
 .redesign-header[data-home="true"] .redesign-menu-trigger {
-  border-color: rgba(255, 255, 255, 0.76);
-  background: transparent;
-  color: #fff;
+  border-color: var(--enhe-border);
+  background: var(--enhe-page-bg);
+  color: var(--enhe-text);
 }
 
 .redesign-header-inner {
@@ -71,54 +71,46 @@
 }
 
 .redesign-header[data-home="true"] .redesign-brand-mark {
-  filter: none;
+  filter: brightness(0) saturate(100%);
 }
 
-.redesign-brand-label {
-  display: none;
-}
-
-.redesign-header[data-home="true"] .redesign-desktop-nav {
-  color: #fff;
-}
-
-.redesign-home-hero {
-  min-height: clamp(520px, 48vw, 660px);
-  display: flex;
-  align-items: stretch;
-  background-color: #061432;
-  background-image:
-    linear-gradient(90deg, rgba(3, 11, 34, 0.92) 0%, rgba(3, 11, 34, 0.76) 34%, rgba(3, 11, 34, 0.16) 78%),
-    linear-gradient(0deg, rgba(3, 11, 34, 0.28), rgba(3, 11, 34, 0.06)),
-    url("/redesign/home/blue-energy-city.webp");
-  background-position: center;
-  background-size: cover;
-  color: #fff;
-}
-
-.redesign-home .redesign-home-hero-inner {
-  width: min(100%, 1320px);
-  max-width: none;
-  margin-inline: auto;
-  padding: clamp(160px, 18vw, 208px) 24px clamp(84px, 10vw, 132px);
-  text-align: left;
-}
-
-.redesign-home .redesign-home-mobile-label {
+.redesign-header[data-home="true"] .redesign-brand-label {
   display: inline-flex;
-  margin-bottom: 22px;
-  color: #a9ccff;
+  min-height: auto;
+  padding: 4px 0 0;
+  border-radius: 0;
+  background: transparent;
+  color: var(--enhe-text);
+  font-size: 12px;
+  font-weight: 600;
   letter-spacing: 0.02em;
 }
 
-.redesign-home .redesign-home-mobile-label::before {
-  background: #62a2ff;
+.redesign-header[data-home="true"] .redesign-desktop-nav {
+  color: var(--enhe-text);
+}
+
+.redesign-home-hero {
+  min-height: clamp(420px, 40vw, 560px);
+  display: flex;
+  align-items: center;
+  background-color: var(--enhe-page-bg);
+  background-image: none;
+  color: var(--enhe-text);
+}
+
+.redesign-home .redesign-home-hero-inner {
+  width: min(100%, 1040px);
+  max-width: 1040px;
+  margin-inline: auto;
+  padding: clamp(64px, 9vw, 112px) 24px;
+  text-align: center;
 }
 
 .redesign-home .redesign-home-hero-inner h1 {
-  max-width: 700px;
-  margin: 0;
-  color: #fff;
+  max-width: 860px;
+  margin: 0 auto;
+  color: var(--enhe-text);
   font-size: clamp(2.75rem, 5.6vw, 5.25rem);
   font-weight: 750;
   letter-spacing: -0.035em;
@@ -127,9 +119,9 @@
 }
 
 .redesign-home .redesign-home-subtitle {
-  max-width: 610px;
-  margin: 24px 0 0;
-  color: rgba(255, 255, 255, 0.84);
+  max-width: 700px;
+  margin: 24px auto 0;
+  color: var(--enhe-text-muted);
   font-size: clamp(1rem, 1.3vw, 1.2rem);
   line-height: 1.65;
 }
@@ -150,6 +142,7 @@
 }
 
 .redesign-home-features {
+  border: 0;
   background: #fff;
   color: var(--enhe-text);
 }
@@ -160,7 +153,7 @@
   width: min(100% - 48px, 1220px);
   margin-inline: auto;
   padding: 36px 0;
-  border-bottom: 1px solid var(--enhe-border);
+  border: 0;
 }
 
 .redesign-home-feature-card {
@@ -169,14 +162,10 @@
   align-items: center;
   gap: 14px;
   padding: 12px 18px;
-  border: 1px solid transparent;
-  border-right-color: var(--enhe-border);
+  border: 0;
+  box-shadow: none;
   color: var(--enhe-text);
   text-decoration: none;
-}
-
-.redesign-home-feature-card:last-child {
-  border-right-color: transparent;
 }
 
 .redesign-home-feature-card > svg {
@@ -253,14 +242,10 @@
 }
 
 .redesign-home-reviews-control {
-  border-color: var(--enhe-text);
-  background: #fff;
+  border: 0;
+  border-radius: 0;
+  background: var(--enhe-page-bg);
   color: var(--enhe-text);
-  transition:
-    background-color var(--enhe-motion-fast) var(--enhe-ease-ui-move),
-    border-color var(--enhe-motion-fast) var(--enhe-ease-ui-move),
-    color var(--enhe-motion-fast) var(--enhe-ease-ui-move),
-    transform var(--enhe-motion-fast) var(--enhe-ease-ui-move);
 }
 
 .redesign-home-reviews-control svg {
@@ -269,9 +254,8 @@
 }
 
 .redesign-home-reviews-control:hover {
-  border-color: var(--enhe-action);
-  background: var(--enhe-action);
-  color: #fff;
+  background: var(--enhe-page-bg);
+  color: var(--enhe-action);
 }
 
 .redesign-home-brand-value {
@@ -301,15 +285,13 @@
 }
 
 .redesign-footer {
-  background:
-    radial-gradient(ellipse at 78% 0%, rgba(36, 107, 254, 0.34), transparent 42%),
-    linear-gradient(130deg, #071635 0%, #09265d 52%, #06183f 100%);
+  background: var(--enhe-footer);
   color: #fff;
 }
 
 .footer-grid p,
 .footer-grid a {
-  color: #d7e3fb;
+  color: #c1cfcb;
 }
 
 .footer-grid a:hover,
@@ -318,8 +300,8 @@
 }
 
 .footer-bottom {
-  border-top-color: rgba(213, 228, 255, 0.26);
-  color: #c0d0ed;
+  border-top-color: rgba(205, 222, 216, 0.24);
+  color: #aebdb8;
 }
 
 .enhe-redesign-production .ai-trends-page {
@@ -491,7 +473,7 @@
   background: var(--enhe-action-hover) !important;
 }
 
-.enhe-redesign-production :is(button, [role="button"], a[class*="button"], a[class*="cta"], a[class*="card"], a[class*="control"], .enhe-contentless-action) {
+.enhe-redesign-production :is(button, [role="button"], a[class*="button"], a[class*="cta"], a[class*="card"], a[class*="control"], .enhe-contentless-action, .redesign-language-link, .redesign-login-link, .redesign-avatar-trigger, .redesign-home-product-detail-link, .footer-group > summary) {
   transition:
     background-color var(--enhe-motion-fast) var(--enhe-ease-ui-move),
     border-color var(--enhe-motion-fast) var(--enhe-ease-ui-move),
@@ -500,15 +482,12 @@
     transform var(--enhe-motion-fast) var(--enhe-ease-ui-move);
 }
 
-.enhe-redesign-production :is(button:not(:disabled), [role="button"], a[class*="button"], a[class*="cta"], a[class*="card"], a[class*="control"], .enhe-contentless-action):hover {
-  transform: translateY(-2px);
+.enhe-redesign-production :is(button:not(:disabled), [role="button"], a[class*="button"], a[class*="cta"], a[class*="card"], a[class*="control"], .enhe-contentless-action, .redesign-language-link, .redesign-login-link, .redesign-avatar-trigger, .redesign-home-product-detail-link, .footer-group > summary):active {
+  transform: scale(0.985);
+  transition-duration: 100ms;
 }
 
-.enhe-redesign-production :is(button:not(:disabled), [role="button"], a[class*="button"], a[class*="cta"], a[class*="card"], a[class*="control"], .enhe-contentless-action):active {
-  transform: translateY(0) scale(0.985);
-}
-
-.enhe-redesign-production :is(button, [role="button"], a[class*="button"], a[class*="cta"], a[class*="card"], a[class*="control"], .enhe-contentless-action):focus-visible {
+.enhe-redesign-production :is(button, [role="button"], a[class*="button"], a[class*="cta"], a[class*="card"], a[class*="control"], .enhe-contentless-action, .redesign-language-link, .redesign-login-link, .redesign-avatar-trigger, .redesign-home-product-detail-link, .footer-group > summary):focus-visible {
   outline: 3px solid var(--enhe-focus);
   outline-offset: 3px;
 }
@@ -520,10 +499,16 @@
     transform var(--enhe-motion-standard) var(--enhe-ease-ui-move);
 }
 
-.enhe-redesign-production article[class*="card"]:not(.redesign-home-review-card):hover {
-  border-color: #a9bad3;
-  box-shadow: 0 14px 34px rgba(18, 42, 79, 0.11);
-  transform: translateY(-3px);
+@media (hover: hover) and (pointer: fine) {
+  .enhe-redesign-production :is(button:not(:disabled), [role="button"], a[class*="button"], a[class*="cta"], a[class*="card"], a[class*="control"], .enhe-contentless-action, .redesign-language-link, .redesign-login-link, .redesign-avatar-trigger, .redesign-home-product-detail-link, .footer-back-to-top, .footer-group > summary):hover {
+    transform: translateY(-2px);
+  }
+
+  .enhe-redesign-production article[class*="card"]:not(.redesign-home-review-card):hover {
+    border-color: #a9bad3;
+    box-shadow: 0 14px 34px rgba(18, 42, 79, 0.11);
+    transform: translateY(-3px);
+  }
 }
 
 @media (width < 900px) {
@@ -532,11 +517,11 @@
   }
 
   .redesign-home-feature-card:nth-child(2) {
-    border-right-color: transparent;
+    border: 0;
   }
 
   .redesign-home-feature-card:nth-child(-n + 2) {
-    border-bottom-color: var(--enhe-border);
+    border: 0;
   }
 }
 
@@ -551,23 +536,23 @@
   }
 
   .redesign-home-hero {
-    min-height: 660px;
-    background-position: 62% center;
+    min-height: 0;
   }
 
   .redesign-home .redesign-home-hero-inner {
-    padding: 154px 22px 82px;
+    padding: 72px 22px 84px;
   }
 
   .redesign-home .redesign-home-hero-inner h1 {
-    max-width: 560px;
-    font-size: clamp(2.5rem, 11vw, 4rem);
+    max-width: 720px;
+    margin-inline: auto;
+    font-size: clamp(2.25rem, 9vw, 3.5rem);
     line-height: 1.12;
   }
 
   .redesign-home .redesign-home-subtitle {
     max-width: 520px;
-    margin-top: 20px;
+    margin: 20px auto 0;
   }
 
   .redesign-home .redesign-home-cta {
@@ -585,7 +570,7 @@
     min-height: 92px;
     gap: 10px;
     padding: 10px 8px;
-    border-right: 0;
+    border: 0;
   }
 
   .redesign-home-feature-copy > span {
@@ -599,6 +584,10 @@
   .redesign-home-brand-value-inner {
     padding: 72px 20px;
   }
+
+  .footer-back-to-top {
+    margin-top: 16px;
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -606,13 +595,13 @@
     transition-property: border-color !important;
   }
 
-  .enhe-redesign-production :is(button, [role="button"], a[class*="button"], a[class*="cta"], a[class*="card"], a[class*="control"], .enhe-contentless-action, article[class*="card"]:not(.redesign-home-review-card)) {
+  .enhe-redesign-production :is(button, [role="button"], a[class*="button"], a[class*="cta"], a[class*="card"], a[class*="control"], .enhe-contentless-action, .redesign-language-link, .redesign-login-link, .redesign-avatar-trigger, .redesign-home-product-detail-link, .footer-back-to-top, .footer-group > summary, article[class*="card"]:not(.redesign-home-review-card)) {
     scroll-behavior: auto;
     transition-duration: 0.01ms !important;
   }
 
-  .enhe-redesign-production :is(button:not(:disabled), [role="button"], a[class*="button"], a[class*="cta"], a[class*="card"], a[class*="control"], .enhe-contentless-action):hover,
-  .enhe-redesign-production :is(button:not(:disabled), [role="button"], a[class*="button"], a[class*="cta"], a[class*="card"], a[class*="control"], .enhe-contentless-action):active {
+  .enhe-redesign-production :is(button:not(:disabled), [role="button"], a[class*="button"], a[class*="cta"], a[class*="card"], a[class*="control"], .enhe-contentless-action, .redesign-language-link, .redesign-login-link, .redesign-avatar-trigger, .redesign-home-product-detail-link, .footer-back-to-top, .footer-group > summary):hover,
+  .enhe-redesign-production :is(button:not(:disabled), [role="button"], a[class*="button"], a[class*="cta"], a[class*="card"], a[class*="control"], .enhe-contentless-action, .redesign-language-link, .redesign-login-link, .redesign-avatar-trigger, .redesign-home-product-detail-link, .footer-back-to-top, .footer-group > summary):active {
     transform: none;
   }
 

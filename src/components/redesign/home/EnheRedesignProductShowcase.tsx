@@ -11,7 +11,6 @@ import {
   useState,
   type KeyboardEvent,
 } from "react";
-import { ArrowLeft, ArrowRight } from "lucide-react";
 import type { RedesignLocale } from "@/components/redesign/types";
 import {
   HOME_PRODUCT_COUNT,
@@ -67,7 +66,7 @@ const SHOWCASE_COPY = {
     next: "下一款产品",
     loading: "正在加载产品封面…",
     error: "产品封面暂时无法加载。",
-    detail: "查看产品 →",
+    detail: "查看产品",
   },
   en: {
     eyebrow: "Featured products",
@@ -76,7 +75,7 @@ const SHOWCASE_COPY = {
     next: "Next product",
     loading: "Loading product cover…",
     error: "This product cover could not be loaded.",
-    detail: "View product →",
+    detail: "View product",
   },
 } satisfies Record<
   RedesignLocale,
@@ -90,6 +89,29 @@ const SHOWCASE_COPY = {
     detail: string;
   }
 >;
+
+function ProductTriangle({
+  className,
+  direction,
+}: {
+  className: string;
+  direction: "previous" | "next";
+}) {
+  return (
+    <svg
+      className={className}
+      data-direction={direction}
+      aria-hidden="true"
+      viewBox="0 0 24 24"
+      focusable="false"
+    >
+      <path
+        d="M7.2 4.8 18 10.9a1.25 1.25 0 0 1 0 2.2L7.2 19.2A1.35 1.35 0 0 1 5.2 18V6a1.35 1.35 0 0 1 2-1.2Z"
+        fill="currentColor"
+      />
+    </svg>
+  );
+}
 
 export function EnheRedesignProductShowcase({
   locale,
@@ -117,7 +139,6 @@ export function EnheRedesignProductShowcase({
   const product = HOME_PRODUCTS[index];
   const previousProduct =
     previousIndex === null ? null : HOME_PRODUCTS[previousIndex];
-  const counter = `${String(index + 1).padStart(2, "0")} / ${String(HOME_PRODUCT_COUNT).padStart(2, "0")}`;
   const panelId = `redesign-home-product-panel-${locale}`;
   const motionProfile: ProductStageMotionProfile =
     inputModality === "keyboard"
@@ -360,7 +381,13 @@ export function EnheRedesignProductShowcase({
         <div className="redesign-home-product-detail">
           <h3>{product.name[locale]}</h3>
           <p>{product.description[locale]}</p>
-          <a href={product.detailHref[locale]}>{copy.detail}</a>
+          <a className="redesign-home-product-detail-link" href={product.detailHref[locale]}>
+            {copy.detail}
+            <ProductTriangle
+              className="redesign-home-product-link-triangle"
+              direction="next"
+            />
+          </a>
         </div>
       </div>
     );
@@ -380,14 +407,6 @@ export function EnheRedesignProductShowcase({
               {copy.heading}
             </h2>
           </div>
-          <p
-            className="redesign-home-product-counter"
-            aria-label={`${counter}: ${product.name[locale]}`}
-            aria-live="polite"
-            aria-atomic="true"
-          >
-            {counter}
-          </p>
         </div>
 
         <div
@@ -408,34 +427,43 @@ export function EnheRedesignProductShowcase({
           data-motion-exit-transform={motion.outgoing.transform ?? "none"}
           data-motion-transition-key={transitionKey}
         >
-          <button
-            type="button"
-            className="redesign-home-product-control"
-            onClick={(event) =>
-              move(-1, event.detail === 0 ? "keyboard" : "pointer")
-            }
-            aria-label={copy.previous}
-            aria-controls={panelId}
-          >
-            <ArrowLeft aria-hidden="true" />
-          </button>
-
           <div className={`redesign-home-product-content ${styles.viewport}`}>
             {previousProduct ? renderProduct(previousProduct, true) : null}
             {renderProduct(product, false)}
           </div>
-
-          <button
-            type="button"
-            className="redesign-home-product-control"
-            onClick={(event) =>
-              move(1, event.detail === 0 ? "keyboard" : "pointer")
-            }
-            aria-label={copy.next}
-            aria-controls={panelId}
-          >
-            <ArrowRight aria-hidden="true" />
-          </button>
+          <div className="redesign-home-product-controls">
+            <button
+              type="button"
+              className="redesign-home-product-control"
+              onClick={(event) =>
+                move(-1, event.detail === 0 ? "keyboard" : "pointer")
+              }
+              aria-label={copy.previous}
+              aria-controls={panelId}
+            >
+              <ProductTriangle
+                className="redesign-home-product-triangle"
+                direction="previous"
+              />
+            </button>
+            <button
+              type="button"
+              className="redesign-home-product-control"
+              onClick={(event) =>
+                move(1, event.detail === 0 ? "keyboard" : "pointer")
+              }
+              aria-label={copy.next}
+              aria-controls={panelId}
+            >
+              <ProductTriangle
+                className="redesign-home-product-triangle"
+                direction="next"
+              />
+            </button>
+          </div>
+          <span className="sr-only" aria-live="polite" aria-atomic="true">
+            {product.name[locale]}
+          </span>
         </div>
 
         <noscript>
