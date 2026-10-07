@@ -2,6 +2,9 @@ import { configDefaults, defineConfig } from "vitest/config";
 import { fileURLToPath } from "node:url";
 
 export default defineConfig({
+  oxc: {
+    jsx: { runtime: "classic" },
+  },
   test: {
     environment: "node",
     globals: false,

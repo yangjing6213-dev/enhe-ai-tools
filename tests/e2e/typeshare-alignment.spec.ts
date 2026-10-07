@@ -53,13 +53,20 @@ for (const route of routes) {
         const title = document.querySelector<HTMLElement>("main h1");
         if (!productionShell || !referenceSurface || !title) throw new Error("The public design shell and page title must be present.");
         const titleStyles = getComputedStyle(title);
+        const surfaceProbe = document.createElement("div");
+        surfaceProbe.style.backgroundColor = "var(--enhe-surface)";
+        surfaceProbe.style.position = "fixed";
+        surfaceProbe.style.visibility = "hidden";
+        document.body.append(surfaceProbe);
+        const normalizedSurface = getComputedStyle(surfaceProbe).backgroundColor;
+        surfaceProbe.remove();
         return {
           page: styles.getPropertyValue("--enhe-page-bg").trim().toLowerCase(),
           text: styles.getPropertyValue("--enhe-text").trim().toLowerCase(),
           muted: styles.getPropertyValue("--enhe-text-muted").trim().toLowerCase(),
           action: styles.getPropertyValue("--enhe-action").trim().toLowerCase(),
           actionHover: styles.getPropertyValue("--enhe-action-hover").trim().toLowerCase(),
-          surface: styles.getPropertyValue("--enhe-surface").trim().toLowerCase(),
+          surface: normalizedSurface,
           elevated: styles.getPropertyValue("--enhe-surface-elevated").trim().toLowerCase(),
           border: styles.getPropertyValue("--enhe-border").trim().toLowerCase(),
           focus: styles.getPropertyValue("--enhe-focus").trim().toLowerCase(),
@@ -79,7 +86,7 @@ for (const route of routes) {
         muted: "#536057",
         action: "#2f6f44",
         actionHover: "#245a36",
-        surface: "#ffffff",
+        surface: "rgb(255, 255, 255)",
         elevated: "#f0f5ef",
         border: "#d3ddd5",
         focus: "#f6c945",

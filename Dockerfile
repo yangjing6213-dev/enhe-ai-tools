@@ -1,6 +1,7 @@
 FROM node:24-alpine AS deps
 WORKDIR /app
 COPY package.json package-lock.json* ./
+COPY vendor/braces-3.0.4-enhe.0.tgz ./vendor/
 RUN npm install
 
 FROM node:24-alpine AS builder

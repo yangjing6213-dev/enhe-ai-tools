@@ -179,6 +179,8 @@ if ($LASTEXITCODE -ne 0) {
   throw "ReleaseRef must descend from the current origin/$Branch before release."
 }
 
+Invoke-Native -FilePath npm -Arguments @("audit", "--include=dev", "--include=optional", "--include=peer", "--audit-level=high", "--registry=https://registry.npmjs.org")
+
 Invoke-Native -FilePath node -Arguments @("scripts/test-migration-paths.mjs", $Branch)
 $releaseShellMount = "type=bind,source=$repoRoot,target=/repo,readonly"
 Invoke-Native -FilePath docker -Arguments @(

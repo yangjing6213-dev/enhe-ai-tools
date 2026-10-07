@@ -43,6 +43,10 @@ push or deployment.
 
 With `-Deploy`, the script also requires the SSH key, checks the server's operation lock and clean checkout, pushes the exact release ref, fetches and checks that same ref on the server, then runs `deploy.sh`. That script builds the release image, checks the existing database volume, stops the application writers, creates and validates a pre-migration database backup, runs `prisma migrate deploy`, restarts services, and checks health. A deployment can change production data and must use an exact reviewed commit plus the documented backup, rollback, and health gates.
 
+## Complete dependency gate (2026-10-07)
+
+The wrapper runs `npm audit --include=dev --include=optional --include=peer --audit-level=high --registry=https://registry.npmjs.org` before migration drills, build, push, or deployment. The current production image retains the complete installed dependency tree, including development tools. A high/critical dependency advisory or failed audit request stops the workflow. Explicit inclusion prevents inherited production/omit settings from silently narrowing the audit, as documented in https://docs.npmjs.com/cli/v11/commands/npm-audit/#include. A passing browser suite does not replace this check. Do not use `npm audit fix --force` or omit this gate to publish a candidate; repair the dependency graph and repeat the affected validation.
+
 ## Safe stage order
 
 1. Finish local review and validation; prepare a clean, exact release commit without touching excluded files.

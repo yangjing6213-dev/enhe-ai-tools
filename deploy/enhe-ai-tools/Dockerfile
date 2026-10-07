@@ -1,7 +1,11 @@
 FROM node:24-alpine AS deps
 WORKDIR /app
 COPY package.json package-lock.json* ./
+COPY vendor/braces-3.0.4-enhe.0.tgz ./vendor/
 RUN npm ci
+
+FROM deps AS production-deps
+RUN npm prune --omit=dev --ignore-scripts
 
 FROM node:24-alpine AS builder
 WORKDIR /app
@@ -26,7 +30,7 @@ ENV NEXT_TELEMETRY_DISABLED=1
 RUN sed -i 's#dl-cdn.alpinelinux.org#mirrors.aliyun.com#g' /etc/apk/repositories \
     && apk add --no-cache python3
 
-COPY --from=deps /app/node_modules ./node_modules
+COPY --from=production-deps /app/node_modules ./node_modules
 COPY --from=builder /app/package.json ./package.json
 COPY --from=builder /app/package-lock.json ./package-lock.json
 COPY --from=builder /app/public ./public

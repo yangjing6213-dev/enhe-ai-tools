@@ -10,6 +10,41 @@ function read(path: string) {
 }
 
 describe("production release workflow", () => {
+  it("keeps lint and test tools out of the runtime image while retaining operational tools", () => {
+    const dockerfile = read("deploy/enhe-ai-tools/Dockerfile");
+    const manifest = JSON.parse(read("package.json"));
+    const runtime = dockerfile.slice(dockerfile.indexOf("FROM node:24-alpine AS runner"));
+    expect(dockerfile).toContain("FROM deps AS production-deps");
+    expect(dockerfile).toContain("RUN npm prune --omit=dev --ignore-scripts");
+    expect(runtime).toContain("COPY --from=production-deps /app/node_modules ./node_modules");
+    expect(runtime).not.toContain("COPY --from=deps /app/node_modules");
+    expect(manifest.dependencies.prisma).toBeTruthy();
+    expect(manifest.dependencies.tsx).toBeTruthy();
+    expect(manifest.devDependencies.prisma).toBeUndefined();
+    expect(manifest.devDependencies.tsx).toBeUndefined();
+  });
+
+  it("copies the local braces archive before installing in both Docker build paths", () => {
+    const dockerfiles = [read("Dockerfile"), read("deploy/enhe-ai-tools/Dockerfile")];
+
+    for (const dockerfile of dockerfiles) {
+      const archiveCopy = dockerfile.indexOf("COPY vendor/braces-3.0.4-enhe.0.tgz ./vendor/");
+      const dependencyInstall = dockerfile.search(/^RUN npm (?:ci|install)$/m);
+
+      expect(archiveCopy).toBeGreaterThan(-1);
+      expect(dependencyInstall).toBeGreaterThan(archiveCopy);
+    }
+  });
+
+  it("blocks release on high severity dependency advisories before build or push", () => {
+    const wrapper = read("scripts/push-and-deploy.ps1");
+    const audit = wrapper.indexOf('Invoke-Native -FilePath npm -Arguments @("audit", "--include=dev", "--include=optional", "--include=peer", "--audit-level=high", "--registry=https://registry.npmjs.org")');
+    expect(audit).toBeGreaterThan(-1);
+    expect(audit).toBeLessThan(wrapper.indexOf('"scripts/test-migration-paths.mjs", $Branch'));
+    expect(audit).toBeLessThan(wrapper.indexOf('Invoke-Native -FilePath npm -Arguments @("run", "build")'));
+    expect(audit).toBeLessThan(wrapper.indexOf('Invoke-Native -FilePath git -Arguments @("push", "origin"'));
+  });
+
   it("pins standalone output tracing to the current worktree root", () => {
     expect(nextConfig.output).toBe("standalone");
     expect(nextConfig.outputFileTracingRoot).toBe(root);
