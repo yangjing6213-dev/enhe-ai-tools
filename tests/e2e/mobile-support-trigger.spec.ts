@@ -760,7 +760,7 @@ test("keeps component exclusions aligned with a non-zero right safe area", async
   expect(geometryChecks).toBeGreaterThan(0);
 });
 
-test("retains the exact desktop launcher baseline from 768px upward", async ({ page }) => {
+test("uses the redesigned compact white launcher from 768px upward", async ({ page }) => {
   for (const viewportSize of [
     { width: 768, height: 900, offset: 24 },
     { width: 1024, height: 900, offset: 24 },
@@ -769,10 +769,11 @@ test("retains the exact desktop launcher baseline from 768px upward", async ({ p
     await page.setViewportSize(viewportSize);
 
     for (const route of [
-      { path: "/software", label: "客服", width: 88 },
-      { path: "/en/software", label: "Chat", width: 95.546875 },
+      { path: "/software", label: "客服" },
+      { path: "/en/software", label: "Chat" },
     ] as const) {
       await openFormalRoute(page, route.path);
+      await page.evaluate(async () => document.fonts.ready);
       const launcher = page.getByRole("button", { name: route.label, exact: true });
       const metrics = await launcher.evaluate((button) => {
         const bounds = button.getBoundingClientRect();
@@ -781,6 +782,8 @@ test("retains the exact desktop launcher baseline from 768px upward", async ({ p
         const wrapperBounds = wrapper.getBoundingClientRect();
         const buttonStyle = getComputedStyle(button);
         const wrapperStyle = getComputedStyle(wrapper);
+        const label = button.querySelector<HTMLElement>(".customer-support-launcher-label");
+        if (!label) throw new Error("Missing support launcher label");
         const colorToRgba = (value: string) => {
           const canvas = document.createElement("canvas");
           const context = canvas.getContext("2d");
@@ -799,22 +802,24 @@ test("retains the exact desktop launcher baseline from 768px upward", async ({ p
           padding: buttonStyle.padding,
           backgroundColor: buttonStyle.backgroundColor,
           backgroundRgba: colorToRgba(buttonStyle.backgroundColor),
-          expectedBackgroundRgba: colorToRgba("rgb(16 24 33 / 0.95)"),
           color: buttonStyle.color,
+          labelColor: getComputedStyle(label).color,
           zIndex: wrapperStyle.zIndex,
         };
       });
 
       await expect(launcher.locator("span", { hasText: route.label })).toBeVisible();
       await expect(launcher.locator("svg")).toBeVisible();
-      expect(Math.abs(metrics.width - route.width)).toBeLessThanOrEqual(0.1);
+      expect(metrics.width).toBeGreaterThanOrEqual(88);
+      expect(metrics.width).toBeLessThanOrEqual(112);
       expect(Math.abs(metrics.height - 46)).toBeLessThanOrEqual(0.1);
       expect(Math.abs(metrics.right - viewportSize.offset)).toBeLessThanOrEqual(0.1);
       expect(Math.abs(metrics.bottom - viewportSize.offset)).toBeLessThanOrEqual(0.1);
       expect(metrics.wrapperWidth).toBe(360);
       expect(metrics.padding).toBe("12px 16px");
-      expect(metrics.backgroundRgba).toEqual(metrics.expectedBackgroundRgba);
-      expect(metrics.color).toBe("rgb(255, 255, 255)");
+      expect(metrics.backgroundRgba).toEqual([255, 255, 255, 255]);
+      expect(metrics.color).toBe("rgb(36, 107, 254)");
+      expect(metrics.labelColor).toBe("rgb(16, 24, 40)");
       expect(metrics.zIndex).toBe("70");
     }
   }
