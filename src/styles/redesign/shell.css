@@ -296,7 +296,8 @@
   align-items: center;
   padding: 2px 7px;
   border-radius: 3px;
-  background: var(--enhe-yellow);
+  background: var(--enhe-action);
+  color: var(--enhe-page-bg, #fff);
   font-size: 10px;
   font-weight: 900;
   line-height: 1.15;

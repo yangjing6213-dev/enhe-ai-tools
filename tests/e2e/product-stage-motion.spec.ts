@@ -235,7 +235,11 @@ test("keyboard switching is instant and retains persistent-control focus", async
 
   await stage.focus();
   await page.keyboard.press("Tab");
+  await expect(detailLink).toBeFocused();
+  await page.keyboard.press("Tab");
   await expect(previous).toBeFocused();
+  await page.keyboard.press("Tab");
+  await expect(next).toBeFocused();
 });
 
 test("keyboard remains instant when reduced motion is enabled", async ({
