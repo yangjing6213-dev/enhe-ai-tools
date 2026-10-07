@@ -789,21 +789,34 @@ describe("production release workflow", () => {
 
   it("pins the SSH host key and preserves old backups during release deployment", () => {
     const wrapper = read("scripts/push-and-deploy.ps1");
-    const elevatedDeploy = wrapper.indexOf(
-      "sudo -n env RETENTION_DAYS=36500 ENHE_OPERATION_LOCK_HELD=1",
+    const rootDeployCommand = wrapper.indexOf("$rootDeployCommand = @(");
+    const rootWorkingDirectory = wrapper.indexOf('"cd $RemoteProjectDir"', rootDeployCommand);
+    const rootReleaseRefCheck = wrapper.indexOf(
+      "'test \"$(git rev-parse HEAD)\" = \"$RELEASE_REF\"'",
+      rootDeployCommand,
     );
+    const lockRelease = wrapper.indexOf("'flock -u 9'");
+    const lockClose = wrapper.indexOf("'exec 9>&-'", lockRelease);
+    const elevatedDeploy = wrapper.indexOf("sudo -n env RETENTION_DAYS=36500", lockClose);
 
     expect(wrapper.match(/StrictHostKeyChecking=yes/g) ?? []).toHaveLength(2);
     expect(wrapper).not.toContain("StrictHostKeyChecking=accept-new");
-    expect(elevatedDeploy).toBeGreaterThan(-1);
-    expect(wrapper.indexOf("ENHE_OPERATION_LOCK_FILE=", elevatedDeploy)).toBeGreaterThan(
-      elevatedDeploy,
+    expect(rootDeployCommand).toBeGreaterThan(-1);
+    expect(rootDeployCommand).toBeLessThan(lockRelease);
+    expect(rootWorkingDirectory).toBeGreaterThan(rootDeployCommand);
+    expect(rootReleaseRefCheck).toBeGreaterThan(rootWorkingDirectory);
+    expect(lockRelease).toBeGreaterThan(-1);
+    expect(lockClose).toBeGreaterThan(lockRelease);
+    expect(elevatedDeploy).toBeGreaterThan(lockClose);
+    expect(wrapper).toContain("unset ENHE_OPERATION_LOCK_HELD ENHE_OPERATION_LOCK_FILE");
+    expect(wrapper).toContain('exec 9>"$remote_lock_file"');
+    expect(wrapper).toContain('test "$(git rev-parse HEAD)" = "$RELEASE_REF"');
+    expect(wrapper).not.toContain(
+      "sudo -n env RETENTION_DAYS=36500 ENHE_OPERATION_LOCK_HELD=1",
     );
     expect(wrapper.indexOf("PREVIOUS_RELEASE_REF=", elevatedDeploy)).toBeGreaterThan(
       elevatedDeploy,
     );
-    expect(wrapper.indexOf("sh ./deploy.sh", elevatedDeploy)).toBeGreaterThan(
-      elevatedDeploy,
-    );
+    expect(wrapper).toContain("'exec sh ./deploy.sh'");
   });
 });

@@ -317,6 +317,21 @@ if (-not $deployRequested) {
   exit 0
 }
 
+$rootDeployCommand = @(
+  "set -eu"
+  "APP_DIR=$RemoteProjectDir"
+  'remote_lock_file="$APP_DIR/deploy/enhe-ai-tools/runtime/enhe-operation.lock"'
+  'mkdir -p "$(dirname "$remote_lock_file")"'
+  'exec 9>"$remote_lock_file"'
+  'if ! flock -n 9; then echo "Another ENHE production operation is running." >&2; exit 75; fi'
+  'export ENHE_OPERATION_LOCK_HELD=1'
+  'export ENHE_OPERATION_LOCK_FILE="$remote_lock_file"'
+  "cd $RemoteProjectDir"
+  'test -z "$(git status --porcelain --untracked-files=all)"'
+  'test "$(git rev-parse HEAD)" = "$RELEASE_REF"'
+  'exec sh ./deploy.sh'
+) -join "; "
+
 $remoteCommand = @(
   "set -eu"
   "remote_lock_file='$remoteLockFile'"
@@ -333,7 +348,10 @@ $remoteCommand = @(
   "git fetch --depth=1 origin '$Branch'"
   "test `"`$(git rev-parse FETCH_HEAD)`" = '$ReleaseRef'"
   "git checkout --detach '$ReleaseRef'"
-  "sudo -n env RETENTION_DAYS=36500 ENHE_OPERATION_LOCK_HELD=1 ENHE_OPERATION_LOCK_FILE=`"`$remote_lock_file`" PREVIOUS_RELEASE_REF=`"`$previous_release_ref`" RELEASE_REF='$ReleaseRef' sh ./deploy.sh"
+  'flock -u 9'
+  'exec 9>&-'
+  'unset ENHE_OPERATION_LOCK_HELD ENHE_OPERATION_LOCK_FILE'
+  "sudo -n env RETENTION_DAYS=36500 PREVIOUS_RELEASE_REF=`"`$previous_release_ref`" RELEASE_REF='$ReleaseRef' sh -c '$rootDeployCommand'"
 ) -join "; "
 
 Invoke-Native -FilePath ssh -Arguments @(
