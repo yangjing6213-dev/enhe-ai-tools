@@ -111,7 +111,7 @@ test("software category panel fixed layers stay viewport-anchored", async ({ pag
   }
 });
 
-test("review focus pause stays latched until explicit continue", async ({ page }) => {
+test("review auto-rotation pauses while focused and resumes when focus leaves", async ({ page }) => {
   await page.clock.install();
   await openFormalRoute(page, "/");
 
@@ -122,17 +122,14 @@ test("review focus pause stays latched until explicit continue", async ({ page }
   await expect(activeReview).toHaveCount(1);
   await expect(track).toHaveAttribute("aria-live", "off");
   const initialReview = await activeReview.getAttribute("aria-label");
+  await expect(page.getByRole("button", { name: /暂停自动播放|继续自动播放/ })).toHaveCount(0);
 
   await section.focus();
   await expect(track).toHaveAttribute("aria-live", "polite");
-  await expect(page.getByRole("button", { name: "继续自动播放" })).toBeVisible();
-
-  await page.locator("header a").first().focus();
   await page.clock.fastForward(6_100);
   await expect(activeReview).toHaveAttribute("aria-label", initialReview ?? "");
   await expect(track).toHaveAttribute("aria-live", "polite");
 
-  await section.focus();
   await page
     .getByRole("button", { name: "下一条评价" })
     .evaluate((button: HTMLButtonElement) => button.click());
@@ -140,39 +137,34 @@ test("review focus pause stays latched until explicit continue", async ({ page }
   await page.clock.fastForward(12_000);
   await expect(activeReview).toHaveAttribute("aria-label", focusedManualReview ?? "");
 
-  const continueButton = page.getByRole("button", { name: "继续自动播放" });
-  await continueButton.focus();
-  await continueButton.press("Enter");
+  await page.locator("header a").first().focus();
   await expect(track).toHaveAttribute("aria-live", "off");
-  await expect(page.getByRole("button", { name: "暂停自动播放" })).toBeVisible();
-
   await page.clock.fastForward(5_100);
-  await expect(activeReview).not.toHaveAttribute("aria-label", initialReview ?? "");
+  await expect(activeReview).not.toHaveAttribute("aria-label", focusedManualReview ?? "");
 });
 
-test("review explicit pause and manual navigation obey timer priority", async ({ page }) => {
+test("review auto-rotation pauses on hover and resumes after manual navigation", async ({ page }) => {
   await page.clock.install();
   await openFormalRoute(page, "/");
 
+  const section = page.locator(".redesign-home-reviews");
   const track = page.locator(".redesign-home-reviews-track");
   const activeReview = page.locator('.redesign-home-review-card[data-active="true"]');
-  const pauseButton = page.getByRole("button", { name: "暂停自动播放" });
 
   await expect(activeReview).toHaveCount(1);
   const initialReview = await activeReview.getAttribute("aria-label");
-  await pauseButton.evaluate((button: HTMLButtonElement) => button.click());
+  await page.clock.fastForward(5_100);
+  await expect(activeReview).not.toHaveAttribute("aria-label", initialReview ?? "");
+
+  const beforeHover = await activeReview.getAttribute("aria-label");
+  await section.dispatchEvent("mouseenter");
   await expect(track).toHaveAttribute("aria-live", "polite");
-  await expect(page.getByRole("button", { name: "继续自动播放" })).toBeVisible();
-
-  await page.locator(".redesign-home-reviews").dispatchEvent("mouseleave");
-  await page.locator("header a").first().focus();
   await page.clock.fastForward(12_000);
-  await expect(activeReview).toHaveAttribute("aria-label", initialReview ?? "");
-
-  await page
-    .getByRole("button", { name: "继续自动播放" })
-    .evaluate((button: HTMLButtonElement) => button.click());
+  await expect(activeReview).toHaveAttribute("aria-label", beforeHover ?? "");
+  await section.dispatchEvent("mouseleave");
   await expect(track).toHaveAttribute("aria-live", "off");
+  await page.clock.fastForward(5_100);
+  await expect(activeReview).not.toHaveAttribute("aria-label", beforeHover ?? "");
 
   const beforeManualMove = await activeReview.getAttribute("aria-label");
   await page
@@ -186,9 +178,10 @@ test("review explicit pause and manual navigation obey timer priority", async ({
   await expect(activeReview).toHaveAttribute("aria-label", manuallySelectedReview ?? "");
   await page.clock.fastForward(1);
   await expect(track).toHaveAttribute("aria-live", "off");
-  await expect(activeReview).toHaveAttribute("aria-label", manuallySelectedReview ?? "");
-  await page.clock.fastForward(5_000);
+  await page.clock.fastForward(5_100);
   await expect(activeReview).not.toHaveAttribute("aria-label", manuallySelectedReview ?? "");
+
+  await expect(page.getByRole("button", { name: /暂停自动播放|继续自动播放/ })).toHaveCount(0);
 });
 
 test("reduced motion keeps product, review, and support controls functional", async ({ page }) => {

@@ -124,7 +124,7 @@ for (const route of knownRoutes) {
       expect(focusStyles.active).toBe(true);
       expect(focusStyles.outlineWidth).toBe("3px");
       expect(focusStyles.outlineStyle).toBe("solid");
-      expect(focusStyles.outlineOffset).toBe("2px");
+      expect(focusStyles.outlineOffset).toBe("3px");
       expect(focusStyles.boxShadow).not.toBe("none");
       expect(focusStyles.position).toBe("relative");
       expect(focusStyles.zIndex).not.toBe("auto");
@@ -146,7 +146,7 @@ for (const route of knownRoutes) {
         };
       });
 
-      expect(styles.backgroundColor).toBe("rgb(248, 250, 247)");
+      expect(styles.backgroundColor).toBe("rgb(255, 255, 255)");
       expect(styles.panelBackgroundColor).toBe("rgb(255, 255, 255)");
       expect(styles.panelBackdropFilter).toBe("none");
       expect(styles.panelBoxShadow).toBe("none");

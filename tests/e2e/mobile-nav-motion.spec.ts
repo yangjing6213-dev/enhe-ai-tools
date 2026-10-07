@@ -785,8 +785,9 @@ test("navigation and language links remain immediate and unchanged", async ({ pa
   const items = drawer.locator(
     ".redesign-mobile-nav > a, .redesign-mobile-nav > details",
   );
-  await expect(items).toHaveCount(6);
+  await expect(items).toHaveCount(7);
   await expect(items).toHaveText([
+    "首页",
     "AI工具",
     "AI SkillAI 提示词AI Skill",
     "AI资讯",
@@ -806,8 +807,8 @@ test("navigation and language links remain immediate and unchanged", async ({ pa
   const order = await mobileActions.evaluate((element) =>
     Array.from(element.children).map((child) => child.className),
   );
-  expect(order[0]).toContain("redesign-language-switch");
-  expect(order[1]).toContain("redesign-mobile-menu-root");
+  expect(order[0]).toContain("redesign-mobile-menu-root");
+  expect(order[1]).toContain("redesign-language-switch");
 
   await Promise.all([
     page.waitForURL((url) => url.pathname === "/en/software"),

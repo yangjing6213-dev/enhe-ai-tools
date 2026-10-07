@@ -43,7 +43,7 @@ const routes: FormalRoute[] = [
   {
     path: "/",
     kind: "home",
-    h1: /一站式AI平台/,
+    h1: /让 AI 创意，落地为真实成果/,
     menu: "菜单",
     closeMenu: "收起菜单",
     support: "客服",
@@ -53,7 +53,7 @@ const routes: FormalRoute[] = [
   {
     path: "/en",
     kind: "home",
-    h1: /The All-in-One AI Platform\./i,
+    h1: /Turn AI ideas into real results\./i,
     menu: "Menu",
     closeMenu: "Close menu",
     support: "Chat",
@@ -825,10 +825,9 @@ for (const route of homeSsrRoutes) {
       );
       await expect(currentProduct(page)).toBeVisible();
       await expect(currentProduct(page).getByRole("link")).toBeVisible();
-      await page.waitForLoadState("networkidle");
-      expect([...new Set(productMediaRequests)]).toEqual([
-        HOME_PRODUCTS[0].mediaSrc,
-      ]);
+      await expect
+        .poll(() => [...new Set(productMediaRequests)])
+        .toEqual([HOME_PRODUCTS[0].mediaSrc]);
       expect(
         await page.locator("[id]").evaluateAll((elements) => {
           const ids = elements.map((element) => element.id);

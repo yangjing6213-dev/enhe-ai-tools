@@ -359,6 +359,16 @@
   color: var(--enhe-action) !important;
 }
 
+.enhe-redesign-production .customer-support-launcher {
+  border-color: var(--enhe-border);
+  background: #fff;
+  color: var(--enhe-action);
+}
+
+.enhe-redesign-production .customer-support-launcher-label {
+  color: var(--enhe-text);
+}
+
 .enhe-redesign-production .enhe-contentless-page .enhe-contentless-action-primary {
   border-color: var(--enhe-action);
   background: var(--enhe-action);
@@ -592,6 +602,10 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
+  .enhe-redesign-production .customer-support-launcher {
+    transition-property: border-color !important;
+  }
+
   .enhe-redesign-production :is(button, [role="button"], a[class*="button"], a[class*="cta"], a[class*="card"], a[class*="control"], .enhe-contentless-action, article[class*="card"]:not(.redesign-home-review-card)) {
     scroll-behavior: auto;
     transition-duration: 0.01ms !important;

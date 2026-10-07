@@ -70,6 +70,8 @@ describe("ENHE public visual refresh contract", () => {
     expect(refreshStyles).toContain(":active");
     expect(refreshStyles).toContain(":focus-visible");
     expect(refreshStyles).toContain("prefers-reduced-motion: reduce");
+    expect(refreshStyles).toContain(".enhe-redesign-production .customer-support-launcher-label");
+    expect(refreshStyles).toMatch(/\.enhe-redesign-production \.customer-support-launcher\s*\{[^}]*transition-property:\s*border-color\s*!important/);
     expect(refreshStyles).toContain(".enhe-redesign-production .enhe-contentless-page .enhe-contentless-action-primary");
     expect(refreshStyles).toContain(".enhe-redesign-production :is(button:not(:disabled), [role=\"button\"], a[class*=\"button\"], a[class*=\"cta\"], a[class*=\"card\"], a[class*=\"control\"], .enhe-contentless-action):hover");
   });

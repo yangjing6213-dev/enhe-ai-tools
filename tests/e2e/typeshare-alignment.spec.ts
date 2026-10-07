@@ -81,25 +81,23 @@ for (const route of routes) {
         };
       });
       expect(designTokens).toMatchObject({
-        page: "#f8faf7",
-        text: "#101612",
-        muted: "#536057",
-        action: "#2f6f44",
-        actionHover: "#245a36",
+        page: "#ffffff",
+        text: "#101828",
+        muted: "#526174",
+        action: "#246bfe",
+        actionHover: "#0b57e3",
         surface: "rgb(255, 255, 255)",
-        elevated: "#f0f5ef",
-        border: "#d3ddd5",
-        focus: "#f6c945",
-        yellow: "#f6c945",
-        footer: "#0b2119",
-        referenceAccent: "#2f6f44",
-        referenceCanvas: "#f8faf7",
-        titleColor: "rgb(16, 22, 18)",
+        elevated: "#ffffff",
+        border: "#d8e0eb",
+        focus: "#73a0ff",
+        yellow: "#246bfe",
+        footer: "#06183f",
+        referenceAccent: "#246bfe",
+        referenceCanvas: "#ffffff",
+        titleColor: "rgb(16, 24, 40)",
         titleTrackingRatio: -0.025,
       });
-      const expectedLocaleFont = route.startsWith("/en/")
-        ? "Montserrat"
-        : "Microsoft YaHei";
+      const expectedLocaleFont = "Alimama Fang Yuan Ti";
       expect(designTokens.bodyFont).toContain(expectedLocaleFont);
       expect(designTokens.titleFont).toContain(expectedLocaleFont);
       expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBeLessThanOrEqual(width);
