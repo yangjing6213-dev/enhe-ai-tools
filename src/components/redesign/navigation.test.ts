@@ -29,15 +29,15 @@ describe("public navigation current-page state", () => {
     expect(mobileMenuSource).not.toContain("redesign-search-icon");
   });
 
-  it("places the desktop language switch after the account control", () => {
+  it("places the desktop language switch before the account control", () => {
     const desktopNav = headerSource.slice(
       headerSource.indexOf('<nav className="redesign-desktop-nav"'),
       headerSource.indexOf("</nav>", headerSource.indexOf('<nav className="redesign-desktop-nav"')),
     );
 
-    expect(desktopNav.indexOf("account.status")).toBeGreaterThanOrEqual(0);
-    expect(desktopNav.indexOf("account.status")).toBeLessThan(
-      desktopNav.indexOf("<EnheRedesignLanguageSwitch"),
-    );
+    const accountControlIndex = desktopNav.indexOf("account.status");
+    const languageSwitchIndex = desktopNav.indexOf("<EnheRedesignLanguageSwitch");
+    expect(languageSwitchIndex).toBeGreaterThanOrEqual(0);
+    expect(accountControlIndex).toBeGreaterThan(languageSwitchIndex);
   });
 });

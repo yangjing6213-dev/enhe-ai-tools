@@ -29,5 +29,6 @@
 - `verified`: acceptance tests were first run against the unchanged baseline and failed as expected; the focused component suite now passes 39 tests across 5 files.
 - `verified`: database-free Chromium acceptance passed at 1440, 1024, 900, 768, 390, and 320 pixels, including layout overflow, brand alignment, account-menu contrast, arrow placement, product/review previous-next switching, footer disclosure, hover feedback, and back-to-top behavior.
 - `verified`: independent code review found no P1/P2 blockers; its minor finding about missing review-arrow switching coverage was addressed with product and review previous-next assertions and a passing six-width browser rerun. The final test-only addendum review is pending.
-- `in_progress`: complete project release checks.
+- `verified`: the first full unit-suite run exposed two stale assertions that conflicted with the approved language/account order and filled-triangle icon. Updated those expectations; both affected suites now pass (11 tests). The complete release gate must be rerun against the final commit.
+- `in_progress`: final test-only review, then complete project release checks and guarded exact-ref push/deploy.
 - `pending`: guarded exact-ref GitHub push and Tencent Cloud deployment after every release gate passes.

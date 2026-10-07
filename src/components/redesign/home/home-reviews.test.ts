@@ -173,7 +173,7 @@ describe("homepage experience review candidate", () => {
     expect(reviewCardRule).not.toContain("will-change");
   });
 
-  it("keeps only previous/next rounded triangle controls and timer-controlled rotation", () => {
+  it("keeps only previous/next filled rounded triangle controls and timer-controlled rotation", () => {
     expect(reviewSource).toContain('"use client"');
     expect(reviewSource).toContain("useEffect");
     expect(reviewSource).toContain("setInterval");
@@ -193,10 +193,9 @@ describe("homepage experience review candidate", () => {
     expect(reviewSource).toContain('aria-label={copy.next}');
     expect(reviewSource).not.toContain("togglePause");
     expect(reviewSource).not.toContain("aria-pressed");
-    expect(reviewSource).toContain('strokeLinecap="round"');
-    expect(reviewSource).toContain('strokeLinejoin="round"');
-    expect(reviewSource).toContain('d="M16 5.5 7.5 12 16 18.5Z"');
-    expect(reviewSource).toContain('d="M8 5.5 16.5 12 8 18.5Z"');
+    expect(reviewSource).toContain('data-direction="previous"');
+    expect(reviewSource).toContain('data-direction="next"');
+    expect(reviewSource).toContain('d="M7.2 4.8 18 10.9a1.25 1.25 0 0 1 0 2.2L7.2 19.2A1.35 1.35 0 0 1 5.2 18V6a1.35 1.35 0 0 1 2-1.2Z" fill="currentColor"');
     expect(reviewSource).toContain("REVIEW_INITIAL_INDEX");
     expect(reviewSource).toContain("tabIndex={0}");
     expect(reviewSource).toContain('role="region"');
