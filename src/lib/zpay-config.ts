@@ -19,6 +19,8 @@ export type ZpayConfig = {
   key: string;
   defaultType: ZpayPaymentType;
   channelId?: string;
+  alipayChannelId?: string;
+  wechatChannelId?: string;
   siteUrl: string;
 };
 
@@ -94,6 +96,8 @@ export function loadZpayConfig(input: LoadZpayConfigInput = {}): ZpayConfig {
   );
   const channelId =
     readConfigValue("ZPAY_CHANNEL_ID", env, fileEnv) || undefined;
+  const alipayChannelId = readConfigValue("ZPAY_ALIPAY_CHANNEL_ID", env, fileEnv) || undefined;
+  const wechatChannelId = readConfigValue("ZPAY_WECHAT_CHANNEL_ID", env, fileEnv) || undefined;
   const siteUrl = normalizeOrigin(
     readConfigValue("NEXT_PUBLIC_SITE_URL", env, fileEnv) ||
       readConfigValue("NEXT_PUBLIC_APP_URL", env, fileEnv) ||
@@ -106,7 +110,13 @@ export function loadZpayConfig(input: LoadZpayConfigInput = {}): ZpayConfig {
     if (!key) throw new Error("ZPAY_KEY is required in live mode.");
   }
 
-  return { mode, apiBase, pid, key, defaultType, channelId, siteUrl };
+  return { mode, apiBase, pid, key, defaultType, channelId, alipayChannelId, wechatChannelId, siteUrl };
+}
+
+export function getZpayChannelId(config: ZpayConfig, type: ZpayPaymentType) {
+  const specificChannel = type === "alipay" ? config.alipayChannelId : config.wechatChannelId;
+  // A legacy channel belongs to the configured default method, not both methods.
+  return specificChannel ?? (type === config.defaultType ? config.channelId : undefined);
 }
 
 export function assertZpayPaymentCreationAllowed(config: ZpayConfig) {

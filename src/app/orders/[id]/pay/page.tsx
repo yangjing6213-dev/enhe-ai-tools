@@ -7,9 +7,12 @@ import { PaymentQrCode } from "@/components/payment-qr-code";
 import { ZpayPaymentStatusPoller } from "@/components/zpay-payment-status-poller";
 import { requireUser } from "@/lib/auth";
 import { prisma } from "@/lib/db";
+import { expireUnpaidOrder } from "@/lib/order-expiry";
+import { isOrderPaymentExpired } from "@/lib/order-payment-deadline";
 import { getOrderPaymentPresentation } from "@/lib/order-payment-presentation";
 import { buildCanonicalToolPath } from "@/lib/public-slugs";
 import { formatCurrency } from "@/lib/utils";
+import { getLocalizedStatusLabel } from "@/lib/status-labels";
 import { getZpayPaymentErrorCopy } from "@/lib/zpay-payment-copy";
 import { ensureZpayPaymentForOrder, type ZpayPaymentView } from "@/lib/zpay-orders";
 
@@ -39,6 +42,12 @@ export default async function PayPage({ params }: PayPageProps) {
   });
   if (!order) notFound();
 
+  if (order.orderStatus === "pending_payment" && isOrderPaymentExpired(order.createdAt)) {
+    await expireUnpaidOrder(order.id);
+    const current = await prisma.order.findUnique({ where: { id: order.id }, select: { orderStatus: true, paymentTransaction: true } });
+    if (current) Object.assign(order, current);
+  }
+
   let zpayPayment: ZpayPaymentView | null = null;
   let zpayError: string | null = null;
   const presentation = getOrderPaymentPresentation({
@@ -49,6 +58,12 @@ export default async function PayPage({ params }: PayPageProps) {
     hasSeoAuditSubscriptionOrder: Boolean(order.seoAuditSubscriptionOrder),
   });
   const isTerminalUnpayable = order.orderStatus === "cancelled" || order.orderStatus === "refunded";
+
+  if (order.orderStatus === "cancelled") {
+    zpayError = order.paymentTransaction?.status === "paid"
+      ? "ZPAY_PAYMENT_AFTER_CANCEL_RECONCILIATION"
+      : "ZPAY_ORDER_CANCELLED";
+  }
 
   if (presentation.isZpayPayable && !presentation.isUnlocked && !isTerminalUnpayable) {
     try {
@@ -94,8 +109,8 @@ export default async function PayPage({ params }: PayPageProps) {
       />
 
       <div className="grid gap-6 lg:grid-cols-[0.9fr_1.1fr]">
-        <div className="surface-panel p-7">
-          <p className="text-sm text-[#8B95A7]">订单号</p>
+        <div className="surface-panel !border-slate-200 !bg-white !bg-none p-7 text-slate-900">
+          <p className="text-sm text-slate-600">订单号</p>
           <h1 className="mt-2 break-all text-2xl font-black text-[var(--marketing-accent)]">{order.orderNo}</h1>
 
           <div className="mt-7 grid gap-4">
@@ -103,16 +118,16 @@ export default async function PayPage({ params }: PayPageProps) {
             {order.toolPriceSpecName ? <Info label="规格" value={order.toolPriceSpecName} /> : null}
             <Info label="类型" value={presentation.typeLabel} />
             <Info label="金额" value={formatCurrency(order.amount.toString())} />
-            <Info label="订单状态" value={order.orderStatus} />
+            <Info label="订单状态" value={getLocalizedStatusLabel("order", order.orderStatus, "zh")} />
             <Info label="支付方式" value={paymentChannelCopy.methodLabel} />
           </div>
         </div>
 
-        <div className="surface-panel p-7">
+        <div className="surface-panel !border-slate-200 !bg-white !bg-none p-7 text-slate-900">
           {presentation.isUnlocked ? (
             <div>
               <h2 className="text-xl font-bold text-[var(--marketing-accent)]">{presentation.unlockedTitle}</h2>
-              <p className="mt-3 text-sm leading-6 text-[#8B95A7]">
+              <p className="mt-3 text-sm leading-6 text-slate-600">
                 {presentation.unlockedDescription}
               </p>
               <div className="mt-6 flex flex-wrap gap-3">
@@ -131,10 +146,10 @@ export default async function PayPage({ params }: PayPageProps) {
               <h2 className="text-xl font-bold text-[var(--marketing-accent)]">
                 {paymentErrorCopy.title}
               </h2>
-              <p className="status-warning mt-3">
+              <p className="mt-3 rounded-xl border border-slate-200 bg-white p-4 text-sm leading-6 text-slate-900">
                 {paymentErrorCopy.description}
               </p>
-              <p className="mt-4 text-sm leading-6 text-[#8B95A7]">
+              <p className="mt-4 text-sm leading-6 text-slate-600">
                 {paymentErrorCopy.nextStep}
               </p>
             </div>
@@ -142,8 +157,8 @@ export default async function PayPage({ params }: PayPageProps) {
             <div>
               <div className="flex flex-wrap items-start justify-between gap-4">
                 <div>
-                  <h2 className="text-xl font-semibold text-[#F6FAFF]">扫码支付</h2>
-                  <p className="mt-2 text-sm leading-6 text-[#8B95A7]">
+                  <h2 className="text-xl font-semibold text-slate-900">扫码支付</h2>
+                  <p className="mt-2 text-sm leading-6 text-slate-600">
                     二维码为当前订单动态生成，请确认金额与订单号无误后支付。
                   </p>
                 </div>
@@ -175,7 +190,8 @@ export default async function PayPage({ params }: PayPageProps) {
                 </div>
 
                 <div className="flex flex-col justify-between gap-5">
-                  <div className="space-y-3 text-sm leading-6 text-[#8B95A7]">
+                  <div className="space-y-3 text-sm leading-6 text-slate-600">
+                    <p>请在下单后 10 分钟内付款，超时未付款订单将自动取消。</p>
                     <p>{presentation.paymentCompletionText}</p>
                     <p>{paymentChannelCopy.guide}</p>
                     {zpayPayment.transaction.providerTradeNo ? (
@@ -209,7 +225,7 @@ export default async function PayPage({ params }: PayPageProps) {
           ) : (
             <div>
               <h2 className="text-xl font-bold text-[var(--marketing-accent)]">当前订单暂不可支付</h2>
-              <p className="mt-3 text-sm leading-6 text-[#8B95A7]">
+              <p className="mt-3 text-sm leading-6 text-slate-600">
                 该订单状态为 {order.orderStatus}，请返回订单详情查看。
               </p>
             </div>
@@ -222,9 +238,9 @@ export default async function PayPage({ params }: PayPageProps) {
 
 function Info({ label, value }: { label: string; value: string }) {
   return (
-    <div className="rounded-xl border border-white/10 bg-white/8 p-4">
-      <p className="text-xs text-[#8B95A7]">{label}</p>
-      <p className="mt-2 break-all font-semibold text-[#F6FAFF]">{value}</p>
+    <div className="rounded-xl border border-slate-200 bg-white p-4">
+      <p className="text-xs text-slate-600">{label}</p>
+      <p className="mt-2 break-all font-semibold text-slate-900">{value}</p>
     </div>
   );
 }

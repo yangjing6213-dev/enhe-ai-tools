@@ -324,6 +324,18 @@ describe("activateOrderFromZpayNotify", () => {
     );
   });
 
+  it("records a verified late payment on a cancelled order without activating it", async () => {
+    const fixture = seoAuditFixture({ orderStatus: "cancelled" });
+    const trackEvent = vi.fn();
+    const payload = successfulPayload("unit-late-cancelled");
+    await expect(activateOrderFromZpayNotify(payload, { db: fixture.db as never, config, trackEvent })).resolves.toEqual({ ok: true, response: "success", status: 200 });
+    expect(fixture.tx.paymentTransaction.upsert).toHaveBeenCalledWith(expect.objectContaining({ create: expect.objectContaining({ status: "paid" }) }));
+    expect(fixture.tx.order.update).not.toHaveBeenCalled();
+    expect(grantSeoAuditEntitlementsForPaidOrderInTransaction).not.toHaveBeenCalled();
+    expect(trackEvent).not.toHaveBeenCalled();
+    expect(fixture.tx.adminAuditLog.create).toHaveBeenCalledWith(expect.objectContaining({ data: expect.objectContaining({ action: "order.payment.zpay_late_after_cancel" }) }));
+  });
+
   it("tracks a first monitoring purchase only after commit without URL or report data", async () => {
     const fixture = seoAuditFixture({ orderType: "seo_audit_monitoring" });
     const trackEvent = vi.fn(async (_event: AnalyticsEventInput) => {

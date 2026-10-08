@@ -2,11 +2,13 @@ import { Prisma, type Order, type PaymentMethod, type PaymentTransaction, type T
 import { createAdminAuditCreateData } from "@/lib/admin-audit";
 import { trackAnalyticsEvent } from "@/lib/analytics";
 import { prisma } from "@/lib/db";
+import { isOrderPaymentExpired } from "@/lib/order-payment-deadline";
 import { lockSoftwareEntitlement } from "@/lib/membership";
 import { LATE_PAYMENT_AFTER_LOCAL_REFUND_ERROR_CODE } from "@/lib/refund-reconciliation";
 import { grantSeoAuditEntitlementsForPaidOrderInTransaction } from "@/lib/seo-audit/entitlements";
 import {
   assertZpayPaymentCreationAllowed,
+  getZpayChannelId,
   loadZpayConfig,
   type ZpayConfig,
 } from "@/lib/zpay-config";
@@ -322,7 +324,7 @@ export function buildZpayPaymentRequest(input: {
   const params = buildZpaySignedParams(
     {
       pid: input.config.pid,
-      cid: input.config.channelId,
+      cid: getZpayChannelId(input.config, paymentType),
       type: paymentType,
       out_trade_no: input.order.orderNo,
       notify_url: `${input.config.siteUrl}/api/zpay/notify`,
@@ -366,12 +368,13 @@ async function postZpayForm<T extends Record<string, unknown>>(
   for (const [key, value] of Object.entries(params)) {
     if (value !== "") body.append(key, value);
   }
-  const response = await fetch(url, { method: "POST", body, signal });
+  const response = await fetch(url, { method: "POST", body, signal, redirect: "error" });
+  if (!response.ok) throw new Error("ZPAY_PROVIDER_HTTP_ERROR");
   const text = await response.text();
   try {
     return JSON.parse(text) as T;
   } catch {
-    throw new Error(`ZPAY returned non-JSON response: ${text.slice(0, 160)}`);
+    throw new Error("ZPAY_PROVIDER_INVALID_JSON");
   }
 }
 
@@ -388,7 +391,9 @@ export async function requestZpayPayment(
   try {
     return await postZpayForm<ZpayCreatePaymentResponse>(
       input.endpoint,
-      Object.fromEntries(Object.entries(input.params).map(([key, value]) => [key, String(value)])),
+      Object.fromEntries(Object.entries(input.params)
+        .filter(([, value]) => value !== undefined && value !== null && value !== "")
+        .map(([key, value]) => [key, String(value)])),
       controller.signal,
     );
   } finally {
@@ -425,11 +430,15 @@ export async function ensureZpayPaymentForOrder(
     if (!order) throw new Error("Order does not exist or is not payable by ZPAY.");
 
     const currentTransaction = order.paymentTransaction;
+    if (order.orderStatus === "cancelled") throw new Error("ZPAY_ORDER_CANCELLED");
     if (isPaidOrderStatus(order.orderStatus)) {
       if (!currentTransaction) {
         throw new Error("ZPAY_ORDER_ALREADY_PAID_WITHOUT_TRANSACTION");
       }
       return { kind: "view" as const, transaction: currentTransaction };
+    }
+    if (isOrderPaymentExpired(order.createdAt, dependencies.now?.() ?? new Date())) {
+      throw new Error("ZPAY_ORDER_EXPIRED");
     }
 
     const request = buildZpayPaymentRequest({
@@ -450,6 +459,9 @@ export async function ensureZpayPaymentForOrder(
       return { kind: "view" as const, transaction: currentTransaction };
     }
     if (currentTransaction?.status === "failed") {
+      if (getRawResponseObject(currentTransaction)?.creationState === "failed") {
+        throw new Error("ZPAY_PAYMENT_CREATION_REJECTED");
+      }
       return { kind: "reconciliation_required" as const };
     }
     if (
@@ -549,8 +561,16 @@ export async function ensureZpayPaymentForOrder(
     }
     throw error;
   }
-  if (!isSuccessfulProviderCode(response.code)) {
-    const providerError = new Error(response.msg || "ZPAY 创建支付订单失败。");
+  const responseCode = response && typeof response === "object" ? String(response.code) : "";
+  const hasPaymentEntry = response && [response.qrcode, response.img, response.payurl, response.payurl2]
+    .some((value) => typeof value === "string" && value.trim().length > 0);
+  if (!["0", "1", "error"].includes(responseCode) || (responseCode === "1" && !hasPaymentEntry)) {
+    const persisted = await persistZpayPaymentCreationState(db, claim, "ambiguous");
+    if (persisted.kind === "terminal") return toZpayPaymentView(persisted.transaction);
+    throw new Error("ZPAY_PAYMENT_CREATION_RECONCILIATION_REQUIRED");
+  }
+  if (!isSuccessfulProviderCode(responseCode)) {
+    const providerError = new Error("ZPAY_PAYMENT_CREATION_REJECTED");
     const persisted = await persistZpayPaymentCreationState(db, claim, "failed");
     if (persisted.kind === "terminal") {
       return toZpayPaymentView(persisted.transaction);
@@ -789,6 +809,17 @@ export async function activateOrderFromZpayNotify(
       }
     });
 
+    if (current.orderStatus === "cancelled") {
+      if (current.paymentTransaction?.status !== "paid") {
+        await tx.adminAuditLog.create({ data: createAdminAuditCreateData({
+          action: "order.payment.zpay_late_after_cancel",
+          targetType: "order", targetId: current.id,
+          summary: "Payment received after cancellation; reconciliation required, no access granted.",
+          metadata: { paymentType: String(payload.type ?? ""), amount: current.amount.toString() },
+        }) });
+      }
+      return { validationFailure: null, purchaseEvents: [] };
+    }
     if (isNewLatePaymentAfterLocalRefund) {
       await tx.adminAuditLog.create({
         data: createAdminAuditCreateData({

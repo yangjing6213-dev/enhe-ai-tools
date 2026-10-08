@@ -45,6 +45,9 @@ services:
       SEO_AUDIT_WORKER_HEARTBEAT_FILE: /app/runtime/seo-audit-worker-heartbeat.json
       SEO_AUDIT_SCHEDULER_HEARTBEAT_FILE: /app/runtime/seo-audit-scheduler-heartbeat.json
       ZPAY_REFUND_CONFIRMATION_STORE: /app/runtime/zpay-refund-confirmations
+      # ENHE's verified signed channels; no credentials are stored here.
+      ZPAY_ALIPAY_CHANNEL_ID: ${ZPAY_ALIPAY_CHANNEL_ID:-18670}
+      ZPAY_WECHAT_CHANNEL_ID: ${ZPAY_WECHAT_CHANNEL_ID:-18680}
       UPLOAD_DIR: /app/public/uploads
     ports:
       - "127.0.0.1:3001:3000"

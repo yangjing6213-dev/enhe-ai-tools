@@ -9,6 +9,7 @@ import {
   ensureZpayPaymentForOrder,
 } from "@/lib/zpay-orders";
 import { updateOrderForAdmin } from "@/lib/admin-order-mutations";
+import { expireUnpaidOrder } from "@/lib/order-expiry";
 
 const databaseUrl = process.env.SEO_AUDIT_TEST_DATABASE_URL;
 if (databaseUrl) {
@@ -111,6 +112,51 @@ describePostgres("PostgreSQL ZPAY payment creation serialization", () => {
     orderIds.push(order.id);
     return { offer, user, order };
   }
+
+  it("serializes duplicate expiry sweeps and records late payments without granting access", async () => {
+    const fixture = await createOrder();
+    const now = new Date(fixture.order.createdAt.getTime() + 600_000);
+    const queryOrder = vi.fn();
+    const results = await Promise.all([
+      expireUnpaidOrder(fixture.order.id, { db, config, now: () => now, queryOrder }),
+      expireUnpaidOrder(fixture.order.id, { db, config, now: () => now, queryOrder }),
+    ]);
+    expect(results.sort()).toEqual(["cancelled", "unchanged"]);
+    expect(queryOrder).not.toHaveBeenCalled();
+    expect(await db.adminAuditLog.count({ where: { targetId: fixture.order.id, action: "order.payment.expired" } })).toBe(1);
+    const payload = buildZpaySignedParams({ pid: config.pid, out_trade_no: fixture.order.orderNo, money: "19.90", type: "wxpay", trade_no: `unit-late-${randomUUID()}`, trade_status: "TRADE_SUCCESS" }, config.key);
+    for (let i = 0; i < 2; i += 1) {
+      expect(await activateOrderFromZpayNotify(payload, { db, config, now: () => now })).toMatchObject({ ok: true });
+    }
+    expect((await db.order.findUniqueOrThrow({ where: { id: fixture.order.id } })).orderStatus).toBe("cancelled");
+    expect((await db.paymentTransaction.findUniqueOrThrow({ where: { orderId: fixture.order.id } })).status).toBe("paid");
+    expect(await db.seoAuditCredit.findUnique({ where: { orderId: fixture.order.id } })).toBeNull();
+    expect(await db.adminAuditLog.count({ where: { targetId: fixture.order.id, action: "order.payment.zpay_late_after_cancel" } })).toBe(1);
+  });
+
+  it("does not cancel a payment whose callback commits while the expiry query is in flight", async () => {
+    const fixture = await createOrder();
+    const now = new Date(fixture.order.createdAt.getTime() + 600_000);
+    const providerTradeNo = `unit-expiry-race-${randomUUID()}`;
+    await db.paymentTransaction.create({ data: { orderId: fixture.order.id, provider: "zpay", paymentType: "wxpay", amount: fixture.order.amount, status: "pending", providerTradeNo, rawResponse: { creationState: "created" } } });
+    const queryStarted = createDeferred();
+    const queryRelease = createDeferred();
+    const expiring = expireUnpaidOrder(fixture.order.id, { db, config, now: () => now, queryOrder: async () => {
+      queryStarted.resolve();
+      await queryRelease.promise;
+      return { kind: "unpaid" };
+    } });
+    try {
+      await queryStarted.promise;
+      const payload = buildZpaySignedParams({ pid: config.pid, out_trade_no: fixture.order.orderNo, money: "19.90", type: "wxpay", trade_no: providerTradeNo, trade_status: "TRADE_SUCCESS" }, config.key);
+      expect(await activateOrderFromZpayNotify(payload, { db, config, now: () => now })).toMatchObject({ ok: true });
+    } finally {
+      queryRelease.resolve();
+    }
+    expect(await expiring).toBe("unchanged");
+    expect((await db.order.findUniqueOrThrow({ where: { id: fixture.order.id } })).orderStatus).toBe("activated");
+    expect(await db.adminAuditLog.count({ where: { targetId: fixture.order.id, action: "order.payment.expired" } })).toBe(0);
+  });
 
   it.each(["paid", "activated", "refunded"] as const)(
     "fails closed when a %s order has no payment transaction",
@@ -407,7 +453,7 @@ describePostgres("PostgreSQL ZPAY payment creation serialization", () => {
         { orderId: fixture.order.id },
         { db, config, requestPayment: rejectedRequest },
       ),
-    ).rejects.toThrow("provider rejected");
+    ).rejects.toThrow("ZPAY_PAYMENT_CREATION_REJECTED");
 
     const transaction = await db.paymentTransaction.findUniqueOrThrow({
       where: { orderId: fixture.order.id },
@@ -427,13 +473,24 @@ describePostgres("PostgreSQL ZPAY payment creation serialization", () => {
         { orderId: fixture.order.id },
         { db, config, requestPayment: retryRequest },
       ),
-    ).rejects.toThrow("ZPAY_PAYMENT_CREATION_RECONCILIATION_REQUIRED");
+    ).rejects.toThrow("ZPAY_PAYMENT_CREATION_REJECTED");
     expect(rejectedRequest).toHaveBeenCalledTimes(1);
     expect(retryRequest).not.toHaveBeenCalled();
     expect((await db.order.findUniqueOrThrow({ where: { id: fixture.order.id } })).orderNo).toBe(
       fixture.order.orderNo,
     );
   }, 30_000);
+
+  it.each([null, {}, { code: 503 }, { code: 1 }, { code: 1, qrcode: "" }])("holds malformed or incomplete provider responses for reconciliation: %j", async (response) => {
+    const fixture = await createOrder();
+    const requestPayment = vi.fn().mockResolvedValue(response);
+    await expect(ensureZpayPaymentForOrder({ orderId: fixture.order.id }, { db, config, requestPayment })).rejects.toThrow("ZPAY_PAYMENT_CREATION_RECONCILIATION_REQUIRED");
+    const transaction = await db.paymentTransaction.findUniqueOrThrow({ where: { orderId: fixture.order.id } });
+    expect(transaction.status).toBe("pending");
+    expect(transaction.rawResponse).toMatchObject({ creationState: "ambiguous" });
+    await expect(ensureZpayPaymentForOrder({ orderId: fixture.order.id }, { db, config, requestPayment })).rejects.toThrow("ZPAY_PAYMENT_CREATION_RECONCILIATION_REQUIRED");
+    expect(requestPayment).toHaveBeenCalledTimes(1);
+  });
 
   it("moves only a stale matching dispatch to ambiguous without contacting the provider", async () => {
     const fixture = await createOrder();

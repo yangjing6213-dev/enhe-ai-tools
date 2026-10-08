@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { getCurrentUser } from "@/lib/auth";
 import { prisma } from "@/lib/db";
+import { isOrderPaymentExpired } from "@/lib/order-payment-deadline";
 
 export async function GET(_request: Request, { params }: { params: Promise<{ id: string }> }) {
   const user = await getCurrentUser();
@@ -17,6 +18,7 @@ export async function GET(_request: Request, { params }: { params: Promise<{ id:
   return NextResponse.json({
     orderStatus: order.orderStatus,
     paymentStatus: order.paymentTransaction?.status ?? null,
+    paymentExpired: order.orderStatus === "pending_payment" && isOrderPaymentExpired(order.createdAt),
     unlocked
   });
 }

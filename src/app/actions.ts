@@ -280,10 +280,21 @@ export async function cancelOrderAction(formData: FormData) {
     throw new Error("当前订单状态不允许取消。");
   }
 
-  await prisma.order.update({
-    where: { id: order.id },
+  const cancelled = await prisma.order.updateMany({
+    where: {
+      id: order.id,
+      userId: user.id,
+      orderStatus: { in: ["pending_payment", "pending_review", "rejected"] },
+      paidAt: null,
+      activatedAt: null,
+      OR: [
+        { paymentTransaction: { is: null } },
+        { paymentTransaction: { is: { status: { in: ["pending", "failed"] } } } },
+      ],
+    },
     data: { orderStatus: "cancelled" }
   });
+  if (cancelled.count !== 1) throw new Error("订单状态已经更新，请刷新后查看，不能重复取消。");
 
   revalidatePath(buildLocalePath("/user", locale));
   redirect(`${buildLocalePath("/user", locale)}?order=cancelled`);

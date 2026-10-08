@@ -15,6 +15,7 @@ export function ZpayPaymentStatusPoller({ orderId, toolHref }: ZpayPaymentStatus
   useEffect(() => {
     let stopped = false;
     let attempts = 0;
+    let timer: number;
 
     async function poll() {
       attempts += 1;
@@ -22,15 +23,24 @@ export function ZpayPaymentStatusPoller({ orderId, toolHref }: ZpayPaymentStatus
         const response = await fetch(`/api/orders/${orderId}/payment-status`, { cache: "no-store" });
         if (!response.ok) {
           if (!stopped) setMessage("暂时无法读取支付结果，请稍后刷新页面。");
+          if (!stopped && attempts < 300) timer = window.setTimeout(poll, 3000);
           return;
         }
         const data = (await response.json()) as {
           unlocked?: boolean;
+          orderStatus?: string;
+          paymentExpired?: boolean;
         };
+        if (stopped) return;
         if (data.unlocked) {
           setMessage("支付成功，下载链接已解锁，正在跳转...");
           const target = toolHref || `/orders/${orderId}?paid=success`;
           router.replace(target);
+          return;
+        }
+        if (data.paymentExpired || data.orderStatus === "cancelled" || data.orderStatus === "refunded") {
+          setMessage("当前付款入口已关闭，正在更新订单状态。");
+          router.refresh();
           return;
         }
         if (!stopped) {
@@ -40,12 +50,12 @@ export function ZpayPaymentStatusPoller({ orderId, toolHref }: ZpayPaymentStatus
         if (!stopped) setMessage("正在等待支付结果，请保持页面打开。");
       }
 
-      if (!stopped && attempts < 120) {
-        window.setTimeout(poll, 3000);
+      if (!stopped && attempts < 300) {
+        timer = window.setTimeout(poll, 3000);
       }
     }
 
-    const timer = window.setTimeout(poll, 2000);
+    timer = window.setTimeout(poll, 2000);
     return () => {
       stopped = true;
       window.clearTimeout(timer);
