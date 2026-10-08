@@ -178,7 +178,7 @@ export function ToolAdminList({
             {isAiSkill ? copy.aiSkillListIntro : isSkillLearning ? copy.courseListIntro : isAccountService ? copy.serviceListIntro : copy.listIntro}
           </p>
         </div>
-        <Link href={getAdminToolNewPath(type)} className="enhe-admin-tool-primary-action rounded-full bg-[var(--marketing-accent)] px-5 py-3 text-sm font-semibold text-white transition hover:bg-[#56bfd0]">
+        <Link href={getAdminToolNewPath(type)} className="enhe-admin-tool-primary-action rounded-full bg-[var(--marketing-accent)] px-5 py-3 text-sm font-semibold text-primary-foreground transition hover:bg-[var(--blue-12)]">
           {isAiSkill ? copy.newAiSkill : isSkillLearning ? copy.newCourse : isAccountService ? copy.newService : copy.newTool}
         </Link>
       </div>
@@ -576,7 +576,7 @@ export function ToolEditor({
                 <p className="mt-2 text-sm leading-6 text-[#8B95A7]">{copy.courseContentSectionIntro}</p>
                 {tool?.id ? (
                   <div className="mt-4 flex flex-wrap gap-3">
-                    <a href={`/admin/tutorials?toolId=${tool.id}`} className="inline-block rounded-full bg-[var(--marketing-accent)] px-5 py-3 text-sm font-semibold text-white transition hover:bg-[#56bfd0]">{copy.manageTutorials}</a>
+                    <a href={`/admin/tutorials?toolId=${tool.id}`} className="inline-block rounded-full bg-[var(--marketing-accent)] px-5 py-3 text-sm font-semibold text-primary-foreground transition hover:bg-[var(--blue-12)]">{copy.manageTutorials}</a>
                     <a href={`/admin/faqs?toolId=${tool.id}`} className="inline-block rounded-full border border-white/15 px-5 py-3 text-sm font-semibold text-[#E8EEF8] transition hover:border-[var(--marketing-accent)]/50 hover:text-[var(--marketing-accent)]">{copy.manageFaq}</a>
                   </div>
                 ) : (

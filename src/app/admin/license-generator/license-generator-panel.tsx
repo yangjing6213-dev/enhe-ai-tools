@@ -182,7 +182,7 @@ export function LicenseGeneratorPanel({ labels, serverMachineId }: LicenseGenera
 
         <button
           disabled={pending}
-          className="rounded-full bg-[var(--marketing-accent)] px-5 py-3 text-sm font-semibold text-white transition hover:shadow-[0_0_26px_rgba(65,197,219,0.22)] disabled:cursor-not-allowed disabled:opacity-60"
+          className="rounded-full bg-[var(--marketing-accent)] px-5 py-3 text-sm font-semibold text-primary-foreground transition hover:shadow-[0_0_26px_rgba(65,197,219,0.22)] disabled:cursor-not-allowed disabled:opacity-60"
         >
           {pending ? "..." : labels.generate}
         </button>

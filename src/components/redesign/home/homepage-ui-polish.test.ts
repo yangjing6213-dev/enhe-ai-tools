@@ -17,7 +17,9 @@ const footer = read("src/components/redesign/enhe-redesign-footer.tsx");
 const homeStyles = read("src/styles/redesign/home.css");
 const shellStyles = read("src/styles/redesign/shell.css");
 const refreshStyles = read("src/styles/redesign/site-refresh.css");
+const softwareStyles = read("src/styles/redesign/software.css");
 const tokens = read("src/styles/redesign/tokens.css");
+const globalStyles = read("src/app/globals.css");
 
 describe("homepage UI polish", () => {
   it("places the new brand line with the logo and centers a light, dark-ink hero", () => {
@@ -32,16 +34,34 @@ describe("homepage UI polish", () => {
     expect(refreshStyles).toMatch(/\.redesign-home-hero-inner\s*\{[^}]*text-align:\s*center/);
     expect(refreshStyles).toMatch(/\.redesign-home-hero\s*\{[^}]*min-height:\s*clamp\(560px,\s*44vw,\s*680px\)/);
     expect(refreshStyles).toMatch(/\.redesign-home \.redesign-home-hero-inner\s*\{[^}]*padding:\s*clamp\(84px,\s*10vw,\s*128px\)/);
-    expect(homeStyles).toMatch(/@font-face\s*\{[^}]*font-family:\s*"LXGW WenKai"[^}]*src:\s*url\("\/fonts\/lxgw-wenkai\/lxgw-wenkai-home-label\.woff"\)/);
-    expect(shellStyles).toMatch(/\.redesign-brand-label\s*\{[^}]*font-family:\s*"LXGW WenKai"/);
+    expect(tokens).toContain('--enhe-font-brand-label: "LXGW WenKai Lite"');
+    expect(globalStyles).toContain("font-family: 'LXGW WenKai Lite'");
+    expect(globalStyles).toContain("/fonts/lxgw-wenkai/lxgw-wenkai-home-label.woff");
+    expect(shellStyles).toMatch(/\.redesign-brand-label\s*\{[^}]*font-family:\s*var\(--enhe-font-brand-label(?:,|\))/);
   });
 
-  it("orders the language control before the account and keeps its menu readable", () => {
-    const desktopNav = header.slice(header.indexOf('<nav className="redesign-desktop-nav"'), header.indexOf("</nav>"));
+  it("uses the shared theme background on homepage and product fallback surfaces", () => {
+    expect(homeStyles).toMatch(/\.redesign-home\s*\{[^}]*background-color:\s*var\(--enhe-page-bg\)/);
+    expect(homeStyles).toMatch(/\.redesign-home-product-media-fallback\s*\{[^}]*background:\s*color-mix\([^}]*var\(--enhe-surface/);
+    expect(homeStyles).not.toMatch(/#fdfcf7|253,\s*252,\s*247/);
+  });
 
-    expect(desktopNav.indexOf("<EnheRedesignLanguageSwitch")).toBeLessThan(
-      desktopNav.indexOf('<details className="redesign-account-menu">'),
-    );
+  it("uses theme-matched foreground colors on primary buttons in both themes", () => {
+    expect(refreshStyles).toMatch(/\.redesign-home \.redesign-home-cta,[\s\S]*?\.redesign-home-brand-value-cta\s*\{[^}]*color:\s*var\(--primary-foreground/);
+    expect(refreshStyles).toMatch(/\.redesign-home \.redesign-home-cta:hover,[\s\S]*?\.redesign-home-brand-value-cta:hover\s*\{[^}]*color:\s*var\(--primary-foreground/);
+    expect(softwareStyles).toMatch(/\.redesign-software-category-button\[data-selected="true"\]\s*\{[^}]*color:\s*var\(--primary-foreground/);
+    expect(softwareStyles).toMatch(/\.redesign-software-empty-action\s*\{[^}]*color:\s*var\(--primary-foreground/);
+    expect(softwareStyles).toMatch(/\.redesign-software-load-more-button\s*\{[^}]*color:\s*var\(--primary-foreground/);
+  });
+
+  it("keeps language at the far right after the account and theme controls", () => {
+    const accountControl = header.indexOf('className="redesign-account-menu"');
+    const themeControl = header.indexOf("<ThemeToggle locale={locale} />");
+    const languageControl = header.indexOf("<EnheRedesignLanguageSwitch");
+
+    expect(accountControl).toBeGreaterThanOrEqual(0);
+    expect(themeControl).toBeGreaterThan(accountControl);
+    expect(languageControl).toBeGreaterThan(themeControl);
     expect(shellStyles).toMatch(/\.redesign-avatar-menu\s*\{[^}]*color:\s*var\(--enhe-text\)/);
     expect(shellStyles).toMatch(/\.redesign-language-switch\s*\{[^}]*border:\s*1px solid var\(--enhe-border\)/);
     expect(shellStyles).toMatch(/\.redesign-avatar-trigger\s*\{[^}]*border:\s*1px solid var\(--enhe-border\)/);
@@ -84,13 +104,17 @@ describe("homepage UI polish", () => {
     expect(reviews).not.toContain("以下人物与评价内容由 AI 生成，仅作页面展示示意，并非真实用户评价。");
   });
 
+  it("keeps narrow-phone review cards readable without clipped neighboring reviews", () => {
+    expect(homeStyles).toMatch(/@media\s*screen and \(width < 480px\)[\s\S]*?\.redesign-home-review-card\s*\{[^}]*width:\s*min\(100%,\s*520px\)[^}]*\}[\s\S]*?\.redesign-home-review-card:not\(\[data-position="0"\]\)\s*\{[^}]*visibility:\s*hidden/);
+  });
+
   it("uses collapsed expandable footer groups without a back-to-top link", () => {
     expect(footer).toContain('<details className="footer-group">');
     expect(footer).not.toContain('<details className="footer-group" open>');
     expect(footer).not.toContain("footer-back-to-top");
     expect(footer).not.toContain("backToTop");
     expect(header).toContain('id="top"');
-    expect(tokens).toContain("--enhe-footer: #001512");
+    expect(tokens).toContain("--enhe-footer: #0b1f44");
     expect(refreshStyles).toMatch(/\.redesign-footer\s*\{[^}]*background:\s*var\(--enhe-footer\)/);
     expect(shellStyles).toMatch(/\.redesign-footer-inner\s*\{[^}]*position:\s*relative/);
     expect(shellStyles).not.toContain(".footer-back-to-top-row");

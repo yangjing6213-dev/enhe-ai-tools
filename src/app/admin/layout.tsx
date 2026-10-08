@@ -10,6 +10,7 @@ import { getAdminDictionary } from "@/lib/admin-i18n";
 import { getDictionary } from "@/lib/dictionaries";
 import { getCurrentLocale } from "@/lib/i18n";
 import { AdminNav } from "@/app/admin/admin-nav";
+import { ThemeToggle } from "@/components/theme-toggle";
 
 const adminNav = [
   ["dashboard", "/admin"],
@@ -75,6 +76,7 @@ export default async function AdminLayout({ children }: { children: React.ReactN
                   role: adminUser.role,
                 }}
               />
+              <ThemeToggle locale={locale} />
               <LanguageSwitcher locale={locale} labels={publicLabels.language} />
               <a className="admin-topbar-home" href={locale === "en" ? "/en" : "/"}>
                 {locale === "en" ? "View site" : "查看网站"}

@@ -34,14 +34,14 @@ describe("ENHE typography source contract", () => {
     expect(css).not.toContain("fonts.googleapis.com");
   });
 
-  it("keeps Chinese and English headings aligned to the approved Montserrat / Microsoft YaHei stack", () => {
+  it("keeps Chinese and English headings aligned to the same approved rounded family", () => {
     const css = readFileSync(cssPath, "utf8");
 
-    expect(css).toContain("font-family: 'SmileySans'");
     expect(css).toContain("html[lang='zh-CN'] :is(h1, h2, h3, .home-hero-title)");
     expect(css).toContain("font-family: var(--font-heading-zh)");
     expect(css).toContain("html[lang='en-US'] :is(h1, h2, h3, .home-hero-title)");
     expect(css).toContain("font-family: var(--font-heading-en)");
+    expect(css).toContain("--font-heading-en: 'Alimama Fang Yuan Ti'");
   });
 
   it("does not preload unused Montserrat 800 and 900 font files in the shared document head", () => {

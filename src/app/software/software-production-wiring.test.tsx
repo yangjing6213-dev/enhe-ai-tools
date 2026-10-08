@@ -124,7 +124,9 @@ describe("production software route wiring", () => {
     expect(html).toContain('role="list"');
     expect(html).toContain('aria-labelledby="all-products-heading"');
     expect(html).toContain('role="listitem"');
-    expect(html).not.toMatch(/<article[^>]*hidden/i);
+    const productCardTags = Array.from(html.matchAll(/<article\b[^>]*>/gi), ([tag]) => tag);
+    expect(productCardTags.length).toBeGreaterThan(0);
+    expect(productCardTags.every((tag) => !/\shidden(?:=|\s|>)/i.test(tag))).toBe(true);
     expect(html).not.toMatch(/LOCAL CANDIDATE|Preview|fileUrl|filePath|delivery/i);
   });
 

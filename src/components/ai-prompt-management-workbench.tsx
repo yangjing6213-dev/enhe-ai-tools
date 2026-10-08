@@ -180,7 +180,7 @@ export function AiPromptManagementWorkbench({
               aria-pressed={category === item}
               className={
                 category === item
-                  ? "rounded-lg border border-[var(--marketing-accent)] bg-[var(--marketing-accent)] px-3 py-2 text-left text-sm font-black text-white"
+                  ? "rounded-lg border border-[var(--marketing-accent)] bg-[var(--marketing-accent)] px-3 py-2 text-left text-sm font-black text-primary-foreground"
                   : "rounded-lg border border-transparent px-3 py-2 text-left text-sm font-bold text-[var(--marketing-muted)] hover:border-[var(--marketing-border)] hover:text-[var(--marketing-text)]"
               }
             >

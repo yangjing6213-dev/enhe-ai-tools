@@ -13,11 +13,11 @@ describe("ENHE redesign public shell candidate", () => {
   it("defines the approved independent visual tokens without forbidden effects", () => {
     const tokens = readCandidate("styles/redesign/tokens.css");
 
-    expect(tokens).toContain("--enhe-page-bg: #ffffff");
-    expect(tokens).toContain("--enhe-text: #101828");
-    expect(tokens).toContain("--enhe-action: #246bfe");
-    expect(tokens).toContain("--enhe-footer: #001512");
-    expect(tokens).toContain("--enhe-focus: #73a0ff");
+    expect(tokens).toContain("--enhe-page-bg: var(--background, #ffffff)");
+    expect(tokens).toContain("--enhe-text: var(--foreground, #101828)");
+    expect(tokens).toContain("--enhe-action: var(--primary, #0d74ce)");
+    expect(tokens).toContain("--enhe-footer: #0b1f44");
+    expect(tokens).toContain("--enhe-focus: var(--ring, #73a0ff)");
     expect(tokens).toContain("--enhe-motion-fast: 170ms");
     expect(tokens).toContain("--enhe-z-focus: 60");
     expect(tokens).not.toMatch(/gradient|glow|glass|glitch|neon/i);
@@ -28,14 +28,14 @@ describe("ENHE redesign public shell candidate", () => {
     const labelRule = shell.match(/\.redesign-preview-state-label\s*\{([^}]*)\}/)?.[1] ?? "";
 
     expect(labelRule).toContain("background: var(--enhe-yellow)");
-    expect(labelRule).toContain("color: #fff");
+    expect(labelRule).toContain("color: var(--primary-foreground)");
   });
 
   it("keeps the approved desktop navigation order and explicit account boundary", () => {
     const header = readCandidate("components/redesign/enhe-redesign-header.tsx");
     const navigation = readCandidate("components/redesign/navigation.ts");
-    const desktopNavStart = header.indexOf('<nav className="redesign-desktop-nav"');
-    const desktopNav = header.slice(desktopNavStart, header.indexOf("</nav>", desktopNavStart));
+    const desktopNavStart = header.indexOf('<NavigationMenu\n          className="redesign-desktop-nav"');
+    const desktopNav = header.slice(desktopNavStart, header.indexOf("</NavigationMenu>", desktopNavStart));
 
     const expectedOrder = [
       "首页",
@@ -54,7 +54,8 @@ describe("ENHE redesign public shell candidate", () => {
     }
 
     expect(header).toContain('languageAriaLabel = "中文 / EN"');
-    expect(desktopNav.indexOf("EnheRedesignLanguageSwitch")).toBeLessThan(desktopNav.indexOf("account.loginLabel"));
+    expect(desktopNav.indexOf("account.loginLabel")).toBeLessThan(desktopNav.indexOf("ThemeToggle"));
+    expect(desktopNav.indexOf("ThemeToggle")).toBeLessThan(desktopNav.indexOf("EnheRedesignLanguageSwitch"));
     expect(header).toContain("account.isAdmin");
     expect(header).toContain("adminHref");
     expect(header).toContain("account.isAdmin ?");

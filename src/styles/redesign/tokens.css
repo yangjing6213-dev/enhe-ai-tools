@@ -1,15 +1,15 @@
 :root {
-  --enhe-page-bg: #ffffff;
-  --enhe-text: #101828;
-  --enhe-text-muted: #526174;
-  --enhe-action: #246bfe;
-  --enhe-action-hover: #0b57e3;
-  --enhe-surface: #ffffff;
-  --enhe-surface-elevated: #ffffff;
-  --enhe-yellow: #246bfe;
-  --enhe-footer: #001512;
-  --enhe-border: #d8e0eb;
-  --enhe-focus: #73a0ff;
+  --enhe-page-bg: var(--background, #ffffff);
+  --enhe-text: var(--foreground, #101828);
+  --enhe-text-muted: var(--muted-foreground, #526174);
+  --enhe-action: var(--primary, #0d74ce);
+  --enhe-action-hover: var(--blue-12, #113264);
+  --enhe-surface: var(--card, #ffffff);
+  --enhe-surface-elevated: var(--popover, #ffffff);
+  --enhe-yellow: var(--primary, #0d74ce);
+  --enhe-footer: #0b1f44;
+  --enhe-border: var(--border, #d8e0eb);
+  --enhe-focus: var(--ring, #73a0ff);
   --enhe-content-max: 1200px;
   --enhe-button-h: 48px;
   --enhe-button-r: 4px;
@@ -43,6 +43,7 @@
   --enhe-font-en: "Alimama Fang Yuan Ti", "Microsoft YaHei", Arial, sans-serif;
   --enhe-font-display: "Alimama Fang Yuan Ti", "Microsoft YaHei", Arial, sans-serif;
   --enhe-font-utility: "Alimama Fang Yuan Ti", "Microsoft YaHei", Arial, sans-serif;
+  --enhe-font-brand-label: "LXGW WenKai Lite", var(--enhe-font-zh);
 
   /* Typeshare comparison tokens: layout rhythm only, never reference-brand assets. */
   --enhe-reference-brand: var(--enhe-action);

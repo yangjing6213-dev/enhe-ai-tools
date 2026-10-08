@@ -56,4 +56,11 @@ describe("admin shell foundation", () => {
     )?.[0];
     expect(adminInputFocusRule).toContain("0 0 0 7px var(--enhe-text)");
   });
+
+  it("lays admin links out in two columns on tablets and one column on narrow phones", () => {
+    const shell = read("../../styles/redesign/shell.css");
+
+    expect(shell).toMatch(/@media\s*\(max-width:\s*1023px\)[\s\S]*?\.admin-nav-list\s*\{[^}]*display:\s*grid;[^}]*grid-template-columns:\s*repeat\(2,\s*minmax\(0,\s*1fr\)\)/);
+    expect(shell).toMatch(/@media\s*\(max-width:\s*520px\)[\s\S]*?\.admin-nav-list\s*\{[^}]*grid-template-columns:\s*1fr/);
+  });
 });

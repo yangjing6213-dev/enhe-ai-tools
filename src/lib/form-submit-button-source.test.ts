@@ -10,6 +10,9 @@ describe("form submit feedback", () => {
     expect(source).toContain("useFormStatus");
     expect(source).toContain("pendingLabel");
     expect(source).toContain("aria-disabled={isDisabled}");
+    expect(source).toContain('import { Button } from "@/components/ui/button";');
+    expect(source).toContain('<Button');
+    expect(source).toContain('variant={buttonVariant[variant]}');
   });
 
   it("prevents duplicate submit clicks and shows a clear duplicate notice", () => {

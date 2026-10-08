@@ -33,7 +33,7 @@ describe("global card border glow source contract", () => {
     expect(controllerSource).toContain('window.matchMedia("(prefers-reduced-motion: reduce)")');
   });
 
-  it("defines the global card border glow layer with ENHE orange theme and accessibility fallbacks", () => {
+  it("defines the global card border glow layer with the Radix blue theme and accessibility fallbacks", () => {
     const cssSource = readFileSync(new URL("../app/globals.css", import.meta.url), "utf8").replace(/\r\n/g, "\n");
 
     expect(cssSource).toContain("--edge-proximity: 0");
@@ -42,7 +42,7 @@ describe("global card border glow source contract", () => {
     expect(cssSource).toContain("--cone-spread: 25deg");
     expect(cssSource).toContain("--glow-padding: 40px");
     expect(cssSource).toContain("--fill-opacity: 0.5");
-    expect(cssSource).toContain("--glow-color: hsl(12deg 86% 58%");
+    expect(cssSource).toContain("--glow-color: var(--blue-9)");
     expect(cssSource).toContain("from calc(var(--cursor-angle) - var(--cone-spread))");
     expect(cssSource).toContain("mask-composite: exclude");
     expect(cssSource).toContain("@supports not ((mask-composite: exclude) or (-webkit-mask-composite: xor))");

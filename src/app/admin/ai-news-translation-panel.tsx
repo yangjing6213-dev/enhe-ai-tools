@@ -2,6 +2,7 @@
 
 import { useActionState, useEffect } from "react";
 import { generateAiNewsEnglishDraftAction } from "@/app/admin/actions";
+import { Button } from "@/components/ui/button";
 
 export type AiNewsTranslationActionData = {
   englishTitle: string;
@@ -46,7 +47,7 @@ export function AiNewsTranslationPanel({
   }, [state, onTranslated]);
 
   return (
-    <div className="rounded-2xl border border-white/12 bg-white/6 p-4 md:col-span-2">
+    <div className="rounded-2xl border border-border bg-card p-4 md:col-span-2">
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div>
           <p className="text-sm font-semibold text-[var(--marketing-text)]">English Content</p>
@@ -54,22 +55,23 @@ export function AiNewsTranslationPanel({
             Generate English title, summary, content, takeaways, and SEO fields from the current Chinese draft.
           </p>
         </div>
-        <button
+        <Button
           type="submit"
           formAction={formAction}
-          className="rounded-full border border-white/14 px-4 py-2 text-sm font-semibold text-[var(--marketing-text)] transition hover:border-[var(--marketing-accent)] hover:text-[var(--marketing-accent)] disabled:cursor-not-allowed disabled:opacity-60"
+          variant="outline"
+          className="h-10 rounded-full border-border px-4 text-sm font-semibold text-foreground hover:border-primary hover:text-primary"
           disabled={pending}
         >
           {pending ? "Generating..." : "Generate English Content"}
-        </button>
+        </Button>
       </div>
 
       {state.message ? (
         <p
           className={`mt-3 rounded-xl border px-4 py-3 text-sm ${
             state.ok
-              ? "enhe-admin-translation-success border-[#5EF1C7]/30 bg-[#5EF1C7]/10"
-              : "border-red-400/30 bg-red-400/10 text-red-100"
+              ? "enhe-admin-translation-success border-emerald-600/30 bg-emerald-600/10"
+              : "border-destructive/30 bg-destructive/10 text-destructive"
           }`}
         >
           {state.message}

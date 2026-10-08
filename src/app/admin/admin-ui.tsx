@@ -44,9 +44,9 @@ export function AdminProvenanceNotice({ title = "首方来源与审批上下文"
   );
 }
 
-export const inputClass = "enhe-admin-input w-full rounded-xl border border-white/14 bg-white/7 px-4 py-3 text-sm outline-none placeholder:text-[var(--marketing-muted)]/75 focus:border-[var(--marketing-accent)]";
-export const selectClass = "enhe-admin-input w-full rounded-xl border border-white/14 bg-white/7 px-4 py-3 text-sm outline-none focus:border-[var(--marketing-accent)]";
-export const textareaClass = "enhe-admin-input min-h-28 w-full rounded-xl border border-white/14 bg-white/7 px-4 py-3 text-sm outline-none placeholder:text-[var(--marketing-muted)]/75 focus:border-[var(--marketing-accent)]";
+export const inputClass = "enhe-admin-input w-full rounded-xl border border-input bg-background px-4 py-3 text-sm text-foreground outline-none placeholder:text-muted-foreground focus:border-ring";
+export const selectClass = "enhe-admin-input w-full rounded-xl border border-input bg-background px-4 py-3 text-sm text-foreground outline-none focus:border-ring";
+export const textareaClass = "enhe-admin-input min-h-28 w-full rounded-xl border border-input bg-background px-4 py-3 text-sm text-foreground outline-none placeholder:text-muted-foreground focus:border-ring";
 
 export function SubmitButton({ children = "Save", ...props }: FormSubmitButtonProps) {
   return <FormSubmitButton {...props}>{children}</FormSubmitButton>;

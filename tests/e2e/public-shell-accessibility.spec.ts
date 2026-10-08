@@ -14,8 +14,8 @@ test.beforeEach(async ({ page }) => {
 });
 
 for (const route of [
-  { path: "/ai-skills", menu: "菜单", href: "/ai-skills" },
-  { path: "/en/ai-skills", menu: "Menu", href: "/en/ai-skills" },
+  { path: "/ai-skills", menu: "菜单", href: "/ai-skills", label: "AI Skill" },
+  { path: "/en/ai-skills", menu: "Menu", href: "/en/ai-skills", label: "AI Skills" },
 ] as const) {
   test(`${route.path} marks only one current page in desktop and mobile navigation`, async ({
     page,
@@ -35,12 +35,15 @@ for (const route of [
         nav = page.locator(".redesign-desktop-nav");
       }
 
-      const dropdown = nav.locator("details").first();
-      await expect(dropdown.locator(`a[href="${route.href}"]`)).toHaveAttribute(
-        "aria-current",
-        "page",
-      );
-      await expect(dropdown.locator('[aria-current="page"]')).toHaveCount(1);
+      if (width < 768) {
+        const currentLinks = nav.locator('[aria-current="page"]');
+        await expect(currentLinks).toHaveCount(1);
+        await expect(currentLinks.first()).toHaveAttribute("href", route.href);
+      } else {
+        const currentTrigger = nav.locator('.redesign-nav-link[aria-current="page"]');
+        await expect(currentTrigger).toHaveCount(1);
+        await expect(currentTrigger).toHaveText(route.label);
+      }
     }
   });
 }

@@ -2,6 +2,12 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import {
+  NavigationMenu,
+  NavigationMenuItem,
+  NavigationMenuLink,
+  NavigationMenuList,
+} from "@/components/ui/navigation-menu";
 
 type AdminNavItem = readonly [key: string, href: string];
 
@@ -24,21 +30,31 @@ export function AdminNav({
   }, -1);
 
   return (
-    <nav className="admin-nav" aria-label={ariaLabel}>
-      {items.map(([key, href], index) => {
-        const isActive = index === activeIndex;
+    <NavigationMenu
+      className="admin-nav w-full max-w-none flex-col items-stretch justify-start"
+      orientation="vertical"
+      aria-label={ariaLabel}
+      viewport={false}
+    >
+      <NavigationMenuList className="admin-nav-list flex-col items-stretch justify-start">
+        {items.map(([key, href], index) => {
+          const isActive = index === activeIndex;
 
-        return (
-          <Link
-            key={href}
-            href={href}
-            className={`admin-nav-link${isActive ? " is-active" : ""}`}
-            aria-current={isActive ? "page" : undefined}
-          >
-            {labels[key] ?? key}
-          </Link>
-        );
-      })}
-    </nav>
+          return (
+            <NavigationMenuItem key={href} className="w-full">
+              <NavigationMenuLink asChild>
+                <Link
+                  href={href}
+                  className={`admin-nav-link${isActive ? " is-active" : ""}`}
+                  aria-current={isActive ? "page" : undefined}
+                >
+                  {labels[key] ?? key}
+                </Link>
+              </NavigationMenuLink>
+            </NavigationMenuItem>
+          );
+        })}
+      </NavigationMenuList>
+    </NavigationMenu>
   );
 }

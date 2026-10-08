@@ -1,6 +1,16 @@
 import { EnheBrandLockup } from "./enhe-brand-lockup";
 import { EnheRedesignLanguageSwitch } from "./enhe-redesign-language-switch";
 import { EnheRedesignMobileMenu } from "./enhe-redesign-mobile-menu";
+import { PrefetchLink } from "@/components/prefetch-link";
+import { ThemeToggle } from "@/components/theme-toggle";
+import {
+  NavigationMenu,
+  NavigationMenuContent,
+  NavigationMenuItem,
+  NavigationMenuLink,
+  NavigationMenuList,
+  NavigationMenuTrigger,
+} from "@/components/ui/navigation-menu";
 import { isExactCurrentPage } from "./navigation";
 import type { RedesignAccount, RedesignLanguageHrefs, RedesignLocale, RedesignNavItem } from "./types";
 
@@ -53,61 +63,82 @@ export function EnheRedesignHeader({
           />
           <span className="redesign-brand-label">{brandLabel}</span>
         </div>
-        <nav className="redesign-desktop-nav" aria-label={locale === "en" ? "Primary navigation" : "主导航"}>
-          {navItems.map((item) =>
-            item.children?.length ? (
-              <details key={item.href} className="redesign-nav-dropdown">
-                <summary
-                  className="redesign-nav-link"
-                >
-                  <span>{item.label}</span>
-                </summary>
-                <div className="redesign-nav-dropdown-panel">
-                  {item.children.map((child) => (
-                    <a
-                      key={child.href}
-                      href={child.href}
-                      aria-current={isCurrentPath(child.href) ? "page" : undefined}
+        <NavigationMenu
+          className="redesign-desktop-nav"
+          aria-label={locale === "en" ? "Primary navigation" : "主导航"}
+          viewport={false}
+        >
+          <NavigationMenuList className="redesign-desktop-nav-list">
+            {navItems.map((item) =>
+              item.children?.length ? (
+                <NavigationMenuItem key={item.href}>
+                  <NavigationMenuTrigger
+                    className="redesign-nav-link"
+                    aria-current={isCurrentPath(item.href) ? "page" : undefined}
+                  >
+                    {item.label}
+                  </NavigationMenuTrigger>
+                  <NavigationMenuContent className="redesign-nav-menu-content">
+                    <NavigationMenuLink asChild>
+                      <PrefetchLink className="redesign-nav-dropdown-item" href={item.href} aria-current={isCurrentPath(item.href) ? "page" : undefined}>
+                        {locale === "en" ? `All ${item.label}` : `查看全部${item.label}`}
+                      </PrefetchLink>
+                    </NavigationMenuLink>
+                    {item.children.map((child) => (
+                      <NavigationMenuLink key={child.href} asChild>
+                        <PrefetchLink className="redesign-nav-dropdown-item" href={child.href} aria-current={isCurrentPath(child.href) ? "page" : undefined}>
+                          {child.label}
+                        </PrefetchLink>
+                      </NavigationMenuLink>
+                    ))}
+                  </NavigationMenuContent>
+                </NavigationMenuItem>
+              ) : (
+                <NavigationMenuItem key={item.href}>
+                  <NavigationMenuLink asChild>
+                    <PrefetchLink
+                      className="redesign-nav-link"
+                      href={item.href}
+                      prefetch={item.href === homeHref ? false : undefined}
+                      aria-current={isCurrentPath(item.href) ? "page" : undefined}
                     >
-                      {child.label}
-                    </a>
-                  ))}
-                </div>
-              </details>
-            ) : (
-              <a
-                key={item.href}
-                className="redesign-nav-link"
-                href={item.href}
-                aria-current={isCurrentPath(item.href) ? "page" : undefined}
-              >
-                <span>{item.label}</span>
-              </a>
-            ),
-          )}
-          <EnheRedesignLanguageSwitch
-            localeHrefs={languageHrefs}
-            currentLocale={locale}
-            ariaLabel={languageAriaLabel}
-          />
-          {account.status === "guest" ? (
-            <a className="redesign-login-link" href={account.loginHref}>
-              {account.loginLabel}
-            </a>
-          ) : (
-            <details className="redesign-account-menu">
-              <summary className="redesign-avatar-trigger" aria-label={account.avatarLabel}>
-                {account.displayName}
-              </summary>
-              <div className="redesign-avatar-menu" role="menu" aria-label={userMenuLabel}>
-                <a href={account.userHref} role="menuitem">
-                  {account.userLabel}
-                </a>
-                {account.isAdmin ? <a href={account.adminHref} role="menuitem">{account.adminLabel}</a> : null}
-              </div>
-            </details>
-          )}
-        </nav>
+                      <span>{item.label}</span>
+                    </PrefetchLink>
+                  </NavigationMenuLink>
+                </NavigationMenuItem>
+              ),
+            )}
+            <NavigationMenuItem>
+              {account.status === "guest" ? (
+                <PrefetchLink className="redesign-login-link" href={account.loginHref}>
+                  {account.loginLabel}
+                </PrefetchLink>
+              ) : (
+                <details className="redesign-account-menu">
+                  <summary className="redesign-avatar-trigger" aria-label={account.avatarLabel}>
+                    {account.displayName}
+                  </summary>
+                  <div className="redesign-avatar-menu" role="menu" aria-label={userMenuLabel}>
+                    <PrefetchLink href={account.userHref} role="menuitem">
+                      {account.userLabel}
+                    </PrefetchLink>
+                    {account.isAdmin ? <PrefetchLink href={account.adminHref} role="menuitem">{account.adminLabel}</PrefetchLink> : null}
+                  </div>
+                </details>
+              )}
+            </NavigationMenuItem>
+            <NavigationMenuItem>
+              <ThemeToggle locale={locale} />
+            </NavigationMenuItem>
+            <NavigationMenuItem>
+              <EnheRedesignLanguageSwitch
+                localeHrefs={languageHrefs}
+                currentLocale={locale}
+                ariaLabel={languageAriaLabel}
+              />
+            </NavigationMenuItem>
+          </NavigationMenuList>
+        </NavigationMenu>
         <div className="redesign-mobile-actions">
           <EnheRedesignMobileMenu
             menuId={menuId}
@@ -116,6 +147,7 @@ export function EnheRedesignHeader({
             navItems={navItems}
             account={account}
             pathname={currentPathname}
+            locale={locale}
           />
           <EnheRedesignLanguageSwitch
             localeHrefs={languageHrefs}

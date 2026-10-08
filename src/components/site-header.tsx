@@ -7,8 +7,16 @@ import { HeaderSessionGate } from "@/components/header-session-gate";
 import { BackNavigationBar } from "@/components/back-navigation-bar";
 import { LanguageSwitcher } from "@/components/language-switcher";
 import { PrefetchLink } from "@/components/prefetch-link";
-import { PublicNavDropdown } from "@/components/public-nav-dropdown";
 import { PublicNavLink } from "@/components/public-nav-link";
+import { ThemeToggle } from "@/components/theme-toggle";
+import {
+  NavigationMenu,
+  NavigationMenuContent,
+  NavigationMenuItem,
+  NavigationMenuLink,
+  NavigationMenuList,
+  NavigationMenuTrigger,
+} from "@/components/ui/navigation-menu";
 import { Container } from "@/components/ui";
 import { getDictionary, type Locale } from "@/lib/dictionaries";
 import { getCurrentLocale } from "@/lib/i18n";
@@ -133,49 +141,69 @@ async function SiteHeaderContent({ forceLocale }: { forceLocale?: Locale }) {
             <span className="site-brand-wordmark">{brandWordmark}</span>
           </PrefetchLink>
 
-          <nav
+          <NavigationMenu
             className="site-primary-nav hidden items-center lg:flex"
-            aria-label="Primary navigation"
+            aria-label={locale === "en" ? "Primary navigation" : "主导航"}
+            viewport={false}
           >
-            {navItems.map((item) =>
-              "children" in item ? (
-                <PublicNavDropdown
-                  key={item.href}
-                  href={item.href}
-                  label={item.label}
-                >
-                  {item.children.map((child) => (
-                    <PublicNavLink
-                      key={child.href}
-                      href={child.href}
-                      exact={child.href === item.href}
-                      className="site-nav-dropdown-link cursor-target"
-                    >
-                      <span>{child.label}</span>
-                      <small>{child.description}</small>
-                    </PublicNavLink>
-                  ))}
-                </PublicNavDropdown>
-              ) : (
-                <PublicNavLink
-                  key={item.href}
-                  href={item.href}
-                  prefetch={item.href === homeHref ? false : undefined}
-                  className="site-nav-link cursor-target"
-                >
-                  {"icon" in item && item.icon === "search" ? (
-                    <Search size={15} strokeWidth={1.8} aria-hidden="true" />
-                  ) : null}
-                  <span>{item.label}</span>
-                </PublicNavLink>
-              ),
-            )}
-            <HeaderAdminNavLink
-              locale={locale}
-              label={t.nav.admin}
-              initialUser={headerUser}
-            />
-          </nav>
+            <NavigationMenuList className="site-primary-nav-list">
+              {navItems.map((item) =>
+                "children" in item ? (
+                  <NavigationMenuItem key={item.href}>
+                    <NavigationMenuTrigger className="site-nav-link site-nav-dropdown-trigger cursor-target">
+                      {item.label}
+                    </NavigationMenuTrigger>
+                    <NavigationMenuContent className="site-nav-menu-content">
+                      <NavigationMenuLink asChild>
+                        <PublicNavLink
+                          href={item.href}
+                          exact
+                          className="site-nav-dropdown-link cursor-target"
+                        >
+                          <span>{locale === "en" ? `All ${item.label}` : `查看全部${item.label}`}</span>
+                          <small>{locale === "en" ? "Browse the full collection" : "浏览全部内容"}</small>
+                        </PublicNavLink>
+                      </NavigationMenuLink>
+                      {item.children.map((child) => (
+                        <NavigationMenuLink key={child.href} asChild>
+                          <PublicNavLink
+                            href={child.href}
+                            exact={child.href === item.href}
+                            className="site-nav-dropdown-link cursor-target"
+                          >
+                            <span>{child.label}</span>
+                            <small>{child.description}</small>
+                          </PublicNavLink>
+                        </NavigationMenuLink>
+                      ))}
+                    </NavigationMenuContent>
+                  </NavigationMenuItem>
+                ) : (
+                  <NavigationMenuItem key={item.href}>
+                    <NavigationMenuLink asChild>
+                      <PublicNavLink
+                        href={item.href}
+                        prefetch={item.href === homeHref ? false : undefined}
+                        className="site-nav-link cursor-target"
+                      >
+                        {"icon" in item && item.icon === "search" ? (
+                          <Search size={15} strokeWidth={1.8} aria-hidden="true" />
+                        ) : null}
+                        <span>{item.label}</span>
+                      </PublicNavLink>
+                    </NavigationMenuLink>
+                  </NavigationMenuItem>
+                ),
+              )}
+              <NavigationMenuItem>
+                <HeaderAdminNavLink
+                  locale={locale}
+                  label={t.nav.admin}
+                  initialUser={headerUser}
+                />
+              </NavigationMenuItem>
+            </NavigationMenuList>
+          </NavigationMenu>
 
           <div className="site-header-actions flex items-center gap-2">
             <HeaderAccountControls
@@ -183,6 +211,7 @@ async function SiteHeaderContent({ forceLocale }: { forceLocale?: Locale }) {
               locale={locale}
               initialUser={headerUser}
             />
+            <ThemeToggle locale={locale} />
             <PrefetchLink href={buildLocalePath("/login", locale)} className="sr-only">
               {t.nav.login}
             </PrefetchLink>

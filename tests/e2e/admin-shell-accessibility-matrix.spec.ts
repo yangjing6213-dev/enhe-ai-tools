@@ -117,7 +117,12 @@ test("admin shell stays usable across breakpoints and accessibility modes in the
   }
   expect(lightModeHtmlFieldFocused, "keyboard navigation reaches the HTML field in light mode").toBe(true);
   const lightModeFocusShadow = await htmlField.evaluate((element) => getComputedStyle(element).boxShadow);
-  expect(lightModeFocusShadow).toContain("rgb(16, 22, 18)");
+  const lightModeFocusRing = lightModeFocusShadow.match(
+    /color\(srgb\s+([\d.]+)\s+([\d.]+)\s+([\d.]+)\s*\/\s*[\d.]+\)/,
+  );
+  expect(lightModeFocusRing, "the light theme uses a visible Radix blue focus ring").not.toBeNull();
+  expect(Number(lightModeFocusRing?.[3])).toBeGreaterThan(Number(lightModeFocusRing?.[2]));
+  expect(Number(lightModeFocusRing?.[2])).toBeGreaterThan(Number(lightModeFocusRing?.[1]));
 
   await page.emulateMedia({ forcedColors: "active" });
   expect(await page.evaluate(() => matchMedia("(forced-colors: active)").matches)).toBe(true);

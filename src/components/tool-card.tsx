@@ -2,6 +2,7 @@ import Image from "next/image";
 import { ArrowUpRight, Check, Download, MousePointer2, UserRound } from "lucide-react";
 import { PrefetchLink } from "@/components/prefetch-link";
 import { Badge } from "@/components/ui";
+import { Card } from "@/components/ui/card";
 import { getDictionary, type Locale } from "@/lib/i18n";
 import { resolveToolImageSrc } from "@/lib/tool-image";
 import { buildCanonicalToolPath } from "@/lib/public-slugs";
@@ -90,8 +91,9 @@ export function ToolCard({
   });
 
   return (
-    <PrefetchLink href={buildCanonicalToolPath(tool, locale)} className="surface-panel group block overflow-hidden transition-[border-color,transform] hover:-translate-y-1 hover:border-[var(--marketing-accent)]/45">
-      <div className="relative aspect-[16/9] overflow-hidden border-b border-white/14 bg-[#101821]">
+    <PrefetchLink href={buildCanonicalToolPath(tool, locale)} className="group block rounded-2xl focus-visible:outline-none">
+      <Card className="surface-panel tool-product-card group overflow-hidden rounded-2xl border border-border bg-card p-0 text-card-foreground shadow-sm transition-[border-color,box-shadow,transform] duration-200 hover:-translate-y-1 hover:border-primary/45 hover:shadow-lg">
+      <div className="relative aspect-[16/9] overflow-hidden border-b border-border bg-muted">
         {coverImage ? (
           <Image
             src={coverImage}
@@ -102,9 +104,9 @@ export function ToolCard({
             unoptimized
           />
         ) : (
-          <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_25%,rgba(65,197,219,0.16),transparent_34%),radial-gradient(circle_at_72%_72%,rgba(255,255,255,0.1),transparent_36%),linear-gradient(135deg,rgba(255,255,255,0.08),transparent)]" />
+          <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_25%,color-mix(in_srgb,var(--primary)_16%,transparent),transparent_34%),radial-gradient(circle_at_72%_72%,color-mix(in_srgb,var(--foreground)_8%,transparent),transparent_36%),linear-gradient(135deg,color-mix(in_srgb,var(--foreground)_6%,transparent),transparent)]" />
         )}
-        <div className="absolute inset-0 bg-gradient-to-t from-[#101821]/90 via-transparent to-transparent" />
+        <div className="absolute inset-0 bg-gradient-to-t from-foreground/70 via-transparent to-transparent" />
       </div>
 
       <div className="p-5">
@@ -148,7 +150,7 @@ export function ToolCard({
                 </span>
               ))}
             </div>
-            <div className="mt-5 flex items-center gap-2 rounded-xl border border-white/10 bg-white/6 px-3 py-2 text-xs text-[var(--marketing-muted)]">
+            <div className="mt-5 flex items-center gap-2 rounded-xl border border-border bg-muted px-3 py-2 text-xs text-muted-foreground">
               <UserRound size={14} className="shrink-0 text-[var(--marketing-accent)]" />
               <span>
                 {t.toolCard.audienceLabel}: {audience}
@@ -189,6 +191,7 @@ export function ToolCard({
           </span>
         </div>
       </div>
+      </Card>
     </PrefetchLink>
   );
 }

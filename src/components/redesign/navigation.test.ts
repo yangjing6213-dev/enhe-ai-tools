@@ -11,6 +11,8 @@ const mobileMenuSource = readFileSync(
   join(process.cwd(), "src/components/redesign/enhe-redesign-mobile-menu.tsx"),
   "utf8",
 );
+const globalStyles = readFileSync(join(process.cwd(), "src/app/globals.css"), "utf8");
+const navigationMenuSource = readFileSync(join(process.cwd(), "src/components/ui/navigation-menu.tsx"), "utf8");
 
 describe("public navigation current-page state", () => {
   it("marks only the exact destination as the current page", () => {
@@ -29,15 +31,20 @@ describe("public navigation current-page state", () => {
     expect(mobileMenuSource).not.toContain("redesign-search-icon");
   });
 
-  it("places the desktop language switch before the account control", () => {
-    const desktopNav = headerSource.slice(
-      headerSource.indexOf('<nav className="redesign-desktop-nav"'),
-      headerSource.indexOf("</nav>", headerSource.indexOf('<nav className="redesign-desktop-nav"')),
-    );
+  it("keeps the language switch at the far right after account and theme controls", () => {
+    const accountControlIndex = headerSource.indexOf('className="redesign-account-menu"');
+    const themeControlIndex = headerSource.indexOf("<ThemeToggle locale={locale} />");
+    const languageSwitchIndex = headerSource.indexOf("<EnheRedesignLanguageSwitch");
 
-    const accountControlIndex = desktopNav.indexOf("account.status");
-    const languageSwitchIndex = desktopNav.indexOf("<EnheRedesignLanguageSwitch");
-    expect(languageSwitchIndex).toBeGreaterThanOrEqual(0);
-    expect(accountControlIndex).toBeGreaterThan(languageSwitchIndex);
+    expect(accountControlIndex).toBeGreaterThanOrEqual(0);
+    expect(themeControlIndex).toBeGreaterThan(accountControlIndex);
+    expect(languageSwitchIndex).toBeGreaterThan(themeControlIndex);
+  });
+
+  it("allows desktop dropdown content to float without expanding the header", () => {
+    const dropdownRule = globalStyles.match(/\.site-nav-menu-content\s*\{[^}]*\}/)?.[0] ?? "";
+
+    expect(dropdownRule).not.toMatch(/position:\s*relative/);
+    expect(navigationMenuSource).toContain("md:absolute");
   });
 });

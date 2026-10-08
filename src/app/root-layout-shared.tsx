@@ -3,6 +3,7 @@ import { AnalyticsTracker } from "@/components/analytics-tracker";
 import { BorderGlowController } from "@/components/border-glow-controller";
 import { CursorGlow } from "@/components/cursor-glow";
 import { InteractiveBackground } from "@/components/interactive-background";
+import { SiteThemeProvider } from "@/components/site-theme-provider";
 import {
   defaultSiteDescription,
   getSiteBaseUrl,
@@ -46,7 +47,7 @@ export function RootDocument({
   disableLegacyVisualEffects?: boolean;
 }>) {
   return (
-    <html lang={lang}>
+    <html lang={lang} suppressHydrationWarning>
       <head>
         <link
           rel="alternate"
@@ -62,15 +63,17 @@ export function RootDocument({
         />
       </head>
       <body>
-        {!disableLegacyVisualEffects ? (
-          <>
-            <InteractiveBackground />
-            <CursorGlow />
-            <BorderGlowController />
-          </>
-        ) : null}
-        <AnalyticsTracker />
-        {children}
+        <SiteThemeProvider>
+          {!disableLegacyVisualEffects ? (
+            <>
+              <InteractiveBackground />
+              <CursorGlow />
+              <BorderGlowController />
+            </>
+          ) : null}
+          <AnalyticsTracker />
+          {children}
+        </SiteThemeProvider>
       </body>
     </html>
   );

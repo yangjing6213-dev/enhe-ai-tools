@@ -1,7 +1,7 @@
 /* Shared light-and-blue refresh for the public ENHE experience. */
 .enhe-redesign-production,
 .enhe-redesign-production :is(.enhe-auth-page, .ai-trends-page) {
-  background-color: #fff;
+  background-color: var(--enhe-page-bg);
   color: var(--enhe-text);
   font-family: var(--enhe-font-zh);
 }
@@ -13,7 +13,7 @@
 
 .enhe-redesign-production :is(.glass, .evidence-card, .dossier-card, .surface-panel, .surface-panel-soft, .filter-surface, .admin-shell-card) {
   border: 1px solid var(--enhe-border);
-  background: #fff;
+  background: var(--enhe-page-bg);
   color: var(--enhe-text);
   box-shadow: 0 12px 32px rgba(18, 42, 79, 0.08);
   -webkit-backdrop-filter: none;
@@ -70,8 +70,16 @@
   object-fit: contain;
 }
 
+.dark .redesign-brand-mark {
+  filter: brightness(0) invert(1);
+}
+
 .redesign-header[data-home="true"] .redesign-brand-mark {
   filter: brightness(0) saturate(100%);
+}
+
+.dark .redesign-header[data-home="true"] .redesign-brand-mark {
+  filter: brightness(0) invert(1);
 }
 
 .redesign-header[data-home="true"] .redesign-brand-label {
@@ -80,7 +88,7 @@
   padding: 2px 7px;
   border-radius: 3px;
   background: var(--enhe-action);
-  color: #fff;
+  color: var(--primary-foreground, #fff);
   font-size: 12px;
   font-weight: 600;
   letter-spacing: 0.02em;
@@ -128,22 +136,22 @@
 
 .redesign-home .redesign-home-cta,
 .redesign-home-brand-value-cta {
-  border: 1px solid #246bfe;
+  border: 1px solid var(--enhe-action);
   border-radius: 999px;
-  background: #246bfe;
-  color: #fff;
+  background: var(--enhe-action);
+  color: var(--primary-foreground, #fff);
 }
 
 .redesign-home .redesign-home-cta:hover,
 .redesign-home-brand-value-cta:hover {
-  border-color: #0b57e3;
-  background: #0b57e3;
-  color: #fff;
+  border-color: var(--enhe-action-hover);
+  background: var(--enhe-action-hover);
+  color: var(--primary-foreground, #fff);
 }
 
 .redesign-home-features {
   border: 0;
-  background: #fff;
+  background: var(--enhe-page-bg);
   color: var(--enhe-text);
 }
 
@@ -192,14 +200,14 @@
 .redesign-home-feature-card:hover {
   border-color: var(--enhe-border);
   border-radius: var(--enhe-card-r);
-  background: #fff;
+  background: var(--enhe-page-bg);
   box-shadow: 0 10px 26px rgba(18, 42, 79, 0.08);
 }
 
 .redesign-home-products,
 .redesign-home-reviews {
   border-top-color: var(--enhe-border);
-  background: #fff;
+  background: var(--enhe-page-bg);
 }
 
 .redesign-home-products-inner,
@@ -219,7 +227,7 @@
 .redesign-home-review-card {
   border-color: var(--enhe-border);
   border-radius: 16px;
-  background: #fff;
+  background: var(--enhe-page-bg);
   color: var(--enhe-text);
 }
 
@@ -248,7 +256,7 @@
 
 .redesign-home-brand-value {
   border-top: 0;
-  background: #fff;
+  background: var(--enhe-page-bg);
   color: var(--enhe-text);
 }
 
@@ -277,6 +285,10 @@
   color: #fff;
 }
 
+.enhe-redesign-production .tool-product-card {
+  background: var(--enhe-surface);
+}
+
 .footer-grid p,
 .footer-grid a {
   color: #c1cfcb;
@@ -294,20 +306,20 @@
 
 .enhe-redesign-production .ai-trends-page {
   min-height: 60vh;
-  background: #fff;
+  background: var(--enhe-page-bg);
   color: var(--enhe-text);
 }
 
 .enhe-redesign-production .ai-trends-page :is(.glass, .evidence-card, .dossier-card, .surface-panel, .surface-panel-soft, .filter-surface, .admin-shell-card) {
   border-color: var(--enhe-border);
-  background: #fff;
+  background: var(--enhe-page-bg);
   color: var(--enhe-text);
 }
 
 .enhe-redesign-production .ai-trends-page .ai-trends-primary-action {
   border-color: var(--enhe-action) !important;
   background: var(--enhe-action) !important;
-  color: #fff !important;
+  color: var(--primary-foreground, #fff) !important;
   box-shadow: 0 8px 22px rgba(36, 107, 254, 0.2) !important;
 }
 
@@ -318,20 +330,20 @@
 
 .enhe-redesign-production .ai-trends-page .ai-trends-secondary-action {
   border-color: var(--enhe-border) !important;
-  background: #fff !important;
+  background: var(--enhe-page-bg) !important;
   color: var(--enhe-text) !important;
   box-shadow: none !important;
 }
 
 .enhe-redesign-production .ai-trends-page .ai-trends-secondary-action:hover {
   border-color: var(--enhe-action) !important;
-  background: #fff !important;
+  background: var(--enhe-page-bg) !important;
   color: var(--enhe-action) !important;
 }
 
 .enhe-redesign-production .customer-support-launcher {
   border-color: var(--enhe-border);
-  background: #fff;
+  background: var(--enhe-page-bg);
   color: var(--enhe-action);
 }
 
@@ -342,35 +354,35 @@
 .enhe-redesign-production .enhe-contentless-page .enhe-contentless-action-primary {
   border-color: var(--enhe-action);
   background: var(--enhe-action);
-  color: #fff;
+  color: var(--primary-foreground, #fff);
 }
 
 .enhe-redesign-production .enhe-contentless-page .enhe-contentless-action-primary:hover {
   border-color: var(--enhe-action-hover);
   background: var(--enhe-action-hover);
-  color: #fff;
+  color: var(--primary-foreground, #fff);
 }
 
 .enhe-redesign-production .enhe-contentless-page .enhe-contentless-action-secondary {
   border-color: var(--enhe-border);
-  background: #fff;
+  background: var(--enhe-page-bg);
   color: var(--enhe-text);
 }
 
 .enhe-redesign-production .enhe-contentless-page .enhe-contentless-action-secondary:hover {
   border-color: var(--enhe-action);
-  background: #fff;
+  background: var(--enhe-page-bg);
   color: var(--enhe-action);
 }
 
 .enhe-redesign-production .tool-detail-page {
-  background: #fff;
+  background: var(--enhe-page-bg);
   color: var(--enhe-text);
 }
 
 .enhe-redesign-production .tool-detail-page :is(.glass, .evidence-card, .dossier-card, .surface-panel, .surface-panel-soft, .filter-surface, .admin-shell-card) {
   border-color: var(--enhe-border);
-  background: #fff;
+  background: var(--enhe-page-bg);
   color: var(--enhe-text);
 }
 
@@ -389,7 +401,7 @@
 .enhe-redesign-production .tool-detail-page [class*="bg-white/"],
 .enhe-redesign-production .tool-detail-page [class*="bg-[rgba("],
 .enhe-redesign-production .tool-detail-page [class*="bg-[radial-gradient"] {
-  background: #fff !important;
+  background: var(--enhe-page-bg) !important;
 }
 
 .enhe-redesign-production .tool-detail-page [class*="border-white/"],
@@ -404,13 +416,13 @@
 
 .enhe-redesign-production .tool-detail-hero-stack :is(.glass, .evidence-card, .dossier-card, .surface-panel, .surface-panel-soft, .filter-surface, .admin-shell-card) {
   border-color: var(--enhe-border);
-  background: #fff;
+  background: var(--enhe-page-bg);
 }
 
 .enhe-redesign-production .tool-detail-hero-stack [class*="bg-[#07101E]"],
 .enhe-redesign-production .tool-detail-hero-stack [class*="bg-white/"],
 .enhe-redesign-production .tool-detail-hero-stack [class*="bg-[radial-gradient"] {
-  background: #fff !important;
+  background: var(--enhe-page-bg) !important;
 }
 
 .enhe-redesign-production .tool-detail-hero-stack [class*="text-[#FFB86B]"] {
@@ -419,27 +431,27 @@
 
 .enhe-redesign-production .tool-detail-hero-stack :is(input, select, textarea) {
   border-color: var(--enhe-border);
-  background-color: #fff;
+  background-color: var(--enhe-page-bg);
   color: var(--enhe-text);
 }
 
 .enhe-redesign-production .enhe-auth-page {
   min-height: calc(100vh - var(--enhe-header-h));
-  background: #fff;
+  background: var(--enhe-page-bg);
   color: var(--enhe-text);
 }
 
 .enhe-redesign-production .enhe-auth-page .surface-panel {
   border-color: var(--enhe-border);
   border-radius: 20px;
-  background: #fff;
+  background: var(--enhe-page-bg);
   box-shadow: 0 18px 48px rgba(18, 42, 79, 0.1);
 }
 
 .enhe-redesign-production .enhe-auth-page :is(.form-control-dark, input, textarea) {
   border: 1px solid var(--enhe-border);
   border-radius: 10px;
-  background: #fff;
+  background: var(--enhe-page-bg);
   color: var(--enhe-text);
 }
 
@@ -453,7 +465,7 @@
   border-radius: 999px;
   background: var(--enhe-action) !important;
   box-shadow: 0 8px 22px rgba(36, 107, 254, 0.2) !important;
-  color: #fff !important;
+  color: var(--primary-foreground, #fff) !important;
 }
 
 .enhe-redesign-production .enhe-auth-page .login-submit-button:hover {
@@ -580,7 +592,7 @@
 
 }
 
-@media (width < 360px) {
+@media (width < 420px) {
   .redesign-header-inner {
     width: min(100% - 24px, 1320px);
     gap: 6px;

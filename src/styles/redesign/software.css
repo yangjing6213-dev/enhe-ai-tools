@@ -1,5 +1,5 @@
 .redesign-software {
-  background-color: #fff;
+  background-color: var(--enhe-page-bg);
   color: var(--enhe-text, #080808);
   font-family: var(--enhe-font-zh, "Microsoft YaHei", system-ui, sans-serif);
 }
@@ -9,7 +9,7 @@
 }
 
 .redesign-software[data-locale="en"] {
-  font-family: var(--enhe-font-en, Inter, Arial, sans-serif);
+  font-family: var(--enhe-font-en, 'Alimama Fang Yuan Ti', 'Microsoft YaHei', Arial, sans-serif);
 }
 
 .redesign-software-page {
@@ -73,7 +73,7 @@
   padding: 10px 18px;
   border: 1px solid var(--enhe-border, #dfe5df);
   border-radius: 999px;
-  background: #fff;
+  background: var(--enhe-page-bg);
   color: var(--enhe-text, #080808);
   font-weight: 700;
 }
@@ -117,7 +117,7 @@
 .redesign-software-category-button[data-selected="true"] {
   border-color: var(--enhe-yellow, #ffd60a);
   background: var(--enhe-yellow, #ffd60a);
-  color: #fff;
+  color: var(--primary-foreground, #fff);
 }
 
 .redesign-software-section {
@@ -176,14 +176,23 @@
   min-width: 0;
   overflow: hidden;
   border: 1px solid var(--enhe-border, #dfe5df);
-  border-radius: var(--enhe-card-r, 12px);
-  background: #fff;
+  border-radius: var(--radius-xl, var(--enhe-card-r, 12px));
+  background: var(--card, #fff);
+  color: var(--card-foreground, #101828);
+  box-shadow: 0 1px 2px color-mix(in srgb, var(--foreground, #101828) 5%, transparent);
+  transition: border-color 180ms ease, box-shadow 180ms ease, transform 180ms ease;
+}
+
+.redesign-software-card:hover {
+  border-color: var(--primary, #246bfe);
+  box-shadow: 0 16px 36px color-mix(in srgb, var(--foreground, #101828) 12%, transparent);
+  transform: translateY(-3px);
 }
 
 .redesign-software-card-frame {
   position: relative;
   aspect-ratio: 16 / 9;
-  background: var(--enhe-surface-muted, #eef1ea);
+  background: var(--muted, #eef1ea);
 }
 
 .redesign-software-card-media {
@@ -200,7 +209,7 @@
   flex-direction: column;
   justify-content: space-between;
   padding: 18px;
-  background: #eef1ea;
+  background: var(--muted, #eef1ea);
   color: var(--enhe-text, #080808);
 }
 
@@ -287,7 +296,7 @@
   padding: 24px;
   border: 1px solid var(--enhe-border, #dfe5df);
   border-radius: var(--enhe-card-r, 12px);
-  background: #fff;
+  background: var(--enhe-page-bg);
 }
 
 .redesign-software-empty p {
@@ -313,7 +322,7 @@
   border: 1px solid var(--enhe-action, #527e54);
   border-radius: 999px;
   background: var(--enhe-action, #527e54);
-  color: #fff;
+  color: var(--primary-foreground, #fff);
   font-weight: 700;
 }
 
@@ -346,7 +355,7 @@
   border: 1px solid var(--enhe-action, #527e54);
   border-radius: 999px;
   background: var(--enhe-action, #527e54);
-  color: #fff;
+  color: var(--primary-foreground, #fff);
   font-weight: 700;
 }
 

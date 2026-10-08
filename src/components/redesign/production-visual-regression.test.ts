@@ -31,7 +31,7 @@ describe("production public shell visual boundary", () => {
 
     expect(shell).toMatch(/\.enhe-redesign-production\s*\{[\s\S]*?background:\s*var\(--enhe-page-bg\)/);
     expect(shell).toMatch(/\.enhe-redesign-production\s*\{[\s\S]*?color:\s*var\(--enhe-text\)/);
-    expect(shell).toMatch(/\.enhe-redesign-production\s*\{[\s\S]*?color-scheme:\s*light/);
+    expect(shell).toMatch(/\.enhe-redesign-production\s*\{[\s\S]*?color-scheme:\s*inherit/);
     expect(shell).toContain(".enhe-redesign-production .redesign-header");
     expect(shell).toContain("color: var(--enhe-text);");
   });

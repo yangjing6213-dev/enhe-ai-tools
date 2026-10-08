@@ -1,18 +1,22 @@
 import { readFileSync } from "node:fs";
 import { describe, expect, it } from "vitest";
 
-describe("global white and blue UI source contract", () => {
-  it("shares the approved white and blue tokens and forces public cards onto white surfaces", () => {
+describe("global blue and white UI source contract", () => {
+  it("shares Radix blue and gray tokens across light and dark themes", () => {
     const css = readFileSync(new URL("../app/globals.css", import.meta.url), "utf8");
     const refresh = readFileSync(new URL("../styles/redesign/site-refresh.css", import.meta.url), "utf8");
 
-    expect(css).toContain("color-scheme: light");
-    expect(css).toContain("--marketing-bg: #ffffff");
-    expect(css).toContain("--marketing-accent: #246bfe");
+    expect(css).toContain('@import "@radix-ui/colors/blue.css"');
+    expect(css).toContain('@import "@radix-ui/colors/blue-dark.css"');
+    expect(css).toContain('@import "@radix-ui/colors/gray.css"');
+    expect(css).toContain('@import "@radix-ui/colors/gray-dark.css"');
+    expect(css).toMatch(/\.dark\s*\{/);
+    expect(css).toContain("--marketing-bg: var(--gray-1)");
+    expect(css).toContain("--marketing-accent: var(--blue-11)");
     expect(css).toContain("--font-sans: 'Alimama Fang Yuan Ti', 'Microsoft YaHei', Arial, sans-serif");
     expect(css).toContain("--font-heading-zh: 'Alimama Fang Yuan Ti', 'Microsoft YaHei', Arial, sans-serif");
     expect(refresh).toContain(".enhe-redesign-production :is(.glass, .evidence-card, .dossier-card, .surface-panel");
-    expect(refresh).toContain("background: #fff;");
+    expect(refresh).toContain("background: var(--enhe-page-bg);");
     expect(css).toContain(".surface-panel");
     expect(css).toContain(".surface-panel-soft");
     expect(css).toContain(".filter-surface");
@@ -25,7 +29,9 @@ describe("global white and blue UI source contract", () => {
     expect(css).toContain(".status-danger");
     expect(css).toContain("backdrop-filter: blur(28px) saturate(160%)");
     expect(css).toContain("-webkit-backdrop-filter: blur(28px) saturate(160%)");
-    expect(css).toContain("filter: brightness(0) invert(1)");
+    expect(css).toContain(".dark .site-brand-logo-dark");
+    expect(css).toContain("color-scheme: light");
+    expect(css).toContain("color-scheme: dark");
   });
 
   it("updates shared public components away from the old cyan primary language", () => {
@@ -38,8 +44,8 @@ describe("global white and blue UI source contract", () => {
     expect(ui).not.toContain("#7DD3FC");
     expect(ui).not.toContain("#7AA7FF");
 
-    expect(submitButton).toContain("bg-[#050505]");
-    expect(submitButton).toContain("bg-[var(--marketing-accent)]");
+    expect(submitButton).toContain('import { Button } from "@/components/ui/button"');
+    expect(submitButton).toContain("variant={buttonVariant[variant]}");
     expect(submitButton).not.toContain("bg-[#7DD3FC]");
     expect(submitButton).not.toContain("bg-[#48F5D3]");
 
@@ -61,9 +67,9 @@ describe("global white and blue UI source contract", () => {
     expect(toolCard).not.toContain("#7DD3FC");
     expect(toolCard).not.toContain("#7AA7FF");
 
-    expect(adminUi).toContain("border-white/14");
-    expect(adminUi).toContain("bg-white/7");
-    expect(adminUi).toContain("focus:border-[var(--marketing-accent)]");
+    expect(adminUi).toContain("border-input bg-background");
+    expect(adminUi).toContain("text-foreground");
+    expect(adminUi).toContain("focus:border-ring");
     expect(adminUi).not.toContain("#7DD3FC");
     expect(adminUi).not.toContain("#7AA7FF");
 

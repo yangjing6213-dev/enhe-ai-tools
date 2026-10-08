@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState, type ButtonHTMLAttributes, type MouseEvent, type ReactNode } from "react";
 import { useFormStatus } from "react-dom";
+import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 
 export type FormSubmitButtonProps = ButtonHTMLAttributes<HTMLButtonElement> & {
@@ -10,18 +11,11 @@ export type FormSubmitButtonProps = ButtonHTMLAttributes<HTMLButtonElement> & {
   variant?: "primary" | "success" | "secondary" | "danger";
 };
 
-const baseClass =
-  "inline-flex items-center justify-center rounded-full font-semibold transition-[background-color,border-color,color,opacity] disabled:pointer-events-none disabled:cursor-not-allowed disabled:opacity-60";
-
-const variantClass = {
-  primary:
-    "bg-[#050505] px-5 py-3 text-sm text-white shadow-[0_14px_34px_rgba(0,0,0,0.22)] hover:bg-[#161616]",
-  success:
-    "bg-[var(--marketing-accent)] px-5 py-3 text-sm text-white hover:bg-[#56bfd0]",
-  secondary:
-    "border border-white/14 bg-white/7 px-5 py-3 text-sm text-[var(--marketing-text)] hover:border-[var(--marketing-accent)] hover:text-[var(--marketing-accent)]",
-  danger:
-    "border border-red-400/35 bg-red-400/10 px-4 py-2 text-sm text-red-100 hover:border-red-300 hover:bg-red-400/15"
+const buttonVariant = {
+  primary: "default",
+  success: "default",
+  secondary: "outline",
+  danger: "destructive",
 } as const;
 
 export function FormSubmitButton({
@@ -75,21 +69,22 @@ export function FormSubmitButton({
 
   return (
     <>
-      <button
+      <Button
         {...props}
         type={type}
         disabled={disabled}
         aria-disabled={isDisabled}
         onClick={handleClick}
-        className={cn(baseClass, variantClass[variant], isDisabled && "cursor-not-allowed opacity-70", className)}
+        variant={buttonVariant[variant]}
+        className={cn("h-auto min-h-11 rounded-full px-5 py-3 text-sm font-semibold", isDisabled && "cursor-not-allowed opacity-70", className)}
       >
         {pending ? pendingLabel : children}
-      </button>
+      </Button>
       {showDuplicateNotice ? (
         <span
           role="status"
           aria-live="polite"
-          className="pointer-events-none fixed bottom-6 left-1/2 z-[80] -translate-x-1/2 rounded-full border border-[var(--marketing-accent)]/35 bg-[#101821]/95 px-4 py-2 text-sm font-semibold text-[var(--marketing-text)] shadow-[0_16px_40px_rgba(0,0,0,0.35)]"
+          className="pointer-events-none fixed bottom-6 left-1/2 z-[80] -translate-x-1/2 rounded-full border border-border bg-popover px-4 py-2 text-sm font-semibold text-popover-foreground shadow-lg"
         >
           {duplicateSubmitLabel}
         </span>

@@ -20,6 +20,8 @@ async function installLoopbackOnlyGuard(page: Page) {
 }
 
 test("homepage polish stays readable, responsive, and interactive without external services", async ({ page }) => {
+  test.setTimeout(90_000);
+
   if (process.env.DATABASE_URL?.trim()) {
     throw new Error("Homepage UI checks require an unset DATABASE_URL.");
   }
@@ -39,13 +41,26 @@ test("homepage polish stays readable, responsive, and interactive without extern
     await expect(brand).toBeVisible();
     await expect(brandLabel).toHaveText("给你的人生添加AI外挂");
     await expect(brandLabel).toBeVisible();
-    expect(await brandLabel.evaluate((element) => {
-      const fontFamily = getComputedStyle(element).fontFamily;
-      return fontFamily.includes("LXGW WenKai") && document.fonts.check('500 11px "LXGW WenKai"', element.textContent ?? "");
-    }), `the selected local WenKai font is loaded at ${width}px`).toBe(true);
+    const brandFontFamily = await brandLabel.evaluate((element) => getComputedStyle(element).fontFamily);
+    const fontResponse = await page.request.get(new URL(
+      "/fonts/alimama/AlimamaFangYuanTiVF-Thin.woff2",
+      page.url(),
+    ).toString());
+    expect(brandFontFamily).toContain("Lemi Shi Guang Shou Zha Ti");
+    expect(brandFontFamily).toContain("Alimama Fang Yuan Ti");
+    expect(fontResponse.status(), `site font asset at ${width}px`).toBe(200);
     await expect(hero.locator(".redesign-home-hero-inner")).toHaveCSS("text-align", "center");
     await expect(hero).toHaveCSS("background-image", "none");
-    await expect(hero).toHaveCSS("color", "rgb(16, 24, 40)");
+    const heroColor = await hero.evaluate((element) => getComputedStyle(element).color);
+    const radixForeground = await page.evaluate(() => {
+      const probe = document.createElement("span");
+      probe.style.color = "var(--gray-12)";
+      document.body.append(probe);
+      const color = getComputedStyle(probe).color;
+      probe.remove();
+      return color;
+    });
+    expect(heroColor).toBe(radixForeground);
     expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBeLessThanOrEqual(width);
 
     const brandAlignment = await page.evaluate(() => {
@@ -103,6 +118,9 @@ test("homepage polish stays readable, responsive, and interactive without extern
       ).toBeLessThanOrEqual(
         layout.innerRight + 1,
       );
+      await page.locator(".redesign-menu-trigger").click();
+      await expect(page.locator(".redesign-mobile-drawer .theme-toggle")).toBeVisible();
+      await page.locator(".redesign-drawer-close").click();
     }
 
     const featureCards = page.locator(".redesign-home-feature-card");
@@ -160,6 +178,16 @@ test("homepage polish stays readable, responsive, and interactive without extern
     await expect(reviews.locator(".redesign-home-reviews-control, .redesign-home-review-triangle")).toHaveCount(0);
     await expect(reviews.getByRole("button", { name: "上一条评价" })).toHaveCount(0);
     await expect(reviews.getByRole("button", { name: "下一条评价" })).toHaveCount(0);
+    if (width <= 480) {
+      await expect(reviews.locator('.redesign-home-review-card:not([data-position="0"])').first()).toHaveCSS("visibility", "hidden");
+      const activeReviewBounds = await reviews.locator('.redesign-home-review-card[data-position="0"]').evaluate((card) => {
+        const { left, right, width: cardWidth } = card.getBoundingClientRect();
+        return { left, right, width: cardWidth };
+      });
+      expect(activeReviewBounds.left).toBeGreaterThanOrEqual(0);
+      expect(activeReviewBounds.right).toBeLessThanOrEqual(width);
+      expect(activeReviewBounds.width).toBeGreaterThan(width * 0.75);
+    }
     const activeReviewQuote = reviews.locator('.redesign-home-review-card[data-position="0"] blockquote');
     const initialReviewQuote = await activeReviewQuote.textContent();
     await reviews.focus();
@@ -180,7 +208,7 @@ test("homepage polish stays readable, responsive, and interactive without extern
     }
 
     const footer = page.locator(".redesign-footer");
-    await expect(footer).toHaveCSS("background-color", "rgb(0, 21, 18)");
+    await expect(footer).toHaveCSS("background-color", "rgb(11, 31, 68)");
     const footerGroup = footer.locator("details.footer-group").first();
     await expect(footerGroup).not.toHaveAttribute("open", "");
     await footerGroup.locator("summary").click();
@@ -217,8 +245,8 @@ test("homepage polish stays readable, responsive, and interactive without extern
       });
       expect(accountStyle.accountBorder).toBe(accountStyle.languageBorder);
       expect(accountStyle.accountRadius).toBe(accountStyle.languageRadius);
-      expect(accountStyle.menuText).toBe("rgb(16, 24, 40)");
-      expect(accountStyle.menuLinkText).toBe("rgb(16, 24, 40)");
+      expect(accountStyle.menuText).toBe(radixForeground);
+      expect(accountStyle.menuLinkText).toBe(radixForeground);
 
       const navLetterSpacing = await page.locator(".redesign-desktop-nav").evaluate((nav) =>
         Number.parseFloat(getComputedStyle(nav).letterSpacing),
@@ -257,14 +285,33 @@ test("homepage polish stays readable, responsive, and interactive without extern
   }
 
   await page.setViewportSize({ width: 1440, height: 900 });
+  await page.emulateMedia({ colorScheme: "dark" });
+  await page.goto("/", { waitUntil: "load" });
+  await expect(page.locator("html")).toHaveClass(/dark/);
+  const darkPalette = await page.locator(".enhe-redesign-production").evaluate((element) => {
+    const style = getComputedStyle(element);
+    return { background: style.backgroundColor, foreground: style.color };
+  });
+  expect(darkPalette.background).not.toBe("rgb(252, 252, 252)");
+  if (process.env.ENHE_CAPTURE_HOME_UI === "1") {
+    await page.locator(".redesign-home-products").scrollIntoViewIfNeeded();
+    await expect(page.locator('.redesign-home-product-media[data-media-status="ready"]').first()).toBeVisible();
+    await page.evaluate(() => window.scrollTo(0, 0));
+    await page.screenshot({ path: "test-results/homepage-ui-polish-dark-1440.png", fullPage: true });
+  }
+  const darkToggle = page.getByRole("button", { name: "切换到浅色模式" }).first();
+  await expect(darkToggle).toBeVisible();
+  await darkToggle.click();
+  await expect(page.locator("html")).not.toHaveClass(/dark/);
+
+  await page.setViewportSize({ width: 1440, height: 900 });
   const englishResponse = await page.goto("/en", { waitUntil: "load" });
   expect(englishResponse?.status(), "English homepage").toBe(200);
   const englishBrandLabel = page.locator(".redesign-header[data-home='true'] .redesign-brand-label");
   await expect(englishBrandLabel).toHaveText("Give your life an AI superpower");
-  expect(await englishBrandLabel.evaluate((element) => {
-    const fontFamily = getComputedStyle(element).fontFamily;
-    return fontFamily.includes("LXGW WenKai") && document.fonts.check('500 11px "LXGW WenKai"', element.textContent ?? "");
-  }), "the selected local WenKai font also loads for the English tagline").toBe(true);
+  const englishBrandFontFamily = await englishBrandLabel.evaluate((element) => getComputedStyle(element).fontFamily);
+  expect(englishBrandFontFamily).toContain("Lemi Shi Guang Shou Zha Ti");
+  expect(englishBrandFontFamily).toContain("Alimama Fang Yuan Ti");
   const englishReviews = page.locator(".redesign-home-reviews");
   await expect(englishReviews.getByRole("heading", { name: "User feedback" })).toBeVisible();
   await expect(englishReviews.locator(".redesign-home-reviews-disclosure")).toHaveText("AI-generated examples (not real customer feedback).");

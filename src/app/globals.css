@@ -1,4 +1,12 @@
 @import "tailwindcss";
+@import "@radix-ui/colors/blue.css";
+@import "@radix-ui/colors/blue-dark.css";
+@import "@radix-ui/colors/gray.css";
+@import "@radix-ui/colors/gray-dark.css";
+@import "tw-animate-css";
+@import "shadcn/tailwind.css";
+
+@custom-variant dark (&:is(.dark *));
 
 @font-face {
   font-family: 'Alimama Fang Yuan Ti';
@@ -9,63 +17,16 @@
 }
 
 @font-face {
-  font-family: 'Montserrat';
-  src: url('/fonts/montserrat/montserrat-latin-400-normal.woff2') format('woff2');
-  font-display: swap;
-  font-style: normal;
-  font-weight: 400;
-}
-
-@font-face {
-  font-family: 'Montserrat';
-  src: url('/fonts/montserrat/montserrat-latin-500-normal.woff2') format('woff2');
+  font-family: 'LXGW WenKai Lite';
+  src: url('/fonts/lxgw-wenkai/lxgw-wenkai-home-label.woff') format('woff');
   font-display: swap;
   font-style: normal;
   font-weight: 500;
 }
 
-@font-face {
-  font-family: 'Montserrat';
-  src: url('/fonts/montserrat/montserrat-latin-600-normal.woff2') format('woff2');
-  font-display: swap;
-  font-style: normal;
-  font-weight: 600;
-}
-
-@font-face {
-  font-family: 'Montserrat';
-  src: url('/fonts/montserrat/montserrat-latin-700-normal.woff2') format('woff2');
-  font-display: swap;
-  font-style: normal;
-  font-weight: 700;
-}
-
-@font-face {
-  font-family: 'Montserrat';
-  src: url('/fonts/montserrat/montserrat-latin-800-normal.woff2') format('woff2');
-  font-display: swap;
-  font-style: normal;
-  font-weight: 800;
-}
-
-@font-face {
-  font-family: 'Montserrat';
-  src: url('/fonts/montserrat/montserrat-latin-900-normal.woff2') format('woff2');
-  font-display: swap;
-  font-style: normal;
-  font-weight: 900;
-}
-
-@font-face {
-  font-family: 'SmileySans';
-  src: url('/fonts/smiley-sans/SmileySans-Oblique.ttf.woff2') format('woff2');
-  font-display: swap;
-  font-style: normal;
-  font-weight: 400 900;
-}
-
 @theme {
   --font-sans: 'Alimama Fang Yuan Ti', 'Microsoft YaHei', Arial, sans-serif;
+  --font-heading: 'Alimama Fang Yuan Ti', 'Microsoft YaHei', Arial, sans-serif;
 }
 
 :root {
@@ -75,41 +36,66 @@
   --font-heading-zh: 'Alimama Fang Yuan Ti', 'Microsoft YaHei', Arial, sans-serif;
   --mouse-x: 72vw;
   --mouse-y: 18vh;
-  --marketing-bg: #ffffff;
-  --marketing-bg-soft: #ffffff;
-  --marketing-bg-warm: #ffffff;
-  --marketing-text: #101828;
-  --marketing-muted: #526174;
-  --marketing-soft-text: #344256;
-  --marketing-accent: #246bfe;
-  --marketing-button: #246bfe;
-  --marketing-card: #ffffff;
-  --marketing-card-soft: #ffffff;
-  --marketing-border: #d8e0eb;
-  --marketing-border-strong: #9baabe;
-  --marketing-shadow: 0 16px 42px rgba(18, 42, 79, 0.1);
-  --background: var(--marketing-bg);
-  --background-deep: #ffffff;
-  --background-soft: #ffffff;
-  --card: #ffffff;
-  --card-strong: #ffffff;
-  --card-soft: #ffffff;
-  --border: #d8e0eb;
-  --border-strong: #9baabe;
-  --border-focus: #246bfe;
-  --foreground: #101828;
-  --foreground-soft: #344256;
-  --muted: #526174;
-  --dim: #66758a;
-  --primary: var(--marketing-accent);
-  --primary-bright: #0b57e3;
+  --marketing-bg: var(--gray-1);
+  --marketing-bg-soft: var(--gray-2);
+  --marketing-bg-warm: var(--gray-1);
+  --marketing-text: var(--gray-12);
+  --marketing-muted: var(--gray-11);
+  --marketing-soft-text: var(--gray-11);
+  --marketing-accent: var(--blue-11);
+  --marketing-button: var(--blue-11);
+  --marketing-card: var(--gray-1);
+  --marketing-card-soft: var(--gray-2);
+  --marketing-border: var(--gray-6);
+  --marketing-border-strong: var(--gray-8);
+  --marketing-shadow: 0 16px 42px color-mix(in srgb, var(--gray-12) 12%, transparent);
+  --background: var(--gray-1);
+  --background-deep: var(--gray-2);
+  --background-soft: var(--gray-2);
+  --card: var(--gray-1);
+  --card-foreground: var(--gray-12);
+  --card-strong: var(--gray-1);
+  --card-soft: var(--gray-2);
+  --border: var(--gray-6);
+  --border-strong: var(--gray-8);
+  --border-focus: var(--blue-8);
+  --foreground: var(--gray-12);
+  --foreground-soft: var(--gray-11);
+  --muted: var(--gray-3);
+  --muted-foreground: var(--gray-11);
+  --dim: var(--gray-10);
+  --primary: var(--blue-11);
+  --primary-foreground: #ffffff;
+  --secondary: var(--blue-3);
+  --secondary-foreground: var(--blue-12);
+  --popover: var(--gray-1);
+  --popover-foreground: var(--gray-12);
+  --accent: var(--blue-3);
+  --accent-foreground: var(--blue-12);
+  --destructive: #c62828;
+  --input: var(--gray-6);
+  --ring: var(--blue-8);
+  --sidebar: var(--gray-2);
+  --sidebar-foreground: var(--gray-12);
+  --sidebar-primary: var(--blue-9);
+  --sidebar-primary-foreground: #ffffff;
+  --sidebar-accent: var(--blue-3);
+  --sidebar-accent-foreground: var(--blue-12);
+  --sidebar-border: var(--gray-6);
+  --sidebar-ring: var(--blue-8);
+  --radius: 0.9rem;
+  --primary-bright: var(--blue-10);
   --cyan: var(--marketing-accent);
-  --cyan-bright: #246bfe;
-  --accent: var(--marketing-accent);
-  --purple: #246bfe;
-  --price: #101828;
+  --cyan-bright: var(--blue-9);
+  --purple: var(--blue-9);
+  --price: var(--gray-12);
   --alert: #c62828;
   --warning: #9a6700;
+  --chart-1: var(--blue-8);
+  --chart-2: var(--blue-9);
+  --chart-3: var(--blue-10);
+  --chart-4: var(--blue-11);
+  --chart-5: var(--blue-12);
 }
 
 * {
@@ -134,8 +120,7 @@ body {
   min-height: 100vh;
   margin: 0;
   overflow-x: clip;
-  background:
-    #ffffff;
+  background: var(--background);
   color: var(--foreground);
   font-family: var(--font-sans);
 }
@@ -329,7 +314,7 @@ a {
 }
 
 select {
-  color-scheme: light;
+  color-scheme: inherit;
   background-color: var(--marketing-card);
   color: var(--foreground);
 }
@@ -354,9 +339,9 @@ select option:disabled {
 .glass,
 .evidence-card,
 .dossier-card {
-  border: 1px solid rgba(255, 255, 255, 0.14);
-  background-color: rgba(33, 36, 44, 0.52);
-  background-image: linear-gradient(135deg, rgba(255, 255, 255, 0.16), rgba(255, 255, 255, 0.045));
+  border: 1px solid var(--marketing-border);
+  background-color: var(--marketing-card);
+  background-image: linear-gradient(135deg, color-mix(in srgb, var(--foreground) 3%, transparent), color-mix(in srgb, var(--foreground) 1%, transparent));
   box-shadow: var(--marketing-shadow);
   backdrop-filter: blur(28px) saturate(160%);
   -webkit-backdrop-filter: blur(28px) saturate(160%);
@@ -366,9 +351,9 @@ select option:disabled {
 .surface-panel-soft,
 .filter-surface,
 .admin-shell-card {
-  border: 1px solid rgba(255, 255, 255, 0.14);
-  background-color: rgba(33, 36, 44, 0.52);
-  background-image: linear-gradient(135deg, rgba(255, 255, 255, 0.095), rgba(255, 255, 255, 0.035));
+  border: 1px solid var(--marketing-border);
+  background-color: var(--marketing-card);
+  background-image: linear-gradient(135deg, color-mix(in srgb, var(--foreground) 2.5%, transparent), color-mix(in srgb, var(--foreground) 0.8%, transparent));
   box-shadow: var(--marketing-shadow);
   backdrop-filter: blur(28px) saturate(160%);
   -webkit-backdrop-filter: blur(28px) saturate(160%);
@@ -385,8 +370,8 @@ select option:disabled {
 }
 
 .surface-panel-soft {
-  background-color: rgba(38, 41, 50, 0.4);
-  box-shadow: 0 18px 60px rgba(0, 0, 0, 0.22), inset 0 1px 0 rgba(255, 255, 255, 0.08);
+  background-color: var(--marketing-card-soft);
+  box-shadow: 0 18px 60px color-mix(in srgb, var(--foreground) 10%, transparent), inset 0 1px 0 color-mix(in srgb, var(--foreground) 5%, transparent);
 }
 
 .filter-surface {
@@ -394,7 +379,7 @@ select option:disabled {
 }
 
 .admin-shell-card {
-  box-shadow: 0 24px 80px rgba(0, 0, 0, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.12);
+  box-shadow: 0 24px 80px color-mix(in srgb, var(--foreground) 14%, transparent), inset 0 1px 0 color-mix(in srgb, var(--foreground) 6%, transparent);
 }
 
 :is(
@@ -417,13 +402,13 @@ select option:disabled {
   --glow-padding: 40px;
   --cone-spread: 25deg;
   --fill-opacity: 0.5;
-  --glow-color: hsl(12deg 86% 58% / 92%);
-  --glow-color-60: hsl(12deg 86% 58% / 56%);
-  --glow-color-50: hsl(20deg 100% 70% / 46%);
-  --glow-color-40: hsl(0deg 0% 100% / 34%);
-  --glow-color-30: hsl(12deg 86% 58% / 28%);
-  --glow-color-20: hsl(36deg 100% 72% / 20%);
-  --glow-color-10: hsl(0deg 0% 100% / 10%);
+  --glow-color: var(--blue-9);
+  --glow-color-60: color-mix(in srgb, var(--blue-9) 56%, transparent);
+  --glow-color-50: color-mix(in srgb, var(--blue-8) 46%, transparent);
+  --glow-color-40: color-mix(in srgb, var(--blue-7) 34%, transparent);
+  --glow-color-30: color-mix(in srgb, var(--blue-9) 28%, transparent);
+  --glow-color-20: color-mix(in srgb, var(--blue-8) 20%, transparent);
+  --glow-color-10: color-mix(in srgb, var(--blue-7) 10%, transparent);
 
   position: relative;
   isolation: isolate;
@@ -795,25 +780,25 @@ select option:disabled {
 .login-submit-button,
 .purchase-guide-button {
   min-height: 48px !important;
-  border: 1px solid rgba(255, 255, 255, 0.2) !important;
-  background: #ffffff !important;
-  color: #050505 !important;
-  box-shadow:
-    0 16px 38px rgba(0, 0, 0, 0.2),
-    inset 0 1px 0 rgba(255, 255, 255, 0.8) !important;
+  border: 1px solid var(--primary) !important;
+  border-radius: 999px;
+  background: var(--primary) !important;
+  color: var(--primary-foreground) !important;
+  box-shadow: 0 10px 24px color-mix(in srgb, var(--primary) 22%, transparent) !important;
 }
 
 .login-submit-button,
 .login-submit-button *,
 .purchase-guide-button,
 .purchase-guide-button * {
-  color: #050505 !important;
+  color: var(--primary-foreground) !important;
 }
 
 .login-submit-button:hover,
 .purchase-guide-button:hover {
-  background: #f4f4f4 !important;
-  color: #050505 !important;
+  border-color: var(--blue-10) !important;
+  background: var(--blue-10) !important;
+  color: var(--primary-foreground) !important;
 }
 
 .status-success,
@@ -887,6 +872,13 @@ select option:disabled {
 .text-\[\#E8EEF8\],
 .text-white {
   color: var(--foreground) !important;
+}
+
+.login-submit-button,
+.login-submit-button *,
+.purchase-guide-button,
+.purchase-guide-button * {
+  color: var(--primary-foreground) !important;
 }
 
 .text-\[\#8B95A7\],
@@ -1045,7 +1037,7 @@ select option:disabled {
   gap: 0.4rem;
   border: 0;
   background: transparent;
-  color: rgba(255, 255, 255, 0.78);
+  color: var(--marketing-muted);
   font: inherit;
   font-size: 0.95rem;
   font-weight: 600;
@@ -1103,7 +1095,11 @@ select option:disabled {
 
 .site-brand-logo-dark {
   opacity: 1;
-  filter: brightness(0) invert(1) drop-shadow(0 10px 24px rgba(65, 197, 219, 0.2));
+  filter: brightness(0) saturate(100%);
+}
+
+.dark .site-brand-logo-dark {
+  filter: brightness(0) invert(1) drop-shadow(0 10px 24px color-mix(in srgb, var(--primary) 20%, transparent));
 }
 
 .site-brand:hover .site-brand-logo {
@@ -1126,6 +1122,34 @@ select option:disabled {
   grid-column: 2;
   justify-self: center;
   gap: clamp(0.385rem, 1.32vw, 0.825rem);
+}
+
+.site-primary-nav-list {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: clamp(0.385rem, 1.32vw, 0.825rem);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.site-nav-menu-content {
+  z-index: 60;
+  display: grid;
+  width: min(20rem, 88vw);
+  gap: 4px;
+  padding: 8px;
+  border: 1px solid var(--marketing-border);
+  border-radius: 16px;
+  background: var(--popover);
+  color: var(--popover-foreground);
+  box-shadow: var(--marketing-shadow);
+}
+
+.theme-toggle {
+  min-width: 40px;
+  min-height: 40px;
 }
 
 .site-header-actions {
@@ -1184,7 +1208,7 @@ select option:disabled {
 }
 
 .site-nav-dropdown-link.is-active small {
-  color: rgba(211, 238, 242, 0.78);
+  color: var(--marketing-muted);
 }
 
 .site-nav-dropdown {
@@ -5603,5 +5627,147 @@ select option:disabled {
   85% {
     opacity: 0;
     transform: translate3d(0, 0, 0);
+  }
+}
+
+@theme inline {
+  --font-heading: 'Alimama Fang Yuan Ti', 'Microsoft YaHei', Arial, sans-serif;
+  --font-sans: 'Alimama Fang Yuan Ti', 'Microsoft YaHei', Arial, sans-serif;
+  --color-sidebar-ring: var(--sidebar-ring);
+  --color-sidebar-border: var(--sidebar-border);
+  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+  --color-sidebar-accent: var(--sidebar-accent);
+  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+  --color-sidebar-primary: var(--sidebar-primary);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar: var(--sidebar);
+  --color-chart-5: var(--chart-5);
+  --color-chart-4: var(--chart-4);
+  --color-chart-3: var(--chart-3);
+  --color-chart-2: var(--chart-2);
+  --color-chart-1: var(--chart-1);
+  --color-ring: var(--ring);
+  --color-input: var(--input);
+  --color-border: var(--border);
+  --color-destructive: var(--destructive);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-accent: var(--accent);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-muted: var(--muted);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-secondary: var(--secondary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-primary: var(--primary);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-popover: var(--popover);
+  --color-card-foreground: var(--card-foreground);
+  --color-card: var(--card);
+  --color-foreground: var(--foreground);
+  --color-background: var(--background);
+  --radius-sm: calc(var(--radius) * 0.6);
+  --radius-md: calc(var(--radius) * 0.8);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) * 1.4);
+  --radius-2xl: calc(var(--radius) * 1.8);
+  --radius-3xl: calc(var(--radius) * 2.2);
+  --radius-4xl: calc(var(--radius) * 2.6);
+}
+
+.dark {
+  color-scheme: dark;
+  --marketing-bg: var(--gray-1);
+  --marketing-bg-soft: var(--gray-2);
+  --marketing-bg-warm: var(--gray-2);
+  --marketing-text: var(--gray-12);
+  --marketing-muted: var(--gray-11);
+  --marketing-soft-text: var(--gray-11);
+  --marketing-accent: var(--blue-11);
+  --marketing-button: var(--blue-11);
+  --marketing-card: var(--gray-2);
+  --marketing-card-soft: var(--gray-3);
+  --marketing-border: var(--gray-6);
+  --marketing-border-strong: var(--gray-8);
+  --marketing-shadow: 0 18px 48px color-mix(in srgb, var(--gray-12) 20%, transparent);
+  --background: var(--gray-1);
+  --background-deep: var(--gray-2);
+  --background-soft: var(--gray-2);
+  --card: var(--gray-2);
+  --card-foreground: var(--gray-12);
+  --card-strong: var(--gray-3);
+  --card-soft: var(--gray-3);
+  --border: var(--gray-6);
+  --border-strong: var(--gray-8);
+  --border-focus: var(--blue-8);
+  --foreground: var(--gray-12);
+  --foreground-soft: var(--gray-11);
+  --muted: var(--gray-3);
+  --muted-foreground: var(--gray-11);
+  --dim: var(--gray-10);
+  --primary: var(--blue-11);
+  --primary-foreground: var(--gray-1);
+  --secondary: var(--blue-3);
+  --secondary-foreground: var(--blue-12);
+  --popover: var(--gray-2);
+  --popover-foreground: var(--gray-12);
+  --accent: var(--blue-3);
+  --accent-foreground: var(--blue-12);
+  --destructive: #f87171;
+  --input: var(--gray-6);
+  --ring: var(--blue-8);
+  --sidebar: var(--gray-2);
+  --sidebar-foreground: var(--gray-12);
+  --sidebar-primary: var(--blue-9);
+  --sidebar-primary-foreground: #ffffff;
+  --sidebar-accent: var(--blue-3);
+  --sidebar-accent-foreground: var(--blue-12);
+  --sidebar-border: var(--gray-6);
+  --sidebar-ring: var(--blue-8);
+  --primary-bright: var(--blue-10);
+  --cyan: var(--marketing-accent);
+  --cyan-bright: var(--blue-9);
+  --purple: var(--blue-9);
+  --price: var(--gray-12);
+  --alert: #f87171;
+  --warning: #fbbf24;
+  --chart-1: var(--blue-8);
+  --chart-2: var(--blue-9);
+  --chart-3: var(--blue-10);
+  --chart-4: var(--blue-11);
+  --chart-5: var(--blue-12);
+}
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+  button:not(:disabled) {
+    transition:
+      transform 160ms cubic-bezier(0.23, 1, 0.32, 1),
+      border-color 160ms ease,
+      background-color 160ms ease,
+      color 160ms ease,
+      box-shadow 160ms ease;
+  }
+  button:not(:disabled):hover {
+    transform: translateY(-1px);
+  }
+  button:not(:disabled):active {
+    transform: translateY(1px) scale(0.985);
+  }
+  body {
+    @apply bg-background text-foreground;
+  }
+  html {
+    @apply font-sans;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  button:not(:disabled) {
+    transition-duration: 0.01ms !important;
+  }
+  button:not(:disabled):hover,
+  button:not(:disabled):active {
+    transform: none !important;
   }
 }

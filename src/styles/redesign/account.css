@@ -81,7 +81,7 @@
   border-color: var(--enhe-action);
   border-radius: var(--enhe-button-r);
   background: var(--enhe-action);
-  color: #fff;
+  color: var(--primary-foreground, #fff);
   font-weight: 700;
   padding: 0.75rem 1.25rem;
 }
@@ -94,7 +94,7 @@
 .enhe-account-shell .user-center-page button:not(:disabled) {
   border-color: var(--enhe-action);
   background-color: var(--enhe-action);
-  color: #fff;
+  color: var(--primary-foreground, #fff);
   transition:
     border-color var(--enhe-motion-fast) var(--enhe-ease-ui-move),
     background-color var(--enhe-motion-fast) var(--enhe-ease-ui-move),
@@ -182,7 +182,7 @@
   .enhe-account-shell .user-center-page .user-center-action--primary:hover,
   .enhe-account-shell .user-center-page button:not([class*="border"]):hover {
     background-color: var(--enhe-action-hover);
-    color: #fff;
+    color: var(--primary-foreground, #fff);
   }
 }
 

@@ -25,7 +25,7 @@ export default function AdminManualsPage() {
             <Link
               href={`/admin/manuals/view/${manual.slug}`}
               target="_blank"
-              className="mt-5 inline-flex rounded-full bg-[var(--marketing-accent)] px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-[#8feaff]"
+              className="mt-5 inline-flex rounded-full bg-[var(--marketing-accent)] px-5 py-2.5 text-sm font-semibold text-primary-foreground transition hover:bg-[var(--blue-12)]"
             >
               打开说明
             </Link>

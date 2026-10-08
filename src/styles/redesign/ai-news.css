@@ -7,7 +7,7 @@
   --marketing-soft-text: var(--enhe-text-muted);
   --marketing-accent: var(--enhe-action);
   --marketing-button: var(--enhe-text);
-  --marketing-card: #fff;
+  --marketing-card: var(--enhe-surface);
   --marketing-card-soft: var(--enhe-surface);
   --marketing-border: var(--enhe-border);
   --marketing-border-strong: var(--enhe-action);
@@ -62,9 +62,9 @@
 .enhe-redesign-production .ai-news-page .form-control-dark,
 .enhe-redesign-production .ai-news-page .form-select-dark {
   border-color: var(--enhe-border);
-  background-color: #fff;
+  background-color: var(--enhe-page-bg);
   color: var(--enhe-text);
-  color-scheme: light;
+  color-scheme: inherit;
 }
 
 .enhe-redesign-production .ai-news-page .form-control-dark::placeholder {
@@ -74,9 +74,9 @@
 .enhe-redesign-production .ai-news-page select,
 .enhe-redesign-production .ai-news-page select option,
 .enhe-redesign-production .ai-news-page select optgroup {
-  background-color: #fff;
+  background-color: var(--enhe-page-bg);
   color: var(--enhe-text);
-  color-scheme: light;
+  color-scheme: inherit;
 }
 
 .enhe-redesign-production .ai-news-page .ai-news-workspace-lead-grid {

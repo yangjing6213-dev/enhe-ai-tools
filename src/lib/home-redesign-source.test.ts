@@ -110,10 +110,10 @@ describe("homepage SaaS redesign source", () => {
     expect(dictionaries).toContain('metricsExplore: "Open More Possibilities with AI"');
     expect(dictionaries).toContain('featuredContentTitle: "Featured Content"');
 
-    expect(css).toContain("color-scheme: light");
-    expect(css).toContain("--marketing-bg: #ffffff");
+    expect(css).toContain("--marketing-bg: var(--gray-1)");
     expect(css).not.toContain(".site-brand-logo-light");
-    expect(css).toContain("--marketing-accent: #246bfe");
+    expect(css).toContain("--marketing-accent: var(--blue-11)");
+    expect(css).toContain(".dark {");
     expect(css).toContain("--font-sans: 'Alimama Fang Yuan Ti', 'Microsoft YaHei', Arial, sans-serif");
     expect(css).toContain("--font-heading-zh: 'Alimama Fang Yuan Ti', 'Microsoft YaHei', Arial, sans-serif");
     expect(css).toContain(".home-page-shell {\n  position: relative;\n  background: #101821;");
@@ -177,7 +177,8 @@ describe("homepage SaaS redesign source", () => {
     expect(css).toContain(".enhe-hero-gradient-subtitle");
     expect(css).toContain(".enhe-hero-subtitle-static");
     expect(css).toContain("font-size: clamp(4.05rem, 11.1vw, 9.15rem)");
-    expect(css).toContain(".site-brand-logo-dark {\n  opacity: 1;\n  filter: brightness(0) invert(1)");
+    expect(css).toContain(".site-brand-logo-dark {\n  opacity: 1;\n  filter: brightness(0) saturate(100%)");
+    expect(css).toContain(".dark .site-brand-logo-dark {");
   });
 
   it("uses localized task-outcome entries without the old animated category menu", () => {

@@ -1,4 +1,5 @@
 import { PrefetchLink } from "@/components/prefetch-link";
+import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import type { ComponentProps } from "react";
 
@@ -8,7 +9,7 @@ export function Container({ className, children }: React.PropsWithChildren<{ cla
 
 export function Badge({ children, className }: React.PropsWithChildren<{ className?: string }>) {
   return (
-    <span className={cn("rounded-full border border-white/14 bg-white/7 px-3 py-1 text-xs font-semibold text-[var(--marketing-muted)]", className)}>
+    <span className={cn("rounded-full border border-border bg-muted px-3 py-1 text-xs font-semibold text-muted-foreground", className)}>
       {children}
     </span>
   );
@@ -28,19 +29,19 @@ export function ButtonLink({
   }
 >) {
   return (
-    <PrefetchLink
-      {...props}
+    <Button
+      asChild
+      variant={variant === "primary" ? "default" : "outline"}
       className={cn(
-        "cursor-target inline-flex items-center justify-center rounded-full px-5 py-3 text-sm font-bold transition-[background-color,border-color,color,box-shadow,transform] duration-200 hover:-translate-y-0.5",
-        variant === "primary"
-          ? "border border-[#050505] bg-[#050505] text-white shadow-[0_14px_34px_rgba(0,0,0,0.22)] hover:bg-[#161616]"
-          : "surface-panel-soft border-white/14 text-[var(--marketing-text)] hover:border-[var(--marketing-accent)] hover:text-[var(--marketing-accent)]",
+        "cursor-target h-auto min-h-11 rounded-full px-5 py-3 font-bold transition-[background-color,border-color,color,box-shadow,transform] duration-200 hover:-translate-y-0.5",
+        variant === "primary" ? "shadow-[0_12px_28px_color-mix(in_srgb,var(--primary)_24%,transparent)]" : "bg-background/80 hover:border-primary hover:text-primary",
         className
       )}
-      href={href}
     >
-      <span className="relative z-10 inline-flex items-center gap-2">{children}</span>
-    </PrefetchLink>
+      <PrefetchLink {...props} href={href}>
+        <span className="relative z-10 inline-flex items-center gap-2">{children}</span>
+      </PrefetchLink>
+    </Button>
   );
 }
 

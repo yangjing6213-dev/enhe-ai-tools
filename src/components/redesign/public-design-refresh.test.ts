@@ -40,13 +40,13 @@ describe("ENHE public visual refresh contract", () => {
     expect(brandLockup).toContain("/images/enhe-logo-white.png");
     expect(refreshStyles).toMatch(/\.redesign-home-hero\s*\{[^}]*background-image:\s*none/);
     expect(refreshStyles).toMatch(/\.redesign-home-hero\s*\{[^}]*color:\s*var\(--enhe-text\)/);
-    expect(tokens).toMatch(/--enhe-page-bg:\s*#fff/i);
-    expect(tokens).toMatch(/--enhe-surface-elevated:\s*#fff/i);
-    expect(tokens).toMatch(/--enhe-action:\s*#(?:[0-9a-f]{3}|[0-9a-f]{6})/i);
+    expect(tokens).toContain("--enhe-page-bg: var(--background, #ffffff)");
+    expect(tokens).toContain("--enhe-surface-elevated: var(--popover, #ffffff)");
+    expect(tokens).toContain("--enhe-action: var(--primary, #0d74ce)");
     expect(refreshStyles).toContain(".redesign-footer");
-    expect(tokens).toContain("--enhe-footer: #001512");
+    expect(tokens).toContain("--enhe-footer: #0b1f44");
     expect(refreshStyles).toContain(".enhe-redesign-production :is(.glass, .evidence-card, .dossier-card, .surface-panel");
-    expect(globalStyles).toContain("select {\n  color-scheme: light;");
+    expect(globalStyles).toContain("select {\n  color-scheme: inherit;");
     expect(refreshStyles).toContain("font-size: clamp(1.25rem, 3.5vw, 3.75rem);");
   });
 

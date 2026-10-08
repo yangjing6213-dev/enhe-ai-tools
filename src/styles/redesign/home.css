@@ -1,13 +1,5 @@
-@font-face {
-  font-family: "LXGW WenKai";
-  src: url("/fonts/lxgw-wenkai/lxgw-wenkai-home-label.woff") format("woff");
-  font-style: normal;
-  font-weight: 500;
-  font-display: swap;
-}
-
 .redesign-home {
-  background-color: #fdfcf7;
+  background-color: var(--enhe-page-bg);
   color: var(--enhe-text, #080808);
   font-family: var(--enhe-font-zh, "Microsoft YaHei", system-ui, sans-serif);
 }
@@ -22,7 +14,7 @@
 }
 
 .redesign-home[data-locale="en"] {
-  font-family: var(--enhe-font-en, Inter, Arial, sans-serif);
+  font-family: var(--enhe-font-en, 'Alimama Fang Yuan Ti', 'Microsoft YaHei', Arial, sans-serif);
 }
 
 .redesign-home .redesign-home-hero-inner {
@@ -81,7 +73,7 @@
   border: 2px solid var(--enhe-action, #527e54);
   border-radius: var(--enhe-button-r, 4px);
   background-color: var(--enhe-action, #527e54);
-  color: #fff;
+  color: var(--primary-foreground, #fff);
   font-size: 1rem;
   font-weight: 700;
   line-height: 1.2;
@@ -131,7 +123,7 @@
   border: 2px solid var(--enhe-yellow, #ffd60a);
   border-radius: var(--enhe-button-r, 4px);
   background: var(--enhe-yellow, #ffd60a);
-  color: #fff;
+  color: var(--primary-foreground, #fff);
   font-weight: 800;
 }
 
@@ -330,7 +322,7 @@
   margin: 0;
   padding: 12px 16px;
   border: 1px solid var(--enhe-border, #dfe5df);
-  background: rgba(253, 252, 247, 0.94);
+  background: color-mix(in srgb, var(--enhe-surface, #fff) 94%, transparent);
   color: var(--enhe-text, #080808);
   text-align: center;
   transform: translate(-50%, -50%);
@@ -530,7 +522,7 @@
   padding: 28px;
   border: 1px solid var(--enhe-border, #dfe5df);
   border-radius: var(--enhe-card-r, 12px);
-  background: #fff;
+  background: var(--enhe-surface, #fff);
   opacity: 0.12;
   pointer-events: none;
   transform: translate(calc(-50% - 164%), -50%) scale(0.9);
@@ -682,6 +674,16 @@
 
   .redesign-home-review-card[data-position="1"] {
     transform: translate(calc(-50% + 88%), -50%) scale(0.94);
+  }
+}
+
+@media screen and (width < 480px) {
+  .redesign-home-review-card {
+    width: min(100%, 520px);
+  }
+
+  .redesign-home-review-card:not([data-position="0"]) {
+    visibility: hidden;
   }
 }
 

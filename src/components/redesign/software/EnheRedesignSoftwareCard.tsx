@@ -2,6 +2,7 @@
 
 import Image from "next/image";
 import { useState } from "react";
+import { Card } from "@/components/ui/card";
 
 import type { RedesignLocale } from "@/components/redesign/types";
 import type { SoftwareCatalogItem } from "@/lib/redesign/software/software-production";
@@ -28,57 +29,61 @@ export function EnheRedesignSoftwareCard({
   const headingId = `${sectionId}-${product.id}-title`;
 
   return (
-    <article
+    <Card
+      asChild
       className="redesign-software-card"
-      data-catalog-card
-      data-category={product.categoryId}
-      data-section={sectionId}
-      data-extra-card={extraHidden ? "true" : undefined}
-      hidden={extraHidden}
-      role={listItem ? "listitem" : undefined}
-      aria-labelledby={headingId}
     >
-      <div className="redesign-software-card-frame">
-        {product.media && !showTextCover ? (
-          <Image
-            className="redesign-software-card-media"
-            src={product.media.src}
-            alt={product.media.alt}
-            width={product.media.width}
-            height={product.media.height}
-            sizes="(min-width: 1025px) 280px, (min-width: 768px) 33vw, 84vw"
-            unoptimized={product.media.src.startsWith("/api/tool-images?")}
-            onError={() => setMediaFailed(true)}
-          />
-        ) : null}
-        {showTextCover ? (
-          <div className="redesign-software-card-cover" aria-hidden="true">
-            <span>ENHE AI</span>
-            <strong>{product.name}</strong>
-          </div>
-        ) : null}
-      </div>
-      <div className="redesign-software-card-body">
-        <p className="redesign-software-card-category">{categoryLabel}</p>
-        <h3 id={headingId}>{product.name}</h3>
-        <dl className="redesign-software-card-meta">
-          <div>
-            <dt>{locale === "en" ? "Category" : "分类"}</dt>
-            <dd>{categoryLabel}</dd>
-          </div>
-          <div>
-            <dt>{locale === "en" ? "Price" : "价格"}</dt>
-            <dd>{product.price}</dd>
-          </div>
-        </dl>
-        <a
-          className="redesign-software-card-link"
-          data-support-exclusion={sectionId}
-          href={product.detailHref}
-        >
-          {detailLabel}
-        </a>
-      </div>
-    </article>
+      <article
+        data-catalog-card
+        data-category={product.categoryId}
+        data-section={sectionId}
+        data-extra-card={extraHidden ? "true" : undefined}
+        hidden={extraHidden}
+        role={listItem ? "listitem" : undefined}
+        aria-labelledby={headingId}
+      >
+        <div className="redesign-software-card-frame">
+          {product.media && !showTextCover ? (
+            <Image
+              className="redesign-software-card-media"
+              src={product.media.src}
+              alt={product.media.alt}
+              width={product.media.width}
+              height={product.media.height}
+              sizes="(min-width: 1025px) 280px, (min-width: 768px) 33vw, 84vw"
+              unoptimized={product.media.src.startsWith("/api/tool-images?")}
+              onError={() => setMediaFailed(true)}
+            />
+          ) : null}
+          {showTextCover ? (
+            <div className="redesign-software-card-cover" aria-hidden="true">
+              <span>ENHE AI</span>
+              <strong>{product.name}</strong>
+            </div>
+          ) : null}
+        </div>
+        <div className="redesign-software-card-body">
+          <p className="redesign-software-card-category">{categoryLabel}</p>
+          <h3 id={headingId}>{product.name}</h3>
+          <dl className="redesign-software-card-meta">
+            <div>
+              <dt>{locale === "en" ? "Category" : "分类"}</dt>
+              <dd>{categoryLabel}</dd>
+            </div>
+            <div>
+              <dt>{locale === "en" ? "Price" : "价格"}</dt>
+              <dd>{product.price}</dd>
+            </div>
+          </dl>
+          <a
+            className="redesign-software-card-link"
+            data-support-exclusion={sectionId}
+            href={product.detailHref}
+          >
+            {detailLabel}
+          </a>
+        </div>
+      </article>
+    </Card>
   );
 }

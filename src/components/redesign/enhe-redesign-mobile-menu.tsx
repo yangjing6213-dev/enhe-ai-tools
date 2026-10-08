@@ -15,8 +15,9 @@ import {
   type MobileNavMotionPhase,
   type MobileNavMotionProfile,
 } from "@/lib/motion/mobile-nav-motion";
+import { ThemeToggle } from "@/components/theme-toggle";
 import { isExactCurrentPage } from "./navigation";
-import type { RedesignAccount, RedesignNavItem } from "./types";
+import type { RedesignAccount, RedesignLocale, RedesignNavItem } from "./types";
 
 const MOBILE_NAV_QUERY = "(width < 768px)";
 const REDUCED_MOTION_QUERY = "(prefers-reduced-motion: reduce)";
@@ -35,6 +36,7 @@ export function EnheRedesignMobileMenu({
   navItems,
   account,
   pathname,
+  locale,
 }: {
   menuId: string;
   triggerLabel: string;
@@ -42,6 +44,7 @@ export function EnheRedesignMobileMenu({
   navItems: ReadonlyArray<RedesignNavItem>;
   account: RedesignAccount;
   pathname?: string;
+  locale: RedesignLocale;
 }) {
   const [open, setOpen] = useState(false);
   const [layerRendered, setLayerRendered] = useState(false);
@@ -483,6 +486,9 @@ export function EnheRedesignMobileMenu({
                 ),
               )}
             </nav>
+            <div className="redesign-mobile-preferences">
+              <ThemeToggle locale={locale} />
+            </div>
             <div className="redesign-mobile-account">
               {account.status === "guest" ? (
                 <a

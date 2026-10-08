@@ -87,13 +87,9 @@ describe("site header navigation", () => {
     expect(source).not.toContain("AI productivity");
   });
 
-  it("uses hover and focus for desktop dropdown visibility", () => {
+  it("uses the accessible shared navigation menu for desktop dropdowns", () => {
     const source = readFileSync(
       new URL("../components/site-header.tsx", import.meta.url),
-      "utf8",
-    );
-    const dropdownSource = readFileSync(
-      new URL("../components/public-nav-dropdown.tsx", import.meta.url),
       "utf8",
     );
     const mobileSource = readFileSync(
@@ -105,20 +101,14 @@ describe("site header navigation", () => {
       "utf8",
     ).replace(/\r\n/g, "\n");
 
-    expect(source).not.toContain("<details key={item.href} className=\"site-nav-dropdown\">");
-    expect(source).toContain("<PublicNavDropdown");
+    expect(source).toContain("<NavigationMenu");
+    expect(source).toContain("<NavigationMenuTrigger");
+    expect(source).toContain("<NavigationMenuContent");
+    expect(source).toContain("<NavigationMenuLink asChild>");
     expect(source).toContain("exact={child.href === item.href}");
     expect(mobileSource).toContain("exact={child.href === item.href}");
-    expect(dropdownSource).toContain("useState(false)");
-    expect(dropdownSource).toContain("onPointerEnter");
-    expect(dropdownSource).toContain("inert={dismissed ? true : undefined}");
-    expect(css).toContain(".site-nav-dropdown::after {");
-    expect(css).toContain("height: 12px;");
-    expect(css).toContain(".site-nav-dropdown:hover .site-nav-dropdown-panel,");
-    expect(css).toContain(".site-nav-dropdown:focus-within .site-nav-dropdown-panel");
-    expect(css).toContain(".site-nav-dropdown.is-dismissed .site-nav-dropdown-panel");
-    expect(css).not.toContain(".site-nav-dropdown[open] .site-nav-dropdown-panel");
-    expect(css).not.toContain(".site-nav-dropdown[open] .site-nav-dropdown-trigger");
+    expect(css).toContain(".site-nav-menu-content {");
+    expect(css).toContain("background: var(--popover);");
   });
 
   it("keeps legacy categoryName URLs noindex while using fixed catalog keys", () => {

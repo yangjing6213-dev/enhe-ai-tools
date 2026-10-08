@@ -42,7 +42,7 @@
   font-family: var(--enhe-font-zh);
   line-height: var(--enhe-line-body);
   font-synthesis: none;
-  color-scheme: light;
+  color-scheme: inherit;
 }
 
 .enhe-redesign-preview:lang(en) {
@@ -225,7 +225,7 @@
   padding: 4px 9px;
   border-radius: 3px;
   background: var(--enhe-yellow);
-  color: #fff;
+  color: var(--primary-foreground);
   font-size: 11px;
   font-weight: 900;
 }
@@ -299,7 +299,7 @@
   border-radius: 3px;
   background: var(--enhe-action);
   color: var(--enhe-page-bg, #fff);
-  font-family: "LXGW WenKai", var(--enhe-font-zh, "Microsoft YaHei", sans-serif);
+  font-family: var(--enhe-font-brand-label, 'Alimama Fang Yuan Ti', 'Microsoft YaHei', Arial, sans-serif);
   font-size: 11px;
   font-weight: 500;
   line-height: 1.15;
@@ -317,6 +317,44 @@
   font-weight: 700;
   letter-spacing: 0.025em;
   white-space: nowrap;
+}
+
+.redesign-desktop-nav-list {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: clamp(12px, 1.1vw, 22px);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.redesign-nav-menu-content {
+  display: grid;
+  min-width: 190px;
+  gap: 2px;
+  padding: 8px;
+  border: 1px solid var(--enhe-border);
+  border-radius: var(--enhe-card-r);
+  background: var(--popover, var(--enhe-page-bg));
+  color: var(--popover-foreground, var(--enhe-text));
+  box-shadow: var(--enhe-shadow-panel);
+}
+
+.redesign-nav-dropdown-item {
+  display: flex;
+  min-height: 42px;
+  align-items: center;
+  border-radius: 10px;
+  padding: 0 10px;
+  color: var(--enhe-text);
+  text-decoration: none;
+}
+
+.redesign-nav-dropdown-item:hover,
+.redesign-nav-dropdown-item[aria-current="page"] {
+  background: var(--accent, color-mix(in srgb, var(--enhe-action) 10%, var(--enhe-page-bg)));
+  color: var(--enhe-action);
 }
 
 .redesign-nav-dropdown {
@@ -374,6 +412,10 @@
 .redesign-nav-link:hover,
 .redesign-language-link:hover,
 .redesign-login-link:hover {
+  color: var(--enhe-action);
+}
+
+.redesign-nav-link[aria-current="page"] {
   color: var(--enhe-action);
 }
 
@@ -535,6 +577,12 @@
 .redesign-mobile-nav {
   display: grid;
   gap: 2px;
+}
+
+.redesign-mobile-preferences {
+  display: flex;
+  justify-content: flex-end;
+  padding-top: var(--enhe-space-4);
 }
 
 .redesign-mobile-nav-dropdown {
@@ -873,7 +921,7 @@
   border-radius: var(--enhe-button-r);
   background: var(--enhe-page-bg);
   color: var(--enhe-text);
-  color-scheme: light;
+  color-scheme: inherit;
 }
 
 .enhe-redesign-production .enhe-editorial-page :is(.form-control-dark, .form-select-dark)::placeholder {
@@ -1096,7 +1144,7 @@
 .enhe-reference-workspace .filter-surface {
   border: 1px solid var(--reference-border);
   border-radius: 12px;
-  background: #fff;
+  background: var(--enhe-page-bg);
   box-shadow: none;
   backdrop-filter: none;
 }
@@ -1112,7 +1160,7 @@
 
 .enhe-redesign-production .enhe-reference-editorial :is(.glass, .surface-panel, .surface-panel-soft, .enhe-reference-editorial-card, .enhe-reference-editorial-links, .enhe-reference-editorial-faq),
 .enhe-redesign-production .enhe-reference-workspace :is(.glass, .surface-panel, .surface-panel-soft, .filter-surface) {
-  background-color: #fff;
+  background-color: var(--enhe-page-bg);
   background-image: none;
   box-shadow: none;
 }
@@ -1134,7 +1182,7 @@
 
 .enhe-redesign-production .enhe-reference-editorial .enhe-reference-editorial-hero a {
   border-color: var(--reference-border);
-  background: #fff;
+  background: var(--enhe-page-bg);
   color: var(--reference-accent-hover);
 }
 
@@ -1163,7 +1211,7 @@
 .enhe-reference-editorial .enhe-reference-editorial-links a {
   border-color: var(--reference-border);
   border-radius: 8px;
-  background: #fff;
+  background: var(--enhe-page-bg);
 }
 
 .enhe-reference-editorial .enhe-reference-editorial-links a:hover {
@@ -1427,14 +1475,14 @@
   align-items: center;
   justify-content: center;
   background: var(--enhe-action);
-  color: #fff;
+  color: var(--primary-foreground, #fff);
   text-decoration: none;
   transition: background-color 140ms ease, box-shadow 140ms ease;
 }
 
 .enhe-admin-shell .enhe-admin-content-primary-action:hover {
   background: var(--enhe-action-hover);
-  color: #fff;
+  color: var(--primary-foreground, #fff);
   box-shadow: 0 6px 18px color-mix(in srgb, var(--enhe-action) 22%, transparent);
 }
 
@@ -2100,7 +2148,7 @@
 .enhe-admin-shell .admin-nav-link[aria-current="page"] {
   background: var(--enhe-action);
   border-color: var(--enhe-action);
-  color: #fff;
+  color: var(--primary-foreground, #fff);
 }
 
 .enhe-admin-shell .admin-nav-link:focus-visible,
@@ -2139,6 +2187,11 @@
   }
 
   .enhe-admin-shell .admin-nav {
+    grid-template-columns: 1fr;
+  }
+
+  .enhe-admin-shell .admin-nav-list {
+    display: grid;
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 }
@@ -2148,7 +2201,7 @@
     padding-inline: 16px;
   }
 
-  .enhe-admin-shell .admin-nav {
+  .enhe-admin-shell .admin-nav-list {
     grid-template-columns: 1fr;
   }
 }
@@ -3149,7 +3202,7 @@
 .enhe-admin-shell .enhe-admin-payment-codes-form button[type="submit"] {
   border-color: var(--enhe-action);
   background: var(--enhe-action);
-  color: #fff;
+  color: var(--primary-foreground, #fff);
 }
 
 .enhe-admin-shell .enhe-admin-payment-codes-notice {
@@ -3437,7 +3490,7 @@
   border-radius: 999px;
   background: var(--enhe-action);
   padding: 10px 18px;
-  color: #fff;
+  color: var(--primary-foreground, #fff);
   font-size: 14px;
   font-weight: 650;
   text-decoration: none;

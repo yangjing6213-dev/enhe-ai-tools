@@ -27,14 +27,17 @@ describe("admin translation feedback", () => {
     const markup = renderToStaticMarkup(<AiNewsTranslationPanel onTranslated={() => undefined} />);
     expect(markup).toContain("Local synthetic translation result");
     expect(markup).toContain("enhe-admin-translation-success");
+    expect(markup).toContain('data-slot="button"');
+    expect(markup).toContain('data-variant="outline"');
+    expect(markup).toContain("border-border bg-card");
     const css = readFileSync("src/styles/redesign/shell.css", "utf8");
     const colorToken = css.match(/\.enhe-admin-translation-success\s*\{[^}]*color:\s*var\((--[\w-]+)\)/)?.[1];
     expect(colorToken).toBeDefined();
     const tokens = readFileSync("src/styles/redesign/tokens.css", "utf8");
-    const hex = tokens.match(new RegExp(`${colorToken}:\\s*(#[a-fA-F0-9]{6})`))?.[1];
+    const hex = tokens.match(new RegExp(`${colorToken}:\\s*(?:var\\([^,]+,\\s*)?(#[a-fA-F0-9]{6})`))?.[1];
     expect(hex).toBeDefined();
     const rgb = (value: string) => [1, 3, 5].map((index) => parseInt(value.slice(index, index + 2), 16));
-    const base = rgb(tokens.match(/--enhe-page-bg:\s*(#[a-fA-F0-9]{6})/)![1]);
+    const base = rgb(tokens.match(/--enhe-page-bg:\s*(?:var\([^,]+,\s*)?(#[a-fA-F0-9]{6})/)![1]);
     // Admin feedback now sits on the shared white surface, so verify the
     // success text against the page surface instead of the retired dark glass.
     const background = base;

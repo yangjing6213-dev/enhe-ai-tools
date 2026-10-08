@@ -3,6 +3,8 @@ import Image from "next/image";
 import { headers } from "next/headers";
 import { notFound } from "next/navigation";
 import { Container, SectionTitle } from "@/components/ui";
+import { Button } from "@/components/ui/button";
+import { Card } from "@/components/ui/card";
 import { PaymentQrCode } from "@/components/payment-qr-code";
 import { ZpayPaymentStatusPoller } from "@/components/zpay-payment-status-poller";
 import { requireUser } from "@/lib/auth";
@@ -109,8 +111,8 @@ export default async function PayPage({ params }: PayPageProps) {
       />
 
       <div className="grid gap-6 lg:grid-cols-[0.9fr_1.1fr]">
-        <div className="surface-panel !border-slate-200 !bg-white !bg-none p-7 text-slate-900">
-          <p className="text-sm text-slate-600">订单号</p>
+        <Card className="surface-panel gap-0 !border-border !bg-card p-7 text-card-foreground">
+          <p className="text-sm text-muted-foreground">订单号</p>
           <h1 className="mt-2 break-all text-2xl font-black text-[var(--marketing-accent)]">{order.orderNo}</h1>
 
           <div className="mt-7 grid gap-4">
@@ -121,24 +123,24 @@ export default async function PayPage({ params }: PayPageProps) {
             <Info label="订单状态" value={getLocalizedStatusLabel("order", order.orderStatus, "zh")} />
             <Info label="支付方式" value={paymentChannelCopy.methodLabel} />
           </div>
-        </div>
+        </Card>
 
-        <div className="surface-panel !border-slate-200 !bg-white !bg-none p-7 text-slate-900">
+        <Card className="surface-panel gap-0 !border-border !bg-card p-7 text-card-foreground">
           {presentation.isUnlocked ? (
             <div>
               <h2 className="text-xl font-bold text-[var(--marketing-accent)]">{presentation.unlockedTitle}</h2>
-              <p className="mt-3 text-sm leading-6 text-slate-600">
+              <p className="mt-3 text-sm leading-6 text-muted-foreground">
                 {presentation.unlockedDescription}
               </p>
               <div className="mt-6 flex flex-wrap gap-3">
                 {order.tool ? (
-                  <Link href={`${buildCanonicalToolPath(order.tool, "zh")}#download-links`} className="rounded-full bg-[#050505] px-5 py-3 text-sm font-semibold text-white">
-                    查看下载链接
-                  </Link>
+                  <Button asChild>
+                    <Link href={`${buildCanonicalToolPath(order.tool, "zh")}#download-links`}>查看下载链接</Link>
+                  </Button>
                 ) : null}
-                <Link href={`/orders/${order.id}`} className="rounded-full border border-white/12 px-5 py-3 text-sm">
-                  查看订单详情
-                </Link>
+                <Button asChild variant="outline">
+                  <Link href={`/orders/${order.id}`}>查看订单详情</Link>
+                </Button>
               </div>
             </div>
           ) : paymentErrorCopy ? (
@@ -146,10 +148,10 @@ export default async function PayPage({ params }: PayPageProps) {
               <h2 className="text-xl font-bold text-[var(--marketing-accent)]">
                 {paymentErrorCopy.title}
               </h2>
-              <p className="mt-3 rounded-xl border border-slate-200 bg-white p-4 text-sm leading-6 text-slate-900">
+              <p className="mt-3 rounded-xl border border-border bg-card p-4 text-sm leading-6 text-card-foreground">
                 {paymentErrorCopy.description}
               </p>
-              <p className="mt-4 text-sm leading-6 text-slate-600">
+              <p className="mt-4 text-sm leading-6 text-muted-foreground">
                 {paymentErrorCopy.nextStep}
               </p>
             </div>
@@ -157,15 +159,15 @@ export default async function PayPage({ params }: PayPageProps) {
             <div>
               <div className="flex flex-wrap items-start justify-between gap-4">
                 <div>
-                  <h2 className="text-xl font-semibold text-slate-900">扫码支付</h2>
-                  <p className="mt-2 text-sm leading-6 text-slate-600">
+                  <h2 className="text-xl font-semibold text-card-foreground">扫码支付</h2>
+                  <p className="mt-2 text-sm leading-6 text-muted-foreground">
                     二维码为当前订单动态生成，请确认金额与订单号无误后支付。
                   </p>
                 </div>
               </div>
 
               <div className="mt-6 grid gap-5 md:grid-cols-[280px_1fr]">
-                <div className="rounded-2xl border border-white/10 bg-white p-4">
+                <div className="rounded-2xl border border-border bg-white p-4">
                   {zpayPayment.displayImageUrl ? (
                     <Image
                       src={zpayPayment.displayImageUrl}
@@ -190,7 +192,7 @@ export default async function PayPage({ params }: PayPageProps) {
                 </div>
 
                 <div className="flex flex-col justify-between gap-5">
-                  <div className="space-y-3 text-sm leading-6 text-slate-600">
+                  <div className="space-y-3 text-sm leading-6 text-muted-foreground">
                     <p>请在下单后 10 分钟内付款，超时未付款订单将自动取消。</p>
                     <p>{presentation.paymentCompletionText}</p>
                     <p>{paymentChannelCopy.guide}</p>
@@ -201,18 +203,19 @@ export default async function PayPage({ params }: PayPageProps) {
 
                   <div className="flex flex-wrap gap-3">
                     {zpayPayment.transaction.paymentType !== "wxpay" && (zpayPayment.payUrl ?? zpayPayment.qrcodeUrl ?? zpayPayment.displayUrl) ? (
-                      <a
-                        href={zpayPayment.payUrl ?? zpayPayment.qrcodeUrl ?? zpayPayment.displayUrl ?? "#"}
-                        target="_blank"
-                        rel="nofollow noopener noreferrer"
-                        className="rounded-full bg-[#050505] px-5 py-3 text-sm font-semibold text-white"
-                      >
-                        {paymentChannelCopy.checkoutLabel}
-                      </a>
+                      <Button asChild>
+                        <a
+                          href={zpayPayment.payUrl ?? zpayPayment.qrcodeUrl ?? zpayPayment.displayUrl ?? "#"}
+                          target="_blank"
+                          rel="nofollow noopener noreferrer"
+                        >
+                          {paymentChannelCopy.checkoutLabel}
+                        </a>
+                      </Button>
                     ) : null}
-                    <Link href={`/orders/${order.id}`} className="rounded-full border border-white/12 px-5 py-3 text-sm">
-                      查看订单详情
-                    </Link>
+                    <Button asChild variant="outline">
+                      <Link href={`/orders/${order.id}`}>查看订单详情</Link>
+                    </Button>
                   </div>
                 </div>
               </div>
@@ -225,12 +228,12 @@ export default async function PayPage({ params }: PayPageProps) {
           ) : (
             <div>
               <h2 className="text-xl font-bold text-[var(--marketing-accent)]">当前订单暂不可支付</h2>
-              <p className="mt-3 text-sm leading-6 text-slate-600">
+              <p className="mt-3 text-sm leading-6 text-muted-foreground">
                 该订单状态为 {order.orderStatus}，请返回订单详情查看。
               </p>
             </div>
           )}
-        </div>
+        </Card>
       </div>
     </Container>
   );
@@ -238,9 +241,9 @@ export default async function PayPage({ params }: PayPageProps) {
 
 function Info({ label, value }: { label: string; value: string }) {
   return (
-    <div className="rounded-xl border border-slate-200 bg-white p-4">
-      <p className="text-xs text-slate-600">{label}</p>
-      <p className="mt-2 break-all font-semibold text-slate-900">{value}</p>
+    <div className="rounded-xl border border-border bg-card p-4">
+      <p className="text-xs text-muted-foreground">{label}</p>
+      <p className="mt-2 break-all font-semibold text-card-foreground">{value}</p>
     </div>
   );
 }
