@@ -91,14 +91,16 @@ export function EnheRedesignFooter({
   return (
     <footer className="redesign-footer" aria-label={copy.ariaLabel}>
       <div className="redesign-footer-inner">
-        <a
-          className="footer-back-to-top footer-back-to-top-button"
-          href="#top"
-          aria-label={copy.backToTop}
-        >
-          {copy.backToTop}
-          <ArrowUp aria-hidden="true" size={16} />
-        </a>
+        <div className="footer-back-to-top-row">
+          <a
+            className="footer-back-to-top footer-back-to-top-button"
+            href="#top"
+            aria-label={copy.backToTop}
+          >
+            {copy.backToTop}
+            <ArrowUp aria-hidden="true" size={16} />
+          </a>
+        </div>
         <div className="footer-grid">
           <div>
             <h2>{copy.brandLine}</h2>

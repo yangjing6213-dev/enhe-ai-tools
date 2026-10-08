@@ -39,6 +39,10 @@ test("homepage polish stays readable, responsive, and interactive without extern
     await expect(brand).toBeVisible();
     await expect(brandLabel).toHaveText("给你的人生添加AI外挂");
     await expect(brandLabel).toBeVisible();
+    expect(await brandLabel.evaluate((element) => {
+      const fontFamily = getComputedStyle(element).fontFamily;
+      return fontFamily.includes("LXGW WenKai") && document.fonts.check('500 11px "LXGW WenKai"', element.textContent ?? "");
+    }), `the selected local WenKai font is loaded at ${width}px`).toBe(true);
     await expect(hero.locator(".redesign-home-hero-inner")).toHaveCSS("text-align", "center");
     await expect(hero).toHaveCSS("background-image", "none");
     await expect(hero).toHaveCSS("color", "rgb(16, 24, 40)");
@@ -144,6 +148,14 @@ test("homepage polish stays readable, responsive, and interactive without extern
     const reviews = page.locator(".redesign-home-reviews");
     await reviews.scrollIntoViewIfNeeded();
     await reviews.hover();
+    const reviewHeadingSize = await page.evaluate(() => {
+      const productHeading = document.querySelector<HTMLElement>(".redesign-home-products-heading h2");
+      const reviewHeading = document.querySelector<HTMLElement>(".redesign-home-reviews-heading-row h2");
+      if (!productHeading || !reviewHeading) throw new Error("A homepage section heading is missing.");
+      return [getComputedStyle(productHeading).fontSize, getComputedStyle(reviewHeading).fontSize];
+    });
+    expect(reviewHeadingSize[1], `review and product headings share one size at ${width}px`).toBe(reviewHeadingSize[0]);
+    await expect(reviews.locator(".redesign-home-reviews-disclosure")).toHaveText("AI生成展示内容，不代表真实用户评价。");
     await expect(reviews.locator(".redesign-home-review-triangle")).toHaveCount(2);
     const reviewArrowAlignment = await reviews.evaluate((section) => {
       const arrows = section.querySelectorAll<HTMLElement>(".redesign-home-reviews-control");
@@ -180,10 +192,18 @@ test("homepage polish stays readable, responsive, and interactive without extern
     await expect.poll(() => activeReviewQuote.textContent()).toBe(initialReviewQuote);
     const reviewAvatar = reviews.locator('.redesign-home-review-card[data-position="0"] .redesign-home-review-avatar');
     await expect(reviewAvatar).toHaveAttribute("alt", /AI 生成的虚构人物/);
-    const pauseRotation = reviews.getByRole("button", { name: "暂停自动播放" });
+    const pauseRotation = reviews.getByRole("button", { name: "暂停轮播" });
     await expect(pauseRotation).toHaveAttribute("aria-pressed", "false");
+    await expect(pauseRotation).toHaveText("");
     await pauseRotation.click();
-    await expect(reviews.getByRole("button", { name: "继续自动播放" })).toHaveAttribute("aria-pressed", "true");
+    await expect(reviews.getByRole("button", { name: "继续轮播" })).toHaveAttribute("aria-pressed", "true");
+    if (width === 1440) {
+      await reviews.focus();
+      await page.keyboard.press("ArrowRight");
+      await expect(reviews).toHaveAttribute("data-motion-modality", "keyboard");
+      await expect(reviews.locator('.redesign-home-review-card[data-position="0"]')).toHaveCSS("transition-property", "none");
+      await page.keyboard.press("ArrowLeft");
+    }
 
     const footer = page.locator(".redesign-footer");
     await expect(footer).toHaveCSS("background-color", "rgb(0, 21, 18)");
@@ -251,9 +271,24 @@ test("homepage polish stays readable, responsive, and interactive without extern
 
       const cta = page.locator(".redesign-home-hero .redesign-home-cta");
       const transition = await cta.evaluate((element) => getComputedStyle(element).transitionDuration);
-      expect(transition).toContain("0.17s");
+      expect(transition).toContain("0.1s");
       await cta.hover();
       expect(await cta.evaluate((element) => getComputedStyle(element).transform)).not.toBe("none");
+      if (width === 1440) {
+        await page.emulateMedia({ reducedMotion: "reduce" });
+        const reducedMotionCTA = await cta.evaluate((element) => {
+          const style = getComputedStyle(element);
+          return {
+            property: style.transitionProperty,
+            duration: style.transitionDuration,
+            transform: style.transform,
+          };
+        });
+        expect(reducedMotionCTA.property).not.toContain("transform");
+        expect(reducedMotionCTA.duration).toContain("0.17s");
+        expect(reducedMotionCTA.transform).toBe("none");
+        await page.emulateMedia({ reducedMotion: "no-preference" });
+      }
     }
 
     await page.evaluate(() => window.scrollTo(0, document.body.scrollHeight));
@@ -264,6 +299,16 @@ test("homepage polish stays readable, responsive, and interactive without extern
       await page.screenshot({ path: `test-results/homepage-ui-polish-${width}.png`, fullPage: true });
     }
   }
+
+  await page.setViewportSize({ width: 1440, height: 900 });
+  const englishResponse = await page.goto("/en", { waitUntil: "load" });
+  expect(englishResponse?.status(), "English homepage").toBe(200);
+  const englishBrandLabel = page.locator(".redesign-header[data-home='true'] .redesign-brand-label");
+  await expect(englishBrandLabel).toHaveText("Give your life an AI superpower");
+  expect(await englishBrandLabel.evaluate((element) => {
+    const fontFamily = getComputedStyle(element).fontFamily;
+    return fontFamily.includes("LXGW WenKai") && document.fonts.check('500 11px "LXGW WenKai"', element.textContent ?? "");
+  }), "the selected local WenKai font also loads for the English tagline").toBe(true);
 
   expect(rejectedOrigins).toEqual([]);
   expect(pageErrors).toEqual([]);

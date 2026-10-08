@@ -1,3 +1,11 @@
+@font-face {
+  font-family: "LXGW WenKai";
+  src: url("/fonts/lxgw-wenkai/lxgw-wenkai-home-label.woff") format("woff");
+  font-style: normal;
+  font-weight: 500;
+  font-display: swap;
+}
+
 .redesign-home {
   background-color: #fdfcf7;
   color: var(--enhe-text, #080808);
@@ -440,7 +448,7 @@
 
 .redesign-home-reviews-inner {
   box-sizing: border-box;
-  width: min(100%, 1180px);
+  width: min(100%, 1040px);
   margin-inline: auto;
   padding: clamp(72px, 10vw, 128px) 24px clamp(88px, 12vw, 144px);
 }
@@ -448,23 +456,37 @@
 .redesign-home-reviews-inner h2 {
   margin: 0 0 40px;
   color: var(--enhe-text, #080808);
-  font-size: clamp(2rem, 5vw, 4.5rem);
+  font-size: clamp(1rem, 2.2vw, 2.25rem);
   letter-spacing: -0.05em;
   line-height: 1;
   text-align: center;
 }
 
+.redesign-home-reviews-heading-row {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 28px;
+}
+
+.redesign-home-reviews-heading-row h2 {
+  margin-bottom: 0;
+}
+
 .redesign-home-reviews-rotation {
-  display: block;
-  min-height: 44px;
-  margin: -16px auto 24px;
-  padding: 8px 12px;
+  position: absolute;
+  right: 0;
+  display: inline-grid;
+  width: 34px;
+  min-width: 34px;
+  height: 34px;
+  place-items: center;
+  padding: 0;
   border: 0;
+  border-radius: 50%;
   background: transparent;
   color: var(--enhe-action);
-  font: inherit;
-  text-decoration: underline;
-  text-underline-offset: 3px;
   cursor: pointer;
 }
 
@@ -481,6 +503,8 @@
 
 .redesign-home-reviews-window {
   position: relative;
+  width: min(100%, 980px);
+  margin-inline: auto;
   min-height: 352px;
   overflow: hidden;
   mask-image: linear-gradient(to right, transparent 0, #000 12%, #000 88%, transparent 100%);
@@ -497,7 +521,7 @@
   top: 50%;
   left: 50%;
   box-sizing: border-box;
-  width: min(78vw, 680px);
+  width: min(70vw, 600px);
   min-height: 320px;
   padding: 28px;
   border: 1px solid var(--enhe-border, #dfe5df);
@@ -531,6 +555,10 @@
 
 .redesign-home-review-card[data-position="2"] {
   transform: translate(calc(-50% + 164%), -50%) scale(0.9);
+}
+
+.redesign-home-reviews[data-motion-modality="keyboard"] .redesign-home-review-card {
+  transition: none;
 }
 
 .redesign-home-review-top {
@@ -654,7 +682,11 @@
   }
 
   .redesign-home-reviews-inner h2 {
-    margin-bottom: 28px;
+    margin-bottom: 0;
+  }
+
+  .redesign-home-reviews-heading-row {
+    margin-bottom: 20px;
   }
 
   .redesign-home-reviews-window {
@@ -664,7 +696,7 @@
   }
 
   .redesign-home-review-card {
-    width: 68%;
+    width: min(70%, 520px);
     min-height: 408px;
     padding: 22px;
   }
@@ -672,6 +704,18 @@
   .redesign-home-review-triangle {
     width: 18px;
     height: 18px;
+  }
+
+  .redesign-home-reviews-control {
+    width: 34px;
+    min-width: 34px;
+    height: 40px;
+  }
+
+  .redesign-home-reviews-rotation {
+    width: 30px;
+    min-width: 30px;
+    height: 30px;
   }
 
   .redesign-home-review-top {

@@ -61,13 +61,11 @@ function assertLocaleSurface(locale: RedesignLocale, html: string) {
 
   for (const product of SOFTWARE_PRODUCTS) {
     expect(html).toContain(product.name[locale]);
-    expect(html).toContain(product.description[locale]);
+    expect(html).not.toContain(product.description[locale]);
     expect(html).toContain(product.price[locale]);
     expect(html).toContain(product.detailHref[locale]);
 
-    if (product.description[locale] !== product.description[otherLocale]) {
-      expect(html).not.toContain(product.description[otherLocale]);
-    }
+    expect(html).not.toContain(product.description[otherLocale]);
 
     if (product.price[locale] !== product.price[otherLocale]) {
       expect(html).not.toContain(product.price[otherLocale]);
@@ -143,7 +141,7 @@ describe("AI tools candidate bilingual preview regression", () => {
     expect(layout).toMatch(/<html\s+lang=\{/);
   });
 
-  it("renders both locales with one H1, localized catalog copy, product content, and footer-bound locale propagation", () => {
+  it("renders both locales with one H1 and concise product cards without long descriptions", () => {
     const page = readCandidate("app/redesign-preview/software/page.tsx");
 
     expect(page).toContain("<EnheRedesignHeader");

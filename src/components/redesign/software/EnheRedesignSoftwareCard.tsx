@@ -26,7 +26,6 @@ export function EnheRedesignSoftwareCard({
   const [mediaFailed, setMediaFailed] = useState(false);
   const showTextCover = product.media === null || mediaFailed;
   const headingId = `${sectionId}-${product.id}-title`;
-  const descriptionId = `${sectionId}-${product.id}-description`;
 
   return (
     <article
@@ -38,7 +37,6 @@ export function EnheRedesignSoftwareCard({
       hidden={extraHidden}
       role={listItem ? "listitem" : undefined}
       aria-labelledby={headingId}
-      aria-describedby={descriptionId}
     >
       <div className="redesign-software-card-frame">
         {product.media && !showTextCover ? (
@@ -63,9 +61,6 @@ export function EnheRedesignSoftwareCard({
       <div className="redesign-software-card-body">
         <p className="redesign-software-card-category">{categoryLabel}</p>
         <h3 id={headingId}>{product.name}</h3>
-        <p id={descriptionId} className="redesign-software-card-description">
-          {product.description}
-        </p>
         <dl className="redesign-software-card-meta">
           <div>
             <dt>{locale === "en" ? "Category" : "分类"}</dt>

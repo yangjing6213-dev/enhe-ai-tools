@@ -26,11 +26,11 @@ describe("homepage approved copy", () => {
   it("keeps later review and value copy in the typed dictionary", () => {
     expect(HOME_COPY.zh.review).toEqual({
       heading: "产品用户评价",
-      disclosure: "以下人物与评价内容由 AI 生成，仅作页面展示示意，并非真实用户评价。",
+      disclosure: "AI生成展示内容，不代表真实用户评价。",
     });
     expect(HOME_COPY.en.review).toEqual({
       heading: "Product user reviews",
-      disclosure: "These people and review texts are AI-generated illustrations, not real customer reviews.",
+      disclosure: "AI-generated examples, not real customer reviews.",
     });
     expect(HOME_COPY.zh.value.cta).toEqual({ label: "探索 AI 工具", href: "/software" });
     expect(HOME_COPY.en.value.cta).toEqual({ label: "Explore AI tools", href: "/en/software" });

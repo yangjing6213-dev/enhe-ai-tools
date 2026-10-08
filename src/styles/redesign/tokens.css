@@ -35,6 +35,7 @@
   --enhe-motion-panel: 200ms;
   --enhe-motion-standard: 240ms;
   --enhe-ease-ui-move: cubic-bezier(0.4, 0, 0.2, 1);
+  --enhe-ease-ui-feedback: cubic-bezier(0.23, 1, 0.32, 1);
   --enhe-z-header: 20;
   --enhe-z-layer: 40;
   --enhe-z-focus: 60;

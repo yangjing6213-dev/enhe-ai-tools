@@ -92,11 +92,14 @@ describe("homepage experience review candidate", () => {
     expect(HOME_REVIEWS.every((review) => review.stars === 4 || review.stars === 5)).toBe(true);
   });
 
-  it("labels the carousel as generated illustrative content and removes the old sample-feedback label", () => {
+  it("keeps a concise visible AI-generated-content disclosure and removes the old sample-feedback label", () => {
     expect(reviewSource).toContain("copy.disclosure");
+    expect(HOME_REVIEWS[0].avatarAlt.zh).toContain("虚构人物");
     expect(reviewSource).not.toContain("exampleLabel");
     expect(reviewSource).not.toContain("示例体验反馈");
     expect(reviewSource).not.toContain("Example experience feedback");
+    expect(reviewSource).not.toContain("暂停自动播放");
+    expect(reviewSource).not.toContain("Pause automatic playback");
   });
 
   it("keeps the approved automatic and manual-resume timings", () => {
@@ -173,7 +176,7 @@ describe("homepage experience review candidate", () => {
     expect(reviewCardRule).not.toContain("will-change");
   });
 
-  it("keeps previous/next triangles and a persistent manual pause control", () => {
+  it("keeps previous/next triangles and an accessible icon-only manual pause control", () => {
     expect(reviewSource).toContain('"use client"');
     expect(reviewSource).toContain("useEffect");
     expect(reviewSource).toContain("setInterval");
@@ -193,6 +196,7 @@ describe("homepage experience review candidate", () => {
     expect(reviewSource).toContain('aria-label={copy.next}');
     expect(reviewSource).toContain("redesign-home-reviews-rotation");
     expect(reviewSource).toContain('aria-pressed={isManuallyPaused}');
+    expect(reviewSource).toContain("aria-hidden=\"true\"");
     expect(reviewSource).toContain("pauseManually");
     expect(reviewSource).toContain("resumeManually");
     expect(reviewSource).toContain('data-direction="previous"');
@@ -208,7 +212,17 @@ describe("homepage experience review candidate", () => {
     expect(homeStyles).toContain(".redesign-home-reviews-window");
     expect(homeStyles).toContain("opacity");
     expect(homeStyles).toContain("transform");
-    expect(homeStyles).toContain("min-width: 44px");
+    expect(homeStyles).toContain("min-width: 34px");
+  });
+
+  it("keeps keyboard-triggered review changes instant while pointer and automatic changes retain motion", () => {
+    expect(reviewSource).toContain('move(-1, "keyboard")');
+    expect(reviewSource).toContain('move(1, "keyboard")');
+    expect(reviewSource).toContain('event.detail === 0 ? "keyboard" : "pointer"');
+    expect(reviewSource).toContain('setMotionModality("pointer")');
+    expect(reviewSource).toContain('setMotionModality("automatic")');
+    expect(reviewSource).toContain('data-motion-modality={motionModality}');
+    expect(homeStyles).toMatch(/\.redesign-home-reviews\[data-motion-modality="keyboard"\]\s+\.redesign-home-review-card\s*\{\s*transition:\s*none;/);
   });
 
   it("keeps all homepage motion controls still when reduced motion is preferred", () => {

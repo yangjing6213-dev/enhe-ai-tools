@@ -1,6 +1,7 @@
 "use client";
 
 import Image from "next/image";
+import { Pause, Play } from "lucide-react";
 import { useEffect, useRef, useState, type KeyboardEvent } from "react";
 import type { RedesignLocale } from "@/components/redesign/types";
 import {
@@ -15,16 +16,16 @@ const REVIEW_COPY = {
   zh: {
     previous: "上一条评价",
     next: "下一条评价",
-    pause: "暂停自动播放",
-    resume: "继续自动播放",
-    reducedMotion: "已按系统设置暂停自动播放",
+    pause: "暂停轮播",
+    resume: "继续轮播",
+    reducedMotion: "已按系统设置暂停轮播",
     stars: (count: number) => `${count} 星`,
   },
   en: {
     previous: "Previous review",
     next: "Next review",
-    pause: "Pause automatic playback",
-    resume: "Resume automatic playback",
+    pause: "Pause carousel",
+    resume: "Resume carousel",
     reducedMotion: "Paused by your motion settings",
     stars: (count: number) => `${count} stars`,
   },
@@ -64,11 +65,13 @@ export function EnheRedesignExperienceReviews({ locale }: { locale: RedesignLoca
   const timerActionsRef = useRef<ReviewTimerActions | null>(null);
   const focusPausedRef = useRef(false);
   const [index, setIndex] = useState(REVIEW_INITIAL_INDEX);
+  const [motionModality, setMotionModality] = useState<"automatic" | "pointer" | "keyboard">("automatic");
   const [isAutoRotating, setIsAutoRotating] = useState(true);
   const [isManuallyPaused, setIsManuallyPaused] = useState(false);
   const [isReducedMotion, setIsReducedMotion] = useState(false);
 
-  const move = (delta: -1 | 1) => {
+  const move = (delta: -1 | 1, modality: "pointer" | "keyboard") => {
+    setMotionModality(modality);
     setIndex((current) => (current + delta + HOME_REVIEWS.length) % HOME_REVIEWS.length);
     timerActionsRef.current?.scheduleManualResume();
   };
@@ -76,11 +79,11 @@ export function EnheRedesignExperienceReviews({ locale }: { locale: RedesignLoca
   const handleKeyDown = (event: KeyboardEvent<HTMLElement>) => {
     if (event.key === "ArrowLeft") {
       event.preventDefault();
-      move(-1);
+      move(-1, "keyboard");
     }
     if (event.key === "ArrowRight") {
       event.preventDefault();
-      move(1);
+      move(1, "keyboard");
     }
   };
 
@@ -135,6 +138,7 @@ export function EnheRedesignExperienceReviews({ locale }: { locale: RedesignLoca
         return;
       }
       intervalId = window.setInterval(() => {
+        setMotionModality("automatic");
         setIndex((current) => (current + 1) % HOME_REVIEWS.length);
       }, REVIEW_AUTO_INTERVAL_MS);
       setAutoRotationState(true);
@@ -199,6 +203,7 @@ export function EnheRedesignExperienceReviews({ locale }: { locale: RedesignLoca
         const deltaX = event.clientX - startX;
         if (Math.abs(deltaX) > REVIEW_DRAG_THRESHOLD_PX) {
           const direction: -1 | 1 = deltaX > 0 ? -1 : 1;
+          setMotionModality("pointer");
           setIndex((current) => (current + direction + HOME_REVIEWS.length) % HOME_REVIEWS.length);
           scheduleManualResume();
         }
@@ -282,40 +287,43 @@ export function EnheRedesignExperienceReviews({ locale }: { locale: RedesignLoca
     <section
       ref={reviewSectionRef}
       className="redesign-home-reviews"
+      data-motion-modality={motionModality}
       role="region"
       aria-labelledby="redesign-home-reviews-heading"
       tabIndex={0}
       onKeyDown={handleKeyDown}
     >
       <div className="redesign-home-reviews-inner">
-        <h2 id="redesign-home-reviews-heading">{copy.heading}</h2>
-        <p className="redesign-home-reviews-disclosure">{copy.disclosure}</p>
-        <button
-          type="button"
-          className="redesign-home-reviews-rotation"
-          disabled={isReducedMotion}
-          aria-label={
-            isReducedMotion
-              ? copy.reducedMotion
-              : isManuallyPaused
-                ? copy.resume
-                : copy.pause
-          }
-          aria-pressed={isManuallyPaused}
-          onClick={() => {
-            if (isManuallyPaused) {
-              timerActionsRef.current?.resumeManually();
-            } else {
-              timerActionsRef.current?.pauseManually();
+        <div className="redesign-home-reviews-heading-row">
+          <h2 id="redesign-home-reviews-heading">{copy.heading}</h2>
+          <button
+            type="button"
+            className="redesign-home-reviews-rotation"
+            disabled={isReducedMotion}
+            aria-label={
+              isReducedMotion
+                ? copy.reducedMotion
+                : isManuallyPaused
+                  ? copy.resume
+                  : copy.pause
             }
-          }}
-        >
-          {isReducedMotion
-            ? copy.reducedMotion
-            : isManuallyPaused
-              ? copy.resume
-              : copy.pause}
-        </button>
+            aria-pressed={isManuallyPaused}
+            onClick={() => {
+              if (isManuallyPaused) {
+                timerActionsRef.current?.resumeManually();
+              } else {
+                timerActionsRef.current?.pauseManually();
+              }
+            }}
+          >
+            {isManuallyPaused ? (
+              <Play aria-hidden="true" size={18} />
+            ) : (
+              <Pause aria-hidden="true" size={18} />
+            )}
+          </button>
+        </div>
+        <p className="redesign-home-reviews-disclosure">{copy.disclosure}</p>
         <div className="redesign-home-reviews-window">
           <div
             className="redesign-home-reviews-track"
@@ -359,7 +367,7 @@ export function EnheRedesignExperienceReviews({ locale }: { locale: RedesignLoca
             <button
               type="button"
               className="redesign-home-reviews-control"
-              onClick={() => move(-1)}
+              onClick={(event) => move(-1, event.detail === 0 ? "keyboard" : "pointer")}
               aria-label={copy.previous}
             >
               <svg
@@ -375,7 +383,7 @@ export function EnheRedesignExperienceReviews({ locale }: { locale: RedesignLoca
             <button
               type="button"
               className="redesign-home-reviews-control"
-              onClick={() => move(1)}
+              onClick={(event) => move(1, event.detail === 0 ? "keyboard" : "pointer")}
               aria-label={copy.next}
             >
               <svg

@@ -91,7 +91,7 @@
 }
 
 .redesign-home-hero {
-  min-height: clamp(420px, 40vw, 560px);
+  min-height: clamp(560px, 44vw, 680px);
   display: flex;
   align-items: center;
   background-color: var(--enhe-page-bg);
@@ -103,7 +103,7 @@
   width: min(100%, 1040px);
   max-width: 1040px;
   margin-inline: auto;
-  padding: clamp(64px, 9vw, 112px) 24px;
+  padding: clamp(84px, 10vw, 128px) 24px;
   text-align: center;
 }
 
@@ -227,11 +227,16 @@
   box-shadow: 0 10px 30px rgba(18, 42, 79, 0.07);
 }
 
+.redesign-home-product-media-frame {
+  overflow: hidden;
+  border-radius: 20px;
+}
+
 .redesign-home-reviews-disclosure {
   max-width: 760px;
-  margin: -20px auto 32px;
+  margin: 0 auto 24px;
   color: var(--enhe-text-muted);
-  font-size: 0.9rem;
+  font-size: 0.8rem;
   line-height: 1.65;
   text-align: center;
 }
@@ -487,6 +492,16 @@
   transition-duration: 100ms;
 }
 
+.enhe-redesign-production .redesign-home :is(button:not(:disabled), [role="button"], a[class*="button"], a[class*="cta"], a[class*="card"], a[class*="control"], .redesign-home-product-detail-link) {
+  transition-duration: 100ms;
+  transition-timing-function: var(--enhe-ease-ui-feedback);
+}
+
+.enhe-redesign-production .redesign-home :is(button:not(:disabled), [role="button"], a[class*="button"], a[class*="cta"], a[class*="card"], a[class*="control"], .redesign-home-product-detail-link):active {
+  transform: scale(0.97);
+  transition-duration: 140ms;
+}
+
 .enhe-redesign-production :is(button, [role="button"], a[class*="button"], a[class*="cta"], a[class*="card"], a[class*="control"], .enhe-contentless-action, .redesign-language-link, .redesign-login-link, .redesign-avatar-trigger, .redesign-home-product-detail-link, .footer-group > summary):focus-visible {
   outline: 3px solid var(--enhe-focus);
   outline-offset: 3px;
@@ -535,7 +550,7 @@
   }
 
   .redesign-home .redesign-home-hero-inner {
-    padding: 72px 22px 84px;
+    padding: 92px 22px 108px;
   }
 
   .redesign-home .redesign-home-hero-inner h1 {
@@ -573,16 +588,13 @@
   }
 
   .redesign-home-reviews-disclosure {
-    margin: -12px auto 22px;
+    margin: 0 auto 20px;
   }
 
   .redesign-home-brand-value-inner {
     padding: 72px 20px;
   }
 
-  .footer-back-to-top {
-    margin-top: 16px;
-  }
 }
 
 @media (width < 360px) {
@@ -626,5 +638,11 @@
 
   .enhe-redesign-production article[class*="card"]:not(.redesign-home-review-card):hover {
     transform: none;
+  }
+
+  .enhe-redesign-production .redesign-home :is(button, [role="button"], a[class*="button"], a[class*="cta"], a[class*="card"], a[class*="control"], .redesign-home-product-detail-link) {
+    transition-property: background-color, border-color, box-shadow, color, opacity !important;
+    transition-duration: var(--enhe-motion-fast) !important;
+    transition-timing-function: var(--enhe-ease-ui-feedback) !important;
   }
 }

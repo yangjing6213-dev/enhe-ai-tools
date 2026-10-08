@@ -105,6 +105,9 @@ describe("AI tools candidate catalog", () => {
     expect(card).toContain("alt=");
     expect(card).toContain("onError");
     expect(card).not.toMatch(/File\.file(?:Url|Path)|rating|delivery|download|orders|payment|OAuth|fetch\(/i);
+    expect(card).not.toContain("redesign-software-card-description");
+    expect(card).not.toContain("aria-describedby");
+    expect(card).not.toContain("product.description");
   });
 
   it("defines all seven categories with the documented keyboard traversal and shared visibility event", () => {

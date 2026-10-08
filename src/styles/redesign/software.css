@@ -223,7 +223,6 @@
 }
 
 .redesign-software-card-category,
-.redesign-software-card-description,
 .redesign-software-card-body h3,
 .redesign-software-card-meta {
   margin: 0;
@@ -242,11 +241,6 @@
   letter-spacing: -0.03em;
   line-height: 1.25;
   overflow-wrap: anywhere;
-}
-
-.redesign-software-card-description {
-  color: var(--enhe-text-muted, #5f665f);
-  line-height: 1.7;
 }
 
 .redesign-software-card-meta {

@@ -28,7 +28,7 @@ export const HOME_COPY: Record<RedesignLocale, RedesignHomeCopy> = {
     cta: { label: "探索 AI 工具", href: "/software" },
     review: {
       heading: "产品用户评价",
-      disclosure: "以下人物与评价内容由 AI 生成，仅作页面展示示意，并非真实用户评价。",
+      disclosure: "AI生成展示内容，不代表真实用户评价。",
     },
     value: {
       heading: "让每一个普通人，都能借助 AI，创造过去做不到的事。",
@@ -42,7 +42,7 @@ export const HOME_COPY: Record<RedesignLocale, RedesignHomeCopy> = {
     cta: { label: "Explore AI tools", href: "/en/software" },
     review: {
       heading: "Product user reviews",
-      disclosure: "These people and review texts are AI-generated illustrations, not real customer reviews.",
+      disclosure: "AI-generated examples, not real customer reviews.",
     },
     value: {
       heading: "Let everyone use AI to create what once felt out of reach.",

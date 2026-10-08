@@ -299,8 +299,9 @@
   border-radius: 3px;
   background: var(--enhe-action);
   color: var(--enhe-page-bg, #fff);
-  font-size: 10px;
-  font-weight: 900;
+  font-family: "LXGW WenKai", var(--enhe-font-zh, "Microsoft YaHei", sans-serif);
+  font-size: 11px;
+  font-weight: 500;
   line-height: 1.15;
   white-space: nowrap;
 }
@@ -712,10 +713,18 @@
 }
 
 .footer-back-to-top-button {
-  position: absolute;
-  inset-block-start: -44px;
-  inset-inline-end: 0;
   margin-inline-end: 0;
+}
+
+.footer-back-to-top-row .footer-back-to-top {
+  margin-top: 0;
+}
+
+.footer-back-to-top-row {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: -24px;
+  margin-bottom: 24px;
 }
 
 @media (width < 768px) {
