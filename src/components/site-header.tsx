@@ -158,6 +158,7 @@ async function SiteHeaderContent({ forceLocale }: { forceLocale?: Locale }) {
                         <PublicNavLink
                           href={item.href}
                           exact
+                          prefetch={false}
                           className="site-nav-dropdown-link cursor-target"
                         >
                           <span>{locale === "en" ? `All ${item.label}` : `查看全部${item.label}`}</span>
@@ -168,8 +169,8 @@ async function SiteHeaderContent({ forceLocale }: { forceLocale?: Locale }) {
                         <NavigationMenuLink key={child.href} asChild>
                           <PublicNavLink
                             href={child.href}
-                          exact={child.href === item.href}
-                          prefetch={false}
+                            exact={child.href === item.href}
+                            prefetch={false}
                             className="site-nav-dropdown-link cursor-target"
                           >
                             <span>{child.label}</span>
