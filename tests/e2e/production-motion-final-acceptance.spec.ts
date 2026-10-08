@@ -662,9 +662,9 @@ for (const supportWidth of [483, 484] as const) {
               ".redesign-home-cta",
               ".redesign-home-product-control",
               ".redesign-home-brand-value-cta",
-              "footer a",
+              "footer summary",
             ]
-          : ["footer a"];
+          : ["footer summary"];
 
       for (const selector of targets) {
         await expectSupportClearOf(
