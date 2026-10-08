@@ -15,7 +15,6 @@ import {
   type MobileNavMotionPhase,
   type MobileNavMotionProfile,
 } from "@/lib/motion/mobile-nav-motion";
-import { ThemeToggle } from "@/components/theme-toggle";
 import { isExactCurrentPage } from "./navigation";
 import type { RedesignAccount, RedesignLocale, RedesignNavItem } from "./types";
 
@@ -486,9 +485,6 @@ export function EnheRedesignMobileMenu({
                 ),
               )}
             </nav>
-            <div className="redesign-mobile-preferences">
-              <ThemeToggle locale={locale} />
-            </div>
             <div className="redesign-mobile-account">
               {account.status === "guest" ? (
                 <a

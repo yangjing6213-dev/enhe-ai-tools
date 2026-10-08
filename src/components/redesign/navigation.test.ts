@@ -31,14 +31,13 @@ describe("public navigation current-page state", () => {
     expect(mobileMenuSource).not.toContain("redesign-search-icon");
   });
 
-  it("keeps the language switch at the far right after account and theme controls", () => {
+  it("keeps the language switch at the far right after the account control", () => {
     const accountControlIndex = headerSource.indexOf('className="redesign-account-menu"');
-    const themeControlIndex = headerSource.indexOf("<ThemeToggle locale={locale} />");
     const languageSwitchIndex = headerSource.indexOf("<EnheRedesignLanguageSwitch");
 
     expect(accountControlIndex).toBeGreaterThanOrEqual(0);
-    expect(themeControlIndex).toBeGreaterThan(accountControlIndex);
-    expect(languageSwitchIndex).toBeGreaterThan(themeControlIndex);
+    expect(headerSource).not.toContain("ThemeToggle");
+    expect(languageSwitchIndex).toBeGreaterThan(accountControlIndex);
   });
 
   it("allows desktop dropdown content to float without expanding the header", () => {

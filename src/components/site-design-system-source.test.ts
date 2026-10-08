@@ -9,10 +9,20 @@ function readSource(path: string) {
 }
 
 describe("shared shadcn site components", () => {
-  it("uses the shared theme control in public and admin navigation", () => {
-    expect(readSource("src/components/site-header.tsx")).toContain("ThemeToggle");
-    expect(readSource("src/components/redesign/enhe-redesign-header.tsx")).toContain("ThemeToggle");
-    expect(readSource("src/app/admin/layout.tsx")).toContain("ThemeToggle");
+  it("keeps every route in the requested fixed light theme", () => {
+    const provider = readSource("src/components/site-theme-provider.tsx");
+    expect(provider).toContain('defaultTheme="light"');
+    expect(provider).toContain('forcedTheme="light"');
+    expect(provider).toContain("enableSystem={false}");
+
+    for (const path of [
+      "src/components/site-header.tsx",
+      "src/components/redesign/enhe-redesign-header.tsx",
+      "src/components/redesign/enhe-redesign-mobile-menu.tsx",
+      "src/app/admin/layout.tsx",
+    ]) {
+      expect(readSource(path), path).not.toContain("ThemeToggle");
+    }
   });
 
   it("builds product surfaces and primary links from official shared components", () => {

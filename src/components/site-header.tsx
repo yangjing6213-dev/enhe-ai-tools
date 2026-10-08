@@ -8,7 +8,6 @@ import { BackNavigationBar } from "@/components/back-navigation-bar";
 import { LanguageSwitcher } from "@/components/language-switcher";
 import { PrefetchLink } from "@/components/prefetch-link";
 import { PublicNavLink } from "@/components/public-nav-link";
-import { ThemeToggle } from "@/components/theme-toggle";
 import {
   NavigationMenu,
   NavigationMenuContent,
@@ -213,7 +212,6 @@ async function SiteHeaderContent({ forceLocale }: { forceLocale?: Locale }) {
               locale={locale}
               initialUser={headerUser}
             />
-            <ThemeToggle locale={locale} />
             <PrefetchLink href={buildLocalePath("/login", locale)} prefetch={false} className="sr-only">
               {t.nav.login}
             </PrefetchLink>

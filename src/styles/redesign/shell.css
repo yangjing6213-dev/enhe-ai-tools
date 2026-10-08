@@ -643,7 +643,7 @@
 .redesign-footer {
   padding: 64px 0 28px;
   background: var(--enhe-footer);
-  color: #fff;
+  color: #000000;
 }
 
 .redesign-footer-inner {
@@ -675,7 +675,7 @@
 
 .footer-grid p,
 .footer-grid a {
-  color: #b8c8bb;
+  color: #000000;
   font-size: 14px;
 }
 
@@ -727,7 +727,7 @@
 }
 
 .footer-grid a:hover {
-  color: #fff;
+  color: #000000;
 }
 
 .footer-bottom {
@@ -738,7 +738,7 @@
   margin-top: 46px;
   padding-top: 18px;
   border-top: 1px solid #294038;
-  color: #8fa698;
+  color: #000000;
   font-size: 12px;
 }
 
@@ -1176,7 +1176,7 @@
 .enhe-reference-editorial .enhe-reference-editorial-hero a {
   border-color: var(--reference-accent);
   background: var(--reference-accent);
-  color: #fff;
+  color: #000000;
   border-radius: 8px;
 }
 
@@ -2245,7 +2245,7 @@
 }
 
 .enhe-admin-shell .enhe-admin-translation-success {
-  color: var(--enhe-action-hover);
+  color: var(--enhe-success-text);
 }
 
 .enhe-admin-shell .enhe-admin-package-picker:has(input:focus-visible) {

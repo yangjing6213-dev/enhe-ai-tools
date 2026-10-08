@@ -2,7 +2,6 @@ import { EnheBrandLockup } from "./enhe-brand-lockup";
 import { EnheRedesignLanguageSwitch } from "./enhe-redesign-language-switch";
 import { EnheRedesignMobileMenu } from "./enhe-redesign-mobile-menu";
 import { PrefetchLink } from "@/components/prefetch-link";
-import { ThemeToggle } from "@/components/theme-toggle";
 import {
   NavigationMenu,
   NavigationMenuContent,
@@ -126,9 +125,6 @@ export function EnheRedesignHeader({
                   </div>
                 </details>
               )}
-            </NavigationMenuItem>
-            <NavigationMenuItem>
-              <ThemeToggle locale={locale} />
             </NavigationMenuItem>
             <NavigationMenuItem>
               <EnheRedesignLanguageSwitch

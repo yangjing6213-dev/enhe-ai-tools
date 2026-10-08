@@ -92,7 +92,7 @@
 
 .redesign-home-brand-value {
   background: var(--enhe-footer, #071512);
-  color: #fff;
+  color: #000000;
 }
 
 .redesign-home-brand-value-inner {
@@ -106,7 +106,7 @@
 .redesign-home-brand-value-inner h2 {
   max-width: 760px;
   margin: 0 auto;
-  color: #fff;
+  color: #000000;
   font-size: clamp(2.25rem, 6vw, 5rem);
   letter-spacing: -0.055em;
   line-height: 1.02;

@@ -282,7 +282,7 @@
 
 .redesign-footer {
   background: var(--enhe-footer);
-  color: #fff;
+  color: #000000;
 }
 
 .enhe-redesign-production .tool-product-card {
@@ -291,17 +291,17 @@
 
 .footer-grid p,
 .footer-grid a {
-  color: #c1cfcb;
+  color: #000000;
 }
 
 .footer-grid a:hover,
 .footer-bottom a:hover {
-  color: #fff;
+  color: #000000;
 }
 
 .footer-bottom {
   border-top-color: rgba(205, 222, 216, 0.24);
-  color: #aebdb8;
+  color: #000000;
 }
 
 .enhe-redesign-production .ai-trends-page {
@@ -456,7 +456,7 @@
 }
 
 .enhe-redesign-production .enhe-auth-page :is(.form-control-dark, input, textarea)::placeholder {
-  color: #66758a;
+  color: #000000;
   opacity: 1;
 }
 

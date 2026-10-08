@@ -54,14 +54,13 @@ describe("homepage UI polish", () => {
     expect(softwareStyles).toMatch(/\.redesign-software-load-more-button\s*\{[^}]*color:\s*var\(--primary-foreground/);
   });
 
-  it("keeps language at the far right after the account and theme controls", () => {
+  it("keeps language at the far right after the account control without a theme switch", () => {
     const accountControl = header.indexOf('className="redesign-account-menu"');
-    const themeControl = header.indexOf("<ThemeToggle locale={locale} />");
     const languageControl = header.indexOf("<EnheRedesignLanguageSwitch");
 
     expect(accountControl).toBeGreaterThanOrEqual(0);
-    expect(themeControl).toBeGreaterThan(accountControl);
-    expect(languageControl).toBeGreaterThan(themeControl);
+    expect(header).not.toContain("ThemeToggle");
+    expect(languageControl).toBeGreaterThan(accountControl);
     expect(shellStyles).toMatch(/\.redesign-avatar-menu\s*\{[^}]*color:\s*var\(--enhe-text\)/);
     expect(shellStyles).toMatch(/\.redesign-language-switch\s*\{[^}]*border:\s*1px solid var\(--enhe-border\)/);
     expect(shellStyles).toMatch(/\.redesign-avatar-trigger\s*\{[^}]*border:\s*1px solid var\(--enhe-border\)/);
@@ -114,7 +113,7 @@ describe("homepage UI polish", () => {
     expect(footer).not.toContain("footer-back-to-top");
     expect(footer).not.toContain("backToTop");
     expect(header).toContain('id="top"');
-    expect(tokens).toContain("--enhe-footer: #0b1f44");
+    expect(tokens).toContain("--enhe-footer: #ffffff");
     expect(refreshStyles).toMatch(/\.redesign-footer\s*\{[^}]*background:\s*var\(--enhe-footer\)/);
     expect(shellStyles).toMatch(/\.redesign-footer-inner\s*\{[^}]*position:\s*relative/);
     expect(shellStyles).not.toContain(".footer-back-to-top-row");

@@ -110,13 +110,13 @@ describe("homepage SaaS redesign source", () => {
     expect(dictionaries).toContain('metricsExplore: "Open More Possibilities with AI"');
     expect(dictionaries).toContain('featuredContentTitle: "Featured Content"');
 
-    expect(css).toContain("--marketing-bg: var(--gray-1)");
+    expect(css).toContain("--marketing-bg: #ffffff");
     expect(css).not.toContain(".site-brand-logo-light");
     expect(css).toContain("--marketing-accent: var(--blue-11)");
-    expect(css).toContain(".dark {");
+    expect(css).not.toContain(".dark {");
     expect(css).toContain("--font-sans: 'Alimama Fang Yuan Ti', 'Microsoft YaHei', Arial, sans-serif");
     expect(css).toContain("--font-heading-zh: 'Alimama Fang Yuan Ti', 'Microsoft YaHei', Arial, sans-serif");
-    expect(css).toContain(".home-page-shell {\n  position: relative;\n  background: #101821;");
+    expect(css).toContain(".home-page-shell {\n  position: relative;\n  background: #ffffff;");
     expect(css).toContain(".home-hero-liquid-layer");
     expect(css).toContain(".particles-container");
     expect(css).toContain(".home-particles-fallback");
@@ -135,8 +135,8 @@ describe("homepage SaaS redesign source", () => {
     expect(css).toContain(".home-seo-disclosure");
     expect(css).toContain(".home-product-demo-shell {\n  position: relative;\n  padding: clamp(1rem, 2.2vw, 1.8rem) 0 0;");
     expect(css).toContain(".home-task-outcome-grid {");
-    expect(css).toContain("border: 1px solid rgba(255, 255, 255, 0.16);");
-    expect(css).toContain("border-radius: 18px;\n  background: rgba(255, 255, 255, 0.045);");
+    expect(css).toContain("border: 1px solid var(--marketing-border);");
+    expect(css).toContain("border-radius: 8px;\n  background: #ffffff;");
     expect(css).toContain("overflow-x: clip");
     expect(css).toContain("scroll-margin-top: 96px");
     expect(css).not.toContain(".home-hero-actions {");
@@ -282,7 +282,7 @@ describe("homepage SaaS redesign source", () => {
     expect(toolCard).toContain("buildCardHighlights");
   });
 
-  it("applies the new Chinese display font to the homepage header, call-to-action buttons, and slogan copy while keeping the header text white", () => {
+  it("applies the Chinese display font and keeps the homepage header text black", () => {
     const css = readFileSync(new URL("../app/globals.css", import.meta.url), "utf8").replace(/\r\n/g, "\n");
 
     expect(css).toContain("html[lang='zh-CN'] :is(");
@@ -310,7 +310,6 @@ describe("homepage SaaS redesign source", () => {
     expect(css).toContain("min-height: 40px;");
     expect(css).toContain("color: var(--marketing-text);");
     expect(css).toContain(".site-language-switcher a.is-active {\n  background: var(--marketing-button);");
-    expect(css).toContain(".site-language-switcher a.is-active {\n  background: #050505;");
   });
 
   it("keeps the simplified hero scale stable on desktop and mobile", () => {
@@ -330,11 +329,11 @@ describe("homepage SaaS redesign source", () => {
 
     expect(css).toContain(".home-hero-eyebrow {");
     expect(css).toContain("display: inline-flex;");
-    expect(css).toContain("border: 1px solid rgba(255, 255, 255, 0.22)");
+    expect(css).toContain("border: 1px solid var(--marketing-border)");
     expect(css).toContain("background-color: transparent");
     expect(css).toContain("background-image: none");
-    expect(css).toContain("--home-hero-eyebrow-filter: blur(18px) saturate(150%)");
-    expect(css).toContain("backdrop-filter: var(--home-hero-eyebrow-filter)");
+    expect(css).not.toContain("--home-hero-eyebrow-filter: blur(18px) saturate(150%)");
+    expect(css).toContain("backdrop-filter: none");
     expect(css).toContain("padding: clamp(2.2rem, 5.8vh, 4.8rem) 0;");
     expect(css).toContain("padding: 1rem 0;");
     expect(css).toContain("padding: 1.5rem 0;");
@@ -343,14 +342,15 @@ describe("homepage SaaS redesign source", () => {
     expect(page).toContain('<h1 className="sr-only">{heroTitle}</h1>');
     expect(page).toContain("taskCollectionSchema, taskItemListSchema");
     expect(css).toContain(".home-task-outcomes-shell,");
-    expect(css).toContain("linear-gradient(180deg, rgba(16, 24, 33, 0) 0%, rgba(16, 24, 33, 0) 54%, rgba(16, 24, 33, 0.32) 72%, rgba(16, 24, 33, 0.82) 91%, #101821 100%)");
+    expect(css).toContain(".home-task-outcome-link {\n  display: grid;");
+    expect(css).toContain(".home-task-outcome-link {\n  display: grid;\n  min-width: 0;\n  overflow: hidden;\n  border-radius: 8px;\n  background: #ffffff;");
     expect(css).not.toContain("radial-gradient(ellipse at 50% 78%, rgba(65, 197, 219, 0.09), transparent 34%)");
     expect(css).toContain("margin-bottom: -1px;");
     expect(css).not.toContain(".home-flowing-menu-shell");
     expect(css).not.toContain("radial-gradient(ellipse at 50% 54%, rgba(65, 197, 219, 0.08), transparent 34rem)");
     expect(css).not.toContain(".home-recommended-tool-grid");
-    expect(css).toContain("linear-gradient(180deg, #101821 0%, #101821 18%, #0b1118 72%, #080d12 100%)");
-    expect(css).toContain(".site-footer-logo {\n  width: 48px;\n  height: 32px;\n  object-fit: contain;\n  filter: brightness(0) invert(1)");
+    expect(css).toMatch(/\.home-product-preview\s*\{[^}]*border-radius: 18px;[^}]*background: #ffffff;/);
+    expect(css).toContain(".site-footer-logo {\n  width: 48px;\n  height: 32px;\n  object-fit: contain;\n  filter: none;");
     expect(css).not.toContain(".home-gooey-effect.filter");
     expect(css).not.toContain(".home-gooey-particle");
     expect(css).not.toContain("@keyframes home-gooey-particle");

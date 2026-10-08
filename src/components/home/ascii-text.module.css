@@ -63,7 +63,7 @@
   margin: 0;
   padding: 0;
   transform: translate(-50%, -50%);
-  color: rgba(247, 252, 255, 0.98);
+  color: #000000;
   font-family: "SFMono-Regular", Menlo, Consolas, "Liberation Mono", "Courier New", monospace;
   font-weight: 600;
   line-height: 1em;

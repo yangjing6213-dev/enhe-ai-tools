@@ -38,8 +38,9 @@ describe("product demo feature source contract", () => {
       card.indexOf('className="product-demo-card-body"'),
     );
     expect(css).toContain(".home-product-demo-grid {\n  display: flex;\n  flex-direction: column;");
-    expect(css).toContain("background-color: rgba(12, 23, 31, 0.24);");
-    expect(css).toContain("background: rgba(255, 255, 255, 0.028);");
+    expect(css).toContain("background: #ffffff;");
+    expect(css).not.toContain("background-color: rgba(12, 23, 31, 0.24);");
+    expect(css).not.toContain("background: rgba(255, 255, 255, 0.028);");
     expect(css).toContain(".home-product-demo-grid .product-demo-card-media {\n  width: 100%;\n  aspect-ratio: 16 / 9;");
     expect(css).not.toContain("scroll-snap-type: x mandatory");
   });

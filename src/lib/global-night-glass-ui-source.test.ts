@@ -2,16 +2,16 @@ import { readFileSync } from "node:fs";
 import { describe, expect, it } from "vitest";
 
 describe("global blue and white UI source contract", () => {
-  it("shares Radix blue and gray tokens across light and dark themes", () => {
+  it("shares Radix blue and gray tokens in the fixed white theme", () => {
     const css = readFileSync(new URL("../app/globals.css", import.meta.url), "utf8");
     const refresh = readFileSync(new URL("../styles/redesign/site-refresh.css", import.meta.url), "utf8");
 
     expect(css).toContain('@import "@radix-ui/colors/blue.css"');
-    expect(css).toContain('@import "@radix-ui/colors/blue-dark.css"');
     expect(css).toContain('@import "@radix-ui/colors/gray.css"');
-    expect(css).toContain('@import "@radix-ui/colors/gray-dark.css"');
-    expect(css).toMatch(/\.dark\s*\{/);
-    expect(css).toContain("--marketing-bg: var(--gray-1)");
+    expect(css).not.toContain('@import "@radix-ui/colors/blue-dark.css"');
+    expect(css).not.toContain('@import "@radix-ui/colors/gray-dark.css"');
+    expect(css).not.toMatch(/\.dark\s*\{/);
+    expect(css).toContain("--marketing-bg: #ffffff");
     expect(css).toContain("--marketing-accent: var(--blue-11)");
     expect(css).toContain("--font-sans: 'Alimama Fang Yuan Ti', 'Microsoft YaHei', Arial, sans-serif");
     expect(css).toContain("--font-heading-zh: 'Alimama Fang Yuan Ti', 'Microsoft YaHei', Arial, sans-serif");
@@ -31,7 +31,7 @@ describe("global blue and white UI source contract", () => {
     expect(css).toContain("-webkit-backdrop-filter: blur(28px) saturate(160%)");
     expect(css).toContain(".dark .site-brand-logo-dark");
     expect(css).toContain("color-scheme: light");
-    expect(css).toContain("color-scheme: dark");
+    expect(css).not.toContain("color-scheme: dark");
   });
 
   it("updates shared public components away from the old cyan primary language", () => {

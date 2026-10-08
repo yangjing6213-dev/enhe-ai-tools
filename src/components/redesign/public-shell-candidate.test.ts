@@ -14,9 +14,9 @@ describe("ENHE redesign public shell candidate", () => {
     const tokens = readCandidate("styles/redesign/tokens.css");
 
     expect(tokens).toContain("--enhe-page-bg: var(--background, #ffffff)");
-    expect(tokens).toContain("--enhe-text: var(--foreground, #101828)");
-    expect(tokens).toContain("--enhe-action: var(--primary, #0d74ce)");
-    expect(tokens).toContain("--enhe-footer: #0b1f44");
+    expect(tokens).toContain("--enhe-text: var(--foreground, #000000)");
+    expect(tokens).toContain("--enhe-action: var(--primary, #0090ff)");
+    expect(tokens).toContain("--enhe-footer: #ffffff");
     expect(tokens).toContain("--enhe-focus: var(--ring, #73a0ff)");
     expect(tokens).toContain("--enhe-motion-fast: 170ms");
     expect(tokens).toContain("--enhe-z-focus: 60");
@@ -54,8 +54,8 @@ describe("ENHE redesign public shell candidate", () => {
     }
 
     expect(header).toContain('languageAriaLabel = "中文 / EN"');
-    expect(desktopNav.indexOf("account.loginLabel")).toBeLessThan(desktopNav.indexOf("ThemeToggle"));
-    expect(desktopNav.indexOf("ThemeToggle")).toBeLessThan(desktopNav.indexOf("EnheRedesignLanguageSwitch"));
+    expect(desktopNav.indexOf("account.loginLabel")).toBeLessThan(desktopNav.indexOf("EnheRedesignLanguageSwitch"));
+    expect(desktopNav).not.toContain("ThemeToggle");
     expect(header).toContain("account.isAdmin");
     expect(header).toContain("adminHref");
     expect(header).toContain("account.isAdmin ?");
