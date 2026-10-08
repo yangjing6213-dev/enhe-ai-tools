@@ -124,6 +124,33 @@ function Assert-LocalDockerContext {
   }
 }
 
+function Assert-CanonicalOrigin {
+  $canonicalUrls = @(
+    "https://github.com/yangjing6213-dev/enhe-ai-tools.git",
+    "https://github.com/yangjing6213-dev/enhe-ai-tools",
+    "git@github.com:yangjing6213-dev/enhe-ai-tools.git",
+    "git@github.com:yangjing6213-dev/enhe-ai-tools",
+    "ssh://git@github.com/yangjing6213-dev/enhe-ai-tools.git",
+    "ssh://git@github.com/yangjing6213-dev/enhe-ai-tools"
+  )
+  $fetchUrls = @(& git remote get-url --all origin 2>$null)
+  if ($LASTEXITCODE -ne 0 -or $fetchUrls.Count -ne 1) {
+    throw "Unable to inspect the origin fetch URL."
+  }
+  $pushUrls = @(& git remote get-url --push --all origin 2>$null)
+  if ($LASTEXITCODE -ne 0 -or $pushUrls.Count -ne 1) {
+    throw "Unable to inspect the origin push URL."
+  }
+  $fetchUrl = ([string]$fetchUrls[0]).Trim()
+  $pushUrl = ([string]$pushUrls[0]).Trim()
+  if ($fetchUrl -notin $canonicalUrls -or $pushUrl -notin $canonicalUrls) {
+    throw "origin must point to the ENHE AI Tools GitHub repository for both fetch and push."
+  }
+  if ($fetchUrl -cne $pushUrl) {
+    throw "origin fetch and push URLs must match before release."
+  }
+}
+
 Assert-RequiredCommand git
 Assert-RequiredCommand npm
 Assert-RequiredCommand node
@@ -138,6 +165,10 @@ if ($databaseMutationRequested) {
 
 $repoRoot = (Resolve-Path (Join-Path $PSScriptRoot "..")).Path
 Set-Location $repoRoot
+
+if ($pushRequested) {
+  Assert-CanonicalOrigin
+}
 
 $worktreeStatus = & git status --porcelain --untracked-files=all
 if ($LASTEXITCODE -ne 0) {

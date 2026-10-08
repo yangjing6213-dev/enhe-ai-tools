@@ -8,7 +8,7 @@ function read(relativePath: string) {
   return existsSync(path) ? readFileSync(path, "utf8") : "";
 }
 
-const globalStyles = read("src/app/globals.css");
+const globalStyles = read("src/app/globals.css").replace(/\r\n/g, "\n");
 const tokens = read("src/styles/redesign/tokens.css");
 const refreshStyles = read("src/styles/redesign/site-refresh.css");
 const home = read("src/components/redesign/home/EnheRedesignHome.tsx");

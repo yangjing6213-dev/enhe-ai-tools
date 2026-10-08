@@ -24,6 +24,9 @@ describe("homepage UI polish", () => {
     expect(HOME_COPY.zh.label).toBe("给你的人生添加AI外挂");
     expect(hero).not.toContain("redesign-home-mobile-label");
     expect(header).toMatch(/EnheBrandLockup[\s\S]*redesign-brand-label/);
+    expect(shellStyles).toMatch(/\.redesign-brand-region\s*\{[^}]*justify-items:\s*center/);
+    expect(shellStyles).toMatch(/\.redesign-brand-label\s*\{[^}]*background:\s*var\(--enhe-action/);
+    expect(shellStyles).not.toMatch(/\.redesign-brand-label,\s*\.redesign-desktop-nav\s*\{\s*display:\s*none/);
     expect(refreshStyles).toMatch(/\.redesign-header\[data-home="true"\][^{]*\{[^}]*background:\s*var\(--enhe-page-bg\)[^}]*color:\s*var\(--enhe-text\)/);
     expect(refreshStyles).toMatch(/\.redesign-home-hero\s*\{[^}]*background-image:\s*none[^}]*color:\s*var\(--enhe-text\)/);
     expect(refreshStyles).toMatch(/\.redesign-home-hero-inner\s*\{[^}]*text-align:\s*center/);
@@ -64,12 +67,23 @@ describe("homepage UI polish", () => {
   });
 
   it("uses accessible expandable footer groups and a back-to-top link on the AppSumo-like surface", () => {
-    expect(footer).toContain('<details className="footer-group" open>');
+    expect(footer).toContain('<details className="footer-group">');
+    expect(footer).not.toContain('<details className="footer-group" open>');
     expect(footer).toContain('className="footer-back-to-top footer-back-to-top-button"');
     expect(footer).toContain('href="#top"');
+    expect(footer.indexOf("footer-back-to-top-button")).toBeLessThan(footer.indexOf('className="footer-grid"'));
     expect(header).toContain('id="top"');
     expect(tokens).toContain("--enhe-footer: #001512");
     expect(refreshStyles).toMatch(/\.redesign-footer\s*\{[^}]*background:\s*var\(--enhe-footer\)/);
+    expect(shellStyles).toMatch(/\.redesign-footer-inner\s*\{[^}]*position:\s*relative/);
+    expect(shellStyles).toMatch(/\.footer-back-to-top-button\s*\{[^}]*position:\s*absolute[^}]*inset-block-start:\s*-44px/);
+  });
+
+  it("removes the horizontal rules between homepage sections", () => {
+    for (const selector of [".redesign-home-brand-value", ".redesign-home-products", ".redesign-home-reviews"]) {
+      const rule = homeStyles.match(new RegExp(`${selector.replaceAll(".", "\\.")}\\s*\\{([^}]*)\\}`));
+      expect(rule?.[1] ?? "").not.toMatch(/border-top:\s*1px solid/);
+    }
   });
 
   it("keeps button feedback subtle, pointer-aware, and reduced-motion safe", () => {

@@ -34,7 +34,7 @@ const media = (src: string, zhAlt: string, enAlt: string) => ({
 const EXPECTED_COPY = {
   zh: {
     page: {
-      label: "给人生加一个 AI 外挂",
+      label: "精选 AI 工具",
       h1: "AI工具",
       intro:
         "按真实任务找到已公开的 ENHE AI 工具、课程和效率入口，再进入对应详情页了解价格与使用边界。",
@@ -61,7 +61,7 @@ const EXPECTED_COPY = {
   },
   en: {
     page: {
-      label: "An AI upgrade for everyday life",
+      label: "Featured AI tools",
       h1: "AI tools",
       intro:
         "Find public ENHE AI tools, courses, and a free audit by task, then open the matching detail page for price and boundaries.",

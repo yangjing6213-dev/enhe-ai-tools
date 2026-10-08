@@ -2,6 +2,7 @@
   "name": "enhe-ai-tools",
   "version": "0.1.0",
   "private": true,
+  "license": "Apache-2.0",
   "scripts": {
     "dev": "next dev --turbopack",
     "dev:reset": "powershell -ExecutionPolicy Bypass -File scripts/restart-local-dev.ps1",

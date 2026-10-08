@@ -23,6 +23,14 @@ describe("ENHE redesign public shell candidate", () => {
     expect(tokens).not.toMatch(/gradient|glow|glass|glitch|neon/i);
   });
 
+  it("keeps blue state labels readable on their filled background", () => {
+    const shell = readCandidate("styles/redesign/shell.css");
+    const labelRule = shell.match(/\.redesign-preview-state-label\s*\{([^}]*)\}/)?.[1] ?? "";
+
+    expect(labelRule).toContain("background: var(--enhe-yellow)");
+    expect(labelRule).toContain("color: #fff");
+  });
+
   it("keeps the approved desktop navigation order and explicit account boundary", () => {
     const header = readCandidate("components/redesign/enhe-redesign-header.tsx");
     const navigation = readCandidate("components/redesign/navigation.ts");
@@ -132,7 +140,8 @@ describe("ENHE redesign public shell candidate", () => {
       expect(footer).toContain(label);
     }
     expect(footer).toContain("footer-grid");
-    expect(footer).toContain('<details className="footer-group" open>');
+    expect(footer).toContain('<details className="footer-group">');
+    expect(footer).not.toContain('<details className="footer-group" open>');
     expect(footer).toContain('href="#top"');
     expect(footer).not.toContain("AI工具");
     expect(footer).not.toContain("中文 / EN");

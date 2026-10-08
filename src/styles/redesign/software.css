@@ -1,5 +1,5 @@
 .redesign-software {
-  background-color: #fdfcf7;
+  background-color: #fff;
   color: var(--enhe-text, #080808);
   font-family: var(--enhe-font-zh, "Microsoft YaHei", system-ui, sans-serif);
 }
@@ -117,7 +117,7 @@
 .redesign-software-category-button[data-selected="true"] {
   border-color: var(--enhe-yellow, #ffd60a);
   background: var(--enhe-yellow, #ffd60a);
-  color: var(--enhe-text, #080808);
+  color: #fff;
 }
 
 .redesign-software-section {

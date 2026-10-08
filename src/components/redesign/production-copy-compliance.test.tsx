@@ -24,6 +24,7 @@ vi.mock("next/navigation", () => ({
 }));
 
 const sourceRoot = join(process.cwd(), "src");
+const shellStyles = readFileSync(join(sourceRoot, "styles/redesign/shell.css"), "utf8");
 
 Object.assign(globalThis, { React });
 
@@ -107,6 +108,25 @@ describe("ENHE Phase 2C.1.2 production copy compliance", () => {
       expect(html).not.toContain("ICP filing · Public-security filing");
       expect(html).not.toContain("ICP备案 · 公安备案");
     }
+  });
+
+  it("starts footer menus collapsed and places a back-to-top link at the footer top", () => {
+    const html = renderToStaticMarkup(
+      React.createElement(EnheRedesignFooter, { locale: "zh" }),
+    );
+
+    expect((html.match(/<details class="footer-group">/g) ?? [])).toHaveLength(3);
+    expect(html).not.toContain('<details class="footer-group" open');
+    expect(html).toContain('class="footer-back-to-top footer-back-to-top-button" href="#top"');
+    expect(html.indexOf("footer-back-to-top")).toBeLessThan(html.indexOf('class="footer-grid"'));
+    expect(readSource("components/redesign/enhe-redesign-header.tsx")).toContain('id="top"');
+    expect(readSource("styles/redesign/site-refresh.css")).toMatch(/\.redesign-brand-mark\s*\{[^}]*width:\s*154px/);
+  });
+
+  it("centers the shared tagline beneath the restored logo on desktop and mobile", () => {
+    expect(shellStyles).toMatch(/\.redesign-brand-region\s*\{[^}]*justify-items:\s*center/);
+    expect(shellStyles).toMatch(/\.redesign-brand-label\s*\{[^}]*background:\s*var\(--enhe-action/);
+    expect(shellStyles).not.toMatch(/\.redesign-brand-label,\s*\.redesign-desktop-nav\s*\{\s*display:\s*none/);
   });
 
   it.each(["zh", "en"] as const)(

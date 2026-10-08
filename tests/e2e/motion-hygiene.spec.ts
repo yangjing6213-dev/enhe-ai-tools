@@ -122,7 +122,7 @@ test("review auto-rotation pauses while focused and resumes when focus leaves", 
   await expect(activeReview).toHaveCount(1);
   await expect(track).toHaveAttribute("aria-live", "off");
   const initialReview = await activeReview.getAttribute("aria-label");
-  await expect(page.getByRole("button", { name: /暂停自动播放|继续自动播放/ })).toHaveCount(0);
+  await expect(page.getByRole("button", { name: /暂停自动播放|继续自动播放/ })).toHaveCount(1);
 
   await section.focus();
   await expect(track).toHaveAttribute("aria-live", "polite");
@@ -181,7 +181,7 @@ test("review auto-rotation pauses on hover and resumes after manual navigation",
   await page.clock.fastForward(5_100);
   await expect(activeReview).not.toHaveAttribute("aria-label", manuallySelectedReview ?? "");
 
-  await expect(page.getByRole("button", { name: /暂停自动播放|继续自动播放/ })).toHaveCount(0);
+  await expect(page.getByRole("button", { name: /暂停自动播放|继续自动播放/ })).toHaveCount(1);
 });
 
 test("reduced motion keeps product, review, and support controls functional", async ({ page }) => {

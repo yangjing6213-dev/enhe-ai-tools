@@ -91,7 +91,6 @@
 }
 
 .redesign-home-brand-value {
-  border-top: 1px solid var(--enhe-border, #dfe5df);
   background: var(--enhe-footer, #071512);
   color: #fff;
 }
@@ -124,13 +123,13 @@
   border: 2px solid var(--enhe-yellow, #ffd60a);
   border-radius: var(--enhe-button-r, 4px);
   background: var(--enhe-yellow, #ffd60a);
-  color: var(--enhe-text, #080808);
+  color: #fff;
   font-weight: 800;
 }
 
 .redesign-home-brand-value-cta:hover {
-  background: #fff;
-  border-color: #fff;
+  background: var(--enhe-action-hover, #0b57e3);
+  border-color: var(--enhe-action-hover, #0b57e3);
 }
 
 .redesign-home-brand-value-cta:focus-visible {
@@ -182,7 +181,6 @@
 
 .redesign-home-products {
   overflow-x: hidden;
-  border-top: 1px solid var(--enhe-border, #dfe5df);
 }
 
 .redesign-home-products-inner {
@@ -433,7 +431,6 @@
 
 .redesign-home-reviews {
   overflow: hidden;
-  border-top: 1px solid var(--enhe-border, #dfe5df);
 }
 
 .enhe-redesign-production .redesign-home-reviews {
@@ -455,6 +452,31 @@
   letter-spacing: -0.05em;
   line-height: 1;
   text-align: center;
+}
+
+.redesign-home-reviews-rotation {
+  display: block;
+  min-height: 44px;
+  margin: -16px auto 24px;
+  padding: 8px 12px;
+  border: 0;
+  background: transparent;
+  color: var(--enhe-action);
+  font: inherit;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  cursor: pointer;
+}
+
+.redesign-home-reviews-rotation:disabled {
+  color: var(--enhe-text-muted);
+  text-decoration: none;
+  cursor: default;
+}
+
+.redesign-home-reviews-rotation:focus-visible {
+  outline: 3px solid var(--enhe-focus);
+  outline-offset: 3px;
 }
 
 .redesign-home-reviews-window {
@@ -672,6 +694,27 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
+  .redesign-home-brand-value-cta,
+  .redesign-home-reviews-rotation {
+    transition: none;
+  }
+
+  .redesign-home-brand-value-cta:hover,
+  .redesign-home-brand-value-cta:active,
+  .redesign-home-reviews-rotation:hover,
+  .redesign-home-reviews-rotation:active {
+    transform: none;
+  }
+
+  .redesign-home-brand-value-cta {
+    transition: none;
+  }
+
+  .redesign-home-brand-value-cta:hover,
+  .redesign-home-brand-value-cta:active {
+    transform: none;
+  }
+
   .redesign-home-product-media {
     transform: none;
     transition: opacity 1ms linear;

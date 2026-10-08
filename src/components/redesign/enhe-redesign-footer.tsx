@@ -8,6 +8,7 @@ const FOOTER_COPY: Record<RedesignLocale, RedesignFooterCopy> = {
     ariaLabel: "网站页脚",
     brandLine: "ENHE AI",
     brandIntro: ["一站式AI平台", "给人生加一个 AI 外挂"],
+    backToTop: "回到顶部",
     columns: [
       {
         title: "帮助与服务",
@@ -42,6 +43,7 @@ const FOOTER_COPY: Record<RedesignLocale, RedesignFooterCopy> = {
     ariaLabel: "Site footer",
     brandLine: "ENHE AI",
     brandIntro: ["The All-in-One AI Platform.", "An AI upgrade for everyday life"],
+    backToTop: "Back to top",
     columns: [
       {
         title: "Help & Support",
@@ -89,6 +91,14 @@ export function EnheRedesignFooter({
   return (
     <footer className="redesign-footer" aria-label={copy.ariaLabel}>
       <div className="redesign-footer-inner">
+        <a
+          className="footer-back-to-top footer-back-to-top-button"
+          href="#top"
+          aria-label={copy.backToTop}
+        >
+          {copy.backToTop}
+          <ArrowUp aria-hidden="true" size={16} />
+        </a>
         <div className="footer-grid">
           <div>
             <h2>{copy.brandLine}</h2>
@@ -98,7 +108,7 @@ export function EnheRedesignFooter({
           </div>
           {copy.columns.map((column) => (
             <nav key={column.title} aria-label={column.title}>
-              <details className="footer-group" open>
+              <details className="footer-group">
                 <summary className="footer-group-trigger">
                   <h3>{column.title}</h3>
                   <ChevronDown aria-hidden="true" size={18} />
@@ -132,14 +142,6 @@ export function EnheRedesignFooter({
               ))}
             </p>
           ) : null}
-          <a
-            className="footer-back-to-top footer-back-to-top-button"
-            href="#top"
-            aria-label={locale === "en" ? "Back to top" : "回到顶部"}
-          >
-            {locale === "en" ? "Back to top" : "回到顶部"}
-            <ArrowUp aria-hidden="true" size={16} />
-          </a>
         </div>
       </div>
     </footer>

@@ -225,6 +225,7 @@
   padding: 4px 9px;
   border-radius: 3px;
   background: var(--enhe-yellow);
+  color: #fff;
   font-size: 11px;
   font-weight: 900;
 }
@@ -268,7 +269,7 @@
 .redesign-brand-region {
   display: grid;
   flex: 0 0 auto;
-  justify-items: start;
+  justify-items: center;
   gap: 1px;
   line-height: 1;
 }
@@ -597,6 +598,7 @@
 }
 
 .redesign-footer-inner {
+  position: relative;
   width: min(100% - 64px, var(--enhe-content-max));
   margin: 0 auto;
 }
@@ -709,6 +711,13 @@
   white-space: nowrap;
 }
 
+.footer-back-to-top-button {
+  position: absolute;
+  inset-block-start: -44px;
+  inset-inline-end: 0;
+  margin-inline-end: 0;
+}
+
 @media (width < 768px) {
   .footer-grid nav,
   .footer-bottom p:last-child {
@@ -763,7 +772,6 @@
     gap: var(--enhe-space-2);
   }
 
-  .redesign-brand-label,
   .redesign-desktop-nav {
     display: none;
   }

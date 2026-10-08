@@ -173,7 +173,7 @@ describe("homepage experience review candidate", () => {
     expect(reviewCardRule).not.toContain("will-change");
   });
 
-  it("keeps only previous/next filled rounded triangle controls and timer-controlled rotation", () => {
+  it("keeps previous/next triangles and a persistent manual pause control", () => {
     expect(reviewSource).toContain('"use client"');
     expect(reviewSource).toContain("useEffect");
     expect(reviewSource).toContain("setInterval");
@@ -191,8 +191,10 @@ describe("homepage experience review candidate", () => {
     expect(reviewSource).toContain("aria-label");
     expect(reviewSource).toContain('aria-label={copy.previous}');
     expect(reviewSource).toContain('aria-label={copy.next}');
-    expect(reviewSource).not.toContain("togglePause");
-    expect(reviewSource).not.toContain("aria-pressed");
+    expect(reviewSource).toContain("redesign-home-reviews-rotation");
+    expect(reviewSource).toContain('aria-pressed={isManuallyPaused}');
+    expect(reviewSource).toContain("pauseManually");
+    expect(reviewSource).toContain("resumeManually");
     expect(reviewSource).toContain('data-direction="previous"');
     expect(reviewSource).toContain('data-direction="next"');
     expect(reviewSource).toContain('d="M7.2 4.8 18 10.9a1.25 1.25 0 0 1 0 2.2L7.2 19.2A1.35 1.35 0 0 1 5.2 18V6a1.35 1.35 0 0 1 2-1.2Z" fill="currentColor"');
@@ -207,5 +209,15 @@ describe("homepage experience review candidate", () => {
     expect(homeStyles).toContain("opacity");
     expect(homeStyles).toContain("transform");
     expect(homeStyles).toContain("min-width: 44px");
+  });
+
+  it("keeps all homepage motion controls still when reduced motion is preferred", () => {
+    const reducedMotionStyles = homeStyles.slice(
+      homeStyles.lastIndexOf("@media (prefers-reduced-motion: reduce)"),
+    );
+
+    expect(reducedMotionStyles).toContain(".redesign-home-brand-value-cta");
+    expect(reducedMotionStyles).toContain(".redesign-home-reviews-rotation");
+    expect(reviewSource).toContain('disabled={isReducedMotion}');
   });
 });

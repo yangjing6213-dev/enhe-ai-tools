@@ -2,6 +2,8 @@
 
 会员制自研电脑软件与在线网页工具平台，技术栈为 Next.js + TypeScript + Tailwind CSS + Prisma + PostgreSQL。
 
+本仓库自有源码以 Apache-2.0 许可发布，详见 [LICENSE](LICENSE)。第三方依赖、字体和媒体素材按各自的授权条款使用。
+
 ## 项目结构
 
 - `src/app`：前台、用户中心、后台、API 路由

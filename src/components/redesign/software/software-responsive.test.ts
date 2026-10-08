@@ -14,6 +14,7 @@ describe("AI tools candidate responsive browsing", () => {
   it("keeps the approved grid breakpoints and mobile rail CSS contract", () => {
     const css = readCandidate("styles/redesign/software.css");
 
+    expect(css).toMatch(/\.redesign-software\s*\{[^}]*background-color:\s*#fff/);
     expect(css).toMatch(/grid-template-columns:\s*repeat\(4,\s*minmax\(0,\s*1fr\)\)/);
     expect(css).toMatch(/max-width:\s*1024px/);
     expect(css).toMatch(/max-width:\s*768px/);

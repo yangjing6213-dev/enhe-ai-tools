@@ -15,17 +15,35 @@ const REVIEW_COPY = {
   zh: {
     previous: "上一条评价",
     next: "下一条评价",
+    pause: "暂停自动播放",
+    resume: "继续自动播放",
+    reducedMotion: "已按系统设置暂停自动播放",
     stars: (count: number) => `${count} 星`,
   },
   en: {
     previous: "Previous review",
     next: "Next review",
+    pause: "Pause automatic playback",
+    resume: "Resume automatic playback",
+    reducedMotion: "Paused by your motion settings",
     stars: (count: number) => `${count} stars`,
   },
-} satisfies Record<RedesignLocale, { previous: string; next: string; stars: (count: number) => string }>;
+} satisfies Record<
+  RedesignLocale,
+  {
+    previous: string;
+    next: string;
+    pause: string;
+    resume: string;
+    reducedMotion: string;
+    stars: (count: number) => string;
+  }
+>;
 
 type ReviewTimerActions = {
   scheduleManualResume: () => void;
+  pauseManually: () => void;
+  resumeManually: () => void;
 };
 
 const REVIEW_DRAG_THRESHOLD_PX = 35;
@@ -47,6 +65,8 @@ export function EnheRedesignExperienceReviews({ locale }: { locale: RedesignLoca
   const focusPausedRef = useRef(false);
   const [index, setIndex] = useState(REVIEW_INITIAL_INDEX);
   const [isAutoRotating, setIsAutoRotating] = useState(true);
+  const [isManuallyPaused, setIsManuallyPaused] = useState(false);
+  const [isReducedMotion, setIsReducedMotion] = useState(false);
 
   const move = (delta: -1 | 1) => {
     setIndex((current) => (current + delta + HOME_REVIEWS.length) % HOME_REVIEWS.length);
@@ -73,6 +93,7 @@ export function EnheRedesignExperienceReviews({ locale }: { locale: RedesignLoca
     let isMounted = true;
     let isHovered = false;
     let hasPointer = false;
+    let manuallyPaused = false;
     let pointerStartX: number | null = null;
     let reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
@@ -100,6 +121,7 @@ export function EnheRedesignExperienceReviews({ locale }: { locale: RedesignLoca
       !document.hidden &&
       !isHovered &&
       !focusPausedRef.current &&
+      !manuallyPaused &&
       !hasPointer &&
       resumeTimeoutId === null;
 
@@ -132,7 +154,8 @@ export function EnheRedesignExperienceReviews({ locale }: { locale: RedesignLoca
       if (
         reducedMotion ||
         document.hidden ||
-        focusPausedRef.current
+        focusPausedRef.current ||
+        manuallyPaused
       ) {
         return;
       }
@@ -198,6 +221,7 @@ export function EnheRedesignExperienceReviews({ locale }: { locale: RedesignLoca
     };
     const handleReducedMotionChange = (event: MediaQueryListEvent) => {
       reducedMotion = event.matches;
+      if (isMounted) setIsReducedMotion(reducedMotion);
       if (reducedMotion) {
         pause();
         clearResumeTimeout();
@@ -205,10 +229,25 @@ export function EnheRedesignExperienceReviews({ locale }: { locale: RedesignLoca
         resume();
       }
     };
+    const pauseManually = () => {
+      manuallyPaused = true;
+      if (isMounted) setIsManuallyPaused(true);
+      clearResumeTimeout();
+      pause();
+    };
+    const resumeManually = () => {
+      manuallyPaused = false;
+      if (isMounted) setIsManuallyPaused(false);
+      clearResumeTimeout();
+      startAutoInterval();
+    };
 
     timerActionsRef.current = {
       scheduleManualResume,
+      pauseManually,
+      resumeManually,
     };
+    setIsReducedMotion(reducedMotion);
     section.addEventListener("mouseenter", handleMouseEnter);
     section.addEventListener("mouseleave", handleMouseLeave);
     section.addEventListener("focusin", handleFocusIn);
@@ -251,6 +290,32 @@ export function EnheRedesignExperienceReviews({ locale }: { locale: RedesignLoca
       <div className="redesign-home-reviews-inner">
         <h2 id="redesign-home-reviews-heading">{copy.heading}</h2>
         <p className="redesign-home-reviews-disclosure">{copy.disclosure}</p>
+        <button
+          type="button"
+          className="redesign-home-reviews-rotation"
+          disabled={isReducedMotion}
+          aria-label={
+            isReducedMotion
+              ? copy.reducedMotion
+              : isManuallyPaused
+                ? copy.resume
+                : copy.pause
+          }
+          aria-pressed={isManuallyPaused}
+          onClick={() => {
+            if (isManuallyPaused) {
+              timerActionsRef.current?.resumeManually();
+            } else {
+              timerActionsRef.current?.pauseManually();
+            }
+          }}
+        >
+          {isReducedMotion
+            ? copy.reducedMotion
+            : isManuallyPaused
+              ? copy.resume
+              : copy.pause}
+        </button>
         <div className="redesign-home-reviews-window">
           <div
             className="redesign-home-reviews-track"

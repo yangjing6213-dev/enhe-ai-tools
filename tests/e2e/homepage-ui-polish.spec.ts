@@ -38,6 +38,7 @@ test("homepage polish stays readable, responsive, and interactive without extern
     const hero = page.locator(".redesign-home-hero");
     await expect(brand).toBeVisible();
     await expect(brandLabel).toHaveText("给你的人生添加AI外挂");
+    await expect(brandLabel).toBeVisible();
     await expect(hero.locator(".redesign-home-hero-inner")).toHaveCSS("text-align", "center");
     await expect(hero).toHaveCSS("background-image", "none");
     await expect(hero).toHaveCSS("color", "rgb(16, 24, 40)");
@@ -47,9 +48,58 @@ test("homepage polish stays readable, responsive, and interactive without extern
       const logo = document.querySelector<HTMLElement>(".redesign-brand-lockup");
       const label = document.querySelector<HTMLElement>(".redesign-header[data-home='true'] .redesign-brand-label");
       if (!logo || !label) throw new Error("The homepage brand lockup is missing.");
-      return Math.abs(logo.getBoundingClientRect().left - label.getBoundingClientRect().left);
+      const logoRect = logo.getBoundingClientRect();
+      const labelRect = label.getBoundingClientRect();
+      const actionProbe = document.createElement("span");
+      actionProbe.style.backgroundColor = "var(--enhe-action)";
+      document.body.append(actionProbe);
+      const actionBackground = getComputedStyle(actionProbe).backgroundColor;
+      actionProbe.remove();
+      return {
+        centerDifference: Math.abs(logoRect.left + logoRect.width / 2 - (labelRect.left + labelRect.width / 2)),
+        logoWidth: logoRect.width,
+        labelBackground: getComputedStyle(label).backgroundColor,
+        actionBackground,
+      };
     });
-    expect(brandAlignment, `brand line left alignment at ${width}px`).toBeLessThanOrEqual(1);
+    expect(brandAlignment.centerDifference, `brand line center alignment at ${width}px`).toBeLessThanOrEqual(1);
+    expect(brandAlignment.logoWidth, `restored logo width at ${width}px`).toBeGreaterThanOrEqual(150);
+    expect(brandAlignment.labelBackground, `brand line background at ${width}px`).toBe(brandAlignment.actionBackground);
+
+    if (width < 768) {
+      const layout = await page.locator(".redesign-header-inner").evaluate((inner) => {
+        const rect = (selector: string) => {
+          const element = inner.querySelector<HTMLElement>(selector);
+          if (!element) throw new Error(`Missing mobile header element: ${selector}`);
+          const { x, width, right } = element.getBoundingClientRect();
+          return { x, width, right };
+        };
+        const languageSwitch = Array.from(
+          inner.querySelectorAll<HTMLElement>(".redesign-language-switch"),
+        ).find((element) => element.getBoundingClientRect().width > 0);
+        if (!languageSwitch) throw new Error("The mobile language switch is missing.");
+        const languageRect = languageSwitch.getBoundingClientRect();
+        return {
+          innerRight: inner.getBoundingClientRect().right,
+          brand: rect(".redesign-brand-region"),
+          logo: rect(".redesign-brand-mark"),
+          label: rect(".redesign-brand-label"),
+          actions: rect(".redesign-mobile-actions"),
+          menu: rect(".redesign-menu-trigger"),
+          language: {
+            x: languageRect.x,
+            width: languageRect.width,
+            right: languageRect.right,
+          },
+        };
+      });
+      expect(
+        layout.actions.right,
+        `mobile header controls stay inside the header at ${width}px: ${JSON.stringify(layout)}`,
+      ).toBeLessThanOrEqual(
+        layout.innerRight + 1,
+      );
+    }
 
     const featureCards = page.locator(".redesign-home-feature-card");
     await expect(featureCards).toHaveCount(4);
@@ -128,16 +178,37 @@ test("homepage polish stays readable, responsive, and interactive without extern
     await expect.poll(() => activeReviewQuote.textContent()).not.toBe(initialReviewQuote);
     await reviews.getByRole("button", { name: "上一条评价" }).click();
     await expect.poll(() => activeReviewQuote.textContent()).toBe(initialReviewQuote);
+    const reviewAvatar = reviews.locator('.redesign-home-review-card[data-position="0"] .redesign-home-review-avatar');
+    await expect(reviewAvatar).toHaveAttribute("alt", /AI 生成的虚构人物/);
+    const pauseRotation = reviews.getByRole("button", { name: "暂停自动播放" });
+    await expect(pauseRotation).toHaveAttribute("aria-pressed", "false");
+    await pauseRotation.click();
+    await expect(reviews.getByRole("button", { name: "继续自动播放" })).toHaveAttribute("aria-pressed", "true");
 
     const footer = page.locator(".redesign-footer");
     await expect(footer).toHaveCSS("background-color", "rgb(0, 21, 18)");
     const footerGroup = footer.locator("details.footer-group").first();
-    await expect(footerGroup).toHaveAttribute("open", "");
-    await footerGroup.locator("summary").click();
     await expect(footerGroup).not.toHaveAttribute("open", "");
     await footerGroup.locator("summary").click();
     await expect(footerGroup).toHaveAttribute("open", "");
+    await footerGroup.locator("summary").click();
+    await expect(footerGroup).not.toHaveAttribute("open", "");
     await expect(footer.getByRole("link", { name: "回到顶部" })).toHaveAttribute("href", "#top");
+    const backToTopPlacement = await footer.evaluate((element) => {
+      const button = element.querySelector<HTMLElement>(".footer-back-to-top-button");
+      const inner = element.querySelector<HTMLElement>(".redesign-footer-inner");
+      if (!button) throw new Error("The footer back-to-top button is missing.");
+      const footerRect = element.getBoundingClientRect();
+      const innerRect = inner?.getBoundingClientRect();
+      const buttonRect = button.getBoundingClientRect();
+      return {
+        topOffset: buttonRect.top - footerRect.top,
+        rightOffset: innerRect ? innerRect.right - buttonRect.right : Number.POSITIVE_INFINITY,
+      };
+    });
+    expect(backToTopPlacement.topOffset, `back-to-top sits at the footer top at ${width}px`).toBeGreaterThanOrEqual(8);
+    expect(backToTopPlacement.topOffset, `back-to-top sits at the footer top at ${width}px`).toBeLessThan(52);
+    expect(backToTopPlacement.rightOffset, `back-to-top sits at the footer right at ${width}px`).toBeLessThanOrEqual(40);
 
     if (width >= 768) {
       const language = page.locator(".redesign-desktop-nav .redesign-language-switch");

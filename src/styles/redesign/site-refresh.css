@@ -76,11 +76,11 @@
 
 .redesign-header[data-home="true"] .redesign-brand-label {
   display: inline-flex;
-  min-height: auto;
-  padding: 4px 0 0;
-  border-radius: 0;
-  background: transparent;
-  color: var(--enhe-text);
+  min-height: 18px;
+  padding: 2px 7px;
+  border-radius: 3px;
+  background: var(--enhe-action);
+  color: #fff;
   font-size: 12px;
   font-weight: 600;
   letter-spacing: 0.02em;
@@ -530,11 +530,6 @@
     width: min(100% - 32px, 1320px);
   }
 
-  .redesign-brand-lockup,
-  .redesign-brand-mark {
-    width: 128px;
-  }
-
   .redesign-home-hero {
     min-height: 0;
   }
@@ -587,6 +582,30 @@
 
   .footer-back-to-top {
     margin-top: 16px;
+  }
+}
+
+@media (width < 360px) {
+  .redesign-header-inner {
+    width: min(100% - 24px, 1320px);
+    gap: 6px;
+  }
+
+  .redesign-mobile-actions {
+    gap: 6px;
+  }
+
+  .redesign-mobile-actions .redesign-language-switch {
+    padding-inline: 4px;
+  }
+
+  .redesign-mobile-actions .redesign-language-link {
+    min-width: 30px;
+    padding-inline: 2px;
+  }
+
+  .redesign-mobile-actions .redesign-language-separator {
+    padding-inline: 2px;
   }
 }
 

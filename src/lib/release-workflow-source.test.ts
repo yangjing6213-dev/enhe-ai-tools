@@ -229,6 +229,25 @@ describe("production release workflow", () => {
     );
   });
 
+  it("pins origin fetch and push URLs to the ENHE repository before any remote operation", () => {
+    const wrapper = read("scripts/push-and-deploy.ps1");
+    const originGuard = wrapper.indexOf(
+      "Assert-CanonicalOrigin",
+      wrapper.indexOf("function Assert-CanonicalOrigin") + 1,
+    );
+    const fetch = wrapper.indexOf('"fetch"', originGuard);
+    const push = wrapper.indexOf('"push", "origin"', originGuard);
+
+    expect(wrapper).toContain("function Assert-CanonicalOrigin");
+    expect(wrapper).toContain("https://github.com/yangjing6213-dev/enhe-ai-tools.git");
+    expect(wrapper).toContain("git@github.com:yangjing6213-dev/enhe-ai-tools.git");
+    expect(wrapper).toContain("git remote get-url --all origin");
+    expect(wrapper).toContain("git remote get-url --push --all origin");
+    expect(originGuard).toBeGreaterThan(-1);
+    expect(fetch).toBeGreaterThan(originGuard);
+    expect(push).toBeGreaterThan(originGuard);
+  });
+
   it("fails closed when a database-writing browser test targets a non-loopback base URL", () => {
     const commercialFlow = read("tests/e2e/commercial-flow.spec.ts");
 
