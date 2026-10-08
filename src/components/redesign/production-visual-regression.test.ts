@@ -36,11 +36,11 @@ describe("production public shell visual boundary", () => {
     expect(shell).toContain("color: var(--enhe-text);");
   });
 
-  it("keeps the reviews section on the approved light surface with dark controls", () => {
+  it("keeps the reviews section on the approved light surface without side arrows", () => {
     const home = read("styles/redesign/home.css");
 
     expect(home).toMatch(/\.enhe-redesign-production\s+\.redesign-home-reviews\s*\{[\s\S]*?background(?:-color)?:\s*var\(--enhe-page-bg\)/);
     expect(home).toMatch(/\.enhe-redesign-production\s+\.redesign-home-reviews\s*\{[\s\S]*?color:\s*var\(--enhe-text/);
-    expect(home).toMatch(/\.enhe-redesign-production\s+\.redesign-home-reviews-control[^}]*\{[\s\S]*?color:\s*var\(--enhe-text/);
+    expect(home).not.toContain(".redesign-home-reviews-control");
   });
 });

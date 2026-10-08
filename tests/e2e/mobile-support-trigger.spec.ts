@@ -491,9 +491,9 @@ for (const viewportSize of mobileViewports) {
           block: "end" as const,
         },
         {
-          name: "review controls",
+          name: "review card",
           anchor: ".redesign-home-reviews",
-          targets: ".redesign-home-reviews-control",
+          targets: '.redesign-home-review-card[data-active="true"]',
           block: "center" as const,
         },
         {

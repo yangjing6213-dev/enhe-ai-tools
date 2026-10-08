@@ -64,11 +64,11 @@ describe("homepage UI polish", () => {
     expect(refreshStyles).toMatch(/\.redesign-home-product-media-frame\s*\{[^}]*overflow:\s*hidden[^}]*border-radius:\s*20px/);
   });
 
-  it("places unframed review triangles beside the rotating review card", () => {
-    expect(reviews).toMatch(/redesign-home-reviews-window[\s\S]*redesign-home-reviews-controls[\s\S]*<\/div>\s*<\/div>/);
-    expect(reviews).toContain("redesign-home-review-triangle");
-    expect(homeStyles).toMatch(/\.redesign-home-reviews-controls\s*\{[^}]*position:\s*absolute[^}]*align-items:\s*center/);
-    expect(homeStyles).toMatch(/\.redesign-home-reviews-control\s*\{[^}]*border:\s*0[^}]*border-radius:\s*0/);
+  it("removes side arrows from the rotating review card while preserving concise AI disclosure", () => {
+    expect(reviews).not.toContain("redesign-home-reviews-controls");
+    expect(reviews).not.toContain("redesign-home-review-triangle");
+    expect(homeStyles).not.toContain(".redesign-home-reviews-controls");
+    expect(homeStyles).not.toContain(".redesign-home-reviews-control");
     expect(homeStyles).toMatch(/\.redesign-home-reviews-inner\s*\{[^}]*width:\s*min\(100%,\s*1040px\)/);
     expect(homeStyles).toMatch(/\.redesign-home-review-card\s*\{[^}]*width:\s*min\(70vw,\s*600px\)/);
     expect(homeStyles).toMatch(/\.redesign-home-reviews-inner h2\s*\{[^}]*font-size:\s*clamp\(1rem,\s*2\.2vw,\s*2\.25rem\)/);
@@ -77,22 +77,23 @@ describe("homepage UI polish", () => {
     expect(reviews).toContain('<Pause aria-hidden="true"');
     expect(reviews).not.toContain("暂停自动播放");
     expect(reviews).not.toContain("Pause automatic playback");
-    expect(HOME_COPY.zh.review.disclosure).toBe("AI生成展示内容，不代表真实用户评价。");
+    expect(HOME_COPY.zh.review.heading).toBe("用户反馈");
+    expect(HOME_COPY.zh.review.disclosure).toBe("AI 生成示例（非真实用户反馈）");
+    expect(HOME_COPY.en.review.heading).toBe("User feedback");
+    expect(HOME_COPY.en.review.disclosure).toBe("AI-generated examples (not real customer feedback).");
     expect(reviews).not.toContain("以下人物与评价内容由 AI 生成，仅作页面展示示意，并非真实用户评价。");
   });
 
-  it("uses accessible expandable footer groups and a back-to-top link on the AppSumo-like surface", () => {
+  it("uses collapsed expandable footer groups without a back-to-top link", () => {
     expect(footer).toContain('<details className="footer-group">');
     expect(footer).not.toContain('<details className="footer-group" open>');
-    expect(footer).toContain('className="footer-back-to-top footer-back-to-top-button"');
-    expect(footer).toContain('href="#top"');
-    expect(footer).toContain('className="footer-back-to-top-row"');
-    expect(footer.indexOf("footer-back-to-top-row")).toBeLessThan(footer.indexOf('className="footer-grid"'));
+    expect(footer).not.toContain("footer-back-to-top");
+    expect(footer).not.toContain("backToTop");
     expect(header).toContain('id="top"');
     expect(tokens).toContain("--enhe-footer: #001512");
     expect(refreshStyles).toMatch(/\.redesign-footer\s*\{[^}]*background:\s*var\(--enhe-footer\)/);
     expect(shellStyles).toMatch(/\.redesign-footer-inner\s*\{[^}]*position:\s*relative/);
-    expect(shellStyles).toMatch(/\.footer-back-to-top-row\s*\{[^}]*display:\s*flex[^}]*justify-content:\s*flex-end/);
+    expect(shellStyles).not.toContain(".footer-back-to-top-row");
   });
 
   it("removes the horizontal rules between homepage sections", () => {

@@ -14,16 +14,12 @@ import { HOME_COPY } from "@/lib/redesign/home/home-copy";
 
 const REVIEW_COPY = {
   zh: {
-    previous: "上一条评价",
-    next: "下一条评价",
     pause: "暂停轮播",
     resume: "继续轮播",
     reducedMotion: "已按系统设置暂停轮播",
     stars: (count: number) => `${count} 星`,
   },
   en: {
-    previous: "Previous review",
-    next: "Next review",
     pause: "Pause carousel",
     resume: "Resume carousel",
     reducedMotion: "Paused by your motion settings",
@@ -32,8 +28,6 @@ const REVIEW_COPY = {
 } satisfies Record<
   RedesignLocale,
   {
-    previous: string;
-    next: string;
     pause: string;
     resume: string;
     reducedMotion: string;
@@ -290,6 +284,7 @@ export function EnheRedesignExperienceReviews({ locale }: { locale: RedesignLoca
       data-motion-modality={motionModality}
       role="region"
       aria-labelledby="redesign-home-reviews-heading"
+      aria-keyshortcuts="ArrowLeft ArrowRight"
       tabIndex={0}
       onKeyDown={handleKeyDown}
     >
@@ -362,40 +357,6 @@ export function EnheRedesignExperienceReviews({ locale }: { locale: RedesignLoca
                 </article>
               );
             })}
-          </div>
-          <div className="redesign-home-reviews-controls">
-            <button
-              type="button"
-              className="redesign-home-reviews-control"
-              onClick={(event) => move(-1, event.detail === 0 ? "keyboard" : "pointer")}
-              aria-label={copy.previous}
-            >
-              <svg
-                className="redesign-home-review-triangle"
-                data-direction="previous"
-                aria-hidden="true"
-                viewBox="0 0 24 24"
-                focusable="false"
-              >
-                <path d="M7.2 4.8 18 10.9a1.25 1.25 0 0 1 0 2.2L7.2 19.2A1.35 1.35 0 0 1 5.2 18V6a1.35 1.35 0 0 1 2-1.2Z" fill="currentColor" />
-              </svg>
-            </button>
-            <button
-              type="button"
-              className="redesign-home-reviews-control"
-              onClick={(event) => move(1, event.detail === 0 ? "keyboard" : "pointer")}
-              aria-label={copy.next}
-            >
-              <svg
-                className="redesign-home-review-triangle"
-                data-direction="next"
-                aria-hidden="true"
-                viewBox="0 0 24 24"
-                focusable="false"
-              >
-                <path d="M7.2 4.8 18 10.9a1.25 1.25 0 0 1 0 2.2L7.2 19.2A1.35 1.35 0 0 1 5.2 18V6a1.35 1.35 0 0 1 2-1.2Z" fill="currentColor" />
-              </svg>
-            </button>
           </div>
         </div>
       </div>

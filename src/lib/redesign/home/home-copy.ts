@@ -27,8 +27,8 @@ export const HOME_COPY: Record<RedesignLocale, RedesignHomeCopy> = {
     subtitle: "发现值得使用的 AI 工具、实用方法与行业动态，让工作更高效，让创作更自由。",
     cta: { label: "探索 AI 工具", href: "/software" },
     review: {
-      heading: "产品用户评价",
-      disclosure: "AI生成展示内容，不代表真实用户评价。",
+      heading: "用户反馈",
+      disclosure: "AI 生成示例（非真实用户反馈）",
     },
     value: {
       heading: "让每一个普通人，都能借助 AI，创造过去做不到的事。",
@@ -41,8 +41,8 @@ export const HOME_COPY: Record<RedesignLocale, RedesignHomeCopy> = {
     subtitle: "Discover practical AI tools, skills, and industry signals to work faster and create with confidence.",
     cta: { label: "Explore AI tools", href: "/en/software" },
     review: {
-      heading: "Product user reviews",
-      disclosure: "AI-generated examples, not real customer reviews.",
+      heading: "User feedback",
+      disclosure: "AI-generated examples (not real customer feedback).",
     },
     value: {
       heading: "Let everyone use AI to create what once felt out of reach.",

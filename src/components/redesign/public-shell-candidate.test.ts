@@ -142,7 +142,8 @@ describe("ENHE redesign public shell candidate", () => {
     expect(footer).toContain("footer-grid");
     expect(footer).toContain('<details className="footer-group">');
     expect(footer).not.toContain('<details className="footer-group" open>');
-    expect(footer).toContain('href="#top"');
+    expect(footer).not.toContain("backToTop");
+    expect(footer).not.toContain('href="#top"');
     expect(footer).not.toContain("AI工具");
     expect(footer).not.toContain("中文 / EN");
     expect(footer).not.toContain("电话");

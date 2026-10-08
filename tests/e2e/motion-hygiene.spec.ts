@@ -130,9 +130,7 @@ test("review auto-rotation pauses while focused and resumes when focus leaves", 
   await expect(activeReview).toHaveAttribute("aria-label", initialReview ?? "");
   await expect(track).toHaveAttribute("aria-live", "polite");
 
-  await page
-    .getByRole("button", { name: "下一条评价" })
-    .evaluate((button: HTMLButtonElement) => button.click());
+  await page.keyboard.press("ArrowRight");
   const focusedManualReview = await activeReview.getAttribute("aria-label");
   await page.clock.fastForward(12_000);
   await expect(activeReview).toHaveAttribute("aria-label", focusedManualReview ?? "");
@@ -150,8 +148,16 @@ test("review auto-rotation pauses on hover and resumes after manual navigation",
   const section = page.locator(".redesign-home-reviews");
   const track = page.locator(".redesign-home-reviews-track");
   const activeReview = page.locator('.redesign-home-review-card[data-active="true"]');
+  const rotationButton = page.getByRole("button", { name: /暂停轮播|继续轮播/ });
 
   await expect(activeReview).toHaveCount(1);
+  // The server-rendered card can appear before the browser installs the interval.
+  // Toggle the control without pointer movement to confirm hydration and start a fresh interval.
+  await rotationButton.evaluate((button: HTMLButtonElement) => button.click());
+  await expect(rotationButton).toHaveAttribute("aria-pressed", "true");
+  await rotationButton.evaluate((button: HTMLButtonElement) => button.click());
+  await expect(rotationButton).toHaveAttribute("aria-pressed", "false");
+
   const initialReview = await activeReview.getAttribute("aria-label");
   await page.clock.fastForward(5_100);
   await expect(activeReview).not.toHaveAttribute("aria-label", initialReview ?? "");
@@ -167,16 +173,13 @@ test("review auto-rotation pauses on hover and resumes after manual navigation",
   await expect(activeReview).not.toHaveAttribute("aria-label", beforeHover ?? "");
 
   const beforeManualMove = await activeReview.getAttribute("aria-label");
-  await page
-    .getByRole("button", { name: "下一条评价" })
-    .evaluate((button: HTMLButtonElement) => button.click());
+  await section.focus();
+  await page.keyboard.press("ArrowRight");
   await expect(activeReview).not.toHaveAttribute("aria-label", beforeManualMove ?? "");
   const manuallySelectedReview = await activeReview.getAttribute("aria-label");
   await expect(track).toHaveAttribute("aria-live", "polite");
 
-  await page.clock.fastForward(5_999);
-  await expect(activeReview).toHaveAttribute("aria-label", manuallySelectedReview ?? "");
-  await page.clock.fastForward(1);
+  await page.locator("header a").first().focus();
   await expect(track).toHaveAttribute("aria-live", "off");
   await page.clock.fastForward(5_100);
   await expect(activeReview).not.toHaveAttribute("aria-label", manuallySelectedReview ?? "");
@@ -208,14 +211,14 @@ test("reduced motion keeps product, review, and support controls functional", as
   });
 
   const track = page.locator(".redesign-home-reviews-track");
+  const section = page.locator(".redesign-home-reviews");
   const activeReview = page.locator('.redesign-home-review-card[data-active="true"]');
   await expect(track).toHaveAttribute("aria-live", "polite");
   const initialReview = await activeReview.getAttribute("aria-label");
   await page.clock.fastForward(12_000);
   await expect(activeReview).toHaveAttribute("aria-label", initialReview ?? "");
-  await page
-    .getByRole("button", { name: "下一条评价" })
-    .evaluate((button: HTMLButtonElement) => button.click());
+  await section.focus();
+  await page.keyboard.press("ArrowRight");
   await expect(activeReview).not.toHaveAttribute("aria-label", initialReview ?? "");
 
   const launcher = page.locator(".customer-support-launcher");

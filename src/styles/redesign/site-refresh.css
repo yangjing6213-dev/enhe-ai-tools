@@ -246,23 +246,6 @@
   object-fit: cover;
 }
 
-.redesign-home-reviews-control {
-  border: 0;
-  border-radius: 0;
-  background: var(--enhe-page-bg);
-  color: var(--enhe-text);
-}
-
-.redesign-home-reviews-control svg {
-  width: 22px;
-  height: 22px;
-}
-
-.redesign-home-reviews-control:hover {
-  background: var(--enhe-page-bg);
-  color: var(--enhe-action);
-}
-
 .redesign-home-brand-value {
   border-top: 0;
   background: #fff;
@@ -515,7 +498,7 @@
 }
 
 @media (hover: hover) and (pointer: fine) {
-  .enhe-redesign-production :is(button:not(:disabled), [role="button"], a[class*="button"], a[class*="cta"], a[class*="card"], a[class*="control"], .enhe-contentless-action, .redesign-language-link, .redesign-login-link, .redesign-avatar-trigger, .redesign-home-product-detail-link, .footer-back-to-top, .footer-group > summary):hover {
+  .enhe-redesign-production :is(button:not(:disabled), [role="button"], a[class*="button"], a[class*="cta"], a[class*="card"], a[class*="control"], .enhe-contentless-action, .redesign-language-link, .redesign-login-link, .redesign-avatar-trigger, .redesign-home-product-detail-link, .footer-group > summary):hover {
     transform: translateY(-2px);
   }
 
@@ -626,13 +609,13 @@
     transition-property: border-color !important;
   }
 
-  .enhe-redesign-production :is(button, [role="button"], a[class*="button"], a[class*="cta"], a[class*="card"], a[class*="control"], .enhe-contentless-action, .redesign-language-link, .redesign-login-link, .redesign-avatar-trigger, .redesign-home-product-detail-link, .footer-back-to-top, .footer-group > summary, article[class*="card"]:not(.redesign-home-review-card)) {
+  .enhe-redesign-production :is(button, [role="button"], a[class*="button"], a[class*="cta"], a[class*="card"], a[class*="control"], .enhe-contentless-action, .redesign-language-link, .redesign-login-link, .redesign-avatar-trigger, .redesign-home-product-detail-link, .footer-group > summary, article[class*="card"]:not(.redesign-home-review-card)) {
     scroll-behavior: auto;
     transition-duration: 0.01ms !important;
   }
 
-  .enhe-redesign-production :is(button:not(:disabled), [role="button"], a[class*="button"], a[class*="cta"], a[class*="card"], a[class*="control"], .enhe-contentless-action, .redesign-language-link, .redesign-login-link, .redesign-avatar-trigger, .redesign-home-product-detail-link, .footer-back-to-top, .footer-group > summary):hover,
-  .enhe-redesign-production :is(button:not(:disabled), [role="button"], a[class*="button"], a[class*="cta"], a[class*="card"], a[class*="control"], .enhe-contentless-action, .redesign-language-link, .redesign-login-link, .redesign-avatar-trigger, .redesign-home-product-detail-link, .footer-back-to-top, .footer-group > summary):active {
+  .enhe-redesign-production :is(button:not(:disabled), [role="button"], a[class*="button"], a[class*="cta"], a[class*="card"], a[class*="control"], .enhe-contentless-action, .redesign-language-link, .redesign-login-link, .redesign-avatar-trigger, .redesign-home-product-detail-link, .footer-group > summary):hover,
+  .enhe-redesign-production :is(button:not(:disabled), [role="button"], a[class*="button"], a[class*="cta"], a[class*="card"], a[class*="control"], .enhe-contentless-action, .redesign-language-link, .redesign-login-link, .redesign-avatar-trigger, .redesign-home-product-detail-link, .footer-group > summary):active {
     transform: none;
   }
 

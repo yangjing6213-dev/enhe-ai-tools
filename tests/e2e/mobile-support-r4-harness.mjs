@@ -299,7 +299,7 @@ function pagePlans(route) {
           selector: ".redesign-home-brand-value-cta",
         },
         { targetType: "home-product-control", selector: ".redesign-home-product-control" },
-        { targetType: "home-review-control", selector: ".redesign-home-reviews-control" },
+        { targetType: "home-review-card", selector: '.redesign-home-review-card[data-active="true"]' },
         { targetType: "home-footer-link", selector: ".redesign-footer a" },
       ],
     },
@@ -1479,7 +1479,7 @@ async function collectStress(browser) {
     },
     { type: "home-brand-cta", selector: ".redesign-home-brand-value-cta" },
     { type: "home-product-control", selector: ".redesign-home-product-control" },
-    { type: "home-review-control", selector: ".redesign-home-reviews-control" },
+    { type: "home-review-card", selector: '.redesign-home-review-card[data-active="true"]' },
     { type: "home-footer", selector: ".redesign-footer a" },
   ];
   const stressPlans = [...softwarePlans, ...paginationPlans, ...homePlans];
@@ -1758,7 +1758,7 @@ async function collectBrowserMatrix(browser) {
       },
       { type: "home-brand-cta", selector: ".redesign-home-brand-value-cta" },
       { type: "home-product-control", selector: ".redesign-home-product-control" },
-      { type: "home-review-control", selector: ".redesign-home-reviews-control" },
+      { type: "home-review-card", selector: '.redesign-home-review-card[data-active="true"]' },
       { type: "footer", selector: ".redesign-footer a" },
     ],
   };
@@ -2063,7 +2063,7 @@ async function collectFractionalBoundaryMatrix(browser) {
       },
       { type: "home-brand-cta", selector: ".redesign-home-brand-value-cta" },
       { type: "home-product-control", selector: ".redesign-home-product-control" },
-      { type: "home-review-control", selector: ".redesign-home-reviews-control" },
+      { type: "home-review-card", selector: '.redesign-home-review-card[data-active="true"]' },
       { type: "footer", selector: ".redesign-footer a" },
     ],
   };

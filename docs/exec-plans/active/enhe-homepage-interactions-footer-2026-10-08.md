@@ -1,35 +1,33 @@
-# ENHE homepage interaction and footer polish
+# ENHE 首页反馈区与页尾收尾 — 2026-10-08
 
-## Contract
+## 任务契约
 
-- Goal: implement the user's 2026-10-08 homepage/header/footer refinements and publish the verified result to the already approved GitHub branch and Tencent Cloud through the guarded release workflow.
-- Work only in the clean isolated checkout `C:\Users\HU\Documents\New project 2\.worktrees\enhe-ui-refresh-20261007`, based on deployed `d794f4022083a5e23c776c41e3a1c8e2546c6e91`.
-- Preserve login, product, search, language routing, testimonial disclosure and automatic rotation. Do not touch the separate dirty checkout, `.env`, production content/database directly, or deployment files outside the established workflow.
-- Reuse the installed upstream Emil Kowalski design/animation skills; do not add a runtime UI dependency.
+- 目标：按用户截图要求精简首页“用户反馈”区域，并移除页尾“回到顶部”按钮；通过现有受保护发布脚本推送并部署。
+- 工作目录：`C:\Users\HU\Documents\New project 2\.worktrees\enhe-release-candidate-2026-10-08`。
+- 分支：`codex/enhe-home-ui-polish-20261008`；基线：`79ec80d13dfa828c9cc5008dd9a1d055cd4c5c01`。
+- 已有授权：当前会话此前已明确授权 GitHub 推送和腾讯云部署；本批次不再重复询问。
+- 边界：不编辑 `.env`，不直接读取或更改生产数据库内容，不修改其他页面，不动其他 worktree。
 
-## Acceptance criteria
+## 验收标准
 
-1. Homepage Chinese brand line reads “给你的人生添加AI外挂” below and aligned with the logo; the home hero has no background image and uses centered dark text and action.
-2. The signed-in dropdown has readable dark text. Language and account controls share one visual shape and exchange their current positions. Desktop navigation spacing is visibly wider.
-3. The four feature links have no horizontal or vertical divider lines.
-4. The product showcase heading is about half its previous size and remains on one line at desktop widths. The “01 / 05” counter is gone. Product and review controls are unframed filled triangles, placed at the sides and vertically centered on their cards. Product detail links use a triangle icon.
-5. Footer groups use accessible expandable disclosures on an AppSumo-like near-black green surface; a back-to-top control returns to the page header.
-6. Public-site buttons have clear, restrained hover/press feedback, fine-pointer hover gating, keyboard focus styling, and reduced-motion support.
-7. Existing route behavior remains intact. Focused tests, full project release gates, and local browser checks pass before the guarded exact-SHA push/deploy.
+1. 标题改为“用户反馈”，英文标题为“User feedback”。
+2. 删除原来的长句，改用简短双语说明，明确示例由 AI 生成且不是真实用户反馈。
+3. 删除左右三角形轮播按钮；轮播自动播放、暂停控制、键盘与触屏操作继续可用。
+4. 删除页尾“回到顶部”控件及仅供该控件使用的样式；页尾栏目默认折叠。
+5. 定向测试、完整发布门禁及线上页面核验全部通过后，才算完成推送部署。
 
-## Planned scope
+## 当前实现与验证
 
-- Homepage copy, header/footer components, home and shell visual styles, footer token, focused source/component tests, one DB-free browser acceptance spec, and this plan record.
-- No authentication/data semantics, SEO metadata, content, schema, migration, dependency, or admin changes.
+- 完成双语标题与短说明更新，移除反馈轮播两侧按钮及无用样式。
+- 保留键盘左右键和触屏滑动，并为键盘使用者保留可见焦点提示。
+- 移除页尾返回顶部链接、相应文案类型与无用样式。
+- 先更新测试并确认旧实现下出现预期失败，再实现变更。
+- 自动轮播浏览器测试曾以 1/3 次复现计时竞态：页面服务端输出的内容先出现，客户端计时器尚未初始化时测试便快进了虚拟时钟。测试现在先通过无鼠标移动的暂停/恢复控件切换确认交互已启动，再检查自动播放；该用例连续 5 次通过。页面轮播实现无需改动。
+- 独立代码审查：没有 Critical/Important 问题；最初关于键盘提示与焦点可见性的 Minor 项已修复并复核。
+- 此前本地全量检查通过：Vitest 2,626 passed / 90 skipped；lint、typecheck、build 通过；DB-free 浏览器检查 10 passed / 11 skipped。之后只新增了上述稳定性测试同步，最终发布脚本仍须从提交后的准确版本重跑完整门禁。
 
-## Progress
+## 发布状态
 
-- `verified`: clean release worktree and branch match deployed HEAD `d794f4022083a5e23c776c41e3a1c8e2546c6e91`; another checkout contains unrelated dirty changes and will remain untouched.
-- `verified`: AppSumo reference and upstream `emilkowalski/skills` were checked. The relevant Emil design/motion skills are already installed in the active Codex skill environment.
-- `verified`: acceptance tests were first run against the unchanged baseline and failed as expected; the focused component suite now passes 39 tests across 5 files.
-- `verified`: database-free Chromium acceptance passed at 1440, 1024, 900, 768, 390, and 320 pixels, including layout overflow, brand alignment, account-menu contrast, arrow placement, product/review previous-next switching, footer disclosure, hover feedback, and back-to-top behavior.
-- `verified`: independent code review found no P1/P2 blockers. Its minor finding about missing review-arrow switching coverage was addressed with product and review previous-next assertions; final review confirmed the test changes and brand-label contrast fix.
-- `verified`: the first full unit-suite run exposed two stale assertions that conflicted with the approved language/account order and filled-triangle icon. Updated those expectations; both affected suites now pass (11 tests). The complete release gate must be rerun against the final commit.
-- `verified`: the first full browser run passed 319 cases and skipped 136 by suite configuration, but caught six desktop contrast failures from the old blue brand-label background and one stale tab-order expectation. The label now uses white text on the blue action background; all 8 focused desktop contrast checks pass. Keyboard order now asserts the product link, previous control, and next control; its focused browser check passes.
-- `in_progress`: repeat complete project release checks; run guarded exact-ref push/deploy only after they pass.
-- `pending`: guarded exact-ref GitHub push and Tencent Cloud deployment after every release gate passes.
+- `IN_PROGRESS`：整理并提交本批次明确路径后，执行 `scripts/push-and-deploy.ps1` 的完整门禁、GitHub 精确提交推送及腾讯云部署。
+- 受保护脚本完成后，再核对远端分支精确 SHA，并检查线上 `/`、`/en` 与 `/software` 页面。
+- 最终远程回执和本批次路径哈希追加到被本地排除规则忽略的 `.local-audit/PRE-PUBLISH-REPORT.md`；该报告不随提交推送。

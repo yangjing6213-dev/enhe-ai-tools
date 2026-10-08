@@ -176,7 +176,7 @@ describe("homepage experience review candidate", () => {
     expect(reviewCardRule).not.toContain("will-change");
   });
 
-  it("keeps previous/next triangles and an accessible icon-only manual pause control", () => {
+  it("removes overlapping side arrows while retaining keyboard navigation and an accessible pause control", () => {
     expect(reviewSource).toContain('"use client"');
     expect(reviewSource).toContain("useEffect");
     expect(reviewSource).toContain("setInterval");
@@ -191,17 +191,17 @@ describe("homepage experience review candidate", () => {
     expect(reviewSource).toContain("pointerdown");
     expect(reviewSource).toContain("ArrowLeft");
     expect(reviewSource).toContain("ArrowRight");
+    expect(reviewSource).toContain('aria-keyshortcuts="ArrowLeft ArrowRight"');
     expect(reviewSource).toContain("aria-label");
-    expect(reviewSource).toContain('aria-label={copy.previous}');
-    expect(reviewSource).toContain('aria-label={copy.next}');
     expect(reviewSource).toContain("redesign-home-reviews-rotation");
     expect(reviewSource).toContain('aria-pressed={isManuallyPaused}');
     expect(reviewSource).toContain("aria-hidden=\"true\"");
     expect(reviewSource).toContain("pauseManually");
     expect(reviewSource).toContain("resumeManually");
-    expect(reviewSource).toContain('data-direction="previous"');
-    expect(reviewSource).toContain('data-direction="next"');
-    expect(reviewSource).toContain('d="M7.2 4.8 18 10.9a1.25 1.25 0 0 1 0 2.2L7.2 19.2A1.35 1.35 0 0 1 5.2 18V6a1.35 1.35 0 0 1 2-1.2Z" fill="currentColor"');
+    expect(reviewSource).not.toContain("redesign-home-reviews-controls");
+    expect(reviewSource).not.toContain("redesign-home-review-triangle");
+    expect(reviewSource).not.toContain("copy.previous");
+    expect(reviewSource).not.toContain("copy.next");
     expect(reviewSource).toContain("REVIEW_INITIAL_INDEX");
     expect(reviewSource).toContain("tabIndex={0}");
     expect(reviewSource).toContain('role="region"');
@@ -212,13 +212,14 @@ describe("homepage experience review candidate", () => {
     expect(homeStyles).toContain(".redesign-home-reviews-window");
     expect(homeStyles).toContain("opacity");
     expect(homeStyles).toContain("transform");
-    expect(homeStyles).toContain("min-width: 34px");
+    expect(homeStyles).not.toContain(".redesign-home-reviews-control");
+    expect(homeStyles).not.toContain(".redesign-home-review-triangle");
+    expect(homeStyles).toMatch(/\.redesign-home-reviews:focus-visible\s*\{[^}]*outline:\s*3px solid var\(--enhe-focus/);
   });
 
   it("keeps keyboard-triggered review changes instant while pointer and automatic changes retain motion", () => {
     expect(reviewSource).toContain('move(-1, "keyboard")');
     expect(reviewSource).toContain('move(1, "keyboard")');
-    expect(reviewSource).toContain('event.detail === 0 ? "keyboard" : "pointer"');
     expect(reviewSource).toContain('setMotionModality("pointer")');
     expect(reviewSource).toContain('setMotionModality("automatic")');
     expect(reviewSource).toContain('data-motion-modality={motionModality}');

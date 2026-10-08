@@ -148,6 +148,7 @@ test("homepage polish stays readable, responsive, and interactive without extern
     const reviews = page.locator(".redesign-home-reviews");
     await reviews.scrollIntoViewIfNeeded();
     await reviews.hover();
+    await expect(reviews.getByRole("heading", { name: "用户反馈" })).toBeVisible();
     const reviewHeadingSize = await page.evaluate(() => {
       const productHeading = document.querySelector<HTMLElement>(".redesign-home-products-heading h2");
       const reviewHeading = document.querySelector<HTMLElement>(".redesign-home-reviews-heading-row h2");
@@ -155,40 +156,16 @@ test("homepage polish stays readable, responsive, and interactive without extern
       return [getComputedStyle(productHeading).fontSize, getComputedStyle(reviewHeading).fontSize];
     });
     expect(reviewHeadingSize[1], `review and product headings share one size at ${width}px`).toBe(reviewHeadingSize[0]);
-    await expect(reviews.locator(".redesign-home-reviews-disclosure")).toHaveText("AI生成展示内容，不代表真实用户评价。");
-    await expect(reviews.locator(".redesign-home-review-triangle")).toHaveCount(2);
-    const reviewArrowAlignment = await reviews.evaluate((section) => {
-      const arrows = section.querySelectorAll<HTMLElement>(".redesign-home-reviews-control");
-      const card = section.querySelector<HTMLElement>('.redesign-home-review-card[data-position="0"]');
-      if (!arrows[0] || !arrows[1] || !card) throw new Error("The active review card or side arrows are missing.");
-      const previous = arrows[0].getBoundingClientRect();
-      const next = arrows[1].getBoundingClientRect();
-      const cardRect = card.getBoundingClientRect();
-      const previousStyle = getComputedStyle(arrows[0]);
-      const previousHitTarget = document.elementFromPoint(
-        previous.left + previous.width / 2,
-        previous.top + previous.height / 2,
-      );
-      return {
-        verticallyCentered: Math.abs(previous.top + previous.height / 2 - (cardRect.top + cardRect.height / 2)) <= 8,
-        outsideCard: previous.right <= cardRect.left && next.left >= cardRect.right,
-        visible: previous.width > 0 && previous.height > 0 && previousStyle.visibility === "visible" && Number(previousStyle.opacity) > 0,
-        background: previousStyle.backgroundColor,
-        receivesPointer: previousHitTarget === arrows[0] || arrows[0].contains(previousHitTarget),
-      };
-    });
-    expect(reviewArrowAlignment, `review arrows remain visible, clickable, outside, and centered at ${width}px`).toEqual({
-      verticallyCentered: true,
-      outsideCard: true,
-      visible: true,
-      background: "rgb(255, 255, 255)",
-      receivesPointer: true,
-    });
+    await expect(reviews.locator(".redesign-home-reviews-disclosure")).toHaveText("AI 生成示例（非真实用户反馈）");
+    await expect(reviews.locator(".redesign-home-reviews-control, .redesign-home-review-triangle")).toHaveCount(0);
+    await expect(reviews.getByRole("button", { name: "上一条评价" })).toHaveCount(0);
+    await expect(reviews.getByRole("button", { name: "下一条评价" })).toHaveCount(0);
     const activeReviewQuote = reviews.locator('.redesign-home-review-card[data-position="0"] blockquote');
     const initialReviewQuote = await activeReviewQuote.textContent();
-    await reviews.getByRole("button", { name: "下一条评价" }).click();
+    await reviews.focus();
+    await page.keyboard.press("ArrowRight");
     await expect.poll(() => activeReviewQuote.textContent()).not.toBe(initialReviewQuote);
-    await reviews.getByRole("button", { name: "上一条评价" }).click();
+    await page.keyboard.press("ArrowLeft");
     await expect.poll(() => activeReviewQuote.textContent()).toBe(initialReviewQuote);
     const reviewAvatar = reviews.locator('.redesign-home-review-card[data-position="0"] .redesign-home-review-avatar');
     await expect(reviewAvatar).toHaveAttribute("alt", /AI 生成的虚构人物/);
@@ -198,11 +175,8 @@ test("homepage polish stays readable, responsive, and interactive without extern
     await pauseRotation.click();
     await expect(reviews.getByRole("button", { name: "继续轮播" })).toHaveAttribute("aria-pressed", "true");
     if (width === 1440) {
-      await reviews.focus();
-      await page.keyboard.press("ArrowRight");
       await expect(reviews).toHaveAttribute("data-motion-modality", "keyboard");
       await expect(reviews.locator('.redesign-home-review-card[data-position="0"]')).toHaveCSS("transition-property", "none");
-      await page.keyboard.press("ArrowLeft");
     }
 
     const footer = page.locator(".redesign-footer");
@@ -213,22 +187,8 @@ test("homepage polish stays readable, responsive, and interactive without extern
     await expect(footerGroup).toHaveAttribute("open", "");
     await footerGroup.locator("summary").click();
     await expect(footerGroup).not.toHaveAttribute("open", "");
-    await expect(footer.getByRole("link", { name: "回到顶部" })).toHaveAttribute("href", "#top");
-    const backToTopPlacement = await footer.evaluate((element) => {
-      const button = element.querySelector<HTMLElement>(".footer-back-to-top-button");
-      const inner = element.querySelector<HTMLElement>(".redesign-footer-inner");
-      if (!button) throw new Error("The footer back-to-top button is missing.");
-      const footerRect = element.getBoundingClientRect();
-      const innerRect = inner?.getBoundingClientRect();
-      const buttonRect = button.getBoundingClientRect();
-      return {
-        topOffset: buttonRect.top - footerRect.top,
-        rightOffset: innerRect ? innerRect.right - buttonRect.right : Number.POSITIVE_INFINITY,
-      };
-    });
-    expect(backToTopPlacement.topOffset, `back-to-top sits at the footer top at ${width}px`).toBeGreaterThanOrEqual(8);
-    expect(backToTopPlacement.topOffset, `back-to-top sits at the footer top at ${width}px`).toBeLessThan(52);
-    expect(backToTopPlacement.rightOffset, `back-to-top sits at the footer right at ${width}px`).toBeLessThanOrEqual(40);
+    await expect(footer.getByRole("link", { name: "回到顶部" })).toHaveCount(0);
+    await expect(footer.locator(".footer-back-to-top-row")).toHaveCount(0);
 
     if (width >= 768) {
       const language = page.locator(".redesign-desktop-nav .redesign-language-switch");
@@ -291,10 +251,6 @@ test("homepage polish stays readable, responsive, and interactive without extern
       }
     }
 
-    await page.evaluate(() => window.scrollTo(0, document.body.scrollHeight));
-    await footer.getByRole("link", { name: "回到顶部" }).click();
-    await expect.poll(() => page.evaluate(() => window.scrollY)).toBe(0);
-
     if (process.env.ENHE_CAPTURE_HOME_UI === "1") {
       await page.screenshot({ path: `test-results/homepage-ui-polish-${width}.png`, fullPage: true });
     }
@@ -309,6 +265,10 @@ test("homepage polish stays readable, responsive, and interactive without extern
     const fontFamily = getComputedStyle(element).fontFamily;
     return fontFamily.includes("LXGW WenKai") && document.fonts.check('500 11px "LXGW WenKai"', element.textContent ?? "");
   }), "the selected local WenKai font also loads for the English tagline").toBe(true);
+  const englishReviews = page.locator(".redesign-home-reviews");
+  await expect(englishReviews.getByRole("heading", { name: "User feedback" })).toBeVisible();
+  await expect(englishReviews.locator(".redesign-home-reviews-disclosure")).toHaveText("AI-generated examples (not real customer feedback).");
+  await expect(englishReviews.locator(".redesign-home-reviews-control, .redesign-home-review-triangle")).toHaveCount(0);
 
   expect(rejectedOrigins).toEqual([]);
   expect(pageErrors).toEqual([]);

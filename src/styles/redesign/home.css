@@ -280,8 +280,7 @@
   height: 22px;
 }
 
-.redesign-home-product-triangle[data-direction="previous"],
-.redesign-home-review-triangle[data-direction="previous"] {
+.redesign-home-product-triangle[data-direction="previous"] {
   rotate: 180deg;
 }
 
@@ -496,6 +495,11 @@
   cursor: default;
 }
 
+.redesign-home-reviews:focus-visible {
+  outline: 3px solid var(--enhe-focus, #ffd60a);
+  outline-offset: 4px;
+}
+
 .redesign-home-reviews-rotation:focus-visible {
   outline: 3px solid var(--enhe-focus);
   outline-offset: 3px;
@@ -617,41 +621,6 @@
   line-height: 1.75;
 }
 
-.redesign-home-reviews-controls {
-  position: absolute;
-  z-index: 3;
-  inset: 0;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  pointer-events: none;
-}
-
-.redesign-home-reviews-control {
-  display: inline-flex;
-  width: 44px;
-  min-width: 44px;
-  height: 44px;
-  align-items: center;
-  justify-content: center;
-  padding: 0;
-  border: 0;
-  border-radius: 0;
-  background: var(--enhe-page-bg, #fff);
-  color: var(--enhe-text, #080808);
-  cursor: pointer;
-  pointer-events: auto;
-}
-
-.redesign-home-review-triangle {
-  width: 22px;
-  height: 22px;
-}
-
-.enhe-redesign-production .redesign-home-reviews-control {
-  color: var(--enhe-text);
-}
-
 /* Keep visible review text readable; scale and position provide the hierarchy. */
 .enhe-redesign-production .redesign-home-reviews-window {
   mask-image: none;
@@ -664,16 +633,6 @@
 
 .enhe-redesign-production .redesign-home-review-stars {
   color: #8b6617;
-}
-
-.redesign-home-reviews-control:hover {
-  background: var(--enhe-page-bg, #fff);
-  color: var(--enhe-action, #246bfe);
-}
-
-.redesign-home-reviews-control:focus-visible {
-  outline: 3px solid var(--enhe-focus, #ffd60a);
-  outline-offset: 3px;
 }
 
 @media screen and (width < 768px) {
@@ -699,17 +658,6 @@
     width: min(70%, 520px);
     min-height: 408px;
     padding: 22px;
-  }
-
-  .redesign-home-review-triangle {
-    width: 18px;
-    height: 18px;
-  }
-
-  .redesign-home-reviews-control {
-    width: 34px;
-    min-width: 34px;
-    height: 40px;
   }
 
   .redesign-home-reviews-rotation {

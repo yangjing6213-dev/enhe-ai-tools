@@ -1,5 +1,5 @@
 import { Fragment } from "react";
-import { ArrowUp, ChevronDown } from "lucide-react";
+import { ChevronDown } from "lucide-react";
 import type { ProductionFiling } from "@/lib/production-filing";
 import type { RedesignFooterCopy, RedesignLocale } from "./types";
 
@@ -8,7 +8,6 @@ const FOOTER_COPY: Record<RedesignLocale, RedesignFooterCopy> = {
     ariaLabel: "网站页脚",
     brandLine: "ENHE AI",
     brandIntro: ["一站式AI平台", "给人生加一个 AI 外挂"],
-    backToTop: "回到顶部",
     columns: [
       {
         title: "帮助与服务",
@@ -43,7 +42,6 @@ const FOOTER_COPY: Record<RedesignLocale, RedesignFooterCopy> = {
     ariaLabel: "Site footer",
     brandLine: "ENHE AI",
     brandIntro: ["The All-in-One AI Platform.", "An AI upgrade for everyday life"],
-    backToTop: "Back to top",
     columns: [
       {
         title: "Help & Support",
@@ -91,16 +89,6 @@ export function EnheRedesignFooter({
   return (
     <footer className="redesign-footer" aria-label={copy.ariaLabel}>
       <div className="redesign-footer-inner">
-        <div className="footer-back-to-top-row">
-          <a
-            className="footer-back-to-top footer-back-to-top-button"
-            href="#top"
-            aria-label={copy.backToTop}
-          >
-            {copy.backToTop}
-            <ArrowUp aria-hidden="true" size={16} />
-          </a>
-        </div>
         <div className="footer-grid">
           <div>
             <h2>{copy.brandLine}</h2>
