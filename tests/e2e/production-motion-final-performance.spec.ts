@@ -122,16 +122,20 @@ async function layoutShift(page: Page) {
 async function prepareInteractionBaseline(page: Page) {
   await page.evaluate(async () => {
     await document.fonts.ready;
+    const visibleImages = Array.from(document.images).filter((image) => {
+      if (!image.currentSrc) return false;
+      const bounds = image.getBoundingClientRect();
+      return (
+        bounds.width > 0 &&
+        bounds.height > 0 &&
+        bounds.bottom > 0 &&
+        bounds.top < window.innerHeight &&
+        bounds.right > 0 &&
+        bounds.left < window.innerWidth
+      );
+    });
     await Promise.all(
-      Array.from(document.images)
-        .filter((image) => !image.complete)
-        .map(
-          (image) =>
-            new Promise<void>((resolve) => {
-              image.addEventListener("load", () => resolve(), { once: true });
-              image.addEventListener("error", () => resolve(), { once: true });
-            }),
-        ),
+      visibleImages.map((image) => image.decode().catch(() => undefined)),
     );
     await new Promise((resolve) =>
       requestAnimationFrame(() => requestAnimationFrame(resolve)),
@@ -267,10 +271,10 @@ test("product stage has no relevant layout shift or animation residue", async ({
   await page.setViewportSize({ width: 390, height: 844 });
   await installPerformanceCapture(page);
   await openFormalRoute(page, "/");
-  await prepareInteractionBaseline(page);
-  const before = await layoutShift(page);
   const stage = page.locator(".redesign-home-product-stage");
   await stage.scrollIntoViewIfNeeded();
+  await prepareInteractionBaseline(page);
+  const before = await layoutShift(page);
   await page.getByRole("button", { name: "下一款产品" }).click();
   await expect(page.locator('[data-product-current="true"]')).toHaveAttribute(
     "data-product-id",

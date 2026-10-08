@@ -871,7 +871,14 @@ for (const route of homeSsrRoutes) {
         .locator(".redesign-home-product-media")
         .evaluate((element) => new URL((element as HTMLImageElement).src).pathname),
     ).toBe(HOME_PRODUCTS[0].mediaSrc);
-    await page.waitForLoadState("networkidle");
+    await expect
+      .poll(() =>
+        page.locator(".redesign-home-product-media").evaluate((element) => {
+          const image = element as HTMLImageElement;
+          return image.complete && image.naturalWidth > 0;
+        }),
+      )
+      .toBe(true);
     expect([...new Set(productMediaRequests)]).toEqual([
       HOME_PRODUCTS[0].mediaSrc,
     ]);
