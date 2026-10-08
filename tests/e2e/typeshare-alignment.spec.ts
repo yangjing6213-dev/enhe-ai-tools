@@ -81,19 +81,19 @@ for (const route of routes) {
         };
       });
       expect(designTokens).toMatchObject({
-        page: "#ffffff",
+        page: "#fff",
         text: "#202020",
         muted: "#646464",
         action: "#0d74ce",
         actionHover: "#113264",
         surface: "rgb(255, 255, 255)",
-        elevated: "#ffffff",
+        elevated: "#fff",
         border: "#d9d9d9",
         focus: "#5eb1ef",
         yellow: "#0d74ce",
         footer: "#0b1f44",
         referenceAccent: "#0d74ce",
-        referenceCanvas: "#ffffff",
+        referenceCanvas: "#fff",
         titleColor: "rgb(32, 32, 32)",
         titleTrackingRatio: -0.025,
       });

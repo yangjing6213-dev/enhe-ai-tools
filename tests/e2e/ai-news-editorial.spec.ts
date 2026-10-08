@@ -51,7 +51,7 @@ for (const route of routes) {
       });
 
       expect(styles.backgroundColor).toBe("rgb(255, 255, 255)");
-      expect(styles.color).toBe("rgb(16, 24, 40)");
+      expect(styles.color).toBe("rgb(32, 32, 32)");
       expect(styles.panelBackgroundColor).toBe("rgb(255, 255, 255)");
       expect(styles.panelBackdropFilter).toBe("none");
       expect(styles.scrollWidth).toBeLessThanOrEqual(viewport.width);
