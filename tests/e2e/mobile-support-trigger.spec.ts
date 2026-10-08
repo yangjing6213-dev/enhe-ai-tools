@@ -807,6 +807,16 @@ test("uses the redesigned compact white launcher from 768px upward", async ({ pa
           zIndex: wrapperStyle.zIndex,
         };
       });
+      const themeColors = await page.locator(".enhe-redesign-production").evaluate((root) => {
+        const probe = document.createElement("span");
+        probe.style.color = "var(--enhe-action)";
+        root.append(probe);
+        const action = getComputedStyle(probe).color;
+        probe.style.color = "var(--enhe-text)";
+        const text = getComputedStyle(probe).color;
+        probe.remove();
+        return { action, text };
+      });
 
       await expect(launcher.locator("span", { hasText: route.label })).toBeVisible();
       await expect(launcher.locator("svg")).toBeVisible();
@@ -818,8 +828,8 @@ test("uses the redesigned compact white launcher from 768px upward", async ({ pa
       expect(metrics.wrapperWidth).toBe(360);
       expect(metrics.padding).toBe("12px 16px");
       expect(metrics.backgroundRgba).toEqual([255, 255, 255, 255]);
-      expect(metrics.color).toBe("rgb(36, 107, 254)");
-      expect(metrics.labelColor).toBe("rgb(16, 24, 40)");
+      expect(metrics.color).toBe(themeColors.action);
+      expect(metrics.labelColor).toBe(themeColors.text);
       expect(metrics.zIndex).toBe("70");
     }
   }

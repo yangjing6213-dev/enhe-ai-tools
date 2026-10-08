@@ -80,13 +80,13 @@ export function EnheRedesignHeader({
                   </NavigationMenuTrigger>
                   <NavigationMenuContent className="redesign-nav-menu-content">
                     <NavigationMenuLink asChild>
-                      <PrefetchLink className="redesign-nav-dropdown-item" href={item.href} aria-current={isCurrentPath(item.href) ? "page" : undefined}>
+                      <PrefetchLink className="redesign-nav-dropdown-item" href={item.href} prefetch={false} aria-current={isCurrentPath(item.href) ? "page" : undefined}>
                         {locale === "en" ? `All ${item.label}` : `查看全部${item.label}`}
                       </PrefetchLink>
                     </NavigationMenuLink>
                     {item.children.map((child) => (
                       <NavigationMenuLink key={child.href} asChild>
-                        <PrefetchLink className="redesign-nav-dropdown-item" href={child.href} aria-current={isCurrentPath(child.href) ? "page" : undefined}>
+                        <PrefetchLink className="redesign-nav-dropdown-item" href={child.href} prefetch={false} aria-current={isCurrentPath(child.href) ? "page" : undefined}>
                           {child.label}
                         </PrefetchLink>
                       </NavigationMenuLink>
@@ -99,7 +99,7 @@ export function EnheRedesignHeader({
                     <PrefetchLink
                       className="redesign-nav-link"
                       href={item.href}
-                      prefetch={item.href === homeHref ? false : undefined}
+                      prefetch={false}
                       aria-current={isCurrentPath(item.href) ? "page" : undefined}
                     >
                       <span>{item.label}</span>
@@ -110,7 +110,7 @@ export function EnheRedesignHeader({
             )}
             <NavigationMenuItem>
               {account.status === "guest" ? (
-                <PrefetchLink className="redesign-login-link" href={account.loginHref}>
+                <PrefetchLink className="redesign-login-link" href={account.loginHref} prefetch={false}>
                   {account.loginLabel}
                 </PrefetchLink>
               ) : (
@@ -119,10 +119,10 @@ export function EnheRedesignHeader({
                     {account.displayName}
                   </summary>
                   <div className="redesign-avatar-menu" role="menu" aria-label={userMenuLabel}>
-                    <PrefetchLink href={account.userHref} role="menuitem">
+                    <PrefetchLink href={account.userHref} prefetch={false} role="menuitem">
                       {account.userLabel}
                     </PrefetchLink>
-                    {account.isAdmin ? <PrefetchLink href={account.adminHref} role="menuitem">{account.adminLabel}</PrefetchLink> : null}
+                    {account.isAdmin ? <PrefetchLink href={account.adminHref} prefetch={false} role="menuitem">{account.adminLabel}</PrefetchLink> : null}
                   </div>
                 </details>
               )}

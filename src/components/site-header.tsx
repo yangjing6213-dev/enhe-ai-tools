@@ -168,7 +168,8 @@ async function SiteHeaderContent({ forceLocale }: { forceLocale?: Locale }) {
                         <NavigationMenuLink key={child.href} asChild>
                           <PublicNavLink
                             href={child.href}
-                            exact={child.href === item.href}
+                          exact={child.href === item.href}
+                          prefetch={false}
                             className="site-nav-dropdown-link cursor-target"
                           >
                             <span>{child.label}</span>
@@ -183,7 +184,7 @@ async function SiteHeaderContent({ forceLocale }: { forceLocale?: Locale }) {
                     <NavigationMenuLink asChild>
                       <PublicNavLink
                         href={item.href}
-                        prefetch={item.href === homeHref ? false : undefined}
+                        prefetch={false}
                         className="site-nav-link cursor-target"
                       >
                         {"icon" in item && item.icon === "search" ? (
@@ -212,7 +213,7 @@ async function SiteHeaderContent({ forceLocale }: { forceLocale?: Locale }) {
               initialUser={headerUser}
             />
             <ThemeToggle locale={locale} />
-            <PrefetchLink href={buildLocalePath("/login", locale)} className="sr-only">
+            <PrefetchLink href={buildLocalePath("/login", locale)} prefetch={false} className="sr-only">
               {t.nav.login}
             </PrefetchLink>
             <LanguageSwitcher locale={locale} labels={t.language} />

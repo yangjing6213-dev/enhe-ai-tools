@@ -18,7 +18,7 @@ export function HeaderAdminNavLink({
   if (user?.role !== "admin") return null;
 
   return (
-    <PrefetchLink href="/admin" className="site-nav-link cursor-target">
+    <PrefetchLink href="/admin" prefetch={false} className="site-nav-link cursor-target">
       {label}
     </PrefetchLink>
   );

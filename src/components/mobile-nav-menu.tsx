@@ -45,7 +45,7 @@ export function MobileNavMenu({
         {navItems.map((item) =>
           item.children?.length ? (
             <div key={item.href} className="mobile-nav-group">
-              <PublicNavLink href={item.href} className="mobile-nav-link mobile-nav-parent-link cursor-target">
+              <PublicNavLink href={item.href} prefetch={false} className="mobile-nav-link mobile-nav-parent-link cursor-target">
                 {item.label}
               </PublicNavLink>
               <div className="mobile-nav-submenu">
@@ -54,6 +54,7 @@ export function MobileNavMenu({
                     key={child.href}
                     href={child.href}
                     exact={child.href === item.href}
+                    prefetch={false}
                     className="mobile-nav-sublink cursor-target"
                   >
                     <span>{child.label}</span>
@@ -62,19 +63,19 @@ export function MobileNavMenu({
               </div>
             </div>
           ) : (
-            <PublicNavLink key={item.href} href={item.href} className="mobile-nav-link cursor-target">
+            <PublicNavLink key={item.href} href={item.href} prefetch={false} className="mobile-nav-link cursor-target">
               {item.icon === "search" ? <Search size={16} aria-hidden="true" /> : null}
               {item.label}
             </PublicNavLink>
           )
         )}
         {loginItem ? (
-          <PrefetchLink href={loginItem[1]} className="mobile-nav-link cursor-target">
+          <PrefetchLink href={loginItem[1]} prefetch={false} className="mobile-nav-link cursor-target">
             {loginItem[0]}
           </PrefetchLink>
         ) : null}
         {userCenterItem ? (
-          <PrefetchLink href={userCenterItem[1]} className="mobile-nav-link mobile-nav-user-center cursor-target">
+          <PrefetchLink href={userCenterItem[1]} prefetch={false} className="mobile-nav-link mobile-nav-user-center cursor-target">
             {userCenterItem[0]}
           </PrefetchLink>
         ) : null}
@@ -84,6 +85,7 @@ export function MobileNavMenu({
               <PrefetchLink
                 key={item.href}
                 href={item.href}
+                prefetch={false}
                 className={item.active ? "mobile-nav-language-link is-active cursor-target" : "mobile-nav-language-link cursor-target"}
                 onClick={() => {
                   document.cookie = `enhe_locale=${item.locale}; path=/; max-age=31536000; samesite=lax`;
@@ -95,7 +97,7 @@ export function MobileNavMenu({
           </div>
         ) : null}
         {showAdmin ? (
-          <PrefetchLink href="/admin" className="mobile-nav-link mobile-nav-admin cursor-target">
+          <PrefetchLink href="/admin" prefetch={false} className="mobile-nav-link mobile-nav-admin cursor-target">
             <LayoutDashboard size={16} />
             {labels.admin ?? "Admin"}
           </PrefetchLink>

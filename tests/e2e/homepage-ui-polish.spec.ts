@@ -43,12 +43,13 @@ test("homepage polish stays readable, responsive, and interactive without extern
     await expect(brandLabel).toBeVisible();
     const brandFontFamily = await brandLabel.evaluate((element) => getComputedStyle(element).fontFamily);
     const fontResponse = await page.request.get(new URL(
-      "/fonts/alimama/AlimamaFangYuanTiVF-Thin.woff2",
+      "/fonts/lxgw-wenkai/lxgw-wenkai-home-label.woff",
       page.url(),
     ).toString());
-    expect(brandFontFamily).toContain("Lemi Shi Guang Shou Zha Ti");
+    expect(brandFontFamily).toContain("LXGW WenKai Lite");
     expect(brandFontFamily).toContain("Alimama Fang Yuan Ti");
     expect(fontResponse.status(), `site font asset at ${width}px`).toBe(200);
+    expect(await page.evaluate(() => document.fonts.check('500 11px "LXGW WenKai Lite"'))).toBe(true);
     await expect(hero.locator(".redesign-home-hero-inner")).toHaveCSS("text-align", "center");
     await expect(hero).toHaveCSS("background-image", "none");
     const heroColor = await hero.evaluate((element) => getComputedStyle(element).color);
@@ -310,7 +311,7 @@ test("homepage polish stays readable, responsive, and interactive without extern
   const englishBrandLabel = page.locator(".redesign-header[data-home='true'] .redesign-brand-label");
   await expect(englishBrandLabel).toHaveText("Give your life an AI superpower");
   const englishBrandFontFamily = await englishBrandLabel.evaluate((element) => getComputedStyle(element).fontFamily);
-  expect(englishBrandFontFamily).toContain("Lemi Shi Guang Shou Zha Ti");
+  expect(englishBrandFontFamily).toContain("LXGW WenKai Lite");
   expect(englishBrandFontFamily).toContain("Alimama Fang Yuan Ti");
   const englishReviews = page.locator(".redesign-home-reviews");
   await expect(englishReviews.getByRole("heading", { name: "User feedback" })).toBeVisible();

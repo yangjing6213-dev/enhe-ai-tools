@@ -28,7 +28,7 @@ export function HeaderAccountControls({
 
   if (!user) {
     return (
-      <PrefetchLink href={loginPath} className="site-login-link cursor-target hidden sm:inline-flex">
+      <PrefetchLink href={loginPath} prefetch={false} className="site-login-link cursor-target hidden sm:inline-flex">
         {labels.login}
       </PrefetchLink>
     );

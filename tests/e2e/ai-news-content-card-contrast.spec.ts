@@ -46,6 +46,7 @@ for (const route of ["/ai-news", "/en/ai-news"] as const) {
         return {
           violations: report.violations,
           pageColor: getComputedStyle(document.querySelector("main.ai-news-page")!).color,
+          themeTextColor: getComputedStyle(document.querySelector("main.ai-news-page")!).getPropertyValue("--marketing-text").trim(),
           cardBackground: card ? getComputedStyle(card).backgroundColor : "missing",
           headingColor: heading ? getComputedStyle(heading).color : "missing",
           actionBackground: action ? getComputedStyle(action).backgroundColor : "missing",
@@ -53,11 +54,12 @@ for (const route of ["/ai-news", "/en/ai-news"] as const) {
         };
       });
 
-      expect(result.pageColor).toBe("rgb(16, 24, 40)");
+      expect(result.pageColor).toBe("rgb(32, 32, 32)");
+      expect(result.themeTextColor).toBe("#202020");
       expect(result.cardBackground).toBe("rgb(255, 255, 255)");
-      expect(result.headingColor).toBe("rgb(16, 24, 40)");
+      expect(result.headingColor).toBe("rgb(32, 32, 32)");
       expect(result.actionBackground).toBe("rgb(255, 255, 255)");
-      expect(result.actionColor).toBe("rgb(16, 24, 40)");
+      expect(result.actionColor).toBe("rgb(32, 32, 32)");
       expect(result.violations).toEqual([]);
 
       const card = page.locator(".ai-news-interactive-card");
