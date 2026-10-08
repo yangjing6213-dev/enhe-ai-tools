@@ -46,12 +46,12 @@ describe("homepage UI polish", () => {
     expect(homeStyles).not.toMatch(/#fdfcf7|253,\s*252,\s*247/);
   });
 
-  it("uses theme-matched foreground colors on primary buttons in both themes", () => {
-    expect(refreshStyles).toMatch(/\.redesign-home \.redesign-home-cta,[\s\S]*?\.redesign-home-brand-value-cta\s*\{[^}]*color:\s*var\(--primary-foreground/);
-    expect(refreshStyles).toMatch(/\.redesign-home \.redesign-home-cta:hover,[\s\S]*?\.redesign-home-brand-value-cta:hover\s*\{[^}]*color:\s*var\(--primary-foreground/);
-    expect(softwareStyles).toMatch(/\.redesign-software-category-button\[data-selected="true"\]\s*\{[^}]*color:\s*var\(--primary-foreground/);
-    expect(softwareStyles).toMatch(/\.redesign-software-empty-action\s*\{[^}]*color:\s*var\(--primary-foreground/);
-    expect(softwareStyles).toMatch(/\.redesign-software-load-more-button\s*\{[^}]*color:\s*var\(--primary-foreground/);
+  it("keeps primary control text black in the fixed-light palette", () => {
+    expect(refreshStyles).toMatch(/\.redesign-home \.redesign-home-cta,[\s\S]*?\.redesign-home-brand-value-cta\s*\{[^}]*color:\s*var\(--enhe-text/);
+    expect(refreshStyles).toMatch(/\.redesign-home \.redesign-home-cta:hover,[\s\S]*?\.redesign-home-brand-value-cta:hover\s*\{[^}]*color:\s*var\(--enhe-text/);
+    expect(softwareStyles).toMatch(/\.redesign-software-category-button\[data-selected="true"\]\s*\{[^}]*color:\s*var\(--enhe-text/);
+    expect(softwareStyles).toMatch(/\.redesign-software-empty-action\s*\{[^}]*color:\s*var\(--enhe-text/);
+    expect(softwareStyles).toMatch(/\.redesign-software-load-more-button\s*\{[^}]*color:\s*var\(--enhe-text/);
   });
 
   it("keeps language at the far right after the account control without a theme switch", () => {

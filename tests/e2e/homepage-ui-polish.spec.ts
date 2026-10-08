@@ -53,15 +53,8 @@ test("homepage polish stays readable, responsive, and interactive without extern
     await expect(hero.locator(".redesign-home-hero-inner")).toHaveCSS("text-align", "center");
     await expect(hero).toHaveCSS("background-image", "none");
     const heroColor = await hero.evaluate((element) => getComputedStyle(element).color);
-    const radixForeground = await page.evaluate(() => {
-      const probe = document.createElement("span");
-      probe.style.color = "var(--gray-12)";
-      document.body.append(probe);
-      const color = getComputedStyle(probe).color;
-      probe.remove();
-      return color;
-    });
-    expect(heroColor).toBe(radixForeground);
+    const expectedNeutralTextColor = "rgb(0, 0, 0)";
+    expect(heroColor).toBe(expectedNeutralTextColor);
     expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBeLessThanOrEqual(width);
 
     const brandAlignment = await page.evaluate(() => {
@@ -120,7 +113,7 @@ test("homepage polish stays readable, responsive, and interactive without extern
         layout.innerRight + 1,
       );
       await page.locator(".redesign-menu-trigger").click();
-      await expect(page.locator(".redesign-mobile-drawer .theme-toggle")).toBeVisible();
+      await expect(page.locator(".redesign-mobile-drawer .theme-toggle")).toHaveCount(0);
       await page.locator(".redesign-drawer-close").click();
     }
 
@@ -209,7 +202,7 @@ test("homepage polish stays readable, responsive, and interactive without extern
     }
 
     const footer = page.locator(".redesign-footer");
-    await expect(footer).toHaveCSS("background-color", "rgb(11, 31, 68)");
+    await expect(footer).toHaveCSS("background-color", "rgb(255, 255, 255)");
     const footerGroup = footer.locator("details.footer-group").first();
     await expect(footerGroup).not.toHaveAttribute("open", "");
     await footerGroup.locator("summary").click();
@@ -246,8 +239,8 @@ test("homepage polish stays readable, responsive, and interactive without extern
       });
       expect(accountStyle.accountBorder).toBe(accountStyle.languageBorder);
       expect(accountStyle.accountRadius).toBe(accountStyle.languageRadius);
-      expect(accountStyle.menuText).toBe(radixForeground);
-      expect(accountStyle.menuLinkText).toBe(radixForeground);
+      expect(accountStyle.menuText).toBe(expectedNeutralTextColor);
+      expect(accountStyle.menuLinkText).toBe(expectedNeutralTextColor);
 
       const navLetterSpacing = await page.locator(".redesign-desktop-nav").evaluate((nav) =>
         Number.parseFloat(getComputedStyle(nav).letterSpacing),
@@ -288,23 +281,20 @@ test("homepage polish stays readable, responsive, and interactive without extern
   await page.setViewportSize({ width: 1440, height: 900 });
   await page.emulateMedia({ colorScheme: "dark" });
   await page.goto("/", { waitUntil: "load" });
-  await expect(page.locator("html")).toHaveClass(/dark/);
+  await expect(page.locator("html")).not.toHaveClass(/dark/);
   const darkPalette = await page.locator(".enhe-redesign-production").evaluate((element) => {
     const style = getComputedStyle(element);
     return { background: style.backgroundColor, foreground: style.color };
   });
-  expect(darkPalette.background).not.toBe("rgb(252, 252, 252)");
+  expect(darkPalette.background).toBe("rgb(255, 255, 255)");
+  expect(darkPalette.foreground).toBe("rgb(0, 0, 0)");
+  await expect(page.locator(".theme-toggle")).toHaveCount(0);
   if (process.env.ENHE_CAPTURE_HOME_UI === "1") {
     await page.locator(".redesign-home-products").scrollIntoViewIfNeeded();
     await expect(page.locator('.redesign-home-product-media[data-media-status="ready"]').first()).toBeVisible();
     await page.evaluate(() => window.scrollTo(0, 0));
     await page.screenshot({ path: "test-results/homepage-ui-polish-dark-1440.png", fullPage: true });
   }
-  const darkToggle = page.getByRole("button", { name: "切换到浅色模式" }).first();
-  await expect(darkToggle).toBeVisible();
-  await darkToggle.click();
-  await expect(page.locator("html")).not.toHaveClass(/dark/);
-
   await page.setViewportSize({ width: 1440, height: 900 });
   const englishResponse = await page.goto("/en", { waitUntil: "load" });
   expect(englishResponse?.status(), "English homepage").toBe(200);

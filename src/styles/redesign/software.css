@@ -107,7 +107,7 @@
   align-items: center;
   justify-content: center;
   padding: 10px 16px;
-  border: 1px solid rgba(255, 255, 255, 0.24);
+  border: 1px solid #767676;
   border-radius: 999px;
   background: transparent;
   color: #000000;
@@ -117,7 +117,7 @@
 .redesign-software-category-button[data-selected="true"] {
   border-color: var(--enhe-yellow, #ffd60a);
   background: var(--enhe-yellow, #ffd60a);
-  color: var(--primary-foreground, #fff);
+  color: var(--enhe-text, #000000);
 }
 
 .redesign-software-section {
@@ -322,7 +322,7 @@
   border: 1px solid var(--enhe-action, #527e54);
   border-radius: 999px;
   background: var(--enhe-action, #527e54);
-  color: var(--primary-foreground, #fff);
+  color: var(--enhe-text, #000000);
   font-weight: 700;
 }
 
@@ -355,7 +355,7 @@
   border: 1px solid var(--enhe-action, #527e54);
   border-radius: 999px;
   background: var(--enhe-action, #527e54);
-  color: var(--primary-foreground, #fff);
+  color: var(--enhe-text, #000000);
   font-weight: 700;
 }
 

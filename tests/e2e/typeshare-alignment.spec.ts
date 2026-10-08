@@ -82,19 +82,19 @@ for (const route of routes) {
       });
       expect(designTokens).toMatchObject({
         page: "#fff",
-        text: "#202020",
-        muted: "#646464",
-        action: "#0d74ce",
-        actionHover: "#113264",
+        text: "#000",
+        muted: "#000",
+        action: "#0090ff",
+        actionHover: "#0588f0",
         surface: "rgb(255, 255, 255)",
         elevated: "#fff",
         border: "#d9d9d9",
         focus: "#5eb1ef",
-        yellow: "#0d74ce",
-        footer: "#0b1f44",
-        referenceAccent: "#0d74ce",
+        yellow: "#0090ff",
+        footer: "#fff",
+        referenceAccent: "#0090ff",
         referenceCanvas: "#fff",
-        titleColor: "rgb(32, 32, 32)",
+        titleColor: "rgb(0, 0, 0)",
         titleTrackingRatio: -0.025,
       });
       const expectedLocaleFont = "Alimama Fang Yuan Ti";

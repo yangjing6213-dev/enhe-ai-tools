@@ -21,7 +21,10 @@ for (const route of routes) {
       const wasCanceledNextPrefetch =
         new URL(request.url()).searchParams.has("_rsc") &&
         request.failure()?.errorText?.startsWith("net::ERR_ABORTED");
-      if (!wasCanceledNextPrefetch) {
+      const wasCanceledAnalyticsOnNavigation =
+        new URL(request.url()).pathname === "/api/analytics" &&
+        request.failure()?.errorText === "net::ERR_ABORTED";
+      if (!wasCanceledNextPrefetch && !wasCanceledAnalyticsOnNavigation) {
         failedRequests.push(
           `${request.method()} ${request.url()} (${request.failure()?.errorText ?? "unknown"})`,
         );
@@ -51,7 +54,7 @@ for (const route of routes) {
       });
 
       expect(styles.backgroundColor).toBe("rgb(255, 255, 255)");
-      expect(styles.color).toBe("rgb(32, 32, 32)");
+      expect(styles.color).toBe("rgb(0, 0, 0)");
       expect(styles.panelBackgroundColor).toBe("rgb(255, 255, 255)");
       expect(styles.panelBackdropFilter).toBe("none");
       expect(styles.scrollWidth).toBeLessThanOrEqual(viewport.width);

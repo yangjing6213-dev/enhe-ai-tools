@@ -73,7 +73,7 @@
   border: 2px solid var(--enhe-action, #527e54);
   border-radius: var(--enhe-button-r, 4px);
   background-color: var(--enhe-action, #527e54);
-  color: var(--primary-foreground, #fff);
+  color: var(--enhe-text, #000000);
   font-size: 1rem;
   font-weight: 700;
   line-height: 1.2;
@@ -123,7 +123,7 @@
   border: 2px solid var(--enhe-yellow, #ffd60a);
   border-radius: var(--enhe-button-r, 4px);
   background: var(--enhe-yellow, #ffd60a);
-  color: var(--primary-foreground, #fff);
+  color: var(--enhe-text, #000000);
   font-weight: 800;
 }
 
@@ -200,7 +200,7 @@
 
 .redesign-home-products-eyebrow {
   margin: 0 0 14px;
-  color: var(--enhe-action, #527e54);
+  color: var(--enhe-action-text, #0066cc);
   font-size: 0.875rem;
   font-weight: 700;
   letter-spacing: 0.08em;

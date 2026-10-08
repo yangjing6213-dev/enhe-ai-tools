@@ -4,6 +4,7 @@
   --enhe-text-muted: var(--muted-foreground, #000000);
   --enhe-action: var(--primary, #0090ff);
   --enhe-action-hover: var(--blue-10, #0588f0);
+  --enhe-action-text: #0066cc;
   --enhe-success-text: #166534;
   --enhe-surface: var(--card, #ffffff);
   --enhe-surface-elevated: var(--popover, #ffffff);

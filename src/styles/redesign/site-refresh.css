@@ -88,7 +88,7 @@
   padding: 2px 7px;
   border-radius: 3px;
   background: var(--enhe-action);
-  color: var(--primary-foreground, #fff);
+  color: var(--enhe-text, #000000);
   font-size: 12px;
   font-weight: 600;
   letter-spacing: 0.02em;
@@ -139,14 +139,14 @@
   border: 1px solid var(--enhe-action);
   border-radius: 999px;
   background: var(--enhe-action);
-  color: var(--primary-foreground, #fff);
+  color: var(--enhe-text, #000000);
 }
 
 .redesign-home .redesign-home-cta:hover,
 .redesign-home-brand-value-cta:hover {
   border-color: var(--enhe-action-hover);
   background: var(--enhe-action-hover);
-  color: var(--primary-foreground, #fff);
+  color: var(--enhe-text, #000000);
 }
 
 .redesign-home-features {
@@ -319,7 +319,7 @@
 .enhe-redesign-production .ai-trends-page .ai-trends-primary-action {
   border-color: var(--enhe-action) !important;
   background: var(--enhe-action) !important;
-  color: var(--primary-foreground, #fff) !important;
+  color: var(--enhe-text, #000000) !important;
   box-shadow: 0 8px 22px rgba(36, 107, 254, 0.2) !important;
 }
 
@@ -354,13 +354,13 @@
 .enhe-redesign-production .enhe-contentless-page .enhe-contentless-action-primary {
   border-color: var(--enhe-action);
   background: var(--enhe-action);
-  color: var(--primary-foreground, #fff);
+  color: var(--enhe-text, #000000);
 }
 
 .enhe-redesign-production .enhe-contentless-page .enhe-contentless-action-primary:hover {
   border-color: var(--enhe-action-hover);
   background: var(--enhe-action-hover);
-  color: var(--primary-foreground, #fff);
+  color: var(--enhe-text, #000000);
 }
 
 .enhe-redesign-production .enhe-contentless-page .enhe-contentless-action-secondary {
@@ -465,7 +465,7 @@
   border-radius: 999px;
   background: var(--enhe-action) !important;
   box-shadow: 0 8px 22px rgba(36, 107, 254, 0.2) !important;
-  color: var(--primary-foreground, #fff) !important;
+  color: var(--enhe-text, #000000) !important;
 }
 
 .enhe-redesign-production .enhe-auth-page .login-submit-button:hover {

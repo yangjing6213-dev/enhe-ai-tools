@@ -54,12 +54,12 @@ for (const route of ["/ai-news", "/en/ai-news"] as const) {
         };
       });
 
-      expect(result.pageColor).toBe("rgb(32, 32, 32)");
-      expect(result.themeTextColor).toBe("#202020");
+      expect(result.pageColor).toBe("rgb(0, 0, 0)");
+      expect(result.themeTextColor).toBe("#000");
       expect(result.cardBackground).toBe("rgb(255, 255, 255)");
-      expect(result.headingColor).toBe("rgb(32, 32, 32)");
+      expect(result.headingColor).toBe("rgb(0, 0, 0)");
       expect(result.actionBackground).toBe("rgb(255, 255, 255)");
-      expect(result.actionColor).toBe("rgb(32, 32, 32)");
+      expect(result.actionColor).toBe("rgb(0, 0, 0)");
       expect(result.violations).toEqual([]);
 
       const card = page.locator(".ai-news-interactive-card");

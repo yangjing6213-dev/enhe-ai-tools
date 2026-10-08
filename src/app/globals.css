@@ -781,7 +781,7 @@ select option:disabled {
   border: 1px solid var(--primary) !important;
   border-radius: 999px;
   background: var(--primary) !important;
-  color: var(--primary-foreground) !important;
+  color: #000000 !important;
   box-shadow: 0 10px 24px color-mix(in srgb, var(--primary) 22%, transparent) !important;
 }
 
@@ -789,14 +789,14 @@ select option:disabled {
 .login-submit-button *,
 .purchase-guide-button,
 .purchase-guide-button * {
-  color: var(--primary-foreground) !important;
+  color: #000000 !important;
 }
 
 .login-submit-button:hover,
 .purchase-guide-button:hover {
   border-color: var(--blue-10) !important;
   background: var(--blue-10) !important;
-  color: var(--primary-foreground) !important;
+  color: #000000 !important;
 }
 
 .status-success,
@@ -876,7 +876,7 @@ select option:disabled {
 .login-submit-button *,
 .purchase-guide-button,
 .purchase-guide-button * {
-  color: var(--primary-foreground) !important;
+  color: #000000 !important;
 }
 
 .text-\[\#8B95A7\],
@@ -1540,7 +1540,7 @@ select option:disabled {
 }
 
 .mobile-nav-user-center:hover {
-  background: #161616;
+  background: #ffffff;
   color: #000000;
 }
 
@@ -4085,7 +4085,7 @@ select option:disabled {
 .site-user-center-cta,
 .mobile-nav-user-center {
   background: #ffffff !important;
-  color: #050505 !important;
+  color: #000000 !important;
 }
 
 .site-language-switcher a.is-active {
@@ -5188,9 +5188,9 @@ select option:disabled {
   margin-top: 1rem;
   max-height: 28rem;
   overflow: auto;
-  border: 1px solid rgba(255, 255, 255, 0.11);
+  border: 1px solid var(--marketing-border);
   border-radius: 0.5rem;
-  background: rgba(0, 0, 0, 0.38);
+  background: #ffffff;
   padding: 0.9rem;
   white-space: pre-wrap;
   color: #000000;

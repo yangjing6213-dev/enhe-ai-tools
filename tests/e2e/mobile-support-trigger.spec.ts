@@ -828,7 +828,7 @@ test("uses the redesigned compact white launcher from 768px upward", async ({ pa
       expect(metrics.wrapperWidth).toBe(360);
       expect(metrics.padding).toBe("12px 16px");
       expect(metrics.backgroundRgba).toEqual([255, 255, 255, 255]);
-      expect(metrics.color).toBe(themeColors.action);
+      expect(metrics.color).toBe(themeColors.text);
       expect(metrics.labelColor).toBe(themeColors.text);
       expect(metrics.zIndex).toBe("70");
     }
