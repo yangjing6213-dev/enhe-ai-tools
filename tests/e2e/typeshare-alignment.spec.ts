@@ -60,6 +60,13 @@ for (const route of routes) {
         document.body.append(surfaceProbe);
         const normalizedSurface = getComputedStyle(surfaceProbe).backgroundColor;
         surfaceProbe.remove();
+        const footerProbe = document.createElement("div");
+        footerProbe.style.backgroundColor = "var(--enhe-footer)";
+        footerProbe.style.position = "fixed";
+        footerProbe.style.visibility = "hidden";
+        document.body.append(footerProbe);
+        const normalizedFooter = getComputedStyle(footerProbe).backgroundColor;
+        footerProbe.remove();
         return {
           page: styles.getPropertyValue("--enhe-page-bg").trim().toLowerCase(),
           text: styles.getPropertyValue("--enhe-text").trim().toLowerCase(),
@@ -71,7 +78,7 @@ for (const route of routes) {
           border: styles.getPropertyValue("--enhe-border").trim().toLowerCase(),
           focus: styles.getPropertyValue("--enhe-focus").trim().toLowerCase(),
           yellow: styles.getPropertyValue("--enhe-yellow").trim().toLowerCase(),
-          footer: styles.getPropertyValue("--enhe-footer").trim().toLowerCase(),
+          footer: normalizedFooter,
           referenceAccent: getComputedStyle(referenceSurface).getPropertyValue("--reference-accent").trim().toLowerCase(),
           referenceCanvas: getComputedStyle(referenceSurface).getPropertyValue("--reference-canvas").trim().toLowerCase(),
           bodyFont: getComputedStyle(productionShell).fontFamily,
@@ -91,7 +98,7 @@ for (const route of routes) {
         border: "#d9d9d9",
         focus: "#5eb1ef",
         yellow: "#0090ff",
-        footer: "#fff",
+        footer: "rgb(255, 255, 255)",
         referenceAccent: "#0090ff",
         referenceCanvas: "#fff",
         titleColor: "rgb(0, 0, 0)",

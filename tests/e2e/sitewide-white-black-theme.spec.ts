@@ -71,32 +71,71 @@ test("site pages keep white surfaces and black neutral text, including interacti
   }));
   expect(newsColors).toEqual({ background: "rgb(255, 255, 255)", color: "rgb(0, 0, 0)" });
 
-  const softwareResponse = await page.goto("/redesign-preview/software", { waitUntil: "load" });
+  const useProductionServer = process.env.PLAYWRIGHT_USE_PRODUCTION_SERVER === "1";
+  const softwareResponse = await page.goto(
+    useProductionServer ? "/software" : "/redesign-preview/software",
+    { waitUntil: "load" },
+  );
   expect(softwareResponse?.status()).toBe(200);
-  const categoryTrigger = page.locator(".redesign-software-category-trigger");
-  await categoryTrigger.focus();
-  await categoryTrigger.press("Enter");
-  const categoryOption = page.locator(".redesign-software-category-button").first();
-  const categoryClose = page.locator('[data-category-close="true"]');
-  await expect(categoryOption).toBeVisible();
-  const softwareControls = await page.evaluate(() => {
-    const option = document.querySelector<HTMLElement>(".redesign-software-category-button");
-    const unselectedOption = document.querySelector<HTMLElement>(".redesign-software-category-button:not([data-selected='true'])");
-    const close = document.querySelector<HTMLElement>('[data-category-close="true"]');
-    if (!option || !unselectedOption || !close) throw new Error("The software category controls must render.");
-    return {
-      primaryForeground: getComputedStyle(document.documentElement).getPropertyValue("--primary-foreground").trim(),
-      optionText: getComputedStyle(option).color,
-      optionSelected: option.dataset.selected,
-      optionBorder: getComputedStyle(unselectedOption).borderColor,
-      closeText: getComputedStyle(close).color,
-      closeBorder: getComputedStyle(close).borderColor,
-    };
-  });
-  expect(softwareControls.optionText, JSON.stringify(softwareControls)).toBe("rgb(0, 0, 0)");
-  expect(softwareControls.optionBorder).toBe("rgb(118, 118, 118)");
-  expect(softwareControls.closeText).toBe("rgb(0, 0, 0)");
-  expect(softwareControls.closeBorder).toBe("rgb(118, 118, 118)");
+  if (useProductionServer) {
+    const softwareColors = await page.evaluate(() => {
+      const emptyCard = document.querySelector<HTMLElement>(".redesign-software-empty");
+      const emptyCardText = emptyCard?.querySelector<HTMLElement>("p");
+      if (!emptyCard || !emptyCardText) throw new Error("The public software empty state must render.");
+
+      const categoryButton = document.createElement("button");
+      categoryButton.className = "redesign-software-category-button";
+      categoryButton.dataset.selected = "false";
+      categoryButton.textContent = "Category";
+      document.body.append(categoryButton);
+      const categoryText = getComputedStyle(categoryButton).color;
+      categoryButton.dataset.selected = "true";
+      const selectedCategory = {
+        background: getComputedStyle(categoryButton).backgroundColor,
+        color: getComputedStyle(categoryButton).color,
+      };
+      categoryButton.remove();
+
+      return {
+        cardBackground: getComputedStyle(emptyCard).backgroundColor,
+        cardText: getComputedStyle(emptyCardText).color,
+        categoryText,
+        selectedCategory,
+      };
+    });
+    expect(softwareColors).toEqual({
+      cardBackground: "rgb(255, 255, 255)",
+      cardText: "rgb(0, 0, 0)",
+      categoryText: "rgb(0, 0, 0)",
+      selectedCategory: {
+        background: "rgb(0, 144, 255)",
+        color: "rgb(0, 0, 0)",
+      },
+    });
+  } else {
+    const categoryTrigger = page.locator(".redesign-software-category-trigger");
+    await categoryTrigger.focus();
+    await categoryTrigger.press("Enter");
+    const categoryOption = page.locator(".redesign-software-category-button").first();
+    const categoryClose = page.locator('[data-category-close="true"]');
+    await expect(categoryOption).toBeVisible();
+    const softwareControls = await page.evaluate(() => {
+      const option = document.querySelector<HTMLElement>(".redesign-software-category-button");
+      const unselectedOption = document.querySelector<HTMLElement>(".redesign-software-category-button:not([data-selected='true'])");
+      const close = document.querySelector<HTMLElement>('[data-category-close="true"]');
+      if (!option || !unselectedOption || !close) throw new Error("The software category controls must render.");
+      return {
+        optionText: getComputedStyle(option).color,
+        optionBorder: getComputedStyle(unselectedOption).borderColor,
+        closeText: getComputedStyle(close).color,
+        closeBorder: getComputedStyle(close).borderColor,
+      };
+    });
+    expect(softwareControls.optionText).toBe("rgb(0, 0, 0)");
+    expect(softwareControls.optionBorder).toBe("rgb(118, 118, 118)");
+    expect(softwareControls.closeText).toBe("rgb(0, 0, 0)");
+    expect(softwareControls.closeBorder).toBe("rgb(118, 118, 118)");
+  }
 
   const byoxResponse = await page.goto("/build-your-own-x", { waitUntil: "load" });
   expect(byoxResponse?.status()).toBe(200);
