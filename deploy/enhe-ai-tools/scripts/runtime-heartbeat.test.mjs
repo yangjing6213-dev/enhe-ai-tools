@@ -41,11 +41,21 @@ async function stopChild(child) {
   await Promise.race([exited, delay(5_000)]);
 }
 
-async function waitForExitCode(child, timeoutMs = 750) {
-  return Promise.race([
-    once(child, "exit").then(([code]) => code),
-    delay(timeoutMs).then(() => null)
-  ]);
+async function waitForExitCode(child, timeoutMs = 5_000) {
+  if (child.exitCode !== null) return child.exitCode;
+
+  return new Promise((resolve) => {
+    const onExit = (code) => {
+      clearTimeout(timeout);
+      resolve(code);
+    };
+    const timeout = setTimeout(() => {
+      child.removeListener("exit", onExit);
+      resolve(null);
+    }, timeoutMs);
+
+    child.once("exit", onExit);
+  });
 }
 
 async function waitForJsonFile(path, timeoutMs = 3_000) {
