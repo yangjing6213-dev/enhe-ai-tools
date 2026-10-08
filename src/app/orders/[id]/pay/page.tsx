@@ -3,12 +3,14 @@ import Image from "next/image";
 import { headers } from "next/headers";
 import { notFound } from "next/navigation";
 import { Container, SectionTitle } from "@/components/ui";
+import { PaymentQrCode } from "@/components/payment-qr-code";
 import { ZpayPaymentStatusPoller } from "@/components/zpay-payment-status-poller";
 import { requireUser } from "@/lib/auth";
 import { prisma } from "@/lib/db";
 import { getOrderPaymentPresentation } from "@/lib/order-payment-presentation";
 import { buildCanonicalToolPath } from "@/lib/public-slugs";
 import { formatCurrency } from "@/lib/utils";
+import { getZpayPaymentErrorCopy } from "@/lib/zpay-payment-copy";
 import { ensureZpayPaymentForOrder, type ZpayPaymentView } from "@/lib/zpay-orders";
 
 type PayPageProps = {
@@ -63,6 +65,7 @@ export default async function PayPage({ params }: PayPageProps) {
       qrcodeUrl: order.paymentTransaction.qrCodeUrl
     };
   }
+  const paymentErrorCopy = zpayError ? getZpayPaymentErrorCopy(zpayError, order.orderNo) : null;
 
   const isWechatPayment = zpayPayment
     ? zpayPayment.transaction.paymentType === "wxpay"
@@ -83,7 +86,11 @@ export default async function PayPage({ params }: PayPageProps) {
     <Container className="py-14">
       <SectionTitle
         title="订单支付"
-        intro={`请使用当前订单二维码完成支付。${presentation.paymentCompletionText}`}
+        intro={
+          paymentErrorCopy
+            ? "请根据下方提示处理当前订单。"
+            : `请使用当前订单二维码完成支付。${presentation.paymentCompletionText}`
+        }
       />
 
       <div className="grid gap-6 lg:grid-cols-[0.9fr_1.1fr]">
@@ -119,14 +126,16 @@ export default async function PayPage({ params }: PayPageProps) {
                 </Link>
               </div>
             </div>
-          ) : zpayError ? (
+          ) : paymentErrorCopy ? (
             <div>
-              <h2 className="text-xl font-bold text-[var(--marketing-accent)]">支付订单创建失败</h2>
+              <h2 className="text-xl font-bold text-[var(--marketing-accent)]">
+                {paymentErrorCopy.title}
+              </h2>
               <p className="status-warning mt-3">
-                {zpayError}
+                {paymentErrorCopy.description}
               </p>
               <p className="mt-4 text-sm leading-6 text-[#8B95A7]">
-                请稍后刷新重试。如果问题持续存在，请联系管理员检查支付通道或服务器配置。
+                {paymentErrorCopy.nextStep}
               </p>
             </div>
           ) : zpayPayment ? (
@@ -153,7 +162,10 @@ export default async function PayPage({ params }: PayPageProps) {
                     />
                   ) : zpayPayment.qrcodeUrl ? (
                     <div className="flex aspect-square w-full items-center justify-center rounded-xl bg-slate-100 p-4 text-center text-sm text-slate-900">
-                      <span className="break-all">{zpayPayment.qrcodeUrl}</span>
+                      <PaymentQrCode
+                        value={zpayPayment.qrcodeUrl}
+                        label={`${paymentChannelCopy.methodLabel}支付二维码`}
+                      />
                     </div>
                   ) : (
                     <div className="flex aspect-square w-full items-center justify-center rounded-xl bg-slate-100 text-sm text-slate-900">

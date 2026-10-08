@@ -48,6 +48,22 @@ describe("zpay payment page copy", () => {
     expect(payPage).not.toContain("<p>请使用微信扫码完成支付");
   });
 
+  it("renders the gateway QR URL as a scannable code instead of plain text", () => {
+    const payPage = readFileSync(resolve(root, "src/app/orders/[id]/pay/page.tsx"), "utf8");
+
+    expect(payPage).toContain("<PaymentQrCode");
+    expect(payPage).toContain("value={zpayPayment.qrcodeUrl}");
+    expect(payPage).not.toContain('<span className="break-all">{zpayPayment.qrcodeUrl}</span>');
+  });
+
+  it("explains reconciliation without encouraging another payment attempt", () => {
+    const payPage = readFileSync(resolve(root, "src/app/orders/[id]/pay/page.tsx"), "utf8");
+
+    expect(payPage).toContain("getZpayPaymentErrorCopy(zpayError, order.orderNo)");
+    expect(payPage).toContain(") : paymentErrorCopy ? (");
+    expect(payPage).toContain('paymentErrorCopy\n            ? "请根据下方提示处理当前订单。"');
+  });
+
   it("defaults new purchases to WeChat while keeping Alipay selectable", () => {
     const toolPage = readFileSync(resolve(root, "src/app/tools/[slug]/page-shell.tsx"), "utf8");
 
