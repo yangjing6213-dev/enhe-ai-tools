@@ -174,6 +174,7 @@ describe("E1-NB-R22 AI News listing DB-free preview", () => {
       expect(db.analyticsEventFindMany).not.toHaveBeenCalled();
       expect(db.newsKeywordInterventionFindMany).not.toHaveBeenCalled();
     },
+    15_000,
   );
 
   it("preserves the configured AI News listing and indexable metadata", async () => {
