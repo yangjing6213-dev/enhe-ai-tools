@@ -23,12 +23,12 @@ describe("ENHE redesign public shell candidate", () => {
     expect(tokens).not.toMatch(/gradient|glow|glass|glitch|neon/i);
   });
 
-  it("keeps blue state labels readable on their filled background", () => {
+  it("keeps blue state labels readable with black text", () => {
     const shell = readCandidate("styles/redesign/shell.css");
     const labelRule = shell.match(/\.redesign-preview-state-label\s*\{([^}]*)\}/)?.[1] ?? "";
 
     expect(labelRule).toContain("background: var(--enhe-yellow)");
-    expect(labelRule).toContain("color: var(--primary-foreground)");
+    expect(labelRule).toContain("color: var(--enhe-text, #000000)");
   });
 
   it("keeps the approved desktop navigation order and explicit account boundary", () => {

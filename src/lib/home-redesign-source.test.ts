@@ -305,7 +305,7 @@ describe("homepage SaaS redesign source", () => {
     expect(css).toContain(".site-header-actions > .site-login-link,\n.site-header-actions > .site-user-center-cta,\n.site-header-actions > .site-user-chip {\n  display: none;");
     expect(css).toContain(".site-header-actions > .site-login-link,\n  .site-header-actions > .site-user-center-cta,\n  .site-header-actions > .site-user-chip {\n    display: inline-flex;");
     expect(css).toContain("background: #ffffff;\n  color: #050505;");
-    expect(css).toContain(".site-user-center-cta,\n.mobile-nav-user-center {\n  background: #ffffff !important;\n  color: #050505 !important;");
+    expect(css).toContain(".site-user-center-cta,\n.mobile-nav-user-center {\n  background: #ffffff !important;\n  color: #000000 !important;");
     expect(css).toContain(".site-language-switcher a {");
     expect(css).toContain("min-height: 40px;");
     expect(css).toContain("color: var(--marketing-text);");
