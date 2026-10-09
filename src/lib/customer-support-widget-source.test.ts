@@ -191,9 +191,10 @@ describe("customer support widget source", () => {
     expect(homeStyles).not.toContain("@media (max-width: 767px)");
     expect(home).toContain('className="redesign-home-product-control"');
     expect(software).toContain("var(--support-exclusion-applied)");
-    expect(software).toContain("[data-catalog-card]:nth-child(2n)");
+    expect(software).toContain("[data-catalog-card]:nth-child(1n)");
     expect(software).toContain("[data-catalog-card]:nth-child(3n)");
-    expect(software).toContain("[data-catalog-card]:nth-child(4n)");
+    expect(software).not.toContain("[data-catalog-card]:nth-child(2n)");
+    expect(software).not.toContain("[data-catalog-card]:nth-child(4n)");
     expect(software).toContain("@media (width < 768px)");
     expect(software).toContain("@media (768px < width <= 1024px)");
     expect(software).toContain("@media (width > 1024px)");

@@ -112,7 +112,6 @@ function renderProductionCatalog({
       data-production-catalog
     >
       <section className="redesign-software-hero">
-        <p className="redesign-software-label">{copy.page.label}</p>
         <h1>{copy.page.h1}</h1>
         <p className="redesign-software-intro">{copy.page.intro}</p>
       </section>
@@ -176,7 +175,6 @@ function renderProductionCatalog({
           {listing.items.map((product) => (
             <EnheRedesignSoftwareCard
               key={`all-${product.id}`}
-              locale={locale}
               product={product}
               categoryLabel={getCategoryLabel(locale, product.categoryId)}
               detailLabel={copy.actions.detail}
@@ -272,7 +270,6 @@ function CatalogSection({
         {items.map((product) => (
           <EnheRedesignSoftwareCard
             key={`${rail}-${product.id}`}
-            locale={locale}
             product={product}
             categoryLabel={getCategoryLabel(locale, product.categoryId)}
             detailLabel={copy.actions.detail}
@@ -310,7 +307,6 @@ function renderPreviewCatalog({
       data-selected-category="all"
     >
       <section className="redesign-software-hero">
-        <p className="redesign-software-label">{copy.page.label}</p>
         <h1>{copy.page.h1}</h1>
         <p className="redesign-software-intro">{copy.page.intro}</p>
       </section>
@@ -356,7 +352,6 @@ function renderPreviewCatalog({
           {allProducts.map((product, index) => (
             <EnheRedesignSoftwareCard
               key={`all-${product.id}`}
-              locale={locale}
               product={product}
               categoryLabel={getCategoryLabel(locale, product.categoryId)}
               detailLabel={copy.actions.detail}

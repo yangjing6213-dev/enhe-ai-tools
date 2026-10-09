@@ -83,12 +83,12 @@
 }
 
 .redesign-header[data-home="true"] .redesign-brand-label {
-  display: inline-flex;
-  min-height: 18px;
-  padding: 2px 7px;
-  border-radius: 3px;
-  background: var(--enhe-action);
-  color: var(--enhe-text, #000000);
+  display: block;
+  min-height: 0;
+  padding: 0;
+  border-radius: 0;
+  background: transparent;
+  color: var(--enhe-action);
   font-size: 12px;
   font-weight: 600;
   letter-spacing: 0.02em;
@@ -136,17 +136,17 @@
 
 .redesign-home .redesign-home-cta,
 .redesign-home-brand-value-cta {
-  border: 1px solid var(--enhe-action);
+  border: 1px solid var(--blue-11);
   border-radius: 999px;
-  background: var(--enhe-action);
-  color: var(--enhe-text, #000000);
+  background: var(--blue-11);
+  color: #fff;
 }
 
 .redesign-home .redesign-home-cta:hover,
 .redesign-home-brand-value-cta:hover {
-  border-color: var(--enhe-action-hover);
-  background: var(--enhe-action-hover);
-  color: var(--enhe-text, #000000);
+  border-color: var(--blue-12);
+  background: var(--blue-12);
+  color: #fff;
 }
 
 .redesign-home-features {
@@ -177,6 +177,13 @@
 }
 
 .redesign-home-feature-card > svg {
+  flex: 0 0 auto;
+  color: var(--enhe-action);
+}
+
+.redesign-home-feature-icon {
+  width: 26px;
+  height: 26px;
   flex: 0 0 auto;
   color: var(--enhe-action);
 }
@@ -241,9 +248,13 @@
 }
 
 .redesign-home-reviews-disclosure {
+  display: table;
   max-width: 760px;
   margin: 0 auto 24px;
-  color: var(--enhe-text-muted);
+  padding: 6px 12px;
+  border-radius: 999px;
+  background: var(--blue-11);
+  color: #fff;
   font-size: 0.8rem;
   line-height: 1.65;
   text-align: center;
@@ -258,6 +269,40 @@
   border-top: 0;
   background: var(--enhe-page-bg);
   color: var(--enhe-text);
+}
+
+.redesign-header {
+  border-bottom: 0 !important;
+}
+
+.enhe-redesign-production .redesign-home-review-card:not([data-position="0"]) {
+  border-color: transparent !important;
+  background: transparent !important;
+  box-shadow: none !important;
+}
+
+.enhe-redesign-production:not(.enhe-admin-shell) :is(.border-t, .border-b, .border-y, hr) {
+  border-block-color: transparent !important;
+}
+
+.enhe-redesign-production:not(.enhe-admin-shell) :is(
+  .redesign-home-products,
+  .redesign-home-reviews,
+  .redesign-software-section,
+  .footer-bottom
+) {
+  border-block-color: transparent !important;
+}
+
+.enhe-redesign-production:not(.enhe-admin-shell) :is(
+  .redesign-mobile-nav-dropdown,
+  .redesign-mobile-nav a,
+  .redesign-mobile-account,
+  .ai-news-section-nav,
+  .ai-news-page .ai-news-workspace-lead-grid,
+  .enhe-contentless-hero
+) {
+  border-block-color: transparent !important;
 }
 
 .redesign-home-brand-value-inner {

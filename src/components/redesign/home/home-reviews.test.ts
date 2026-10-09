@@ -103,7 +103,7 @@ describe("homepage experience review candidate", () => {
   });
 
   it("keeps the approved automatic and manual-resume timings", () => {
-    expect(REVIEW_AUTO_INTERVAL_MS).toBe(5000);
+    expect(REVIEW_AUTO_INTERVAL_MS).toBe(2500);
     expect(REVIEW_MANUAL_RESUME_MS).toBe(6000);
   });
 

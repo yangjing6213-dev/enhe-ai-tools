@@ -11,7 +11,7 @@ export type RedesignHomeReview = {
   stars: 4 | 5;
 };
 
-export const REVIEW_AUTO_INTERVAL_MS = 5000;
+export const REVIEW_AUTO_INTERVAL_MS = 2500;
 export const REVIEW_MANUAL_RESUME_MS = 6000;
 export const REVIEW_INITIAL_INDEX = 2;
 

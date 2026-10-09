@@ -292,13 +292,11 @@
 }
 
 .redesign-brand-label {
-  display: inline-flex;
-  min-height: 18px;
-  align-items: center;
-  padding: 2px 7px;
-  border-radius: 3px;
-  background: var(--enhe-action);
-  color: var(--enhe-text, #000000);
+  display: block;
+  padding: 0;
+  border-radius: 0;
+  background: transparent;
+  color: var(--enhe-action);
   font-family: var(--enhe-font-brand-label, 'Alimama Fang Yuan Ti', 'Microsoft YaHei', Arial, sans-serif);
   font-size: 11px;
   font-weight: 500;
@@ -658,19 +656,24 @@
   gap: var(--enhe-footer-gap);
 }
 
-.footer-grid h2,
 .footer-grid h3 {
   margin: 0 0 14px;
 }
 
-.footer-grid h2 {
-  font-size: 26px;
-  letter-spacing: -0.04em;
+.footer-brand-logo {
+  display: block;
+  width: min(100%, 240px);
+  height: auto;
+  filter: brightness(0) saturate(100%);
 }
 
 .footer-grid h3 {
   font-size: 13px;
   letter-spacing: 0.04em;
+}
+
+.footer-group-trigger h3 {
+  font-weight: 800;
 }
 
 .footer-grid p,

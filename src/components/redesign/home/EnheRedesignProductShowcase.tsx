@@ -2,6 +2,7 @@
 
 import Image from "next/image";
 import { animate } from "motion/react";
+import { EnheIconfontIcon } from "@/components/redesign/enhe-iconfont-icon";
 import {
   useCallback,
   useEffect,
@@ -60,8 +61,8 @@ const REDUCED_MOTION_QUERY = "(prefers-reduced-motion: reduce)";
 
 const SHOWCASE_COPY = {
   zh: {
-    eyebrow: "精选产品",
-    heading: "把想法变成看得见的结果",
+    eyebrow: "热门AI推荐",
+    heading: "勇于跨出这一步，你就离成功更近一步。",
     previous: "上一款产品",
     next: "下一款产品",
     loading: "正在加载产品封面…",
@@ -69,8 +70,8 @@ const SHOWCASE_COPY = {
     detail: "查看产品",
   },
   en: {
-    eyebrow: "Featured products",
-    heading: "Turn ideas into visible results",
+    eyebrow: "Popular AI picks",
+    heading: "Take one step forward, and you're closer to success.",
     previous: "Previous product",
     next: "Next product",
     loading: "Loading product cover…",
@@ -89,29 +90,6 @@ const SHOWCASE_COPY = {
     detail: string;
   }
 >;
-
-function ProductTriangle({
-  className,
-  direction,
-}: {
-  className: string;
-  direction: "previous" | "next";
-}) {
-  return (
-    <svg
-      className={className}
-      data-direction={direction}
-      aria-hidden="true"
-      viewBox="0 0 24 24"
-      focusable="false"
-    >
-      <path
-        d="M7.2 4.8 18 10.9a1.25 1.25 0 0 1 0 2.2L7.2 19.2A1.35 1.35 0 0 1 5.2 18V6a1.35 1.35 0 0 1 2-1.2Z"
-        fill="currentColor"
-      />
-    </svg>
-  );
-}
 
 export function EnheRedesignProductShowcase({
   locale,
@@ -383,9 +361,9 @@ export function EnheRedesignProductShowcase({
           <p>{product.description[locale]}</p>
           <a className="redesign-home-product-detail-link" href={product.detailHref[locale]}>
             {copy.detail}
-            <ProductTriangle
+            <EnheIconfontIcon
+              icon="arrow-right"
               className="redesign-home-product-link-triangle"
-              direction="next"
             />
           </a>
         </div>
@@ -441,9 +419,9 @@ export function EnheRedesignProductShowcase({
               aria-label={copy.previous}
               aria-controls={panelId}
             >
-              <ProductTriangle
+              <EnheIconfontIcon
+                icon="arrow-left-bold"
                 className="redesign-home-product-triangle"
-                direction="previous"
               />
             </button>
             <button
@@ -455,9 +433,9 @@ export function EnheRedesignProductShowcase({
               aria-label={copy.next}
               aria-controls={panelId}
             >
-              <ProductTriangle
+              <EnheIconfontIcon
+                icon="arrow-right-bold"
                 className="redesign-home-product-triangle"
-                direction="next"
               />
             </button>
           </div>

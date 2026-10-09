@@ -49,7 +49,6 @@ function assertLocaleSurface(locale: RedesignLocale, html: string) {
   const otherCopy = SOFTWARE_COPY[otherLocale];
 
   expect(countMatches(html, /<h1>/g)).toBe(1);
-  expect(html).toContain(copy.page.label);
   expect(html).toContain(copy.page.h1);
   expect(html).toContain(copy.page.intro);
   expect(html).toContain(copy.sections.newReleases.heading);
@@ -61,7 +60,7 @@ function assertLocaleSurface(locale: RedesignLocale, html: string) {
 
   for (const product of SOFTWARE_PRODUCTS) {
     expect(html).toContain(product.name[locale]);
-    expect(html).not.toContain(product.description[locale]);
+    expect(html).toContain(product.description[locale]);
     expect(html).toContain(product.price[locale]);
     expect(html).toContain(product.detailHref[locale]);
 
@@ -81,13 +80,11 @@ function assertLocaleSurface(locale: RedesignLocale, html: string) {
     otherCopy.actions.pageTwo,
     otherCopy.actions.detail,
   ]) {
-    if (!html.includes(value) && value !== copy.page.label) {
+    if (!html.includes(value)) {
       continue;
     }
 
-    if (value !== copy.page.label) {
-      expect(html).not.toContain(value);
-    }
+    expect(html).not.toContain(value);
   }
 }
 
@@ -224,14 +221,12 @@ describe("AI tools candidate bilingual preview regression", () => {
     expect(html).not.toMatch(forbiddenClaimsPattern);
   });
 
-  it("keeps the responsive rail-only markers, 4/3/2/1/1 grid breakpoints, and mobile one-column all-products contract", () => {
+  it("keeps the AI Skills-sized three-column desktop grid, responsive rails, and mobile one-column all-products contract", () => {
     const css = readCandidate("styles/redesign/software.css");
     const catalog = readCandidate("components/redesign/software/EnheRedesignSoftwareCatalog.tsx");
 
-    expect(css).toMatch(/grid-template-columns:\s*repeat\(4,\s*minmax\(0,\s*1fr\)\)/);
-    expect(css).toMatch(/@media\s*\(max-width:\s*1024px\)[\s\S]*repeat\(3,\s*minmax\(0,\s*1fr\)\)/);
-    expect(css).toMatch(/@media\s*\(max-width:\s*768px\)[\s\S]*repeat\(2,\s*minmax\(0,\s*1fr\)\)/);
-    expect(css).toMatch(/@media\s*\(width\s*<\s*768px\)[\s\S]*grid-template-columns:\s*1fr/);
+    expect(css).toMatch(/\.redesign-software-grid\s*\{[^}]*grid-template-columns:\s*repeat\(3,\s*minmax\(0,\s*1fr\)\)/);
+    expect(css).toMatch(/@media\s*\(max-width:\s*768px\)[\s\S]*\.redesign-software-grid\s*\{[^}]*grid-template-columns:\s*minmax\(0,\s*1fr\)/);
     expect(css).toContain("gap: 18px");
     expect(css).toContain("scroll-snap-type: x mandatory");
     expect(css).toContain("overflow-x: auto");

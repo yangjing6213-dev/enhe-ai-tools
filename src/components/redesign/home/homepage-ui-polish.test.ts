@@ -27,7 +27,8 @@ describe("homepage UI polish", () => {
     expect(hero).not.toContain("redesign-home-mobile-label");
     expect(header).toMatch(/EnheBrandLockup[\s\S]*redesign-brand-label/);
     expect(shellStyles).toMatch(/\.redesign-brand-region\s*\{[^}]*justify-items:\s*center/);
-    expect(shellStyles).toMatch(/\.redesign-brand-label\s*\{[^}]*background:\s*var\(--enhe-action/);
+    expect(shellStyles).toMatch(/\.redesign-brand-label\s*\{[^}]*background:\s*transparent/);
+    expect(shellStyles).toMatch(/\.redesign-brand-label\s*\{[^}]*color:\s*var\(--enhe-action/);
     expect(shellStyles).not.toMatch(/\.redesign-brand-label,\s*\.redesign-desktop-nav\s*\{\s*display:\s*none/);
     expect(refreshStyles).toMatch(/\.redesign-header\[data-home="true"\][^{]*\{[^}]*background:\s*var\(--enhe-page-bg\)[^}]*color:\s*var\(--enhe-text\)/);
     expect(refreshStyles).toMatch(/\.redesign-home-hero\s*\{[^}]*background-image:\s*none[^}]*color:\s*var\(--enhe-text\)/);
@@ -46,9 +47,9 @@ describe("homepage UI polish", () => {
     expect(homeStyles).not.toMatch(/#fdfcf7|253,\s*252,\s*247/);
   });
 
-  it("keeps primary control text black in the fixed-light palette", () => {
-    expect(refreshStyles).toMatch(/\.redesign-home \.redesign-home-cta,[\s\S]*?\.redesign-home-brand-value-cta\s*\{[^}]*color:\s*var\(--enhe-text/);
-    expect(refreshStyles).toMatch(/\.redesign-home \.redesign-home-cta:hover,[\s\S]*?\.redesign-home-brand-value-cta:hover\s*\{[^}]*color:\s*var\(--enhe-text/);
+  it("keeps primary control text white on the blue buttons", () => {
+    expect(refreshStyles).toMatch(/\.redesign-home \.redesign-home-cta,[\s\S]*?\.redesign-home-brand-value-cta\s*\{[^}]*color:\s*#fff/);
+    expect(refreshStyles).toMatch(/\.redesign-home \.redesign-home-cta:hover,[\s\S]*?\.redesign-home-brand-value-cta:hover\s*\{[^}]*color:\s*#fff/);
     expect(softwareStyles).toMatch(/\.redesign-software-category-button\[data-selected="true"\]\s*\{[^}]*color:\s*var\(--enhe-text/);
     expect(softwareStyles).toMatch(/\.redesign-software-empty-action\s*\{[^}]*color:\s*var\(--enhe-text/);
     expect(softwareStyles).toMatch(/\.redesign-software-load-more-button\s*\{[^}]*color:\s*var\(--enhe-text/);
@@ -73,12 +74,18 @@ describe("homepage UI polish", () => {
     expect(refreshStyles).toMatch(/\.redesign-home-feature-card\s*\{[^}]*border:\s*0/);
   });
 
-  it("removes the product counter, shrinks the heading, and uses triangle controls", () => {
+  it("removes the product counter, centers concise copy, and uses Iconfont arrows", () => {
     expect(showcase).not.toContain("redesign-home-product-counter");
     expect(showcase).not.toContain("const counter =");
     expect(showcase).toContain("redesign-home-product-triangle");
     expect(showcase).toContain("redesign-home-product-link-triangle");
-    expect(homeStyles).toMatch(/\.redesign-home-products-heading h2\s*\{[^}]*font-size:\s*clamp\([^}]*2\.25rem\)[^}]*white-space:\s*nowrap/);
+    expect(showcase).toContain('icon="arrow-left-bold"');
+    expect(showcase).toContain('icon="arrow-right-bold"');
+    expect(showcase).toContain('icon="arrow-right"');
+    expect(homeStyles).toMatch(/\.redesign-home-products-heading\s*\{[^}]*text-align:\s*center/);
+    expect(homeStyles).toMatch(/\.redesign-home-products-eyebrow\s*\{[^}]*font-size:\s*1rem/);
+    expect(homeStyles).toMatch(/\.redesign-home-products-heading h2\s*\{[^}]*font-size:\s*clamp\([^}]*1\.2rem\)/);
+    expect(homeStyles).not.toMatch(/\.redesign-home-products-heading h2\s*\{[^}]*white-space:\s*nowrap/);
     expect(homeStyles).toMatch(/\.redesign-home-product-control\s*\{[^}]*border:\s*0[^}]*border-radius:\s*0/);
     expect(refreshStyles).toMatch(/\.redesign-home-product-media-frame\s*\{[^}]*overflow:\s*hidden[^}]*border-radius:\s*20px/);
   });
@@ -96,11 +103,15 @@ describe("homepage UI polish", () => {
     expect(reviews).toContain('<Pause aria-hidden="true"');
     expect(reviews).not.toContain("暂停自动播放");
     expect(reviews).not.toContain("Pause automatic playback");
-    expect(HOME_COPY.zh.review.heading).toBe("用户反馈");
+    expect(HOME_COPY.zh.review.heading).toBe("客户的心得");
     expect(HOME_COPY.zh.review.disclosure).toBe("AI 生成示例（非真实用户反馈）");
-    expect(HOME_COPY.en.review.heading).toBe("User feedback");
+    expect(HOME_COPY.en.review.heading).toBe("Customer stories");
     expect(HOME_COPY.en.review.disclosure).toBe("AI-generated examples (not real customer feedback).");
     expect(reviews).not.toContain("以下人物与评价内容由 AI 生成，仅作页面展示示意，并非真实用户评价。");
+    expect(refreshStyles).toMatch(/\.redesign-home-reviews-disclosure\s*\{[^}]*color:\s*#fff/);
+    expect(refreshStyles).toMatch(/\.redesign-home-reviews-disclosure\s*\{[^}]*background:\s*var\(--blue-11/);
+    expect(homeStyles).toMatch(/\.redesign-home-reviews-rotation\s*\{[^}]*color:\s*#fff/);
+    expect(homeStyles).toMatch(/\.redesign-home-reviews-rotation\s*\{[^}]*background:\s*var\(--blue-11/);
   });
 
   it("keeps narrow-phone review cards readable without clipped neighboring reviews", () => {
@@ -117,6 +128,10 @@ describe("homepage UI polish", () => {
     expect(refreshStyles).toMatch(/\.redesign-footer\s*\{[^}]*background:\s*var\(--enhe-footer\)/);
     expect(shellStyles).toMatch(/\.redesign-footer-inner\s*\{[^}]*position:\s*relative/);
     expect(shellStyles).not.toContain(".footer-back-to-top-row");
+    expect(footer).toContain('/images/brand/enhe-footer-wordmark.png');
+    expect(footer).toContain('alt={locale === "en" ? "ENHE brand" : "ENHE 品牌标志"}');
+    expect(footer).not.toContain("brandIntro.map");
+    expect(shellStyles).toMatch(/\.footer-group-trigger h3\s*\{[^}]*font-weight:\s*800/);
   });
 
   it("removes the horizontal rules between homepage sections", () => {
@@ -124,6 +139,36 @@ describe("homepage UI polish", () => {
       const rule = homeStyles.match(new RegExp(`${selector.replaceAll(".", "\\.")}\\s*\\{([^}]*)\\}`));
       expect(rule?.[1] ?? "").not.toMatch(/border-top:\s*1px solid/);
     }
+    expect(refreshStyles).toMatch(/\.redesign-header\s*\{[^}]*border-bottom:\s*0\s*!important/);
+    expect(refreshStyles).toMatch(/\.enhe-redesign-production\s+\.redesign-home-review-card:not\(\[data-position="0"\]\)\s*\{[^}]*border-color:\s*transparent\s*!important/);
+  });
+
+  it("removes decorative horizontal separators throughout public pages while preserving the admin shell", () => {
+    expect(refreshStyles).toMatch(/\.enhe-redesign-production:not\(\.enhe-admin-shell\)\s+:is\(\.border-t,\s*\.border-b,\s*\.border-y,\s*hr\)\s*\{[^}]*border-block-color:\s*transparent\s*!important/);
+    expect(refreshStyles).toContain(".redesign-mobile-nav-dropdown");
+    expect(refreshStyles).toContain(".ai-news-page .ai-news-workspace-lead-grid");
+    expect(refreshStyles).toContain(".enhe-contentless-hero");
+    expect(refreshStyles).toContain(":not(.enhe-admin-shell)");
+    expect(softwareStyles).not.toContain(".redesign-software-card-meta");
+  });
+
+  it("uses the Iconfont collection for all four homepage feature icons", () => {
+    const features = read("src/components/redesign/home/EnheRedesignFeatures.tsx");
+    const iconFont = read("src/components/redesign/enhe-iconfont-icon.tsx");
+    expect(features).toContain('icon: "code"');
+    expect(features).toContain('icon: "training"');
+    expect(features).toContain('icon: "file-common"');
+    expect(features).toContain('icon: "data-view"');
+    expect(iconFont).toContain("cid=22664");
+  });
+
+  it("matches the AI Skill catalog card footprint and keeps the existing hover motion", () => {
+    expect(softwareStyles).toMatch(/\.redesign-software-page\s*\{[^}]*width:\s*min\(100%,\s*1280px\)/);
+    expect(softwareStyles).toMatch(/\.redesign-software-grid\s*\{[^}]*grid-template-columns:\s*repeat\(3,\s*minmax\(0,\s*1fr\)\)/);
+    expect(softwareStyles).toMatch(/\.redesign-software-card\s*\{[^}]*height:\s*751px/);
+    expect(softwareStyles).toMatch(/\.redesign-software-card\s*\{[^}]*border-radius:\s*0/);
+    expect(softwareStyles).toMatch(/\.redesign-software-card:hover\s*\{[^}]*transform:\s*translateY\(-3px\)/);
+    expect(softwareStyles).toMatch(/\.redesign-software-card-description\s*\{[^}]*-webkit-line-clamp:\s*4/);
   });
 
   it("keeps button feedback subtle, pointer-aware, and reduced-motion safe", () => {

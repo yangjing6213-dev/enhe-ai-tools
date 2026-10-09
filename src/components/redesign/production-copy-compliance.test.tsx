@@ -125,7 +125,8 @@ describe("ENHE Phase 2C.1.2 production copy compliance", () => {
 
   it("centers the shared tagline beneath the restored logo on desktop and mobile", () => {
     expect(shellStyles).toMatch(/\.redesign-brand-region\s*\{[^}]*justify-items:\s*center/);
-    expect(shellStyles).toMatch(/\.redesign-brand-label\s*\{[^}]*background:\s*var\(--enhe-action/);
+    expect(shellStyles).toMatch(/\.redesign-brand-label\s*\{[^}]*background:\s*transparent/);
+    expect(shellStyles).toMatch(/\.redesign-brand-label\s*\{[^}]*color:\s*var\(--enhe-action/);
     expect(shellStyles).not.toMatch(/\.redesign-brand-label,\s*\.redesign-desktop-nav\s*\{\s*display:\s*none/);
   });
 

@@ -11,13 +11,16 @@ function readCandidate(relativePath: string) {
 }
 
 describe("AI tools candidate responsive browsing", () => {
-  it("keeps the approved grid breakpoints and mobile rail CSS contract", () => {
+  it("keeps the fixed AI Skills-sized desktop grid and mobile rail CSS contract", () => {
     const css = readCandidate("styles/redesign/software.css");
 
     expect(css).toMatch(/\.redesign-software\s*\{[^}]*background-color:\s*var\(--enhe-page-bg\)/);
-    expect(css).toMatch(/grid-template-columns:\s*repeat\(4,\s*minmax\(0,\s*1fr\)\)/);
-    expect(css).toMatch(/max-width:\s*1024px/);
-    expect(css).toMatch(/max-width:\s*768px/);
+    expect(css).toMatch(/\.redesign-software-grid\s*\{[^}]*grid-template-columns:\s*repeat\(3,\s*minmax\(0,\s*1fr\)\)/);
+    expect(css).toMatch(/@media\s*\(max-width:\s*768px\)[\s\S]*\.redesign-software-grid\s*\{[^}]*grid-template-columns:\s*minmax\(0,\s*1fr\)/);
+    expect(css).toContain(":nth-child(1n)");
+    expect(css.match(/:nth-child\(3n\)/g)).toHaveLength(2);
+    expect(css).not.toContain(":nth-child(2n)");
+    expect(css).not.toContain(":nth-child(4n)");
     expect(css).toMatch(/width\s*<\s*768px/);
     expect(css).not.toMatch(/max-width:\s*767px/);
     expect(css).toContain("overflow-x: auto");
@@ -50,7 +53,7 @@ describe("AI tools candidate responsive browsing", () => {
     const css = readCandidate("styles/redesign/software.css");
 
     expect(css).toMatch(
-      /\.redesign-software-card-link\[data-support-exclusion\]\s*\{\s*min-height:\s*var\(--enhe-button-h,\s*48px\);/,
+      /\.redesign-software-card-link\[data-support-exclusion\]\s*\{[^}]*min-height:\s*var\(--enhe-button-h,\s*48px\);/,
     );
   });
 

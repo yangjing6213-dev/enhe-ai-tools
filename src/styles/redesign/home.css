@@ -192,29 +192,31 @@
 
 .redesign-home-products-heading {
   display: flex;
-  align-items: end;
-  justify-content: space-between;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
   gap: 24px;
   margin-bottom: 40px;
+  text-align: center;
 }
 
 .redesign-home-products-eyebrow {
   margin: 0 0 14px;
   color: var(--enhe-action-text, #0066cc);
-  font-size: 0.875rem;
+  font-size: 1rem;
   font-weight: 700;
   letter-spacing: 0.08em;
   text-transform: uppercase;
 }
 
 .redesign-home-products-heading h2 {
-  max-width: none;
+  max-width: 100%;
   margin: 0;
   color: var(--enhe-text, #080808);
-  font-size: clamp(1rem, 2.2vw, 2.25rem);
-  letter-spacing: -0.05em;
-  line-height: 1;
-  white-space: nowrap;
+  font-size: clamp(1rem, 1.3vw, 1.2rem);
+  letter-spacing: -0.02em;
+  line-height: 1.65;
+  white-space: normal;
 }
 
 .redesign-home-product-stage {
@@ -270,10 +272,6 @@
 .redesign-home-product-link-triangle {
   width: 22px;
   height: 22px;
-}
-
-.redesign-home-product-triangle[data-direction="previous"] {
-  rotate: 180deg;
 }
 
 .redesign-home-product-control:hover {
@@ -380,7 +378,7 @@
   }
 
   .redesign-home-products-heading {
-    align-items: start;
+    align-items: center;
     flex-direction: column;
     gap: 20px;
     margin-bottom: 28px;
@@ -476,8 +474,8 @@
   padding: 0;
   border: 0;
   border-radius: 50%;
-  background: transparent;
-  color: var(--enhe-action);
+  background: var(--blue-11);
+  color: #fff;
   cursor: pointer;
 }
 

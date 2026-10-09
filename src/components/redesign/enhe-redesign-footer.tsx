@@ -1,4 +1,5 @@
 import { Fragment } from "react";
+import Image from "next/image";
 import { ChevronDown } from "lucide-react";
 import type { ProductionFiling } from "@/lib/production-filing";
 import type { RedesignFooterCopy, RedesignLocale } from "./types";
@@ -6,8 +7,6 @@ import type { RedesignFooterCopy, RedesignLocale } from "./types";
 const FOOTER_COPY: Record<RedesignLocale, RedesignFooterCopy> = {
   zh: {
     ariaLabel: "网站页脚",
-    brandLine: "ENHE AI",
-    brandIntro: ["一站式AI平台", "给人生加一个 AI 外挂"],
     columns: [
       {
         title: "帮助与服务",
@@ -40,8 +39,6 @@ const FOOTER_COPY: Record<RedesignLocale, RedesignFooterCopy> = {
   },
   en: {
     ariaLabel: "Site footer",
-    brandLine: "ENHE AI",
-    brandIntro: ["The All-in-One AI Platform.", "An AI upgrade for everyday life"],
     columns: [
       {
         title: "Help & Support",
@@ -90,11 +87,14 @@ export function EnheRedesignFooter({
     <footer className="redesign-footer" aria-label={copy.ariaLabel}>
       <div className="redesign-footer-inner">
         <div className="footer-grid">
-          <div>
-            <h2>{copy.brandLine}</h2>
-            {copy.brandIntro.map((line) => (
-              <p key={line}>{line}</p>
-            ))}
+          <div className="footer-brand">
+            <Image
+              className="footer-brand-logo"
+              src="/images/brand/enhe-footer-wordmark.png"
+              alt={locale === "en" ? "ENHE brand" : "ENHE 品牌标志"}
+              width={2172}
+              height={724}
+            />
           </div>
           {copy.columns.map((column) => (
             <nav key={column.title} aria-label={column.title}>

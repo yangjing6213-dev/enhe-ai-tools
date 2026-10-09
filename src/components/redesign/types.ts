@@ -42,8 +42,6 @@ export type RedesignFooterColumn = {
 
 export type RedesignFooterCopy = {
   ariaLabel: string;
-  brandLine: string;
-  brandIntro: ReadonlyArray<string>;
   columns: ReadonlyArray<RedesignFooterColumn>;
   copyright: string;
 };

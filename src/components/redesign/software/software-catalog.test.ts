@@ -85,6 +85,8 @@ describe("AI tools candidate catalog", () => {
     }
 
     expect(catalog).toContain("<h1>");
+    expect(catalog).toContain("{copy.page.h1}");
+    expect(catalog).not.toContain("redesign-software-label");
     expect(previewCatalog).toContain("NEW_RELEASE_IDS");
     expect(previewCatalog).toContain("FEATURED_PRODUCT_IDS");
     expect(previewCatalog).toContain("SOFTWARE_PRODUCTS");
@@ -105,9 +107,8 @@ describe("AI tools candidate catalog", () => {
     expect(card).toContain("alt=");
     expect(card).toContain("onError");
     expect(card).not.toMatch(/File\.file(?:Url|Path)|rating|delivery|download|orders|payment|OAuth|fetch\(/i);
-    expect(card).not.toContain("redesign-software-card-description");
-    expect(card).not.toContain("aria-describedby");
-    expect(card).not.toContain("product.description");
+    expect(card).toContain("redesign-software-card-description");
+    expect(card).toContain("product.description");
   });
 
   it("defines all seven categories with the documented keyboard traversal and shared visibility event", () => {
