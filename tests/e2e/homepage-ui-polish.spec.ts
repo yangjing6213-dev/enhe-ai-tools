@@ -306,7 +306,7 @@ test("homepage polish stays readable, responsive, and interactive without extern
   expect(englishBrandFontFamily).toContain("LXGW WenKai Lite");
   expect(englishBrandFontFamily).toContain("Alimama Fang Yuan Ti");
   const englishReviews = page.locator(".redesign-home-reviews");
-  await expect(englishReviews.getByRole("heading", { name: "User feedback" })).toBeVisible();
+  await expect(englishReviews.getByRole("heading", { name: "Customer stories" })).toBeVisible();
   await expect(englishReviews.locator(".redesign-home-reviews-disclosure")).toHaveText("AI-generated examples (not real customer feedback).");
   await expect(englishReviews.locator(".redesign-home-reviews-control, .redesign-home-review-triangle")).toHaveCount(0);
 

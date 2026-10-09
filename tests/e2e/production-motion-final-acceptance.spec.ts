@@ -63,7 +63,7 @@ const routes: FormalRoute[] = [
   {
     path: "/software",
     kind: "software",
-    h1: /精选 AI 工具/,
+    h1: hasProductCatalogTestDatabase ? /精选 AI 工具/ : /最热门AI工具/,
     menu: "菜单",
     closeMenu: "收起菜单",
     closeCategory: "关闭分类",
@@ -72,7 +72,7 @@ const routes: FormalRoute[] = [
   {
     path: "/en/software",
     kind: "software",
-    h1: /Featured AI tools/i,
+    h1: hasProductCatalogTestDatabase ? /Featured AI tools/i : /Most Popular AI Tools/i,
     menu: "Menu",
     closeMenu: "Close menu",
     closeCategory: "Close categories",

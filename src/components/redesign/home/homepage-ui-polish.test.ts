@@ -97,7 +97,7 @@ describe("homepage UI polish", () => {
     expect(homeStyles).not.toContain(".redesign-home-reviews-control");
     expect(homeStyles).toMatch(/\.redesign-home-reviews-inner\s*\{[^}]*width:\s*min\(100%,\s*1040px\)/);
     expect(homeStyles).toMatch(/\.redesign-home-review-card\s*\{[^}]*width:\s*min\(70vw,\s*600px\)/);
-    expect(homeStyles).toMatch(/\.redesign-home-reviews-inner h2\s*\{[^}]*font-size:\s*clamp\(1rem,\s*2\.2vw,\s*2\.25rem\)/);
+    expect(homeStyles).toMatch(/\.redesign-home-reviews-inner h2\s*\{[^}]*font-size:\s*clamp\(1rem,\s*1\.3vw,\s*1\.2rem\)/);
     expect(reviews).toContain("copy.resume");
     expect(reviews).toContain("copy.pause");
     expect(reviews).toContain('<Pause aria-hidden="true"');
