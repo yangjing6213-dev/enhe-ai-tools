@@ -43,7 +43,7 @@ const routes: FormalRoute[] = [
   {
     path: "/",
     kind: "home",
-    h1: /让 AI 创意，落地为真实成果/,
+    h1: /懂你的AI一站式平台，你需要的，都在这里。/,
     menu: "菜单",
     closeMenu: "收起菜单",
     support: "客服",
@@ -53,7 +53,7 @@ const routes: FormalRoute[] = [
   {
     path: "/en",
     kind: "home",
-    h1: /Turn AI ideas into real results\./i,
+    h1: /A one-stop AI platform that gets you\. Everything you need, all in one place\./i,
     menu: "Menu",
     closeMenu: "Close menu",
     support: "Chat",
@@ -63,7 +63,7 @@ const routes: FormalRoute[] = [
   {
     path: "/software",
     kind: "software",
-    h1: /AI工具/,
+    h1: /精选 AI 工具/,
     menu: "菜单",
     closeMenu: "收起菜单",
     closeCategory: "关闭分类",
@@ -72,7 +72,7 @@ const routes: FormalRoute[] = [
   {
     path: "/en/software",
     kind: "software",
-    h1: /AI Tools/i,
+    h1: /Featured AI tools/i,
     menu: "Menu",
     closeMenu: "Close menu",
     closeCategory: "Close categories",

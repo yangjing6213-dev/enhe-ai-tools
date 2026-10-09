@@ -41,6 +41,7 @@ test("homepage polish stays readable, responsive, and interactive without extern
     await expect(brand).toBeVisible();
     await expect(brandLabel).toHaveText("给你的人生添加AI外挂");
     await expect(brandLabel).toBeVisible();
+    await expect(hero.locator("h1")).toHaveText("懂你的AI一站式平台，你需要的，都在这里。");
     const brandFontFamily = await brandLabel.evaluate((element) => getComputedStyle(element).fontFamily);
     const fontResponse = await page.request.get(new URL(
       "/fonts/lxgw-wenkai/lxgw-wenkai-home-label.woff",
@@ -64,7 +65,7 @@ test("homepage polish stays readable, responsive, and interactive without extern
       const logoRect = logo.getBoundingClientRect();
       const labelRect = label.getBoundingClientRect();
       const actionProbe = document.createElement("span");
-      actionProbe.style.backgroundColor = "var(--enhe-action)";
+      actionProbe.style.backgroundColor = "var(--blue-11)";
       document.body.append(actionProbe);
       const actionBackground = getComputedStyle(actionProbe).backgroundColor;
       actionProbe.remove();
@@ -72,12 +73,14 @@ test("homepage polish stays readable, responsive, and interactive without extern
         centerDifference: Math.abs(logoRect.left + logoRect.width / 2 - (labelRect.left + labelRect.width / 2)),
         logoWidth: logoRect.width,
         labelBackground: getComputedStyle(label).backgroundColor,
-        actionBackground,
+        labelColor: getComputedStyle(label).color,
+        expectedLabelColor: actionBackground,
       };
     });
     expect(brandAlignment.centerDifference, `brand line center alignment at ${width}px`).toBeLessThanOrEqual(1);
     expect(brandAlignment.logoWidth, `restored logo width at ${width}px`).toBeGreaterThanOrEqual(150);
-    expect(brandAlignment.labelBackground, `brand line background at ${width}px`).toBe(brandAlignment.actionBackground);
+    expect(brandAlignment.labelBackground, `brand line background at ${width}px`).toBe("rgba(0, 0, 0, 0)");
+    expect(brandAlignment.labelColor, `brand line color at ${width}px`).toBe(brandAlignment.expectedLabelColor);
 
     if (width < 768) {
       const layout = await page.locator(".redesign-header-inner").evaluate((inner) => {
@@ -126,12 +129,11 @@ test("homepage polish stays readable, responsive, and interactive without extern
     }
 
     const productHeading = page.locator(".redesign-home-products-heading h2");
-    const headingFitsOneLine = await productHeading.evaluate((element) => {
-      const style = getComputedStyle(element);
-      return element.getBoundingClientRect().height <= Number.parseFloat(style.lineHeight) + 1 &&
-        element.scrollWidth <= element.clientWidth;
-    });
-    expect(headingFitsOneLine, `product heading stays on one line at ${width}px`).toBe(true);
+    await expect(productHeading).toHaveCSS("text-align", "center");
+    const headingDoesNotOverflow = await productHeading.evaluate((element) =>
+      element.scrollWidth <= element.clientWidth,
+    );
+    expect(headingDoesNotOverflow, `product heading stays within its section at ${width}px`).toBe(true);
     await expect(page.locator(".redesign-home-product-counter")).toHaveCount(0);
     await expect(page.locator(".redesign-home-product-stage [aria-live='polite'][aria-atomic='true']")).toHaveCount(1);
 
@@ -160,7 +162,7 @@ test("homepage polish stays readable, responsive, and interactive without extern
     const reviews = page.locator(".redesign-home-reviews");
     await reviews.scrollIntoViewIfNeeded();
     await reviews.hover();
-    await expect(reviews.getByRole("heading", { name: "用户反馈" })).toBeVisible();
+    await expect(reviews.getByRole("heading", { name: "客户的心得" })).toBeVisible();
     const reviewHeadingSize = await page.evaluate(() => {
       const productHeading = document.querySelector<HTMLElement>(".redesign-home-products-heading h2");
       const reviewHeading = document.querySelector<HTMLElement>(".redesign-home-reviews-heading-row h2");

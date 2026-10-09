@@ -30,4 +30,5 @@
 - `npm run lint`: PASS. `npm run typecheck`: PASS after stopping the local preview server, which had held Prisma's Windows engine file open.
 - Browser check against the local production homepage route: PASS for the approved headline, removed header separator, and transparent side review cards. Software preview check: PASS (19 cards, 3-column desktop grid, fixed 751px cards, square corners).
 - `git diff --check`: PASS; Git reports only expected LF/CRLF conversion notices.
-- Release wrapper build/e2e/audit, final commit, push, deployment, and live verification: pending.
+- Browser acceptance review found stale checks for the previous hero text, logo label background, review title, and primary button text; updated those expectations to the approved design. Contrast scanning also found the small blue logo label needed a darker Radix blue for readable white-background text.
+- Current commit's full release workflow is run through `scripts/push-and-deploy.ps1`, which repeats audit, migration checks, tests, typecheck, lint, build, browser checks, push, and deployment.

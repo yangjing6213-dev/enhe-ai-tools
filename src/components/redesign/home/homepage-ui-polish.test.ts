@@ -28,7 +28,7 @@ describe("homepage UI polish", () => {
     expect(header).toMatch(/EnheBrandLockup[\s\S]*redesign-brand-label/);
     expect(shellStyles).toMatch(/\.redesign-brand-region\s*\{[^}]*justify-items:\s*center/);
     expect(shellStyles).toMatch(/\.redesign-brand-label\s*\{[^}]*background:\s*transparent/);
-    expect(shellStyles).toMatch(/\.redesign-brand-label\s*\{[^}]*color:\s*var\(--enhe-action/);
+    expect(shellStyles).toMatch(/\.redesign-brand-label\s*\{[^}]*color:\s*var\(--blue-11/);
     expect(shellStyles).not.toMatch(/\.redesign-brand-label,\s*\.redesign-desktop-nav\s*\{\s*display:\s*none/);
     expect(refreshStyles).toMatch(/\.redesign-header\[data-home="true"\][^{]*\{[^}]*background:\s*var\(--enhe-page-bg\)[^}]*color:\s*var\(--enhe-text\)/);
     expect(refreshStyles).toMatch(/\.redesign-home-hero\s*\{[^}]*background-image:\s*none[^}]*color:\s*var\(--enhe-text\)/);

@@ -37,7 +37,7 @@ test("site pages keep white surfaces and black neutral text, including interacti
     foreground: "#000",
     muted: "#000",
     mainText: "rgb(0, 0, 0)",
-    actionText: "rgb(0, 0, 0)",
+    actionText: "rgb(255, 255, 255)",
     eyebrowText: "rgb(0, 102, 204)",
   });
 
