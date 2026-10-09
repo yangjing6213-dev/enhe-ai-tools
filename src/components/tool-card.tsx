@@ -6,7 +6,7 @@ import { Card } from "@/components/ui/card";
 import { getDictionary, type Locale } from "@/lib/i18n";
 import { resolveToolImageSrc } from "@/lib/tool-image";
 import { buildCanonicalToolPath } from "@/lib/public-slugs";
-import { buildToolCardHighlights } from "@/lib/tool-card-highlights";
+import { buildToolCardHighlights, buildValueSentence } from "@/lib/tool-card-highlights";
 import {
   buildLocalizedToolPreviewText,
   resolveLocalizedToolCategoryName,
@@ -194,12 +194,6 @@ export function ToolCard({
       </Card>
     </PrefetchLink>
   );
-}
-
-function buildValueSentence(description: string, locale: Locale) {
-  const sentence = description.split(/[。?!；，,.!?]/).find(Boolean)?.trim() ?? description.trim();
-  const maxLength = locale === "zh" ? 44 : 86;
-  return sentence.length > maxLength ? `${sentence.slice(0, maxLength - 1)}...` : sentence;
 }
 
 function buildCardHighlights(tool: ToolCardProps["tool"], locale: Locale) {

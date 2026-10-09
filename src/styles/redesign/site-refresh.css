@@ -70,6 +70,28 @@
   object-fit: contain;
 }
 
+.redesign-brand-region {
+  width: 154px;
+  min-width: 0;
+}
+
+.redesign-brand-label {
+  max-width: 100%;
+  white-space: normal;
+  text-align: center;
+}
+
+@media (768px <= width < 1024px) {
+  .redesign-desktop-nav-list {
+    gap: 4px;
+  }
+
+  .redesign-header[data-locale="en"] .redesign-desktop-nav {
+    font-size: 11px;
+    letter-spacing: 0;
+  }
+}
+
 .dark .redesign-brand-mark {
   filter: brightness(0) invert(1);
 }
@@ -223,7 +245,6 @@
 }
 
 .redesign-home-products-heading h2,
-.redesign-home-reviews-inner h2,
 .redesign-home-brand-value-inner h2 {
   color: var(--enhe-text);
   letter-spacing: -0.035em;

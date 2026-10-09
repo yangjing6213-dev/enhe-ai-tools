@@ -106,7 +106,7 @@ describe("AI tools candidate catalog", () => {
     expect(card).toContain("detailHref");
     expect(card).toContain("alt=");
     expect(card).toContain("onError");
-    expect(card).not.toMatch(/File\.file(?:Url|Path)|rating|delivery|download|orders|payment|OAuth|fetch\(/i);
+    expect(card).not.toMatch(/File\.file(?:Url|Path)|rating|downloadFile|orders|payment|OAuth|fetch\(/i);
     expect(card).toContain("redesign-software-card-description");
     expect(card).toContain("product.description");
   });

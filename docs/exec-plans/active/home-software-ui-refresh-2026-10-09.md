@@ -32,3 +32,16 @@
 - `git diff --check`: PASS; Git reports only expected LF/CRLF conversion notices.
 - Browser acceptance review found stale checks for the previous hero text, logo label background, review title, and primary button text; updated those expectations to the approved design. Contrast scanning also found the small blue logo label needed a darker Radix blue for readable white-background text.
 - Current commit's full release workflow is run through `scripts/push-and-deploy.ps1`, which repeats audit, migration checks, tests, typecheck, lint, build, browser checks, push, and deployment.
+
+## Follow-up — 2026-10-10
+
+Approved scope: swap the shared header/footer logo sources without changing their CSS dimensions; double the recommendation eyebrow to 2rem and match review-heading typography; keep footer chevrons 8px from their headings; use AI Skill-style software card content and square, flush-top covers while preserving hover/rail motion.
+
+Implementation: reuse the existing localized summary/highlight helpers and actual catalog prices/counts. Show secondary English names on Chinese cards, value summary, capability list, category audience, price/delivery, and localized detail action. Do not invent supported-agent badges or metrics. Keep the 751px standard footprint and allow growth with user-enlarged root text. Align the development preview with the production style sheet and contain bilingual navigation on narrow screens.
+
+Verification before commit:
+- PASS: 162 targeted component/catalog/unit checks.
+- PASS: homepage browser acceptance across six viewport widths; 12 bilingual software preview checks, including 320–1440px layouts, square corners, zero cover gap, all card actions contained, hover transform, keyboard focus and enlarged text.
+- PASS: TypeScript, full ESLint, diff whitespace check; source Gitleaks scan (no findings).
+- Screenshots reviewed locally under ignored `output/ui-followup/`.
+- Release: use the existing protected `scripts/push-and-deploy.ps1` workflow for the exact committed SHA. Full release checks and live verification are recorded in local release receipts.

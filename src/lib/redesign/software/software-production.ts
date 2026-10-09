@@ -7,6 +7,7 @@ import {
   shouldIndexEnglishToolPage,
 } from "@/lib/tool-localization";
 import { getPrimaryToolPrice } from "@/lib/tool-price-specs";
+import { buildToolCardHighlights } from "@/lib/tool-card-highlights";
 
 import {
   SOFTWARE_CATEGORIES,
@@ -28,6 +29,8 @@ export type PublicSoftwareCatalogRow = {
   isDownloadPaid: boolean;
   downloadPrice: unknown;
   isHomeRecommended: boolean;
+  downloadCount?: number;
+  usageCount?: number;
   sortOrder: number;
   createdAt: Date | string;
   category: { name: string } | null;
@@ -40,6 +43,12 @@ export type PublicSoftwareCatalogRow = {
 
 export type SoftwareCatalogItem = {
   id: string;
+  type: PublicSoftwareCatalogRow["type"];
+  secondaryName: string | null;
+  isPaid: boolean;
+  highlights: string[];
+  downloadCount: number;
+  usageCount: number;
   categoryId: SoftwareLeafCategoryId;
   name: string;
   description: string;
@@ -345,6 +354,12 @@ function buildCatalogItem(
 
   return {
     id: row.id,
+    type: row.type,
+    secondaryName: locale === "zh" ? localizedIdentity.secondaryName : null,
+    isPaid,
+    highlights: buildToolCardHighlights({ ...row, isDownloadPaid: isPaid }, locale),
+    downloadCount: row.downloadCount ?? 0,
+    usageCount: row.usageCount ?? 0,
     categoryId,
     name: localizedIdentity.primaryName,
     description,

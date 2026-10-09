@@ -9,6 +9,8 @@ import { describe, expect, it } from "vitest";
 import type { RedesignLocale } from "@/components/redesign/types";
 import { middleware } from "@/middleware";
 import { SOFTWARE_CATEGORIES } from "@/lib/redesign/software/software-categories";
+import { buildValueSentence } from "@/lib/tool-card-highlights";
+import { getDictionary } from "@/lib/i18n";
 import { SOFTWARE_COPY } from "@/lib/redesign/software/software-copy";
 import { SOFTWARE_PRODUCTS } from "@/lib/redesign/software/software-products";
 
@@ -56,11 +58,12 @@ function assertLocaleSurface(locale: RedesignLocale, html: string) {
   expect(html).toContain(copy.sections.allProducts.heading);
   expect(html).toContain(copy.actions.loadMore);
   expect(html).toContain(copy.actions.pageTwo);
-  expect(html).toContain(copy.actions.detail);
+  expect(html).toContain(getDictionary(locale).toolCard.compareBeforeBuy);
+  expect(html).toContain(getDictionary(locale).toolCard.getFreeTool);
 
   for (const product of SOFTWARE_PRODUCTS) {
     expect(html).toContain(product.name[locale]);
-    expect(html).toContain(product.description[locale]);
+    expect(html).toContain(buildValueSentence(product.description[locale], locale));
     expect(html).toContain(product.price[locale]);
     expect(html).toContain(product.detailHref[locale]);
 
@@ -204,11 +207,11 @@ describe("AI tools candidate bilingual preview regression", () => {
       ),
     ].sort();
     const forbiddenClaimsPattern =
-      /\bhttps?:\/\/\b|File\.file(?:Url|Path)|\bratings?\b|\bdelivery\b|\bdownloads?\b|\borders?\b|\bpayments?\b|\bOAuth\b/i;
+      /\bhttps?:\/\/\b|File\.file(?:Url|Path)|\bratings?\b|\bdownloadFile\b|\borders?\b|\bpayments?\b|\bOAuth\b/i;
 
     expect(card).toContain("redesign-software-card-cover");
     expect(card).toContain("onError");
-    expect(card).not.toMatch(/File\.file(?:Url|Path)|rating|delivery|download|orders|payment|OAuth|fetch\(/i);
+    expect(card).not.toMatch(/File\.file(?:Url|Path)|rating|downloadFile|orders|payment|OAuth|fetch\(/i);
 
     expect(SOFTWARE_PRODUCTS.every((product) => product.detailHref.zh.startsWith("/"))).toBe(true);
     expect(SOFTWARE_PRODUCTS.every((product) => product.detailHref.en.startsWith("/en/"))).toBe(true);
@@ -218,7 +221,7 @@ describe("AI tools candidate bilingual preview regression", () => {
     expect(preloadHrefs).toEqual([]);
     expect([...new Set(resolvedImageSources)].sort()).toEqual(expectedMediaSources);
     expect(resolvedImageSources.every((value) => value.startsWith("/"))).toBe(true);
-    expect(html).not.toMatch(forbiddenClaimsPattern);
+    expect(html.replaceAll('xmlns="http://www.w3.org/2000/svg"', "")).not.toMatch(forbiddenClaimsPattern);
   });
 
   it("keeps the AI Skills-sized three-column desktop grid, responsive rails, and mobile one-column all-products contract", () => {

@@ -4,6 +4,7 @@ import {
   type SoftwareCategoryId,
   type SoftwareLeafCategoryId,
 } from "@/lib/redesign/software/software-categories";
+import { buildToolCardHighlights } from "@/lib/tool-card-highlights";
 import { SOFTWARE_COPY } from "@/lib/redesign/software/software-copy";
 import type {
   RedesignSoftwareProductId,
@@ -177,7 +178,7 @@ function renderProductionCatalog({
               key={`all-${product.id}`}
               product={product}
               categoryLabel={getCategoryLabel(locale, product.categoryId)}
-              detailLabel={copy.actions.detail}
+              locale={locale}
               sectionId="all-products"
               listItem
             />
@@ -254,8 +255,6 @@ function CatalogSection({
   sectionId: "new-releases" | "featured-products";
   rail: "new" | "featured";
 }) {
-  const copy = SOFTWARE_COPY[locale];
-
   return (
     <section className="redesign-software-section" data-section={sectionId}>
       <header className="redesign-software-section-header">
@@ -272,7 +271,7 @@ function CatalogSection({
             key={`${rail}-${product.id}`}
             product={product}
             categoryLabel={getCategoryLabel(locale, product.categoryId)}
-            detailLabel={copy.actions.detail}
+            locale={locale}
             sectionId={sectionId}
           />
         ))}
@@ -354,7 +353,7 @@ function renderPreviewCatalog({
               key={`all-${product.id}`}
               product={product}
               categoryLabel={getCategoryLabel(locale, product.categoryId)}
-              detailLabel={copy.actions.detail}
+              locale={locale}
               sectionId="all-products"
               extraHidden={index >= INITIAL_VISIBLE_ALL_PRODUCTS}
               listItem
@@ -391,8 +390,18 @@ function localizePreviewProduct(
   product: SoftwareProduct,
   locale: RedesignLocale,
 ): SoftwareCatalogItem {
+  const type = product.detailHref.zh.startsWith("/ai-skills/") ? "ai_skill"
+    : product.detailHref.zh.startsWith("/skill-learning/") ? "skill_learning" : "software";
+  const numericPrice = Number(product.price[locale].replace(/[^0-9.]/g, ""));
+  const isPaid = numericPrice > 0;
   return {
     id: product.id,
+    type,
+    secondaryName: locale === "zh" ? product.name.en : null,
+    isPaid,
+    highlights: buildToolCardHighlights({ type, isDownloadPaid: isPaid, downloadPrice: numericPrice, priceSpecs: [{ price: numericPrice, status: "active" }] }, locale),
+    downloadCount: 0,
+    usageCount: 0,
     categoryId: product.categoryId,
     name: product.name[locale],
     description: product.description[locale],

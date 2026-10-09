@@ -83,7 +83,7 @@ describe("homepage UI polish", () => {
     expect(showcase).toContain('icon="arrow-right-bold"');
     expect(showcase).toContain('icon="arrow-right"');
     expect(homeStyles).toMatch(/\.redesign-home-products-heading\s*\{[^}]*text-align:\s*center/);
-    expect(homeStyles).toMatch(/\.redesign-home-products-eyebrow\s*\{[^}]*font-size:\s*1rem/);
+    expect(homeStyles).toMatch(/\.redesign-home-products-eyebrow\s*\{[^}]*font-size:\s*2rem/);
     expect(homeStyles).toMatch(/\.redesign-home-products-heading h2\s*\{[^}]*font-size:\s*clamp\([^}]*1\.2rem\)/);
     expect(homeStyles).not.toMatch(/\.redesign-home-products-heading h2\s*\{[^}]*white-space:\s*nowrap/);
     expect(homeStyles).toMatch(/\.redesign-home-product-control\s*\{[^}]*border:\s*0[^}]*border-radius:\s*0/);
@@ -97,7 +97,7 @@ describe("homepage UI polish", () => {
     expect(homeStyles).not.toContain(".redesign-home-reviews-control");
     expect(homeStyles).toMatch(/\.redesign-home-reviews-inner\s*\{[^}]*width:\s*min\(100%,\s*1040px\)/);
     expect(homeStyles).toMatch(/\.redesign-home-review-card\s*\{[^}]*width:\s*min\(70vw,\s*600px\)/);
-    expect(homeStyles).toMatch(/\.redesign-home-reviews-inner h2\s*\{[^}]*font-size:\s*clamp\(1rem,\s*1\.3vw,\s*1\.2rem\)/);
+    expect(homeStyles).toMatch(/\.redesign-home-reviews-inner h2\s*\{[^}]*font-size:\s*2rem/);
     expect(reviews).toContain("copy.resume");
     expect(reviews).toContain("copy.pause");
     expect(reviews).toContain('<Pause aria-hidden="true"');
@@ -128,7 +128,8 @@ describe("homepage UI polish", () => {
     expect(refreshStyles).toMatch(/\.redesign-footer\s*\{[^}]*background:\s*var\(--enhe-footer\)/);
     expect(shellStyles).toMatch(/\.redesign-footer-inner\s*\{[^}]*position:\s*relative/);
     expect(shellStyles).not.toContain(".footer-back-to-top-row");
-    expect(footer).toContain('/images/brand/enhe-footer-wordmark.png');
+    expect(footer).toContain('/images/enhe-logo-white.png');
+    expect(read('src/components/redesign/enhe-brand-lockup.tsx')).toContain('/images/brand/enhe-footer-wordmark.png');
     expect(footer).toContain('alt={locale === "en" ? "ENHE brand" : "ENHE 品牌标志"}');
     expect(footer).not.toContain("brandIntro.map");
     expect(shellStyles).toMatch(/\.footer-group-trigger h3\s*\{[^}]*font-weight:\s*800/);
@@ -168,7 +169,7 @@ describe("homepage UI polish", () => {
     expect(softwareStyles).toMatch(/\.redesign-software-card\s*\{[^}]*height:\s*751px/);
     expect(softwareStyles).toMatch(/\.redesign-software-card\s*\{[^}]*border-radius:\s*0/);
     expect(softwareStyles).toMatch(/\.redesign-software-card:hover\s*\{[^}]*transform:\s*translateY\(-3px\)/);
-    expect(softwareStyles).toMatch(/\.redesign-software-card-description\s*\{[^}]*-webkit-line-clamp:\s*4/);
+    expect(softwareStyles).toMatch(/\.redesign-software-card-description\s*\{[^}]*-webkit-line-clamp:\s*3/);
   });
 
   it("keeps button feedback subtle, pointer-aware, and reduced-motion safe", () => {

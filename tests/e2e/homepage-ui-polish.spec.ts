@@ -164,12 +164,17 @@ test("homepage polish stays readable, responsive, and interactive without extern
     await reviews.hover();
     await expect(reviews.getByRole("heading", { name: "客户的心得" })).toBeVisible();
     const reviewHeadingSize = await page.evaluate(() => {
-      const productHeading = document.querySelector<HTMLElement>(".redesign-home-products-heading h2");
+      const productHeading = document.querySelector<HTMLElement>(".redesign-home-products-eyebrow");
       const reviewHeading = document.querySelector<HTMLElement>(".redesign-home-reviews-heading-row h2");
       if (!productHeading || !reviewHeading) throw new Error("A homepage section heading is missing.");
-      return [getComputedStyle(productHeading).fontSize, getComputedStyle(reviewHeading).fontSize];
+      const typography = (element: HTMLElement) => {
+        const style = getComputedStyle(element);
+        return { size: style.fontSize, weight: style.fontWeight, spacing: style.letterSpacing, family: style.fontFamily, color: style.color };
+      };
+      return [typography(productHeading), typography(reviewHeading)];
     });
-    expect(reviewHeadingSize[1], `review and product headings share one size at ${width}px`).toBe(reviewHeadingSize[0]);
+    expect(reviewHeadingSize[1], `review and product headings share one size at ${width}px`).toEqual(reviewHeadingSize[0]);
+    expect(reviewHeadingSize[0].size).toBe("32px");
     await expect(reviews.locator(".redesign-home-reviews-disclosure")).toHaveText("AI 生成示例（非真实用户反馈）");
     await expect(reviews.locator(".redesign-home-reviews-control, .redesign-home-review-triangle")).toHaveCount(0);
     await expect(reviews.getByRole("button", { name: "上一条评价" })).toHaveCount(0);
@@ -205,6 +210,14 @@ test("homepage polish stays readable, responsive, and interactive without extern
 
     const footer = page.locator(".redesign-footer");
     await expect(footer).toHaveCSS("background-color", "rgb(255, 255, 255)");
+    await expect(page.locator(".redesign-brand-mark")).toHaveAttribute("src", "/images/brand/enhe-footer-wordmark.png");
+    await expect(footer.locator(".footer-brand-logo")).toHaveAttribute("src", /enhe-logo-white/);
+    const chevronGaps = await footer.locator(".footer-group-trigger").evaluateAll((summaries) => summaries.map((summary) => {
+      const title = summary.querySelector("h3")!.getBoundingClientRect();
+      const icon = summary.querySelector("svg")!.getBoundingClientRect();
+      return icon.left - title.right;
+    }));
+    expect(chevronGaps.every((gap) => gap >= 6 && gap <= 10)).toBe(true);
     const footerGroup = footer.locator("details.footer-group").first();
     await expect(footerGroup).not.toHaveAttribute("open", "");
     await footerGroup.locator("summary").click();

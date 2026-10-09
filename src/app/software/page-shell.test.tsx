@@ -111,6 +111,7 @@ describe("software page schema boundary", () => {
         items: [
           {
             id: "tool-1",
+            type: "software", secondaryName: null, isPaid: false, highlights: ["Software app", "Free trial", "Clear access"], downloadCount: 0, usageCount: 0,
             categoryId: "video",
             name: "Verified Tool",
             description: "A verified public tool.",

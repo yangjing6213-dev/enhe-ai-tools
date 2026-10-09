@@ -159,6 +159,9 @@
   display: flex;
   flex-direction: column;
   height: 751px;
+  min-height: 46.9375rem;
+  padding: 0;
+  gap: 0;
   min-width: 0;
   overflow: hidden;
   border: 1px solid var(--enhe-border, #dfe5df);
@@ -178,6 +181,7 @@
 .redesign-software-card-frame {
   position: relative;
   aspect-ratio: 16 / 9;
+  max-height: 240px;
   flex: 0 0 auto;
   background: #fff;
 }
@@ -213,10 +217,11 @@
 }
 
 .redesign-software-card-body {
-  display: grid;
+  display: flex;
+  flex-direction: column;
   flex: 1;
-  grid-template-rows: auto auto minmax(0, 1fr) auto;
-  gap: 16px;
+  min-height: 0;
+  gap: 12px;
   padding: 20px;
 }
 
@@ -230,27 +235,25 @@
 .redesign-software-card-badges {
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  gap: 12px;
+  flex-wrap: wrap;
+  gap: 8px;
 }
 
 .redesign-software-card-category {
-  color: var(--enhe-action, #527e54);
-  font-size: 0.8125rem;
+  color: var(--enhe-text);
+  font-size: 0.75rem;
   font-weight: 700;
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
 }
 
 .redesign-software-card-price {
   color: var(--enhe-text);
-  font-size: 0.875rem;
+  font-size: 0.75rem;
   font-weight: 700;
-  white-space: nowrap;
 }
 
 .redesign-software-card-body h3 {
-  font-size: 1.2rem;
+  font-size: 1.25rem;
+  font-weight: 700;
   letter-spacing: -0.03em;
   line-height: 1.25;
   overflow-wrap: anywhere;
@@ -263,9 +266,10 @@
 .redesign-software-card-description {
   display: -webkit-box;
   -webkit-box-orient: vertical;
-  -webkit-line-clamp: 4;
+  -webkit-line-clamp: 3;
   overflow: hidden;
-  color: var(--enhe-text-muted, #5f665f);
+  color: var(--enhe-text);
+  font-size: 0.875rem;
   line-height: 1.7;
 }
 
@@ -281,14 +285,109 @@
 }
 
 .redesign-software-card-link[data-support-exclusion] {
-  width: 100%;
+  min-width: 0;
   min-height: var(--enhe-button-h, 48px);
-  align-self: end;
-  padding: 12px 18px;
-  border: 1px solid var(--blue-11);
+  margin-inline-start: auto;
+  gap: 6px;
+  padding: 8px 0;
+  border: 0;
   border-radius: 0;
-  background: var(--blue-11);
-  color: #fff;
+  background: transparent;
+  color: var(--enhe-action-text, #0066cc);
+  font-size: 0.8125rem;
+  text-align: right;
+}
+
+.redesign-software-card-category,
+.redesign-software-card-price {
+  padding: 4px 12px;
+  border: 1px solid var(--enhe-border);
+  border-radius: 999px;
+  line-height: 1.3;
+}
+
+.redesign-software-card-arrow {
+  margin-inline-start: auto;
+  flex-shrink: 0;
+}
+
+.redesign-software-card-secondary {
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  overflow: hidden;
+  overflow-wrap: anywhere;
+  margin: 4px 0 0;
+  color: var(--enhe-action-text, #0066cc);
+  font-size: 0.875rem;
+  line-height: 1.4;
+}
+
+.redesign-software-card-description strong,
+.redesign-software-card-highlights svg,
+.redesign-software-card-audience svg {
+  color: var(--enhe-action-text, #0066cc);
+  flex-shrink: 0;
+}
+
+.redesign-software-card-highlights {
+  display: grid;
+  gap: 6px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  font-size: 0.875rem;
+}
+
+.redesign-software-card-highlights li,
+.redesign-software-card-audience,
+.redesign-software-card-bottom,
+.redesign-software-card-metrics,
+.redesign-software-card-metrics > span {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.redesign-software-card-audience {
+  margin: 0;
+  padding: 8px 12px;
+  border: 1px solid var(--enhe-border);
+  border-radius: 999px;
+  font-size: 0.75rem;
+}
+
+.redesign-software-card-commerce {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+  margin-top: auto;
+}
+
+.redesign-software-card-commerce span,
+.redesign-software-card-commerce strong {
+  display: block;
+  overflow-wrap: anywhere;
+}
+
+.redesign-software-card-commerce span {
+  margin-bottom: 4px;
+  font-size: 0.6875rem;
+  font-weight: 700;
+}
+
+.redesign-software-card-commerce strong {
+  font-size: 0.875rem;
+  line-height: 1.4;
+}
+
+.redesign-software-card-bottom {
+  justify-content: flex-end;
+  font-size: 0.75rem;
+}
+
+.redesign-software-card-metrics {
+  margin-inline-end: auto;
 }
 
 .redesign-software-empty {

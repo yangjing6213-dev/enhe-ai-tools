@@ -298,3 +298,49 @@ for (const locale of locales) {
     expect(requestFailures).toEqual([]);
   });
 }
+
+for (const locale of locales) {
+  test(`DB-free ${locale.query} software cards match the Skill layout without cover gaps or clipped actions`, async ({ page }) => {
+    test.setTimeout(90_000);
+    for (const width of [1440, 1024, 768, 390, 320]) {
+      await page.setViewportSize({ width, height: 1000 });
+      await openSoftwarePreview(page, locale.query);
+      const cards = page.locator(".redesign-software-card:visible");
+      const layout = await cards.evaluateAll((elements) => elements.map((card) => {
+        const bounds = card.getBoundingClientRect();
+        const style = getComputedStyle(card);
+        const frame = card.querySelector(".redesign-software-card-frame")!.getBoundingClientRect();
+        const action = card.querySelector(".redesign-software-card-link")!.getBoundingClientRect();
+        const body = card.querySelector(".redesign-software-card-body")!;
+        return {
+          topGap: frame.top - bounds.top - parseFloat(style.borderTopWidth),
+          radius: style.borderRadius,
+          height: bounds.height,
+          actionFits: action.bottom <= bounds.bottom && action.right <= bounds.right && action.left >= bounds.left,
+          bodyFits: body.scrollHeight <= body.clientHeight + 1,
+        };
+      }));
+      expect(layout.length).toBeGreaterThan(0);
+      for (const card of layout) {
+        expect(card.topGap, `${width}px cover flush`).toBeLessThanOrEqual(1);
+        expect(card.radius).toBe("0px");
+        expect(card.height).toBe(751);
+        expect(card.actionFits, `${width}px action: ${JSON.stringify(card)}`).toBe(true);
+        expect(card.bodyFits, `${width}px content: ${JSON.stringify(card)}`).toBe(true);
+      }
+      expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBeLessThanOrEqual(width);
+      const first = cards.first();
+      await expect(first.locator(".redesign-software-card-description strong")).toHaveText(locale.query === "zh" ? "价值:" : "Value:");
+      await expect(first.locator(".redesign-software-card-highlights li").first()).toBeVisible();
+      await expect(first.locator(".redesign-software-card-commerce")).toBeVisible();
+      if (width === 1440 || width === 390) {
+        await first.screenshot({ path: `output/ui-followup/card-${locale.query}-${width}.png` });
+      }
+      if (width === 1440) {
+        await first.hover();
+        await expect(first).toHaveCSS("transform", "matrix(1, 0, 0, 1, 0, -3)");
+        await page.mouse.move(0, 0);
+      }
+    }
+  });
+}

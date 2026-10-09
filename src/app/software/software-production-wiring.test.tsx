@@ -86,9 +86,10 @@ describe("production software route wiring", () => {
     expect(productionBranch).not.toContain("hidden=");
   });
 
-  it("server-renders one H1 and the initial public product semantics without candidate or delivery text", () => {
+  it("server-renders one H1 and the initial public product semantics without candidate text or private download paths", () => {
     const item = {
       id: "public-tool",
+      type: "software" as const, secondaryName: null, isPaid: true, highlights: ["Software app", "Paid download"], downloadCount: 0, usageCount: 0,
       categoryId: "video" as const,
       name: "Public AI Video Tool",
       description: "Creates a practical video draft from approved source material.",
@@ -127,7 +128,7 @@ describe("production software route wiring", () => {
     const productCardTags = Array.from(html.matchAll(/<article\b[^>]*>/gi), ([tag]) => tag);
     expect(productCardTags.length).toBeGreaterThan(0);
     expect(productCardTags.every((tag) => !/\shidden(?:=|\s|>)/i.test(tag))).toBe(true);
-    expect(html).not.toMatch(/LOCAL CANDIDATE|Preview|fileUrl|filePath|delivery/i);
+    expect(html).not.toMatch(/LOCAL CANDIDATE|Preview|fileUrl|filePath|downloadFile/i);
   });
 
   it("renders a clean empty state with a home recovery link and no empty rails or pagination nav", () => {

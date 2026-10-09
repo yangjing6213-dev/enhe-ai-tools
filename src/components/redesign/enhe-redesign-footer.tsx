@@ -90,7 +90,7 @@ export function EnheRedesignFooter({
           <div className="footer-brand">
             <Image
               className="footer-brand-logo"
-              src="/images/brand/enhe-footer-wordmark.png"
+              src="/images/enhe-logo-white.png"
               alt={locale === "en" ? "ENHE brand" : "ENHE 品牌标志"}
               width={2172}
               height={724}

@@ -1,5 +1,11 @@
-import { getDictionary, type Locale } from "@/lib/i18n";
+import { getDictionary, type Locale } from "@/lib/dictionaries";
 import { getPrimaryToolPrice, type ToolPriceSpecStatus } from "@/lib/tool-price-specs";
+
+export function buildValueSentence(description: string, locale: Locale) {
+  const sentence = description.split(/[。?!；，,.!?]/).find(Boolean)?.trim() ?? description.trim();
+  const maxLength = locale === "zh" ? 44 : 86;
+  return sentence.length > maxLength ? `${sentence.slice(0, maxLength - 1)}...` : sentence;
+}
 
 type ToolHighlightInput = {
   type: "software" | "online" | "skill_learning" | "ai_skill";

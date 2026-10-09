@@ -203,7 +203,7 @@
 .redesign-home-products-eyebrow {
   margin: 0 0 14px;
   color: var(--enhe-action-text, #0066cc);
-  font-size: 1rem;
+  font-size: 2rem;
   font-weight: 700;
   letter-spacing: 0.08em;
   text-transform: uppercase;
@@ -444,10 +444,12 @@
 
 .redesign-home-reviews-inner h2 {
   margin: 0 0 40px;
-  color: var(--enhe-text, #080808);
-  font-size: clamp(1rem, 1.3vw, 1.2rem);
-  letter-spacing: -0.05em;
-  line-height: 1;
+  color: var(--enhe-action-text, #0066cc);
+  font-size: 2rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  line-height: 1.5;
+  text-transform: uppercase;
   text-align: center;
 }
 

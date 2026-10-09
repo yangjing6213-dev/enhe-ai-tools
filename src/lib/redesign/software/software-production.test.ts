@@ -102,6 +102,18 @@ describe("production software catalog adapter", () => {
     );
   });
 
+  it("exposes real card metadata and omits missing metrics", () => {
+    const rows = buildRows(2);
+    const page = buildSoftwareCatalogPage({ rows: [{ ...rows[1], downloadCount: 7, usageCount: 2 }], locale: "zh", page: 1 });
+    expect(page?.items[0]).toMatchObject({
+      type: "software", secondaryName: "Practical AI Tool 2", isPaid: true,
+      highlights: ["软件应用", "付费下载"], downloadCount: 7, usageCount: 2,
+    });
+    expect(buildSoftwareCatalogPage({ rows: [rows[0]], locale: "en", page: 1 })?.items[0]).toMatchObject({
+      secondaryName: null, isPaid: false, downloadCount: 0, usageCount: 0,
+    });
+  });
+
   it("caps new releases at four and featured products at three using tracked fields", () => {
     const page = buildSoftwareCatalogPage({ rows: buildRows(25), locale: "zh", page: 1 });
 
