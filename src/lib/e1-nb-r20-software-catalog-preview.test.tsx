@@ -127,6 +127,7 @@ describe("E1-NB-R20 software catalog DB-free preview", () => {
     process.env.DATABASE_URL = "postgresql://configured.invalid/enhe";
     const item = {
       id: "verified-software",
+      type: "software", secondaryName: null, isPaid: false, highlights: ["Software app", "Free trial", "Clear access"], downloadCount: 0, usageCount: 0,
       categoryId: "efficiency",
       name: "Verified Software",
       description: "A verified catalog listing.",
