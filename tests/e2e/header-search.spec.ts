@@ -38,11 +38,13 @@ test("public header replaces the search link, opens recommendations, and submits
       expect(ctaCentered).toBeLessThan(2);
       if (width >= 1280) {
         const logoPosition = await footer.evaluate((element) => {
-          const grid = element.querySelector(".footer-grid")!.getBoundingClientRect();
-          const logo = element.querySelector(".footer-brand-logo")!.getBoundingClientRect();
-          return { gridCenter: grid.top + grid.height / 2, logoCenter: logo.top + logo.height / 2 };
+          const logo = element.querySelector<HTMLElement>(".footer-brand-logo")!;
+          const logoHeight = logo.getBoundingClientRect().height;
+          const transform = getComputedStyle(logo).transform;
+          const logoShift = transform === "none" ? 0 : new DOMMatrixReadOnly(transform).m42;
+          return { logoHeight, logoShift };
         });
-        expect(Math.abs(logoPosition.logoCenter - logoPosition.gridCenter)).toBeLessThan(2);
+        expect(logoPosition.logoShift).toBeCloseTo(logoPosition.logoHeight * 0.1, 0);
         const layout = await footer.evaluate((element) => {
           const logo = element.querySelector(".footer-brand-logo")!.getBoundingClientRect();
           const value = element.querySelector(".redesign-home-brand-value")!.getBoundingClientRect();
