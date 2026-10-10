@@ -43,7 +43,8 @@ describe("ENHE Phase 2C.1 production wiring", () => {
     expect(home).toContain("<EnheRedesignHero");
     expect(home).toContain("<EnheRedesignProductShowcase");
     expect(home).toContain("<EnheRedesignExperienceReviews");
-    expect(home).toContain("<EnheRedesignBrandValue");
+    expect(home).not.toContain("<EnheRedesignBrandValue");
+    expect(readSource("components/redesign/enhe-redesign-footer.tsx")).toContain("<EnheRedesignBrandValue locale={locale} />");
   });
 
   it("exposes exactly two AI Skill dropdown destinations", () => {

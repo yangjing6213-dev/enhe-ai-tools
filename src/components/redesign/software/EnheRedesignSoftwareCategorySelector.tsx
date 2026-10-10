@@ -24,8 +24,6 @@ import {
   type CategoryMotionProfile,
 } from "@/lib/motion/category-layer-motion";
 
-import styles from "./EnheRedesignSoftwareCategoryMotion.module.css";
-
 export const SOFTWARE_CATALOG_VISIBILITY_EVENT = "software-catalog:visibility-change";
 
 const CATALOG_CARD_SELECTOR = "[data-catalog-card]";
@@ -33,8 +31,7 @@ const ALL_PRODUCTS_ROOT_SELECTOR = "[data-all-products-root]";
 const LOAD_MORE_STATUS_SELECTOR = "[data-load-more-status]";
 const MOBILE_CATEGORY_QUERY = "(width < 768px)";
 const REDUCED_MOTION_QUERY = "(prefers-reduced-motion: reduce)";
-const FOCUSABLE_CATEGORY_CONTROLS =
-  '.redesign-software-category-button, [data-category-close="true"]';
+const FOCUSABLE_CATEGORY_CONTROLS = ".redesign-software-category-button";
 const CATEGORY_MOTION_DURATION_MS = {
   desktop: 190,
   mobile: 230,
@@ -464,15 +461,6 @@ export function EnheRedesignSoftwareCategorySelector({
           touchStartYRef.current = null;
         }}
       >
-        <button
-          type="button"
-          className={styles.closeButton}
-          aria-label={locale === "zh" ? "关闭分类" : "Close categories"}
-          data-category-close="true"
-          onClick={(event) => close(event.detail === 0 ? "keyboard" : "pointer")}
-        >
-          <span aria-hidden="true">×</span>
-        </button>
         <div
           className="redesign-software-category-buttons"
           role="group"

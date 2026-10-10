@@ -90,7 +90,7 @@ const EXPECTED_COPY = {
 const EXPECTED_CATEGORIES = [
   {
     id: "all",
-    label: localized("全部产品", "All products"),
+    label: localized("全部商品", "All products"),
   },
   {
     id: "skill",

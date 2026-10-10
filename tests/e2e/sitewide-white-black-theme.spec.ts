@@ -149,24 +149,19 @@ test("site pages keep white surfaces and black neutral text, including interacti
     await categoryTrigger.focus();
     await categoryTrigger.press("Enter");
     const categoryOption = page.locator(".redesign-software-category-button").first();
-    const categoryClose = page.locator('[data-category-close="true"]');
+    await expect(page.locator('[data-category-close="true"]')).toHaveCount(0);
     await expect(categoryOption).toBeVisible();
     const softwareControls = await page.evaluate(() => {
       const option = document.querySelector<HTMLElement>(".redesign-software-category-button");
       const unselectedOption = document.querySelector<HTMLElement>(".redesign-software-category-button:not([data-selected='true'])");
-      const close = document.querySelector<HTMLElement>('[data-category-close="true"]');
-      if (!option || !unselectedOption || !close) throw new Error("The software category controls must render.");
+      if (!option || !unselectedOption) throw new Error("The software category controls must render.");
       return {
         optionText: getComputedStyle(option).color,
         optionBorder: getComputedStyle(unselectedOption).borderColor,
-        closeText: getComputedStyle(close).color,
-        closeBorder: getComputedStyle(close).borderColor,
       };
     });
     expect(softwareControls.optionText).toBe("rgb(255, 255, 255)");
     expect(softwareControls.optionBorder).toBe("rgb(118, 118, 118)");
-    expect(softwareControls.closeText).toBe("rgb(0, 0, 0)");
-    expect(softwareControls.closeBorder).toBe("rgb(118, 118, 118)");
   }
 
   const byoxResponse = await page.goto("/build-your-own-x", { waitUntil: "load" });

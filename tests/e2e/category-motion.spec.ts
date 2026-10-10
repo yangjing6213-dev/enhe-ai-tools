@@ -7,12 +7,10 @@ const locales = [
   {
     locale: "zh",
     route: isDatabaseFree ? "/redesign-preview/software" : "/software",
-    closeLabel: "关闭分类",
   },
   {
     locale: "en",
     route: isDatabaseFree ? "/redesign-preview/software" : "/en/software",
-    closeLabel: "Close categories",
   },
 ] as const;
 
@@ -42,7 +40,7 @@ async function openCategoryRoute(
 }
 
 for (const width of viewports) {
-  for (const { locale, route, closeLabel } of locales) {
+  for (const { locale, route } of locales) {
     test(`origin-aware category layer passes ${route} (${locale}) at ${width}px`, async ({ page }) => {
       const consoleErrors: string[] = [];
       const pageErrors: string[] = [];
@@ -68,7 +66,8 @@ for (const width of viewports) {
       );
       await expect(panel).toHaveAttribute("data-motion-modality", "pointer");
       await expect(panel).toHaveAttribute("data-motion-origin", "trigger");
-      await expect(page.getByRole("button", { name: closeLabel })).toBeVisible();
+      await expect(panel.locator('[data-category-close="true"]')).toHaveCount(0);
+      await expect(panel.locator(".redesign-software-category-buttons")).toHaveCSS("justify-content", "center");
 
       const state = await panel.evaluate((element) => {
         const trigger = document.querySelector<HTMLElement>(
@@ -157,7 +156,7 @@ test("pre-navigation reduced motion hydrates cleanly and stays opacity-only", as
   await expect(panel).toHaveAttribute("data-motion-modality", "reduced");
   await expect(panel).toHaveAttribute("data-motion-enter-transform", "none");
 
-  await page.getByRole("button", { name: "关闭分类" }).click();
+  await page.mouse.click(8, 8);
   await expect(panel).toBeHidden();
   expect(consoleErrors).toEqual([]);
   expect(pageErrors).toEqual([]);
@@ -166,7 +165,7 @@ test("pre-navigation reduced motion hydrates cleanly and stays opacity-only", as
 test("keyboard and reduced-motion profiles stay fast, transform-free, and focus-safe", async ({
   page,
 }) => {
-  for (const { locale, route, closeLabel } of locales) {
+  for (const { locale, route } of locales) {
     await page.setViewportSize({ width: 390, height: 844 });
     await openCategoryRoute(page, route, locale);
 
@@ -186,13 +185,12 @@ test("keyboard and reduced-motion profiles stay fast, transform-free, and focus-
     await expect(panel).toHaveAttribute("data-motion-modality", "keyboard");
     await expect(panel).toHaveAttribute("data-motion-enter-transform", "none");
 
-    const closeButton = page.getByRole("button", { name: closeLabel });
     const categoryButtons = panel.locator(".redesign-software-category-button");
-    await closeButton.focus();
+    await categoryButtons.first().focus();
     await page.keyboard.press("Shift+Tab");
     await expect(categoryButtons.last()).toBeFocused();
     await page.keyboard.press("Tab");
-    await expect(closeButton).toBeFocused();
+    await expect(categoryButtons.first()).toBeFocused();
 
     await page.keyboard.press("Escape");
     await expect(panel).toBeHidden();
@@ -201,7 +199,7 @@ test("keyboard and reduced-motion profiles stay fast, transform-free, and focus-
     await trigger.press("Space");
     await expect(panel).toBeVisible();
     await expect(panel).toHaveAttribute("data-motion-duration-ms", "100");
-    await closeButton.press("Enter");
+    await categoryButtons.first().press("Enter");
     await expect(panel).toBeHidden();
     await expect(trigger).toBeFocused();
 
@@ -210,7 +208,7 @@ test("keyboard and reduced-motion profiles stay fast, transform-free, and focus-
     await expect(panel).toHaveAttribute("data-motion-duration-ms", "80");
     await expect(panel).toHaveAttribute("data-motion-modality", "reduced");
     await expect(panel).toHaveAttribute("data-motion-enter-transform", "none");
-    await closeButton.click();
+    await page.mouse.click(8, 8);
     await expect(panel).toBeHidden();
     await page.emulateMedia({ reducedMotion: "no-preference" });
   }

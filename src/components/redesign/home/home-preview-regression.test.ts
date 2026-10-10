@@ -133,11 +133,11 @@ describe("bilingual homepage candidate preview", () => {
     const render = home.slice(home.indexOf("return ("));
     expect(render.indexOf("<EnheRedesignHero")).toBeLessThan(render.indexOf("<EnheRedesignProductShowcase"));
     expect(render.indexOf("<EnheRedesignProductShowcase")).toBeLessThan(render.indexOf("<EnheRedesignExperienceReviews"));
-    expect(render.indexOf("<EnheRedesignExperienceReviews")).toBeLessThan(render.indexOf("<EnheRedesignBrandValue"));
     expect(render).toContain("<EnheRedesignHero locale={locale} />");
     expect(render).toContain("<EnheRedesignProductShowcase locale={locale} />");
     expect(render).toContain("<EnheRedesignExperienceReviews locale={locale} />");
-    expect(render).toContain("<EnheRedesignBrandValue locale={locale} />");
+    expect(render).not.toContain("<EnheRedesignBrandValue");
+    expect(readCandidate("components/redesign/enhe-redesign-footer.tsx")).toContain("<EnheRedesignBrandValue locale={locale} />");
     expect(home).not.toContain("LOCAL CANDIDATE");
     expect(brandValue).toContain("HOME_COPY");
     expect(brandValue).toContain("HOME_COPY[locale]");

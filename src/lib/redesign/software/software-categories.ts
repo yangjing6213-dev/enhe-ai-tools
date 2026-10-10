@@ -20,7 +20,7 @@ export const SOFTWARE_CATEGORIES = [
   {
     id: "all",
     label: {
-      zh: "全部产品",
+      zh: "全部商品",
       en: "All products",
     },
   },

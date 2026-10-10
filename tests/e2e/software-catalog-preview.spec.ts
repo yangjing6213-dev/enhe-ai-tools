@@ -1,7 +1,7 @@
 import { expect, test, type Locator, type Page } from "@playwright/test";
 
 const locales = [
-  { query: "zh", triggerLabel: "全部产品" },
+  { query: "zh", triggerLabel: "全部商品" },
   { query: "en", triggerLabel: "All products" },
 ] as const;
 
@@ -74,10 +74,9 @@ for (const locale of locales) {
       panel.locator(".redesign-software-category-button").first(),
       `${locale.query} category option`,
     );
-    await expectDarkFocusGuard(
-      panel.locator('[data-category-close="true"]'),
-      `${locale.query} category close`,
-    );
+    await expect(panel.locator('[data-category-close="true"]')).toHaveCount(0);
+    await page.keyboard.press("Escape");
+    await expect(trigger).toBeFocused();
     await expect(page.locator("html")).toHaveAttribute("lang", locale.query === "en" ? "en" : "zh");
     expect(pageErrors).toEqual([]);
     expect(requestFailures).toEqual([]);
@@ -110,10 +109,9 @@ for (const locale of locales) {
       panel.locator(".redesign-software-category-button").first(),
       `${locale.query} category option`,
     );
-    await expectForcedColorFocusRing(
-      panel.locator('[data-category-close="true"]'),
-      `${locale.query} category close`,
-    );
+    await expect(panel.locator('[data-category-close="true"]')).toHaveCount(0);
+    await page.keyboard.press("Escape");
+    await expectForcedColorFocusRing(trigger, `${locale.query} category dismissal`);
     expect(pageErrors).toEqual([]);
     expect(requestFailures).toEqual([]);
   });

@@ -1,6 +1,7 @@
 import { Fragment } from "react";
 import Image from "next/image";
 import { ChevronDown } from "lucide-react";
+import { EnheRedesignBrandValue } from "./home/EnheRedesignBrandValue";
 import type { ProductionFiling } from "@/lib/production-filing";
 import type { RedesignFooterCopy, RedesignLocale } from "./types";
 
@@ -96,23 +97,26 @@ export function EnheRedesignFooter({
               height={724}
             />
           </div>
-          {copy.columns.map((column) => (
-            <nav key={column.title} aria-label={column.title}>
-              <details className="footer-group">
-                <summary className="footer-group-trigger">
-                  <h3>{column.title}</h3>
-                  <ChevronDown aria-hidden="true" size={18} />
-                </summary>
-                <div className="footer-group-links">
-                  {column.links.map((link) => (
-                    <a key={link.href} href={link.href}>
-                      {link.label}
-                    </a>
-                  ))}
-                </div>
-              </details>
-            </nav>
-          ))}
+          <EnheRedesignBrandValue locale={locale} />
+          <div className="footer-navigation">
+            {copy.columns.map((column) => (
+              <nav key={column.title} aria-label={column.title}>
+                <details className="footer-group">
+                  <summary className="footer-group-trigger">
+                    <h3>{column.title}</h3>
+                    <ChevronDown aria-hidden="true" size={18} />
+                  </summary>
+                  <div className="footer-group-links">
+                    {column.links.map((link) => (
+                      <a key={link.href} href={link.href}>
+                        {link.label}
+                      </a>
+                    ))}
+                  </div>
+                </details>
+              </nav>
+            ))}
+          </div>
         </div>
         <div className="footer-bottom">
           <p className="footer-copyright-filings">

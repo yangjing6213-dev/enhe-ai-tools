@@ -4,7 +4,7 @@ test("public header replaces the search link, opens recommendations, and submits
   test.setTimeout(120_000);
   for (const locale of ["zh", "en"] as const) {
     const english = locale === "en";
-    for (const width of [1440, 1280, 1024, 768, 390, 320]) {
+    for (const width of [1920, 1440, 1280, 1024, 768, 390, 320]) {
       await page.setViewportSize({ width, height: 900 });
       await page.goto(english ? "/en" : "/");
       const header = page.locator(".redesign-header");
@@ -25,13 +25,34 @@ test("public header replaces the search link, opens recommendations, and submits
       await expect(footer.locator(".footer-bottom")).toHaveCSS("justify-content", "center");
       await expect(footer.locator(".footer-bottom p")).toHaveCount(1);
       await expect(footer.locator(".footer-bottom p")).toHaveCSS("color", "rgb(255, 255, 255)");
-      if (width >= 768) {
+      await expect(page.locator("main .redesign-home-brand-value")).toHaveCount(0);
+      await expect(footer.locator(".redesign-home-brand-value-cta")).toHaveAttribute("href", english ? "/en/software" : "/software");
+      await expect(footer.locator(".redesign-home-brand-value-inner h2")).toHaveCSS("color", "rgb(255, 255, 255)");
+      await expect(footer.locator(".redesign-home-brand-value")).toHaveCSS("background-color", "rgba(0, 0, 0, 0)");
+      await expect(footer.locator(".footer-navigation")).toHaveCSS("justify-content", "flex-end");
+      const ctaCentered = await footer.evaluate((element) => {
+        const area = element.querySelector(".redesign-home-brand-value")!.getBoundingClientRect();
+        const cta = element.querySelector(".redesign-home-brand-value-cta")!.getBoundingClientRect();
+        return Math.abs(area.left + area.width / 2 - cta.left - cta.width / 2);
+      });
+      expect(ctaCentered).toBeLessThan(2);
+      if (width >= 1280) {
         const logoPosition = await footer.evaluate((element) => {
           const grid = element.querySelector(".footer-grid")!.getBoundingClientRect();
           const logo = element.querySelector(".footer-brand-logo")!.getBoundingClientRect();
           return { gridCenter: grid.top + grid.height / 2, logoCenter: logo.top + logo.height / 2 };
         });
         expect(Math.abs(logoPosition.logoCenter - logoPosition.gridCenter)).toBeLessThan(2);
+        const layout = await footer.evaluate((element) => {
+          const logo = element.querySelector(".footer-brand-logo")!.getBoundingClientRect();
+          const value = element.querySelector(".redesign-home-brand-value")!.getBoundingClientRect();
+          const menus = element.querySelector(".footer-navigation")!.getBoundingClientRect();
+          return { logoLeft: logo.left, logoRight: logo.right, valueLeft: value.left, valueRight: value.right, valueCenter: value.left + value.width / 2, menusLeft: menus.left };
+        });
+        expect(Math.abs(layout.valueCenter - width / 2)).toBeLessThan(2);
+        expect(layout.logoRight).toBeLessThan(layout.valueLeft);
+        expect(layout.valueRight).toBeLessThan(layout.menusLeft);
+        if (width === 1920) expect(layout.logoLeft).toBe((width - 1200) / 2 - 240);
       }
       for (const selector of [".redesign-home-product-autoplay", ".redesign-home-reviews-rotation"]) {
         const rotationButton = page.locator(selector);
@@ -42,9 +63,9 @@ test("public header replaces the search link, opens recommendations, and submits
         await page.mouse.move(0, 0);
       }
       await expect(page.locator(".redesign-home-brand-value-inner h2")).toHaveCSS("font-weight", "700");
-      if (!english && [1440, 390].includes(width)) {
+      if ([1920, 1440, 390].includes(width)) {
         await footer.scrollIntoViewIfNeeded();
-        await page.screenshot({ path: `output/ui-followup/compact-footer-${width}.png` });
+        await page.screenshot({ path: `output/ui-followup/footer-center-${locale}-${width}.png` });
         await header.scrollIntoViewIfNeeded();
         await page.screenshot({ path: `output/ui-followup/compact-header-${width}.png` });
       }

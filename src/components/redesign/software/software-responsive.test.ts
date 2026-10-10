@@ -87,14 +87,12 @@ describe("AI tools candidate responsive browsing", () => {
     expect(focusBlock).toMatch(/box-shadow:\s*0 0 0 3px var\(--enhe-text,\s*#080808\);/);
   });
 
-  it("keeps the category sheet close control on the same focus guard", () => {
-    const css = readCandidate(
-      "components/redesign/software/EnheRedesignSoftwareCategoryMotion.module.css",
-    );
-
-    expect(css).toMatch(
-      /\.closeButton:focus-visible\s*\{[\s\S]*?outline:\s*3px solid var\(--enhe-focus,\s*#ffd60a\);[\s\S]*?outline-offset:\s*4px;[\s\S]*?box-shadow:\s*0 0 0 3px var\(--enhe-text,\s*#080808\);/,
-    );
+  it("removes the category cross while preserving dismissal and category focus", () => {
+    const selector = readCandidate("components/redesign/software/EnheRedesignSoftwareCategorySelector.tsx");
+    expect(selector).not.toContain('data-category-close="true"');
+    expect(selector).toContain('event.key === "Escape"');
+    expect(selector).toContain('document.addEventListener("pointerdown", handlePointerDown)');
+    expect(selector).toContain('const FOCUSABLE_CATEGORY_CONTROLS = ".redesign-software-category-button"');
   });
 
   it("uses the rail only for new releases and featured products", () => {

@@ -1,5 +1,4 @@
 import type { RedesignLocale } from "@/components/redesign/types";
-import { EnheRedesignBrandValue } from "./EnheRedesignBrandValue";
 import { EnheRedesignExperienceReviews } from "./EnheRedesignExperienceReviews";
 import { EnheRedesignFeatures } from "./EnheRedesignFeatures";
 import { EnheRedesignHero } from "./EnheRedesignHero";
@@ -12,7 +11,6 @@ export function EnheRedesignHome({ locale }: { locale: RedesignLocale }) {
       <EnheRedesignFeatures locale={locale} />
       <EnheRedesignProductShowcase locale={locale} />
       <EnheRedesignExperienceReviews locale={locale} />
-      <EnheRedesignBrandValue locale={locale} />
     </main>
   );
 }
