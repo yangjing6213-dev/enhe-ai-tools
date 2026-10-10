@@ -2,6 +2,7 @@ import "../globals.css";
 import "@/styles/redesign/tokens.css";
 import "@/styles/redesign/shell.css";
 import "@/styles/redesign/account.css";
+import "@/styles/redesign/site-refresh.css";
 import type { Metadata } from "next";
 import { headers } from "next/headers";
 import { RootDocument, sharedRootMetadata } from "@/app/root-layout-shared";

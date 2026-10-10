@@ -41,6 +41,30 @@ test("site pages keep white surfaces and black neutral text, including interacti
     eyebrowText: "rgb(4, 98, 194)",
   });
 
+  // Account/order layouts still render the legacy shell with globals.css.
+  await page.evaluate(() => {
+    const probe = document.createElement("div");
+    probe.dataset.legacyBrandProbe = "true";
+    probe.innerHTML = `<a class="site-user-chip">User</a>
+      <div class="site-language-switcher"><a class="is-active">中文</a><a>EN</a></div>
+      <footer class="site-footer"><nav><details class="site-footer-disclosure"><summary>帮助与服务</summary></details></nav>
+        <img class="site-footer-logo" alt="Brand" src="/images/enhe-logo-white.png">
+        <div class="site-footer-bottom"><p class="site-footer-filings"><span>© ENHE AI</span><a>ICP</a></p></div>
+      </footer>`;
+    document.body.append(probe);
+  });
+  const legacy = page.locator("[data-legacy-brand-probe]");
+  await expect(legacy.locator(".site-user-chip")).toHaveCSS("background-color", "rgb(4, 98, 194)");
+  await expect(legacy.locator(".site-language-switcher a.is-active")).toHaveCSS("background-color", "rgb(4, 98, 194)");
+  await expect(legacy.locator(".site-language-switcher a.is-active")).toHaveCSS("color", "rgb(255, 255, 255)");
+  await expect(legacy.locator("footer")).toHaveCSS("background-color", "rgb(13, 58, 109)");
+  await expect(legacy.locator("nav")).toHaveCSS("background-color", "rgb(13, 58, 109)");
+  await expect(legacy.locator("summary")).toHaveCSS("color", "rgb(255, 255, 255)");
+  await expect(legacy.locator(".site-footer-logo")).toHaveCSS("filter", "brightness(0) invert(1)");
+  await expect(legacy.locator(".site-footer-filings")).toHaveCSS("justify-content", "center");
+  await expect(legacy.locator(".site-footer-filings a")).toHaveCSS("color", "rgb(255, 255, 255)");
+  await legacy.evaluate((element) => element.remove());
+
   await page.setViewportSize({ width: 390, height: 844 });
   await page.locator(".redesign-menu-trigger").click();
   const mobileMenu = page.locator(".redesign-mobile-drawer");

@@ -5834,3 +5834,35 @@ body :is(
   background-color: #ffffff !important;
   background-image: none !important;
 }
+
+/* Older account/order layouts share the same public brand colors. */
+body .site-footer,
+body .site-footer :is(nav, address, .site-footer-disclosure, .site-footer-social-link) {
+  background-color: #0D3A6D !important;
+  color: #fff;
+}
+
+body .site-footer :is(a, p, span, dt, dd, summary) {
+  color: #fff;
+}
+
+body .site-footer .site-footer-logo {
+  filter: brightness(0) invert(1);
+}
+
+body .site-footer :is(.site-footer-bottom, .site-footer-filings) {
+  justify-content: center;
+  text-align: center;
+}
+
+body .site-footer a:focus-visible,
+body .site-footer summary:focus-visible {
+  outline-color: #fff;
+}
+
+body :is(.site-user-chip, .site-login-link, .site-language-switcher),
+body .site-language-switcher a,
+body .site-language-switcher a.is-active {
+  background: var(--brand-blue);
+  color: #fff;
+}

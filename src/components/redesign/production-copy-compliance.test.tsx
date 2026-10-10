@@ -149,6 +149,9 @@ describe("ENHE Phase 2C.1.2 production copy compliance", () => {
       const filing = PRODUCTION_FILING[locale];
       const html = renderToStaticMarkup(await SiteFooter({ forceLocale: locale }));
 
+      const bottom = html.slice(html.indexOf('<div class="site-footer-bottom">'));
+      expect(bottom.match(/<p(?:\s[^>]*)?>/g)).toHaveLength(1);
+      expect(bottom.indexOf(filing.icp.label)).toBeLessThan(bottom.indexOf(filing.publicSecurity.label));
       expect(html).toContain(filing.icp.label);
       expect(html).toContain(filing.publicSecurity.label);
       expect(html).toContain(`href="${filing.icp.href}"`);

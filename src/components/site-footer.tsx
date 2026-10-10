@@ -167,21 +167,21 @@ export async function SiteFooter({ forceLocale }: { forceLocale?: Locale }) {
         </div>
 
         <div className="site-footer-bottom">
-          <p>{copyright}</p>
-          <div className="site-footer-filings">
+          <p className="site-footer-filings">
+            <span>{copyright}</span>
+            <a href={filing.icp.href} target="_blank" rel="noreferrer" className="site-footer-filing-link cursor-target">
+              {filing.icp.label}
+            </a>
+            <span aria-hidden="true">·</span>
             <a
               href={filing.publicSecurity.href}
               target="_blank"
               rel="noreferrer"
               className="site-footer-filing-link cursor-target"
             >
-              <Image src="/images/beian-icon.png" alt={filing.publicSecurityAlt} width={18} height={20} unoptimized />
               <span>{filing.publicSecurity.label}</span>
             </a>
-            <a href={filing.icp.href} target="_blank" rel="noreferrer" className="site-footer-filing-link cursor-target">
-              {filing.icp.label}
-            </a>
-          </div>
+          </p>
         </div>
       </Container>
     </footer>
