@@ -31,7 +31,6 @@ const productionMotionPaths = [
   "src/components/redesign/enhe-redesign-mobile-menu.tsx",
   "src/components/redesign/home/EnheRedesignProductShowcase.tsx",
   "src/components/redesign/home/EnheRedesignProductStageMotion.module.css",
-  "src/components/redesign/software/EnheRedesignSoftwareCategoryMotion.module.css",
   "src/components/redesign/software/EnheRedesignSoftwareCategorySelector.tsx",
   "src/lib/motion/category-layer-motion.ts",
   "src/lib/motion/mobile-nav-motion.ts",
@@ -40,6 +39,8 @@ const productionMotionPaths = [
 
 const combinedSourceRangePaths = new Set([
   ...productionMotionPaths,
+  // Historical implementation included the now-removed category close-button styles.
+  "src/components/redesign/software/EnheRedesignSoftwareCategoryMotion.module.css",
   "src/components/redesign/public-shell-candidate.test.ts",
   "src/components/redesign/software/software-responsive.test.ts",
   "tests/category-motion.test.ts",

@@ -30,8 +30,7 @@ function resolveVariant(variant: unknown, custom: CategoryLayerMotionCustom) {
 
 const selectorPath =
   "src/components/redesign/software/EnheRedesignSoftwareCategorySelector.tsx";
-const stylesPath =
-  "src/components/redesign/software/EnheRedesignSoftwareCategoryMotion.module.css";
+const stylesPath = "src/styles/redesign/software.css";
 const shellPath = "src/styles/redesign/shell.css";
 const motionPath = "src/lib/motion/category-layer-motion.ts";
 
@@ -133,8 +132,9 @@ describe("production category origin-aware motion", () => {
     expect(selector).toContain('event.key === "ArrowDown"');
     expect(selector).toContain('event.key === "ArrowUp"');
     expect(selector).toContain("buttonRef.current?.focus()");
-    expect(selector).toContain('data-category-close="true"');
-    expect(styles).toMatch(/min-width:\s*44px/);
+    expect(selector).not.toContain('data-category-close="true"');
+    expect(selector).toContain('document.addEventListener("pointerdown", handlePointerDown)');
+    expect(selector).toContain('const FOCUSABLE_CATEGORY_CONTROLS = ".redesign-software-category-button"');
     expect(styles).toMatch(/min-height:\s*44px/);
   });
 
