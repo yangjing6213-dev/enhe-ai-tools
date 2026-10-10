@@ -159,10 +159,10 @@ describe("homepage UI polish", () => {
     expect(iconFont).toContain("cid=22664");
   });
 
-  it("sizes concise catalog cards to their content and keeps the existing hover motion", () => {
+  it("keeps catalog cards at one height and preserves the existing hover motion", () => {
     expect(softwareStyles).toMatch(/\.redesign-software-page\s*\{[^}]*width:\s*min\(100%,\s*1280px\)/);
     expect(softwareStyles).toMatch(/\.redesign-software-grid\s*\{[^}]*grid-template-columns:\s*repeat\(3,\s*minmax\(0,\s*1fr\)\)/);
-    expect(softwareStyles).toMatch(/\.redesign-software-card\s*\{[^}]*height:\s*auto[^}]*min-height:\s*0/);
+    expect(softwareStyles).toMatch(/\.redesign-software-card\s*\{[^}]*height:\s*602px[^}]*min-height:\s*0/);
     expect(softwareStyles).toMatch(/\.redesign-software-card\s*\{[^}]*border-radius:\s*0/);
     expect(softwareStyles).toMatch(/\.redesign-software-card:hover\s*\{[^}]*transform:\s*translateY\(-3px\)/);
     expect(softwareStyles).toMatch(/\.redesign-software-card-description\s*\{[^}]*-webkit-line-clamp:\s*3/);

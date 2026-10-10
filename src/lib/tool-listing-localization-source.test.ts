@@ -68,7 +68,7 @@ describe("tool listing localization source", () => {
     expect(softwareSource.indexOf("copy.page.intro")).toBeLessThan(
       softwareSource.indexOf("<EnheRedesignSoftwareCategorySelector"),
     );
-    expect(softwareCopySource).toContain("价格与使用边界");
+    expect(softwareCopySource).toContain("价格与使用教程");
     expect(softwareCopySource).toContain("price and boundaries");
     expect(accountServicesSource).toContain("<ListingGuidanceFold forceLocale={forceLocale} />");
     expect(accountServicesSource.indexOf("<ListingGuidanceFold")).toBeLessThan(accountServicesSource.indexOf("<FilterBar"));
