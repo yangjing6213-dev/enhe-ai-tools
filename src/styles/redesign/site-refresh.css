@@ -859,6 +859,7 @@ body .redesign-footer nav {
 
 .redesign-footer .footer-brand-logo {
   filter: brightness(0) invert(1);
+  transform: translateY(10%);
 }
 
 .redesign-footer .footer-brand {
