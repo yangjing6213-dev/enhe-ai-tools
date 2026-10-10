@@ -36,7 +36,7 @@ const EXPECTED_COPY = {
     page: {
       h1: "精选 AI 工具",
       intro:
-        "按真实任务找到已公开的 ENHE AI 工具、课程和效率入口，再进入对应详情页了解价格与使用边界。",
+        "按真实任务找到已公开的 ENHE AI 工具、课程和效率入口，再进入对应详情页了解价格与使用教程。",
     },
     sections: {
       newReleases: {

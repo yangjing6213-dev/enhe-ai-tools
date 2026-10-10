@@ -38,6 +38,18 @@ describe("AI tools candidate responsive browsing", () => {
     expect(css).toContain("margin-inline: calc(50% - 50vw)");
   });
 
+  it("matches the requested software catalogue layout and equal-height cards", () => {
+    const css = readCandidate("styles/redesign/software.css");
+    const catalog = readCandidate("components/redesign/software/EnheRedesignSoftwareCatalog.tsx");
+
+    expect(css).toContain("padding: 144px 24px 120px");
+    expect(css).toContain("font-size: clamp(0.9rem, 2vw, 1.5rem)");
+    expect(css).toContain("height: 602px;");
+    expect(css).toContain("font-weight: 900;");
+    expect(catalog).not.toContain("按公开发布时间展示最新上架的工具入口。");
+    expect(catalog).not.toContain("通过已跟踪的编辑推荐字段筛选公开产品。");
+  });
+
   it("keeps primary and secondary catalogue controls at the locked 48px height", () => {
     const css = readCandidate("styles/redesign/software.css");
 

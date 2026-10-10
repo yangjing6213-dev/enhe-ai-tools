@@ -133,7 +133,7 @@ function renderProductionCatalog({
           description={
             locale === "en"
               ? "The newest published entries, ordered by their public release record."
-              : "按公开发布时间展示最新上架的工具入口。"
+              : undefined
           }
           items={listing.newReleases}
           sectionId="new-releases"
@@ -148,7 +148,7 @@ function renderProductionCatalog({
           description={
             locale === "en"
               ? "Published products selected through the tracked editorial field."
-              : "通过已跟踪的编辑推荐字段筛选公开产品。"
+              : undefined
           }
           items={listing.featuredProducts}
           sectionId="featured-products"
@@ -250,7 +250,7 @@ function CatalogSection({
 }: {
   locale: RedesignLocale;
   heading: string;
-  description: string;
+  description?: string;
   items: SoftwareCatalogItem[];
   sectionId: "new-releases" | "featured-products";
   rail: "new" | "featured";
@@ -259,7 +259,7 @@ function CatalogSection({
     <section className="redesign-software-section" data-section={sectionId}>
       <header className="redesign-software-section-header">
         <h2>{heading}</h2>
-        <p>{description}</p>
+        {description ? <p>{description}</p> : null}
       </header>
       <EnheRedesignSoftwareRail
         ariaLabel={heading}
