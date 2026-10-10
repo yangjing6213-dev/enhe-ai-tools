@@ -65,7 +65,7 @@ for (const locale of locales) {
     const cardActionBox = await cardAction.boundingBox();
     expect(cardActionBox?.height, `${locale.query} card action height`).toBeGreaterThanOrEqual(48);
     await expectDarkFocusGuard(trigger, `${locale.query} category trigger`);
-    await expectDarkFocusGuard(cardAction, `${locale.query} card action`);
+    await expectDarkFocusGuard(page.locator(".redesign-software-card-full-link").first(), `${locale.query} card link`);
     await trigger.focus();
     await trigger.press("Enter");
     const panel = page.locator(".redesign-software-category-panel");
@@ -98,8 +98,8 @@ for (const locale of locales) {
 
     expect(response?.status(), `${locale.query} forced-colors preview status`).toBe(200);
     const trigger = page.locator(".redesign-software-category-trigger");
-    const cardAction = page.locator(".redesign-software-card-link").first();
-    await expectForcedColorFocusRing(cardAction, `${locale.query} card action`);
+    const cardLink = page.locator(".redesign-software-card-full-link").first();
+    await expectForcedColorFocusRing(cardLink, `${locale.query} card link`);
     await expectForcedColorFocusRing(trigger, `${locale.query} category trigger`);
     await trigger.press("Enter");
 
@@ -311,6 +311,18 @@ for (const locale of locales) {
         const action = card.querySelector(".redesign-software-card-link")!.getBoundingClientRect();
         const body = card.querySelector(".redesign-software-card-body")!;
         return {
+          section: card.getAttribute("data-section"),
+          trackOffsets: [
+            ".redesign-software-card-badges",
+            ".redesign-software-card-identity",
+            ".redesign-software-card-description",
+            ".redesign-software-card-highlights",
+            ".redesign-software-card-audience",
+            ".redesign-software-card-bottom",
+          ].map((selector) => {
+            const element = card.querySelector<HTMLElement>(selector);
+            return element ? element.getBoundingClientRect().top - bounds.top : null;
+          }),
           topGap: frame.top - bounds.top - parseFloat(style.borderTopWidth),
           radius: style.borderRadius,
           height: bounds.height,
@@ -327,13 +339,27 @@ for (const locale of locales) {
         expect(card.actionFits, `${width}px action: ${JSON.stringify(card)}`).toBe(true);
         expect(card.bodyFits, `${width}px content: ${JSON.stringify(card)}`).toBe(true);
       }
+      for (const section of new Set(layout.map((card) => card.section))) {
+        const sectionCards = layout.filter((card) => card.section === section);
+        for (let track = 0; track < sectionCards[0].trackOffsets.length; track += 1) {
+          const positions = sectionCards
+            .map((card) => card.trackOffsets[track])
+            .filter((position): position is number => position !== null);
+          if (positions.length > 1) {
+            expect(
+              Math.max(...positions) - Math.min(...positions),
+              `${width}px ${section} content row ${track} aligns with the first card`,
+            ).toBeLessThanOrEqual(1);
+          }
+        }
+      }
       expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBeLessThanOrEqual(width);
       const first = cards.first();
       await expect(first.locator(".redesign-software-card-description strong")).toHaveText(locale.query === "zh" ? "价值:" : "Value:");
       await expect(first.locator(".redesign-software-card-highlights li").first()).toBeVisible();
       await expect(cards.locator(".redesign-software-card-commerce, .redesign-software-card-price")).toHaveCount(0);
       await expect(first.locator(".redesign-software-card-link")).toHaveText("");
-      await expect(first.locator(".redesign-software-card-link")).toHaveAccessibleName(await first.locator("h3").innerText());
+      await expect(first.locator(".redesign-software-card-full-link")).toHaveAccessibleName(await first.locator("h3").innerText());
       if (width === 1440 || width === 390) {
         await first.screenshot({ path: `output/ui-followup/card-${locale.query}-${width}.png` });
       }
@@ -345,3 +371,18 @@ for (const locale of locales) {
     }
   });
 }
+
+test("clicking a software card's content opens that product's detail page", async ({ page }) => {
+  await page.setViewportSize({ width: 1440, height: 1000 });
+  await openSoftwarePreview(page, "zh");
+  await page.route("**/software/**", (route) =>
+    route.fulfill({ status: 200, contentType: "text/html", body: "<main>详情预览</main>" }),
+  );
+
+  const card = page.locator(".redesign-software-card:visible").first();
+  const target = await card.locator(".redesign-software-card-full-link").getAttribute("href");
+  expect(target).toBeTruthy();
+  const expectedUrl = new URL(target!, page.url()).href;
+  await card.locator(".redesign-software-card-identity h3").click();
+  await expect(page).toHaveURL(expectedUrl);
+});

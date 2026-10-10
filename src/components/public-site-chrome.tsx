@@ -1,10 +1,12 @@
 import { StructuredData } from "@/components/structured-data";
 import { CustomerSupportWidget } from "@/components/customer-support-widget";
+import { SiteFloatingActions } from "@/components/redesign/site-floating-actions";
 import {
   EnheRedesignPublicFooter,
   EnheRedesignPublicHeader,
 } from "@/components/redesign/enhe-production-public-shell";
 import { getCustomerSupportFaqs } from "@/lib/customer-support";
+import { getHeaderUserSnapshot } from "@/lib/auth";
 import { buildEnheOrganizationSchema } from "@/lib/brand-entity";
 import { getDictionary, type Locale } from "@/lib/dictionaries";
 import {
@@ -29,7 +31,10 @@ export async function PublicSiteChrome({
   forceLocale: Locale;
   languageHrefs?: RedesignLanguageHrefs;
 }>) {
-  const settings = await getSettingsMap();
+  const [settings, headerUser] = await Promise.all([
+    getSettingsMap(),
+    getHeaderUserSnapshot(),
+  ]);
   const t = getDictionary(forceLocale);
   const languageAlternates = buildLanguageAlternates("/");
   const siteLogo = getEffectiveSiteLogo(settings, "/images/brand/enhe-icon-gradient-white-bg-cropped.png");
@@ -70,6 +75,7 @@ export async function PublicSiteChrome({
         locale={forceLocale}
         languageHrefs={languageHrefs}
       />
+      <SiteFloatingActions locale={forceLocale} isAuthenticated={Boolean(headerUser)} />
       <div id="main-content" tabIndex={-1}>
         {children}
       </div>

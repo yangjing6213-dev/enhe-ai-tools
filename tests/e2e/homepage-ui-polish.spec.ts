@@ -1,4 +1,6 @@
 import { expect, test, type Page } from "@playwright/test";
+import { getAuthSecret, signHeaderUserCookieValue } from "@/lib/auth-security";
+import { headerUserCookieName } from "@/lib/header-user-cookie";
 
 test.use({ serviceWorkers: "block" });
 
@@ -202,13 +204,20 @@ test("homepage polish stays readable, responsive, and interactive without extern
         ctaShift: matrixY(cta),
         logoHeight: logo.getBoundingClientRect().height,
         logoShift: matrixY(logo),
+        logoCenterOffset: Math.abs(
+          logo.getBoundingClientRect().top + logo.getBoundingClientRect().height / 2 -
+          (element.querySelector<HTMLElement>(".footer-grid")!.getBoundingClientRect().top +
+            element.querySelector<HTMLElement>(".footer-grid")!.getBoundingClientRect().height / 2),
+        ),
         navigationTop: navigation.getBoundingClientRect().top,
         firstTriggerTop: firstTrigger.getBoundingClientRect().top,
       };
     });
     expect(footerAlignment.headingSize).toBeGreaterThanOrEqual(36);
     expect(footerAlignment.ctaShift).toBeCloseTo(footerAlignment.ctaHeight * 0.3, 0);
-    expect(footerAlignment.logoShift).toBeCloseTo(footerAlignment.logoHeight * 0.1, 0);
+    if (width >= 1280) {
+      expect(footerAlignment.logoCenterOffset).toBeLessThanOrEqual(1);
+    }
     if (width >= 1280) {
       expect(Math.abs(footerAlignment.navigationTop - footerAlignment.headingTop)).toBeLessThanOrEqual(1);
       expect(Math.abs(footerAlignment.firstTriggerTop - footerAlignment.headingTop)).toBeLessThanOrEqual(1);
@@ -339,4 +348,60 @@ test("homepage polish stays readable, responsive, and interactive without extern
 
   expect(rejectedOrigins).toEqual([]);
   expect(pageErrors).toEqual([]);
+});
+
+test("floating inbox and cart actions stack above support and show unread status", async ({ page }) => {
+  if (process.env.DATABASE_URL?.trim()) {
+    throw new Error("Floating action UI checks require an unset DATABASE_URL.");
+  }
+
+  const port = process.env.PORT ?? "3000";
+  const cookiePayload = Buffer.from(JSON.stringify({
+    email: "visitor@example.com",
+    nickname: "Test visitor",
+    role: "user",
+  })).toString("base64url");
+  await page.context().addCookies([{
+    name: headerUserCookieName,
+    value: signHeaderUserCookieValue(cookiePayload, getAuthSecret()),
+    url: `http://127.0.0.1:${port}/`,
+  }]);
+  await page.route("**/api/user/notifications/unread-status", (route) =>
+    route.fulfill({
+      status: 200,
+      contentType: "application/json",
+      body: JSON.stringify({ hasUnread: true }),
+    }),
+  );
+
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.goto("/", { waitUntil: "load" });
+
+  const cart = page.getByRole("link", { name: "查看购买订单" });
+  const inbox = page.getByRole("link", { name: "站内消息，有未读消息" });
+  const support = page.locator(".customer-support-widget .customer-support-launcher");
+  await expect(cart).toHaveAttribute("href", "/user#orders");
+  await expect(inbox).toHaveAttribute("href", "/user#notifications");
+  await expect(inbox.locator(".site-floating-action-unread")).toBeVisible();
+  await expect(support).toBeVisible();
+
+  const positions = await Promise.all([cart, inbox, support].map((control) =>
+    control.evaluate((element) => {
+      const { top, right, bottom, width, height } = element.getBoundingClientRect();
+      return { top, right, bottom, width, height, radius: getComputedStyle(element).borderRadius };
+    }),
+  ));
+  for (const [index, position] of positions.entries()) {
+    expect(position.width, `floating control ${index} width`).toBe(44);
+    expect(position.height, `floating control ${index} height`).toBe(44);
+    expect(position.radius, `floating control ${index} shape`).toBe("50%");
+  }
+  expect(positions[0].right).toBeCloseTo(positions[1].right, 0);
+  expect(positions[1].right).toBeCloseTo(positions[2].right, 0);
+  expect(positions[0].bottom).toBeLessThan(positions[1].top);
+  expect(positions[1].bottom).toBeLessThan(positions[2].top);
+
+  await page.emulateMedia({ reducedMotion: "reduce" });
+  await expect(cart).toHaveCSS("transition-property", "none");
+  await expect(cart).toHaveCSS("transform", "none");
 });

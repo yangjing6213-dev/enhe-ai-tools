@@ -111,7 +111,7 @@ export async function UserCenterPageShell({
 
       <div className="grid gap-6 lg:grid-cols-[320px_1fr]">
         <aside className="space-y-4">
-          <Panel title={t.notifications.title.replace("{count}", String(unreadNotificationCount))}>
+          <Panel id="notifications" title={t.notifications.title.replace("{count}", String(unreadNotificationCount))}>
             {notifications.length ? (
               <div className="space-y-3">
                 <form action={markAllNotificationsReadAction}>
@@ -234,7 +234,7 @@ export async function UserCenterPageShell({
         </aside>
 
         <div className="space-y-6">
-          <Panel title={t.userCenter.orders}>
+          <Panel id="orders" title={t.userCenter.orders}>
             <div className="space-y-3">
               {orders.length ? (
                 orders.map((order) => (
@@ -334,9 +334,9 @@ export async function UserCenterPageShell({
   );
 }
 
-function Panel({ title, children }: React.PropsWithChildren<{ title: string }>) {
+function Panel({ id, title, children }: React.PropsWithChildren<{ id?: string; title: string }>) {
   return (
-    <section className="surface-panel user-center-panel p-6">
+    <section id={id} className="surface-panel user-center-panel p-6">
       <h2 className="mb-4 text-xl font-bold text-[var(--marketing-text)]">{title}</h2>
       {children}
     </section>
