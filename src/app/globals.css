@@ -5842,8 +5842,12 @@ body .site-footer :is(nav, address, .site-footer-disclosure, .site-footer-social
   color: #fff;
 }
 
-body .site-footer :is(a, p, span, dt, dd, summary) {
-  color: #fff;
+body .site-footer :is(a, p, span, dt, dd, summary, svg) {
+  color: #fff !important;
+}
+
+body .site-footer :is(a:hover, summary:hover) {
+  background-color: transparent !important;
 }
 
 body .site-footer .site-footer-logo {
@@ -5863,6 +5867,6 @@ body .site-footer summary:focus-visible {
 body :is(.site-user-chip, .site-login-link, .site-language-switcher),
 body .site-language-switcher a,
 body .site-language-switcher a.is-active {
-  background: var(--brand-blue);
-  color: #fff;
+  background: var(--brand-blue) !important;
+  color: #fff !important;
 }
