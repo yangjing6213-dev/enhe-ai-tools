@@ -158,8 +158,9 @@
 .redesign-software-card {
   display: flex;
   flex-direction: column;
-  height: 751px;
-  min-height: 46.9375rem;
+  height: auto;
+  min-height: 0;
+  align-self: start;
   padding: 0;
   gap: 0;
   min-width: 0;
@@ -226,7 +227,6 @@
 }
 
 .redesign-software-card-category,
-.redesign-software-card-price,
 .redesign-software-card-body h3,
 .redesign-software-card-description {
   margin: 0;
@@ -240,12 +240,6 @@
 }
 
 .redesign-software-card-category {
-  color: var(--enhe-text);
-  font-size: 0.75rem;
-  font-weight: 700;
-}
-
-.redesign-software-card-price {
   color: var(--enhe-text);
   font-size: 0.75rem;
   font-weight: 700;
@@ -285,11 +279,11 @@
 }
 
 .redesign-software-card-link[data-support-exclusion] {
-  min-width: 0;
+  min-width: 44px;
   min-height: var(--enhe-button-h, 48px);
   margin-inline-start: auto;
   gap: 6px;
-  padding: 8px 0;
+  padding: 8px;
   border: 0;
   border-radius: 0;
   background: transparent;
@@ -298,17 +292,11 @@
   text-align: right;
 }
 
-.redesign-software-card-category,
-.redesign-software-card-price {
+.redesign-software-card-category {
   padding: 4px 12px;
   border: 1px solid var(--enhe-border);
   border-radius: 999px;
   line-height: 1.3;
-}
-
-.redesign-software-card-arrow {
-  margin-inline-start: auto;
-  flex-shrink: 0;
 }
 
 .redesign-software-card-secondary {
@@ -355,30 +343,6 @@
   border: 1px solid var(--enhe-border);
   border-radius: 999px;
   font-size: 0.75rem;
-}
-
-.redesign-software-card-commerce {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 12px;
-  margin-top: auto;
-}
-
-.redesign-software-card-commerce span,
-.redesign-software-card-commerce strong {
-  display: block;
-  overflow-wrap: anywhere;
-}
-
-.redesign-software-card-commerce span {
-  margin-bottom: 4px;
-  font-size: 0.6875rem;
-  font-weight: 700;
-}
-
-.redesign-software-card-commerce strong {
-  font-size: 0.875rem;
-  line-height: 1.4;
 }
 
 .redesign-software-card-bottom {

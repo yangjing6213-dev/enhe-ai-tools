@@ -40,7 +40,7 @@ test("homepage polish stays readable, responsive, and interactive without extern
     const hero = page.locator(".redesign-home-hero");
     await expect(brand).toBeVisible();
     await expect(brandLabel).toHaveCount(0);
-    await expect(hero.locator("h1")).toHaveText("AI一站式平台，一起创造未来");
+    await expect(hero.locator("h1")).toHaveText("AI一站式平台 一起创造未来");
     await expect(hero.locator(".redesign-home-hero-inner")).toHaveCSS("text-align", "center");
     await expect(hero).toHaveCSS("background-image", "none");
     const heroColor = await hero.evaluate((element) => getComputedStyle(element).color);

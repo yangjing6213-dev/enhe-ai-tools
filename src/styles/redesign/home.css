@@ -476,8 +476,8 @@
   padding: 0;
   border: 0;
   border-radius: 50%;
-  background: var(--blue-11);
-  color: #fff;
+  background: transparent;
+  color: #000;
   cursor: pointer;
 }
 

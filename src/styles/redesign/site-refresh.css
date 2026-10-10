@@ -822,11 +822,24 @@
   .redesign-header-search {
     width: 50%;
   }
+
+  .redesign-footer .footer-grid {
+    min-height: 126px;
+  }
+
+  .redesign-footer .footer-brand {
+    align-self: center;
+  }
+
+  .redesign-footer .footer-bottom {
+    margin-top: 0;
+  }
 }
 
 .redesign-header .redesign-language-switch,
 .redesign-header .redesign-login-link,
 .redesign-header .redesign-avatar-trigger {
+  border: 0 !important;
   background: var(--enhe-action) !important;
   color: #fff !important;
 }
@@ -897,7 +910,7 @@ body .customer-support-widget .customer-support-launcher,
   min-height: 44px;
   border: 0;
   background: transparent;
-  color: var(--enhe-action);
+  color: #000;
   cursor: pointer;
 }
 

@@ -32,11 +32,10 @@ describe("tool listing localization source", () => {
     expect(softwareSource.indexOf("<EnheRedesignSoftwareCategorySelector")).toBeLessThan(
       softwareSource.indexOf('data-section="all-products"'),
     );
-    expect(softwareCardSource).toContain('className="redesign-software-card-commerce"');
-    expect(softwareCardSource).toContain('<strong>{product.price}</strong>');
-    expect(softwareCardSource.indexOf('<strong>{product.price}</strong>')).toBeLessThan(
-      softwareCardSource.indexOf("href={product.detailHref}"),
-    );
+    expect(softwareCardSource).not.toContain('className="redesign-software-card-commerce"');
+    expect(softwareCardSource).not.toContain("product.price");
+    expect(softwareCardSource).toContain("href={product.detailHref}");
+    expect(softwareCardSource).toContain("aria-labelledby={headingId}");
     expect(accountServicesSource).toContain("<ListingGuidanceFold forceLocale={forceLocale} />");
     expect(accountServicesSource.indexOf("<ListingGuidanceFold")).toBeLessThan(accountServicesSource.indexOf("<FilterBar"));
     expect(accountServicesSource).toContain("<ListingDecisionStrip");

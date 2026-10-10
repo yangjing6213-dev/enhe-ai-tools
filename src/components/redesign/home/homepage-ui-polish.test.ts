@@ -59,8 +59,8 @@ describe("homepage UI polish", () => {
     expect(header).not.toContain("ThemeToggle");
     expect(languageControl).toBeGreaterThan(accountControl);
     expect(shellStyles).toMatch(/\.redesign-avatar-menu\s*\{[^}]*color:\s*var\(--enhe-text\)/);
-    expect(shellStyles).toMatch(/\.redesign-language-switch\s*\{[^}]*border:\s*1px solid #000/);
-    expect(shellStyles).toMatch(/\.redesign-avatar-trigger\s*\{[^}]*border:\s*1px solid #000/);
+    expect(shellStyles).toMatch(/\.redesign-language-switch\s*\{[^}]*border:\s*0/);
+    expect(shellStyles).toMatch(/\.redesign-avatar-trigger\s*\{[^}]*border:\s*0/);
     expect(shellStyles).toMatch(/\.redesign-desktop-nav\s*\{[^}]*gap:\s*clamp\(/);
     expect(shellStyles).toMatch(/\.redesign-desktop-nav\s*\{[^}]*letter-spacing:\s*0\.(?:015|025)em/);
   });
@@ -106,8 +106,8 @@ describe("homepage UI polish", () => {
     expect(reviews).not.toContain("以下人物与评价内容由 AI 生成，仅作页面展示示意，并非真实用户评价。");
     expect(refreshStyles).toMatch(/\.redesign-home-reviews-disclosure\s*\{[^}]*color:\s*#fff/);
     expect(refreshStyles).toMatch(/\.redesign-home-reviews-disclosure\s*\{[^}]*background:\s*var\(--blue-11/);
-    expect(homeStyles).toMatch(/\.redesign-home-reviews-rotation\s*\{[^}]*color:\s*#fff/);
-    expect(homeStyles).toMatch(/\.redesign-home-reviews-rotation\s*\{[^}]*background:\s*var\(--blue-11/);
+    expect(homeStyles).toMatch(/\.redesign-home-reviews-rotation\s*\{[^}]*color:\s*#000/);
+    expect(homeStyles).toMatch(/\.redesign-home-reviews-rotation\s*\{[^}]*background:\s*transparent/);
   });
 
   it("keeps narrow-phone review cards readable without clipped neighboring reviews", () => {
@@ -159,10 +159,10 @@ describe("homepage UI polish", () => {
     expect(iconFont).toContain("cid=22664");
   });
 
-  it("matches the AI Skill catalog card footprint and keeps the existing hover motion", () => {
+  it("sizes concise catalog cards to their content and keeps the existing hover motion", () => {
     expect(softwareStyles).toMatch(/\.redesign-software-page\s*\{[^}]*width:\s*min\(100%,\s*1280px\)/);
     expect(softwareStyles).toMatch(/\.redesign-software-grid\s*\{[^}]*grid-template-columns:\s*repeat\(3,\s*minmax\(0,\s*1fr\)\)/);
-    expect(softwareStyles).toMatch(/\.redesign-software-card\s*\{[^}]*height:\s*751px/);
+    expect(softwareStyles).toMatch(/\.redesign-software-card\s*\{[^}]*height:\s*auto[^}]*min-height:\s*0/);
     expect(softwareStyles).toMatch(/\.redesign-software-card\s*\{[^}]*border-radius:\s*0/);
     expect(softwareStyles).toMatch(/\.redesign-software-card:hover\s*\{[^}]*transform:\s*translateY\(-3px\)/);
     expect(softwareStyles).toMatch(/\.redesign-software-card-description\s*\{[^}]*-webkit-line-clamp:\s*3/);

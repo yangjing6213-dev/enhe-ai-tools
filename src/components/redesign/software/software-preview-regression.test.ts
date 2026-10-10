@@ -58,20 +58,18 @@ function assertLocaleSurface(locale: RedesignLocale, html: string) {
   expect(html).toContain(copy.sections.allProducts.heading);
   expect(html).toContain(copy.actions.loadMore);
   expect(html).toContain(copy.actions.pageTwo);
-  expect(html).toContain(getDictionary(locale).toolCard.compareBeforeBuy);
-  expect(html).toContain(getDictionary(locale).toolCard.getFreeTool);
+  expect(html).not.toContain(getDictionary(locale).toolCard.compareBeforeBuy);
+  expect(html).not.toContain(getDictionary(locale).toolCard.getFreeTool);
+  expect(html).not.toContain("redesign-software-card-price");
+  expect(html).not.toContain("redesign-software-card-commerce");
 
   for (const product of SOFTWARE_PRODUCTS) {
     expect(html).toContain(product.name[locale]);
     expect(html).toContain(buildValueSentence(product.description[locale], locale));
-    expect(html).toContain(product.price[locale]);
     expect(html).toContain(product.detailHref[locale]);
 
     expect(html).not.toContain(product.description[otherLocale]);
 
-    if (product.price[locale] !== product.price[otherLocale]) {
-      expect(html).not.toContain(product.price[otherLocale]);
-    }
   }
 
   for (const value of [

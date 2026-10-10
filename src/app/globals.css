@@ -5867,6 +5867,7 @@ body .site-footer summary:focus-visible {
 body :is(.site-user-chip, .site-login-link, .site-language-switcher),
 body .site-language-switcher a,
 body .site-language-switcher a.is-active {
+  border: 0 !important;
   background: var(--brand-blue) !important;
   color: #fff !important;
 }

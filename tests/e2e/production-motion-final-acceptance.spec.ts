@@ -43,7 +43,7 @@ const routes: FormalRoute[] = [
   {
     path: "/",
     kind: "home",
-    h1: /AI一站式平台，一起创造未来/,
+    h1: /AI一站式平台 一起创造未来/,
     menu: "菜单",
     closeMenu: "收起菜单",
     support: "客服",

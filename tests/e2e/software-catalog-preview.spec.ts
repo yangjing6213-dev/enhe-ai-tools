@@ -324,7 +324,8 @@ for (const locale of locales) {
       for (const card of layout) {
         expect(card.topGap, `${width}px cover flush`).toBeLessThanOrEqual(1);
         expect(card.radius).toBe("0px");
-        expect(card.height).toBe(751);
+        expect(card.height).toBeLessThan(751);
+        expect(card.height).toBeGreaterThan(300);
         expect(card.actionFits, `${width}px action: ${JSON.stringify(card)}`).toBe(true);
         expect(card.bodyFits, `${width}px content: ${JSON.stringify(card)}`).toBe(true);
       }
@@ -332,7 +333,9 @@ for (const locale of locales) {
       const first = cards.first();
       await expect(first.locator(".redesign-software-card-description strong")).toHaveText(locale.query === "zh" ? "价值:" : "Value:");
       await expect(first.locator(".redesign-software-card-highlights li").first()).toBeVisible();
-      await expect(first.locator(".redesign-software-card-commerce")).toBeVisible();
+      await expect(cards.locator(".redesign-software-card-commerce, .redesign-software-card-price")).toHaveCount(0);
+      await expect(first.locator(".redesign-software-card-link")).toHaveText("");
+      await expect(first.locator(".redesign-software-card-link")).toHaveAccessibleName(await first.locator("h3").innerText());
       if (width === 1440 || width === 390) {
         await first.screenshot({ path: `output/ui-followup/card-${locale.query}-${width}.png` });
       }

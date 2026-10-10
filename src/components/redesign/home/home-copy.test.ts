@@ -11,7 +11,7 @@ const heroSource = readFileSync(
 describe("homepage approved copy", () => {
   it("keeps the exact bilingual hero and value contract", () => {
     expect(HOME_COPY.zh.label).toBe("给你的人生添加AI外挂");
-    expect(HOME_COPY.zh.h1).toBe("AI一站式平台，一起创造未来");
+    expect(HOME_COPY.zh.h1).toBe("AI一站式平台 一起创造未来");
     expect(HOME_COPY.zh.subtitle).toBe("发现值得使用的 AI 工具、实用方法与行业动态，让工作更高效，让创作更自由。");
     expect(HOME_COPY.zh.cta).toEqual({ label: "探索 AI 工具", href: "/software" });
     expect(HOME_COPY.zh.value.heading).toBe("让每一个人，都能驾驭AI，创造价值。");

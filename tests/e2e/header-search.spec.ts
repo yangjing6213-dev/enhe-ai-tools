@@ -13,7 +13,8 @@ test("public header replaces the search link, opens recommendations, and submits
       await expect(header.locator(".redesign-brand-label")).toHaveCount(0);
       await expect(header.locator('.redesign-nav-link[href$="/search"]')).toHaveCount(0);
       await expect(page.locator(".redesign-home-cta")).toHaveCSS("border-radius", "4px");
-      await expect(header.locator(".redesign-language-switch:visible")).toHaveCSS("border-color", "rgb(0, 0, 0)");
+      await expect(header.locator(".redesign-language-switch:visible")).toHaveCSS("border-width", "0px");
+      if (width >= 768) await expect(header.locator(".redesign-login-link:visible")).toHaveCSS("border-width", "0px");
       await expect(header.locator(".redesign-language-switch:visible")).toHaveCSS("background-color", "rgb(4, 98, 194)");
       await expect(header.locator(".redesign-language-link:visible").first()).toHaveCSS("color", "rgb(255, 255, 255)");
       const footer = page.locator(".redesign-footer");
@@ -24,7 +25,29 @@ test("public header replaces the search link, opens recommendations, and submits
       await expect(footer.locator(".footer-bottom")).toHaveCSS("justify-content", "center");
       await expect(footer.locator(".footer-bottom p")).toHaveCount(1);
       await expect(footer.locator(".footer-bottom p")).toHaveCSS("color", "rgb(255, 255, 255)");
+      if (width >= 768) {
+        const logoPosition = await footer.evaluate((element) => {
+          const grid = element.querySelector(".footer-grid")!.getBoundingClientRect();
+          const logo = element.querySelector(".footer-brand-logo")!.getBoundingClientRect();
+          return { gridCenter: grid.top + grid.height / 2, logoCenter: logo.top + logo.height / 2 };
+        });
+        expect(Math.abs(logoPosition.logoCenter - logoPosition.gridCenter)).toBeLessThan(2);
+      }
+      for (const selector of [".redesign-home-product-autoplay", ".redesign-home-reviews-rotation"]) {
+        const rotationButton = page.locator(selector);
+        await expect(rotationButton).toHaveCSS("color", "rgb(0, 0, 0)");
+        await expect(rotationButton).toHaveCSS("background-color", "rgba(0, 0, 0, 0)");
+        await rotationButton.hover();
+        await expect(rotationButton).toHaveCSS("background-color", "rgba(0, 0, 0, 0)");
+        await page.mouse.move(0, 0);
+      }
       await expect(page.locator(".redesign-home-brand-value-inner h2")).toHaveCSS("font-weight", "700");
+      if (!english && [1440, 390].includes(width)) {
+        await footer.scrollIntoViewIfNeeded();
+        await page.screenshot({ path: `output/ui-followup/compact-footer-${width}.png` });
+        await header.scrollIntoViewIfNeeded();
+        await page.screenshot({ path: `output/ui-followup/compact-header-${width}.png` });
+      }
       const layout = await header.evaluate((el) => {
         const box = (selector: string) => el.querySelector(selector)!.getBoundingClientRect().toJSON();
         return { logo: box(".redesign-brand-mark"), search: box(".redesign-header-search"), nav: box(".redesign-desktop-nav"), scrollWidth: document.documentElement.scrollWidth };

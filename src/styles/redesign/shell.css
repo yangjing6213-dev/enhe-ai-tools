@@ -409,7 +409,7 @@
   align-items: center;
   min-height: 44px;
   padding-inline: 7px;
-  border: 1px solid #000;
+  border: 0;
   border-radius: var(--enhe-button-r);
   background: var(--enhe-page-bg);
   color: var(--enhe-text);
@@ -429,7 +429,7 @@
 
 .redesign-login-link {
   padding-inline: 13px;
-  border: 1px solid #000;
+  border: 0;
   border-radius: var(--enhe-button-r);
 }
 
@@ -439,7 +439,7 @@
 
 .redesign-avatar-trigger {
   padding: 0 12px;
-  border: 1px solid #000;
+  border: 0;
   border-radius: var(--enhe-button-r);
   background: var(--enhe-page-bg);
   color: var(--enhe-text);
