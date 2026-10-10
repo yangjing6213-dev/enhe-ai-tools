@@ -22,11 +22,11 @@ describe("public navigation current-page state", () => {
     expect(isExactCurrentPage("/en/ai-news/topics", "/en/ai-news")).toBe(false);
   });
 
-  it("puts a Home destination first in both locale menus and keeps Search as text", () => {
+  it("puts Home first and removes the old Search link in both locale menus", () => {
     expect(REDESIGN_NAV_ITEMS.zh[0]).toMatchObject({ label: "首页", href: "/" });
     expect(REDESIGN_NAV_ITEMS.en[0]).toMatchObject({ label: "Home", href: "/en" });
-    expect(REDESIGN_NAV_ITEMS.zh.some((item) => item.href === "/search")).toBe(true);
-    expect(REDESIGN_NAV_ITEMS.en.some((item) => item.href === "/en/search")).toBe(true);
+    expect(REDESIGN_NAV_ITEMS.zh.some((item) => String(item.href) === "/search")).toBe(false);
+    expect(REDESIGN_NAV_ITEMS.en.some((item) => String(item.href) === "/en/search")).toBe(false);
     expect(headerSource).not.toContain("redesign-search-icon");
     expect(mobileMenuSource).not.toContain("redesign-search-icon");
   });

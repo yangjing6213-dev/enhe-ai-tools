@@ -46,13 +46,17 @@
 .redesign-header[data-home="true"] .redesign-login-link,
 .redesign-header[data-home="true"] .redesign-avatar-trigger,
 .redesign-header[data-home="true"] .redesign-menu-trigger {
-  border-color: var(--enhe-border);
+  border-color: #000;
   background: var(--enhe-page-bg);
   color: var(--enhe-text);
 }
 
 .redesign-header-inner {
-  width: min(100% - 48px, 1320px);
+  width: min(100% - 48px, 1560px);
+  display: grid;
+  grid-template-columns: 154px minmax(220px, 1fr) auto;
+  gap: 16px;
+  padding-block: 12px;
 }
 
 .redesign-brand-lockup {
@@ -73,12 +77,6 @@
 .redesign-brand-region {
   width: 154px;
   min-width: 0;
-}
-
-.redesign-brand-label {
-  max-width: 100%;
-  white-space: normal;
-  text-align: center;
 }
 
 @media (768px <= width < 1024px) {
@@ -102,18 +100,6 @@
 
 .dark .redesign-header[data-home="true"] .redesign-brand-mark {
   filter: brightness(0) invert(1);
-}
-
-.redesign-header[data-home="true"] .redesign-brand-label {
-  display: block;
-  min-height: 0;
-  padding: 0;
-  border-radius: 0;
-  background: transparent;
-  color: var(--blue-11);
-  font-size: 12px;
-  font-weight: 600;
-  letter-spacing: 0.02em;
 }
 
 .redesign-header[data-home="true"] .redesign-desktop-nav {
@@ -162,6 +148,123 @@
   border-radius: 999px;
   background: var(--blue-11);
   color: #fff;
+}
+
+/* The shared search replaces the former navigation link on every public route. */
+.redesign-header-search {
+  position: relative;
+  min-width: 0;
+}
+
+.redesign-header-search input {
+  height: 46px;
+  padding: 10px 48px 10px 14px;
+  border: 1px solid #000;
+  border-radius: var(--enhe-button-r);
+  background: var(--enhe-page-bg);
+  color: var(--enhe-text);
+  font-size: 14px;
+}
+
+.redesign-header-search .redesign-header-search-submit {
+  position: absolute;
+  right: 1px;
+  top: 1px;
+  width: 44px;
+  height: 44px;
+  padding: 0;
+  color: var(--enhe-text);
+}
+
+.redesign-header-search-panel {
+  z-index: var(--enhe-z-layer);
+  box-sizing: border-box;
+  width: max(320px, var(--radix-popover-trigger-width));
+  max-width: calc(100vw - 24px);
+  max-height: var(--radix-popover-content-available-height);
+  overflow-y: auto;
+  border-radius: var(--enhe-button-r);
+  padding: 16px;
+  background: var(--enhe-page-bg);
+  color: var(--enhe-text);
+  font-family: var(--enhe-font-zh);
+}
+
+.redesign-header-search-panel h2,
+.redesign-header-search-panel p {
+  margin: 0;
+  font-size: 14px;
+  line-height: 1.6;
+}
+
+.redesign-header-search-panel ul {
+  display: grid;
+  gap: 4px;
+  padding: 0;
+  margin: 0;
+  list-style: none;
+}
+
+.redesign-header-search-panel a {
+  display: grid;
+  gap: 4px;
+  min-height: 44px;
+  padding: 10px 8px;
+  border-radius: var(--enhe-button-r);
+  color: var(--enhe-text);
+  text-decoration: none;
+  overflow-wrap: anywhere;
+  transition: background-color 140ms ease-out;
+}
+
+.redesign-header-search-panel a:hover,
+.redesign-header-search-panel a:focus-visible {
+  background: var(--blue-3);
+}
+
+.redesign-header-search-panel a:focus-visible {
+  outline: 2px solid var(--enhe-focus);
+  outline-offset: 1px;
+}
+
+.redesign-header-search-panel a span {
+  font-size: 12px;
+}
+
+.redesign-header .redesign-avatar-trigger {
+  max-width: 150px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  display: block;
+  line-height: 42px;
+}
+
+@media (width < 1280px) {
+  .redesign-header-inner {
+    grid-template-columns: 154px minmax(0, 1fr);
+    gap: 10px 16px;
+  }
+
+  .redesign-header-search {
+    grid-row: 2;
+    grid-column: 1 / -1;
+  }
+
+  .redesign-header .redesign-desktop-nav,
+  .redesign-header .redesign-mobile-actions {
+    grid-column: 2;
+    grid-row: 1;
+  }
+}
+
+/* Keep card shapes intact; only interactive controls adopt small rounded corners. */
+:is(.enhe-redesign-production, .enhe-redesign-preview):not(.enhe-admin-shell)
+  :is(button, [role="button"], [data-slot="button"], input[type="submit"], input[type="reset"],
+    a[class*="button"], a[class*="btn"], a[class*="cta"], a[class*="control"],
+    .enhe-contentless-action, .redesign-login-link, .redesign-avatar-trigger,
+    .redesign-language-switch, .redesign-nav-link, .footer-group > summary) {
+  border-radius: var(--enhe-button-r) !important;
 }
 
 .redesign-home .redesign-home-cta:hover,
@@ -683,6 +786,10 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
+  .redesign-header-search-panel {
+    animation: none !important;
+  }
+
   .enhe-redesign-production .customer-support-launcher {
     transition-property: border-color !important;
   }

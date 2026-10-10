@@ -22,14 +22,11 @@ const tokens = read("src/styles/redesign/tokens.css");
 const globalStyles = read("src/app/globals.css");
 
 describe("homepage UI polish", () => {
-  it("places the new brand line with the logo and centers a light, dark-ink hero", () => {
+  it("removes the tagline while keeping the centered light hero", () => {
     expect(HOME_COPY.zh.label).toBe("给你的人生添加AI外挂");
     expect(hero).not.toContain("redesign-home-mobile-label");
-    expect(header).toMatch(/EnheBrandLockup[\s\S]*redesign-brand-label/);
+    expect(header).not.toContain("redesign-brand-label");
     expect(shellStyles).toMatch(/\.redesign-brand-region\s*\{[^}]*justify-items:\s*center/);
-    expect(shellStyles).toMatch(/\.redesign-brand-label\s*\{[^}]*background:\s*transparent/);
-    expect(shellStyles).toMatch(/\.redesign-brand-label\s*\{[^}]*color:\s*var\(--blue-11/);
-    expect(shellStyles).not.toMatch(/\.redesign-brand-label,\s*\.redesign-desktop-nav\s*\{\s*display:\s*none/);
     expect(refreshStyles).toMatch(/\.redesign-header\[data-home="true"\][^{]*\{[^}]*background:\s*var\(--enhe-page-bg\)[^}]*color:\s*var\(--enhe-text\)/);
     expect(refreshStyles).toMatch(/\.redesign-home-hero\s*\{[^}]*background-image:\s*none[^}]*color:\s*var\(--enhe-text\)/);
     expect(refreshStyles).toMatch(/\.redesign-home-hero-inner\s*\{[^}]*text-align:\s*center/);
@@ -38,7 +35,6 @@ describe("homepage UI polish", () => {
     expect(tokens).toContain('--enhe-font-brand-label: "LXGW WenKai Lite"');
     expect(globalStyles).toContain("font-family: 'LXGW WenKai Lite'");
     expect(globalStyles).toContain("/fonts/lxgw-wenkai/lxgw-wenkai-home-label.woff");
-    expect(shellStyles).toMatch(/\.redesign-brand-label\s*\{[^}]*font-family:\s*var\(--enhe-font-brand-label(?:,|\))/);
   });
 
   it("uses the shared theme background on homepage and product fallback surfaces", () => {
@@ -63,8 +59,8 @@ describe("homepage UI polish", () => {
     expect(header).not.toContain("ThemeToggle");
     expect(languageControl).toBeGreaterThan(accountControl);
     expect(shellStyles).toMatch(/\.redesign-avatar-menu\s*\{[^}]*color:\s*var\(--enhe-text\)/);
-    expect(shellStyles).toMatch(/\.redesign-language-switch\s*\{[^}]*border:\s*1px solid var\(--enhe-border\)/);
-    expect(shellStyles).toMatch(/\.redesign-avatar-trigger\s*\{[^}]*border:\s*1px solid var\(--enhe-border\)/);
+    expect(shellStyles).toMatch(/\.redesign-language-switch\s*\{[^}]*border:\s*1px solid #000/);
+    expect(shellStyles).toMatch(/\.redesign-avatar-trigger\s*\{[^}]*border:\s*1px solid #000/);
     expect(shellStyles).toMatch(/\.redesign-desktop-nav\s*\{[^}]*gap:\s*clamp\(/);
     expect(shellStyles).toMatch(/\.redesign-desktop-nav\s*\{[^}]*letter-spacing:\s*0\.(?:015|025)em/);
   });
@@ -128,8 +124,8 @@ describe("homepage UI polish", () => {
     expect(refreshStyles).toMatch(/\.redesign-footer\s*\{[^}]*background:\s*var\(--enhe-footer\)/);
     expect(shellStyles).toMatch(/\.redesign-footer-inner\s*\{[^}]*position:\s*relative/);
     expect(shellStyles).not.toContain(".footer-back-to-top-row");
-    expect(footer).toContain('/images/enhe-logo-white.png');
-    expect(read('src/components/redesign/enhe-brand-lockup.tsx')).toContain('/images/brand/enhe-footer-wordmark.png');
+    expect(footer).toContain('/images/brand/enhe-footer-wordmark.png');
+    expect(read('src/components/redesign/enhe-brand-lockup.tsx')).toContain('/images/enhe-logo-white.png');
     expect(footer).toContain('alt={locale === "en" ? "ENHE brand" : "ENHE 品牌标志"}');
     expect(footer).not.toContain("brandIntro.map");
     expect(shellStyles).toMatch(/\.footer-group-trigger h3\s*\{[^}]*font-weight:\s*800/);

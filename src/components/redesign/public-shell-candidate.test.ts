@@ -44,7 +44,6 @@ describe("ENHE redesign public shell candidate", () => {
       "AI资讯",
       "AI趋势",
       "关于我们",
-      "搜索",
     ];
     let lastIndex = -1;
     for (const label of expectedOrder) {

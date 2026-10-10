@@ -776,7 +776,7 @@ test("desktop resize closes the mobile drawer and releases modal state", async (
   expect(errors.pageErrors).toEqual([]);
 });
 
-test("navigation and language links remain immediate and unchanged", async ({ page }) => {
+test("navigation and language links remain immediate after search moves into the header", async ({ page }) => {
   const errors = monitorErrors(page);
   await page.setViewportSize({ width: 390, height: 844 });
   await openFormalRoute(page, "/");
@@ -785,7 +785,7 @@ test("navigation and language links remain immediate and unchanged", async ({ pa
   const items = drawer.locator(
     ".redesign-mobile-nav > a, .redesign-mobile-nav > details",
   );
-  await expect(items).toHaveCount(7);
+  await expect(items).toHaveCount(6);
   await expect(items).toHaveText([
     "首页",
     "AI工具",
@@ -793,7 +793,6 @@ test("navigation and language links remain immediate and unchanged", async ({ pa
     "AI资讯",
     "AI趋势",
     "关于我们",
-    "搜索",
   ]);
   await expect(drawer.locator("[aria-selected]")).toHaveCount(0);
 

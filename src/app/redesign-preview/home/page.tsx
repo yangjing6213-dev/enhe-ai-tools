@@ -6,7 +6,6 @@ import { REDESIGN_NAV_ITEMS } from "@/components/redesign/navigation";
 import { REDESIGN_PREVIEW_FILING } from "@/components/redesign/preview-filing";
 import type { RedesignLocale } from "@/components/redesign/types";
 import { EnheRedesignHome } from "@/components/redesign/home/EnheRedesignHome";
-import { HOME_COPY } from "@/lib/redesign/home/home-copy";
 import { resolveRedesignPreviewLocale } from "@/lib/redesign/home/home-preview-locale";
 
 const HEADER_COPY = {
@@ -53,7 +52,10 @@ export default async function RedesignHomePreviewPage({
       <EnheRedesignHeader
         locale={locale}
         homeHref={currentHref}
-        brandLabel={HOME_COPY[locale].label}
+        searchRecommendations={[
+          { id: "preview-software", title: "Preview AI tool", category: "AI Tools", href: locale === "en" ? "/en/software/preview-tool" : "/software/preview-tool", downloadCount: 120 },
+          { id: "preview-skill", title: "Preview AI skill", category: "AI Skill", href: locale === "en" ? "/en/ai-skills/preview-skill" : "/ai-skills/preview-skill", downloadCount: 60 },
+        ]}
         navItems={REDESIGN_NAV_ITEMS[locale]}
         languageHrefs={languageHrefs}
         account={{ status: "guest", loginLabel: copy.loginLabel, loginHref: "#login" }}

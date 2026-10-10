@@ -149,7 +149,8 @@ describe("bilingual homepage candidate preview", () => {
     const brandValue = readCandidate("components/redesign/home/EnheRedesignBrandValue.tsx");
     const sitemap = readCandidate("app/sitemap.ts");
     const navigation = readCandidate("components/redesign/navigation.ts");
-    const forbidden = /File\.file(?:Url|Path)|orders|payment|download|OAuth|prisma|database|fetch\(|\/api\/|secret/i;
+    // Static recommendation counts are allowed; download operations and private reads are not.
+    const forbidden = /File\.file(?:Url|Path)|orders|payment|download(?!Count)|OAuth|prisma|database|fetch\(|\/api\/|secret/i;
 
     expect(sitemap).not.toContain("redesign-preview");
     expect(navigation).not.toContain("redesign-preview");

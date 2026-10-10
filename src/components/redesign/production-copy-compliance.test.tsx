@@ -49,7 +49,6 @@ describe("ENHE Phase 2C.1.2 production copy compliance", () => {
       "AI资讯",
       "AI趋势",
       "关于我们",
-      "搜索",
     ]);
     expect(REDESIGN_EN_NAV_ITEMS.map(({ label }) => label)).toEqual([
       "Home",
@@ -58,7 +57,6 @@ describe("ENHE Phase 2C.1.2 production copy compliance", () => {
       "AI News",
       "AI Trends",
       "About",
-      "Search",
     ]);
   });
 
@@ -123,11 +121,9 @@ describe("ENHE Phase 2C.1.2 production copy compliance", () => {
     expect(readSource("styles/redesign/site-refresh.css")).toMatch(/\.redesign-brand-mark\s*\{[^}]*width:\s*154px/);
   });
 
-  it("centers the shared tagline beneath the restored logo on desktop and mobile", () => {
+  it("removes the shared tagline beneath the logo", () => {
+    expect(readSource("components/redesign/enhe-redesign-header.tsx")).not.toContain("redesign-brand-label");
     expect(shellStyles).toMatch(/\.redesign-brand-region\s*\{[^}]*justify-items:\s*center/);
-    expect(shellStyles).toMatch(/\.redesign-brand-label\s*\{[^}]*background:\s*transparent/);
-    expect(shellStyles).toMatch(/\.redesign-brand-label\s*\{[^}]*color:\s*var\(--blue-11/);
-    expect(shellStyles).not.toMatch(/\.redesign-brand-label,\s*\.redesign-desktop-nav\s*\{\s*display:\s*none/);
   });
 
   it.each(["zh", "en"] as const)(

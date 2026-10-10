@@ -1,4 +1,6 @@
 import { EnheBrandLockup } from "./enhe-brand-lockup";
+import { EnheHeaderSearch } from "./enhe-header-search";
+import type { SearchRecommendation } from "@/lib/public-search-recommendations";
 import { EnheRedesignLanguageSwitch } from "./enhe-redesign-language-switch";
 import { EnheRedesignMobileMenu } from "./enhe-redesign-mobile-menu";
 import { PrefetchLink } from "@/components/prefetch-link";
@@ -16,7 +18,7 @@ import type { RedesignAccount, RedesignLanguageHrefs, RedesignLocale, RedesignNa
 export function EnheRedesignHeader({
   locale,
   homeHref,
-  brandLabel,
+  searchRecommendations,
   navItems,
   currentPathname,
   languageHrefs,
@@ -30,7 +32,7 @@ export function EnheRedesignHeader({
 }: {
   locale: RedesignLocale;
   homeHref: string;
-  brandLabel: string;
+  searchRecommendations?: readonly SearchRecommendation[];
   navItems: ReadonlyArray<RedesignNavItem>;
   currentPathname?: string;
   languageHrefs: RedesignLanguageHrefs;
@@ -60,8 +62,8 @@ export function EnheRedesignHeader({
             href={homeHref}
             label={locale === "en" ? "ENHE AI home" : "ENHE AI 首页"}
           />
-          <span className="redesign-brand-label">{brandLabel}</span>
         </div>
+        <EnheHeaderSearch locale={locale} recommendations={searchRecommendations} />
         <NavigationMenu
           className="redesign-desktop-nav"
           aria-label={locale === "en" ? "Primary navigation" : "主导航"}

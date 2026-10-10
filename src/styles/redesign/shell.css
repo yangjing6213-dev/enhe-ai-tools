@@ -291,19 +291,6 @@
   object-fit: contain;
 }
 
-.redesign-brand-label {
-  display: block;
-  padding: 0;
-  border-radius: 0;
-  background: transparent;
-  color: var(--blue-11);
-  font-family: var(--enhe-font-brand-label, 'Alimama Fang Yuan Ti', 'Microsoft YaHei', Arial, sans-serif);
-  font-size: 11px;
-  font-weight: 500;
-  line-height: 1.15;
-  white-space: nowrap;
-}
-
 .redesign-desktop-nav {
   display: flex;
   flex: 1 1 auto;
@@ -422,8 +409,8 @@
   align-items: center;
   min-height: 44px;
   padding-inline: 7px;
-  border: 1px solid var(--enhe-border);
-  border-radius: 999px;
+  border: 1px solid #000;
+  border-radius: var(--enhe-button-r);
   background: var(--enhe-page-bg);
   color: var(--enhe-text);
   font-size: 12px;
@@ -442,7 +429,7 @@
 
 .redesign-login-link {
   padding-inline: 13px;
-  border: 1px solid var(--enhe-border);
+  border: 1px solid #000;
   border-radius: var(--enhe-button-r);
 }
 
@@ -452,8 +439,8 @@
 
 .redesign-avatar-trigger {
   padding: 0 12px;
-  border: 1px solid var(--enhe-border);
-  border-radius: 999px;
+  border: 1px solid #000;
+  border-radius: var(--enhe-button-r);
   background: var(--enhe-page-bg);
   color: var(--enhe-text);
   cursor: pointer;

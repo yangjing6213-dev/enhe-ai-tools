@@ -23,7 +23,6 @@ export default function RedesignShellPreviewPage() {
           <EnheRedesignHeader
             locale="zh"
             homeHref="#zh"
-            brandLabel="给人生加一个 AI 外挂"
             navItems={REDESIGN_NAV_ITEMS.zh}
             languageHrefs={{ zh: "#zh", en: "#en" }}
             account={{ status: "guest", loginLabel: "登录", loginHref: "#zh-login" }}
@@ -36,7 +35,6 @@ export default function RedesignShellPreviewPage() {
           <EnheRedesignHeader
             locale="zh"
             homeHref="#zh"
-            brandLabel="给人生加一个 AI 外挂"
             navItems={REDESIGN_NAV_ITEMS.zh}
             languageHrefs={{ zh: "#zh", en: "#en" }}
             account={{
@@ -63,7 +61,6 @@ export default function RedesignShellPreviewPage() {
           <EnheRedesignHeader
             locale="en"
             homeHref="#en"
-            brandLabel="An AI upgrade for everyday life"
             navItems={REDESIGN_NAV_ITEMS.en}
             languageHrefs={{ zh: "#zh", en: "#en" }}
             languageAriaLabel="Language switch"

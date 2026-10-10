@@ -39,18 +39,8 @@ test("homepage polish stays readable, responsive, and interactive without extern
     const brandLabel = page.locator(".redesign-header[data-home='true'] .redesign-brand-label");
     const hero = page.locator(".redesign-home-hero");
     await expect(brand).toBeVisible();
-    await expect(brandLabel).toHaveText("给你的人生添加AI外挂");
-    await expect(brandLabel).toBeVisible();
+    await expect(brandLabel).toHaveCount(0);
     await expect(hero.locator("h1")).toHaveText("懂你的AI一站式平台，你需要的，都在这里。");
-    const brandFontFamily = await brandLabel.evaluate((element) => getComputedStyle(element).fontFamily);
-    const fontResponse = await page.request.get(new URL(
-      "/fonts/lxgw-wenkai/lxgw-wenkai-home-label.woff",
-      page.url(),
-    ).toString());
-    expect(brandFontFamily).toContain("LXGW WenKai Lite");
-    expect(brandFontFamily).toContain("Alimama Fang Yuan Ti");
-    expect(fontResponse.status(), `site font asset at ${width}px`).toBe(200);
-    expect(await page.evaluate(() => document.fonts.check('500 11px "LXGW WenKai Lite"'))).toBe(true);
     await expect(hero.locator(".redesign-home-hero-inner")).toHaveCSS("text-align", "center");
     await expect(hero).toHaveCSS("background-image", "none");
     const heroColor = await hero.evaluate((element) => getComputedStyle(element).color);
@@ -58,29 +48,7 @@ test("homepage polish stays readable, responsive, and interactive without extern
     expect(heroColor).toBe(expectedNeutralTextColor);
     expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBeLessThanOrEqual(width);
 
-    const brandAlignment = await page.evaluate(() => {
-      const logo = document.querySelector<HTMLElement>(".redesign-brand-lockup");
-      const label = document.querySelector<HTMLElement>(".redesign-header[data-home='true'] .redesign-brand-label");
-      if (!logo || !label) throw new Error("The homepage brand lockup is missing.");
-      const logoRect = logo.getBoundingClientRect();
-      const labelRect = label.getBoundingClientRect();
-      const actionProbe = document.createElement("span");
-      actionProbe.style.backgroundColor = "var(--blue-11)";
-      document.body.append(actionProbe);
-      const actionBackground = getComputedStyle(actionProbe).backgroundColor;
-      actionProbe.remove();
-      return {
-        centerDifference: Math.abs(logoRect.left + logoRect.width / 2 - (labelRect.left + labelRect.width / 2)),
-        logoWidth: logoRect.width,
-        labelBackground: getComputedStyle(label).backgroundColor,
-        labelColor: getComputedStyle(label).color,
-        expectedLabelColor: actionBackground,
-      };
-    });
-    expect(brandAlignment.centerDifference, `brand line center alignment at ${width}px`).toBeLessThanOrEqual(1);
-    expect(brandAlignment.logoWidth, `restored logo width at ${width}px`).toBeGreaterThanOrEqual(150);
-    expect(brandAlignment.labelBackground, `brand line background at ${width}px`).toBe("rgba(0, 0, 0, 0)");
-    expect(brandAlignment.labelColor, `brand line color at ${width}px`).toBe(brandAlignment.expectedLabelColor);
+    expect((await brand.boundingBox())?.width).toBe(154);
 
     if (width < 768) {
       const layout = await page.locator(".redesign-header-inner").evaluate((inner) => {
@@ -99,7 +67,6 @@ test("homepage polish stays readable, responsive, and interactive without extern
           innerRight: inner.getBoundingClientRect().right,
           brand: rect(".redesign-brand-region"),
           logo: rect(".redesign-brand-mark"),
-          label: rect(".redesign-brand-label"),
           actions: rect(".redesign-mobile-actions"),
           menu: rect(".redesign-menu-trigger"),
           language: {
@@ -210,8 +177,8 @@ test("homepage polish stays readable, responsive, and interactive without extern
 
     const footer = page.locator(".redesign-footer");
     await expect(footer).toHaveCSS("background-color", "rgb(255, 255, 255)");
-    await expect(page.locator(".redesign-brand-mark")).toHaveAttribute("src", "/images/brand/enhe-footer-wordmark.png");
-    await expect(footer.locator(".footer-brand-logo")).toHaveAttribute("src", /enhe-logo-white/);
+    await expect(page.locator(".redesign-brand-mark")).toHaveAttribute("src", "/images/enhe-logo-white.png");
+    await expect(footer.locator(".footer-brand-logo")).toHaveAttribute("src", /enhe-footer-wordmark/);
     const chevronGaps = await footer.locator(".footer-group-trigger").evaluateAll((summaries) => summaries.map((summary) => {
       const title = summary.querySelector("h3")!.getBoundingClientRect();
       const icon = summary.querySelector("svg")!.getBoundingClientRect();
@@ -314,10 +281,7 @@ test("homepage polish stays readable, responsive, and interactive without extern
   const englishResponse = await page.goto("/en", { waitUntil: "load" });
   expect(englishResponse?.status(), "English homepage").toBe(200);
   const englishBrandLabel = page.locator(".redesign-header[data-home='true'] .redesign-brand-label");
-  await expect(englishBrandLabel).toHaveText("Give your life an AI superpower");
-  const englishBrandFontFamily = await englishBrandLabel.evaluate((element) => getComputedStyle(element).fontFamily);
-  expect(englishBrandFontFamily).toContain("LXGW WenKai Lite");
-  expect(englishBrandFontFamily).toContain("Alimama Fang Yuan Ti");
+  await expect(englishBrandLabel).toHaveCount(0);
   const englishReviews = page.locator(".redesign-home-reviews");
   await expect(englishReviews.getByRole("heading", { name: "Customer stories" })).toBeVisible();
   await expect(englishReviews.locator(".redesign-home-reviews-disclosure")).toHaveText("AI-generated examples (not real customer feedback).");

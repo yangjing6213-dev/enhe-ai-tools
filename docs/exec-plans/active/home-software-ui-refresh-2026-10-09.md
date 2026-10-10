@@ -45,3 +45,17 @@ Verification before commit:
 - PASS: TypeScript, full ESLint, diff whitespace check; source Gitleaks scan (no findings).
 - Screenshots reviewed locally under ignored `output/ui-followup/`.
 - Release: use the existing protected `scripts/push-and-deploy.ps1` workflow for the exact committed SHA. Full release checks and live verification are recorded in local release receipts.
+
+## Header search follow-up — 2026-10-10
+
+Approved scope: remove the shared tagline, swap the existing logo sources again without changing image dimensions, use black account/language outlines and 4px public button corners, and replace the navigation Search link with an inline search field. Keep the field in the shared header so search remains reachable on every public route. Desktop places it between the logo and navigation; narrow layouts give it its own row.
+
+Recommendations read only published software/AI Skill products with nonzero download counts, ordered by actual downloads descending with a stable ID tie-breaker, limited to five and cached for five minutes. Public names, categories, counts and canonical localized links are the only browser data. An unavailable read leaves a usable search form and an honest empty message. Reuse the existing search route. No schema, payment, product-data, environment or dependency changes.
+
+Use official shadcn Input/Popover source with the existing local utility and Radix dependency; retain MIT attribution. Verify keyboard navigation, Escape, outside click, product links, bilingual queries, logo sizes, black outlines, button shape and 320–1440px layouts.
+
+Local checks before release: 53 focused tests passed; bilingual header checks at six viewport widths and the existing homepage interaction suite passed; fixture recommendation links, keyboard navigation and dismissal passed. TypeScript, full ESLint and source secret scan passed. The full protected release workflow and production data/UI verification follow the commit.
+
+Final local evidence (2026-10-10): 2691 unit tests passed, 97 skipped; TypeScript, full ESLint, production build, dependency audit (0 vulnerabilities), source/bundle secret scans, and focused header accessibility scan passed. Production browser run passed 327 tests and skipped 139 environment-gated tests; one obsolete seven-item mobile-nav expectation failed after the requested Search link removal. The expectation was corrected to six items and its exact browser test passed (1/1). No application change followed the successful build. Protected Docker-backed release checks and live deployment remain pending.
+
+Local release blocker: Docker Desktop 4.86.0 could not initialize stale Windows runtime sockets. The official signed 4.94.0 installer completed an in-place upgrade. The persistent Docker data disk was backed up and verified byte-identical immediately after upgrade. The engine still cannot start because Windows refuses access to the old Secrets Engine socket; ordinary and administrator parent-directory rename attempts both failed. No factory reset, uninstall, data/volume deletion, or production change was performed. Next prerequisite is a user-controlled Windows restart, then engine verification and the existing exact-SHA release workflow. Detailed local recovery evidence is in ignored `.local-audit/docker-recovery-20261010.md`.

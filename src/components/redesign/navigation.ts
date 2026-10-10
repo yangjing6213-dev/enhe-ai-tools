@@ -19,7 +19,6 @@ export const REDESIGN_NAV_ITEMS = {
     { label: "AI资讯", href: "/ai-news" },
     { label: "AI趋势", href: "/ai-trends" },
     { label: "关于我们", href: "/about" },
-    { label: "搜索", href: "/search" },
   ],
   en: [
     { label: "Home", href: "/en" },
@@ -35,7 +34,6 @@ export const REDESIGN_NAV_ITEMS = {
     { label: "AI News", href: "/en/ai-news" },
     { label: "AI Trends", href: "/en/ai-trends" },
     { label: "About", href: "/en/about" },
-    { label: "Search", href: "/en/search" },
   ],
 } as const satisfies Record<RedesignLocale, ReadonlyArray<RedesignNavItem>>;
 

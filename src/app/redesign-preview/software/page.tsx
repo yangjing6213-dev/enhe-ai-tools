@@ -6,7 +6,6 @@ import { EnheRedesignHeader } from "@/components/redesign/enhe-redesign-header";
 import { REDESIGN_EN_NAV_ITEMS, REDESIGN_ZH_NAV_ITEMS } from "@/components/redesign/navigation";
 import { EnheRedesignSoftwarePreviewCatalog } from "@/components/redesign/software/EnheRedesignSoftwarePreviewCatalog";
 import type { RedesignLocale } from "@/components/redesign/types";
-import { HOME_COPY } from "@/lib/redesign/home/home-copy";
 import { resolveRedesignPreviewLocale } from "@/lib/redesign/home/home-preview-locale";
 
 const HEADER_COPY = {
@@ -47,7 +46,6 @@ export default async function RedesignSoftwarePreviewPage({
   const params = await searchParams;
   const locale = resolveRedesignPreviewLocale(params, (await headers()).get("x-enhe-locale"));
   const copy = HEADER_COPY[locale];
-  const brandLabel = HOME_COPY[locale].label;
   const currentHref = `/redesign-preview/software?locale=${locale}`;
   const languageHrefs = {
     zh: "/redesign-preview/software?locale=zh",
@@ -59,7 +57,6 @@ export default async function RedesignSoftwarePreviewPage({
       <EnheRedesignHeader
         locale={locale}
         homeHref={currentHref}
-        brandLabel={brandLabel}
         navItems={locale === "en" ? REDESIGN_EN_NAV_ITEMS : REDESIGN_ZH_NAV_ITEMS}
         languageHrefs={languageHrefs}
         languageAriaLabel={copy.languageAriaLabel}

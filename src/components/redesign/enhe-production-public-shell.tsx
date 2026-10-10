@@ -3,7 +3,7 @@ import { getHeaderUserSnapshot } from "@/lib/auth";
 import { getDictionary, type Locale } from "@/lib/dictionaries";
 import { buildLanguageSwitcherHref, buildLocalePath } from "@/lib/seo";
 import { PRODUCTION_FILING } from "@/lib/production-filing";
-import { HOME_COPY } from "@/lib/redesign/home/home-copy";
+import { getPublicSearchRecommendations } from "@/lib/public-search-recommendations";
 import { EnheRedesignFooter } from "./enhe-redesign-footer";
 import { EnheRedesignHeader } from "./enhe-redesign-header";
 import { REDESIGN_NAV_ITEMS } from "./navigation";
@@ -20,7 +20,9 @@ export async function EnheRedesignPublicHeader({
   locale: Locale;
   languageHrefs?: RedesignLanguageHrefs;
 }) {
-  const [requestHeaders, user] = await Promise.all([headers(), getHeaderUserSnapshot()]);
+  const [requestHeaders, user, searchRecommendations] = await Promise.all([
+    headers(), getHeaderUserSnapshot(), getPublicSearchRecommendations(locale),
+  ]);
   const redesignLocale = toRedesignLocale(locale);
   const pathname = requestHeaders.get("x-enhe-pathname") ?? buildLocalePath("/", locale);
   const t = getDictionary(locale);
@@ -45,7 +47,7 @@ export async function EnheRedesignPublicHeader({
     <EnheRedesignHeader
       locale={redesignLocale}
       homeHref={buildLocalePath("/", locale)}
-      brandLabel={HOME_COPY[redesignLocale].label}
+      searchRecommendations={searchRecommendations}
       navItems={REDESIGN_NAV_ITEMS[redesignLocale]}
       currentPathname={pathname}
       languageHrefs={

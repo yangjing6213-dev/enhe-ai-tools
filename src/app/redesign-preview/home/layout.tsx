@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import "@/styles/redesign/tokens.css";
 import "@/styles/redesign/shell.css";
 import "@/styles/redesign/home.css";
+import "@/styles/redesign/site-refresh.css";
 
 export const metadata: Metadata = {
   title: "ENHE Homepage Preview",
