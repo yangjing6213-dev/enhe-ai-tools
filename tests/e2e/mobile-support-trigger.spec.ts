@@ -321,15 +321,15 @@ test("reserves an 8px fixed safe zone for the 320px all-products action", async 
   }
 });
 
-test("uses compact exclusion through 483px and expanded exclusion from 484px", async ({
+test("uses compact exclusion for the icon-only launcher at every width", async ({
   page,
 }) => {
   test.skip(!hasProductCatalogTestDatabase, productCatalogSkipReason);
   for (const route of mobileRoutes) {
     for (const contract of [
-      { width: 483, reserve: "52px", cardIndex: 0, textVisible: false },
-      { width: 484, reserve: "104px", cardIndex: 0, textVisible: true },
-      { width: 768, reserve: "104px", cardIndex: 1, textVisible: true },
+      { width: 483, reserve: "52px", cardIndex: 0 },
+      { width: 484, reserve: "52px", cardIndex: 0 },
+      { width: 768, reserve: "52px", cardIndex: 1 },
     ] as const) {
       await page.setViewportSize({ width: contract.width, height: 900 });
       await openFormalRoute(page, route.path);
@@ -374,9 +374,7 @@ test("uses compact exclusion through 483px and expanded exclusion from 484px", a
       expect.soft(geometry.gap, JSON.stringify(geometry)).toBeGreaterThanOrEqual(8);
       expect.soft(actionRect.height, JSON.stringify(geometry)).toBeGreaterThanOrEqual(44);
       expect.soft(layout.rootOverflow, JSON.stringify(geometry)).toBe(0);
-      await expect(launcher.locator("span", { hasText: route.label })).toBeVisible({
-        visible: contract.textVisible,
-      });
+      await expect(launcher.locator(".customer-support-launcher-label")).toHaveClass(/sr-only/);
 
       if (contract.width === 768) {
         const nonRightAction = page
@@ -760,7 +758,7 @@ test("keeps component exclusions aligned with a non-zero right safe area", async
   expect(geometryChecks).toBeGreaterThan(0);
 });
 
-test("uses the redesigned compact white launcher from 768px upward", async ({ page }) => {
+test("uses a circular icon-only white launcher from 768px upward", async ({ page }) => {
   for (const viewportSize of [
     { width: 768, height: 900, offset: 24 },
     { width: 1024, height: 900, offset: 24 },
@@ -818,15 +816,15 @@ test("uses the redesigned compact white launcher from 768px upward", async ({ pa
         return { action, text };
       });
 
-      await expect(launcher.locator("span", { hasText: route.label })).toBeVisible();
+      await expect(launcher.locator(".customer-support-launcher-label")).toHaveClass(/sr-only/);
       await expect(launcher.locator("svg")).toBeVisible();
-      expect(metrics.width).toBeGreaterThanOrEqual(88);
-      expect(metrics.width).toBeLessThanOrEqual(112);
-      expect(Math.abs(metrics.height - 46)).toBeLessThanOrEqual(0.1);
+      expect(metrics.width).toBe(44);
+      await expect(launcher).toHaveCSS("border-radius", "50%");
+      expect(Math.abs(metrics.height - 44)).toBeLessThanOrEqual(0.1);
       expect(Math.abs(metrics.right - viewportSize.offset)).toBeLessThanOrEqual(0.1);
       expect(Math.abs(metrics.bottom - viewportSize.offset)).toBeLessThanOrEqual(0.1);
-      expect(metrics.wrapperWidth).toBe(360);
-      expect(metrics.padding).toBe("12px 16px");
+      expect(metrics.wrapperWidth).toBe(44);
+      expect(metrics.padding).toBe("0px");
       expect(metrics.backgroundRgba).toEqual([255, 255, 255, 255]);
       expect(metrics.color).toBe(themeColors.text);
       expect(metrics.labelColor).toBe(themeColors.text);

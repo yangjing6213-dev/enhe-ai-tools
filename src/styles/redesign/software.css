@@ -82,7 +82,7 @@
   width: min(100%, 920px);
   padding: 20px;
   border-radius: 20px;
-  background: var(--enhe-footer, #071512);
+  background: var(--enhe-action, #0462C2);
   box-shadow: 0 18px 40px rgba(8, 8, 8, 0.18);
 }
 
@@ -108,7 +108,7 @@
 .redesign-software-category-button[data-selected="true"] {
   border-color: var(--enhe-yellow, #ffd60a);
   background: var(--enhe-yellow, #ffd60a);
-  color: var(--enhe-text, #000000);
+  color: #fff;
 }
 
 .redesign-software-section {
@@ -173,7 +173,7 @@
 }
 
 .redesign-software-card:hover {
-  border-color: var(--primary, #246bfe);
+  border-color: var(--primary, #0462C2);
   box-shadow: 0 16px 36px color-mix(in srgb, var(--foreground, #101828) 12%, transparent);
   transform: translateY(-3px);
 }
@@ -293,7 +293,7 @@
   border: 0;
   border-radius: 0;
   background: transparent;
-  color: var(--enhe-action-text, #0066cc);
+  color: var(--enhe-action-text, #0462C2);
   font-size: 0.8125rem;
   text-align: right;
 }
@@ -318,7 +318,7 @@
   overflow: hidden;
   overflow-wrap: anywhere;
   margin: 4px 0 0;
-  color: var(--enhe-action-text, #0066cc);
+  color: var(--enhe-action-text, #0462C2);
   font-size: 0.875rem;
   line-height: 1.4;
 }
@@ -326,7 +326,7 @@
 .redesign-software-card-description strong,
 .redesign-software-card-highlights svg,
 .redesign-software-card-audience svg {
-  color: var(--enhe-action-text, #0066cc);
+  color: var(--enhe-action-text, #0462C2);
   flex-shrink: 0;
 }
 
@@ -422,7 +422,7 @@
   border: 1px solid var(--enhe-action, #527e54);
   border-radius: 999px;
   background: var(--enhe-action, #527e54);
-  color: var(--enhe-text, #000000);
+  color: #fff;
   font-weight: 700;
 }
 
@@ -455,7 +455,7 @@
   border: 1px solid var(--enhe-action, #527e54);
   border-radius: 999px;
   background: var(--enhe-action, #527e54);
-  color: var(--enhe-text, #000000);
+  color: #fff;
   font-weight: 700;
 }
 

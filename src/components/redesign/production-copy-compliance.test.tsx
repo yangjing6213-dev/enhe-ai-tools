@@ -102,7 +102,7 @@ describe("ENHE Phase 2C.1.2 production copy compliance", () => {
 
     for (const html of [withoutFiling, withEmptyFiling]) {
       const footerBottom = html.slice(html.indexOf('<div class="footer-bottom">'));
-      expect(footerBottom.match(/<p>/g)).toHaveLength(1);
+      expect(footerBottom.match(/<p(?:\s[^>]*)?>/g)).toHaveLength(1);
       expect(html).not.toContain("ICP filing · Public-security filing");
       expect(html).not.toContain("ICP备案 · 公安备案");
     }

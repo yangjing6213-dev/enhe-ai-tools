@@ -125,7 +125,7 @@ describe("production mobile navigation directional drawer", () => {
     expect(styles).toMatch(/\.customer-support-widget\s*{[\s\S]*?z-index:\s*10/);
     expect(component).toContain("FOCUSABLE_MENU_CONTROLS");
     expect(styles).toContain("--support-exclusion-compact: 52px");
-    expect(styles).toContain("--support-exclusion-expanded: 104px");
+    expect(styles).toContain("--support-exclusion-expanded: 52px");
     expect(styles).toContain("@media (width < 484px)");
   });
 

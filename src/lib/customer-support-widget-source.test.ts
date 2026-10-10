@@ -56,7 +56,7 @@ describe("customer support widget source", () => {
     expect(shell).toContain("--support-trigger-icon-size: 44px");
     expect(shell).toContain("--support-trigger-gap: 8px");
     expect(shell).toContain("--support-exclusion-compact: 52px");
-    expect(shell).toContain("--support-exclusion-expanded: 104px");
+    expect(shell).toContain("--support-exclusion-expanded: 52px");
     expect(shell).toContain("--support-text-mode-min-width: 484px");
     const widgetRules = shell.slice(
       shell.indexOf("--support-trigger-icon-size"),

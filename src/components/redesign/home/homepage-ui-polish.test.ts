@@ -46,9 +46,9 @@ describe("homepage UI polish", () => {
   it("keeps primary control text white on the blue buttons", () => {
     expect(refreshStyles).toMatch(/\.redesign-home \.redesign-home-cta,[\s\S]*?\.redesign-home-brand-value-cta\s*\{[^}]*color:\s*#fff/);
     expect(refreshStyles).toMatch(/\.redesign-home \.redesign-home-cta:hover,[\s\S]*?\.redesign-home-brand-value-cta:hover\s*\{[^}]*color:\s*#fff/);
-    expect(softwareStyles).toMatch(/\.redesign-software-category-button\[data-selected="true"\]\s*\{[^}]*color:\s*var\(--enhe-text/);
-    expect(softwareStyles).toMatch(/\.redesign-software-empty-action\s*\{[^}]*color:\s*var\(--enhe-text/);
-    expect(softwareStyles).toMatch(/\.redesign-software-load-more-button\s*\{[^}]*color:\s*var\(--enhe-text/);
+    expect(softwareStyles).toMatch(/\.redesign-software-category-button\[data-selected="true"\]\s*\{[^}]*color:\s*#fff/);
+    expect(softwareStyles).toMatch(/\.redesign-software-empty-action\s*\{[^}]*color:\s*#fff/);
+    expect(softwareStyles).toMatch(/\.redesign-software-load-more-button\s*\{[^}]*color:\s*#fff/);
   });
 
   it("keeps language at the far right after the account control without a theme switch", () => {
@@ -120,7 +120,7 @@ describe("homepage UI polish", () => {
     expect(footer).not.toContain("footer-back-to-top");
     expect(footer).not.toContain("backToTop");
     expect(header).toContain('id="top"');
-    expect(tokens).toContain("--enhe-footer: #ffffff");
+    expect(tokens).toContain("--enhe-footer: #0D3A6D");
     expect(refreshStyles).toMatch(/\.redesign-footer\s*\{[^}]*background:\s*var\(--enhe-footer\)/);
     expect(shellStyles).toMatch(/\.redesign-footer-inner\s*\{[^}]*position:\s*relative/);
     expect(shellStyles).not.toContain(".footer-back-to-top-row");

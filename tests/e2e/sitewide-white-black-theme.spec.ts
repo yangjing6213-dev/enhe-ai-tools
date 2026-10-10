@@ -38,7 +38,7 @@ test("site pages keep white surfaces and black neutral text, including interacti
     muted: "#000",
     mainText: "rgb(0, 0, 0)",
     actionText: "rgb(255, 255, 255)",
-    eyebrowText: "rgb(0, 102, 204)",
+    eyebrowText: "rgb(4, 98, 194)",
   });
 
   await page.setViewportSize({ width: 390, height: 844 });
@@ -108,8 +108,8 @@ test("site pages keep white surfaces and black neutral text, including interacti
       cardText: "rgb(0, 0, 0)",
       categoryText: "rgb(0, 0, 0)",
       selectedCategory: {
-        background: "rgb(0, 144, 255)",
-        color: "rgb(0, 0, 0)",
+        background: "rgb(4, 98, 194)",
+        color: "rgb(255, 255, 255)",
       },
     });
   } else {
@@ -131,7 +131,7 @@ test("site pages keep white surfaces and black neutral text, including interacti
         closeBorder: getComputedStyle(close).borderColor,
       };
     });
-    expect(softwareControls.optionText).toBe("rgb(0, 0, 0)");
+    expect(softwareControls.optionText).toBe("rgb(255, 255, 255)");
     expect(softwareControls.optionBorder).toBe("rgb(118, 118, 118)");
     expect(softwareControls.closeText).toBe("rgb(0, 0, 0)");
     expect(softwareControls.closeBorder).toBe("rgb(118, 118, 118)");

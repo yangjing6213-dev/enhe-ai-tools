@@ -380,7 +380,7 @@ export function CustomerSupportWidget({
         }
       >
         <MessageCircle size={18} className="text-[var(--marketing-accent)]" aria-hidden="true" />
-        <span className="customer-support-launcher-label">{copy.launcherLabel}</span>
+        <span className="customer-support-launcher-label sr-only">{copy.launcherLabel}</span>
       </button>
     </div>
   );

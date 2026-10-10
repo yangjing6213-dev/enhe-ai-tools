@@ -43,7 +43,7 @@ const routes: FormalRoute[] = [
   {
     path: "/",
     kind: "home",
-    h1: /懂你的AI一站式平台，你需要的，都在这里。/,
+    h1: /AI一站式平台，一起创造未来/,
     menu: "菜单",
     closeMenu: "收起菜单",
     support: "客服",
@@ -53,7 +53,7 @@ const routes: FormalRoute[] = [
   {
     path: "/en",
     kind: "home",
-    h1: /A one-stop AI platform that gets you\. Everything you need, all in one place\./i,
+    h1: /Your all-in-one AI platform\. Let’s create the future together\./i,
     menu: "Menu",
     closeMenu: "Close menu",
     support: "Chat",
@@ -553,18 +553,11 @@ for (const route of routes) {
               .getPropertyValue("--support-exclusion-current")
               .trim(),
           );
-        expect(supportReserve).toBe(
-          viewport.width <= 483 ? "52px" : "104px",
-        );
-        const supportLabel = support.locator(".customer-support-launcher-label");
-        if (viewport.width <= 483) {
-          expect(supportBox?.width).toBe(44);
-          expect(supportBox?.height).toBe(44);
-          await expect(supportLabel).toBeHidden();
-        } else {
-          expect(supportBox?.width ?? 0).toBeGreaterThan(44);
-          await expect(supportLabel).toBeVisible();
-        }
+        expect(supportReserve).toBe("52px");
+        expect(supportBox?.width).toBe(44);
+        expect(supportBox?.height).toBe(44);
+        await expect(support.locator(".customer-support-launcher-label")).toHaveClass(/sr-only/);
+
 
         if (route.kind === "home") {
           await exerciseHome(page, route, modality);

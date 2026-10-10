@@ -73,7 +73,7 @@
   border: 2px solid var(--enhe-action, #527e54);
   border-radius: var(--enhe-button-r, 4px);
   background-color: var(--enhe-action, #527e54);
-  color: var(--enhe-text, #000000);
+  color: #fff;
   font-size: 1rem;
   font-weight: 700;
   line-height: 1.2;
@@ -91,7 +91,7 @@
 }
 
 .redesign-home-brand-value {
-  background: var(--enhe-footer, #071512);
+  background: var(--enhe-action, #0462C2);
   color: #000000;
 }
 
@@ -123,13 +123,13 @@
   border: 2px solid var(--enhe-yellow, #ffd60a);
   border-radius: var(--enhe-button-r, 4px);
   background: var(--enhe-yellow, #ffd60a);
-  color: var(--enhe-text, #000000);
+  color: #fff;
   font-weight: 800;
 }
 
 .redesign-home-brand-value-cta:hover {
-  background: var(--enhe-action-hover, #0b57e3);
-  border-color: var(--enhe-action-hover, #0b57e3);
+  background: var(--enhe-action-hover, #0462C2);
+  border-color: var(--enhe-action-hover, #0462C2);
 }
 
 .redesign-home-brand-value-cta:focus-visible {
@@ -202,7 +202,7 @@
 
 .redesign-home-products-eyebrow {
   margin: 0 0 14px;
-  color: var(--enhe-action-text, #0066cc);
+  color: var(--enhe-action-text, #0462C2);
   font-size: 2rem;
   font-weight: 700;
   letter-spacing: 0.08em;
@@ -276,7 +276,7 @@
 
 .redesign-home-product-control:hover {
   background: transparent;
-  color: var(--enhe-action, #246bfe);
+  color: var(--enhe-action, #0462C2);
 }
 
 .redesign-home-product-control:focus-visible {
@@ -444,7 +444,7 @@
 
 .redesign-home-reviews-inner h2 {
   margin: 0 0 40px;
-  color: var(--enhe-action-text, #0066cc);
+  color: var(--enhe-action-text, #0462C2);
   font-size: 2rem;
   font-weight: 700;
   letter-spacing: 0.08em;

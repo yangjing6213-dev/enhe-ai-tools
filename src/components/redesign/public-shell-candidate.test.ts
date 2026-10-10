@@ -15,20 +15,20 @@ describe("ENHE redesign public shell candidate", () => {
 
     expect(tokens).toContain("--enhe-page-bg: var(--background, #ffffff)");
     expect(tokens).toContain("--enhe-text: var(--foreground, #000000)");
-    expect(tokens).toContain("--enhe-action: var(--primary, #0090ff)");
-    expect(tokens).toContain("--enhe-footer: #ffffff");
-    expect(tokens).toContain("--enhe-focus: var(--ring, #73a0ff)");
+    expect(tokens).toContain("--enhe-action: var(--primary, #0462C2)");
+    expect(tokens).toContain("--enhe-footer: #0D3A6D");
+    expect(tokens).toContain("--enhe-focus: var(--ring, #0462C2)");
     expect(tokens).toContain("--enhe-motion-fast: 170ms");
     expect(tokens).toContain("--enhe-z-focus: 60");
     expect(tokens).not.toMatch(/gradient|glow|glass|glitch|neon/i);
   });
 
-  it("keeps blue state labels readable with black text", () => {
+  it("keeps blue state labels readable with white text", () => {
     const shell = readCandidate("styles/redesign/shell.css");
     const labelRule = shell.match(/\.redesign-preview-state-label\s*\{([^}]*)\}/)?.[1] ?? "";
 
     expect(labelRule).toContain("background: var(--enhe-yellow)");
-    expect(labelRule).toContain("color: var(--enhe-text, #000000)");
+    expect(labelRule).toContain("color: #fff");
   });
 
   it("keeps the approved desktop navigation order and explicit account boundary", () => {
@@ -233,7 +233,7 @@ describe("ENHE redesign public shell candidate", () => {
 
     expect(footer).toContain('aria-label={copy.ariaLabel}');
     expect(footer).toContain("{link.label}");
-    expect(footer).toContain("filingEntries.length");
+    expect(footer).toContain("filingEntries.map");
     expect(footer).toContain("{entry.label}");
     expect(footer).not.toContain("language-switch");
     expect(footer).not.toContain("AI tools");

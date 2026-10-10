@@ -31,7 +31,7 @@ describe("shared shadcn site components", () => {
     expect(readSource("src/components/ui.tsx")).toContain("<Button");
   });
 
-  it("uses black text on blue token-based primary actions", () => {
+  it("uses white text on the darker blue primary actions", () => {
     const actionRules: Array<[string, RegExp]> = [
       ["homepage CTA", /\.redesign-home \.redesign-home-cta\s*\{[^}]*\}/],
       ["homepage brand CTA", /\.redesign-home-brand-value-cta\s*\{[^}]*\}/],
@@ -61,7 +61,7 @@ describe("shared shadcn site components", () => {
 
     for (const [name, selector] of actionRules) {
       const rule = sources.map((source) => source.match(selector)?.[0]).find(Boolean) ?? "";
-      expect(rule, name).toContain("color: var(--enhe-text");
+      expect(rule, name).toContain("color: #fff");
     }
   });
 

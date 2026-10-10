@@ -34,7 +34,6 @@ describe("sitewide white and black color contract", () => {
       "foreground-soft",
       "muted-foreground",
       "dim",
-      "primary-foreground",
       "popover-foreground",
       "sidebar-foreground",
     ];
@@ -46,8 +45,10 @@ describe("sitewide white and black color contract", () => {
       expect(rootTokens, `--${token}`).toMatch(new RegExp(`--${token}:\\s*#000000\\s*;`, "i"));
     }
 
+    expect(rootTokens).toContain("--primary-foreground: #ffffff;");
+    expect(rootTokens).toContain("--brand-blue: #0462C2;");
     const tokens = read("src/styles/redesign/tokens.css");
-    expect(tokens).toMatch(/--enhe-footer:\s*#ffffff\s*;/i);
+    expect(tokens).toMatch(/--enhe-footer:\s*#0D3A6D\s*;/i);
     expect(css).toContain("/* Sitewide fixed-light color contract */");
     expect(css).toMatch(/body :is\(\s*main,\s*section,\s*article/);
     expect(css).toContain('[class*="Card"]');

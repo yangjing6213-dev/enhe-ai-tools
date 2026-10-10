@@ -580,7 +580,12 @@ describe("final production motion source contract", () => {
     expect(implementation).not.toMatch(/scale\(0\)(?!\.)/i);
     expect(implementation).not.toMatch(/will-change/i);
     expect(implementation).not.toMatch(/\bease-in\b/i);
-    expect(implementation).not.toMatch(/\b(?:spring|bounce|autoplay)\b/i);
+    expect(implementation).not.toMatch(/\b(?:spring|bounce)\b/i);
+    // Autoplay is now approved only for the homepage product showcase.
+    const otherMotion = productionMotionPaths
+      .filter((path) => !path.endsWith("EnheRedesignProductShowcase.tsx"))
+      .map(readProjectFile).join("\n");
+    expect(otherMotion).not.toMatch(/\bautoplay\b/i);
     expect(implementation).not.toMatch(/setInterval\s*\(/);
     expect(implementation).not.toMatch(
       /\b(?:width|height|margin|padding|top|left)\s*:\s*\[/i,
@@ -614,7 +619,7 @@ describe("final production motion source contract", () => {
     );
     expect(shell).toContain("--support-trigger-icon-size: 44px");
     expect(shell).toContain("--support-exclusion-compact: 52px");
-    expect(shell).toContain("--support-exclusion-expanded: 104px");
+    expect(shell).toContain("--support-exclusion-expanded: 52px");
     expect(shell).toContain("--support-text-mode-min-width: 484px");
     expect(shell).toContain("@media (width < 484px)");
     expect(shell).toMatch(

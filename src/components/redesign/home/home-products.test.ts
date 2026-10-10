@@ -113,7 +113,7 @@ describe("homepage approved product showcase", () => {
     expect(fallback).not.toContain("<img");
   });
 
-  it("keeps the showcase manual, keyboard accessible, and product-state driven", () => {
+  it("keeps manual selection keyboard accessible alongside product autoplay", () => {
     expect(showcaseSource).toContain('"use client"');
     expect(showcaseSource).toContain("ArrowLeft");
     expect(showcaseSource).toContain("ArrowRight");
@@ -128,7 +128,7 @@ describe("homepage approved product showcase", () => {
     expect(showcaseSource).toContain('unoptimized');
     expect(showcaseSource).toContain("setMediaState");
     expect(showcaseSource).toContain("onError");
-    expect(showcaseSource).not.toMatch(/setInterval|setTimeout|autoplay|Audio\(|fetch\(|prisma|database|delivery/i);
+    expect(showcaseSource).not.toMatch(/setInterval|Audio\(|fetch\(|prisma|database|delivery/i);
   });
 
   it("keeps product detail links touchable and mobile controls beside the card", () => {

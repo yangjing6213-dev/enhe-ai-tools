@@ -2,6 +2,7 @@
 
 import Image from "next/image";
 import { animate } from "motion/react";
+import { Pause, Play } from "lucide-react";
 import { EnheIconfontIcon } from "@/components/redesign/enhe-iconfont-icon";
 import {
   useCallback,
@@ -58,6 +59,7 @@ const INITIAL_MEDIA_STATE = Object.fromEntries(
 ) as ProductMediaState;
 
 const REDUCED_MOTION_QUERY = "(prefers-reduced-motion: reduce)";
+const PRODUCT_AUTO_INTERVAL_MS = 6000;
 
 const SHOWCASE_COPY = {
   zh: {
@@ -68,6 +70,8 @@ const SHOWCASE_COPY = {
     loading: "正在加载产品封面…",
     error: "产品封面暂时无法加载。",
     detail: "查看产品",
+    pause: "暂停产品轮播",
+    resume: "继续产品轮播",
   },
   en: {
     eyebrow: "Popular AI picks",
@@ -77,6 +81,8 @@ const SHOWCASE_COPY = {
     loading: "Loading product cover…",
     error: "This product cover could not be loaded.",
     detail: "View product",
+    pause: "Pause product slideshow",
+    resume: "Resume product slideshow",
   },
 } satisfies Record<
   RedesignLocale,
@@ -88,6 +94,8 @@ const SHOWCASE_COPY = {
     loading: string;
     error: string;
     detail: string;
+    pause: string;
+    resume: string;
   }
 >;
 
@@ -102,6 +110,13 @@ export function EnheRedesignProductShowcase({
   const [inputModality, setInputModality] =
     useState<ProductStageInputModality>("pointer");
   const [prefersReducedMotion, setPrefersReducedMotion] = useState(false);
+  const [manuallyPaused, setManuallyPaused] = useState(false);
+  const [hovered, setHovered] = useState(false);
+  const [focused, setFocused] = useState(false);
+  const [inView, setInView] = useState(false);
+  const [pageVisible, setPageVisible] = useState(false);
+  const stageRef = useRef<HTMLDivElement>(null);
+  const isAutoRotating = inView && pageVisible && !prefersReducedMotion && !manuallyPaused && !hovered && !focused;
   const [transitionKey, setTransitionKey] = useState(0);
   const [mediaState, setMediaState] =
     useState<ProductMediaState>(INITIAL_MEDIA_STATE);
@@ -148,6 +163,23 @@ export function EnheRedesignProductShowcase({
   }, []);
 
   useEffect(() => stopActiveAnimations, [stopActiveAnimations]);
+
+  useEffect(() => {
+    const stage = stageRef.current;
+    if (!stage) return;
+    const observer = new IntersectionObserver(
+      ([entry]) => setInView(entry.isIntersecting && entry.intersectionRatio >= 0.15),
+      { threshold: [0, 0.15] },
+    );
+    observer.observe(stage);
+    const updateVisibility = () => setPageVisible(!document.hidden);
+    updateVisibility();
+    document.addEventListener("visibilitychange", updateVisibility);
+    return () => {
+      observer.disconnect();
+      document.removeEventListener("visibilitychange", updateVisibility);
+    };
+  }, []);
 
   useLayoutEffect(() => {
     if (previousIndex === null) {
@@ -296,6 +328,13 @@ export function EnheRedesignProductShowcase({
     }
   };
 
+  useEffect(() => {
+    if (!isAutoRotating) return;
+    // A fresh reading interval follows every manual change or pause.
+    const timer = window.setTimeout(() => move(1, "pointer"), PRODUCT_AUTO_INTERVAL_MS);
+    return () => window.clearTimeout(timer);
+  }, [isAutoRotating, move, transitionKey]);
+
   const renderProduct = (
     product: (typeof HOME_PRODUCTS)[number],
     isPrevious: boolean,
@@ -375,6 +414,11 @@ export function EnheRedesignProductShowcase({
     <section
       className="redesign-home redesign-home-products"
       data-locale={locale}
+      data-auto-rotating={isAutoRotating ? "true" : "false"}
+      onFocus={() => setFocused(true)}
+      onBlur={(event) => {
+        if (!event.currentTarget.contains(event.relatedTarget as Node | null)) setFocused(false);
+      }}
       aria-labelledby={`redesign-home-products-title-${locale}`}
     >
       <div className="redesign-home-products-inner">
@@ -385,10 +429,26 @@ export function EnheRedesignProductShowcase({
               {copy.heading}
             </h2>
           </div>
+          <button
+            type="button"
+            className="redesign-home-product-autoplay"
+            aria-label={manuallyPaused ? copy.resume : copy.pause}
+            aria-pressed={manuallyPaused}
+            aria-controls={panelId}
+            disabled={prefersReducedMotion}
+            onClick={() => setManuallyPaused((paused) => !paused)}
+          >
+            {manuallyPaused || prefersReducedMotion ? <Play size={18} aria-hidden="true" /> : <Pause size={18} aria-hidden="true" />}
+          </button>
         </div>
 
         <div
+          ref={stageRef}
           className="redesign-home-product-stage"
+          onPointerEnter={(event) => {
+            if (event.pointerType === "mouse") setHovered(true);
+          }}
+          onPointerLeave={() => setHovered(false)}
           tabIndex={0}
           onKeyDown={handleKeyDown}
           role="region"
@@ -439,7 +499,7 @@ export function EnheRedesignProductShowcase({
               />
             </button>
           </div>
-          <span className="sr-only" aria-live="polite" aria-atomic="true">
+          <span className="sr-only" aria-live={isAutoRotating ? "off" : "polite"} aria-atomic="true">
             {product.name[locale]}
           </span>
         </div>

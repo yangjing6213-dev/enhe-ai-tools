@@ -28,7 +28,7 @@
   --support-trigger-icon-size: 44px;
   --support-trigger-gap: 8px;
   --support-exclusion-compact: 52px;
-  --support-exclusion-expanded: 104px;
+  --support-exclusion-expanded: 52px;
   --support-text-mode-min-width: 484px;
   --support-exclusion-current: var(--support-exclusion-expanded);
   --support-safe-area-inline-end: 0px;
@@ -225,7 +225,7 @@
   padding: 4px 9px;
   border-radius: 3px;
   background: var(--enhe-yellow);
-  color: var(--enhe-text, #000000);
+  color: #fff;
   font-size: 11px;
   font-weight: 900;
 }
@@ -1466,14 +1466,14 @@
   align-items: center;
   justify-content: center;
   background: var(--enhe-action);
-  color: var(--enhe-text, #000000);
+  color: #fff;
   text-decoration: none;
   transition: background-color 140ms ease, box-shadow 140ms ease;
 }
 
 .enhe-admin-shell .enhe-admin-content-primary-action:hover {
   background: var(--enhe-action-hover);
-  color: var(--enhe-text, #000000);
+  color: #fff;
   box-shadow: 0 6px 18px color-mix(in srgb, var(--enhe-action) 22%, transparent);
 }
 
@@ -2139,7 +2139,7 @@
 .enhe-admin-shell .admin-nav-link[aria-current="page"] {
   background: var(--enhe-action);
   border-color: var(--enhe-action);
-  color: var(--enhe-text, #000000);
+  color: #fff;
 }
 
 .enhe-admin-shell .admin-nav-link:focus-visible,
@@ -2876,7 +2876,7 @@
 }
 
 .enhe-admin-shell .enhe-admin-commerce-amount {
-  color: #31558c;
+  color: #0462C2;
   font-weight: 700;
   font-variant-numeric: tabular-nums;
 }
@@ -3197,7 +3197,7 @@
 .enhe-admin-shell .enhe-admin-payment-codes-form button[type="submit"] {
   border-color: var(--enhe-action);
   background: var(--enhe-action);
-  color: var(--enhe-text, #000000);
+  color: #fff;
 }
 
 .enhe-admin-shell .enhe-admin-payment-codes-notice {
@@ -3485,7 +3485,7 @@
   border-radius: 999px;
   background: var(--enhe-action);
   padding: 10px 18px;
-  color: var(--enhe-text, #000000);
+  color: #fff;
   font-size: 14px;
   font-weight: 650;
   text-decoration: none;

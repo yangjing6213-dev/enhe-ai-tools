@@ -11,16 +11,16 @@ const heroSource = readFileSync(
 describe("homepage approved copy", () => {
   it("keeps the exact bilingual hero and value contract", () => {
     expect(HOME_COPY.zh.label).toBe("给你的人生添加AI外挂");
-    expect(HOME_COPY.zh.h1).toBe("懂你的AI一站式平台，你需要的，都在这里。");
+    expect(HOME_COPY.zh.h1).toBe("AI一站式平台，一起创造未来");
     expect(HOME_COPY.zh.subtitle).toBe("发现值得使用的 AI 工具、实用方法与行业动态，让工作更高效，让创作更自由。");
     expect(HOME_COPY.zh.cta).toEqual({ label: "探索 AI 工具", href: "/software" });
-    expect(HOME_COPY.zh.value.heading).toBe("让每一个普通人，都能借助 AI，创造过去做不到的事。");
+    expect(HOME_COPY.zh.value.heading).toBe("让每一个人，都能驾驭AI，创造价值。");
 
     expect(HOME_COPY.en.label).toBe("Give your life an AI superpower");
-    expect(HOME_COPY.en.h1).toBe("A one-stop AI platform that gets you. Everything you need, all in one place.");
+    expect(HOME_COPY.en.h1).toBe("Your all-in-one AI platform. Let’s create the future together.");
     expect(HOME_COPY.en.subtitle).toBe("Discover practical AI tools, skills, and industry signals to work faster and create with confidence.");
     expect(HOME_COPY.en.cta).toEqual({ label: "Explore AI tools", href: "/en/software" });
-    expect(HOME_COPY.en.value.heading).toBe("Let everyone use AI to create what once felt out of reach.");
+    expect(HOME_COPY.en.value.heading).toBe("Help everyone master AI and create value.");
   });
 
   it("keeps later review and value copy in the typed dictionary", () => {

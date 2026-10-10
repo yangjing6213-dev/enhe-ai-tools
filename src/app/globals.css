@@ -28,6 +28,19 @@
 }
 
 :root {
+  --brand-blue: #0462C2;
+  --blue-1: var(--brand-blue);
+  --blue-2: var(--brand-blue);
+  --blue-3: var(--brand-blue);
+  --blue-4: var(--brand-blue);
+  --blue-5: var(--brand-blue);
+  --blue-6: var(--brand-blue);
+  --blue-7: var(--brand-blue);
+  --blue-8: var(--brand-blue);
+  --blue-9: var(--brand-blue);
+  --blue-10: var(--brand-blue);
+  --blue-11: var(--brand-blue);
+  --blue-12: var(--brand-blue);
   color-scheme: light;
   --font-sans: 'Alimama Fang Yuan Ti', 'Microsoft YaHei', Arial, sans-serif;
   --font-heading-en: 'Alimama Fang Yuan Ti', var(--font-sans);
@@ -63,22 +76,22 @@
   --muted-foreground: #000000;
   --dim: #000000;
   --primary: var(--blue-9);
-  --primary-foreground: #000000;
+  --primary-foreground: #ffffff;
   --secondary: var(--blue-3);
-  --secondary-foreground: var(--blue-12);
+  --secondary-foreground: #ffffff;
   --popover: #ffffff;
   --popover-foreground: #000000;
   --accent: var(--blue-3);
-  --accent-foreground: var(--blue-12);
+  --accent-foreground: #ffffff;
   --destructive: #c62828;
   --input: var(--gray-6);
   --ring: var(--blue-8);
   --sidebar: #ffffff;
   --sidebar-foreground: #000000;
   --sidebar-primary: var(--blue-9);
-  --sidebar-primary-foreground: #000000;
+  --sidebar-primary-foreground: #ffffff;
   --sidebar-accent: var(--blue-3);
-  --sidebar-accent-foreground: var(--blue-12);
+  --sidebar-accent-foreground: #ffffff;
   --sidebar-border: var(--gray-6);
   --sidebar-ring: var(--blue-8);
   --radius: 0.9rem;
@@ -781,7 +794,7 @@ select option:disabled {
   border: 1px solid var(--primary) !important;
   border-radius: 999px;
   background: var(--primary) !important;
-  color: #000000 !important;
+  color: #ffffff !important;
   box-shadow: 0 10px 24px color-mix(in srgb, var(--primary) 22%, transparent) !important;
 }
 
@@ -789,14 +802,14 @@ select option:disabled {
 .login-submit-button *,
 .purchase-guide-button,
 .purchase-guide-button * {
-  color: #000000 !important;
+  color: #ffffff !important;
 }
 
 .login-submit-button:hover,
 .purchase-guide-button:hover {
   border-color: var(--blue-10) !important;
   background: var(--blue-10) !important;
-  color: #000000 !important;
+  color: #ffffff !important;
 }
 
 .status-success,
@@ -876,7 +889,7 @@ select option:disabled {
 .login-submit-button *,
 .purchase-guide-button,
 .purchase-guide-button * {
-  color: #000000 !important;
+  color: #ffffff !important;
 }
 
 .text-\[\#8B95A7\],
@@ -2435,7 +2448,7 @@ select option:disabled {
   border: 1px solid var(--marketing-border);
   border-radius: 8px;
   background: #ffffff;
-  box-shadow: 0 12px 32px rgba(18, 42, 79, 0.08);
+  box-shadow: 0 12px 32px rgba(4, 98, 194, 0.08);
   backdrop-filter: none;
   -webkit-backdrop-filter: none;
 }
@@ -3092,7 +3105,7 @@ select option:disabled {
   border: 1px solid var(--marketing-border);
   border-radius: 18px;
   background: #ffffff;
-  box-shadow: 0 16px 42px rgba(18, 42, 79, 0.08);
+  box-shadow: 0 16px 42px rgba(4, 98, 194, 0.08);
   backdrop-filter: none;
   -webkit-backdrop-filter: none;
   padding: clamp(1rem, 2vw, 1.35rem);
@@ -3144,7 +3157,7 @@ select option:disabled {
   border-color: var(--marketing-border);
   background: #ffffff;
   background-image: none;
-  box-shadow: 0 12px 32px rgba(18, 42, 79, 0.08);
+  box-shadow: 0 12px 32px rgba(4, 98, 194, 0.08);
   backdrop-filter: none;
   -webkit-backdrop-filter: none;
 }
@@ -3188,7 +3201,7 @@ select option:disabled {
   border: 1px solid var(--marketing-border);
   border-radius: 15px;
   background: #ffffff;
-  box-shadow: 0 12px 32px rgba(18, 42, 79, 0.08);
+  box-shadow: 0 12px 32px rgba(4, 98, 194, 0.08);
   backdrop-filter: none;
   -webkit-backdrop-filter: none;
 }
@@ -4651,7 +4664,7 @@ select option:disabled {
 .byox-page {
   background:
     radial-gradient(circle at 18% 0%, rgba(65, 197, 219, 0.12), transparent 30rem),
-    radial-gradient(circle at 88% 16%, rgba(88, 166, 255, 0.12), transparent 26rem),
+    radial-gradient(circle at 88% 16%, rgba(4, 98, 194, 0.12), transparent 26rem),
     var(--marketing-bg);
 }
 

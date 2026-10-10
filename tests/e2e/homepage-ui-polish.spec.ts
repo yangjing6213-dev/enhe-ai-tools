@@ -40,7 +40,7 @@ test("homepage polish stays readable, responsive, and interactive without extern
     const hero = page.locator(".redesign-home-hero");
     await expect(brand).toBeVisible();
     await expect(brandLabel).toHaveCount(0);
-    await expect(hero.locator("h1")).toHaveText("懂你的AI一站式平台，你需要的，都在这里。");
+    await expect(hero.locator("h1")).toHaveText("AI一站式平台，一起创造未来");
     await expect(hero.locator(".redesign-home-hero-inner")).toHaveCSS("text-align", "center");
     await expect(hero).toHaveCSS("background-image", "none");
     const heroColor = await hero.evaluate((element) => getComputedStyle(element).color);
@@ -176,7 +176,7 @@ test("homepage polish stays readable, responsive, and interactive without extern
     }
 
     const footer = page.locator(".redesign-footer");
-    await expect(footer).toHaveCSS("background-color", "rgb(255, 255, 255)");
+    await expect(footer).toHaveCSS("background-color", "rgb(13, 58, 109)");
     await expect(page.locator(".redesign-brand-mark")).toHaveAttribute("src", "/images/enhe-logo-white.png");
     await expect(footer.locator(".footer-brand-logo")).toHaveAttribute("src", /enhe-footer-wordmark/);
     const chevronGaps = await footer.locator(".footer-group-trigger").evaluateAll((summaries) => summaries.map((summary) => {

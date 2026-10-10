@@ -36,15 +36,15 @@ describe("ENHE public visual refresh contract", () => {
     expect(featureCards).toContain('aria-label=');
   });
 
-  it("uses a white, image-free hero, white cards, and a white footer", () => {
+  it("uses a white, image-free hero, white cards, and a dark-blue footer", () => {
     expect(brandLockup).toContain("/images/enhe-logo-white.png");
     expect(refreshStyles).toMatch(/\.redesign-home-hero\s*\{[^}]*background-image:\s*none/);
     expect(refreshStyles).toMatch(/\.redesign-home-hero\s*\{[^}]*color:\s*var\(--enhe-text\)/);
     expect(tokens).toContain("--enhe-page-bg: var(--background, #ffffff)");
     expect(tokens).toContain("--enhe-surface-elevated: var(--popover, #ffffff)");
-    expect(tokens).toContain("--enhe-action: var(--primary, #0090ff)");
+    expect(tokens).toContain("--enhe-action: var(--primary, #0462C2)");
     expect(refreshStyles).toContain(".redesign-footer");
-    expect(tokens).toContain("--enhe-footer: #ffffff");
+    expect(tokens).toContain("--enhe-footer: #0D3A6D");
     expect(refreshStyles).toContain(".enhe-redesign-production :is(.glass, .evidence-card, .dossier-card, .surface-panel");
     expect(globalStyles).toContain("select {\n  color-scheme: inherit;");
     expect(refreshStyles).toContain("font-size: clamp(1.25rem, 3.5vw, 3.75rem);");

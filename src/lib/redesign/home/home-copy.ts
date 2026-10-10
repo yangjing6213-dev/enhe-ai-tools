@@ -23,7 +23,7 @@ export type RedesignHomeCopy = {
 export const HOME_COPY: Record<RedesignLocale, RedesignHomeCopy> = {
   zh: {
     label: "给你的人生添加AI外挂",
-    h1: "懂你的AI一站式平台，你需要的，都在这里。",
+    h1: "AI一站式平台，一起创造未来",
     subtitle: "发现值得使用的 AI 工具、实用方法与行业动态，让工作更高效，让创作更自由。",
     cta: { label: "探索 AI 工具", href: "/software" },
     review: {
@@ -31,13 +31,13 @@ export const HOME_COPY: Record<RedesignLocale, RedesignHomeCopy> = {
       disclosure: "AI 生成示例（非真实用户反馈）",
     },
     value: {
-      heading: "让每一个普通人，都能借助 AI，创造过去做不到的事。",
+      heading: "让每一个人，都能驾驭AI，创造价值。",
       cta: { label: "探索 AI 工具", href: "/software" },
     },
   },
   en: {
     label: "Give your life an AI superpower",
-    h1: "A one-stop AI platform that gets you. Everything you need, all in one place.",
+    h1: "Your all-in-one AI platform. Let’s create the future together.",
     subtitle: "Discover practical AI tools, skills, and industry signals to work faster and create with confidence.",
     cta: { label: "Explore AI tools", href: "/en/software" },
     review: {
@@ -45,7 +45,7 @@ export const HOME_COPY: Record<RedesignLocale, RedesignHomeCopy> = {
       disclosure: "AI-generated examples (not real customer feedback).",
     },
     value: {
-      heading: "Let everyone use AI to create what once felt out of reach.",
+      heading: "Help everyone master AI and create value.",
       cta: { label: "Explore AI tools", href: "/en/software" },
     },
   },

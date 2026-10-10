@@ -14,12 +14,30 @@ test("public header replaces the search link, opens recommendations, and submits
       await expect(header.locator('.redesign-nav-link[href$="/search"]')).toHaveCount(0);
       await expect(page.locator(".redesign-home-cta")).toHaveCSS("border-radius", "4px");
       await expect(header.locator(".redesign-language-switch:visible")).toHaveCSS("border-color", "rgb(0, 0, 0)");
+      await expect(header.locator(".redesign-language-switch:visible")).toHaveCSS("background-color", "rgb(4, 98, 194)");
+      await expect(header.locator(".redesign-language-link:visible").first()).toHaveCSS("color", "rgb(255, 255, 255)");
+      const footer = page.locator(".redesign-footer");
+      await expect(footer).toHaveCSS("background-color", "rgb(13, 58, 109)");
+      await expect(footer.locator("h3").first()).toHaveCSS("color", "rgb(255, 255, 255)");
+      await expect(footer.locator("nav").first()).toHaveCSS("background-color", "rgb(13, 58, 109)");
+      await expect(footer.locator(".footer-brand-logo")).toHaveCSS("filter", "brightness(0) invert(1)");
+      await expect(footer.locator(".footer-bottom")).toHaveCSS("justify-content", "center");
+      await expect(footer.locator(".footer-bottom p")).toHaveCount(1);
+      await expect(footer.locator(".footer-bottom p")).toHaveCSS("color", "rgb(255, 255, 255)");
+      await expect(page.locator(".redesign-home-brand-value-inner h2")).toHaveCSS("font-weight", "700");
       const layout = await header.evaluate((el) => {
         const box = (selector: string) => el.querySelector(selector)!.getBoundingClientRect().toJSON();
         return { logo: box(".redesign-brand-mark"), search: box(".redesign-header-search"), nav: box(".redesign-desktop-nav"), scrollWidth: document.documentElement.scrollWidth };
       });
       expect(layout.logo.width).toBe(154);
       expect(layout.scrollWidth).toBeLessThanOrEqual(width);
+      const searchRatio = await input.evaluate((element) => {
+        const form = element.closest(".redesign-header-search")!;
+        const inner = form.parentElement!;
+        const columns = getComputedStyle(inner).gridTemplateColumns.split(" ").map(parseFloat);
+        return form.getBoundingClientRect().width / (columns.length === 3 ? columns[1] : inner.clientWidth);
+      });
+      expect(searchRatio).toBeCloseTo(width >= 768 ? 0.5 : 1, 1);
       if (width >= 1280) {
         expect(layout.search.x).toBeGreaterThanOrEqual(layout.logo.right);
         expect(layout.search.right).toBeLessThanOrEqual(layout.nav.x + 1);

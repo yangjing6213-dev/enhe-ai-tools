@@ -106,8 +106,9 @@ describe("production home product directional slide", () => {
     expect(component).toContain("key={product.id}");
     expect(component).toContain('data-motion-variant="directional-slide"');
     expect(component).toContain("data-product-current");
-    expect(component).not.toMatch(/setInterval|autoplay/i);
-    expect(component).not.toMatch(/setTimeout\s*\(/);
+    expect(component).not.toMatch(/setInterval/i);
+    expect(component).toContain("window.clearTimeout(timer)");
+    expect(component).toContain("[isAutoRotating, move, transitionKey]");
   });
 
   it("keeps formal SSR, keyboard focus, and live-region semantics scoped to the stage", () => {

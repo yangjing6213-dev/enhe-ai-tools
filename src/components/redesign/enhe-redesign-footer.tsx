@@ -115,23 +115,21 @@ export function EnheRedesignFooter({
           ))}
         </div>
         <div className="footer-bottom">
-          <p>{copy.copyright}</p>
-          {filingEntries.length ? (
-            <p>
-              {filingEntries.map((entry, index) => (
-                <Fragment key={`${entry.label}:${entry.href ?? "text"}`}>
-                  {index ? " · " : null}
-                  {entry.href ? (
-                    <a href={entry.href} target="_blank" rel="noreferrer">
-                      {entry.label}
-                    </a>
-                  ) : (
-                    entry.label
-                  )}
-                </Fragment>
-              ))}
-            </p>
-          ) : null}
+          <p className="footer-copyright-filings">
+            <span>{copy.copyright}</span>
+            {filingEntries.map((entry, index) => (
+              <Fragment key={`${entry.label}:${entry.href ?? "text"}`}>
+                {index ? <span aria-hidden="true">·</span> : null}
+                {entry.href ? (
+                  <a href={entry.href} target="_blank" rel="noreferrer">
+                    {entry.label}
+                  </a>
+                ) : (
+                  <span>{entry.label}</span>
+                )}
+              </Fragment>
+            ))}
+          </p>
         </div>
       </div>
     </footer>
