@@ -14,6 +14,10 @@ vi.mock("@/components/customer-support-widget", () => ({
   CustomerSupportWidget: () => React.createElement("aside", { "data-support": true }),
 }));
 
+vi.mock("@/lib/auth", () => ({
+  getHeaderUserSnapshot: async () => null,
+}));
+
 vi.mock("@/components/redesign/enhe-production-public-shell", () => ({
   EnheRedesignPublicHeader: () => React.createElement("header"),
   EnheRedesignPublicFooter: () => React.createElement("footer"),

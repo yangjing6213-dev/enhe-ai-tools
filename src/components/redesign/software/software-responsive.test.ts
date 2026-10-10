@@ -17,10 +17,10 @@ describe("AI tools candidate responsive browsing", () => {
     expect(css).toMatch(/\.redesign-software\s*\{[^}]*background-color:\s*var\(--enhe-page-bg\)/);
     expect(css).toMatch(/\.redesign-software-grid\s*\{[^}]*grid-template-columns:\s*repeat\(3,\s*minmax\(0,\s*1fr\)\)/);
     expect(css).toMatch(/@media\s*\(max-width:\s*768px\)[\s\S]*\.redesign-software-grid\s*\{[^}]*grid-template-columns:\s*minmax\(0,\s*1fr\)/);
-    expect(css).toContain(":nth-child(1n)");
-    expect(css.match(/:nth-child\(3n\)/g)).toHaveLength(2);
-    expect(css).not.toContain(":nth-child(2n)");
-    expect(css).not.toContain(":nth-child(4n)");
+    expect(css).not.toContain(":nth-child(");
+    expect(css).toContain("grid-template-rows: 48px 84px 72px 62px 34px minmax(20px, 1fr)");
+    expect(css).toMatch(/\.redesign-software-card-badges\s*\{[^}]*justify-content:\s*space-between;/);
+    expect(css).toMatch(/\.redesign-software-card-full-link\s*\{[^}]*display:\s*flex;/);
     expect(css).toMatch(/width\s*<\s*768px/);
     expect(css).not.toMatch(/max-width:\s*767px/);
     expect(css).toContain("overflow-x: auto");

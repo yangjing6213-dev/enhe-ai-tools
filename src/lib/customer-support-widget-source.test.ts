@@ -133,7 +133,7 @@ describe("customer support widget source", () => {
     expect(spinnerRule).toContain("animation: none");
   });
 
-  it("scopes the shared exclusion to approved product, footer, and home targets", () => {
+  it("keeps support spacing separate from the fixed product card layout", () => {
     const card = readFileSync(
       new URL(
         "../components/redesign/software/EnheRedesignSoftwareCard.tsx",
@@ -179,7 +179,10 @@ describe("customer support widget source", () => {
       "utf8",
     );
 
-    expect(card).toContain("data-support-exclusion={sectionId}");
+    expect(card).toContain('className="redesign-software-card-full-link"');
+    expect(card).toContain("href={product.detailHref}");
+    expect(card).toContain('className="redesign-software-card-badges"');
+    expect(card).toContain('aria-hidden="true"');
     expect(footer).not.toContain('data-support-exclusion="footer"');
     expect(catalog).not.toContain('data-support-exclusion="pagination"');
     expect(home).not.toContain('data-support-exclusion="home-control"');
@@ -191,13 +194,9 @@ describe("customer support widget source", () => {
     expect(homeStyles).not.toContain("@media (max-width: 767px)");
     expect(home).toContain('className="redesign-home-product-control"');
     expect(software).toContain("var(--support-exclusion-applied)");
-    expect(software).toContain("[data-catalog-card]:nth-child(1n)");
-    expect(software).toContain("[data-catalog-card]:nth-child(3n)");
-    expect(software).not.toContain("[data-catalog-card]:nth-child(2n)");
-    expect(software).not.toContain("[data-catalog-card]:nth-child(4n)");
+    expect(software).not.toContain(":nth-child(");
+    expect(software).toContain("grid-template-rows: 48px 84px 72px 62px 34px minmax(20px, 1fr)");
     expect(software).toContain("@media (width < 768px)");
-    expect(software).toContain("@media (768px < width <= 1024px)");
-    expect(software).toContain("@media (width > 1024px)");
     expect(software).not.toContain("@media (max-width: 767px)");
     expect(software).not.toContain("--mobile-support-action-reserve");
     expect(software).toContain(".redesign-software-load-row {");
