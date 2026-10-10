@@ -4,11 +4,12 @@ test.use({ serviceWorkers: "block" });
 
 async function installLoopbackOnlyGuard(page: Page) {
   const rejectedOrigins: string[] = [];
-  const localOrigin = `http://127.0.0.1:${process.env.PORT ?? "3000"}`;
+  const port = process.env.PORT ?? "3000";
+  const localOrigins = new Set([`http://127.0.0.1:${port}`, `http://localhost:${port}`]);
 
   await page.route("**/*", async (route) => {
     const origin = new URL(route.request().url()).origin;
-    if (origin === localOrigin) {
+    if (localOrigins.has(origin)) {
       await route.continue();
       return;
     }
@@ -40,7 +41,9 @@ test("homepage polish stays readable, responsive, and interactive without extern
     const hero = page.locator(".redesign-home-hero");
     await expect(brand).toBeVisible();
     await expect(brandLabel).toHaveCount(0);
-    await expect(hero.locator("h1")).toHaveText("AI一站式平台 一起创造未来");
+    await expect(hero.locator("h1")).toHaveAttribute("aria-label", "AI一站式平台 一起创造未来");
+    const heroTitleLines = hero.locator("h1 > span");
+    await expect(heroTitleLines).toHaveText(["AI一站式平台", "一起创造未来"]);
     await expect(hero.locator(".redesign-home-hero-inner")).toHaveCSS("text-align", "center");
     await expect(hero).toHaveCSS("background-image", "none");
     const heroColor = await hero.evaluate((element) => getComputedStyle(element).color);
@@ -179,6 +182,37 @@ test("homepage polish stays readable, responsive, and interactive without extern
     await expect(footer).toHaveCSS("background-color", "rgb(13, 58, 109)");
     await expect(page.locator(".redesign-brand-mark")).toHaveAttribute("src", "/images/enhe-logo-white.png");
     await expect(footer.locator(".footer-brand-logo")).toHaveAttribute("src", /enhe-footer-wordmark/);
+    const footerAlignment = await footer.evaluate((element) => {
+      const heading = element.querySelector<HTMLElement>(".redesign-home-brand-value-inner h2");
+      const cta = element.querySelector<HTMLElement>(".redesign-home-brand-value-cta");
+      const logo = element.querySelector<HTMLElement>(".footer-brand-logo");
+      const navigation = element.querySelector<HTMLElement>(".footer-navigation");
+      const firstTrigger = element.querySelector<HTMLElement>(".footer-group-trigger");
+      if (!heading || !cta || !logo || !navigation || !firstTrigger) {
+        throw new Error("A footer alignment element is missing.");
+      }
+      const matrixY = (target: HTMLElement) => {
+        const transform = getComputedStyle(target).transform;
+        return transform === "none" ? 0 : new DOMMatrixReadOnly(transform).m42;
+      };
+      return {
+        headingTop: heading.getBoundingClientRect().top,
+        headingSize: Number.parseFloat(getComputedStyle(heading).fontSize),
+        ctaHeight: cta.getBoundingClientRect().height,
+        ctaShift: matrixY(cta),
+        logoHeight: logo.getBoundingClientRect().height,
+        logoShift: matrixY(logo),
+        navigationTop: navigation.getBoundingClientRect().top,
+        firstTriggerTop: firstTrigger.getBoundingClientRect().top,
+      };
+    });
+    expect(footerAlignment.headingSize).toBeGreaterThanOrEqual(36);
+    expect(footerAlignment.ctaShift).toBeCloseTo(footerAlignment.ctaHeight * 0.3, 0);
+    expect(footerAlignment.logoShift).toBeCloseTo(footerAlignment.logoHeight * 0.1, 0);
+    if (width >= 1280) {
+      expect(Math.abs(footerAlignment.navigationTop - footerAlignment.headingTop)).toBeLessThanOrEqual(1);
+      expect(Math.abs(footerAlignment.firstTriggerTop - footerAlignment.headingTop)).toBeLessThanOrEqual(1);
+    }
     const chevronGaps = await footer.locator(".footer-group-trigger").evaluateAll((summaries) => summaries.map((summary) => {
       const title = summary.querySelector("h3")!.getBoundingClientRect();
       const icon = summary.querySelector("svg")!.getBoundingClientRect();
@@ -286,6 +320,22 @@ test("homepage polish stays readable, responsive, and interactive without extern
   await expect(englishReviews.getByRole("heading", { name: "Customer stories" })).toBeVisible();
   await expect(englishReviews.locator(".redesign-home-reviews-disclosure")).toHaveText("AI-generated examples (not real customer feedback).");
   await expect(englishReviews.locator(".redesign-home-reviews-control, .redesign-home-review-triangle")).toHaveCount(0);
+
+  if (process.env.PLAYWRIGHT_USE_PRODUCTION_SERVER !== "1") {
+    const softwareResponse = await page.goto("/redesign-preview/software?locale=zh", { waitUntil: "load" });
+    expect(softwareResponse?.status(), "software catalog preview").toBe(200);
+    await expect(page.locator(".redesign-software-section-header h2")).toHaveText([
+      "最新推荐",
+      "精选推荐",
+      "全部AI工具",
+    ]);
+    await expect(page.locator("#all-products-heading")).toHaveText("全部AI工具");
+    const softwareHeadingWeights = await page.locator(".redesign-software-section-header h2, #all-products-heading").evaluateAll((headings) =>
+      headings.map((heading) => Number.parseInt(getComputedStyle(heading).fontWeight, 10)),
+    );
+    expect(softwareHeadingWeights.length).toBeGreaterThanOrEqual(3);
+    expect(softwareHeadingWeights.every((weight) => weight >= 700)).toBe(true);
+  }
 
   expect(rejectedOrigins).toEqual([]);
   expect(pageErrors).toEqual([]);

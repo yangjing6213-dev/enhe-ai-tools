@@ -54,6 +54,10 @@
   line-height: 0.98;
 }
 
+.redesign-home .redesign-home-hero-inner h1 > span {
+  display: block;
+}
+
 .redesign-home .redesign-home-subtitle {
   max-width: 700px;
   margin: 32px auto 0;

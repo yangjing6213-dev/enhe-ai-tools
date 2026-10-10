@@ -40,15 +40,15 @@ const EXPECTED_COPY = {
     },
     sections: {
       newReleases: {
-        heading: "新品推荐",
+        heading: "最新推荐",
         description: "公开页面中最近呈现的四个工具入口。",
       },
       featuredProducts: {
-        heading: "精选产品",
+        heading: "精选推荐",
         description: "三项适合对比浏览的代表性公开产品。",
       },
       allProducts: {
-        heading: "全部产品",
+        heading: "全部AI工具",
         description: "按分类浏览十二个已冻结的公开产品与课程入口。",
       },
     },

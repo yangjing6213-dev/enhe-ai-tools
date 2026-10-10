@@ -851,6 +851,7 @@ body .redesign-footer nav {
 
 .redesign-footer .footer-brand-logo {
   filter: brightness(0) invert(1);
+  transform: translateY(10%);
 }
 
 .redesign-footer-inner {
@@ -859,7 +860,7 @@ body .redesign-footer nav {
 
 .redesign-footer .footer-grid {
   grid-template-columns: repeat(3, minmax(0, 1fr));
-  align-items: center;
+  align-items: start;
   gap: 32px;
   min-height: 126px;
 }
@@ -896,7 +897,7 @@ body .redesign-footer nav {
 .redesign-footer .redesign-home-brand-value-inner h2 {
   margin: 0;
   color: #fff;
-  font-size: clamp(1.125rem, 1.6vw, 1.5rem);
+  font-size: clamp(2.25rem, 3.2vw, 3rem);
   line-height: 1.5;
   letter-spacing: 0;
 }
@@ -911,6 +912,7 @@ body .redesign-footer nav {
   margin-inline: 0;
   padding: 12px 24px;
   font-size: 14px;
+  transform: translateY(30%);
 }
 
 .redesign-footer .footer-bottom {
