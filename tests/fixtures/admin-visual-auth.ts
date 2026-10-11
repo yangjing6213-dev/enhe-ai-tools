@@ -50,7 +50,7 @@ export async function requireUser() {
     email: "visual-user@localhost.invalid",
     phone: null,
     nickname: "Local Visual Fixture User",
-    avatar: "/images/tool-software.svg",
+    avatar: "/uploads/user-avatars/local-visual-avatar.png",
     role: "user" as const,
     status: "active" as const,
     createdAt: new Date("2026-09-30T00:00:00.000Z"),

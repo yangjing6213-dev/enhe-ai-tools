@@ -11,12 +11,15 @@ function read(relativePath: string) {
 const globalStyles = read("src/app/globals.css").replace(/\r\n/g, "\n");
 const tokens = read("src/styles/redesign/tokens.css");
 const refreshStyles = read("src/styles/redesign/site-refresh.css");
+const accountStyles = read("src/styles/redesign/account.css");
 const home = read("src/components/redesign/home/EnheRedesignHome.tsx");
 const featureCards = read("src/components/redesign/home/EnheRedesignFeatures.tsx");
 const brandLockup = read("src/components/redesign/enhe-brand-lockup.tsx");
 const authLayout = read("src/app/(auth)/layout.tsx");
 const loginPage = read("src/app/(auth)/login/page-shell.tsx");
 const registerPage = read("src/app/(auth)/register/page-shell.tsx");
+const userPage = read("src/app/user/page-shell.tsx");
+const footer = read("src/components/redesign/enhe-redesign-footer.tsx");
 const trendPage = read("src/app/ai-trends/page-shell.tsx");
 const productPage = read("src/app/tools/[slug]/page-shell.tsx");
 
@@ -64,6 +67,19 @@ describe("ENHE public visual refresh contract", () => {
     expect(refreshStyles).toContain(".tool-detail-hero-stack");
     expect(trendPage).toContain('className="ai-trends-page"');
     expect(productPage).toContain("tool-detail-hero-stack");
+  });
+
+  it("keeps account identifiers flexible and fixes profile and footer presentation", () => {
+    expect(registerPage).toContain('type="text"');
+    expect(registerPage).toContain('placeholder={locale === "en" ? "Enter your account" : "请输入注册账号"}');
+    expect(registerPage).toContain("字母和数字");
+    expect(loginPage).toContain('type="text"');
+    expect(userPage).toContain("normalizeImageSrc(user.avatar)");
+    expect(refreshStyles).toMatch(/\.enhe-redesign-production \.enhe-auth-page::before\s*\{[^}]*display:\s*none/);
+    expect(refreshStyles).toMatch(/\.enhe-redesign-production \.enhe-auth-page \.login-submit-button[\s\S]*?-webkit-text-fill-color:\s*#fff\s*!important/);
+    expect(accountStyles).toMatch(/\.enhe-account-shell \.user-center-page[\s\S]*?-webkit-text-fill-color:\s*#fff\s*!important/);
+    expect(footer).toContain('<nav className="footer-social-links"');
+    expect(refreshStyles).toMatch(/@media \(width >= 1280px\)[\s\S]*?\.redesign-footer \.footer-grid\s*\{[^}]*min-height:\s*192px/);
   });
 
   it("adds restrained hover, press, focus, and reduced-motion handling", () => {

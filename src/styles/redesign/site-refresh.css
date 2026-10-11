@@ -630,6 +630,10 @@
   color: var(--enhe-text);
 }
 
+.enhe-redesign-production .enhe-auth-page::before {
+  display: none;
+}
+
 .enhe-redesign-production .enhe-auth-page .surface-panel {
   border-color: var(--enhe-border);
   border-radius: 20px;
@@ -660,6 +664,12 @@
 .enhe-redesign-production .enhe-auth-page .login-submit-button:hover {
   border-color: var(--enhe-action-hover) !important;
   background: var(--enhe-action-hover) !important;
+}
+
+.enhe-redesign-production .enhe-auth-page .login-submit-button,
+.enhe-redesign-production .enhe-auth-page .login-submit-button * {
+  color: #fff !important;
+  -webkit-text-fill-color: #fff !important;
 }
 
 .enhe-redesign-production :is(button, [role="button"], a[class*="button"], a[class*="cta"], a[class*="card"], a[class*="control"], .enhe-contentless-action, .redesign-language-link, .redesign-login-link, .redesign-avatar-trigger, .redesign-home-product-detail-link, .footer-group > summary) {
@@ -1312,5 +1322,11 @@ body .customer-support-widget .customer-support-launcher,
 
   .redesign-footer {
     padding-bottom: 72px;
+  }
+}
+
+@media (width >= 1280px) {
+  .redesign-footer .footer-grid {
+    min-height: 192px;
   }
 }

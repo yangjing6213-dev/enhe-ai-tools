@@ -181,10 +181,21 @@ test("User center exposes username and avatar controls without submitting change
     }
     await route.continue();
   });
+  await page.route("**/api/uploads/user-avatars/local-visual-avatar.png", async (route) => {
+    await route.fulfill({
+      status: 200,
+      contentType: "image/svg+xml",
+      body: '<svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 64 64"><circle cx="32" cy="32" r="32" fill="#0462C2"/></svg>'
+    });
+  });
 
   await page.goto("/user", { waitUntil: "load" });
   await expect(page.getByRole("heading", { name: "个人资料" })).toBeVisible();
   await expect(page.locator("#profile-nickname")).toHaveValue("Local Visual Fixture User");
+  const avatar = page.locator(".user-center-page img").first();
+  await expect(avatar).toHaveAttribute("src", "/api/uploads/user-avatars/local-visual-avatar.png");
+  await expect.poll(() => avatar.evaluate((image) => (image as HTMLImageElement).naturalWidth)).toBe(64);
+  await expect(page.locator(".user-center-page button[data-variant='default']").first()).toHaveCSS("color", "rgb(255, 255, 255)");
   await expect(page.locator("#profile-avatar")).toHaveAttribute("accept", "image/png,image/jpeg,image/webp");
   await expect(page.locator("#profile-avatar").locator("xpath=ancestor::form")).toHaveAttribute("enctype", "multipart/form-data");
 });

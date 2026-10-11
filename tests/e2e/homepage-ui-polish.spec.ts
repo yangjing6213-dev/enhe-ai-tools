@@ -188,10 +188,11 @@ test("homepage polish stays readable, responsive, and interactive without extern
     const footerAlignment = await footer.evaluate((element) => {
       const heading = element.querySelector<HTMLElement>(".redesign-home-brand-value-inner h2");
       const logo = element.querySelector<HTMLElement>(".footer-brand-logo");
+      const socialLinks = element.querySelector<HTMLElement>(".footer-social-links");
       const navigation = element.querySelector<HTMLElement>(".footer-navigation");
       const firstTrigger = element.querySelector<HTMLElement>(".footer-group-trigger");
       const footerGrid = element.querySelector<HTMLElement>(".footer-grid");
-      if (!heading || !logo || !navigation || !firstTrigger || !footerGrid) {
+      if (!heading || !logo || !socialLinks || !navigation || !firstTrigger || !footerGrid) {
         throw new Error("A footer alignment element is missing.");
       }
       return {
@@ -202,11 +203,14 @@ test("homepage polish stays readable, responsive, and interactive without extern
           (footerGrid.getBoundingClientRect().top + footerGrid.getBoundingClientRect().height / 2) -
           logo.getBoundingClientRect().height * 0.1,
         ),
+        socialLinksTop: socialLinks.getBoundingClientRect().top,
+        logoBottom: logo.getBoundingClientRect().bottom,
         navigationTop: navigation.getBoundingClientRect().top,
         firstTriggerTop: firstTrigger.getBoundingClientRect().top,
       };
     });
     expect(footerAlignment.headingSize).toBeGreaterThanOrEqual(36);
+    expect(footerAlignment.socialLinksTop).toBeGreaterThanOrEqual(footerAlignment.logoBottom);
     if (width >= 1280) {
       expect(footerAlignment.logoPositionError).toBeLessThanOrEqual(1);
     }

@@ -48,7 +48,8 @@ for (const route of routes) {
       const account = form.getByLabel(route.locale === "en" ? "Account" : "账号", { exact: true });
       const password = form.getByLabel(route.locale === "en" ? "Password" : "密码", { exact: true });
       await expect(account).toBeVisible();
-      await expect(account).toHaveAttribute("type", "email");
+      await expect(account).toHaveAttribute("type", "text");
+      await expect(account).toHaveAttribute("placeholder", route.locale === "en" ? "Enter your account" : "请输入注册账号");
       await expect(password).toBeVisible();
       await expect(password).toHaveAttribute("type", "password");
 
@@ -61,6 +62,8 @@ for (const route of routes) {
       }
       const submitButton = form.locator("button[type='submit']");
       await expect(submitButton).toBeVisible();
+      await expect(submitButton).toHaveCSS("color", "rgb(255, 255, 255)");
+      expect(await page.locator(".enhe-auth-page").evaluate((element) => getComputedStyle(element, "::before").display)).toBe("none");
       await expect(submitButton).toHaveText(
         route.kind === "login" ? route.title : route.locale === "en" ? "Create account" : "创建账号"
       );

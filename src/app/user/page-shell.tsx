@@ -22,6 +22,7 @@ import { buildCanonicalToolPath } from "@/lib/public-slugs";
 import { reviewCompletionNotice, reviewCompletionNoticeEn } from "@/lib/review-copy";
 import { buildUserToolEntitlements, type UserEntitlementTool } from "@/lib/user-entitlements";
 import { formatCurrency } from "@/lib/utils";
+import { normalizeImageSrc } from "@/lib/media";
 
 export type UserCenterSearchParams = Promise<Record<string, string | undefined>>;
 
@@ -112,7 +113,7 @@ export async function UserCenterPageShell({
           <Panel title={locale === "en" ? "Profile" : "个人资料"}>
             <div className="flex items-center gap-4">
               {user.avatar ? (
-                <Image src={user.avatar} alt={user.nickname ?? (locale === "en" ? "User avatar" : "用户头像")} width={64} height={64} unoptimized className="h-16 w-16 rounded-full object-cover" />
+                <Image src={normalizeImageSrc(user.avatar) ?? user.avatar} alt={user.nickname ?? (locale === "en" ? "User avatar" : "用户头像")} width={64} height={64} unoptimized className="h-16 w-16 rounded-full object-cover" />
               ) : (
                 <div aria-hidden="true" className="flex h-16 w-16 items-center justify-center rounded-full bg-[var(--marketing-accent)] text-xl font-bold text-white">
                   {(user.nickname || user.email || "U").slice(0, 1).toUpperCase()}

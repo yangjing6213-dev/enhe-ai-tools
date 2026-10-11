@@ -48,16 +48,18 @@ export async function RegisterPageShell({
         <input
           id="register-email"
           name="email"
-          type="email"
+          type="text"
           required
+          minLength={3}
+          maxLength={64}
           autoComplete="username"
-          placeholder={locale === "en" ? "you@example.com" : "请输入邮箱地址"}
-          title={locale === "en" ? "Enter an email address for your ENHE AI account." : "请输入用于注册 ENHE AI 的有效邮箱地址。"}
+          placeholder={locale === "en" ? "Enter your account" : "请输入注册账号"}
+          title={locale === "en" ? "Use an email address or letters and numbers for your ENHE AI account." : "可使用邮箱地址或 3–64 位英文字母和数字作为注册账号。"}
           aria-describedby="register-email-help"
           className="form-control-dark mt-2"
         />
         <p id="register-email-help" className="mt-2 text-xs leading-5 text-[var(--marketing-muted)]">
-          {locale === "en" ? "Required. This email will be used for login and order notifications." : "必填，该邮箱用于登录和接收订单通知。"}
+          {locale === "en" ? "Required. Use an email address or 3–64 letters and numbers to sign in." : "必填，可使用邮箱地址或 3–64 位英文字母和数字，注册后用于登录。"}
         </p>
         <label htmlFor="register-password" className="mt-5 block text-sm font-semibold text-[var(--marketing-text)]">{t.auth.password}</label>
         <PasswordInput

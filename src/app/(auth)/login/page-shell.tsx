@@ -66,16 +66,16 @@ export async function LoginPageShell({
         <input
           id="login-email"
           name="email"
-          type="email"
+          type="text"
           required
           autoComplete="username"
-          placeholder={locale === "en" ? "you@example.com" : "请输入邮箱地址"}
-          title={locale === "en" ? "Enter your email address." : "请输入有效邮箱地址。"}
+          placeholder={locale === "en" ? "Enter your account" : "请输入注册账号"}
+          title={locale === "en" ? "Enter your registered email address or letters-and-numbers account." : "请输入注册时使用的邮箱地址或字母数字账号。"}
           aria-describedby="login-email-help"
           className="form-control-dark mt-2"
         />
         <p id="login-email-help" className="mt-2 text-xs leading-5 text-[var(--marketing-muted)]">
-          {locale === "en" ? "Required. Use the email registered with ENHE AI." : "必填，请使用已注册的 ENHE AI 邮箱。"}
+          {locale === "en" ? "Required. Use the account you registered with ENHE AI." : "必填，请使用注册 ENHE AI 时设置的账号。"}
         </p>
         <label htmlFor="login-password" className="mt-5 block text-sm font-semibold text-[var(--marketing-text)]">{t.auth.password}</label>
         <PasswordInput

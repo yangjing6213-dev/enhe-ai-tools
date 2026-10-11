@@ -108,6 +108,11 @@
   color: var(--enhe-text);
 }
 
+.enhe-account-shell .user-center-page :is(button[data-variant="default"], .user-center-action--primary) {
+  color: #fff !important;
+  -webkit-text-fill-color: #fff !important;
+}
+
 .enhe-account-shell .user-center-page .user-center-password-input button:not(:disabled) {
   border: 0;
   background: transparent;
