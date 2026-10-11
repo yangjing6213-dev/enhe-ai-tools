@@ -28,7 +28,7 @@ describe("GEO brand profile source contracts", () => {
     expect(exists("src/app/en/about/page.tsx")).toBe(true);
     expect(about).toContain("恩禾ENHE AI 是什么？");
     expect(about).toContain(
-      "ENHE AI 帮助用户把 AI 用到真实任务里：更快完成工作、创作内容、整理资料、学习技能、解决工具选择和使用问题。在需要处理敏感素材、长期稳定流程或隐私边界时，提供更可控的AI工具和路径。",
+      "了解 ENHE AI 如何帮助普通 AI 用户完成工作、创作内容、整理资料、学习技能和选择工具，并在敏感素材、隐私边界和长期流程中兼顾安全、稳定与少走弯路。",
     );
     expect(about).toContain("安全、隐私和稳定");
     expect(about).toContain("普通用户如何开始");

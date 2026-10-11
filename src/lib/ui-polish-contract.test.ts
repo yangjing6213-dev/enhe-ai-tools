@@ -20,15 +20,15 @@ describe("ENHE visual polish contract", () => {
   it("uses the approved redesigned shell on both account routes", () => {
     const chineseLayout = read("src/app/user/layout.tsx");
     const englishLayout = read("src/app/en/user/layout.tsx");
-    const accountShell = read("src/components/redesign/enhe-account-shell.tsx");
+    const publicShell = read("src/components/public-site-chrome.tsx");
     const page = read("src/app/user/page-shell.tsx");
     const styles = read("src/styles/redesign/account.css");
 
-    expect(chineseLayout).toContain("EnheAccountShell");
-    expect(englishLayout).toContain("EnheAccountShell");
-    expect(accountShell).toContain("EnheRedesignPublicHeader");
-    expect(accountShell).toContain("EnheRedesignPublicFooter");
-    expect(accountShell).toContain('id="main-content"');
+    expect(chineseLayout).toContain("PublicSiteChrome");
+    expect(englishLayout).toContain("PublicSiteChrome");
+    expect(publicShell).toContain("EnheRedesignPublicHeader");
+    expect(publicShell).toContain("EnheRedesignPublicFooter");
+    expect(publicShell).toContain('id="main-content"');
     expect(page).toContain('className="user-center-page py-14"');
     expect(styles).toContain(".user-center-panel");
     expect(styles).toContain(".user-center-record");

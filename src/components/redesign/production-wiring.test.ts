@@ -103,15 +103,17 @@ describe("ENHE Phase 2C.1 production wiring", () => {
     const user = readSource("app/user/layout.tsx");
     const admin = readSource("app/admin/layout.tsx");
     const orders = readSource("app/orders/layout.tsx");
+    const publicChrome = readSource("components/public-site-chrome.tsx");
 
     for (const layout of [auth, enAuth]) {
       expect(layout).toContain("EnheRedesignPublicHeader");
       expect(layout).toContain("EnheRedesignPublicFooter");
     }
     for (const layout of [user, orders]) {
-      expect(layout).toContain("SiteHeader");
-      expect(layout).toContain("SiteFooter");
+      expect(layout).toContain("PublicSiteChrome");
     }
+    expect(publicChrome).toContain("EnheRedesignPublicHeader");
+    expect(publicChrome).toContain("EnheRedesignPublicFooter");
     expect(admin).not.toContain("SiteHeader");
     expect(admin).not.toContain("SiteFooter");
   });
