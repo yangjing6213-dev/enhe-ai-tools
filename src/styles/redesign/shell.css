@@ -1141,9 +1141,7 @@
 }
 
 .enhe-redesign-production .enhe-reference-editorial .enhe-reference-editorial-hero {
-  border-top: 3px solid var(--reference-accent);
-  border-inline: 0;
-  border-bottom: 1px solid var(--reference-border);
+  border: 0;
   border-radius: 0 0 12px 12px;
   background: transparent;
   padding-block: clamp(32px, 6vw, 72px);
@@ -1189,14 +1187,28 @@
 }
 
 .enhe-reference-editorial .enhe-reference-editorial-sections {
-  border-top: 1px solid var(--reference-border);
-  padding-top: 32px;
+  border-top: 0;
+  padding-top: 0;
 }
 
 .enhe-reference-editorial .enhe-reference-editorial-card {
   border-radius: 0;
-  border-width: 0 0 1px;
+  border: 0;
   padding: 0 0 24px;
+}
+
+.enhe-reference-editorial::before {
+  display: none;
+}
+
+.enhe-reference-editorial .about-section-highlight {
+  margin-top: 18px;
+  padding: 12px 14px;
+  border-inline-start: 3px solid var(--enhe-action);
+  background: color-mix(in srgb, var(--enhe-action) 7%, #fff);
+  color: var(--enhe-text);
+  font-weight: 700;
+  line-height: 1.7;
 }
 
 .enhe-reference-editorial .enhe-reference-editorial-links a {

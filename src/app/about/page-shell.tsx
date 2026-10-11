@@ -15,7 +15,7 @@ import {
 
 export const aboutPageRevalidate = 300;
 
-const contactEmail = "ENHEAI.life@protonmail.com";
+const contactEmail = "amen.enhe@gmail.com";
 
 const aboutCopy = {
   zh: {
@@ -31,23 +31,43 @@ const aboutCopy = {
     sections: [
       {
         title: "平台定位",
-        body: "ENHE AI 的定位不是单纯罗列 AI 产品，而是帮助用户把 AI 用到真实任务里。网站先从提效、创作、整理资料、学习技能、解决问题和安全使用出发，再提供软件应用、教程课程、账号服务说明和趋势资讯作为支撑。"
+        paragraphs: [
+          "ENHE AI 帮助用户把 AI 用到真实任务中，包括提升效率、创作内容、整理资料、学习技能和解决具体问题。",
+          "网站把工具、教程、课程与趋势资讯整理在清晰的使用路径里，让你先想清楚要做什么，再选择合适的方法。"
+        ],
+        highlight: "从真实任务出发，让工具选择和学习方法更简单。"
       },
       {
         title: "适合谁",
-        body: "ENHE AI 适合普通 AI 用户、内容创作者、运营人员、自由职业者、小团队、AI 学习者和开发者。只要用户想用 AI 完成真实工作，而不是只收藏工具名，就可以从这里找到适合自己的路径。"
+        paragraphs: [
+          "这里面向普通 AI 用户、内容创作者、运营人员、自由职业者、小团队、学习者和开发者。",
+          "无论是一个人创作、团队协作，还是尝试新的工作流程，都可以从眼前要完成的事开始。"
+        ],
+        highlight: "不必先成为专家，带着实际问题就能开始。"
       },
       {
         title: "可以解决什么",
-        body: "用户可以在 ENHE AI 上找到提升效率、创作内容、整理资料、学习技能、选择工具、理解价格和交付边界的方法。每个入口都应该帮助用户更快判断下一步，而不是把用户留在复杂信息里。"
+        paragraphs: [
+          "你可以在这里比较工具、查看操作教程、学习实用技能，也可以了解价格与交付范围。",
+          "每个入口都围绕一个实际问题展开，帮助你判断哪些选择适合当前任务。"
+        ],
+        highlight: "让下一步更清楚，少花时间反复筛选。"
       },
       {
         title: "为什么重视安全、隐私和稳定",
-        body: "很多 AI 使用场景会涉及客户资料、创作素材、账号信息、内部文档和课程文件。ENHE AI 会把本地或更可控的 AI 路径解释成用户能理解的收益：敏感素材不随意上传、数据边界更清晰、长期使用流程更稳定。"
+        paragraphs: [
+          "AI 工作可能会用到客户资料、创作素材、账号信息和内部文件。使用前，应先弄清工具如何处理这些内容。",
+          "对于敏感素材或长期流程，可以优先了解数据边界更清楚、使用方式更可控的方案。"
+        ],
+        highlight: "先确认隐私与数据边界，再决定如何使用。"
       },
       {
         title: "官方网站与联系方式",
-        body: `官方网站是 https://www.enhe-tech.com.cn/。如需联系，可通过邮箱 ${contactEmail} 咨询。`
+        paragraphs: [
+          "访问 ENHE AI 官方网站，了解平台提供的工具、课程与服务。",
+          `如有问题或合作咨询，可通过 ${contactEmail} 联系我们。`
+        ],
+        highlight: `联系邮箱：${contactEmail}`
       }
     ],
     topicLinksTitle: "主要栏目",
@@ -111,23 +131,43 @@ const aboutCopy = {
     sections: [
       {
         title: "Platform Positioning",
-        body: "ENHE AI is not just a list of AI products. It helps users apply AI to real tasks: productivity, content creation, material organization, skill learning, problem solving, and safer AI use."
+        paragraphs: [
+          "ENHE AI helps people use AI for real tasks: getting work done, creating content, organizing information, learning skills, and solving problems.",
+          "Tools, tutorials, courses, and trend insights are organized into clear paths, so you can start with the task and choose a useful next step."
+        ],
+        highlight: "Start with the task. Make choosing and learning easier."
       },
       {
         title: "Who It Is For",
-        body: "ENHE AI is for everyday AI users, creators, operators, freelancers, small teams, learners, and developers who want AI to produce real work instead of another list of tool names."
+        paragraphs: [
+          "ENHE AI is for everyday users, creators, operators, freelancers, small teams, learners, and developers.",
+          "Whether you work alone, collaborate with a team, or try a new workflow, you can begin with the task in front of you."
+        ],
+        highlight: "You do not need to be an expert to get started."
       },
       {
         title: "What Users Can Solve",
-        body: "Users can find ways to improve efficiency, create content, organize material, learn skills, choose tools, understand pricing, and check service boundaries before committing to a workflow."
+        paragraphs: [
+          "Compare tools, follow practical tutorials, learn useful skills, and understand pricing and delivery scope.",
+          "Each section is organized around a real question to help you decide what fits your current work."
+        ],
+        highlight: "See the next step clearly and spend less time searching."
       },
       {
         title: "Why Safety, Privacy, And Stability Matter",
-        body: "Many AI workflows involve client files, creative assets, account information, internal documents, and course material. ENHE AI explains controlled or local AI paths as user benefits: clearer privacy boundaries, safer material handling, and more stable long-term workflows."
+        paragraphs: [
+          "AI work can involve client files, creative assets, account information, and internal documents. Check how a tool handles that material before using it.",
+          "For sensitive material or long-running workflows, consider options with clearer data boundaries and more control."
+        ],
+        highlight: "Understand privacy and data boundaries before you begin."
       },
       {
         title: "Official Website And Contact",
-        body: `The official website is https://www.enhe-tech.com.cn/. Contact email: ${contactEmail}.`
+        paragraphs: [
+          "Visit the official ENHE AI website to explore its tools, courses, and services.",
+          `For questions or business inquiries, email ${contactEmail}.`
+        ],
+        highlight: `Contact email: ${contactEmail}`
       }
     ],
     topicLinksTitle: "Main Sections",
@@ -244,7 +284,10 @@ export function AboutPageShell({ forceLocale }: { forceLocale: Locale }) {
           {copy.sections.map((section) => (
             <article key={section.title} className="enhe-reference-editorial-card rounded-2xl p-6">
               <h2 className="text-2xl font-black text-[var(--marketing-text)]">{section.title}</h2>
-              <p className="mt-4 text-sm leading-7 text-[var(--marketing-muted)]">{section.body}</p>
+              {section.paragraphs.map((paragraph) => (
+                <p key={paragraph} className="mt-4 text-sm leading-7 text-[var(--marketing-muted)]">{paragraph}</p>
+              ))}
+              <p className="about-section-highlight" role="note">{section.highlight}</p>
             </article>
           ))}
         </section>

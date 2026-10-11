@@ -399,9 +399,6 @@ export async function AiNewsPageShell({
               <p className="mt-5 max-w-3xl text-base font-medium leading-8 text-[var(--marketing-muted)] md:text-lg">
                 {t.aiNews.intro}
               </p>
-              <p className="mt-4 text-sm font-semibold text-[var(--marketing-accent)]">
-                {t.aiNews.support}
-              </p>
           </div>
         </section>
 
@@ -564,7 +561,7 @@ function FilterBar({
   return (
     <form
       action={buildLocalePath("/ai-news", locale)}
-      className="filter-surface mt-8 grid gap-3 lg:grid-cols-[1fr_180px_160px_140px]"
+      className="filter-surface ai-news-filter-surface mt-8 grid gap-3 lg:grid-cols-[1fr_180px_160px_140px]"
       aria-label={t.aiNews.filterFormLabel}
       data-analytics-event="search_ai_news"
       data-analytics-meta-locale={locale}

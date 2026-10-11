@@ -14,7 +14,6 @@ type ListingLabels = {
   emptyTitle: string;
   emptyText: string;
   featured: string;
-  evidenceUnverified: string;
   evidenceSourceMissing: string;
   evidenceSourceAvailable: string;
   readMore: string;
@@ -161,11 +160,10 @@ function NewsListingArticle({ article, labels }: { article: NewsListingCard; lab
           <h3 className="ai-news-card-title mt-4 break-words text-xl font-black leading-snug text-[var(--marketing-text)]" title={article.title}>{article.title}</h3>
           <p className="ai-news-card-summary mt-3 break-words text-sm leading-7 text-[var(--marketing-muted)]" title={article.summary}>{article.summary}</p>
           <div className="mt-5 flex flex-wrap items-center gap-x-4 gap-y-2 text-xs text-[var(--marketing-muted)]">
-            <span>{article.dateLabel}</span><span className="tabular-nums">{article.readingTime} min</span><span className="tabular-nums">{article.viewCount} views</span>
+            <span>{article.dateLabel}</span><span className="tabular-nums">{article.viewCount} views</span>
           </div>
           <div className="mt-3 flex flex-wrap items-center gap-x-3 gap-y-1 text-xs font-semibold text-[var(--marketing-muted)]" data-evidence-state={article.hasExternalSources ? "unverified" : "source-missing"}>
-            <span>{article.hasExternalSources ? labels.evidenceUnverified : labels.evidenceSourceMissing}</span>
-            {article.hasExternalSources ? <span>{labels.evidenceSourceAvailable}</span> : null}
+            <span>{article.hasExternalSources ? labels.evidenceSourceAvailable : labels.evidenceSourceMissing}</span>
           </div>
           <div className="mt-5 flex flex-wrap gap-2">{article.tags.map((tag) => <Badge key={tag.id} className="ai-news-card-tag">{tag.name}</Badge>)}</div>
           <span className="mt-5 inline-flex text-sm font-bold text-[var(--marketing-accent)]">{labels.readMore}</span>

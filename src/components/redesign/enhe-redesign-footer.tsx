@@ -1,6 +1,6 @@
 import { Fragment } from "react";
 import Image from "next/image";
-import { ChevronDown } from "lucide-react";
+import { ChevronDown, Github } from "lucide-react";
 import { EnheRedesignBrandValue } from "./home/EnheRedesignBrandValue";
 import type { ProductionFiling } from "@/lib/production-filing";
 import type { RedesignFooterCopy, RedesignLocale } from "./types";
@@ -96,6 +96,22 @@ export function EnheRedesignFooter({
               width={2172}
               height={724}
             />
+            <nav className="footer-social-links" aria-label={locale === "en" ? "ENHE AI social media" : "ENHE AI 社交平台"}>
+              <a href="https://github.com/yangjing6213-dev/yangjing6213-dev" target="_blank" rel="noreferrer" aria-label="GitHub">
+                <Github aria-hidden="true" size={20} strokeWidth={1.8} />
+              </a>
+              <a href="https://x.com/Amenenhe_ai" target="_blank" rel="noreferrer" aria-label="X">
+                <svg aria-hidden="true" viewBox="0 0 24 24" width="19" height="19" fill="currentColor">
+                  <path d="M18.9 1.15h3.68l-8.04 9.19L24 22.85h-7.41l-5.81-7.66-6.66 7.66H.44l8.6-9.83L0 1.15h7.59l5.25 6.93 6.06-6.93Zm-1.29 19.49h2.04L6.49 3.24H4.3l13.31 17.4Z" />
+                </svg>
+              </a>
+              <a href="https://xhslink.cn/o/1cljZ63UwT1" target="_blank" rel="noreferrer" aria-label="小红书">
+                <svg aria-hidden="true" viewBox="0 0 40 32" width="27" height="22">
+                  <rect x="1" y="1" width="38" height="30" rx="7" fill="none" stroke="currentColor" strokeWidth="1.8" />
+                  <text x="20" y="21" fill="currentColor" textAnchor="middle" fontSize="10" fontWeight="700" fontFamily="sans-serif">小红书</text>
+                </svg>
+              </a>
+            </nav>
           </div>
           <EnheRedesignBrandValue locale={locale} />
           <div className="footer-navigation">
