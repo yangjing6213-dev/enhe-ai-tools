@@ -260,10 +260,11 @@ export function AboutPageShell({ forceLocale }: { forceLocale: Locale }) {
         <StructuredData data={[breadcrumbSchema, aboutPageSchema, faqSchema]} />
         <section className="about-cover relative mb-10 aspect-video overflow-hidden rounded-xl" aria-label={forceLocale === "en" ? "ENHE AI brand cover" : "ENHE AI 品牌封面"}>
           <Image
-            src="/images/about/enhe-about-cover.png"
+            src="/images/about/enhe-about-cover.webp"
             alt={forceLocale === "en" ? "ENHE AI illuminated brand mark" : "ENHE AI 品牌灯光标志"}
             fill
             priority
+            unoptimized
             sizes="(max-width: 768px) 100vw, 1200px"
             className="object-cover"
           />
