@@ -147,19 +147,19 @@ export default async function AdminUserDetailPage({ params, searchParams }: Admi
 
       <div className="enhe-admin-user-summary-card glass rounded-2xl p-6">
         <div className="flex flex-wrap items-start justify-between gap-4">
-          <div>
-            <p className="enhe-admin-user-display-name text-lg font-semibold">{user.nickname || user.email || user.phone || user.id}</p>
-            <p className="enhe-admin-user-contact mt-2 text-sm text-[#8B95A7]">
+          <div className="min-w-0 flex-1">
+            <p title={user.nickname || user.email || user.phone || user.id} className="enhe-admin-user-display-name truncate text-lg font-semibold">{user.nickname || user.email || user.phone || user.id}</p>
+            <p title={`${user.email ?? t.noEmail} · ${user.phone ?? t.noPhone}`} className="enhe-admin-user-contact mt-2 truncate text-sm text-[#8B95A7]">
               {user.email ?? t.noEmail} · {user.phone ?? t.noPhone}
             </p>
           </div>
-          <div className="enhe-admin-user-metadata grid gap-1 text-right text-sm text-[#8B95A7]">
-            <span className="enhe-admin-user-meta-item">{roleLabel(user.role, locale)} · {statusLabel(user.status, locale)}</span>
-            <span className="enhe-admin-user-meta-item">{formatCounts(t.counts, user._count.orders, user._count.comments)}</span>
-            <span className="enhe-admin-user-meta-item">{formatUsageCounts(t.usageCounts, user._count.downloadLogs, user._count.toolUsageLogs)}</span>
-            <span className="enhe-admin-user-meta-item">{user.isTestData ? (locale === "en" ? "Test data" : "测试数据") : (locale === "en" ? "Production data" : "生产数据")}</span>
-            <span className="enhe-admin-user-meta-item">{formatProtectedCounts(protectedCounts, locale)}</span>
-            <span className="enhe-admin-user-meta-item">{t.registeredAt.replace("{date}", formatDate(user.createdAt, locale))}</span>
+          <div className="enhe-admin-user-metadata grid min-w-0 max-w-full gap-1 text-right text-sm text-[#8B95A7]">
+            <span className="enhe-admin-user-meta-item truncate" title={`${roleLabel(user.role, locale)} · ${statusLabel(user.status, locale)}`}>{roleLabel(user.role, locale)} · {statusLabel(user.status, locale)}</span>
+            <span className="enhe-admin-user-meta-item truncate" title={formatCounts(t.counts, user._count.orders, user._count.comments)}>{formatCounts(t.counts, user._count.orders, user._count.comments)}</span>
+            <span className="enhe-admin-user-meta-item truncate" title={formatUsageCounts(t.usageCounts, user._count.downloadLogs, user._count.toolUsageLogs)}>{formatUsageCounts(t.usageCounts, user._count.downloadLogs, user._count.toolUsageLogs)}</span>
+            <span className="enhe-admin-user-meta-item truncate">{user.isTestData ? (locale === "en" ? "Test data" : "测试数据") : (locale === "en" ? "Production data" : "生产数据")}</span>
+            <span className="enhe-admin-user-meta-item truncate" title={formatProtectedCounts(protectedCounts, locale)}>{formatProtectedCounts(protectedCounts, locale)}</span>
+            <span className="enhe-admin-user-meta-item truncate" title={t.registeredAt.replace("{date}", formatDate(user.createdAt, locale))}>{t.registeredAt.replace("{date}", formatDate(user.createdAt, locale))}</span>
           </div>
         </div>
 

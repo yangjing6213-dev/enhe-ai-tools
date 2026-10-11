@@ -2,7 +2,9 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 
 const mocks = vi.hoisted(() => ({
   assertValidCsrfToken: vi.fn(),
+  createUser: vi.fn(),
   findUser: vi.fn(),
+  hashPassword: vi.fn(),
   getCurrentLocale: vi.fn(),
   headers: vi.fn(),
   recordLoginAttempt: vi.fn(),
@@ -16,14 +18,15 @@ const mocks = vi.hoisted(() => ({
 
 vi.mock("next/headers", () => ({ headers: mocks.headers }));
 vi.mock("next/navigation", () => ({ redirect: mocks.redirect }));
-vi.mock("@/lib/db", () => ({ prisma: { user: { findUnique: mocks.findUser } } }));
+vi.mock("@/lib/db", () => ({ prisma: { user: { findUnique: mocks.findUser, create: mocks.createUser } } }));
 vi.mock("@/lib/auth", () => ({
   assertLoginNotLimited: vi.fn(),
   getCurrentUser: vi.fn(),
-  hashPassword: vi.fn(),
+  hashPassword: mocks.hashPassword,
   recordLoginAttempt: mocks.recordLoginAttempt,
   requireAdmin: vi.fn(),
   requireUser: vi.fn(),
+  refreshHeaderUserCookieSnapshot: vi.fn(),
   signInUser: mocks.signInUser,
   signOutUser: vi.fn(),
   verifyPassword: mocks.verifyPassword,
@@ -39,7 +42,7 @@ vi.mock("@/lib/admin-email-notifications", () => ({
   sendRefundRequestAdminEmail: vi.fn(),
 }));
 
-import { loginAction } from "@/app/actions";
+import { loginAction, registerAction } from "@/app/actions";
 
 function loginForm(returnTo: string) {
   const formData = new FormData();
@@ -47,6 +50,15 @@ function loginForm(returnTo: string) {
   formData.set("password", "correct-horse-battery");
   formData.set("csrfToken", "csrf-token");
   formData.set("returnTo", returnTo);
+  return formData;
+}
+
+function registrationForm() {
+  const formData = new FormData();
+  formData.set("email", "new-user@example.com");
+  formData.set("password", "correct-horse-battery");
+  formData.set("nickname", "New User");
+  formData.set("csrfToken", "csrf-token");
   return formData;
 }
 
@@ -65,6 +77,8 @@ describe("admin login return path", () => {
     mocks.headers.mockResolvedValue(new Headers());
     mocks.sendAdminLoginSecurityEmail.mockResolvedValue(undefined);
     mocks.verifyPassword.mockResolvedValue(true);
+    mocks.hashPassword.mockResolvedValue("hashed-password");
+    mocks.createUser.mockResolvedValue({ id: "new-user-1" });
   });
 
   it("returns an admin to the requested English admin page after login", async () => {
@@ -90,5 +104,21 @@ describe("admin login return path", () => {
     });
 
     await expect(loginAction(loginForm("/en/admin/users"))).rejects.toThrow("NEXT_REDIRECT:/en/user");
+  });
+
+  it("requires a chosen nickname and saves it at registration", async () => {
+    const missingNickname = registrationForm();
+    missingNickname.delete("nickname");
+    await expect(registerAction(missingNickname)).rejects.toThrow();
+    expect(mocks.createUser).not.toHaveBeenCalled();
+
+    mocks.findUser.mockResolvedValueOnce(null);
+
+    const formData = registrationForm();
+    await expect(registerAction(formData)).rejects.toThrow("NEXT_REDIRECT:/en/user");
+
+    expect(mocks.createUser).toHaveBeenCalledWith({
+      data: { email: "new-user@example.com", passwordHash: "hashed-password", nickname: "New User" }
+    });
   });
 });

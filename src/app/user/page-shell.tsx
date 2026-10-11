@@ -1,11 +1,14 @@
 import Link from "next/link";
+import Image from "next/image";
 import {
   cancelOrderAction,
   changePasswordAction,
   logoutAction,
   markAllNotificationsReadAction,
   markNotificationReadAction,
-  updateNewsletterSettingsAction
+  updateNewsletterSettingsAction,
+  updateUserAvatarAction,
+  updateUserProfileAction
 } from "@/app/actions";
 import { FormSubmitButton } from "@/components/form-submit-button";
 import { PasswordInput } from "@/components/password-input";
@@ -34,6 +37,11 @@ export async function UserCenterPageShell({
   const t = getDictionary(locale);
   const passwordMessage = getPasswordMessage(params.password, locale);
   const orderMessage = params.order === "cancelled" ? (locale === "en" ? "Order cancelled." : "订单已取消。") : null;
+  const profileMessage = params.profile === "saved"
+    ? (locale === "en" ? "Profile updated." : "个人资料已更新。")
+    : params.profile === "avatar-invalid"
+      ? (locale === "en" ? "Use a PNG, JPEG, or WebP image under 700 KB." : "请上传 700 KB 以内的 PNG、JPEG 或 WebP 图片。")
+      : null;
   const user = await requireUser(locale);
 
   const [notifications, orders, downloads, usages, comments, purchases, publishedTools] = await Promise.all([
@@ -101,6 +109,34 @@ export async function UserCenterPageShell({
       {orderMessage ? <p className="status-success mb-6">{orderMessage}</p> : null}
       <div className="grid gap-6 lg:grid-cols-[320px_1fr]">
         <aside className="space-y-4">
+          <Panel title={locale === "en" ? "Profile" : "个人资料"}>
+            <div className="flex items-center gap-4">
+              {user.avatar ? (
+                <Image src={user.avatar} alt={user.nickname ?? (locale === "en" ? "User avatar" : "用户头像")} width={64} height={64} unoptimized className="h-16 w-16 rounded-full object-cover" />
+              ) : (
+                <div aria-hidden="true" className="flex h-16 w-16 items-center justify-center rounded-full bg-[var(--marketing-accent)] text-xl font-bold text-white">
+                  {(user.nickname || user.email || "U").slice(0, 1).toUpperCase()}
+                </div>
+              )}
+              <div className="min-w-0">
+                <p className="truncate font-semibold text-[var(--marketing-text)]">{user.nickname || (locale === "en" ? "Set a username" : "请设置用户名")}</p>
+                <p className="mt-1 text-xs text-[var(--marketing-muted)]">{locale === "en" ? "Your name and avatar may appear with comments you choose to feature." : "你选择展示的评论可能会同时显示用户名和头像。"}</p>
+              </div>
+            </div>
+            {profileMessage ? <p role="status" className={`${params.profile === "avatar-invalid" ? "status-danger" : "status-success"} mt-4`}>{profileMessage}</p> : null}
+            <form action={updateUserProfileAction} className="mt-5 grid gap-3">
+              <label htmlFor="profile-nickname" className="text-sm font-semibold text-[var(--marketing-text)]">{locale === "en" ? "Username" : "用户名"}</label>
+              <input id="profile-nickname" name="nickname" required maxLength={40} defaultValue={user.nickname ?? ""} className="form-control-dark" />
+              <FormSubmitButton pendingLabel={locale === "en" ? "Saving..." : "保存中..."}>{locale === "en" ? "Save username" : "保存用户名"}</FormSubmitButton>
+            </form>
+            <form action={updateUserAvatarAction} className="mt-5 grid gap-3">
+              <label htmlFor="profile-avatar" className="text-sm font-semibold text-[var(--marketing-text)]">{locale === "en" ? "Change avatar" : "更换头像"}</label>
+              <input id="profile-avatar" name="avatar" type="file" accept="image/png,image/jpeg,image/webp" required className="block w-full text-sm text-[var(--marketing-muted)] file:mr-3 file:rounded-lg file:border file:border-[var(--marketing-border)] file:bg-transparent file:px-3 file:py-2 file:text-[var(--marketing-text)]" />
+              <p className="text-xs leading-5 text-[var(--marketing-muted)]">{locale === "en" ? "PNG, JPEG, or WebP; maximum 700 KB." : "支持 PNG、JPEG、WebP，文件不超过 700 KB。"}</p>
+              <FormSubmitButton pendingLabel={locale === "en" ? "Uploading..." : "上传中..."}>{locale === "en" ? "Save avatar" : "保存头像"}</FormSubmitButton>
+            </form>
+          </Panel>
+
           <Panel id="notifications" title={t.notifications.title.replace("{count}", String(unreadNotificationCount))}>
             {notifications.length ? (
               <div className="space-y-3">

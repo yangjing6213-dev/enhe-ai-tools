@@ -23,9 +23,11 @@ describe("comments, files, and operation-manual admin presentation", () => {
     expect(comments).toContain("buildAdminCommentWhere");
     expect(comments).toContain("updateCommentStatusAction");
     expect(comments).toContain("updateCommentPinAction");
-    for (const status of ["approved", "rejected", "deleted"]) {
+    for (const status of ["approved", "rejected"]) {
       expect(comments).toContain(`status=\"${status}\"`);
     }
+    expect(comments).toContain('value="deleted"');
+    expect(comments).toContain("deleteCommentAction");
     expect(files).toContain("getStorageDiagnostics");
     expect(files).toContain("AdminFileUploadForm");
     expect(files).toContain("action={upsertFileAction}");

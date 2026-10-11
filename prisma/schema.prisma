@@ -899,6 +899,7 @@ model Comment {
   userId    String        @map("user_id")
   toolId    String        @map("tool_id")
   content   String
+  rating    Int?
   status    CommentStatus @default(pending)
   likeCount Int           @default(0) @map("like_count")
   isPinned  Boolean       @default(false) @map("is_pinned")

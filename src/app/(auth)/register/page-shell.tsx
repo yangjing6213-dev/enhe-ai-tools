@@ -32,6 +32,18 @@ export async function RegisterPageShell({
         <input type="hidden" name="returnTo" value={returnTo} />
         <h1 className="text-3xl font-black text-[var(--marketing-text)]">{t.auth.registerTitle}</h1>
         <p className="mt-3 text-sm font-medium text-[var(--marketing-muted)]">{t.auth.registerIntro}</p>
+        <label htmlFor="register-nickname" className="mt-8 block text-sm font-semibold text-[var(--marketing-text)]">{locale === "en" ? "Username" : "用户名"}</label>
+        <input
+          id="register-nickname"
+          name="nickname"
+          type="text"
+          required
+          minLength={1}
+          maxLength={40}
+          autoComplete="nickname"
+          placeholder={locale === "en" ? "Choose a username" : "请输入用户名"}
+          className="form-control-dark mt-2"
+        />
         <label htmlFor="register-email" className="mt-8 block text-sm font-semibold text-[var(--marketing-text)]">{t.auth.email}</label>
         <input
           id="register-email"

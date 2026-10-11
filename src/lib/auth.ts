@@ -197,3 +197,8 @@ function setHeaderUserCookie(
     maxAge: 60 * 60 * 24 * sessionDays
   });
 }
+
+export async function refreshHeaderUserCookieSnapshot(user: HeaderUserSnapshot) {
+  const cookieStore = await cookies();
+  setHeaderUserCookie(cookieStore, user);
+}

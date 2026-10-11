@@ -17,7 +17,7 @@ const localVisualUser = {
   phone: null,
   passwordHash: "fixture-only-disabled",
   nickname: "Local Visual Fixture User",
-  avatar: null,
+  avatar: "/images/tool-software.svg",
   role: "user",
   status: "active",
   isTestData: true,
@@ -133,6 +133,7 @@ const localVisualComment = {
   userId: localVisualUser.id,
   toolId: localVisualTool.id,
   content: "Local visual fixture comment only.",
+  rating: 5,
   status: "approved",
   likeCount: 0,
   isPinned: false,
@@ -145,6 +146,8 @@ const localVisualComment = {
 const localVisualHomepageComment = {
   id: "local-visual-homepage-comment",
   content: "Local visual homepage comment only.",
+  rating: 5,
+  user: { nickname: localVisualUser.nickname, avatar: localVisualUser.avatar },
   tool: { name: localVisualTool.name, englishName: localVisualTool.englishName }
 };
 const localVisualToolsById = [
@@ -389,18 +392,20 @@ export const prisma = new Proxy(
               };
             }
             if (modelName === "comment" && operation === "findMany") {
-              return async (args?: { where?: { status?: string; isPinned?: boolean; showOnHomepage?: boolean } }) => {
+              return async (args?: { where?: { status?: string | { not?: string }; isPinned?: boolean; showOnHomepage?: boolean } }) => {
                 const where = args?.where;
                 if (where?.showOnHomepage) return [localVisualHomepageComment];
-                if (where?.status && where.status !== localVisualComment.status) return [];
+                if (typeof where?.status === "string" && where.status !== localVisualComment.status) return [];
+                if (where?.status && typeof where.status === "object" && where.status.not === localVisualComment.status) return [];
                 if (where?.isPinned !== undefined && where.isPinned !== localVisualComment.isPinned) return [];
                 return [localVisualComment];
               };
             }
             if (modelName === "comment" && operation === "count") {
-              return async (args?: { where?: { status?: string; isPinned?: boolean } }) => {
+              return async (args?: { where?: { status?: string | { not?: string }; isPinned?: boolean } }) => {
                 const where = args?.where;
-                if (where?.status && where.status !== localVisualComment.status) return 0;
+                if (typeof where?.status === "string" && where.status !== localVisualComment.status) return 0;
+                if (where?.status && typeof where.status === "object" && where.status.not === localVisualComment.status) return 0;
                 if (where?.isPinned !== undefined && where.isPinned !== localVisualComment.isPinned) return 0;
                 return 1;
               };
@@ -408,6 +413,12 @@ export const prisma = new Proxy(
             if (modelName === "user" && operation === "findUnique") {
               return async (args?: { where?: { id?: string } }) =>
                 args?.where?.id === localVisualUser.id ? localVisualUser : null;
+            }
+            if (modelName === "user" && operation === "findMany") {
+              return async (args?: { where?: Record<string, unknown> }) => args ? [localVisualUser] : [];
+            }
+            if (modelName === "user" && operation === "count") {
+              return async (args?: { where?: Record<string, unknown> }) => args?.where ? 1 : 0;
             }
             if (modelName === "order" && operation === "findUnique") {
               return async (args?: { where?: { id?: string } }) =>

@@ -45,6 +45,21 @@ export async function recordLoginAttempt() {
 }
 
 export async function requireUser() {
+  return {
+    id: "local-visual-user",
+    email: "visual-user@localhost.invalid",
+    phone: null,
+    nickname: "Local Visual Fixture User",
+    avatar: "/images/tool-software.svg",
+    role: "user" as const,
+    status: "active" as const,
+    createdAt: new Date("2026-09-30T00:00:00.000Z"),
+    newsletterEmail: null,
+    acceptEmailUpdates: false
+  };
+}
+
+export async function refreshHeaderUserCookieSnapshot() {
   throw new Error("User operations are disabled in the admin visual fixture.");
 }
 

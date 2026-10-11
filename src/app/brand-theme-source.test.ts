@@ -27,4 +27,27 @@ describe("ENHE shared design tokens", () => {
     expect(css).toContain("font-family: 'Alimama Fang Yuan Ti'");
     expect(css).toContain("--font-sans: 'Alimama Fang Yuan Ti'");
   });
+
+  it("uses white text when legacy accent backgrounds are remapped to blue", () => {
+    const css = readFileSync(resolve(root, "src/app/globals.css"), "utf8");
+    const ruleStart = css.indexOf(".bg-\\[\\#48F5D3\\],\n.bg-\\[\\#7DD3FC\\]");
+    const ruleEnd = css.indexOf("\n}\n\n.has-", ruleStart);
+    const remappedAccentRule = ruleStart >= 0 && ruleEnd > ruleStart ? css.slice(ruleStart, ruleEnd) : "";
+
+    expect(remappedAccentRule).toContain("background: var(--marketing-accent) !important");
+    expect(remappedAccentRule).toContain("color: #ffffff !important");
+    expect(remappedAccentRule).not.toContain("color: #000000");
+  });
+
+  it("keeps the shared homepage blue call-to-action readable", () => {
+    const css = readFileSync(resolve(root, "src/app/globals.css"), "utf8");
+    const buttonStart = css.indexOf(".home-final-cta-primary {");
+    const hoverStart = css.indexOf(".home-final-cta-primary:hover {");
+    const buttonRule = css.slice(buttonStart, css.indexOf("\n}", buttonStart));
+    const hoverRule = css.slice(hoverStart, css.indexOf("\n}", hoverStart));
+
+    expect(buttonRule).toContain("background: #0462C2 !important");
+    expect(buttonRule).toContain("color: #ffffff !important");
+    expect(hoverRule).toContain("background: #0D70D8 !important");
+  });
 });

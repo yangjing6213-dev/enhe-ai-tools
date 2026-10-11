@@ -739,7 +739,12 @@ test("Admin dashboard cards stack vertically, blue actions stay legible, and app
   await expect(createProduct).toHaveCSS("color", "rgb(255, 255, 255)");
 
   await page.goto("/admin/comments", { waitUntil: "load" });
-  await expect(page.locator(".enhe-admin-comment-card").first()).toContainText("Local visual fixture comment only.");
+  const commentCard = page.locator(".enhe-admin-comment-card").first();
+  await expect(commentCard).toContainText("Local visual fixture comment only.");
+  await expect(commentCard).toContainText("Local Visual Fixture User");
+  await expect(commentCard).toContainText("Local visual fixture tool");
+  await expect(commentCard).toContainText("★★★★★");
+  await expect(commentCard.locator("img")).toHaveCount(1);
   await expect(page.getByRole("button", { name: "展示" })).toBeVisible();
 
   await page.goto("/admin/manuals", { waitUntil: "load" });

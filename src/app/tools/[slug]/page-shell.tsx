@@ -7,6 +7,7 @@ import {
   createSoftwareDownloadOrderAction,
 } from "@/app/actions";
 import { FormSubmitButton } from "@/components/form-submit-button";
+import { StarRatingInput } from "@/components/star-rating-input";
 import { ProductVideoPlayer } from "@/components/product-video-player";
 import { StructuredData } from "@/components/structured-data";
 import { Badge, ButtonLink, Container, SectionTitle } from "@/components/ui";
@@ -294,7 +295,7 @@ export async function ToolDetailPageShell({
       ...comment,
       localizedAuthor:
         buildLocalizedToolOptionalText(comment.user.nickname, forceLocale) ||
-        comment.user.email,
+        (forceLocale === "en" ? "Guest" : "匿名用户"),
       localizedContent: buildLocalizedToolOptionalText(
         comment.content,
         forceLocale,
@@ -1273,6 +1274,7 @@ export async function ToolDetailPageShell({
                 >
                   {forceLocale === "en" ? "Comment" : "评论内容"}
                 </label>
+                <StarRatingInput locale={forceLocale} />
                 <textarea
                   id="tool-comment-content"
                   name="content"
@@ -1314,12 +1316,26 @@ export async function ToolDetailPageShell({
                   key={comment.id}
                   className="rounded-2xl border border-white/10 bg-white/8 p-4"
                 >
-                  <p className="text-sm text-[#8F9DB2]">
-                    {comment.localizedAuthor}{" "}
+                  <div className="flex flex-wrap items-center justify-between gap-3">
+                    <div className="flex min-w-0 items-center gap-3">
+                      {comment.user.avatar ? (
+                        <Image src={comment.user.avatar} alt="" width={40} height={40} unoptimized className="h-10 w-10 rounded-full object-cover" />
+                      ) : (
+                        <span aria-hidden="true" className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-white/10 text-sm font-semibold text-white">{comment.localizedAuthor.slice(0, 1)}</span>
+                      )}
+                      <p className="truncate text-sm text-[#8F9DB2]">{comment.localizedAuthor}{" "}
                     {comment.isPinned ? (
                       <span className="text-[#FFB86B]">· {td.pinned}</span>
                     ) : null}
-                  </p>
+                      </p>
+                    </div>
+                    <span
+                      className="text-sm text-amber-400"
+                      aria-label={comment.rating ? (forceLocale === "en" ? `${comment.rating} out of 5 stars` : `${comment.rating} 星`) : (forceLocale === "en" ? "Not rated" : "未评分")}
+                    >
+                      {comment.rating ? `${"★".repeat(comment.rating)}${"☆".repeat(5 - comment.rating)}` : (forceLocale === "en" ? "Not rated" : "未评分")}
+                    </span>
+                  </div>
                   <p className="mt-2 leading-7">{comment.localizedContent}</p>
                 </div>
               ))}

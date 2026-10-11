@@ -13,12 +13,21 @@ describe("read-only admin auth fixture", () => {
   afterEach(() => vi.unstubAllEnvs());
 
   it.each([
-    "assertLoginNotLimited", "recordLoginAttempt", "requireUser",
+    "assertLoginNotLimited", "recordLoginAttempt", "refreshHeaderUserCookieSnapshot",
     "signInUser", "signOutUser", "verifyPassword", "hashPassword"
   ])("exports %s but refuses authentication or user operations", async (name) => {
     const fixture = await import(fixturePath) as Record<string, unknown>;
     expect(typeof fixture[name]).toBe("function");
     await expect((fixture[name] as () => Promise<never>)()).rejects.toThrow(/disabled in the admin visual fixture/);
+  });
+
+  it("provides a synthetic user identity for read-only profile page checks", async () => {
+    const fixture = await import(fixturePath);
+    await expect(fixture.requireUser()).resolves.toMatchObject({
+      id: "local-visual-user",
+      nickname: "Local Visual Fixture User",
+      role: "user"
+    });
   });
 
   it.each([

@@ -15,22 +15,26 @@ describe("getHomepageCommentCards", () => {
     vi.stubEnv("ENHE_ADMIN_VISUAL_FIXTURE", "0");
   });
 
-  it("reads only approved homepage-selected comments and excludes account data", async () => {
+  it("reads only approved homepage-selected comments and selects display fields without account contacts", async () => {
     findMany.mockResolvedValue([
       {
         id: "comment-1",
         content: "A real selected comment.",
         tool: { name: "产品名称", englishName: "Product Name" },
-        user: { email: "private@example.test" }
+        user: { nickname: "Mia", avatar: "/uploads/mia.png" },
+        rating: 4
       }
     ]);
 
     await expect(getHomepageCommentCards("en")).resolves.toEqual([
       {
         id: "comment-1",
-        displayName: "ENHE AI user",
+        displayName: "Mia",
         productLabel: "Product Name",
-        quote: "A real selected comment."
+        quote: "A real selected comment.",
+        avatarSrc: "/uploads/mia.png",
+        avatarAlt: "Mia",
+        stars: 4
       }
     ]);
     expect(findMany).toHaveBeenCalledWith({
@@ -38,7 +42,9 @@ describe("getHomepageCommentCards", () => {
       select: {
         id: true,
         content: true,
-        tool: { select: { name: true, englishName: true } }
+        rating: true,
+        tool: { select: { name: true, englishName: true } },
+        user: { select: { nickname: true, avatar: true } }
       },
       orderBy: [{ updatedAt: "desc" }, { createdAt: "desc" }],
       take: 5

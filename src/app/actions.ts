@@ -15,6 +15,7 @@ import {
   getCurrentUser,
   hashPassword,
   recordLoginAttempt,
+  refreshHeaderUserCookieSnapshot,
   requireAdmin,
   requireUser,
   signInUser,
@@ -49,6 +50,8 @@ import { buildCanonicalToolPath } from "@/lib/public-slugs";
 import { buildLocalePath } from "@/lib/seo";
 import { resolveToolOrderPriceSpec } from "@/lib/tool-price-specs";
 import { resolveSafeReturnPath } from "@/lib/safe-return-path";
+import { isValidAvatarFile, MAX_AVATAR_FILE_BYTES } from "@/lib/avatar-file";
+import { saveUploadedFile } from "@/lib/storage";
 
 export async function registerAction(formData: FormData) {
   const locale = await getCurrentLocale();
@@ -59,6 +62,7 @@ export async function registerAction(formData: FormData) {
     identifier: formData.get("email"),
     password: formData.get("password")
   });
+  const nickname = z.string().trim().min(1).max(40).parse(formData.get("nickname"));
   const exists = await prisma.user.findUnique({ where: { email: input.identifier } });
   if (exists) {
     const params = new URLSearchParams({ message: "account-exists", returnTo });
@@ -69,7 +73,7 @@ export async function registerAction(formData: FormData) {
     data: {
       email: input.identifier,
       passwordHash: await hashPassword(input.password),
-      nickname: input.identifier.split("@")[0]
+      nickname
     }
   });
   await signInUser(user.id);
@@ -456,7 +460,8 @@ export async function createCommentAction(formData: FormData) {
   const user = await requireUser();
   const toolId = z.string().min(1).parse(formData.get("toolId"));
   const content = z.string().min(2).max(1000).parse(formData.get("content"));
-  await prisma.comment.create({ data: { userId: user.id, toolId, content, status: "pending" } });
+  const rating = z.coerce.number().int().min(1).max(5).parse(formData.get("rating"));
+  await prisma.comment.create({ data: { userId: user.id, toolId, content, rating, status: "pending" } });
   const tool = await prisma.tool.findUnique({
     where: { id: toolId },
     select: { slug: true, name: true, englishName: true, type: true }
@@ -464,6 +469,40 @@ export async function createCommentAction(formData: FormData) {
   if (tool) {
     revalidatePath(buildCanonicalToolPath(tool, locale));
   }
+}
+
+export async function updateUserProfileAction(formData: FormData) {
+  const locale = await getCurrentLocale();
+  const user = await requireUser(locale);
+  const nickname = z.string().trim().min(1).max(40).parse(formData.get("nickname"));
+  const updatedUser = await prisma.user.update({
+    where: { id: user.id },
+    data: { nickname },
+    select: { email: true, nickname: true, role: true }
+  });
+  await refreshHeaderUserCookieSnapshot(updatedUser);
+  revalidatePath(buildLocalePath("/user", locale));
+  redirect(`${buildLocalePath("/user", locale)}?profile=saved`);
+}
+
+export async function updateUserAvatarAction(formData: FormData) {
+  const locale = await getCurrentLocale();
+  const user = await requireUser(locale);
+  const avatarValue = formData.get("avatar");
+  if (!(avatarValue instanceof File) || !(await isValidAvatarFile(avatarValue))) {
+    redirect(`${buildLocalePath("/user", locale)}?profile=avatar-invalid`);
+  }
+
+  const stored = await saveUploadedFile(avatarValue, {
+    folder: "user-avatars",
+    maxBytes: MAX_AVATAR_FILE_BYTES,
+    access: "public"
+  });
+  if (!stored.fileUrl) throw new Error("Avatar upload did not produce a public URL.");
+
+  await prisma.user.update({ where: { id: user.id }, data: { avatar: stored.fileUrl } });
+  revalidatePath(buildLocalePath("/user", locale));
+  redirect(`${buildLocalePath("/user", locale)}?profile=saved`);
 }
 
 export async function reviewPaymentProofAction(formData: FormData) {
@@ -534,6 +573,28 @@ export async function updateCommentStatusAction(formData: FormData) {
   revalidatePath("/admin/comments");
   revalidatePath("/");
   revalidatePath("/en");
+}
+
+export async function deleteCommentAction(formData: FormData) {
+  const admin = await requireAdmin();
+  const id = z.string().min(1).parse(formData.get("id"));
+  const deleted = await prisma.comment.delete({
+    where: { id },
+    include: { tool: { select: { slug: true, name: true, englishName: true, type: true } } }
+  });
+  await writeAdminAuditLog({
+    adminId: admin.id,
+    action: "comment.delete",
+    targetType: "comment",
+    targetId: id,
+    summary: "Permanently deleted a comment.",
+    metadata: { toolId: deleted.toolId }
+  });
+  revalidatePath("/admin/comments");
+  revalidatePath("/");
+  revalidatePath("/en");
+  revalidatePath(buildCanonicalToolPath(deleted.tool, "zh"));
+  revalidatePath(buildCanonicalToolPath(deleted.tool, "en"));
 }
 
 export async function updateCommentHomepageDisplayAction(formData: FormData) {

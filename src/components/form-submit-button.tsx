@@ -33,6 +33,8 @@ export function FormSubmitButton({
   const [hasSubmitted, setHasSubmitted] = useState(false);
   const [showDuplicateNotice, setShowDuplicateNotice] = useState(false);
   const noticeTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const wasPendingRef = useRef(false);
+  const submittedFormRef = useRef<HTMLFormElement | null>(null);
   const isSubmitButton = type === "submit";
   const isDisabled = Boolean(disabled || pending || hasSubmitted);
 
@@ -41,6 +43,21 @@ export function FormSubmitButton({
       if (noticeTimerRef.current) clearTimeout(noticeTimerRef.current);
     };
   }, []);
+
+  useEffect(() => {
+    if (pending) {
+      wasPendingRef.current = true;
+      return;
+    }
+    if (!wasPendingRef.current) return;
+
+    wasPendingRef.current = false;
+    if (submittedFormRef.current) {
+      delete submittedFormRef.current.dataset.submitted;
+      submittedFormRef.current = null;
+    }
+    setHasSubmitted(false);
+  }, [pending]);
 
   function showDuplicateSubmitNotice() {
     if (noticeTimerRef.current) clearTimeout(noticeTimerRef.current);
@@ -62,7 +79,10 @@ export function FormSubmitButton({
 
     if (form && !form.checkValidity()) return;
 
-    if (form) form.dataset.submitted = "true";
+    if (form) {
+      form.dataset.submitted = "true";
+      submittedFormRef.current = form;
+    }
     setHasSubmitted(true);
     setShowDuplicateNotice(false);
   }

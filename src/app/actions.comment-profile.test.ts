@@ -1,0 +1,114 @@
+import { beforeEach, describe, expect, it, vi } from "vitest";
+
+const mocks = vi.hoisted(() => ({
+  createComment: vi.fn(),
+  findTool: vi.fn(),
+  getCurrentLocale: vi.fn(),
+  redirect: vi.fn((path: string) => {
+    throw new Error(`NEXT_REDIRECT:${path}`);
+  }),
+  refreshHeaderUserCookieSnapshot: vi.fn(),
+  revalidatePath: vi.fn(),
+  requireUser: vi.fn(),
+  saveUploadedFile: vi.fn(),
+  updateUser: vi.fn()
+}));
+
+vi.mock("next/cache", () => ({ revalidatePath: mocks.revalidatePath }));
+vi.mock("next/navigation", () => ({ redirect: mocks.redirect }));
+vi.mock("@/lib/db", () => ({
+  prisma: {
+    comment: { create: mocks.createComment },
+    tool: { findUnique: mocks.findTool },
+    user: { update: mocks.updateUser }
+  }
+}));
+vi.mock("@/lib/auth", () => ({
+  assertLoginNotLimited: vi.fn(),
+  getCurrentUser: vi.fn(),
+  hashPassword: vi.fn(),
+  recordLoginAttempt: vi.fn(),
+  refreshHeaderUserCookieSnapshot: mocks.refreshHeaderUserCookieSnapshot,
+  requireAdmin: vi.fn(),
+  requireUser: mocks.requireUser,
+  signInUser: vi.fn(),
+  signOutUser: vi.fn(),
+  verifyPassword: vi.fn()
+}));
+vi.mock("@/lib/i18n", () => ({ getCurrentLocale: mocks.getCurrentLocale }));
+vi.mock("@/lib/storage", () => ({ saveUploadedFile: mocks.saveUploadedFile }));
+
+import { createCommentAction, updateUserAvatarAction, updateUserProfileAction } from "@/app/actions";
+
+function commentForm(rating: string) {
+  const formData = new FormData();
+  formData.set("toolId", "tool-1");
+  formData.set("content", "这款工具确实有帮助。");
+  formData.set("rating", rating);
+  return formData;
+}
+
+describe("comment and user profile actions", () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+    mocks.getCurrentLocale.mockResolvedValue("zh");
+    mocks.requireUser.mockResolvedValue({ id: "user-1", email: "private@example.test", nickname: "Hu", role: "user" });
+    mocks.findTool.mockResolvedValue({ id: "tool-1", slug: "example-tool", name: "示例工具", englishName: "Example Tool", type: "software" });
+    mocks.createComment.mockResolvedValue({ id: "comment-1" });
+    mocks.updateUser.mockResolvedValue({ email: "private@example.test", nickname: "新昵称", role: "user" });
+    mocks.saveUploadedFile.mockResolvedValue({ fileUrl: "/uploads/user-avatars/avatar.png" });
+  });
+
+  it("stores a required 1–5 star rating with the pending comment", async () => {
+    await createCommentAction(commentForm("5"));
+
+    expect(mocks.createComment).toHaveBeenCalledWith({
+      data: {
+        userId: "user-1",
+        toolId: "tool-1",
+        content: "这款工具确实有帮助。",
+        rating: 5,
+        status: "pending"
+      }
+    });
+  });
+
+  it("rejects a missing or out-of-range rating before creating a comment", async () => {
+    await expect(createCommentAction(commentForm("6"))).rejects.toThrow();
+    expect(mocks.createComment).not.toHaveBeenCalled();
+  });
+
+  it("saves an edited nickname and refreshes the signed-in header snapshot", async () => {
+    const formData = new FormData();
+    formData.set("nickname", "  新昵称  ");
+
+    await expect(updateUserProfileAction(formData)).rejects.toThrow("NEXT_REDIRECT:/user?profile=saved");
+
+    expect(mocks.updateUser).toHaveBeenCalledWith({
+      where: { id: "user-1" },
+      data: { nickname: "新昵称" },
+      select: { email: true, nickname: true, role: true }
+    });
+    expect(mocks.refreshHeaderUserCookieSnapshot).toHaveBeenCalledWith({
+      email: "private@example.test",
+      nickname: "新昵称",
+      role: "user"
+    });
+  });
+
+  it("stores a valid avatar through the existing upload service", async () => {
+    const formData = new FormData();
+    formData.set("avatar", new File([new Uint8Array([137, 80, 78, 71, 13, 10, 26, 10])], "avatar.png", { type: "image/png" }));
+
+    await expect(updateUserAvatarAction(formData)).rejects.toThrow("NEXT_REDIRECT:/user?profile=saved");
+
+    expect(mocks.saveUploadedFile).toHaveBeenCalledWith(expect.any(File), expect.objectContaining({
+      folder: "user-avatars",
+      access: "public"
+    }));
+    expect(mocks.updateUser).toHaveBeenCalledWith({
+      where: { id: "user-1" },
+      data: { avatar: "/uploads/user-avatars/avatar.png" }
+    });
+  });
+});

@@ -60,10 +60,11 @@ describe("read-only admin database fixture", () => {
     );
   });
 
-  it("retains a read-only count operation for empty-state previews", async () => {
+  it("retains empty-state previews without a query and fixture user totals for queried lists", async () => {
     const { prisma } = await import(fixturePath);
 
     await expect(prisma.user.count()).resolves.toBe(0);
+    await expect(prisma.user.count({ where: {} })).resolves.toBe(1);
   });
 
   it("keeps the existing single-tool fixture unless empty-tools mode is explicitly enabled", async () => {

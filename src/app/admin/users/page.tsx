@@ -145,17 +145,17 @@ export default async function AdminUsersPage({ searchParams }: { searchParams: A
           <div className="enhe-admin-user-record-rows min-w-[920px] divide-y divide-white/10">
             {users.map((user) => (
               <div key={user.id} className="enhe-admin-user-row enhe-admin-content-row grid grid-cols-[1.6fr_0.8fr_0.8fr_1.1fr_0.6fr] gap-4 px-5 py-4 text-sm transition hover:bg-white/5">
-                <div>
-                  <p className="enhe-admin-user-primary font-semibold text-[#E8EEF8]">{user.nickname || user.email || user.phone || user.id}</p>
-                  <p className="enhe-admin-user-secondary mt-1 text-xs text-[#8B95A7]">{user.email ?? t.noEmail} · {user.phone ?? t.noPhone}</p>
-                  <p className="enhe-admin-user-secondary mt-1 text-xs text-[#8B95A7]">{t.registeredAt.replace("{date}", formatDate(user.createdAt, locale))}</p>
+                <div className="min-w-0">
+                  <p title={user.nickname || user.email || user.phone || user.id} className="enhe-admin-user-primary truncate font-semibold text-[#E8EEF8]">{user.nickname || user.email || user.phone || user.id}</p>
+                  <p title={`${user.email ?? t.noEmail} · ${user.phone ?? t.noPhone}`} className="enhe-admin-user-secondary mt-1 truncate text-xs text-[#8B95A7]">{user.email ?? t.noEmail} · {user.phone ?? t.noPhone}</p>
+                  <p className="enhe-admin-user-secondary mt-1 truncate text-xs text-[#8B95A7]" title={t.registeredAt.replace("{date}", formatDate(user.createdAt, locale))}>{t.registeredAt.replace("{date}", formatDate(user.createdAt, locale))}</p>
                 </div>
-                <div><span className="enhe-admin-user-badge">{roleLabel(user.role, locale)}</span></div>
-                <div><span className={`enhe-admin-user-badge ${user.status === "active" ? "is-active" : "is-disabled"}`}>{statusLabel(user.status, locale)}</span></div>
-                <div className="enhe-admin-user-secondary text-xs leading-6 text-[#8B95A7]">
+                <div className="min-w-0"><span className="enhe-admin-user-badge">{roleLabel(user.role, locale)}</span></div>
+                <div className="min-w-0"><span className={`enhe-admin-user-badge ${user.status === "active" ? "is-active" : "is-disabled"}`}>{statusLabel(user.status, locale)}</span></div>
+                <div className="enhe-admin-user-secondary min-w-0 truncate text-xs leading-6 text-[#8B95A7]" title={formatCounts(t.counts, user._count.orders, user._count.comments, user._count.downloadLogs, user._count.toolUsageLogs)}>
                   {formatCounts(t.counts, user._count.orders, user._count.comments, user._count.downloadLogs, user._count.toolUsageLogs)}
                 </div>
-                <div className="text-right">
+                <div className="min-w-0 text-right">
                   <Link href={`/admin/users/${user.id}`} className="enhe-admin-content-primary-action rounded-full border border-white/15 px-4 py-2 text-xs font-semibold text-[#E8EEF8] transition hover:border-[#48F5D3]/50 hover:text-[#48F5D3]">
                     {t.viewEdit}
                   </Link>

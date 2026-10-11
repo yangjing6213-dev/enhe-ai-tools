@@ -985,7 +985,7 @@ select option:disabled {
 .bg-\[\#41c5db\],
 .bg-\[\#F5C66B\] {
   background: var(--marketing-accent) !important;
-  color: #000000 !important;
+  color: #ffffff !important;
 }
 
 .has-\[\:checked\]\:border-\[\#7DD3FC\]\/70:has(:checked) {
@@ -2769,8 +2769,8 @@ select option:disabled {
 
 .home-final-cta-primary {
   min-height: 48px;
-  background: #41c5db !important;
-  color: #07131a !important;
+  background: #0462C2 !important;
+  color: #ffffff !important;
   box-shadow:
     0 0 0 1px rgba(255, 255, 255, 0.08),
     0 12px 28px rgba(0, 0, 0, 0.2) !important;
@@ -2781,7 +2781,7 @@ select option:disabled {
 }
 
 .home-final-cta-primary:hover {
-  background: #78dbe8 !important;
+  background: #0D70D8 !important;
 }
 
 .home-final-cta-primary:active,

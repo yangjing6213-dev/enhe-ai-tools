@@ -11,7 +11,9 @@ export async function getHomepageCommentCards(locale: RedesignLocale): Promise<H
       select: {
         id: true,
         content: true,
-        tool: { select: { name: true, englishName: true } }
+        rating: true,
+        tool: { select: { name: true, englishName: true } },
+        user: { select: { nickname: true, avatar: true } }
       },
       orderBy: [{ updatedAt: "desc" }, { createdAt: "desc" }],
       take: 5
@@ -21,6 +23,9 @@ export async function getHomepageCommentCards(locale: RedesignLocale): Promise<H
       comments.map((comment) => ({
         id: comment.id,
         content: comment.content,
+        rating: comment.rating,
+        nickname: comment.user.nickname,
+        avatar: comment.user.avatar,
         toolName: comment.tool.name,
         englishToolName: comment.tool.englishName
       })),
