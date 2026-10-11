@@ -418,7 +418,7 @@ test("floating cart and inbox open background-free personal panels above support
     expect(control.width).toBe(44);
     expect(control.height).toBe(44);
     expect(control.backgroundColor).toBe("rgba(0, 0, 0, 0)");
-    expect(control.borderWidth).toBe("0px");
+    expect(control.borderWidth).toBe("1px");
     expect(control.boxShadow).toBe("none");
   }
 

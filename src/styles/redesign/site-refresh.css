@@ -894,6 +894,29 @@ body .redesign-footer nav {
   transform: translateX(-20%);
 }
 
+@media (width >= 1280px) {
+  .redesign-footer .footer-brand {
+    position: relative;
+    display: block;
+    height: 100%;
+  }
+
+  .redesign-footer .footer-brand-logo {
+    position: absolute;
+    inset-block-start: 50%;
+    inset-inline-start: 20%;
+    transform: translateY(-40%);
+  }
+
+  .redesign-footer .footer-social-links {
+    position: absolute;
+    inset-block-end: 0;
+    inset-inline-start: 20%;
+    width: min(100%, 240px);
+    justify-content: center;
+  }
+}
+
 .redesign-footer .footer-social-links {
   display: flex;
   align-items: center;
@@ -1053,10 +1076,10 @@ body .customer-support-widget .customer-support-launcher,
   padding: 0;
   border: 1px solid var(--enhe-border);
   border-radius: 50%;
-  background: var(--enhe-page-bg);
+  background: transparent;
   color: var(--enhe-action);
-  box-shadow: 0 14px 38px rgba(0, 8, 14, 0.42);
-  backdrop-filter: blur(24px);
+  box-shadow: none;
+  backdrop-filter: none;
   cursor: pointer;
   appearance: none;
   transition: transform 160ms ease, border-color 160ms ease;

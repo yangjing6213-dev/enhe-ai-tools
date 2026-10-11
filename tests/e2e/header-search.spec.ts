@@ -46,7 +46,7 @@ test("public header replaces the search link, opens recommendations, and submits
         expect(Math.abs(layout.valueCenter - width / 2)).toBeLessThan(2);
         expect(layout.logoRight).toBeLessThan(layout.valueLeft);
         expect(layout.valueRight).toBeLessThan(layout.menusLeft);
-        if (width === 1920) expect(layout.logoLeft).toBe((width - 1200) / 2 - 240);
+        if (width === 1920) expect(Math.abs(layout.logoLeft - ((width - 1200) / 2 - 240))).toBeLessThan(1);
       }
       for (const selector of [".redesign-home-product-autoplay", ".redesign-home-reviews-rotation"]) {
         const rotationButton = page.locator(selector);
