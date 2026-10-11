@@ -14,12 +14,11 @@ const archivePath = "/ai-trends/daily";
 const copy = {
   zh: {
     title: "AI 需求趋势每日分析",
-    description: "AI 需求趋势每日分析归档。公开用户可阅读摘要，登录用户可阅读完整 HTML 报告。",
+    description: "AI 需求趋势每日分析历史。公开用户可阅读摘要，登录用户可阅读完整 HTML 报告。",
     intro: "每日追踪公开趋势信号，整理“人类最渴望用 AI 解决哪些问题”。公开用户可浏览摘要，登录后可阅读完整视觉化 HTML 报告。",
     back: "返回趋势总览",
     login: "登录查看完整报告",
-    archiveTitle: "分析归档",
-    archiveIntro: "这些日更页用于用户分享和阅读，不进入 sitemap，并通过 robots metadata 设置 noindex, follow。",
+    archiveTitle: "分析历史",
     readFull: "阅读全文",
     readSummary: "阅读摘要",
     emptyTitle: "暂无分析",
@@ -31,14 +30,12 @@ const copy = {
   },
   en: {
     title: "Daily AI Demand Analysis",
-    description: "Daily AI demand analysis archive. Public readers can view summaries, and signed-in users can read full HTML reports.",
+    description: "Daily AI demand analysis history. Public readers can view summaries, and signed-in users can read full HTML reports.",
     intro:
       "Track public demand signals every day around what people most want AI to solve. Public readers can browse the summary, and signed-in users can read the full visual HTML report.",
     back: "Back to trend overview",
     login: "Log in to read the full report",
-    archiveTitle: "Analysis archive",
-    archiveIntro:
-      "These daily pages are meant for reading and sharing, stay out of sitemap, and explicitly use noindex, follow via robots metadata.",
+    archiveTitle: "Analysis history",
     readFull: "Read full report",
     readSummary: "Read summary",
     emptyTitle: "No analysis yet",
@@ -130,7 +127,7 @@ export async function AiTrendDailyArchivePageShell({ forceLocale = "zh" }: { for
       </section>
 
       <section className="mt-12">
-        <SectionTitle title={text.archiveTitle} intro={text.archiveIntro} />
+        <SectionTitle title={text.archiveTitle} />
         {localizedBriefings.length ? (
           <div className="grid gap-5">
             {localizedBriefings.map((briefing) => (

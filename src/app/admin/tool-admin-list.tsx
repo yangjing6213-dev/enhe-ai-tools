@@ -247,7 +247,7 @@ export function ToolAdminList({
 
               return (
                 <div key={tool.id} className="enhe-admin-tool-list-row grid grid-cols-[1.4fr_0.8fr_0.6fr_0.8fr_1.1fr_0.6fr] items-center gap-4 px-5 py-4 text-sm transition-colors">
-                  <div className="flex items-center gap-3">
+                  <div className="flex min-w-0 items-center gap-3">
                     <div className="relative h-14 w-24 shrink-0 overflow-hidden rounded-xl border border-white/10 bg-[#0B1220]">
                       {coverImage ? (
                         <Image src={coverImage} alt={tool.name} fill className="object-cover" sizes="96px" unoptimized />
@@ -255,9 +255,9 @@ export function ToolAdminList({
                         <div className="enhe-admin-tool-empty-image absolute inset-0" />
                       )}
                     </div>
-                    <div>
-                      <p className="font-semibold text-[#E8EEF8]">{tool.name}</p>
-                      {tool.englishName ? <p className="mt-1 text-xs font-medium text-[var(--marketing-accent)]">{tool.englishName}</p> : null}
+                    <div className="min-w-0">
+                      <p className="break-words font-semibold text-[#E8EEF8]">{tool.name}</p>
+                      {tool.englishName ? <p className="mt-1 break-words text-xs font-medium text-[var(--marketing-accent)]">{tool.englishName}</p> : null}
                       <p className="mt-1 text-xs text-[#8B95A7]">{tool.slug}</p>
                     </div>
                   </div>

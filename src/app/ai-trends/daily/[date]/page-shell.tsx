@@ -17,7 +17,7 @@ import { absoluteUrl, buildLocalePath, buildMetaDescription, buildMetadataTitle,
 const copy = {
   zh: {
     description: "AI 需求趋势每日分析详情页。公开展示摘要，登录后阅读完整视觉化 HTML 报告。",
-    back: "返回分析归档",
+    back: "返回分析历史",
     summary: "公开摘要",
     fullHtml: "完整 HTML 报告",
     loginVisible: "登录可见",
@@ -39,7 +39,7 @@ const copy = {
   },
   en: {
     description: "Daily AI demand analysis detail page. Public readers see the summary, and signed-in users can read the full visual HTML report.",
-    back: "Back to analysis archive",
+    back: "Back to analysis history",
     summary: "Public summary",
     fullHtml: "Full HTML report",
     loginVisible: "Visible after sign-in",

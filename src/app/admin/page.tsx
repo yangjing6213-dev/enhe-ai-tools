@@ -120,7 +120,7 @@ export default async function AdminDashboardPage() {
         </div>
         <div className="mt-5 grid gap-3 md:grid-cols-7">
           {analyticsFunnel.map((row) => (
-            <div key={row.eventName} className="rounded-2xl border border-white/10 bg-white/6 p-4">
+            <div key={row.eventName} className="min-w-0 rounded-2xl border border-white/10 bg-white/6 p-4">
               <p className="text-sm font-semibold text-[#E8EEF8]">{t.funnelLabels[row.eventName]}</p>
               <p className="mt-3 text-3xl font-semibold text-[var(--marketing-accent)]">{row.count}</p>
               <div className="mt-4 h-2 overflow-hidden rounded-full bg-white/10">
@@ -213,7 +213,7 @@ function Stat({
   const content = (
     <>
       <p className="text-sm text-[#8B95A7]">{label}</p>
-      <p className={`mt-3 text-3xl font-semibold ${warn ? "text-[#FFB86B]" : accent ? "text-[var(--marketing-accent)]" : "text-[#E8EEF8]"}`}>{value}</p>
+      <p className={`mt-3 break-words text-3xl font-semibold [overflow-wrap:anywhere] ${warn ? "text-[#FFB86B]" : accent ? "text-[var(--marketing-accent)]" : "text-[#E8EEF8]"}`}>{value}</p>
     </>
   );
 

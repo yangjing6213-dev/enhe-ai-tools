@@ -2344,8 +2344,57 @@
   border-color: var(--enhe-border) !important;
 }
 
+.enhe-admin-shell :is(
+  .surface-panel,
+  .surface-panel-soft,
+  .admin-shell-card,
+  .admin-data-panel,
+  .enhe-admin-content-form,
+  .enhe-admin-content-table,
+  .enhe-admin-content-records,
+  .enhe-admin-tool-editor-section
+) {
+  min-width: 0;
+}
+
+.enhe-admin-shell :is(
+  .surface-panel,
+  .surface-panel-soft,
+  .admin-shell-card,
+  .admin-data-panel,
+  .enhe-admin-content-form,
+  .enhe-admin-content-table,
+  .enhe-admin-content-records,
+  .enhe-admin-tool-editor-section
+) :is(h1, h2, h3, p, a, button, span, strong, code, pre) {
+  max-width: 100%;
+  overflow-wrap: anywhere;
+}
+
+.enhe-admin-shell :is(button, [data-slot="button"], a[class*="-action"]) {
+  border-radius: var(--enhe-button-r) !important;
+  max-width: 100%;
+  white-space: normal;
+  overflow-wrap: anywhere;
+}
+
 .enhe-admin-shell [class*="bg-gradient-to-r"] {
   background: var(--enhe-action) !important;
+}
+
+.enhe-admin-shell :is(button, a, label, [role="button"], [data-slot="button"]):is(
+  [class*="bg-[var(--marketing-accent)]"],
+  [class*="bg-[var(--enhe-action)]"],
+  [class*="bg-[var(--blue-9)]"],
+  [class*="bg-blue-"],
+  [class*="bg-[#0462C2]"],
+  [class*="bg-[#7AA7FF]"],
+  [class*="bg-gradient-to-r"],
+  .enhe-admin-tool-primary-action,
+  .enhe-admin-package-picker
+) {
+  background: var(--enhe-action) !important;
+  color: #fff !important;
 }
 
 .enhe-admin-shell [class*="hover:text-[#48F5D3]"]:hover {

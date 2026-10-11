@@ -61,7 +61,7 @@ export default async function AdminAiNewsPage({ searchParams }: { searchParams: 
           <Link href="/admin/ai-news/import" className="rounded-full border border-white/15 px-5 py-3 text-sm font-semibold transition hover:border-[#48F5D3]/50 hover:text-[#48F5D3]">
             导入 HTML
           </Link>
-          <Link href="/admin/ai-news/new" className="rounded-full bg-[#7AA7FF] px-5 py-3 text-sm font-semibold text-[#07101f]">
+          <Link href="/admin/ai-news/new" className="rounded-full bg-[var(--enhe-action)] px-5 py-3 text-sm font-semibold text-white">
             新增资讯
           </Link>
         </div>

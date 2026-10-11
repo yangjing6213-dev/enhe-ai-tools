@@ -89,7 +89,7 @@ const runIdPattern = /^[A-Za-z0-9_-]{1,128}$/;
 const tokenPattern = /^[^\s]{24,512}$/;
 
 const primaryButton =
-  "inline-flex min-h-11 items-center justify-center gap-2 rounded-md bg-[var(--marketing-accent)] px-5 text-sm font-black text-[#071014] hover:bg-[#8feaff] disabled:cursor-not-allowed disabled:opacity-50";
+  "inline-flex min-h-11 items-center justify-center gap-2 rounded-md bg-[var(--marketing-accent)] px-5 text-sm font-black text-white hover:bg-[var(--enhe-action-hover)] disabled:cursor-not-allowed disabled:opacity-50";
 const secondaryButton =
   "inline-flex min-h-10 items-center justify-center gap-2 rounded-md border border-white/15 px-4 text-sm font-bold hover:border-[var(--marketing-accent)] disabled:cursor-not-allowed disabled:opacity-50";
 const severityClass: Record<Severity, string> = {

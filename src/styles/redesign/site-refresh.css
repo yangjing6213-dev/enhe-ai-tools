@@ -26,6 +26,32 @@
   color: var(--enhe-text) !important;
 }
 
+.enhe-redesign-production :is(
+  [data-slot="button"][data-variant="default"],
+  [class~="bg-primary"],
+  [class~="bg-[var(--marketing-accent)]"],
+  [class~="bg-[var(--marketing-button)]"],
+  [class~="bg-[var(--enhe-action)]"],
+  [class~="bg-[var(--blue-9)]"],
+  .site-language-switcher a.is-active,
+  .mobile-nav-user-center
+) {
+  color: #fff !important;
+}
+
+.enhe-redesign-production :is(button, a, [role="button"], [data-slot="button"]):is(
+  [class*="bg-[var(--marketing-accent)]"],
+  [class*="bg-[var(--marketing-button)]"],
+  [class*="bg-[var(--enhe-action)]"],
+  [class*="bg-[var(--blue-9)]"],
+  [class*="bg-blue-"],
+  [class*="bg-[#0462C2]"],
+  [class*="bg-[#7AA7FF]"]
+) {
+  background: var(--enhe-action) !important;
+  color: #fff !important;
+}
+
 .enhe-redesign-production [class*="border-white/"] {
   border-color: var(--enhe-border) !important;
 }

@@ -110,7 +110,7 @@ export default async function AdminUsersPage({ searchParams }: { searchParams: A
           <option value="active">{t.active}</option>
           <option value="disabled">{t.disabled}</option>
         </select>
-        <button className="rounded-full bg-[#7AA7FF] px-5 py-3 text-sm font-semibold text-[#07101f]">{t.filter}</button>
+        <button className="rounded-full bg-[var(--enhe-action)] px-5 py-3 text-sm font-semibold text-white">{t.filter}</button>
       </form>
 
       <div className="enhe-admin-content-toolbar mt-5 flex flex-wrap items-center justify-between gap-3 text-sm text-[#8B95A7]">
