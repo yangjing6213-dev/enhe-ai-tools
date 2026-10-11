@@ -28,5 +28,5 @@
 - 生产头像已只读核验：用户记录保存的是腾讯云 COS 公网格式地址，直接读取返回 403；用服务器现有 COS 配置生成签名后，限量读取返回 206，证实修复路径可以读取原图片。没有输出地址或密钥。
 - 生产 Google OAuth：`GOOGLE_CLIENT_ID`、`GOOGLE_CLIENT_SECRET`、`GOOGLE_REDIRECT_URI` 均未配置。Google 注册入口可显示，但尚不能完成线上注册。
 - 发布门槛：Docker Desktop 引擎已确认就绪（Docker Server 29.8.2）；`node scripts/test-migration-paths.mjs codex/enhe-recovery-baseline` 已通过，全新安装和从远端基线升级两条迁移路径均无差异；发布 shell 的锁、备份冲突和恢复检查已通过。
-- 发布：尚未推送或部署。生产 Google OAuth 凭据仍缺失；将先完成其余发布前检查并推送到明确的恢复分支，线上部署须等 Google OAuth 凭据安全配置完成后再执行。
-- 本次续测：语言路由等 4 组 Vitest 共 38 项通过；Lint 与类型检查通过；生产构建退出码为 0，数据库连接使用本机拒绝连接的占位地址，因此构建没有验证数据库驱动的页面内容。生产浏览器定向检查 6/6 通过（首页语言历史、自动地区判断、窄屏与悬浮客服入口）。完整发布浏览器套件将在推送前重跑。
+- 发布：提交 `0d5d92e9cd56b49c15157e3f4edd8de045a4cae6` 已推送到 `origin/codex/enhe-recovery-baseline`。本轮未部署：生产 Google OAuth 环境变量仍缺失，部署后 Google 注册入口不能完成注册；待在服务器安全配置 `GOOGLE_CLIENT_ID`、`GOOGLE_CLIENT_SECRET`、`GOOGLE_REDIRECT_URI`（回调地址为 `https://www.enhe-tech.com.cn/api/auth/google/callback`）后再部署。
+- 本次续测：语言路由等 4 组 Vitest 共 38 项通过；全量 Vitest 为 540 个文件通过、9 个跳过，2765 项通过、97 项跳过；Lint、类型检查和依赖安全审计通过；数据库迁移演练和 Docker 发布脚本检查通过。生产构建退出码为 0，数据库连接使用本机拒绝连接的占位地址，因此构建没有验证数据库驱动的页面内容。生产浏览器定向检查 6/6 通过；完整发布浏览器套件 332 项通过、145 项因数据库或预览环境条件跳过、0 项失败。
