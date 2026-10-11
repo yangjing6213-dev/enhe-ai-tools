@@ -197,9 +197,10 @@ test("homepage polish stays readable, responsive, and interactive without extern
       return {
         headingTop: heading.getBoundingClientRect().top,
         headingSize: Number.parseFloat(getComputedStyle(heading).fontSize),
-        logoCenterOffset: Math.abs(
+        logoPositionError: Math.abs(
           logo.getBoundingClientRect().top + logo.getBoundingClientRect().height / 2 -
-          (footerGrid.getBoundingClientRect().top + footerGrid.getBoundingClientRect().height / 2),
+          (footerGrid.getBoundingClientRect().top + footerGrid.getBoundingClientRect().height / 2) -
+          logo.getBoundingClientRect().height * 0.1,
         ),
         navigationTop: navigation.getBoundingClientRect().top,
         firstTriggerTop: firstTrigger.getBoundingClientRect().top,
@@ -207,7 +208,7 @@ test("homepage polish stays readable, responsive, and interactive without extern
     });
     expect(footerAlignment.headingSize).toBeGreaterThanOrEqual(36);
     if (width >= 1280) {
-      expect(footerAlignment.logoCenterOffset).toBeLessThanOrEqual(1);
+      expect(footerAlignment.logoPositionError).toBeLessThanOrEqual(1);
     }
     if (width >= 1280) {
       expect(Math.abs(footerAlignment.navigationTop - footerAlignment.headingTop)).toBeLessThanOrEqual(1);

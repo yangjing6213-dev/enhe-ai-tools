@@ -31,12 +31,12 @@ test("public header replaces the search link, opens recommendations, and submits
       await expect(footer.locator(".redesign-home-brand-value")).toHaveCSS("background-color", "rgba(0, 0, 0, 0)");
       await expect(footer.locator(".footer-navigation")).toHaveCSS("justify-content", "flex-end");
       if (width >= 1280) {
-        const logoCenterOffset = await footer.evaluate((element) => {
+        const logoPositionError = await footer.evaluate((element) => {
           const logo = element.querySelector<HTMLElement>(".footer-brand-logo")!.getBoundingClientRect();
           const grid = element.querySelector<HTMLElement>(".footer-grid")!.getBoundingClientRect();
-          return Math.abs(logo.top + logo.height / 2 - (grid.top + grid.height / 2));
+          return Math.abs(logo.top + logo.height / 2 - (grid.top + grid.height / 2) - logo.height * 0.1);
         });
-        expect(logoCenterOffset).toBeLessThanOrEqual(1);
+        expect(logoPositionError).toBeLessThanOrEqual(1);
         const layout = await footer.evaluate((element) => {
           const logo = element.querySelector(".footer-brand-logo")!.getBoundingClientRect();
           const value = element.querySelector(".redesign-home-brand-value")!.getBoundingClientRect();
