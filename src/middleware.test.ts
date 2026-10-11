@@ -15,6 +15,17 @@ describe("locale switch redirects", () => {
     expect(response.headers.get("set-cookie")).toContain("enhe_locale=en");
   });
 
+  it("preserves an explicit English URL until the visitor has saved a language choice", () => {
+    const response = middleware(
+      new NextRequest("https://www.enhe-tech.com.cn/en/software", {
+        headers: { "cf-ipcountry": "CN", "user-agent": "Mozilla/5.0" },
+      }),
+    );
+
+    expect(response.status).toBe(200);
+    expect(response.headers.get("location")).toBeNull();
+  });
+
   it("keeps a manually selected Chinese language when the visitor is outside China", () => {
     const response = middleware(
       new NextRequest("https://www.enhe-tech.com.cn/software", {

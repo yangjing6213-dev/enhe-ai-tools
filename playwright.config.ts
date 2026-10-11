@@ -104,6 +104,7 @@ export default defineConfig({
   reporter: [["list"]],
   use: {
     baseURL,
+    extraHTTPHeaders: { "x-tencent-country": "CN" },
     trace: "retain-on-failure"
   },
   webServer: {

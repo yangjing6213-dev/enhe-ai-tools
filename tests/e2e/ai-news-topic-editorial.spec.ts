@@ -18,6 +18,10 @@ for (const route of knownRoutes) {
     const pageErrors: string[] = [];
     const failedRequests: string[] = [];
 
+    await page.route("**/api/analytics", (route) =>
+      route.fulfill({ status: 204 }),
+    );
+
     page.on("console", (message) => {
       if (message.type() === "error") consoleErrors.push(message.text());
     });
