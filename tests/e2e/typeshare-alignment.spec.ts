@@ -6,16 +6,13 @@ async function installSameOriginRequestGuard(page: Page) {
   const rejectedOrigins: string[] = [];
   const localOrigin = `http://127.0.0.1:${process.env.PORT ?? "3000"}`;
 
-  await page.route("**/*", async (route) => {
-    const requestUrl = new URL(route.request().url());
-    if (requestUrl.origin === localOrigin) {
-      await route.continue();
-      return;
-    }
-
-    rejectedOrigins.push(requestUrl.origin);
-    await route.abort();
-  });
+  await page.route(
+    (url) => url.origin !== localOrigin,
+    async (route) => {
+      rejectedOrigins.push(new URL(route.request().url()).origin);
+      await route.abort();
+    },
+  );
 
   return rejectedOrigins;
 }
