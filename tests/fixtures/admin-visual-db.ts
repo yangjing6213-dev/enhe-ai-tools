@@ -128,6 +128,25 @@ const localVisualTool = {
   downloadFileId: null, downloadFile: null, priceSpecs: [],
   categoryId: null, category: null, _count: { orders: 0, purchases: 0 }
 };
+const localVisualComment = {
+  id: "local-visual-comment",
+  userId: localVisualUser.id,
+  toolId: localVisualTool.id,
+  content: "Local visual fixture comment only.",
+  status: "approved",
+  likeCount: 0,
+  isPinned: false,
+  showOnHomepage: false,
+  createdAt: new Date("2026-09-30T00:00:00.000Z"),
+  updatedAt: new Date("2026-09-30T00:00:00.000Z"),
+  user: localVisualUser,
+  tool: localVisualTool
+};
+const localVisualHomepageComment = {
+  id: "local-visual-homepage-comment",
+  content: "Local visual homepage comment only.",
+  tool: { name: localVisualTool.name, englishName: localVisualTool.englishName }
+};
 const localVisualToolsById = [
   localVisualTool,
   {
@@ -367,6 +386,23 @@ export const prisma = new Proxy(
                 Object.keys(args.select).length === 2;
                 if (!requestsSortedToolNames || process.env.ENHE_ADMIN_VISUAL_EMPTY_TOOLS === "1") return [];
                 return [localVisualTool];
+              };
+            }
+            if (modelName === "comment" && operation === "findMany") {
+              return async (args?: { where?: { status?: string; isPinned?: boolean; showOnHomepage?: boolean } }) => {
+                const where = args?.where;
+                if (where?.showOnHomepage) return [localVisualHomepageComment];
+                if (where?.status && where.status !== localVisualComment.status) return [];
+                if (where?.isPinned !== undefined && where.isPinned !== localVisualComment.isPinned) return [];
+                return [localVisualComment];
+              };
+            }
+            if (modelName === "comment" && operation === "count") {
+              return async (args?: { where?: { status?: string; isPinned?: boolean } }) => {
+                const where = args?.where;
+                if (where?.status && where.status !== localVisualComment.status) return 0;
+                if (where?.isPinned !== undefined && where.isPinned !== localVisualComment.isPinned) return 0;
+                return 1;
               };
             }
             if (modelName === "user" && operation === "findUnique") {

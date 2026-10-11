@@ -539,6 +539,17 @@
   border-radius: 50%;
 }
 
+.redesign-home-review-avatar-placeholder {
+  display: grid;
+  width: 56px;
+  height: 56px;
+  flex: 0 0 56px;
+  place-items: center;
+  border-radius: 50%;
+  background: color-mix(in srgb, var(--enhe-action) 12%, white);
+  color: var(--enhe-action);
+}
+
 .redesign-home-review-person {
   min-width: 0;
 }

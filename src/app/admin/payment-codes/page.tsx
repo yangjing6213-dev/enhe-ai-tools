@@ -65,7 +65,7 @@ export default async function AdminPaymentCodesPage({ searchParams }: AdminPayme
           <PaymentCodeEditor title={t.alipay} value={settingsMap.alipay_qr ?? ""} preview={alipayQr} urlLabel={t.url} uploadLabel={t.upload} currentLabel={t.current} name="alipayQr" fileName="alipayQrFile" />
           <PaymentCodeEditor title={t.wechat} value={settingsMap.wechat_qr ?? ""} preview={wechatQr} urlLabel={t.url} uploadLabel={t.upload} currentLabel={t.current} name="wechatQr" fileName="wechatQrFile" />
         </div>
-        <p className="enhe-admin-payment-codes-hint rounded-2xl border border-[#FFB86B]/25 bg-[#FFB86B]/10 px-4 py-3 text-sm leading-6 text-[#FFD6A5]">{t.hint}</p>
+        <p className="enhe-admin-payment-codes-hint rounded-2xl border border-[#FFB86B]/25 bg-[#FFB86B]/10 px-4 py-3 text-sm leading-6">{t.hint}</p>
         <div>
           <SubmitButton>{t.submit}</SubmitButton>
         </div>

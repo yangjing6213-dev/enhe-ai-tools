@@ -902,6 +902,7 @@ model Comment {
   status    CommentStatus @default(pending)
   likeCount Int           @default(0) @map("like_count")
   isPinned  Boolean       @default(false) @map("is_pinned")
+  showOnHomepage Boolean  @default(false) @map("show_on_homepage")
   createdAt DateTime      @default(now()) @map("created_at")
   updatedAt DateTime      @updatedAt @map("updated_at")
   user      User          @relation(fields: [userId], references: [id])

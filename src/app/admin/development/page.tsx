@@ -131,13 +131,13 @@ export default async function AdminDevelopmentPage({
             <ProgressStat label={copy.todo} value={summary.notStarted + summary.recommended} />
           </div>
           <div className="mt-5 grid gap-3 md:grid-cols-3">
-            <Link href="/admin/development" className="rounded-xl border border-white/10 bg-white/5 px-4 py-3 text-sm text-[#8B95A7] hover:border-[#48F5D3]/40">
+            <Link href="/admin/development" className="enhe-admin-card rounded-xl border border-white/10 bg-white/5 px-4 py-3 text-sm text-[#8B95A7] hover:border-[#48F5D3]/40">
               {copy.developmentVersions} · {versions.length}
             </Link>
-            <Link href="/admin/releases" className="rounded-xl border border-white/10 bg-white/5 px-4 py-3 text-sm text-[#8B95A7] hover:border-[#48F5D3]/40">
+            <Link href="/admin/releases" className="enhe-admin-card rounded-xl border border-white/10 bg-white/5 px-4 py-3 text-sm text-[#8B95A7] hover:border-[#48F5D3]/40">
               {copy.productVersions} · {productReleaseCount}
             </Link>
-            <Link href="/admin/changelogs" className="rounded-xl border border-white/10 bg-white/5 px-4 py-3 text-sm text-[#8B95A7] hover:border-[#48F5D3]/40">
+            <Link href="/admin/changelogs" className="enhe-admin-card rounded-xl border border-white/10 bg-white/5 px-4 py-3 text-sm text-[#8B95A7] hover:border-[#48F5D3]/40">
               {copy.toolVersions} · {toolChangelogCount}
             </Link>
           </div>
@@ -165,7 +165,7 @@ export default async function AdminDevelopmentPage({
         <VersionForm version={selectedVersion} locale={locale} />
       </div>
 
-      <div className="mt-8 grid gap-6 xl:grid-cols-[1fr_360px]">
+      <div className="enhe-admin-card-grid mt-8 grid gap-6 xl:grid-cols-[1fr_360px]">
         <div className="space-y-6">
           {groupedItems.map((group) => (
             <section key={group.module} className="glass rounded-2xl p-6">
@@ -212,7 +212,7 @@ export default async function AdminDevelopmentPage({
 
 function ProgressStat({ label, value, accent = false }: { label: string; value: string | number; accent?: boolean }) {
   return (
-    <div className="rounded-xl border border-white/10 bg-white/6 p-4">
+    <div className="enhe-admin-card rounded-xl border border-white/10 bg-white/6 p-4">
       <p className="text-xs text-[#8B95A7]">{label}</p>
       <p className={`mt-2 text-2xl font-semibold ${accent ? "text-[#48F5D3]" : "text-[#E8EEF8]"}`}>{value}</p>
     </div>

@@ -519,7 +519,10 @@ export async function updateCommentStatusAction(formData: FormData) {
   const admin = await requireAdmin();
   const id = z.string().min(1).parse(formData.get("id"));
   const status = z.enum(["approved", "rejected", "deleted"]).parse(formData.get("status"));
-  await prisma.comment.update({ where: { id }, data: { status } });
+  await prisma.comment.update({
+    where: { id },
+    data: { status, ...(status === "approved" ? {} : { showOnHomepage: false }) }
+  });
   await writeAdminAuditLog({
     adminId: admin.id,
     action: "comment.status.update",
@@ -529,6 +532,33 @@ export async function updateCommentStatusAction(formData: FormData) {
     metadata: { status }
   });
   revalidatePath("/admin/comments");
+  revalidatePath("/");
+  revalidatePath("/en");
+}
+
+export async function updateCommentHomepageDisplayAction(formData: FormData) {
+  const admin = await requireAdmin();
+  const id = z.string().min(1).parse(formData.get("id"));
+  const showOnHomepage = z.enum(["true", "false"]).parse(formData.get("showOnHomepage")) === "true";
+  const result = await prisma.comment.updateMany({
+    where: { id, ...(showOnHomepage ? { status: "approved" as const } : {}) },
+    data: { showOnHomepage }
+  });
+
+  if (result.count > 0) {
+    await writeAdminAuditLog({
+      adminId: admin.id,
+      action: "comment.homepage_display.update",
+      targetType: "comment",
+      targetId: id,
+      summary: "Updated homepage comment display state.",
+      metadata: { showOnHomepage }
+    });
+  }
+
+  revalidatePath("/admin/comments");
+  revalidatePath("/");
+  revalidatePath("/en");
 }
 
 export async function updateCommentPinAction(formData: FormData) {

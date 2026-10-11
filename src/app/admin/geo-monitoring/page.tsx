@@ -116,7 +116,7 @@ export default async function AdminGeoMonitoringPage() {
 
       <section className="surface-panel mt-8 p-6">
         <h2 className="text-xl font-semibold text-[var(--marketing-text)]">月度巡检流程</h2>
-        <div className="mt-5 grid gap-4 md:grid-cols-2 xl:grid-cols-4">
+        <div className="enhe-admin-card-grid mt-5 grid gap-4 md:grid-cols-2 xl:grid-cols-4">
           <ProcessCard title="1. 人工运行核心查询" text="每月由人员在国际平台与中国平台分别检查 20+ 个查询，记录是否出现 ENHE AI、官网链接和竞品来源。" />
           <ProcessCard title="2. 保存人工证据" text="保存原始回答摘要、引用 URL、截图地址、竞争品牌和情绪判断，形成可回溯的人工巡检样本。" />
           <ProcessCard title="3. 生成内容动作" text="根据缺口补 FAQ、对比表、来源引用、可摘录答案段，并把高价值主题写入 OKF 概念页。" />
@@ -270,7 +270,7 @@ function GeoStat({ label, value, accent = false }: { label: string; value: numbe
 
 function ProviderGroup({ title, providers }: { title: string; providers: GeoMonitoringProvider[] }) {
   return (
-    <div className="rounded-2xl border border-white/10 bg-white/5 p-5">
+    <div className="enhe-admin-card rounded-2xl border border-white/10 bg-white/5 p-5">
       <h3 className="text-base font-semibold text-[#E8EEF8]">{title}</h3>
       <div className="mt-4 grid gap-3">
         {providers.map((provider) => (
@@ -279,7 +279,7 @@ function ProviderGroup({ title, providers }: { title: string; providers: GeoMoni
             href={provider.officialUrl}
             target="_blank"
             rel="nofollow noopener noreferrer"
-            className="rounded-xl border border-white/10 bg-black/10 p-4 transition hover:border-[var(--marketing-accent)]/40 hover:bg-[var(--marketing-accent)]/8"
+            className="enhe-admin-card rounded-xl border border-white/10 bg-black/10 p-4 transition hover:border-[var(--marketing-accent)]/40 hover:bg-[var(--marketing-accent)]/8"
           >
             <div className="flex flex-wrap items-center justify-between gap-2">
               <span className="text-sm font-semibold text-[#E8EEF8]">{provider.name}</span>
@@ -333,7 +333,7 @@ function RecommendationCard({ item }: { item: GeoMonitoringRecommendation }) {
 
 function ProcessCard({ title, text }: { title: string; text: string }) {
   return (
-    <div className="rounded-2xl border border-white/10 bg-white/5 p-5">
+    <div className="enhe-admin-card rounded-2xl border border-white/10 bg-white/5 p-5">
       <h3 className="text-base font-semibold text-[#E8EEF8]">{title}</h3>
       <p className="mt-3 text-sm leading-7 text-[var(--marketing-muted)]">{text}</p>
     </div>

@@ -2670,6 +2670,89 @@
   }
 }
 
+/* Admin card groups are read top-to-bottom so labels and actions keep room. */
+.enhe-admin-shell :is(
+  .enhe-admin-card-grid,
+  .enhe-admin-content-card-grid,
+  .enhe-admin-manual-grid,
+  .enhe-admin-keyword-preview-grid,
+  .enhe-admin-commerce-info-grid,
+  .enhe-admin-refund-order-facts,
+  .enhe-admin-refund-payment-facts,
+  .enhe-admin-refund-facts,
+  .enhe-admin-user-action-grid,
+  .enhe-admin-license-generator-panel
+) {
+  grid-template-columns: minmax(0, 1fr) !important;
+}
+
+.enhe-admin-shell .grid:not(.enhe-admin-container):has(> :is(.surface-panel, .surface-panel-soft, .glass, .admin-shell-card, article, [class*="-card"], .enhe-admin-card)) {
+  grid-template-columns: minmax(0, 1fr) !important;
+}
+
+/* Keep labels legible whenever an admin action or card uses the brand blue fill. */
+.enhe-admin-shell :is(
+  .enhe-admin-blue-card,
+  [class*="bg-[var(--marketing-accent)]"],
+  [class*="bg-[var(--blue-"],
+  [class*="bg-blue-"],
+  [class*="bg-sky-"],
+  [class*="bg-indigo-"],
+  [class*="bg-[#0462C2]"],
+  [class*="bg-[#0D3A6D]"],
+  [class*="bg-[#05509F]"],
+  [class*="bg-[#084584]"]
+) {
+  color: #fff !important;
+  -webkit-text-fill-color: #fff !important;
+}
+
+.enhe-admin-shell :is(
+  .enhe-admin-blue-card,
+  [class*="bg-[var(--marketing-accent)]"],
+  [class*="bg-[var(--blue-"],
+  [class*="bg-blue-"],
+  [class*="bg-sky-"],
+  [class*="bg-indigo-"],
+  [class*="bg-[#0462C2]"],
+  [class*="bg-[#0D3A6D]"],
+  [class*="bg-[#05509F]"],
+  [class*="bg-[#084584]"]
+) :is(h1, h2, h3, p, span, strong, small, label, li, a, button) {
+  color: #fff !important;
+  -webkit-text-fill-color: #fff !important;
+}
+
+.enhe-admin-shell :is(
+  [class*="bg-[var(--marketing-accent)]"],
+  [class*="bg-[var(--blue-"],
+  [class*="bg-blue-"],
+  [class*="bg-sky-"],
+  [class*="bg-indigo-"],
+  [class*="bg-[#0462C2]"],
+  [class*="bg-[#0D3A6D]"],
+  [class*="bg-[#05509F]"],
+  [class*="bg-[#084584]"]
+) [class*="bg-white"] {
+  color: var(--enhe-text) !important;
+  -webkit-text-fill-color: var(--enhe-text) !important;
+}
+
+.enhe-admin-shell :is(
+  [class*="bg-[var(--marketing-accent)]"],
+  [class*="bg-[var(--blue-"],
+  [class*="bg-blue-"],
+  [class*="bg-sky-"],
+  [class*="bg-indigo-"],
+  [class*="bg-[#0462C2]"],
+  [class*="bg-[#0D3A6D]"],
+  [class*="bg-[#05509F]"],
+  [class*="bg-[#084584]"]
+) [class*="bg-white"] :is(h1, h2, h3, p, span, strong, small, label, li) {
+  color: var(--enhe-text) !important;
+  -webkit-text-fill-color: var(--enhe-text) !important;
+}
+
 @media (forced-colors: active) {
   .enhe-admin-shell :is(.enhe-admin-comment-filter-form, .enhe-admin-file-filter-form, .enhe-admin-file-create-form, .enhe-admin-comment-card, .enhe-admin-file-card, .enhe-admin-file-upload-panel, .enhe-admin-file-storage-diagnostics, .enhe-admin-manual-card) {
     border-color: CanvasText;

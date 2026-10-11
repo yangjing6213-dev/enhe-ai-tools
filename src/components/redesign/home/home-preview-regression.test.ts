@@ -135,7 +135,7 @@ describe("bilingual homepage candidate preview", () => {
     expect(render.indexOf("<EnheRedesignProductShowcase")).toBeLessThan(render.indexOf("<EnheRedesignExperienceReviews"));
     expect(render).toContain("<EnheRedesignHero locale={locale} />");
     expect(render).toContain("<EnheRedesignProductShowcase locale={locale} />");
-    expect(render).toContain("<EnheRedesignExperienceReviews locale={locale} />");
+    expect(render).toContain("<EnheRedesignExperienceReviews locale={locale} featuredComments={featuredComments} />");
     expect(render).not.toContain("<EnheRedesignBrandValue");
     expect(readCandidate("components/redesign/enhe-redesign-footer.tsx")).toContain("<EnheRedesignBrandValue locale={locale} />");
     expect(home).not.toContain("LOCAL CANDIDATE");

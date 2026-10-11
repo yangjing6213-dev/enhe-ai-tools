@@ -64,7 +64,7 @@ export function ToolProductImageManager({
         return (
           <div
             key={image.id}
-            className={`group overflow-hidden rounded-2xl border border-white/10 bg-[#07101E] transition ${image.keep ? "" : "opacity-55"}`}
+            className={`enhe-admin-card group overflow-hidden rounded-2xl border border-white/10 bg-[#07101E] transition ${image.keep ? "" : "opacity-55"}`}
           >
             {image.keep ? <input type="hidden" name="existingScreenshots" value={image.src} /> : null}
             <div className="relative aspect-[4/3] overflow-hidden">

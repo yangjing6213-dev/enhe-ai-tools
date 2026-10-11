@@ -118,9 +118,9 @@ export default async function AdminDashboardPage() {
           <h2 className="text-xl font-semibold">{t.funnelTitle}</h2>
           <span className="text-xs text-[#8B95A7]">{t.funnelNote}</span>
         </div>
-        <div className="mt-5 grid gap-3 md:grid-cols-7">
+        <div className="enhe-admin-card-grid mt-5 grid gap-3 md:grid-cols-7">
           {analyticsFunnel.map((row) => (
-            <div key={row.eventName} className="min-w-0 rounded-2xl border border-white/10 bg-white/6 p-4">
+            <div key={row.eventName} className="enhe-admin-card min-w-0 rounded-2xl border border-white/10 bg-white/6 p-4">
               <p className="text-sm font-semibold text-[#E8EEF8]">{t.funnelLabels[row.eventName]}</p>
               <p className="mt-3 text-3xl font-semibold text-[var(--marketing-accent)]">{row.count}</p>
               <div className="mt-4 h-2 overflow-hidden rounded-full bg-white/10">

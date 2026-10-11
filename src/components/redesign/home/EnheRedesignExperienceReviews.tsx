@@ -1,9 +1,10 @@
 "use client";
 
 import Image from "next/image";
-import { Pause, Play } from "lucide-react";
+import { Pause, Play, UserRound } from "lucide-react";
 import { useEffect, useRef, useState, type KeyboardEvent } from "react";
 import type { RedesignLocale } from "@/components/redesign/types";
+import type { HomepageCommentCard } from "@/lib/redesign/home/homepage-comment-display";
 import {
   HOME_REVIEWS,
   REVIEW_AUTO_INTERVAL_MS,
@@ -43,8 +44,7 @@ type ReviewTimerActions = {
 
 const REVIEW_DRAG_THRESHOLD_PX = 35;
 
-function getReviewOffset(index: number, activeIndex: number) {
-  const count = HOME_REVIEWS.length;
+function getReviewOffset(index: number, activeIndex: number, count: number) {
   const half = Math.floor(count / 2);
   const rawOffset = index - activeIndex;
 
@@ -53,8 +53,32 @@ function getReviewOffset(index: number, activeIndex: number) {
   return rawOffset;
 }
 
-export function EnheRedesignExperienceReviews({ locale }: { locale: RedesignLocale }) {
+export function EnheRedesignExperienceReviews({
+  locale,
+  featuredComments = []
+}: {
+  locale: RedesignLocale;
+  featuredComments?: readonly HomepageCommentCard[];
+}) {
   const copy = { ...HOME_COPY[locale].review, ...REVIEW_COPY[locale] };
+  const featuredReviewCards = featuredComments;
+  const reviews = featuredReviewCards.length
+    ? featuredReviewCards
+    : HOME_REVIEWS.map((review) => ({
+        id: review.productId,
+        displayName: review.displayName[locale],
+        productLabel: review.productLabel[locale],
+        quote: review.quote[locale],
+        avatarSrc: review.avatarSrc,
+        avatarAlt: review.avatarAlt[locale],
+        stars: review.stars
+      }));
+  const reviewCount = reviews.length;
+  const disclosure = featuredReviewCards.length
+    ? locale === "zh"
+      ? "以下评论由用户提交并经审核后展示。"
+      : "These user-submitted comments were reviewed before being featured."
+    : copy.disclosure;
   const reviewSectionRef = useRef<HTMLElement | null>(null);
   const timerActionsRef = useRef<ReviewTimerActions | null>(null);
   const focusPausedRef = useRef(false);
@@ -66,7 +90,7 @@ export function EnheRedesignExperienceReviews({ locale }: { locale: RedesignLoca
 
   const move = (delta: -1 | 1, modality: "pointer" | "keyboard") => {
     setMotionModality(modality);
-    setIndex((current) => (current + delta + HOME_REVIEWS.length) % HOME_REVIEWS.length);
+    setIndex((current) => (current + delta + reviewCount) % reviewCount);
     timerActionsRef.current?.scheduleManualResume();
   };
 
@@ -133,7 +157,7 @@ export function EnheRedesignExperienceReviews({ locale }: { locale: RedesignLoca
       }
       intervalId = window.setInterval(() => {
         setMotionModality("automatic");
-        setIndex((current) => (current + 1) % HOME_REVIEWS.length);
+        setIndex((current) => (current + 1) % reviewCount);
       }, REVIEW_AUTO_INTERVAL_MS);
       setAutoRotationState(true);
     };
@@ -198,7 +222,7 @@ export function EnheRedesignExperienceReviews({ locale }: { locale: RedesignLoca
         if (Math.abs(deltaX) > REVIEW_DRAG_THRESHOLD_PX) {
           const direction: -1 | 1 = deltaX > 0 ? -1 : 1;
           setMotionModality("pointer");
-          setIndex((current) => (current + direction + HOME_REVIEWS.length) % HOME_REVIEWS.length);
+          setIndex((current) => (current + direction + reviewCount) % reviewCount);
           scheduleManualResume();
         }
       }
@@ -275,7 +299,7 @@ export function EnheRedesignExperienceReviews({ locale }: { locale: RedesignLoca
       document.removeEventListener("visibilitychange", handleVisibilityChange);
       mediaQuery.removeEventListener("change", handleReducedMotionChange);
     };
-  }, []);
+  }, [reviewCount]);
 
   return (
     <section
@@ -318,42 +342,50 @@ export function EnheRedesignExperienceReviews({ locale }: { locale: RedesignLoca
             )}
           </button>
         </div>
-        <p className="redesign-home-reviews-disclosure">{copy.disclosure}</p>
+        <p className="redesign-home-reviews-disclosure">{disclosure}</p>
         <div className="redesign-home-reviews-window">
           <div
             className="redesign-home-reviews-track"
             aria-live={isAutoRotating ? "off" : "polite"}
           >
-            {HOME_REVIEWS.map((review, reviewIndex) => {
-              const offset = getReviewOffset(reviewIndex, index);
+            {reviews.map((review, reviewIndex) => {
+              const offset = getReviewOffset(reviewIndex, index % reviewCount, reviewCount);
               const isActive = offset === 0;
 
               return (
                 <article
-                  key={review.productId}
+                  key={review.id}
                   className="redesign-home-review-card"
                   data-active={isActive}
                   data-position={offset}
                   aria-hidden={!isActive}
-                  aria-label={`${review.productLabel[locale]} — ${copy.heading}`}
+                  aria-label={`${review.productLabel} — ${copy.heading}`}
                 >
                   <div className="redesign-home-review-top">
-                    <Image
-                      className="redesign-home-review-avatar"
-                      src={review.avatarSrc}
-                      alt={review.avatarAlt[locale]}
-                      width={56}
-                      height={56}
-                    />
+                    {review.avatarSrc && review.avatarAlt ? (
+                      <Image
+                        className="redesign-home-review-avatar"
+                        src={review.avatarSrc}
+                        alt={review.avatarAlt}
+                        width={56}
+                        height={56}
+                      />
+                    ) : (
+                      <span className="redesign-home-review-avatar-placeholder" aria-hidden="true">
+                        <UserRound size={24} />
+                      </span>
+                    )}
                     <div className="redesign-home-review-person">
-                      <strong>{review.displayName[locale]}</strong>
-                      <span>{review.productLabel[locale]}</span>
+                      <strong>{review.displayName}</strong>
+                      <span>{review.productLabel}</span>
                     </div>
-                    <span className="redesign-home-review-stars" aria-label={copy.stars(review.stars)}>
-                      {"★".repeat(review.stars)}{"☆".repeat(5 - review.stars)}
-                    </span>
+                    {review.stars ? (
+                      <span className="redesign-home-review-stars" aria-label={copy.stars(review.stars)}>
+                        {"★".repeat(review.stars)}{"☆".repeat(5 - review.stars)}
+                      </span>
+                    ) : null}
                   </div>
-                  <blockquote>{review.quote[locale]}</blockquote>
+                  <blockquote>{review.quote}</blockquote>
                 </article>
               );
             })}

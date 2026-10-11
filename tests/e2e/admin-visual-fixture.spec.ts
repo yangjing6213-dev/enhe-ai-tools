@@ -722,3 +722,37 @@ test("Admin content editors and remaining lists fit mobile screens", async ({ pa
   await expect(page.locator(".enhe-admin-manual-card").first()).toBeVisible();
   expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBe(true);
 });
+
+test("Admin dashboard cards stack vertically, blue actions stay legible, and approved comments have a display control", async ({ page }) => {
+  await page.setViewportSize({ width: 1440, height: 1000 });
+  await page.goto("/admin", { waitUntil: "load" });
+  const dashboardCards = page.locator(".enhe-admin-shell .grid:has(> .surface-panel)").first();
+  await expect(dashboardCards).toBeVisible();
+  const dashboardColumnCount = await dashboardCards.evaluate((element) =>
+    getComputedStyle(element).gridTemplateColumns.trim().split(/\s+/).length
+  );
+  expect(dashboardColumnCount).toBe(1);
+
+  await page.goto("/admin/software", { waitUntil: "load" });
+  const createProduct = page.locator('a[href="/admin/software/new"]');
+  await expect(createProduct).toBeVisible();
+  await expect(createProduct).toHaveCSS("color", "rgb(255, 255, 255)");
+
+  await page.goto("/admin/comments", { waitUntil: "load" });
+  await expect(page.locator(".enhe-admin-comment-card").first()).toContainText("Local visual fixture comment only.");
+  await expect(page.getByRole("button", { name: "展示" })).toBeVisible();
+
+  await page.goto("/admin/manuals", { waitUntil: "load" });
+  const manualCards = page.locator(".enhe-admin-manual-grid");
+  await expect(manualCards).toBeVisible();
+  const manualColumnCount = await manualCards.evaluate((element) =>
+    getComputedStyle(element).gridTemplateColumns.trim().split(/\s+/).length
+  );
+  expect(manualColumnCount).toBe(1);
+
+  diagnostics.get(page)?.expectedBlockedWrites.add("POST /api/analytics");
+  diagnostics.get(page)?.expectedConsoleErrors.add("Failed to load resource: net::ERR_FAILED");
+  await page.goto("/", { waitUntil: "load" });
+  await expect(page.getByText("Local visual homepage comment only.", { exact: true })).toBeVisible();
+  await expect(page.getByText("visual-user@localhost.invalid", { exact: true })).toHaveCount(0);
+});

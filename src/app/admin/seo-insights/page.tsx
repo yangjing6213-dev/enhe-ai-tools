@@ -321,7 +321,7 @@ function EmptyNote({ text }: { text: string }) {
 
 function ToolNote({ title, text }: { title: string; text: string }) {
   return (
-    <div className="rounded-2xl border border-white/10 bg-white/5 p-5">
+    <div className="enhe-admin-card rounded-2xl border border-white/10 bg-white/5 p-5">
       <h3 className="text-base font-semibold text-[#E8EEF8]">{title}</h3>
       <p className="mt-3 text-sm leading-7 text-[var(--marketing-muted)]">{text}</p>
     </div>

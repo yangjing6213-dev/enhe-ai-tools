@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { updateCommentPinAction, updateCommentStatusAction } from "@/app/actions";
+import { updateCommentHomepageDisplayAction, updateCommentPinAction, updateCommentStatusAction } from "@/app/actions";
 import { AdminContentShell, SubmitButton, inputClass, selectClass } from "@/app/admin/admin-ui";
 import { buildAdminCommentPageHref, buildAdminCommentWhere, parseAdminCommentListParams } from "@/lib/admin-list";
 import { prisma } from "@/lib/db";
@@ -28,6 +28,9 @@ const copy = {
     pin: "置顶",
     unpin: "取消置顶",
     pinnedSuffix: "已置顶",
+    display: "展示",
+    hide: "取消展示",
+    displayedSuffix: "已展示到首页",
     empty: "暂无匹配评论。",
     status: {
       pending: "待审核",
@@ -54,6 +57,9 @@ const copy = {
     pin: "Pin",
     unpin: "Unpin",
     pinnedSuffix: "Pinned",
+    display: "Show on home",
+    hide: "Hide from home",
+    displayedSuffix: "Shown on home",
     empty: "No matching comments.",
     status: {
       pending: "Pending",
@@ -128,12 +134,26 @@ export default async function AdminCommentsPage({ searchParams }: AdminCommentsP
             <p className="text-sm text-[#8B95A7]">
               {comment.tool.name} · {comment.user.email ?? comment.user.phone ?? comment.user.id ?? t.userFallback} · {statusLabel(comment.status, locale)}
               {comment.isPinned ? ` · ${t.pinnedSuffix}` : ""}
+              {comment.showOnHomepage ? ` · ${t.displayedSuffix}` : ""}
             </p>
             <p className="mt-3 leading-7">{comment.content}</p>
             <div className="enhe-admin-comment-actions mt-5 flex flex-wrap gap-3">
               <CommentStatusForm id={comment.id} status="approved" label={t.approve} primary />
               <CommentStatusForm id={comment.id} status="rejected" label={t.reject} />
               <CommentStatusForm id={comment.id} status="deleted" label={t.delete} />
+              {comment.status === "approved" ? (
+                <form action={updateCommentHomepageDisplayAction}>
+                  <input type="hidden" name="id" value={comment.id} />
+                  <input type="hidden" name="showOnHomepage" value={String(!comment.showOnHomepage)} />
+                  <SubmitButton
+                    variant={comment.showOnHomepage ? "secondary" : "primary"}
+                    pendingLabel={locale === "zh" ? "处理中..." : "Processing..."}
+                    className="px-5 py-2 text-sm"
+                  >
+                    {comment.showOnHomepage ? t.hide : t.display}
+                  </SubmitButton>
+                </form>
+              ) : null}
               <form action={updateCommentPinAction}>
                 <input type="hidden" name="id" value={comment.id} />
                 <input type="hidden" name="isPinned" value={comment.isPinned ? "false" : "true"} />

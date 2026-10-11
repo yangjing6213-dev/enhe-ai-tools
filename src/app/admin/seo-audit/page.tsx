@@ -39,9 +39,9 @@ export default async function AdminSeoAuditPage({ searchParams }: PageProps) {
         <Metric label={t.deliveryRate} value={`${dashboard.operations.paidReportDeliveryRate}%`} warn={dashboard.operations.paidReportDeliveryRate < 95} />
       </div>
 
-      <div className="mt-6 grid gap-6 xl:grid-cols-2">
+      <div className="enhe-admin-card-grid mt-6 grid gap-6 xl:grid-cols-2">
         <Panel title={t.funnel}>
-          <div className="grid gap-3 md:grid-cols-3">
+          <div className="enhe-admin-card-grid grid gap-3 md:grid-cols-3">
             {dashboard.funnel.map((step) => (
               <div key={step.stage} className="rounded-lg border border-white/10 bg-white/5 p-4">
                 <p className="text-xs font-semibold uppercase text-[#8B95A7]">{t.funnelStages[step.stage]}</p>
@@ -65,7 +65,7 @@ export default async function AdminSeoAuditPage({ searchParams }: PageProps) {
         </Panel>
       </div>
 
-      <div className="mt-6 grid gap-6 xl:grid-cols-2">
+      <div className="enhe-admin-card-grid mt-6 grid gap-6 xl:grid-cols-2">
         <Panel title={t.workers}>
           <div className="overflow-x-auto">
             <table className="w-full min-w-[620px] text-left text-sm">
@@ -167,11 +167,11 @@ function Notice({ params, locale }: { params: { result?: string; error?: string 
 
 function Metric({ label, value, accent = false, warn = false }: { label: string; value: string | number; accent?: boolean; warn?: boolean }) {
   const color = warn ? "text-[#FFB86B]" : accent ? "text-[#48F5D3]" : "text-[#E8EEF8]";
-  return <div className="rounded-lg border border-white/10 bg-white/6 p-5"><p className="text-sm text-[#8B95A7]">{label}</p><p className={"mt-3 text-3xl font-semibold " + color}>{value}</p></div>;
+  return <div className="enhe-admin-card rounded-lg border border-white/10 bg-white/6 p-5"><p className="text-sm text-[#8B95A7]">{label}</p><p className={"mt-3 text-3xl font-semibold " + color}>{value}</p></div>;
 }
 
 function Panel({ title, children, className = "" }: { title: string; children: ReactNode; className?: string }) {
-  return <section className={"rounded-lg border border-white/10 bg-white/6 p-5 " + className}><h2 className="text-lg font-semibold text-[#E8EEF8]">{title}</h2><div className="mt-4">{children}</div></section>;
+  return <section className={"enhe-admin-card rounded-lg border border-white/10 bg-white/6 p-5 " + className}><h2 className="text-lg font-semibold text-[#E8EEF8]">{title}</h2><div className="mt-4">{children}</div></section>;
 }
 
 function EmptyRow({ colSpan, label }: { colSpan: number; label: string }) {
