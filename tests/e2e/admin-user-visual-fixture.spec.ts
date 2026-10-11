@@ -196,6 +196,7 @@ test("User center exposes username and avatar controls without submitting change
   await expect(avatar).toHaveAttribute("src", "/api/uploads/user-avatars/local-visual-avatar.png");
   await expect.poll(() => avatar.evaluate((image) => (image as HTMLImageElement).naturalWidth)).toBe(64);
   await expect(page.locator(".user-center-page button[data-variant='default']").first()).toHaveCSS("color", "rgb(255, 255, 255)");
+  await expect(page.locator(".user-center-page button[data-variant='default']").first()).toHaveCSS("-webkit-text-fill-color", "rgb(255, 255, 255)");
   await expect(page.locator("#profile-avatar")).toHaveAttribute("accept", "image/png,image/jpeg,image/webp");
   await expect(page.locator("#profile-avatar").locator("xpath=ancestor::form")).toHaveAttribute("enctype", "multipart/form-data");
 });

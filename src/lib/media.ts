@@ -7,7 +7,15 @@ export function normalizeImageSrc(value?: string | null) {
   if (!value) return null;
   const trimmed = value.trim();
   if (!trimmed) return null;
-  if (/^https?:\/\//i.test(trimmed)) return trimmed;
+  if (/^https?:\/\//i.test(trimmed)) {
+    try {
+      const url = new URL(trimmed);
+      const localUploadSrc = normalizeLocalUploadSrc(url.pathname);
+      return localUploadSrc ? `${localUploadSrc}${url.search}${url.hash}` : trimmed;
+    } catch {
+      return trimmed;
+    }
+  }
 
   const localUploadSrc = normalizeLocalUploadSrc(trimmed);
   if (localUploadSrc) return localUploadSrc;
@@ -41,7 +49,7 @@ export function isLikelyUploadableVideo(file: File | null | undefined) {
 }
 
 function normalizeLocalUploadSrc(value: string) {
-  const normalized = value.replace(/\\/g, "/").replace(/^\/+/, "");
+  const normalized = value.replace(/\\/g, "/").replace(/^\/+/, "").split(/[?#]/, 1)[0] ?? "";
   if (!normalized.startsWith("uploads/")) return null;
 
   const safePath = normalized

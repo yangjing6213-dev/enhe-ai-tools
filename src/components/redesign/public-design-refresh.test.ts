@@ -77,7 +77,8 @@ describe("ENHE public visual refresh contract", () => {
     expect(userPage).toContain("normalizeImageSrc(user.avatar)");
     expect(refreshStyles).toMatch(/\.enhe-redesign-production \.enhe-auth-page::before\s*\{[^}]*display:\s*none/);
     expect(refreshStyles).toMatch(/\.enhe-redesign-production \.enhe-auth-page \.login-submit-button[\s\S]*?-webkit-text-fill-color:\s*#fff\s*!important/);
-    expect(accountStyles).toMatch(/\.enhe-account-shell \.user-center-page[\s\S]*?-webkit-text-fill-color:\s*#fff\s*!important/);
+    expect(accountStyles).toMatch(/\.enhe-redesign-production \.user-center-page :is\(button\[data-variant="default"\][\s\S]*?-webkit-text-fill-color:\s*#fff\s*!important/);
+    expect(accountStyles).toContain('button[data-variant="outline"]:not(:disabled)');
     expect(footer).toContain('<nav className="footer-social-links"');
     expect(refreshStyles).toMatch(/@media \(width >= 1280px\)[\s\S]*?\.redesign-footer \.footer-grid\s*\{[^}]*min-height:\s*192px/);
   });

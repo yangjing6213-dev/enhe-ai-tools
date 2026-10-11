@@ -11,6 +11,12 @@ describe("media helpers", () => {
   it("normalizes runtime upload image paths through the upload API", () => {
     expect(normalizeImageSrc("uploads/proof.jpg")).toBe("/api/uploads/proof.jpg");
     expect(normalizeImageSrc("/uploads/proof.jpg")).toBe("/api/uploads/proof.jpg");
+    expect(normalizeImageSrc("https://www.enhe-tech.com.cn/uploads/user-avatars/avatar.png")).toBe(
+      "/api/uploads/user-avatars/avatar.png"
+    );
+    expect(normalizeImageSrc("https://www.enhe-tech.com.cn/uploads/user-avatars/avatar.png?v=2")).toBe(
+      "/api/uploads/user-avatars/avatar.png?v=2"
+    );
   });
 
   it("normalizes media URLs without stripping upload subdirectories", () => {

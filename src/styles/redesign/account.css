@@ -1,4 +1,4 @@
-.enhe-account-shell .user-center-page {
+.enhe-redesign-production .user-center-page {
   --marketing-bg: var(--enhe-page-bg);
   --marketing-bg-soft: var(--enhe-surface-elevated);
   --marketing-bg-warm: var(--enhe-surface-elevated);
@@ -16,11 +16,11 @@
   font-family: var(--enhe-font-zh);
 }
 
-.enhe-account-shell:lang(en) .user-center-page {
+.enhe-redesign-production:lang(en) .user-center-page {
   font-family: var(--enhe-font-en);
 }
 
-.enhe-account-shell .user-center-page .user-center-panel {
+.enhe-redesign-production .user-center-page .user-center-panel {
   border: 1px solid var(--enhe-border);
   border-radius: var(--enhe-card-r);
   background: var(--enhe-surface);
@@ -30,7 +30,7 @@
     box-shadow var(--enhe-motion-panel) var(--enhe-ease-ui-move);
 }
 
-.enhe-account-shell .user-center-page .user-center-record {
+.enhe-redesign-production .user-center-page .user-center-record {
   border-color: var(--enhe-border);
   background: var(--enhe-surface-elevated);
   color: var(--enhe-text);
@@ -40,23 +40,23 @@
     transform var(--enhe-motion-panel) var(--enhe-ease-ui-move);
 }
 
-.enhe-account-shell .user-center-page .user-center-notification--unread {
+.enhe-redesign-production .user-center-page .user-center-notification--unread {
   border-color: color-mix(in srgb, var(--enhe-action) 45%, var(--enhe-border));
   background: color-mix(in srgb, var(--enhe-action) 8%, var(--enhe-surface));
 }
 
-.enhe-account-shell .user-center-page .user-center-setting-option {
+.enhe-redesign-production .user-center-page .user-center-setting-option {
   border-color: var(--enhe-border);
   background: var(--enhe-surface-elevated);
 }
 
-.enhe-account-shell .user-center-page .user-center-badge {
+.enhe-redesign-production .user-center-page .user-center-badge {
   border-color: var(--enhe-border);
   background: var(--enhe-surface);
   color: var(--enhe-text-muted);
 }
 
-.enhe-account-shell .user-center-page .user-center-action {
+.enhe-redesign-production .user-center-page .user-center-action {
   display: inline-flex;
   min-height: 40px;
   align-items: center;
@@ -76,7 +76,7 @@
     transform var(--enhe-motion-fast) var(--enhe-ease-ui-move);
 }
 
-.enhe-account-shell .user-center-page .user-center-action--primary {
+.enhe-redesign-production .user-center-page .user-center-action--primary {
   min-height: 48px;
   border-color: var(--enhe-action);
   border-radius: var(--enhe-button-r);
@@ -86,12 +86,12 @@
   padding: 0.75rem 1.25rem;
 }
 
-.enhe-account-shell .user-center-page .user-center-action--compact {
+.enhe-redesign-production .user-center-page .user-center-action--compact {
   min-height: 34px;
   padding: 0.35rem 0.75rem;
 }
 
-.enhe-account-shell .user-center-page button:not(:disabled) {
+.enhe-redesign-production .user-center-page button:not(:disabled) {
   border-color: var(--enhe-action);
   background-color: var(--enhe-action);
   color: #fff;
@@ -102,18 +102,18 @@
     transform var(--enhe-motion-fast) var(--enhe-ease-ui-move);
 }
 
-.enhe-account-shell .user-center-page button[class*="border"]:not(:disabled) {
+.enhe-redesign-production .user-center-page button[data-variant="outline"]:not(:disabled) {
   border-color: var(--enhe-border);
   background-color: var(--enhe-surface-elevated);
   color: var(--enhe-text);
 }
 
-.enhe-account-shell .user-center-page :is(button[data-variant="default"], .user-center-action--primary) {
+.enhe-redesign-production .user-center-page :is(button[data-variant="default"], .user-center-action--primary) {
   color: #fff !important;
   -webkit-text-fill-color: #fff !important;
 }
 
-.enhe-account-shell .user-center-page .user-center-password-input button:not(:disabled) {
+.enhe-redesign-production .user-center-page .user-center-password-input button:not(:disabled) {
   border: 0;
   background: transparent;
   box-shadow: none;
@@ -121,7 +121,7 @@
   padding: 0;
 }
 
-.enhe-account-shell .user-center-page .user-center-password-input button:hover {
+.enhe-redesign-production .user-center-page .user-center-password-input button:hover {
   border-color: transparent;
   background: var(--enhe-surface-elevated);
   box-shadow: none;
@@ -129,70 +129,70 @@
   transform: none;
 }
 
-.enhe-account-shell .user-center-page :is(.form-control-dark, .form-select-dark) {
+.enhe-redesign-production .user-center-page :is(.form-control-dark, .form-select-dark) {
   border-color: var(--enhe-border);
   background-color: var(--enhe-surface);
   color: var(--enhe-text);
   color-scheme: light;
 }
 
-.enhe-account-shell .user-center-page .form-control-dark::placeholder {
+.enhe-redesign-production .user-center-page .form-control-dark::placeholder {
   color: var(--enhe-text-muted);
   opacity: 1;
 }
 
-.enhe-account-shell .user-center-page :is(input, select, textarea):focus-visible,
-.enhe-account-shell .user-center-page :is(button, a):focus-visible {
+.enhe-redesign-production .user-center-page :is(input, select, textarea):focus-visible,
+.enhe-redesign-production .user-center-page :is(button, a):focus-visible {
   outline: 3px solid var(--enhe-focus);
   outline-offset: 2px;
   box-shadow: 0 0 0 5px var(--enhe-text);
 }
 
-.enhe-account-shell .user-center-page .status-success {
+.enhe-redesign-production .user-center-page .status-success {
   border: 1px solid #a8cab6;
   background: #eaf4ed;
   color: #1c5636;
 }
 
-.enhe-account-shell .user-center-page .status-warning {
+.enhe-redesign-production .user-center-page .status-warning {
   border: 1px solid #e6d3a1;
   background: #fbf4e3;
   color: #714c0a;
 }
 
-.enhe-account-shell .user-center-page .status-danger {
+.enhe-redesign-production .user-center-page .status-danger {
   border: 1px solid #dfb2ba;
   background: #f8eaec;
   color: #8f1d2d;
 }
 
 @media (hover: hover) and (prefers-reduced-motion: no-preference) {
-  .enhe-account-shell .user-center-page .user-center-panel:hover {
+  .enhe-redesign-production .user-center-page .user-center-panel:hover {
     border-color: color-mix(in srgb, var(--enhe-action) 40%, var(--enhe-border));
     box-shadow: 0 16px 36px rgba(7, 21, 18, 0.12);
   }
 
-  .enhe-account-shell .user-center-page .user-center-record:hover {
+  .enhe-redesign-production .user-center-page .user-center-record:hover {
     border-color: color-mix(in srgb, var(--enhe-action) 52%, var(--enhe-border));
     box-shadow: 0 8px 20px rgba(7, 21, 18, 0.08);
     transform: translateY(-2px);
   }
 
-  .enhe-account-shell .user-center-page :is(button, .user-center-action):hover {
+  .enhe-redesign-production .user-center-page :is(button, .user-center-action):hover {
     border-color: var(--enhe-action-hover);
     box-shadow: 0 7px 16px rgba(7, 21, 18, 0.12);
     transform: translateY(-1px);
   }
 
-  .enhe-account-shell .user-center-page .user-center-action--primary:hover,
-  .enhe-account-shell .user-center-page button:not([class*="border"]):hover {
+  .enhe-redesign-production .user-center-page .user-center-action--primary:hover,
+  .enhe-redesign-production .user-center-page button[data-variant="default"]:not(:disabled):hover {
     background-color: var(--enhe-action-hover);
     color: #fff;
   }
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .enhe-account-shell .user-center-page :is(
+  .enhe-redesign-production .user-center-page :is(
       button,
       .user-center-action,
       .user-center-panel,
