@@ -94,6 +94,8 @@ export function middleware(request: NextRequest) {
   }
 
   const isExplicitEnglishPath = isEnglishPath;
+  // Geo and browser-language detection applies to this request only. The language
+  // switch persists a manual choice; the legacy locale query is an explicit choice too.
   const localePreference = isLocalizedPublicPath(pathname) &&
     !isExplicitEnglishPath
     ? getRequestLocalePreference(cookieLocale, request.headers)
@@ -112,11 +114,6 @@ export function middleware(request: NextRequest) {
       );
       response.headers.set("Cache-Control", localeDetectionCacheControl);
       response.headers.set("Vary", localeDetectionVaryHeader);
-      response.cookies.set(localeCookieName, localePreference, {
-        path: "/",
-        maxAge: localeCookieMaxAge,
-        sameSite: "lax"
-      });
       return response;
     }
   }
@@ -137,6 +134,13 @@ export function middleware(request: NextRequest) {
       headers: requestHeaders
     }
   });
+  if (isRedesignPreviewPath && requestedLocale) {
+    response.cookies.set(localeCookieName, requestedLocale, {
+      path: "/",
+      maxAge: localeCookieMaxAge,
+      sameSite: "lax"
+    });
+  }
   const isLanguageNeutralMachinePath =
     pathname === "/robots.txt" || pathname === "/sitemap.xml";
   const contentLanguage =
@@ -150,30 +154,6 @@ export function middleware(request: NextRequest) {
 
   if (!isLanguageNeutralMachinePath) {
     response.headers.set("Content-Language", contentLanguage);
-  }
-
-  if (localePreference && cookieLocale !== localePreference) {
-    response.headers.set("Cache-Control", localeDetectionCacheControl);
-    response.headers.set("Vary", localeDetectionVaryHeader);
-    response.cookies.set(localeCookieName, localePreference, {
-      path: "/",
-      maxAge: localeCookieMaxAge,
-      sameSite: "lax"
-    });
-  }
-
-  if (isEnglishPath && cookieLocale !== "en") {
-    response.cookies.set(localeCookieName, "en", {
-      path: "/",
-      maxAge: localeCookieMaxAge,
-      sameSite: "lax"
-    });
-  } else if (isChinesePublicPath && cookieLocale === "en") {
-    response.cookies.set(localeCookieName, "zh", {
-      path: "/",
-      maxAge: localeCookieMaxAge,
-      sameSite: "lax"
-    });
   }
 
   return response;

@@ -1100,7 +1100,7 @@ test("home product stage and mobile navigation preserve latest state across navi
     page.locator('.redesign-mobile-actions .redesign-language-switch a[lang="en"]').click(),
   ]);
   await page.goBack({ waitUntil: "domcontentloaded" });
-  await expect(page).toHaveURL(/\/$/);
+  await expect(page).toHaveURL(/\/en$/);
   await expect(currentProduct(page)).toHaveCount(1);
   await expect(currentProduct(page)).toHaveAttribute("data-product-id", "ultimate-edition");
   await expect(page.locator('[data-product-previous="true"]')).toHaveCount(0);

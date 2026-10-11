@@ -3,7 +3,7 @@ import { describe, expect, it } from "vitest";
 import { middleware } from "@/middleware";
 
 describe("locale switch redirects", () => {
-  it("automatically follows country language on a localized deep link for first-time visitors", () => {
+  it("automatically follows country language without saving it as a manual choice", () => {
     const response = middleware(
       new NextRequest("https://www.enhe-tech.com.cn/software", {
         headers: { "cf-ipcountry": "US", "user-agent": "Mozilla/5.0" },
@@ -12,7 +12,18 @@ describe("locale switch redirects", () => {
 
     expect(response.status).toBe(307);
     expect(response.headers.get("location")).toBe("https://www.enhe-tech.com.cn/en/software");
-    expect(response.headers.get("set-cookie")).toContain("enhe_locale=en");
+    expect(response.headers.get("set-cookie")).toBeNull();
+  });
+
+  it("does not save an automatically detected Chinese locale", () => {
+    const response = middleware(
+      new NextRequest("https://www.enhe-tech.com.cn/software", {
+        headers: { "cf-ipcountry": "CN", "user-agent": "Mozilla/5.0" },
+      }),
+    );
+
+    expect(response.status).toBe(200);
+    expect(response.headers.get("set-cookie")).toBeNull();
   });
 
   it("preserves an explicit English URL until the visitor has saved a language choice", () => {
