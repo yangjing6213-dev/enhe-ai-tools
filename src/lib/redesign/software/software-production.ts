@@ -87,11 +87,14 @@ const leafCategoryIds = new Set<SoftwareCategoryId>(
 
 export function parseSoftwareCatalogSearchParams(
   searchParams: SoftwareCatalogSearchParams,
-): { page: number; category: SoftwareLeafCategoryId | undefined } | null {
+): { page: number; category: SoftwareLeafCategoryId | undefined; q?: string } | null {
   const rawPage = searchParams.page;
   const rawCategory = searchParams.category;
+  const rawQuery = searchParams.q;
 
-  if (Array.isArray(rawPage) || Array.isArray(rawCategory)) return null;
+  if (Array.isArray(rawPage) || Array.isArray(rawCategory) || Array.isArray(rawQuery)) return null;
+  const q = rawQuery?.trim();
+  if (q && q.length > 200) return null;
 
   const normalizedPage = rawPage?.trim();
   const page = normalizedPage ? Number(normalizedPage) : 1;
@@ -119,6 +122,7 @@ export function parseSoftwareCatalogSearchParams(
       normalizedCategory && normalizedCategory !== "all"
         ? normalizedCategory
         : undefined,
+    ...(q ? { q } : {}),
   };
 }
 
@@ -127,18 +131,29 @@ export function buildSoftwareCatalogPage({
   locale,
   category,
   page,
+  q,
 }: {
   rows: PublicSoftwareCatalogRow[];
   locale: RedesignLocale;
   category?: SoftwareLeafCategoryId;
   page: number;
+  q?: string;
 }): SoftwareCatalogPage | null {
   if (!Number.isSafeInteger(page) || page < 1) return null;
 
+  const normalizedQuery = q?.trim().toLocaleLowerCase(locale === "en" ? "en-US" : "zh-CN");
   const publicRows = rows
     .filter((row) => isVisibleInLocale(row, locale))
     .map((row) => ({ row, categoryId: resolveSoftwareCatalogCategory(row) }))
     .filter((entry) => !category || entry.categoryId === category)
+    .filter(({ row, categoryId }) => !normalizedQuery || [
+      row.name,
+      row.englishName,
+      buildLocalizedToolPreviewText({ ...row, categoryName: row.category?.name }, locale),
+      row.category?.name,
+      ...buildToolCardHighlights(row, locale),
+      SOFTWARE_CATEGORIES.find((category) => category.id === categoryId)?.label[locale],
+    ].filter(Boolean).some((value) => value!.toLocaleLowerCase(locale === "en" ? "en-US" : "zh-CN").includes(normalizedQuery)))
     .sort(compareCatalogRows);
   const total = publicRows.length;
   const totalPages = Math.ceil(total / SOFTWARE_CATALOG_PAGE_SIZE);
@@ -171,9 +186,9 @@ export function buildSoftwareCatalogPage({
     hasPrevious,
     hasNext,
     previousHref: hasPrevious
-      ? buildCatalogHref(locale, category, page - 1)
+      ? buildCatalogHref(locale, category, page - 1, q)
       : null,
-    nextHref: hasNext ? buildCatalogHref(locale, category, page + 1) : null,
+    nextHref: hasNext ? buildCatalogHref(locale, category, page + 1, q) : null,
   };
 }
 
@@ -181,15 +196,17 @@ export async function getProductionSoftwareCatalog({
   locale,
   category,
   page,
+  q,
 }: {
   locale: RedesignLocale;
   category?: SoftwareLeafCategoryId;
   page: number;
+  q?: string;
 }) {
   const { getPublicSoftwareCatalogRows } = await import("@/lib/public-content");
   const rows = await getPublicSoftwareCatalogRows();
 
-  return buildSoftwareCatalogPage({ rows, locale, category, page });
+  return buildSoftwareCatalogPage({ rows, locale, category, page, q });
 }
 
 export async function getProductionSoftwareRouteData({
@@ -216,6 +233,7 @@ export async function getProductionSoftwareRouteData({
       rows,
       request.category,
       request.page,
+      request.q,
     ),
   };
 }
@@ -224,6 +242,7 @@ export function buildSoftwareCatalogLanguageHrefs(
   rows: PublicSoftwareCatalogRow[],
   category: SoftwareLeafCategoryId | undefined,
   page: number,
+  q?: string,
 ) {
   return Object.fromEntries(
     (["zh", "en"] as const).map((locale) => {
@@ -232,11 +251,12 @@ export function buildSoftwareCatalogLanguageHrefs(
         locale,
         category,
         page,
+        q,
       });
 
       return [
         locale,
-        buildCatalogHref(locale, category, targetPage ? page : 1),
+        buildCatalogHref(locale, category, targetPage ? page : 1, q),
       ];
     }),
   ) as Record<RedesignLocale, string>;
@@ -390,11 +410,13 @@ function buildCatalogHref(
   locale: RedesignLocale,
   category: SoftwareLeafCategoryId | undefined,
   page: number,
+  q?: string,
 ) {
   const basePath = locale === "en" ? "/en/software" : "/software";
   const params = new URLSearchParams();
   if (category) params.set("category", category);
   if (page > 1) params.set("page", String(page));
+  if (q?.trim()) params.set("q", q.trim());
   const query = params.toString();
 
   return query ? `${basePath}?${query}` : basePath;

@@ -2,12 +2,17 @@ import { readFileSync } from "node:fs";
 
 import React from "react";
 import { renderToStaticMarkup } from "react-dom/server";
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, vi } from "vitest";
 
 import { EnheRedesignSoftwareCatalog } from "@/components/redesign/software/EnheRedesignSoftwareCatalog";
 import type { SoftwareCatalogPage } from "@/lib/redesign/software/software-production";
 
 Object.assign(globalThis, { React });
+
+vi.mock("next/navigation", async (importOriginal) => ({
+  ...await importOriginal<typeof import("next/navigation")>(),
+  useRouter: () => ({ replace: vi.fn() }),
+}));
 
 function readSource(relativePath: string) {
   return readFileSync(new URL(relativePath, import.meta.url), "utf8").replace(/\r\n/g, "\n");

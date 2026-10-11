@@ -22,7 +22,7 @@ import {
   buildPageMetadata,
 } from "@/lib/seo";
 
-const unsupportedLegacyFilterKeys = ["q", "categoryName", "paid", "sort"] as const;
+const unsupportedLegacyFilterKeys = ["categoryName", "paid", "sort"] as const;
 
 export async function generateSoftwarePageMetadata(
   forceLocale: Locale,
@@ -36,7 +36,7 @@ export async function generateSoftwarePageMetadata(
   const hasCategoryParameter = params.category !== undefined;
   const isDbFreeMode = !process.env.DATABASE_URL?.trim();
   const canonicalPath =
-    request && !request.category && request.page > 1
+    request && !request.category && !request.q && request.page > 1
       ? `/software?page=${request.page}`
       : "/software";
   const t = getDictionary(forceLocale);
@@ -51,7 +51,7 @@ export async function generateSoftwarePageMetadata(
     locale: forceLocale === "en" ? "en_US" : "zh_CN",
     localeKey: forceLocale,
     languageAlternates:
-      request && !request.category && request.page > 1
+      request && !request.category && !request.q && request.page > 1
         ? buildAvailableLanguageAlternates(canonicalPath, [forceLocale])
         : undefined,
   });
@@ -60,6 +60,7 @@ export async function generateSoftwarePageMetadata(
     isDbFreeMode ||
     !request ||
     hasCategoryParameter ||
+    Boolean(request.q) ||
     hasUnsupportedLegacyFilter
   ) {
     return {
@@ -136,6 +137,7 @@ export async function SoftwarePageShell({
       locale: forceLocale,
       category: request.category,
       page: request.page,
+      q: request.q,
     }));
   if (!listing) notFound();
 
@@ -152,7 +154,7 @@ export async function SoftwarePageShell({
   const collectionSchema = buildSoftwareCollectionSchema(
     forceLocale,
     listing,
-    Boolean(request.category),
+    Boolean(request.category || request.q),
   );
   const structuredSchemas = listing.items.length
     ? [breadcrumbSchema, collectionSchema]
@@ -166,6 +168,7 @@ export async function SoftwarePageShell({
         mode="production"
         listing={listing}
         selectedCategory={request.category}
+        initialQuery={request.q}
       />
     </>
   );

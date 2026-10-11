@@ -35,6 +35,30 @@ function buildRows(count: number) {
 }
 
 describe("production software catalog adapter", () => {
+  it("searches all published rows before pagination and combines category filters", () => {
+    const rows = buildRows(25);
+    rows[24].name = "独有语音助手";
+    rows[24].category = { name: "语音音频" };
+    const result = buildSoftwareCatalogPage({ rows, locale: "zh", page: 1, q: "语音助手" });
+    expect(result).toMatchObject({ total: 1, totalPages: 1 });
+    expect(result?.items.map((item) => item.id)).toEqual(["tool-25"]);
+    expect(buildSoftwareCatalogPage({ rows, locale: "zh", page: 1, category: "video", q: "语音助手" })?.total).toBe(0);
+    expect(buildSoftwareCatalogPage({ rows, locale: "zh", page: 1, q: "PRactical AI Tool 25" })?.total).toBe(1);
+    expect(buildSoftwareCatalogPage({ rows, locale: "zh", page: 1, q: "不存在的产品" })?.items).toEqual([]);
+  });
+
+  it("preserves search in paging and language links and rejects repeated query values", () => {
+    const rows = buildRows(25);
+    expect(parseSoftwareCatalogSearchParams({ q: "  AI  " })).toMatchObject({ q: "AI" });
+    expect(parseSoftwareCatalogSearchParams({ q: ["AI", "Skill"] })).toBeNull();
+    const result = buildSoftwareCatalogPage({ rows, locale: "zh", page: 1, q: "Practical" });
+    expect(result?.nextHref).toBe("/software?page=2&q=Practical");
+    expect(buildSoftwareCatalogLanguageHrefs(rows, undefined, 2, "Practical")).toEqual({
+      zh: "/software?page=2&q=Practical",
+      en: "/en/software?page=2&q=Practical",
+    });
+  });
+
   it("uses an exact 12-item server pagination contract for 25 published rows", () => {
     const rows = buildRows(25);
     const first = buildSoftwareCatalogPage({ rows, locale: "zh", page: 1 });

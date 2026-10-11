@@ -1,15 +1,12 @@
 import type { Metadata } from "next";
-import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import { AiNewsListing } from "@/components/ai-news-listing";
 import { StructuredData } from "@/components/structured-data";
 import { ContentlessState } from "@/components/redesign/contentless-state";
 import {
-  Badge,
   ButtonLink,
   Container,
-  EmptyState,
-  SectionTitle,
 } from "@/components/ui";
 import {
   getNewsPageCount,
@@ -18,21 +15,19 @@ import {
   isNewsPaginationPageInRange,
   isNewsPaginationPageQueryable,
   parseNewsSearchParams,
-  type NewsSearchFilters,
 } from "@/lib/ai-news";
+import { deduplicateNewsArticles, toNewsListingCards } from "@/lib/ai-news-listing";
 import {
   getAiNewsTopicCopy,
   getAiNewsTopicPath,
 } from "@/lib/ai-news-topics";
 import {
-  buildLocalizedNewsSummary,
   buildLocalizedNewsTitle,
   localizeAiNewsDiscoveryLabel,
   resolveLocalizedNewsCategoryName,
   resolveLocalizedNewsTagName,
 } from "@/lib/ai-news-localization";
 import { getDictionary, type Locale } from "@/lib/dictionaries";
-import { normalizeImageSrc } from "@/lib/media";
 import { buildCanonicalAiNewsPath } from "@/lib/public-slugs";
 import {
   getPublicAiNewsDiscovery,
@@ -331,13 +326,13 @@ export async function AiNewsPageShell({
       />
     );
   }
-  const [{ articles, total }, featured, hot, categories, tags, discovery, topics] =
+  const [{ articles, total }, otherLanguageListing, hot, categories, tags, discovery, topics] =
     await Promise.all([
       getPublicNewsListing({
         ...(filters satisfies PublicNewsListingFilters),
         locale: forceLocale,
       }),
-      getPublicNewsListing({ sort: "featured", take: 3, locale: forceLocale }),
+      getPublicNewsListing({ ...filters, skip: 0, take: 0, locale: forceLocale === "zh" ? "en" : "zh" }),
       getPublicNewsListing({ sort: "hot", take: 6, locale: forceLocale }),
       getPublicNewsCategories(),
       getPublicNewsTags(forceLocale),
@@ -345,20 +340,6 @@ export async function AiNewsPageShell({
       getPublicAiNewsTopics(),
     ]);
   const pageCount = getNewsPageCount(total);
-  const configuredLeadArticle = featured.articles[0];
-  const leadArticle =
-    filters.page > 1
-      ? undefined
-      : filtered
-        ? articles[0]
-        : configuredLeadArticle &&
-            articles.some((article) => article.id === configuredLeadArticle.id)
-          ? configuredLeadArticle
-          : articles[0];
-  const latestArticles = articles.filter(
-    (article) => article.id !== leadArticle?.id,
-  );
-  const showLatestRegion = latestArticles.length > 0 || articles.length === 0;
   if (
     pageOverride &&
     !isNewsPaginationPageInRange(pageOverride, total)
@@ -405,17 +386,10 @@ export async function AiNewsPageShell({
       <Container className="ai-news-workspace-container py-14">
         <StructuredData data={[breadcrumbSchema, collectionSchema, webPageSchema, faqSchema]} />
         <section
-          className={`ai-news-workspace-lead-grid mt-8 ${leadArticle ? "" : "ai-news-workspace-lead-grid--empty"}`}
-          data-ai-news-region="lead"
+          className="ai-news-workspace-hero mt-8"
+          data-ai-news-region="hero"
         >
-          <div
-            className={
-              leadArticle
-                ? "ai-news-workspace-lead-copy"
-                : "glass ai-news-workspace-hero relative overflow-hidden rounded-[2rem] p-7 md:p-10"
-            }
-          >
-            <div className="relative max-w-4xl">
+          <div className="relative max-w-4xl">
               <p className="text-sm font-bold tracking-[0.08em] text-[var(--marketing-accent)]">
                 ENHE AI INSIGHTS
               </p>
@@ -428,22 +402,15 @@ export async function AiNewsPageShell({
               <p className="mt-4 text-sm font-semibold text-[var(--marketing-accent)]">
                 {t.aiNews.support}
               </p>
-            </div>
           </div>
-          {leadArticle ? (
-            <div
-              className="ai-news-workspace-lead-story"
-              data-ai-news-lead-story
-            >
-              <p className="ai-news-workspace-lead-label">
-                {forceLocale === "en" ? "Lead story" : "本期导读"}
-              </p>
-              <NewsCard article={leadArticle} locale={forceLocale} featured />
-            </div>
-          ) : null}
         </section>
 
-        <AiNewsGeoBlock forceLocale={forceLocale} />
+        <FilterBar
+          categories={categories}
+          tags={tags}
+          filters={filters}
+          locale={forceLocale}
+        />
 
         <section className="glass ai-news-workspace-takeaway mt-8 rounded-2xl p-6">
           <p className="text-xs font-bold uppercase tracking-[0.16em] text-[var(--marketing-accent)]">
@@ -457,49 +424,26 @@ export async function AiNewsPageShell({
           </p>
         </section>
 
-        <FilterBar
-          categories={categories}
-          tags={tags}
-          filters={filters}
-          locale={forceLocale}
-        />
-
-        <div className="ai-news-workspace-grid mt-12 grid gap-8 lg:grid-cols-[1fr_320px]">
-          {showLatestRegion ? (
-            <div>
-              <SectionTitle title={t.aiNews.latestTitle} />
-              {latestArticles.length ? (
-                <>
-                  <div className="grid gap-5 md:grid-cols-2">
-                    {latestArticles.map((article) => (
-                      <NewsCard
-                        key={article.id}
-                        article={article}
-                        locale={forceLocale}
-                      />
-                    ))}
-                  </div>
-                  <Pagination
-                    page={filters.page}
-                    pageCount={pageCount}
-                    locale={forceLocale}
-                    filters={filters}
-                  />
-                </>
-              ) : (
-                <EmptyState
-                  title={t.aiNews.emptyTitle}
-                  text={t.aiNews.emptyText}
-                />
-              )}
-            </div>
-          ) : null}
+        <div className="ai-news-workspace-grid mt-12 grid gap-8">
+          <AiNewsListing
+            key={JSON.stringify([forceLocale, filters.q, filters.category, filters.tag, filters.sort, filters.page])}
+            initialArticles={toNewsListingCards(articles, forceLocale)}
+            initialPage={filters.page}
+            initialPageCount={pageCount}
+            initialLanguagePageCounts={{
+              zh: forceLocale === "zh" ? pageCount : getNewsPageCount(otherLanguageListing.total),
+              en: forceLocale === "en" ? pageCount : getNewsPageCount(otherLanguageListing.total),
+            }}
+            locale={forceLocale}
+            filters={filters}
+            labels={t.aiNews}
+          />
 
           <section
-            className={`space-y-6 ${showLatestRegion ? "" : "lg:col-span-2"}`}
+            className="space-y-6"
             aria-label={t.aiNews.discoveryRegionLabel}
           >
-            <TrendPanel articles={hot.articles} locale={forceLocale} />
+            <TrendPanel articles={deduplicateNewsArticles(hot.articles)} locale={forceLocale} />
             <KeywordCloud
               locale={forceLocale}
               items={discovery.keywordCloudItems}
@@ -513,7 +457,7 @@ export async function AiNewsPageShell({
         </div>
 
         <section className="glass mt-12 rounded-2xl p-7">
-          <div className="flex flex-col gap-5 md:flex-row md:items-center md:justify-between">
+          <div className="flex flex-col items-start gap-5">
             <div>
               <h2 className="text-2xl font-black text-[var(--marketing-text)]">
                 {t.aiNews.subscribeTitle}
@@ -524,18 +468,20 @@ export async function AiNewsPageShell({
             </div>
             <ButtonLink
               href={buildLocalePath("/user", forceLocale)}
-              variant="ghost"
+              className="ai-news-subscribe-action"
             >
               {t.nav.user}
             </ButtonLink>
           </div>
         </section>
 
-        <section className="glass mt-8 rounded-2xl p-6">
+        <AiNewsGeoBlock forceLocale={forceLocale} />
+
+        <section className="glass ai-news-faq mt-8 rounded-2xl p-6">
           <h2 className="text-2xl font-black text-[var(--marketing-text)]">
             {forceLocale === "en" ? "AI news FAQ" : "AI前沿资讯常见问题"}
           </h2>
-          <div className="mt-5 grid gap-4 md:grid-cols-3">
+          <div className="mt-5 grid gap-4">
             {aiNewsFaqItems[forceLocale].map((item) => (
               <article key={item.question} className="rounded-2xl border border-[var(--marketing-border)] bg-[var(--marketing-card)] p-5">
                 <h3 className="text-base font-black leading-snug text-[var(--marketing-text)]">
@@ -571,8 +517,8 @@ function AiNewsGeoBlock({ forceLocale }: { forceLocale: Locale }) {
   ];
 
   return (
-    <section className="glass mt-8 rounded-2xl p-6">
-      <div className="grid gap-4 lg:grid-cols-3">
+    <section className="glass ai-news-guide mt-8 rounded-2xl p-6">
+      <div className="grid gap-4">
         {sections.map((section) => (
           <article
             key={section.title}
@@ -617,6 +563,7 @@ function FilterBar({
 
   return (
     <form
+      action={buildLocalePath("/ai-news", locale)}
       className="filter-surface mt-8 grid gap-3 lg:grid-cols-[1fr_180px_160px_140px]"
       aria-label={t.aiNews.filterFormLabel}
       data-analytics-event="search_ai_news"
@@ -693,123 +640,6 @@ function FilterBar({
         {t.aiNews.filter}
       </button>
     </form>
-  );
-}
-
-function NewsCard({
-  article,
-  locale,
-  featured = false,
-}: {
-  article: NewsCardArticle;
-  locale: Locale;
-  featured?: boolean;
-}) {
-  const t = getDictionary(locale);
-  const title =
-    locale === "en"
-      ? buildLocalizedNewsTitle(
-          {
-            title: article.title,
-            englishTitle: article.englishTitle,
-            categoryName: article.category?.name,
-          },
-          locale,
-        )
-      : article.title;
-  const summary =
-    locale === "en"
-      ? buildLocalizedNewsSummary(
-          {
-            title: article.title,
-            englishTitle: article.englishTitle,
-            summary: article.summary,
-            englishSummary: article.englishSummary,
-            description: article.description,
-            englishDescription: article.englishDescription,
-          },
-          locale,
-        )
-      : article.summary;
-  const coverImage = normalizeImageSrc(article.coverImage);
-  const href = buildCanonicalAiNewsPath(article, locale);
-  const hasExternalSources = Boolean(article.externalSources?.length);
-  const evidenceState = hasExternalSources ? "unverified" : "source-missing";
-
-  return (
-    <article
-      className={`ai-news-interactive-card glass group overflow-hidden rounded-2xl ${featured ? "ai-news-lead-card" : ""}`}
-    >
-      <Link href={href} className="block">
-         <div className="relative aspect-[16/9] overflow-hidden bg-[var(--marketing-card-soft)]">
-          {coverImage ? (
-            <Image
-              src={coverImage}
-              alt={title}
-              fill
-              className="content-thumbnail-outline object-cover transition-transform duration-300 group-hover:scale-[1.03]"
-              sizes="(min-width: 1024px) 360px, 100vw"
-              unoptimized
-            />
-          ) : (
-             <div className="absolute inset-0 bg-[var(--marketing-card-soft)]" />
-          )}
-        </div>
-        <div className="p-5">
-          <div className="flex flex-wrap gap-2">
-            {article.category ? (
-              <Badge>
-                {resolveLocalizedNewsCategoryName(
-                  article.category.name,
-                  locale,
-                )}
-              </Badge>
-            ) : null}
-            {article.isPinned ? (
-              <Badge className="text-[var(--marketing-accent)]">
-                {t.aiNews.featured}
-              </Badge>
-            ) : null}
-          </div>
-          <h2 className="mt-4 break-words text-xl font-black leading-snug text-[var(--marketing-text)]">
-            {title}
-          </h2>
-            <p className="mt-3 break-words text-sm leading-7 text-[var(--marketing-muted)]">
-            {summary}
-          </p>
-          <div className="mt-5 flex flex-wrap items-center gap-x-4 gap-y-2 text-xs text-[var(--marketing-muted)]">
-            <span>
-              {formatDate(article.publishedAt ?? article.createdAt, locale)}
-            </span>
-            <span className="tabular-nums">{article.readingTime} min</span>
-            <span className="tabular-nums">{article.viewCount} views</span>
-          </div>
-          <div
-            className="mt-3 flex flex-wrap items-center gap-x-3 gap-y-1 text-xs font-semibold text-[var(--marketing-muted)]"
-            data-evidence-state={evidenceState}
-          >
-            <span>
-              {hasExternalSources
-                ? t.aiNews.evidenceUnverified
-                : t.aiNews.evidenceSourceMissing}
-            </span>
-            {hasExternalSources ? (
-              <span>{t.aiNews.evidenceSourceAvailable}</span>
-            ) : null}
-          </div>
-          <div className="mt-5 flex flex-wrap gap-2">
-            {article.tagLinks.slice(0, 3).map(({ tag }) => (
-              <Badge key={tag.id} className="text-[var(--marketing-accent)]">
-                {resolveLocalizedNewsTagName(tag.name, locale) || tag.name}
-              </Badge>
-            ))}
-          </div>
-          <span className="mt-5 inline-flex text-sm font-bold text-[var(--marketing-accent)]">
-            {t.aiNews.readMore}
-          </span>
-        </div>
-      </Link>
-    </article>
   );
 }
 
@@ -958,57 +788,5 @@ function TopicCollections({
         ))}
       </div>
     </section>
-  );
-}
-
-function Pagination({
-  page,
-  pageCount,
-  locale,
-  filters,
-}: {
-  page: number;
-  pageCount: number;
-  locale: Locale;
-  filters: NewsSearchFilters;
-}) {
-  if (pageCount <= 1) return null;
-
-  return (
-    <div className="mt-8 flex flex-wrap gap-3">
-      {Array.from({ length: pageCount }).map((_, index) => {
-        const nextPage = index + 1;
-        const filtered = hasActiveNewsFilters(filters);
-        const query = new URLSearchParams();
-        if (filters.q) query.set("q", filters.q);
-        if (filters.category) query.set("category", filters.category);
-        if (filters.tag) query.set("tag", filters.tag);
-        if (filters.sort && filters.sort !== "latest") {
-          query.set("sort", filters.sort);
-        }
-        if (filtered && nextPage > 1) query.set("page", String(nextPage));
-        const basePath = filtered
-          ? buildLocalePath("/ai-news", locale)
-          : nextPage > 1
-            ? buildLocalePath(`/ai-news/page/${nextPage}`, locale)
-            : buildLocalePath("/ai-news", locale);
-        const href = query.size ? `${basePath}?${query.toString()}` : basePath;
-        return (
-          <Link
-            key={nextPage}
-            href={href}
-             className={`rounded-full border px-4 py-2 text-sm font-semibold transition-[background-color,border-color,color] ${page === nextPage ? "border-[var(--marketing-accent)] bg-[var(--marketing-accent)]/14 text-[var(--marketing-accent)]" : "border-[var(--marketing-border)] bg-[var(--marketing-card)] text-[var(--marketing-muted)] hover:border-[var(--marketing-accent)] hover:text-[var(--marketing-accent)]"}`}
-          >
-            {nextPage}
-          </Link>
-        );
-      })}
-    </div>
-  );
-}
-
-function formatDate(value: Date | string, locale: Locale) {
-  return new Date(value).toLocaleDateString(
-    locale === "en" ? "en-US" : "zh-CN",
   );
 }

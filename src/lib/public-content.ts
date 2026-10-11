@@ -392,64 +392,94 @@ const getCachedPublicNewsListing = unstable_cache(
       const where = buildNewsWhere(filters);
       const orderBy: Prisma.NewsArticleOrderByWithRelationInput[] =
         filters.sort === "hot"
-          ? [{ viewCount: "desc" }, { publishedAt: "desc" }]
+          ? [{ viewCount: "desc" }, { publishedAt: "desc" }, { id: "asc" }]
           : filters.sort === "featured"
             ? [
                 { isPinned: "desc" },
                 { isFeatured: "desc" },
                 { sortOrder: "asc" },
                 { publishedAt: "desc" },
+                { id: "asc" },
               ]
-            : [{ isPinned: "desc" }, { publishedAt: "desc" }];
-      if (filters.locale === "en") {
-        const candidateArticles = await prisma.newsArticle.findMany({
-          where,
-          include: {
-            category: true,
-            tagLinks: { include: { tag: true } },
-            externalSources: {
-              select: { id: true },
-              orderBy: [{ sortOrder: "asc" }, { createdAt: "asc" }],
-              take: 1,
-            },
+            : [{ isPinned: "desc" }, { publishedAt: "desc" }, { id: "asc" }];
+      const candidateArticles = await prisma.newsArticle.findMany({
+        where,
+        select: {
+          id: true,
+          title: true,
+          slug: true,
+          summary: true,
+          description: true,
+          keywords: true,
+          content: true,
+          englishTitle: true,
+          englishSummary: true,
+          englishDescription: true,
+          englishKeywords: true,
+          englishContent: true,
+          coverImage: true,
+          publishedAt: true,
+          createdAt: true,
+          readingTime: true,
+          viewCount: true,
+          isPinned: true,
+          categoryId: true,
+          category: { select: { id: true, name: true } },
+          tagLinks: {
+            select: { tag: { select: { id: true, name: true, slug: true } } },
           },
-          orderBy,
-        });
-        const indexableArticles = candidateArticles.filter(
-          isEnglishNewsArticleIndexable,
-        );
-        const skip = filters.skip ?? 0;
-        const take = filters.take ?? 9;
+          externalSources: {
+            select: { id: true },
+            orderBy: [{ sortOrder: "asc" }, { createdAt: "asc" }],
+            take: 1,
+          },
+        },
+        orderBy,
+      });
+      const visibleArticles =
+        filters.locale === "en"
+          ? candidateArticles.filter(isEnglishNewsArticleIndexable)
+          : candidateArticles;
+      const articles: typeof candidateArticles = [];
+      const duplicatePositions = new Map<string, number>();
 
-        return {
-          articles: indexableArticles.slice(skip, skip + take),
-          total: indexableArticles.length,
-        };
+      for (const article of visibleArticles) {
+        // Compare full editorial content; equal titles alone are not duplicates.
+        const duplicateKey =
+          article.title?.trim() && article.content?.trim()
+            ? JSON.stringify([
+                article.title.trim(),
+                article.summary?.trim(),
+                article.content.trim(),
+                article.englishTitle?.trim() || "",
+                article.englishSummary?.trim() || "",
+                article.englishContent?.trim() || "",
+                article.categoryId ?? "",
+                (article.tagLinks ?? []).map(({ tag }) => tag.id).sort(),
+              ])
+            : article.id;
+        const position = duplicatePositions.get(duplicateKey);
+        if (position === undefined) {
+          duplicatePositions.set(duplicateKey, articles.length);
+          articles.push(article);
+        } else if (
+          /-\d+$/.test(articles[position].slug) &&
+          !/-\d+$/.test(article.slug)
+        ) {
+          articles[position] = article;
+        }
       }
 
-      const [articles, total] = await Promise.all([
-        prisma.newsArticle.findMany({
-          where,
-          include: {
-            category: true,
-            tagLinks: { include: { tag: true } },
-            externalSources: {
-              select: { id: true },
-              orderBy: [{ sortOrder: "asc" }, { createdAt: "asc" }],
-              take: 1,
-            },
-          },
-          orderBy,
-          skip: filters.skip ?? 0,
-          take: filters.take ?? 9,
-        }),
-        prisma.newsArticle.count({ where }),
-      ]);
-
-      return { articles, total };
+      // Listing cards do not need full bodies. Keep the shared snapshot below
+      // Next's cache item limit and leave article content to the detail query.
+      return articles.map(({ content, englishContent, ...article }) => {
+        void content;
+        void englishContent;
+        return article;
+      });
     } catch (error) {
       if (isRecoverablePublicReadError(error))
-        return { articles: [], total: 0 };
+        return [];
       throw error;
     }
   },
@@ -921,7 +951,18 @@ export async function getPublicNewsListing(filters: PublicNewsListingFilters) {
   if (!process.env.DATABASE_URL?.trim()) {
     return { articles: [], total: 0 };
   }
-  return getCachedPublicNewsListing(filters);
+  // Page slices share one cached snapshot, so separate pages do not drift as
+  // newly published articles enter the listing.
+  const articles = await getCachedPublicNewsListing({
+    q: filters.q?.trim() || undefined,
+    category: filters.category || undefined,
+    tag: filters.tag || undefined,
+    sort: filters.sort ?? "latest",
+    locale: filters.locale ?? "zh",
+  });
+  const skip = filters.skip ?? 0;
+  const take = filters.take ?? 9;
+  return { articles: articles.slice(skip, skip + take), total: articles.length };
 }
 
 export async function getPublicNewsCategories() {

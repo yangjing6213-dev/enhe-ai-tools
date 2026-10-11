@@ -19,6 +19,7 @@ import { EnheRedesignSoftwareCategorySelector } from "./EnheRedesignSoftwareCate
 import { EnheRedesignSoftwareCard } from "./EnheRedesignSoftwareCard";
 import { EnheRedesignSoftwareLoadMore } from "./EnheRedesignSoftwareLoadMore";
 import { EnheRedesignSoftwareRail } from "./EnheRedesignSoftwareRail";
+import { EnheRedesignSoftwareSearch } from "./EnheRedesignSoftwareSearch";
 
 const INITIAL_VISIBLE_ALL_PRODUCTS = 9;
 const SOFTWARE_CATALOG_ROOT_ID = "redesign-software-catalog";
@@ -31,6 +32,7 @@ type ProductionCatalogProps = {
   mode: "production";
   listing: SoftwareCatalogPage;
   selectedCategory?: SoftwareLeafCategoryId;
+  initialQuery?: string;
 };
 
 type PreviewCatalogProps = {
@@ -78,24 +80,25 @@ function renderProductionCatalog({
   locale,
   listing,
   selectedCategory,
+  initialQuery = "",
 }: ProductionCatalogProps) {
   const copy = SOFTWARE_COPY[locale];
   const activeCategory: SoftwareCategoryId = selectedCategory ?? "all";
   const basePath = locale === "en" ? "/en/software" : "/software";
   const categoryHrefs = Object.fromEntries(
-    SOFTWARE_CATEGORIES.map((category) => [
-      category.id,
-      category.id === "all"
-        ? basePath
-        : `${basePath}?category=${category.id}`,
-    ]),
+    SOFTWARE_CATEGORIES.map((category) => {
+      const params = new URLSearchParams();
+      if (category.id !== "all") params.set("category", category.id);
+      if (initialQuery) params.set("q", initialQuery);
+      return [category.id, params.size ? `${basePath}?${params}` : basePath];
+    }),
   ) as Record<SoftwareCategoryId, string>;
-  const emptyRecoveryHref = selectedCategory
+  const emptyRecoveryHref = selectedCategory || initialQuery
     ? basePath
     : locale === "en"
       ? "/en"
       : "/";
-  const emptyRecoveryLabel = selectedCategory
+  const emptyRecoveryLabel = selectedCategory || initialQuery
     ? locale === "en"
       ? "Clear filter"
       : "清除筛选"
@@ -117,14 +120,21 @@ function renderProductionCatalog({
         <p className="redesign-software-intro">{copy.page.intro}</p>
       </section>
 
-      <EnheRedesignSoftwareCategorySelector
-        locale={locale}
-        rootId={SOFTWARE_CATALOG_ROOT_ID}
-        triggerId={SOFTWARE_CATEGORY_TRIGGER_ID}
-        panelId={SOFTWARE_CATEGORY_PANEL_ID}
-        selectedCategoryId={activeCategory}
-        categoryHrefs={categoryHrefs}
-      />
+      <div className="redesign-software-toolbar">
+        <EnheRedesignSoftwareCategorySelector
+          locale={locale}
+          rootId={SOFTWARE_CATALOG_ROOT_ID}
+          triggerId={SOFTWARE_CATEGORY_TRIGGER_ID}
+          panelId={SOFTWARE_CATEGORY_PANEL_ID}
+          selectedCategoryId={activeCategory}
+          categoryHrefs={categoryHrefs}
+        />
+        <EnheRedesignSoftwareSearch
+          locale={locale}
+          category={selectedCategory}
+          initialQuery={initialQuery}
+        />
+      </div>
 
       {listing.newReleases.length > 0 ? (
         <CatalogSection

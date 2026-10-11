@@ -64,15 +64,15 @@ describe("AI News editorial token boundary", () => {
   });
 
   it("allows long unspaced claim text to break inside editorial cards", () => {
-    const listing = read("app/ai-news/page-shell.tsx");
+    const listing = read("components/ai-news-listing.tsx");
     const topic = read("app/ai-news/topics/[slug]/page-shell.tsx");
     const detail = read("app/ai-news/[slug]/page-shell.tsx");
 
     expect(listing).toContain(
-      'className="mt-4 break-words text-xl font-black leading-snug',
+      'className="ai-news-card-title mt-4 break-words text-xl font-black leading-snug',
     );
     expect(listing).toContain(
-      'className="mt-3 break-words text-sm leading-7',
+      'className="ai-news-card-summary mt-3 break-words text-sm leading-7',
     );
     expect(topic).toContain(
       'className="mt-4 break-words text-lg font-black leading-snug',

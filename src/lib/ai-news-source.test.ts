@@ -53,12 +53,15 @@ describe("AI news source contracts", () => {
 
   it("routes english AI news pages through shared localization helpers for visible labels and schema keywords", () => {
     const listing = read("src/app/ai-news/page-shell.tsx");
+    const listingCards = read("src/lib/ai-news-listing.ts");
     const detail = read("src/app/ai-news/[slug]/page-shell.tsx");
 
     expect(listing).toContain('from "@/lib/ai-news-localization"');
     expect(listing).toContain("resolveLocalizedNewsCategoryName");
     expect(listing).toContain("resolveLocalizedNewsTagName");
-    expect(listing).toContain("buildLocalizedNewsSummary");
+    expect(listing).toContain("toNewsListingCards(articles, forceLocale)");
+    expect(listingCards).toContain('from "@/lib/ai-news-localization"');
+    expect(listingCards).toContain("buildLocalizedNewsSummary");
 
     expect(detail).toContain('from "@/lib/ai-news-localization"');
     expect(detail).toContain("resolveLocalizedNewsCategoryName");
