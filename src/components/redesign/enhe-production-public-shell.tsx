@@ -6,6 +6,7 @@ import { PRODUCTION_FILING } from "@/lib/production-filing";
 import { getPublicSearchRecommendations } from "@/lib/public-search-recommendations";
 import { EnheRedesignFooter } from "./enhe-redesign-footer";
 import { EnheRedesignHeader } from "./enhe-redesign-header";
+import { BackNavigationBar } from "@/components/back-navigation-bar";
 import { REDESIGN_NAV_ITEMS } from "./navigation";
 import type { RedesignAccount, RedesignLanguageHrefs } from "./types";
 
@@ -44,25 +45,28 @@ export async function EnheRedesignPublicHeader({
       };
 
   return (
-    <EnheRedesignHeader
-      locale={redesignLocale}
-      homeHref={buildLocalePath("/", locale)}
-      searchRecommendations={searchRecommendations}
-      navItems={REDESIGN_NAV_ITEMS[redesignLocale]}
-      currentPathname={pathname}
-      languageHrefs={
-        languageHrefs ?? {
-          zh: buildLanguageSwitcherHref(pathname, "zh"),
-          en: buildLanguageSwitcherHref(pathname, "en"),
+    <>
+      <EnheRedesignHeader
+        locale={redesignLocale}
+        homeHref={buildLocalePath("/", locale)}
+        searchRecommendations={searchRecommendations}
+        navItems={REDESIGN_NAV_ITEMS[redesignLocale]}
+        currentPathname={pathname}
+        languageHrefs={
+          languageHrefs ?? {
+            zh: buildLanguageSwitcherHref(pathname, "zh"),
+            en: buildLanguageSwitcherHref(pathname, "en"),
+          }
         }
-      }
-      account={account}
-      userMenuLabel={t.nav.user}
-      sticky={false}
-      menuId={`enhe-public-menu-${redesignLocale}`}
-      menuTriggerLabel={t.nav.menu}
-      menuCloseLabel={t.nav.closeMenu}
-    />
+        account={account}
+        userMenuLabel={t.nav.user}
+        sticky={false}
+        menuId={`enhe-public-menu-${redesignLocale}`}
+        menuTriggerLabel={t.nav.menu}
+        menuCloseLabel={t.nav.closeMenu}
+      />
+      <BackNavigationBar locale={locale} />
+    </>
   );
 }
 

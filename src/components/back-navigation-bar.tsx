@@ -54,7 +54,7 @@ export function BackNavigationBar({ locale }: BackNavigationBarProps) {
 
   if (!visible) return null;
 
-  const label = locale === "en" ? "Back" : "返回上一页";
+  const label = locale === "en" ? "Back" : "返回";
 
   return (
     <nav className="site-back-nav" aria-label={locale === "en" ? "Page back navigation" : "页面返回导航"}>

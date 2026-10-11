@@ -854,12 +854,18 @@ body .redesign-footer nav {
   transform: translateY(10%);
 }
 
+.enhe-redesign-production > .site-back-nav {
+  width: min(100% - 64px, var(--enhe-content-max));
+  padding: 12px 0 0;
+}
+
 .redesign-footer .footer-brand {
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
   gap: 16px;
+  transform: translateX(-20%);
 }
 
 .redesign-footer .footer-social-links {
@@ -950,6 +956,10 @@ body .redesign-footer nav {
 }
 
 @media (width < 768px) {
+  .enhe-redesign-production > .site-back-nav {
+    width: calc(100% - 40px);
+  }
+
   .redesign-footer-inner {
     width: calc(100% - 40px);
   }
@@ -1015,19 +1025,20 @@ body .customer-support-widget .customer-support-launcher,
   min-height: 44px;
   place-items: center;
   padding: 0;
-  border: 0;
-  border-radius: 0;
-  background: transparent;
+  border: 1px solid var(--enhe-border);
+  border-radius: 50%;
+  background: var(--enhe-page-bg);
   color: var(--enhe-action);
-  box-shadow: none;
+  box-shadow: 0 14px 38px rgba(0, 8, 14, 0.42);
+  backdrop-filter: blur(24px);
   cursor: pointer;
   appearance: none;
-  transition: transform 160ms ease, color 160ms ease;
+  transition: transform 160ms ease, border-color 160ms ease;
 }
 
 .enhe-redesign-production .site-floating-action:hover {
-  transform: scale(1.08);
-  filter: drop-shadow(0 1px 1px var(--enhe-page-bg));
+  transform: translateY(-2px);
+  border-color: var(--enhe-action);
 }
 
 .enhe-redesign-production .site-floating-action:active {
@@ -1037,6 +1048,12 @@ body .customer-support-widget .customer-support-launcher,
 .enhe-redesign-production .site-floating-action:focus-visible {
   outline: 2px solid var(--enhe-action);
   outline-offset: 2px;
+}
+
+@media (width < 484px) {
+  .enhe-redesign-production .site-floating-action:hover {
+    transform: none;
+  }
 }
 
 .enhe-redesign-production .site-floating-action-panel {

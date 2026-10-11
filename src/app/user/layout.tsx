@@ -4,11 +4,8 @@ import "@/styles/redesign/shell.css";
 import "@/styles/redesign/account.css";
 import "@/styles/redesign/site-refresh.css";
 import type { Metadata } from "next";
-import { headers } from "next/headers";
 import { RootDocument, sharedRootMetadata } from "@/app/root-layout-shared";
-import { SiteFooter } from "@/components/site-footer";
-import { SiteHeader } from "@/components/site-header";
-import { EnheAccountShell } from "@/components/redesign/enhe-account-shell";
+import { PublicSiteChrome } from "@/components/public-site-chrome";
 import { getCurrentLocale } from "@/lib/i18n";
 
 export const metadata: Metadata = {
@@ -21,24 +18,11 @@ export const metadata: Metadata = {
 };
 
 export default async function UserLayout({ children }: { children: React.ReactNode }) {
-  const [locale, requestHeaders] = await Promise.all([getCurrentLocale(), headers()]);
-  const pathname = (requestHeaders.get("x-enhe-pathname") ?? "/user").replace(/\/+$/, "");
-  const isAccountHome = pathname === "/user";
+  const locale = await getCurrentLocale();
 
   return (
-    <RootDocument
-      lang={locale === "en" ? "en-US" : "zh-CN"}
-      disableLegacyVisualEffects={isAccountHome}
-    >
-      {isAccountHome ? (
-        <EnheAccountShell locale={locale}>{children}</EnheAccountShell>
-      ) : (
-        <>
-          <SiteHeader />
-          <div className="fade-in">{children}</div>
-          <SiteFooter />
-        </>
-      )}
+    <RootDocument lang={locale === "en" ? "en-US" : "zh-CN"} disableLegacyVisualEffects>
+      <PublicSiteChrome forceLocale={locale}>{children}</PublicSiteChrome>
     </RootDocument>
   );
 }

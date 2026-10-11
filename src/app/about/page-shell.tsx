@@ -1,7 +1,8 @@
 import type { Metadata } from "next";
+import Image from "next/image";
 import Link from "next/link";
 import { StructuredData } from "@/components/structured-data";
-import { Badge, Container, SectionTitle } from "@/components/ui";
+import { Container, SectionTitle } from "@/components/ui";
 import { enheOrganizationReference } from "@/lib/brand-entity";
 import { getDictionary, type Locale } from "@/lib/dictionaries";
 import {
@@ -20,52 +21,51 @@ const contactEmail = "amen.enhe@gmail.com";
 const aboutCopy = {
   zh: {
     title: "恩禾ENHE AI 是什么？",
-    eyebrow: "用户视角品牌档案",
     description:
-      "ENHE AI 帮助用户把 AI 用到真实任务里：更快完成工作、创作内容、整理资料、学习技能、解决工具选择和使用问题。在需要处理敏感素材、长期稳定流程或隐私边界时，提供更可控的AI工具和路径。",
+      "从真实任务出发，帮你找到合适的 AI 工具、教程与学习路径。",
     metaDescription:
       "了解 ENHE AI 如何帮助普通 AI 用户完成工作、创作内容、整理资料、学习技能和选择工具，并在敏感素材、隐私边界和长期流程中兼顾安全、稳定与少走弯路。",
     intro:
-      "普通用户使用 AI，不是为了记住更多工具名，而是为了更快完成工作、做出内容、整理复杂资料、学会可复用方法，并在涉及敏感素材或长期流程时保持安全、隐私和稳定。ENHE AI 把资讯、软件、教程、课程和账号服务说明整理成清晰路径，让用户先判断自己要完成什么，再选择合适的 AI 工具和方法。",
+      "工具、资讯与教程按实际用途整理，帮助你更快判断从哪里开始。",
     officialSite: "https://www.enhe-tech.com.cn/",
     sections: [
       {
         title: "平台定位",
         paragraphs: [
-          "ENHE AI 帮助用户把 AI 用到真实任务中，包括提升效率、创作内容、整理资料、学习技能和解决具体问题。",
-          "网站把工具、教程、课程与趋势资讯整理在清晰的使用路径里，让你先想清楚要做什么，再选择合适的方法。"
+          "聚合 AI 工具、教程、课程与趋势资讯。",
+          "从要完成的任务出发，找到合适的使用路径。"
         ],
         highlight: "从真实任务出发，让工具选择和学习方法更简单。"
       },
       {
         title: "适合谁",
         paragraphs: [
-          "这里面向普通 AI 用户、内容创作者、运营人员、自由职业者、小团队、学习者和开发者。",
-          "无论是一个人创作、团队协作，还是尝试新的工作流程，都可以从眼前要完成的事开始。"
+          "服务创作者、运营人员、自由职业者、小团队与学习者。",
+          "一个人或团队，都可以从手头的实际问题开始。"
         ],
         highlight: "不必先成为专家，带着实际问题就能开始。"
       },
       {
         title: "可以解决什么",
         paragraphs: [
-          "你可以在这里比较工具、查看操作教程、学习实用技能，也可以了解价格与交付范围。",
-          "每个入口都围绕一个实际问题展开，帮助你判断哪些选择适合当前任务。"
+          "比较工具，查看教程，学习可复用的 AI 技能。",
+          "了解价格与交付内容，再决定下一步怎么做。"
         ],
         highlight: "让下一步更清楚，少花时间反复筛选。"
       },
       {
         title: "为什么重视安全、隐私和稳定",
         paragraphs: [
-          "AI 工作可能会用到客户资料、创作素材、账号信息和内部文件。使用前，应先弄清工具如何处理这些内容。",
-          "对于敏感素材或长期流程，可以优先了解数据边界更清楚、使用方式更可控的方案。"
+          "使用 AI 前，先了解工具如何处理资料和账号信息。",
+          "涉及敏感内容或长期流程时，优先选择边界清楚的方案。"
         ],
         highlight: "先确认隐私与数据边界，再决定如何使用。"
       },
       {
         title: "官方网站与联系方式",
         paragraphs: [
-          "访问 ENHE AI 官方网站，了解平台提供的工具、课程与服务。",
-          `如有问题或合作咨询，可通过 ${contactEmail} 联系我们。`
+          "在官方网站了解平台工具、课程与服务。",
+          `问题或合作咨询：${contactEmail}`
         ],
         highlight: `联系邮箱：${contactEmail}`
       }
@@ -120,52 +120,51 @@ const aboutCopy = {
   },
   en: {
     title: "What is ENHE AI?",
-    eyebrow: "User-first brand profile",
     description:
-      "ENHE AI helps users apply AI to real tasks: work faster, create content, organize material, learn skills, and solve tool-selection and usage problems. When sensitive material, long-running workflows, or privacy boundaries matter, it provides more controllable AI tools and paths.",
+      "Find AI tools, tutorials, and learning paths that fit the work in front of you.",
     metaDescription:
       "Learn how ENHE AI helps everyday users work faster, create content, learn skills, choose tools, and keep sensitive AI workflows safer.",
     intro:
-      "People use AI to finish work, create assets, organize information, learn reusable methods, and solve concrete problems. ENHE AI organizes news, software, tutorials, courses, and account-service notes into clear paths so users can start from the task, then choose the right AI tool or method.",
+      "Tools, news, and tutorials are organized by use so you can decide where to begin.",
     officialSite: "https://www.enhe-tech.com.cn/",
     sections: [
       {
         title: "Platform Positioning",
         paragraphs: [
-          "ENHE AI helps people use AI for real tasks: getting work done, creating content, organizing information, learning skills, and solving problems.",
-          "Tools, tutorials, courses, and trend insights are organized into clear paths, so you can start with the task and choose a useful next step."
+          "Find AI tools, tutorials, courses, and trend insights in one place.",
+          "Start with your task and choose a practical next step."
         ],
         highlight: "Start with the task. Make choosing and learning easier."
       },
       {
         title: "Who It Is For",
         paragraphs: [
-          "ENHE AI is for everyday users, creators, operators, freelancers, small teams, learners, and developers.",
-          "Whether you work alone, collaborate with a team, or try a new workflow, you can begin with the task in front of you."
+          "For creators, operators, freelancers, small teams, and learners.",
+          "Start with the work you need to do, alone or together."
         ],
         highlight: "You do not need to be an expert to get started."
       },
       {
         title: "What Users Can Solve",
         paragraphs: [
-          "Compare tools, follow practical tutorials, learn useful skills, and understand pricing and delivery scope.",
-          "Each section is organized around a real question to help you decide what fits your current work."
+          "Compare tools, follow tutorials, and learn reusable skills.",
+          "Check pricing and delivery details before choosing."
         ],
         highlight: "See the next step clearly and spend less time searching."
       },
       {
         title: "Why Safety, Privacy, And Stability Matter",
         paragraphs: [
-          "AI work can involve client files, creative assets, account information, and internal documents. Check how a tool handles that material before using it.",
-          "For sensitive material or long-running workflows, consider options with clearer data boundaries and more control."
+          "Check how a tool handles files and account information before use.",
+          "For sensitive work, choose options with clear data boundaries."
         ],
         highlight: "Understand privacy and data boundaries before you begin."
       },
       {
         title: "Official Website And Contact",
         paragraphs: [
-          "Visit the official ENHE AI website to explore its tools, courses, and services.",
-          `For questions or business inquiries, email ${contactEmail}.`
+          "Explore ENHE AI tools, courses, and services on the official site.",
+          `Questions and partnership inquiries: ${contactEmail}.`
         ],
         highlight: `Contact email: ${contactEmail}`
       }
@@ -259,10 +258,19 @@ export function AboutPageShell({ forceLocale }: { forceLocale: Locale }) {
     <main className="enhe-editorial-page enhe-reference-editorial">
       <Container className="enhe-reference-editorial-container py-14">
         <StructuredData data={[breadcrumbSchema, aboutPageSchema, faqSchema]} />
-        <section className="enhe-reference-editorial-hero relative overflow-hidden rounded-[2rem] p-7 md:p-10">
+        <section className="about-cover relative mb-10 aspect-video overflow-hidden rounded-xl" aria-label={forceLocale === "en" ? "ENHE AI brand cover" : "ENHE AI 品牌封面"}>
+          <Image
+            src="/images/about/enhe-about-cover.png"
+            alt={forceLocale === "en" ? "ENHE AI illuminated brand mark" : "ENHE AI 品牌灯光标志"}
+            fill
+            priority
+            sizes="(max-width: 768px) 100vw, 1200px"
+            className="object-cover"
+          />
+        </section>
+        <section className="enhe-reference-editorial-hero relative overflow-hidden p-0 text-left">
           <div className="relative max-w-4xl">
-            <Badge>{copy.eyebrow}</Badge>
-            <h1 className="mt-6 text-4xl font-black leading-tight text-[var(--marketing-text)] md:text-6xl">
+            <h1 className="mt-0 text-left text-4xl font-black leading-tight text-[var(--marketing-text)] md:text-6xl">
               {copy.title}
             </h1>
             <p className="mt-5 max-w-3xl text-base font-semibold leading-8 text-[var(--marketing-muted)] md:text-lg">
@@ -280,7 +288,7 @@ export function AboutPageShell({ forceLocale }: { forceLocale: Locale }) {
           </div>
         </section>
 
-        <section className="enhe-reference-editorial-sections mt-8 grid gap-5 lg:grid-cols-2">
+        <section className="enhe-reference-editorial-sections about-section-grid mt-8 grid gap-5 lg:grid-cols-2">
           {copy.sections.map((section) => (
             <article key={section.title} className="enhe-reference-editorial-card rounded-2xl p-6">
               <h2 className="text-2xl font-black text-[var(--marketing-text)]">{section.title}</h2>

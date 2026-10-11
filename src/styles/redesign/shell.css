@@ -1194,7 +1194,20 @@
 .enhe-reference-editorial .enhe-reference-editorial-card {
   border-radius: 0;
   border: 0;
-  padding: 0 0 24px;
+  display: flex;
+  height: 340px;
+  flex-direction: column;
+  overflow: hidden;
+  padding: 24px;
+}
+
+.enhe-reference-editorial .about-section-grid {
+  grid-auto-rows: 340px;
+}
+
+.enhe-reference-editorial .about-section-grid .enhe-reference-editorial-card > p:not(.about-section-highlight) {
+  margin-top: 12px;
+  overflow: hidden;
 }
 
 .enhe-reference-editorial::before {
@@ -1202,7 +1215,8 @@
 }
 
 .enhe-reference-editorial .about-section-highlight {
-  margin-top: 18px;
+  margin-top: auto;
+  margin-bottom: 0;
   padding: 12px 14px;
   border-inline-start: 3px solid var(--enhe-action);
   background: color-mix(in srgb, var(--enhe-action) 7%, #fff);
