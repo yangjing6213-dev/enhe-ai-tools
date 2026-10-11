@@ -57,7 +57,7 @@ describe("public interface polish contract", () => {
 
   it("uses tabular numbers and targeted neutral outlines for public dynamic metrics and thumbnails", () => {
     const toolCard = readFileSync(new URL("../components/tool-card.tsx", import.meta.url), "utf8");
-    const newsList = readFileSync(new URL("../app/ai-news/page-shell.tsx", import.meta.url), "utf8");
+    const newsList = readFileSync(new URL("../components/ai-news-listing.tsx", import.meta.url), "utf8");
     const newsDetail = readFileSync(new URL("../app/ai-news/[slug]/page-shell.tsx", import.meta.url), "utf8");
     const searchDialog = readFileSync(new URL("../components/public-search-dialog.tsx", import.meta.url), "utf8");
     const toolDetail = readFileSync(new URL("../app/tools/[slug]/page-shell.tsx", import.meta.url), "utf8");

@@ -8,6 +8,11 @@ import {
 } from "@/app/software/page-shell";
 import type { SoftwareCatalogPage } from "@/lib/redesign/software/software-production";
 
+vi.mock("next/navigation", async (importOriginal) => ({
+  ...await importOriginal<typeof import("next/navigation")>(),
+  useRouter: () => ({ replace: vi.fn() }),
+}));
+
 Object.assign(globalThis, { React });
 
 function findElement(node: ReactNode, type: unknown): ReactNode | null {

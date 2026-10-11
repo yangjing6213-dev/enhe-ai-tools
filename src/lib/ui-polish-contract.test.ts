@@ -52,8 +52,8 @@ describe("ENHE visual polish contract", () => {
 
   it("uses light-surface tokens for AI News actions and honors reduced motion", () => {
     const interactions = read("src/components/ai-news-interactions.tsx");
-    const newsPage = read("src/app/ai-news/page-shell.tsx");
-    const newsCardStart = newsPage.indexOf("function NewsCard(");
+    const newsPage = read("src/components/ai-news-listing.tsx");
+    const newsCardStart = newsPage.indexOf("function NewsListingArticle(");
     const nextFunctionStart = newsPage.indexOf("\nfunction ", newsCardStart + 1);
     expect(newsCardStart).toBeGreaterThanOrEqual(0);
     const newsCard = newsPage.slice(

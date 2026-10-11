@@ -68,8 +68,10 @@ describe("ENHE redesign public shell candidate", () => {
     const languageSwitch = readCandidate("components/redesign/enhe-redesign-language-switch.tsx");
 
     expect(languageSwitch).toContain("RedesignLanguageHrefs");
-    expect(languageSwitch).toContain("href={localeHrefs.zh}");
-    expect(languageSwitch).toContain("href={localeHrefs.en}");
+    expect(languageSwitch).toContain("useState(localeHrefs)");
+    expect(languageSwitch).toContain("href={currentHrefs.zh}");
+    expect(languageSwitch).toContain("href={currentHrefs.en}");
+    expect(languageSwitch).toContain("CustomEvent<RedesignLanguageHrefs>");
     expect(languageSwitch).toContain("中文");
     expect(languageSwitch).toContain("EN");
     expect(languageSwitch).not.toContain("window.location");
