@@ -1086,22 +1086,14 @@ body .customer-support-widget .customer-support-launcher,
   padding: 0;
   border: 1px solid var(--enhe-border);
   border-radius: 50%;
-  background: transparent;
+  background: #fff;
   color: var(--enhe-action);
-  box-shadow: none;
-  backdrop-filter: none;
   cursor: pointer;
   appearance: none;
-  transition: transform 160ms ease, border-color 160ms ease;
 }
 
-.enhe-redesign-production .site-floating-action:hover {
-  transform: translateY(-2px);
-  border-color: var(--enhe-action);
-}
-
-.enhe-redesign-production .site-floating-action:active {
-  transform: scale(0.96);
+.enhe-redesign-production button.site-floating-action.customer-support-launcher {
+  border-radius: 50% !important;
 }
 
 .enhe-redesign-production .site-floating-action:focus-visible {

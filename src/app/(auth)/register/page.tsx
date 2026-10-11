@@ -5,7 +5,7 @@ export const dynamic = "force-dynamic";
 export default async function RegisterPage({
   searchParams,
 }: {
-  searchParams: Promise<{ returnTo?: string }>;
+  searchParams: Promise<{ returnTo?: string; message?: string }>;
 }) {
   return <RegisterPageShell searchParams={searchParams} />;
 }

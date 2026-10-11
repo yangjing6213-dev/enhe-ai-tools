@@ -74,7 +74,8 @@ describe("ENHE public visual refresh contract", () => {
     expect(registerPage).toContain('placeholder={locale === "en" ? "Enter your account" : "请输入注册账号"}');
     expect(registerPage).toContain("字母和数字");
     expect(loginPage).toContain('type="text"');
-    expect(userPage).toContain("normalizeImageSrc(user.avatar)");
+    expect(userPage).toContain("resolveUserAvatarSrc(user.avatar)");
+    expect(userPage).toContain("<UserAvatar");
     expect(refreshStyles).toMatch(/\.enhe-redesign-production \.enhe-auth-page::before\s*\{[^}]*display:\s*none/);
     expect(refreshStyles).toMatch(/\.enhe-redesign-production \.enhe-auth-page \.login-submit-button[\s\S]*?-webkit-text-fill-color:\s*#fff\s*!important/);
     expect(accountStyles).toMatch(/\.enhe-redesign-production \.user-center-page :is\(button\[data-variant="default"\][\s\S]*?-webkit-text-fill-color:\s*#fff\s*!important/);

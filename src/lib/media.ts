@@ -7,6 +7,7 @@ export function normalizeImageSrc(value?: string | null) {
   if (!value) return null;
   const trimmed = value.trim();
   if (!trimmed) return null;
+  if (/^cos:\/\//i.test(trimmed)) return null;
   if (/^https?:\/\//i.test(trimmed)) {
     try {
       const url = new URL(trimmed);

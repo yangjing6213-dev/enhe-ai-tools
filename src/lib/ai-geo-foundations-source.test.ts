@@ -206,7 +206,8 @@ describe("AI GEO foundations", () => {
     const pageShell = read("src/app/page-shell.tsx");
     const dictionaries = read("src/lib/dictionaries.ts");
 
-    expect(localeRouting).toContain("shouldRedirectRootToEnglish");
+    expect(localeRouting).toContain("getRequestLocalePreference");
+    expect(localeRouting).toContain("getRequestCountryCode");
     expect(localeRouting).toContain("localeDetectionVaryHeader");
     expect(middleware).toContain('isChinesePublicPath ? "zh"');
     expect(middleware).toContain('"x-enhe-locale"');

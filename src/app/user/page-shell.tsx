@@ -1,5 +1,4 @@
 import Link from "next/link";
-import Image from "next/image";
 import {
   cancelOrderAction,
   changePasswordAction,
@@ -22,7 +21,8 @@ import { buildCanonicalToolPath } from "@/lib/public-slugs";
 import { reviewCompletionNotice, reviewCompletionNoticeEn } from "@/lib/review-copy";
 import { buildUserToolEntitlements, type UserEntitlementTool } from "@/lib/user-entitlements";
 import { formatCurrency } from "@/lib/utils";
-import { normalizeImageSrc } from "@/lib/media";
+import { resolveUserAvatarSrc } from "@/lib/user-avatar";
+import { UserAvatar } from "@/components/user-avatar";
 
 export type UserCenterSearchParams = Promise<Record<string, string | undefined>>;
 
@@ -44,8 +44,11 @@ export async function UserCenterPageShell({
       ? (locale === "en" ? "Use a PNG, JPEG, or WebP image under 700 KB." : "请上传 700 KB 以内的 PNG、JPEG 或 WebP 图片。")
       : null;
   const user = await requireUser(locale);
+  const avatarSourcePromise = resolveUserAvatarSrc(user.avatar);
 
-  const [notifications, orders, downloads, usages, comments, purchases, publishedTools] = await Promise.all([
+  const [avatarSrc, userData] = await Promise.all([
+    avatarSourcePromise,
+    Promise.all([
     prisma.notification.findMany({
       where: { userId: user.id },
       orderBy: { createdAt: "desc" },
@@ -85,7 +88,9 @@ export async function UserCenterPageShell({
       },
       orderBy: [{ sortOrder: "asc" }, { createdAt: "desc" }]
     })
+    ])
   ]);
+  const [notifications, orders, downloads, usages, comments, purchases, publishedTools] = userData;
 
   const entitlementSummary = buildUserToolEntitlements({
     purchasedToolIds: purchases.map((purchase) => purchase.toolId),
@@ -112,13 +117,10 @@ export async function UserCenterPageShell({
         <aside className="space-y-4">
           <Panel title={locale === "en" ? "Profile" : "个人资料"}>
             <div className="flex items-center gap-4">
-              {user.avatar ? (
-                <Image src={normalizeImageSrc(user.avatar) ?? user.avatar} alt={user.nickname ?? (locale === "en" ? "User avatar" : "用户头像")} width={64} height={64} unoptimized className="h-16 w-16 rounded-full object-cover" />
-              ) : (
-                <div aria-hidden="true" className="flex h-16 w-16 items-center justify-center rounded-full bg-[var(--marketing-accent)] text-xl font-bold text-white">
-                  {(user.nickname || user.email || "U").slice(0, 1).toUpperCase()}
-                </div>
-              )}
+              <UserAvatar
+                src={avatarSrc}
+                alt={user.nickname ?? (locale === "en" ? "User avatar" : "用户头像")}
+              />
               <div className="min-w-0">
                 <p className="truncate font-semibold text-[var(--marketing-text)]">{user.nickname || (locale === "en" ? "Set a username" : "请设置用户名")}</p>
                 <p className="mt-1 text-xs text-[var(--marketing-muted)]">{locale === "en" ? "Your name and avatar may appear with comments you choose to feature." : "你选择展示的评论可能会同时显示用户名和头像。"}</p>

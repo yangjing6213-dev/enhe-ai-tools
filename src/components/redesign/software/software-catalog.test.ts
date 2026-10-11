@@ -42,27 +42,18 @@ describe("AI tools candidate catalog", () => {
     expect(page).not.toContain("document.documentElement.lang");
   });
 
-  it("normalizes locale query requests before server render so html lang can follow the same effective locale", () => {
-    const redirectResponse = middleware(
+  it("keeps preview locale queries so page content and html lang follow the selected locale", () => {
+    const renderResponse = middleware(
       new NextRequest("https://www.enhe-tech.com.cn/redesign-preview/software?locale=en", {
         headers: { cookie: "enhe_locale=zh" },
       }),
     );
 
-    expect(redirectResponse.status).toBe(308);
-    expect(redirectResponse.headers.get("location")).toBe(
-      "https://www.enhe-tech.com.cn/redesign-preview/software",
-    );
-    expect(redirectResponse.cookies.get("enhe_locale")?.value).toBe("en");
-
-    const renderResponse = middleware(
-      new NextRequest("https://www.enhe-tech.com.cn/redesign-preview/software", {
-        headers: { cookie: "enhe_locale=en" },
-      }),
-    );
-
+    expect(renderResponse.status).toBe(200);
+    expect(renderResponse.headers.get("location")).toBeNull();
     expect(renderResponse.headers.get("x-middleware-request-x-enhe-html-locale")).toBe("en");
     expect(renderResponse.headers.get("x-middleware-request-x-enhe-locale")).toBe("en");
+    expect(renderResponse.cookies.get("enhe_locale")?.value).toBe("en");
   });
 
   it("keeps one H1, three ordered sections, and the exact 4/3/12 section contract", () => {

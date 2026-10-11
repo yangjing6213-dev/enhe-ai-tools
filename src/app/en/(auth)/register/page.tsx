@@ -5,7 +5,7 @@ export const dynamic = "force-dynamic";
 export default function EnglishRegisterPage({
   searchParams,
 }: {
-  searchParams: Promise<{ returnTo?: string }>;
+  searchParams: Promise<{ returnTo?: string; message?: string }>;
 }) {
   return <RegisterPageShell forceLocale="en" searchParams={searchParams} />;
 }

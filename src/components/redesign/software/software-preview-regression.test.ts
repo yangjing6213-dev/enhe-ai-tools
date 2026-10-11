@@ -90,31 +90,22 @@ function assertLocaleSurface(locale: RedesignLocale, html: string) {
 }
 
 describe("AI tools candidate bilingual preview regression", () => {
-  it("keeps the middleware-first locale normalization, candidate guard, and root-lang metadata contract", () => {
+  it("keeps explicit preview locales, candidate guard, and root-lang metadata aligned", () => {
     const page = readCandidate("app/redesign-preview/software/page.tsx");
     const layout = readCandidate("app/redesign-preview/software/layout.tsx");
 
     for (const locale of ["en", "zh"] as const) {
-      const redirectResponse = middleware(
+      const renderResponse = middleware(
         new NextRequest(`https://www.enhe-tech.com.cn${PREVIEW_ROUTE}?locale=${locale}`, {
           headers: { cookie: `enhe_locale=${locale === "en" ? "zh" : "en"}` },
         }),
       );
 
-      expect(redirectResponse.status).toBe(308);
-      expect(redirectResponse.headers.get("location")).toBe(
-        `https://www.enhe-tech.com.cn${PREVIEW_ROUTE}`,
-      );
-      expect(redirectResponse.cookies.get("enhe_locale")?.value).toBe(locale);
-
-      const renderResponse = middleware(
-        new NextRequest(`https://www.enhe-tech.com.cn${PREVIEW_ROUTE}`, {
-          headers: { cookie: `enhe_locale=${locale}` },
-        }),
-      );
-
+      expect(renderResponse.status).toBe(200);
+      expect(renderResponse.headers.get("location")).toBeNull();
       expect(renderResponse.headers.get("x-middleware-request-x-enhe-html-locale")).toBe(locale);
       expect(renderResponse.headers.get("x-middleware-request-x-enhe-locale")).toBe(locale);
+      expect(renderResponse.cookies.get("enhe_locale")?.value).toBe(locale);
     }
 
     expect(page).toContain('process.env.NODE_ENV === "production"');

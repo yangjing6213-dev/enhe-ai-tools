@@ -3,6 +3,42 @@ import { describe, expect, it } from "vitest";
 import { middleware } from "@/middleware";
 
 describe("locale switch redirects", () => {
+  it("automatically follows country language on a localized deep link for first-time visitors", () => {
+    const response = middleware(
+      new NextRequest("https://www.enhe-tech.com.cn/software", {
+        headers: { "cf-ipcountry": "US", "user-agent": "Mozilla/5.0" },
+      }),
+    );
+
+    expect(response.status).toBe(307);
+    expect(response.headers.get("location")).toBe("https://www.enhe-tech.com.cn/en/software");
+    expect(response.headers.get("set-cookie")).toContain("enhe_locale=en");
+  });
+
+  it("keeps a manually selected Chinese language when the visitor is outside China", () => {
+    const response = middleware(
+      new NextRequest("https://www.enhe-tech.com.cn/software", {
+        headers: { cookie: "enhe_locale=zh", "cf-ipcountry": "US", "user-agent": "Mozilla/5.0" },
+      }),
+    );
+
+    expect(response.status).toBe(200);
+    expect(response.headers.get("location")).toBeNull();
+  });
+
+  it("keeps preview locale parameters and gives the preview page the selected language", () => {
+    const response = middleware(
+      new NextRequest("https://www.enhe-tech.com.cn/redesign-preview/software?locale=zh", {
+        headers: { cookie: "enhe_locale=en", "cf-ipcountry": "US", "user-agent": "Mozilla/5.0" },
+      }),
+    );
+
+    expect(response.status).toBe(200);
+    expect(response.headers.get("location")).toBeNull();
+    expect(response.headers.get("x-middleware-request-x-enhe-html-locale")).toBe("zh");
+    expect(response.cookies.get("enhe_locale")?.value).toBe("zh");
+  });
+
   it("redirects unauthenticated admin paths before database-backed rendering", () => {
     const response = middleware(new NextRequest("https://www.enhe-tech.com.cn/admin"));
 

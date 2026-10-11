@@ -66,14 +66,19 @@ export function normalizePathForRequestedLocale(
   pathname: string,
   locale: Locale,
 ) {
+  if (pathname.startsWith("/redesign-preview/")) return pathname;
+  const isAdminOrOrderPath = /^\/(?:admin|orders)(?:\/|$)/.test(pathname);
+
   if (locale === "zh") {
     if (pathname === "/en") return "/";
     if (pathname.startsWith("/en/")) return pathname.slice(3) || "/";
     return pathname;
   }
 
-  if (pathname === "/") return "/en";
-  return pathname;
+  if (isAdminOrOrderPath || pathname === "/en" || pathname.startsWith("/en/")) {
+    return pathname;
+  }
+  return pathname === "/" ? "/en" : `/en${pathname}`;
 }
 
 function parseAcceptLanguage(headerValue: string | null) {
@@ -112,11 +117,11 @@ export function inferLocaleFromRequest(headers: Headers): Locale {
   return "zh";
 }
 
-export function shouldRedirectRootToEnglish(input: {
-  pathname: string;
-  cookieLocale?: string;
-  headers: Headers;
-}) {
-  if (input.pathname !== "/") return false;
-  return false;
+export function getRequestLocalePreference(
+  cookieLocale: string | undefined,
+  headers: Headers,
+): Locale | null {
+  if (cookieLocale === "zh" || cookieLocale === "en") return cookieLocale;
+  if (isSearchOrAiCrawler(headers.get("user-agent"))) return null;
+  return inferLocaleFromRequest(headers);
 }

@@ -32,6 +32,12 @@ test("homepage polish stays readable, responsive, and interactive without extern
   const rejectedOrigins = await installLoopbackOnlyGuard(page);
   const pageErrors: string[] = [];
   page.on("pageerror", (error) => pageErrors.push(error.message));
+  const port = process.env.PORT ?? "3000";
+  await page.context().addCookies([{
+    name: "enhe_locale",
+    value: "zh",
+    url: `http://127.0.0.1:${port}`,
+  }]);
 
   for (const width of [1440, 1024, 900, 768, 390, 320]) {
     await page.setViewportSize({ width, height: 900 });
@@ -44,8 +50,11 @@ test("homepage polish stays readable, responsive, and interactive without extern
     await expect(brand).toBeVisible();
     await expect(brandLabel).toHaveCount(0);
     await expect(hero.locator("h1")).toHaveAttribute("aria-label", "AI一站式平台 创造未来 改变生活");
-    const heroTitleLines = hero.locator("h1 > span");
-    await expect(heroTitleLines).toHaveText(["AI一站式平台", "创造未来 改变生活"]);
+    const heroTitleLines = hero.locator("h1 > span.masked-heading");
+    await expect(heroTitleLines).toHaveCount(2);
+    await expect(heroTitleLines.nth(0).locator(".masked-heading__measure")).toHaveText("AI一站式平台");
+    await expect(heroTitleLines.nth(1).locator(".masked-heading__measure")).toHaveText("创造未来改变生活");
+    await expect(heroTitleLines.locator(".masked-heading__source")).toHaveCount(2);
     await expect(page.locator(".redesign-footer .redesign-home-brand-value-cta")).toHaveCount(0);
     await expect(hero.locator(".redesign-home-hero-inner")).toHaveCSS("text-align", "center");
     await expect(hero).toHaveCSS("background-image", "none");
@@ -327,6 +336,11 @@ test("homepage polish stays readable, responsive, and interactive without extern
   await expect(englishReviews.locator(".redesign-home-reviews-control, .redesign-home-review-triangle")).toHaveCount(0);
 
   if (process.env.PLAYWRIGHT_USE_PRODUCTION_SERVER !== "1") {
+    await page.context().addCookies([{
+      name: "enhe_locale",
+      value: "zh",
+      url: `http://127.0.0.1:${port}`,
+    }]);
     const softwareResponse = await page.goto("/redesign-preview/software?locale=zh", { waitUntil: "load" });
     expect(softwareResponse?.status(), "software catalog preview").toBe(200);
     await expect(page.locator(".redesign-software-section-header h2")).toHaveText([
@@ -346,12 +360,17 @@ test("homepage polish stays readable, responsive, and interactive without extern
   expect(pageErrors).toEqual([]);
 });
 
-test("floating cart and inbox open background-free personal panels above support", async ({ page }) => {
+test("floating cart and inbox match the white circular support icon and open personal panels", async ({ page }) => {
   if (process.env.DATABASE_URL?.trim()) {
     throw new Error("Floating action UI checks require an unset DATABASE_URL.");
   }
 
   const port = process.env.PORT ?? "3000";
+  await page.context().addCookies([{
+    name: "enhe_locale",
+    value: "zh",
+    url: `http://127.0.0.1:${port}`,
+  }]);
   const cookiePayload = Buffer.from(JSON.stringify({
     email: "visitor@example.com",
     nickname: "Test visitor",
@@ -405,25 +424,33 @@ test("floating cart and inbox open background-free personal panels above support
   await expect(inbox.locator(".site-floating-action-unread")).toBeVisible();
   await expect(support).toBeVisible();
 
+  const readButtonStyle = (element: HTMLElement) => {
+    const { width, height } = element.getBoundingClientRect();
+    const style = getComputedStyle(element);
+    return {
+      width,
+      height,
+      backgroundColor: style.backgroundColor,
+      borderWidth: style.borderTopWidth,
+      borderRadius: style.borderRadius,
+      borderColor: style.borderTopColor,
+      boxShadow: style.boxShadow,
+      backdropFilter: style.backdropFilter,
+      transitionProperty: style.transitionProperty,
+      transitionDuration: style.transitionDuration,
+    };
+  };
   const controls = await Promise.all([cart, inbox].map((control) =>
-    control.evaluate((element) => {
-      const { width, height } = element.getBoundingClientRect();
-      const style = getComputedStyle(element);
-      return {
-        width,
-        height,
-        backgroundColor: style.backgroundColor,
-        borderWidth: style.borderTopWidth,
-        boxShadow: style.boxShadow,
-      };
-    }),
+    control.evaluate(readButtonStyle),
   ));
+  const supportStyle = await support.evaluate(readButtonStyle);
   for (const control of controls) {
     expect(control.width).toBe(44);
     expect(control.height).toBe(44);
-    expect(control.backgroundColor).toBe("rgba(0, 0, 0, 0)");
+    expect(control.backgroundColor).toBe("rgb(255, 255, 255)");
     expect(control.borderWidth).toBe("1px");
-    expect(control.boxShadow).toBe("none");
+    expect(control.borderRadius).toBe("50%");
+    expect(control).toEqual(supportStyle);
   }
 
   await cart.click();

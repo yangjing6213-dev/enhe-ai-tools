@@ -13,7 +13,7 @@ export async function RegisterPageShell({
   searchParams = Promise.resolve({}),
 }: {
   forceLocale?: Locale;
-  searchParams?: Promise<{ returnTo?: string }>;
+  searchParams?: Promise<{ returnTo?: string; message?: string }>;
 } = {}) {
   const locale = forceLocale ?? (await getCurrentLocale());
   const t = getDictionary(locale);
@@ -23,6 +23,20 @@ export async function RegisterPageShell({
     params.returnTo,
     buildLocalePath("/user", locale),
   );
+  const googleMessage = params.message === "google-not-configured"
+    ? locale === "en"
+      ? "Google registration is not configured yet. You can create an account below."
+      : "Google 注册服务尚未完成配置，你仍可使用下方表单注册。"
+    : params.message === "google-account-conflict"
+      ? locale === "en"
+        ? "This Google account is already linked to another ENHE AI account. Sign in to that account first."
+        : "此 Google 账号已绑定其他 ENHE AI 账号，请先使用原账号登录。"
+      : params.message === "google-auth-failed"
+        ? locale === "en"
+          ? "Google registration could not be completed. Please try again."
+          : "Google 注册未能完成，请重试。"
+        : null;
+  const googleRegisterHref = `/api/auth/google/start?returnTo=${encodeURIComponent(returnTo)}`;
 
   return (
     <main className="enhe-editorial-page enhe-auth-page">
@@ -32,6 +46,7 @@ export async function RegisterPageShell({
         <input type="hidden" name="returnTo" value={returnTo} />
         <h1 className="text-3xl font-black text-[var(--marketing-text)]">{t.auth.registerTitle}</h1>
         <p className="mt-3 text-sm font-medium text-[var(--marketing-muted)]">{t.auth.registerIntro}</p>
+        {googleMessage ? <p role="alert" className="status-danger mt-4">{googleMessage}</p> : null}
         <label htmlFor="register-nickname" className="mt-8 block text-sm font-semibold text-[var(--marketing-text)]">{locale === "en" ? "Username" : "用户名"}</label>
         <input
           id="register-nickname"
@@ -96,6 +111,13 @@ export async function RegisterPageShell({
         <FormSubmitButton className="login-submit-button mt-8 w-full text-base" pendingLabel={t.auth.creatingAccount}>
           {t.auth.createAccount}
         </FormSubmitButton>
+        <a
+          href={googleRegisterHref}
+          className="mt-4 flex min-h-12 w-full items-center justify-center gap-3 rounded-lg border border-slate-300 bg-white px-4 font-semibold text-slate-900 shadow-sm transition-colors hover:bg-slate-50"
+        >
+          <span aria-hidden="true" className="grid h-6 w-6 place-items-center rounded-full border border-slate-200 font-bold text-[#4285F4]">G</span>
+          {locale === "en" ? "Sign up with Google" : "使用 Google 账号注册"}
+        </a>
         <p className="mt-5 text-center text-sm text-[var(--marketing-muted)]">
           {t.auth.hasAccount}
           <Link

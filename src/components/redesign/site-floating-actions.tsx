@@ -220,7 +220,7 @@ export function SiteFloatingActions({
     >
       <div className="site-floating-action-container">
         <button
-          className="site-floating-action"
+          className="site-floating-action customer-support-launcher shadow-[0_14px_38px_rgba(0,8,14,0.42)] backdrop-blur-xl transition-[border-color,transform] hover:-translate-y-0.5 hover:border-[var(--marketing-accent)]"
           type="button"
           aria-label={isEnglish ? "View purchase orders" : "查看购买订单"}
           aria-controls="site-floating-cart-panel"
@@ -254,7 +254,7 @@ export function SiteFloatingActions({
 
       <div className="site-floating-action-container">
         <button
-          className="site-floating-action"
+          className="site-floating-action customer-support-launcher shadow-[0_14px_38px_rgba(0,8,14,0.42)] backdrop-blur-xl transition-[border-color,transform] hover:-translate-y-0.5 hover:border-[var(--marketing-accent)]"
           type="button"
           aria-label={
             isEnglish

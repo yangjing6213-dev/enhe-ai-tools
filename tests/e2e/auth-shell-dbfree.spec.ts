@@ -39,6 +39,11 @@ for (const route of routes) {
         if (message.type() === "error") consoleErrors.push(message.text());
       });
 
+      await page.context().addCookies([{
+        name: "enhe_locale",
+        value: route.locale,
+        url: new URL(baseURL).origin,
+      }]);
       await page.setViewportSize({ width, height: 844 });
       const response = await page.goto(route.path, { waitUntil: "load" });
       expect(response?.status()).toBe(200);
@@ -59,6 +64,11 @@ for (const route of routes) {
       await expect(password).toHaveAttribute("type", "password");
       if (route.kind === "register") {
         await expect(form.getByLabel(route.locale === "en" ? "Email" : "邮箱", { exact: true })).toBeVisible();
+        const googleLink = form.getByRole("link", {
+          name: route.locale === "en" ? "Sign up with Google" : "使用 Google 账号注册",
+        });
+        await expect(googleLink).toBeVisible();
+        await expect(googleLink).toHaveAttribute("href", /\/api\/auth\/google\/start\?returnTo=/);
       }
       const submitButton = form.locator("button[type='submit']");
       await expect(submitButton).toBeVisible();

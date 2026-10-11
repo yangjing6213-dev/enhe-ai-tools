@@ -43,4 +43,8 @@ describe("media helpers", () => {
     expect(normalizeImageSrc("images/qr.jpg")).toBe("/images/qr.jpg");
     expect(normalizeImageSrc("https://example.com/qr.png")).toBe("https://example.com/qr.png");
   });
+
+  it("does not turn a private COS object reference into a broken browser URL", () => {
+    expect(normalizeImageSrc("cos://enhe-bucket/user-avatars/avatar.png")).toBeNull();
+  });
 });

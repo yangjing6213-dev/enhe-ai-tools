@@ -4,11 +4,12 @@ import {
   localeDetectionVaryHeader,
   localeCookieMaxAge,
   localeCookieName,
+  getRequestLocalePreference,
   getRequestedLocaleSwitch,
   localeSwitchQueryName,
-  shouldRedirectRootToEnglish,
   normalizePathForRequestedLocale,
 } from "@/lib/locale-routing";
+import { isLocalizedPublicPath } from "@/lib/seo";
 
 export function middleware(request: NextRequest) {
   if (request.nextUrl.hostname.toLowerCase() === "enhe-tech.com.cn") {
@@ -21,6 +22,7 @@ export function middleware(request: NextRequest) {
 
   const requestHeaders = new Headers(request.headers);
   const pathname = request.nextUrl.pathname;
+  const isRedesignPreviewPath = pathname.startsWith("/redesign-preview/");
   const isEnglishPath = pathname === "/en" || pathname.startsWith("/en/");
   const isAdminPath =
     pathname === "/admin" ||
@@ -68,7 +70,7 @@ export function middleware(request: NextRequest) {
     pathname.startsWith("/tools/") ||
     pathname.startsWith("/legal/");
 
-  if (requestedLocale) {
+  if (requestedLocale && !isRedesignPreviewPath) {
     const redirectUrl = request.nextUrl.clone();
     redirectUrl.pathname = normalizePathForRequestedLocale(
       redirectUrl.pathname,
@@ -91,28 +93,37 @@ export function middleware(request: NextRequest) {
     return response;
   }
 
-  if (
-    shouldRedirectRootToEnglish({
-      pathname,
-      cookieLocale,
-      headers: request.headers,
-    })
-  ) {
-    const redirectUrl = request.nextUrl.clone();
-    redirectUrl.pathname = "/en";
-    const response = NextResponse.redirect(redirectUrl);
-    response.headers.set("Content-Language", "en-US");
-    response.headers.set("Cache-Control", localeDetectionCacheControl);
-    response.headers.set("Vary", localeDetectionVaryHeader);
-    response.cookies.set(localeCookieName, "en", {
-      path: "/",
-      maxAge: localeCookieMaxAge,
-      sameSite: "lax"
-    });
-    return response;
+  const localePreference = isLocalizedPublicPath(pathname)
+    ? getRequestLocalePreference(cookieLocale, request.headers)
+    : isRedesignPreviewPath
+      ? requestedLocale
+      : null;
+  if (localePreference) {
+    const localizedPath = normalizePathForRequestedLocale(pathname, localePreference);
+    if (localizedPath !== pathname) {
+      const redirectUrl = request.nextUrl.clone();
+      redirectUrl.pathname = localizedPath;
+      const response = NextResponse.redirect(redirectUrl);
+      response.headers.set(
+        "Content-Language",
+        localePreference === "en" ? "en-US" : "zh-CN",
+      );
+      response.headers.set("Cache-Control", localeDetectionCacheControl);
+      response.headers.set("Vary", localeDetectionVaryHeader);
+      response.cookies.set(localeCookieName, localePreference, {
+        path: "/",
+        maxAge: localeCookieMaxAge,
+        sameSite: "lax"
+      });
+      return response;
+    }
   }
 
-  const resolvedLocale = isEnglishPath ? "en" : isChinesePublicPath ? "zh" : cookieLocale === "en" ? "en" : "zh";
+  const resolvedLocale = isEnglishPath
+    ? "en"
+    : isChinesePublicPath
+      ? "zh"
+      : localePreference ?? (cookieLocale === "en" ? "en" : "zh");
   const htmlLocale = isEnglishPath ? "en" : isChinesePublicPath ? "zh" : resolvedLocale;
 
   requestHeaders.set("x-enhe-locale", resolvedLocale);
@@ -137,6 +148,16 @@ export function middleware(request: NextRequest) {
 
   if (!isLanguageNeutralMachinePath) {
     response.headers.set("Content-Language", contentLanguage);
+  }
+
+  if (localePreference && cookieLocale !== localePreference) {
+    response.headers.set("Cache-Control", localeDetectionCacheControl);
+    response.headers.set("Vary", localeDetectionVaryHeader);
+    response.cookies.set(localeCookieName, localePreference, {
+      path: "/",
+      maxAge: localeCookieMaxAge,
+      sameSite: "lax"
+    });
   }
 
   if (isEnglishPath && cookieLocale !== "en") {

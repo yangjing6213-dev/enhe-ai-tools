@@ -1,5 +1,6 @@
 import { HOME_COPY } from "@/lib/redesign/home/home-copy";
 import type { RedesignLocale } from "@/components/redesign/types";
+import MaskedHeading from "@/components/MaskedHeading";
 
 export function EnheRedesignHero({ locale }: { locale: RedesignLocale }) {
   const copy = HOME_COPY[locale];
@@ -13,7 +14,28 @@ export function EnheRedesignHero({ locale }: { locale: RedesignLocale }) {
       <div className="redesign-home-hero-inner">
         <h1 id={`redesign-home-title-${locale}`} aria-label={copy.h1}>
           {titleLines.map((line, index) => (
-            <span key={`${index}-${line}`}>{line}</span>
+            <MaskedHeading
+              key={`${index}-${line}`}
+              tag="span"
+              className="redesign-home-animated-line"
+              text={line}
+              src="/redesign/home/blue-energy-city.webp"
+              fillScale={1.25}
+              parallax={26}
+              drift={18}
+              brightness={1}
+              saturation={1}
+              grayscale={false}
+              reveal="rise"
+              trigger="view"
+              duration={1.1}
+              stagger={0.09}
+              align="center"
+              weight={800}
+              tracking={-0.03}
+              lineHeight={1.06}
+              textScale={locale === "zh" ? 0.105 : 0.08}
+            />
           ))}
         </h1>
         <p className="redesign-home-subtitle">{copy.subtitle}</p>
