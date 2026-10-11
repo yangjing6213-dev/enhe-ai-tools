@@ -43,9 +43,10 @@ test("homepage polish stays readable, responsive, and interactive without extern
     const hero = page.locator(".redesign-home-hero");
     await expect(brand).toBeVisible();
     await expect(brandLabel).toHaveCount(0);
-    await expect(hero.locator("h1")).toHaveAttribute("aria-label", "AI一站式平台 一起创造未来");
+    await expect(hero.locator("h1")).toHaveAttribute("aria-label", "AI一站式平台 创造未来 改变生活");
     const heroTitleLines = hero.locator("h1 > span");
-    await expect(heroTitleLines).toHaveText(["AI一站式平台", "一起创造未来"]);
+    await expect(heroTitleLines).toHaveText(["AI一站式平台", "创造未来 改变生活"]);
+    await expect(page.locator(".redesign-footer .redesign-home-brand-value-cta")).toHaveCount(0);
     await expect(hero.locator(".redesign-home-hero-inner")).toHaveCSS("text-align", "center");
     await expect(hero).toHaveCSS("background-image", "none");
     const heroColor = await hero.evaluate((element) => getComputedStyle(element).color);
@@ -186,35 +187,25 @@ test("homepage polish stays readable, responsive, and interactive without extern
     await expect(footer.locator(".footer-brand-logo")).toHaveAttribute("src", /enhe-footer-wordmark/);
     const footerAlignment = await footer.evaluate((element) => {
       const heading = element.querySelector<HTMLElement>(".redesign-home-brand-value-inner h2");
-      const cta = element.querySelector<HTMLElement>(".redesign-home-brand-value-cta");
       const logo = element.querySelector<HTMLElement>(".footer-brand-logo");
       const navigation = element.querySelector<HTMLElement>(".footer-navigation");
       const firstTrigger = element.querySelector<HTMLElement>(".footer-group-trigger");
-      if (!heading || !cta || !logo || !navigation || !firstTrigger) {
+      const footerGrid = element.querySelector<HTMLElement>(".footer-grid");
+      if (!heading || !logo || !navigation || !firstTrigger || !footerGrid) {
         throw new Error("A footer alignment element is missing.");
       }
-      const matrixY = (target: HTMLElement) => {
-        const transform = getComputedStyle(target).transform;
-        return transform === "none" ? 0 : new DOMMatrixReadOnly(transform).m42;
-      };
       return {
         headingTop: heading.getBoundingClientRect().top,
         headingSize: Number.parseFloat(getComputedStyle(heading).fontSize),
-        ctaHeight: cta.getBoundingClientRect().height,
-        ctaShift: matrixY(cta),
-        logoHeight: logo.getBoundingClientRect().height,
-        logoShift: matrixY(logo),
         logoCenterOffset: Math.abs(
           logo.getBoundingClientRect().top + logo.getBoundingClientRect().height / 2 -
-          (element.querySelector<HTMLElement>(".footer-grid")!.getBoundingClientRect().top +
-            element.querySelector<HTMLElement>(".footer-grid")!.getBoundingClientRect().height / 2),
+          (footerGrid.getBoundingClientRect().top + footerGrid.getBoundingClientRect().height / 2),
         ),
         navigationTop: navigation.getBoundingClientRect().top,
         firstTriggerTop: firstTrigger.getBoundingClientRect().top,
       };
     });
     expect(footerAlignment.headingSize).toBeGreaterThanOrEqual(36);
-    expect(footerAlignment.ctaShift).toBeCloseTo(footerAlignment.ctaHeight * 0.3, 0);
     if (width >= 1280) {
       expect(footerAlignment.logoCenterOffset).toBeLessThanOrEqual(1);
     }
@@ -350,7 +341,7 @@ test("homepage polish stays readable, responsive, and interactive without extern
   expect(pageErrors).toEqual([]);
 });
 
-test("floating inbox and cart actions stack above support and show unread status", async ({ page }) => {
+test("floating cart and inbox open background-free personal panels above support", async ({ page }) => {
   if (process.env.DATABASE_URL?.trim()) {
     throw new Error("Floating action UI checks require an unset DATABASE_URL.");
   }
@@ -364,7 +355,7 @@ test("floating inbox and cart actions stack above support and show unread status
   await page.context().addCookies([{
     name: headerUserCookieName,
     value: signHeaderUserCookieValue(cookiePayload, getAuthSecret()),
-    url: `http://127.0.0.1:${port}/`,
+    url: "http://127.0.0.1:" + port + "/",
   }]);
   await page.route("**/api/user/notifications/unread-status", (route) =>
     route.fulfill({
@@ -373,35 +364,73 @@ test("floating inbox and cart actions stack above support and show unread status
       body: JSON.stringify({ hasUnread: true }),
     }),
   );
+  await page.route("**/api/user/quick-access*", (route) =>
+    route.fulfill({
+      status: 200,
+      contentType: "application/json",
+      body: JSON.stringify({
+        hasUnread: true,
+        orders: [{
+          id: "order-1",
+          orderNo: "ENHE202610110001",
+          itemName: "AI 提示词管理系统",
+          amount: "1.00",
+          orderStatus: "pending_payment",
+          createdAt: "2026-10-11T04:00:00.000Z",
+        }],
+        notifications: [{
+          id: "notification-1",
+          title: "订单支付提醒",
+          content: "你的订单正在等待付款。",
+          linkUrl: null,
+          isRead: false,
+          createdAt: "2026-10-11T04:00:00.000Z",
+        }],
+      }),
+    }),
+  );
 
   await page.setViewportSize({ width: 390, height: 844 });
   await page.goto("/", { waitUntil: "load" });
 
-  const cart = page.getByRole("link", { name: "查看购买订单" });
-  const inbox = page.getByRole("link", { name: "站内消息，有未读消息" });
+  const cart = page.getByRole("button", { name: "查看购买订单" });
+  const inbox = page.getByRole("button", { name: "站内消息，有未读消息" });
   const support = page.locator(".customer-support-widget .customer-support-launcher");
-  await expect(cart).toHaveAttribute("href", "/user#orders");
-  await expect(inbox).toHaveAttribute("href", "/user#notifications");
+  await expect(cart).toHaveAttribute("aria-expanded", "false");
   await expect(inbox.locator(".site-floating-action-unread")).toBeVisible();
   await expect(support).toBeVisible();
 
-  const positions = await Promise.all([cart, inbox, support].map((control) =>
+  const controls = await Promise.all([cart, inbox].map((control) =>
     control.evaluate((element) => {
-      const { top, right, bottom, width, height } = element.getBoundingClientRect();
-      return { top, right, bottom, width, height, radius: getComputedStyle(element).borderRadius };
+      const { width, height } = element.getBoundingClientRect();
+      const style = getComputedStyle(element);
+      return {
+        width,
+        height,
+        backgroundColor: style.backgroundColor,
+        borderWidth: style.borderTopWidth,
+        boxShadow: style.boxShadow,
+      };
     }),
   ));
-  for (const [index, position] of positions.entries()) {
-    expect(position.width, `floating control ${index} width`).toBe(44);
-    expect(position.height, `floating control ${index} height`).toBe(44);
-    expect(position.radius, `floating control ${index} shape`).toBe("50%");
+  for (const control of controls) {
+    expect(control.width).toBe(44);
+    expect(control.height).toBe(44);
+    expect(control.backgroundColor).toBe("rgba(0, 0, 0, 0)");
+    expect(control.borderWidth).toBe("0px");
+    expect(control.boxShadow).toBe("none");
   }
-  expect(positions[0].right).toBeCloseTo(positions[1].right, 0);
-  expect(positions[1].right).toBeCloseTo(positions[2].right, 0);
-  expect(positions[0].bottom).toBeLessThan(positions[1].top);
-  expect(positions[1].bottom).toBeLessThan(positions[2].top);
 
-  await page.emulateMedia({ reducedMotion: "reduce" });
-  await expect(cart).toHaveCSS("transition-property", "none");
-  await expect(cart).toHaveCSS("transform", "none");
+  await cart.click();
+  const ordersPanel = page.getByRole("dialog", { name: "最近订单" });
+  await expect(ordersPanel).toContainText("ENHE202610110001");
+  await expect(ordersPanel).toContainText("AI 提示词管理系统");
+  await expect(ordersPanel).toContainText("待支付");
+
+  await inbox.click();
+  const inboxPanel = page.getByRole("dialog", { name: "站内消息" });
+  await expect(inboxPanel).toContainText("订单支付提醒");
+  await expect(inboxPanel).toContainText("你的订单正在等待付款。");
+  await page.keyboard.press("Escape");
+  await expect(inboxPanel).toHaveCount(0);
 });

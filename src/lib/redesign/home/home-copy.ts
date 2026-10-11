@@ -16,14 +16,13 @@ export type RedesignHomeCopy = {
   };
   value: {
     heading: string;
-    cta: RedesignHomeCta;
   };
 };
 
 export const HOME_COPY: Record<RedesignLocale, RedesignHomeCopy> = {
   zh: {
     label: "给你的人生添加AI外挂",
-    h1: "AI一站式平台 一起创造未来",
+    h1: "AI一站式平台 创造未来 改变生活",
     subtitle: "发现值得使用的 AI 工具、实用方法与行业动态，让工作更高效，让创作更自由。",
     cta: { label: "探索 AI 工具", href: "/software" },
     review: {
@@ -32,7 +31,6 @@ export const HOME_COPY: Record<RedesignLocale, RedesignHomeCopy> = {
     },
     value: {
       heading: "让每一个人，都能驾驭AI，创造价值。",
-      cta: { label: "探索 AI 工具", href: "/software" },
     },
   },
   en: {
@@ -46,7 +44,6 @@ export const HOME_COPY: Record<RedesignLocale, RedesignHomeCopy> = {
     },
     value: {
       heading: "Help everyone master AI and create value.",
-      cta: { label: "Explore AI tools", href: "/en/software" },
     },
   },
 };

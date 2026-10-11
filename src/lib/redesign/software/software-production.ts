@@ -329,6 +329,12 @@ function getCreatedAtTime(value: Date | string) {
   return value instanceof Date ? value.getTime() : Date.parse(value);
 }
 
+export function buildPublicSoftwareCatalogItem(
+  row: PublicSoftwareCatalogRow,
+  locale: RedesignLocale,
+): SoftwareCatalogItem {
+  return buildCatalogItem(row, resolveSoftwareCatalogCategory(row), locale);
+}
 function buildCatalogItem(
   row: PublicSoftwareCatalogRow,
   categoryId: SoftwareLeafCategoryId,

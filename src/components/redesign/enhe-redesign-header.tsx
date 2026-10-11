@@ -80,11 +80,6 @@ export function EnheRedesignHeader({
                     {item.label}
                   </NavigationMenuTrigger>
                   <NavigationMenuContent className="redesign-nav-menu-content">
-                    <NavigationMenuLink asChild>
-                      <PrefetchLink className="redesign-nav-dropdown-item" href={item.href} prefetch={false} aria-current={isCurrentPath(item.href) ? "page" : undefined}>
-                        {locale === "en" ? `All ${item.label}` : `查看全部${item.label}`}
-                      </PrefetchLink>
-                    </NavigationMenuLink>
                     {item.children.map((child) => (
                       <NavigationMenuLink key={child.href} asChild>
                         <PrefetchLink className="redesign-nav-dropdown-item" href={child.href} prefetch={false} aria-current={isCurrentPath(child.href) ? "page" : undefined}>

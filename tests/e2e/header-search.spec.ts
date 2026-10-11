@@ -26,16 +26,10 @@ test("public header replaces the search link, opens recommendations, and submits
       await expect(footer.locator(".footer-bottom p")).toHaveCount(1);
       await expect(footer.locator(".footer-bottom p")).toHaveCSS("color", "rgb(255, 255, 255)");
       await expect(page.locator("main .redesign-home-brand-value")).toHaveCount(0);
-      await expect(footer.locator(".redesign-home-brand-value-cta")).toHaveAttribute("href", english ? "/en/software" : "/software");
+      await expect(footer.locator(".redesign-home-brand-value-cta")).toHaveCount(0);
       await expect(footer.locator(".redesign-home-brand-value-inner h2")).toHaveCSS("color", "rgb(255, 255, 255)");
       await expect(footer.locator(".redesign-home-brand-value")).toHaveCSS("background-color", "rgba(0, 0, 0, 0)");
       await expect(footer.locator(".footer-navigation")).toHaveCSS("justify-content", "flex-end");
-      const ctaCentered = await footer.evaluate((element) => {
-        const area = element.querySelector(".redesign-home-brand-value")!.getBoundingClientRect();
-        const cta = element.querySelector(".redesign-home-brand-value-cta")!.getBoundingClientRect();
-        return Math.abs(area.left + area.width / 2 - cta.left - cta.width / 2);
-      });
-      expect(ctaCentered).toBeLessThan(2);
       if (width >= 1280) {
         const logoCenterOffset = await footer.evaluate((element) => {
           const logo = element.querySelector<HTMLElement>(".footer-brand-logo")!.getBoundingClientRect();

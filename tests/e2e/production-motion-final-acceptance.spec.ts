@@ -43,7 +43,7 @@ const routes: FormalRoute[] = [
   {
     path: "/",
     kind: "home",
-    h1: /AI一站式平台 一起创造未来/,
+    h1: /AI一站式平台 创造未来 改变生活/,
     menu: "菜单",
     closeMenu: "收起菜单",
     support: "客服",
@@ -654,7 +654,6 @@ for (const supportWidth of [483, 484] as const) {
           ? [
               ".redesign-home-cta",
               ".redesign-home-product-control",
-              ".redesign-home-brand-value-cta",
               "footer summary",
             ]
           : ["footer summary"];

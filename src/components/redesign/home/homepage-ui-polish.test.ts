@@ -44,8 +44,8 @@ describe("homepage UI polish", () => {
   });
 
   it("keeps primary control text white on the blue buttons", () => {
-    expect(refreshStyles).toMatch(/\.redesign-home \.redesign-home-cta,[\s\S]*?\.redesign-home-brand-value-cta\s*\{[^}]*color:\s*#fff/);
-    expect(refreshStyles).toMatch(/\.redesign-home \.redesign-home-cta:hover,[\s\S]*?\.redesign-home-brand-value-cta:hover\s*\{[^}]*color:\s*#fff/);
+    expect(refreshStyles).toMatch(/\.redesign-home \.redesign-home-cta\s*\{[^}]*color:\s*#fff/);
+    expect(refreshStyles).toMatch(/\.redesign-home \.redesign-home-cta:hover\s*\{[^}]*color:\s*#fff/);
     expect(softwareStyles).toMatch(/\.redesign-software-category-button\[data-selected="true"\]\s*\{[^}]*color:\s*#fff/);
     expect(softwareStyles).toMatch(/\.redesign-software-empty-action\s*\{[^}]*color:\s*#fff/);
     expect(softwareStyles).toMatch(/\.redesign-software-load-more-button\s*\{[^}]*color:\s*#fff/);

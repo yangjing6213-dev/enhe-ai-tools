@@ -186,11 +186,8 @@ describe("customer support widget source", () => {
     expect(footer).not.toContain('data-support-exclusion="footer"');
     expect(catalog).not.toContain('data-support-exclusion="pagination"');
     expect(home).not.toContain('data-support-exclusion="home-control"');
-    expect(brandValue).toContain('data-support-exclusion="home-brand-cta"');
-    expect(homeStyles).toContain(
-      '[data-support-exclusion="home-brand-cta"]',
-    );
-    expect(homeStyles).toContain("var(--support-exclusion-applied)");
+    expect(brandValue).not.toContain('data-support-exclusion="home-brand-cta"');
+    expect(homeStyles).not.toContain('[data-support-exclusion="home-brand-cta"]');
     expect(homeStyles).not.toContain("@media (max-width: 767px)");
     expect(home).toContain('className="redesign-home-product-control"');
     expect(software).toContain("var(--support-exclusion-applied)");

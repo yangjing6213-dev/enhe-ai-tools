@@ -3,7 +3,10 @@ import type { RedesignLocale } from "@/components/redesign/types";
 
 export function EnheRedesignHero({ locale }: { locale: RedesignLocale }) {
   const copy = HOME_COPY[locale];
-  const titleLines = locale === "zh" ? copy.h1.split(" ", 2) : [copy.h1];
+  const titleBreak = copy.h1.indexOf(" ");
+  const titleLines = locale === "zh" && titleBreak >= 0
+    ? [copy.h1.slice(0, titleBreak), copy.h1.slice(titleBreak + 1)]
+    : [copy.h1];
 
   return (
     <section className="redesign-home redesign-home-hero" data-locale={locale} aria-labelledby={`redesign-home-title-${locale}`}>

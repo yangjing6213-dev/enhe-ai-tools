@@ -34,7 +34,6 @@ describe("shared shadcn site components", () => {
   it("uses white text on the darker blue primary actions", () => {
     const actionRules: Array<[string, RegExp]> = [
       ["homepage CTA", /\.redesign-home \.redesign-home-cta\s*\{[^}]*\}/],
-      ["homepage brand CTA", /\.redesign-home-brand-value-cta\s*\{[^}]*\}/],
       ["software selected category", /\.redesign-software-category-button\[data-selected="true"\]\s*\{[^}]*\}/],
       ["software empty state action", /\.redesign-software-empty-action\s*\{[^}]*\}/],
       ["software load more", /\.redesign-software-load-more-button\s*\{[^}]*\}/],

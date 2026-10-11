@@ -40,6 +40,10 @@ describe("public navigation current-page state", () => {
     expect(languageSwitchIndex).toBeGreaterThan(accountControlIndex);
   });
 
+  it("omits the automatic all-items link from the AI Skill dropdown", () => {
+    expect(headerSource).not.toContain("查看全部");
+  });
+
   it("allows desktop dropdown content to float without expanding the header", () => {
     const dropdownRule = globalStyles.match(/\.site-nav-menu-content\s*\{[^}]*\}/)?.[0] ?? "";
 

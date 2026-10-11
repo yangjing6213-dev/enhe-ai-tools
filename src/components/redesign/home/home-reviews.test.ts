@@ -226,12 +226,11 @@ describe("homepage experience review candidate", () => {
     expect(homeStyles).toMatch(/\.redesign-home-reviews\[data-motion-modality="keyboard"\]\s+\.redesign-home-review-card\s*\{\s*transition:\s*none;/);
   });
 
-  it("keeps all homepage motion controls still when reduced motion is preferred", () => {
+  it("keeps review motion still when reduced motion is preferred", () => {
     const reducedMotionStyles = homeStyles.slice(
       homeStyles.lastIndexOf("@media (prefers-reduced-motion: reduce)"),
     );
 
-    expect(reducedMotionStyles).toContain(".redesign-home-brand-value-cta");
     expect(reducedMotionStyles).toContain(".redesign-home-reviews-rotation");
     expect(reviewSource).toContain('disabled={isReducedMotion}');
   });

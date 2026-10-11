@@ -483,12 +483,6 @@ for (const viewportSize of mobileViewports) {
           block: "center" as const,
         },
         {
-          name: "brand value CTA",
-          anchor: ".redesign-home-brand-value-cta",
-          targets: ".redesign-home-brand-value-cta",
-          block: "end" as const,
-        },
-        {
           name: "review card",
           anchor: ".redesign-home-reviews",
           targets: '.redesign-home-review-card[data-active="true"]',
@@ -730,12 +724,6 @@ test("keeps component exclusions aligned with a non-zero right safe area", async
         anchor: ".redesign-home-products",
         targets: ".redesign-home-product-control",
         block: "center" as const,
-      },
-      {
-        name: "brand value CTA",
-        anchor: ".redesign-home-brand-value-cta",
-        targets: ".redesign-home-brand-value-cta",
-        block: "end" as const,
       },
       {
         name: "footer",

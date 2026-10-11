@@ -12,13 +12,6 @@ export function EnheRedesignBrandValue({ locale }: { locale: RedesignLocale }) {
     >
       <div className="redesign-home-brand-value-inner">
         <h2 id={`redesign-home-brand-value-title-${locale}`}>{copy.value.heading}</h2>
-        <a
-          className="redesign-home-brand-value-cta"
-          data-support-exclusion="home-brand-cta"
-          href={copy.value.cta.href}
-        >
-          {copy.value.cta.label}
-        </a>
       </div>
     </section>
   );
