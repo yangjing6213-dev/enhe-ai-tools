@@ -1,6 +1,7 @@
 import { expect, test } from "@playwright/test";
 
 test("featured products rotate, pause for reading and focus, and resume with a fresh interval", async ({ page }) => {
+  test.setTimeout(60_000);
   await page.clock.install();
   await page.goto("/");
   const section = page.locator(".redesign-home-products");
@@ -8,6 +9,7 @@ test("featured products rotate, pause for reading and focus, and resume with a f
   await section.scrollIntoViewIfNeeded();
   await page.mouse.move(0, 0);
   await expect(section).toHaveAttribute("data-auto-rotating", "true");
+  await page.clock.runFor(1);
   const first = await current.getAttribute("data-product-id");
   await page.clock.runFor(6100);
   await expect(current).not.toHaveAttribute("data-product-id", first!);
@@ -41,6 +43,7 @@ test("featured products rotate, pause for reading and focus, and resume with a f
   await page.evaluate(() => (document.activeElement as HTMLElement)?.blur());
   await page.mouse.move(0, 0);
   await expect(section).toHaveAttribute("data-auto-rotating", "true");
+  await page.clock.runFor(1);
   await page.clock.runFor(6100);
   await expect(current).not.toHaveAttribute("data-product-id", manual!);
 

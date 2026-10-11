@@ -26,6 +26,37 @@ describe("locale switch redirects", () => {
     expect(response.headers.get("location")).toBeNull();
   });
 
+  it("preserves an explicit English URL even when saved language and region are Chinese", () => {
+    const response = middleware(
+      new NextRequest("https://www.enhe-tech.com.cn/en/software", {
+        headers: {
+          cookie: "enhe_locale=zh",
+          "cf-ipcountry": "CN",
+          "user-agent": "Mozilla/5.0",
+        },
+      }),
+    );
+
+    expect(response.status).toBe(200);
+    expect(response.headers.get("location")).toBeNull();
+  });
+
+  it("lets an explicit English switch override a saved Chinese language", () => {
+    const response = middleware(
+      new NextRequest("https://www.enhe-tech.com.cn/software?locale=en", {
+        headers: {
+          cookie: "enhe_locale=zh",
+          "cf-ipcountry": "CN",
+          "user-agent": "Mozilla/5.0",
+        },
+      }),
+    );
+
+    expect(response.status).toBe(308);
+    expect(response.headers.get("location")).toBe("https://www.enhe-tech.com.cn/en/software");
+    expect(response.headers.get("set-cookie")).toContain("enhe_locale=en");
+  });
+
   it("keeps a manually selected Chinese language when the visitor is outside China", () => {
     const response = middleware(
       new NextRequest("https://www.enhe-tech.com.cn/software", {

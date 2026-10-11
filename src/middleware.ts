@@ -93,11 +93,9 @@ export function middleware(request: NextRequest) {
     return response;
   }
 
-  const hasSavedLocale = cookieLocale === "zh" || cookieLocale === "en";
-  const isExplicitEnglishPathWithoutSavedPreference =
-    isEnglishPath && !hasSavedLocale;
+  const isExplicitEnglishPath = isEnglishPath;
   const localePreference = isLocalizedPublicPath(pathname) &&
-    !isExplicitEnglishPathWithoutSavedPreference
+    !isExplicitEnglishPath
     ? getRequestLocalePreference(cookieLocale, request.headers)
     : isRedesignPreviewPath
       ? requestedLocale

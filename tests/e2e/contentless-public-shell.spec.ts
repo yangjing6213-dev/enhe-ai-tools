@@ -36,7 +36,14 @@ for (const route of routes) {
     });
     page.on("pageerror", (error) => pageErrors.push(error.message));
     page.on("requestfailed", (request) => {
-      failedRequests.push(`${request.method()} ${request.url()}`);
+      const errorText = request.failure()?.errorText;
+      // Next can cancel speculative route prefetches when the browser closes a page.
+      if (request.url().includes("_rsc=") && errorText === "net::ERR_ABORTED") {
+        return;
+      }
+      failedRequests.push(
+        `${request.method()} ${request.url()} (${errorText ?? "unknown failure"})`,
+      );
     });
 
     const response = await page.goto(route, { waitUntil: "networkidle" });

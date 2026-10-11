@@ -221,7 +221,7 @@ test("reduced motion keeps product, review, and support controls functional", as
   await page.keyboard.press("ArrowRight");
   await expect(activeReview).not.toHaveAttribute("aria-label", initialReview ?? "");
 
-  const launcher = page.locator(".customer-support-launcher");
+  const launcher = page.locator('.customer-support-launcher[aria-controls="customer-support-panel"]');
   await launcher.hover();
   const launcherMotion = await launcher.evaluate((element) => {
     const style = getComputedStyle(element);

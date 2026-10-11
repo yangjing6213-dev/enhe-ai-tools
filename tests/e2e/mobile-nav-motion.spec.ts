@@ -813,6 +813,10 @@ test("navigation and language links remain immediate after search moves into the
     page.waitForURL((url) => url.pathname === "/en/software"),
     mobileActions.locator('a[lang="en"]').click(),
   ]);
+  await Promise.all([
+    page.waitForURL((url) => url.pathname === "/software"),
+    mobileActions.locator('a[lang="zh"]').click(),
+  ]);
   await expect(page.locator(".redesign-mobile-drawer")).toHaveCount(0);
   expect(errors.consoleErrors).toEqual([]);
   expect(errors.pageErrors).toEqual([]);
