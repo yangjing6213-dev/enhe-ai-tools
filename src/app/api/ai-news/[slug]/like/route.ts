@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { getCurrentUser } from "@/lib/auth";
 import { prisma } from "@/lib/db";
+import { setCardLike } from "@/lib/card-likes";
 import { resolvePublicNewsArticleSlug } from "@/lib/public-content";
 
 export async function POST(_request: Request, { params }: { params: Promise<{ slug: string }> }) {
@@ -14,15 +15,7 @@ export async function POST(_request: Request, { params }: { params: Promise<{ sl
     : null;
   if (!article) return NextResponse.json({ error: "NOT_FOUND" }, { status: 404 });
 
-  const existing = await prisma.newsArticleLike.findUnique({
-    where: { articleId_userId: { articleId: article.id, userId: user.id } }
-  });
-  if (existing) return NextResponse.json({ ok: true, already: true });
-
-  await prisma.$transaction([
-    prisma.newsArticleLike.create({ data: { articleId: article.id, userId: user.id } }),
-    prisma.newsArticle.update({ where: { id: article.id }, data: { likeCount: { increment: 1 } } })
-  ]);
-
-  return NextResponse.json({ ok: true });
+  const result = await setCardLike({ kind: "news", id: article.id }, user.id, true);
+  if (!result) return NextResponse.json({ error: "NOT_FOUND" }, { status: 404 });
+  return NextResponse.json({ ok: true, already: !result.changed });
 }

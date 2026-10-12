@@ -1,7 +1,7 @@
 .card-like-action { position: relative; display: flex; justify-content: flex-end; padding: 0 16px 12px; min-height: 56px; }
-.card-like-action .pulse-heart { min-height: 44px; max-width: 100%; flex-shrink: 0; color: #f5f5f5; }
-.card-like-action .pulse-heart__pill { max-width: 100%; background: #232326; }
-.card-like-action .pulse-heart__count { color: #f5f5f5; }
+.card-like-action .pulse-heart { min-height: 44px; max-width: 100%; flex-shrink: 0; color: #18181b; }
+.card-like-action .pulse-heart__pill { max-width: 100%; background: #fff; box-shadow: inset 0 0 0 1px #e4e4e7; }
+.card-like-action .pulse-heart__count { color: #18181b; }
 .card-like-action .pulse-heart__heart { color: #8b8b93; }
 .card-like-action .pulse-heart[data-liked='true'] .pulse-heart__heart { color: #ff4d6d; }
 .card-like-action .pulse-heart__heart svg { stroke: currentColor; fill: none; }

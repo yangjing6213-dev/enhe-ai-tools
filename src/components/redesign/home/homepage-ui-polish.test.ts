@@ -30,8 +30,8 @@ describe("homepage UI polish", () => {
     expect(refreshStyles).toMatch(/\.redesign-header\[data-home="true"\][^{]*\{[^}]*background:\s*var\(--enhe-page-bg\)[^}]*color:\s*var\(--enhe-text\)/);
     expect(refreshStyles).toMatch(/\.redesign-home-hero\s*\{[^}]*background-image:\s*none[^}]*color:\s*var\(--enhe-text\)/);
     expect(refreshStyles).toMatch(/\.redesign-home-hero-inner\s*\{[^}]*text-align:\s*center/);
-    expect(refreshStyles).toMatch(/\.redesign-home-hero\s*\{[^}]*min-height:\s*clamp\(400px,\s*34vw,\s*500px\)/);
-    expect(refreshStyles).toMatch(/\.redesign-home \.redesign-home-hero-inner\s*\{[^}]*padding:\s*clamp\(78px,\s*7.8vw,\s*114.4px\)/);
+    expect(refreshStyles).toMatch(/\.redesign-home-hero\s*\{[^}]*min-height:\s*calc\(clamp\(400px,\s*34vw,\s*500px\) \+ clamp\(23.4px,\s*2.34vw,\s*34.32px\)\)/);
+    expect(refreshStyles).toMatch(/\.redesign-home \.redesign-home-hero-inner\s*\{[^}]*padding:\s*clamp\(101.4px,\s*10.14vw,\s*148.72px\)/);
     expect(tokens).toContain('--enhe-font-brand-label: "LXGW WenKai Lite"');
     expect(globalStyles).toContain("font-family: 'LXGW WenKai Lite'");
     expect(globalStyles).toContain("/fonts/lxgw-wenkai/lxgw-wenkai-home-label.woff");

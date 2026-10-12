@@ -16,7 +16,7 @@ export interface PulseHeartProps {
   defaultLiked?: boolean;
   count?: number;
   onChange?: (liked: boolean, count: number) => void;
-  incrementOnly?: boolean;
+  deferChange?: boolean;
   showCount?: boolean;
   icon?: PulseHeartIcon | ReactNode;
   idleOutline?: boolean;
@@ -58,7 +58,7 @@ const PulseHeart: React.FC<PulseHeartProps> = ({
   defaultLiked = false,
   count = 0,
   onChange,
-  incrementOnly = false,
+  deferChange = false,
   showCount = true,
   icon = 'heart',
   idleOutline = true,
@@ -169,8 +169,8 @@ const PulseHeart: React.FC<PulseHeartProps> = ({
       pill.style.transform = `scale(${1 - (B / 100) * s})`;
       if (!swapped && t + step / 2 / D >= OUT) {
         swapped = true;
-        const displayCount = incrementOnly ? logical.current.count : nextCount;
-        const displayLiked = incrementOnly ? logical.current.liked : nextLiked;
+        const displayCount = deferChange ? logical.current.count : nextCount;
+        const displayLiked = deferChange ? logical.current.liked : nextLiked;
         root.dataset.liked = String(displayLiked);
         startRoll(shownRef.current.count, displayCount);
         shownRef.current = { liked: displayLiked, count: displayCount };
@@ -211,15 +211,15 @@ const PulseHeart: React.FC<PulseHeartProps> = ({
     viaPointer.current = false;
   };
   const handleClick = (e: React.MouseEvent<HTMLButtonElement>) => {
-    if (disabled || (raf.current && !incrementOnly)) return;
+    if (disabled || (raf.current && !deferChange)) return;
     const pointer = viaPointer.current && e.detail !== 0;
     viaPointer.current = false;
-    const nextLiked = incrementOnly || !liked;
+    const nextLiked = !liked;
     const nextCount = total + (nextLiked ? 1 : -1);
     if (!controlled) setInner(nextLiked);
-    if (!incrementOnly) setTotal(nextCount);
+    if (!deferChange) setTotal(nextCount);
     onChange?.(nextLiked, nextCount);
-    if (pointer && !reducedMotion()) run(nextLiked, incrementOnly ? total : nextCount);
+    if (pointer && !reducedMotion()) run(nextLiked, deferChange ? total : nextCount);
     else if (rootRef.current) rootRef.current.dataset.instant = '';
   };
 

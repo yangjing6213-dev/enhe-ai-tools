@@ -7,7 +7,7 @@ import {
   createSoftwareDownloadOrderAction,
 } from "@/app/actions";
 import { FormSubmitButton } from "@/components/form-submit-button";
-import { StarRatingInput } from "@/components/star-rating-input";
+import { StarRatingInput, CommentRatingDisplay } from "@/components/star-rating-input";
 import { ProductVideoPlayer } from "@/components/product-video-player";
 import { StructuredData } from "@/components/structured-data";
 import { Badge, ButtonLink, Container, SectionTitle } from "@/components/ui";
@@ -1299,7 +1299,7 @@ export async function ToolDetailPageShell({
                     : "必填，2 到 1000 个字符。评论通过审核后展示。"}
                 </p>
                 <FormSubmitButton
-                  className="mt-3 text-base"
+                  className="comment-submit-button mt-3 text-base"
                   pendingLabel={
                     forceLocale === "en" ? "Submitting..." : "提交中..."
                   }
@@ -1329,12 +1329,7 @@ export async function ToolDetailPageShell({
                     ) : null}
                       </p>
                     </div>
-                    <span
-                      className="text-sm text-amber-400"
-                      aria-label={comment.rating ? (forceLocale === "en" ? `${comment.rating} out of 5 stars` : `${comment.rating} 星`) : (forceLocale === "en" ? "Not rated" : "未评分")}
-                    >
-                      {comment.rating ? `${"★".repeat(comment.rating)}${"☆".repeat(5 - comment.rating)}` : (forceLocale === "en" ? "Not rated" : "未评分")}
-                    </span>
+                    <CommentRatingDisplay rating={comment.rating} locale={forceLocale} />
                   </div>
                   <p className="mt-2 leading-7">{comment.localizedContent}</p>
                 </div>

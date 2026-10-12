@@ -1,0 +1,14 @@
+.comment-peek-rating { min-width: 0; }
+.comment-peek-rating .peek-rating { max-width: 100%; }
+.comment-peek-rating .peek-rating__star { background: transparent; border: 0; color: inherit; padding: 0; }
+.comment-peek-rating .peek-rating__glyph { color: #52525b; }
+.comment-peek-rating .peek-rating__glyph[data-lit='true'] { color: #f5b400; }
+.comment-peek-rating .peek-rating__glyph svg { fill: currentColor; stroke: currentColor; }
+.comment-peek-rating .peek-rating__tip { background: #27272a; color: #f5f5f5; }
+.comment-peek-rating .peek-rating__star:hover, .comment-peek-rating .peek-rating__star:active { transform: none; }
+.comment-peek-rating-display .peek-rating__star { min-width: 0; min-height: 0; }
+.enhe-redesign-production .comment-submit-button,
+.enhe-redesign-production .comment-submit-button:hover,
+.enhe-redesign-production .comment-submit-button:focus-visible,
+.enhe-redesign-production .comment-submit-button:active { color: #fff !important; }
+@media (prefers-reduced-motion: reduce) { .comment-peek-rating .peek-rating__lift { transform: none !important; } }

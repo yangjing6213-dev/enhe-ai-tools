@@ -256,6 +256,7 @@ model User {
   acceptEmailUpdates    Boolean                @default(true) @map("accept_email_updates")
   newsFavorites         NewsArticleFavorite[]
   newsLikes             NewsArticleLike[]
+  toolLikes             ToolLike[]
   seoAuditProjects      SeoAuditProject[]
   seoAuditRuns          SeoAuditRun[]
   seoAuditCredits       SeoAuditCredit[]
@@ -357,6 +358,7 @@ model Tool {
   tutorials             Tutorial[]
   comments              Comment[]
   downloadLogs          DownloadLog[]
+  likes                 ToolLike[]
   toolUsageLogs         ToolUsageLog[]
   orders                Order[]
   purchases             ToolPurchase[]
@@ -369,6 +371,19 @@ model Tool {
   @@index([type, status])
   @@index([isHomeRecommended, status, sortOrder])
   @@map("tools")
+}
+
+model ToolLike {
+  id        String   @id @default(cuid())
+  toolId    String   @map("tool_id")
+  userId    String   @map("user_id")
+  createdAt DateTime @default(now()) @map("created_at")
+  tool      Tool     @relation(fields: [toolId], references: [id], onDelete: Cascade)
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([toolId, userId])
+  @@index([userId, createdAt])
+  @@map("tool_likes")
 }
 
 model ProductDemo {

@@ -1,6 +1,7 @@
 import { createHash } from "node:crypto";
 import { NextResponse } from "next/server";
-import { incrementCardLike, parseCardLikeTarget, readCardLikes } from "@/lib/card-likes";
+import { setCardLike, parseCardLikeTarget, readCardLikes, readCardLikedState } from "@/lib/card-likes";
+import { getCurrentUser } from "@/lib/auth";
 
 export const dynamic = "force-dynamic";
 const visitors = new Map<string, { start: number; count: number }>();
@@ -11,7 +12,10 @@ export async function GET(request: Request) {
   const targets = params.map(value => { const parts = value.split(":"); return parts.length === 2 ? parseCardLikeTarget({ kind: parts[0], id: parts[1] }) : null; });
   if (targets.some(t => !t)) return NextResponse.json({ error: "INVALID_TARGETS" }, { status: 400 });
   try {
-    return NextResponse.json({ counts: await readCardLikes(targets.filter(t => t !== null)) }, { headers: { "Cache-Control": "no-store" } });
+    const user = await getCurrentUser();
+    const validTargets = targets.filter(t => t !== null);
+    const [counts, liked] = await Promise.all([readCardLikes(validTargets), readCardLikedState(validTargets, user?.id)]);
+    return NextResponse.json({ counts, liked }, { headers: { "Cache-Control": "private, no-store", Vary: "Cookie" } });
   } catch {
     return NextResponse.json({ error: "UNAVAILABLE" }, { status: 503 });
   }
@@ -28,8 +32,9 @@ export async function POST(request: Request) {
   }
   if (Number(request.headers.get("content-length") ?? 0) > 1024) return NextResponse.json({ error: "INVALID_TARGET" }, { status: 400 });
   let target;
-  try { const body = await request.text(); target = body.length <= 1024 ? parseCardLikeTarget(JSON.parse(body)) : null; } catch { target = null; }
-  if (!target) return NextResponse.json({ error: "INVALID_TARGET" }, { status: 400 });
+  let liked;
+  try { const body = await request.text(); const data = body.length <= 1024 ? JSON.parse(body) : null; target = parseCardLikeTarget(data); liked = data?.liked; } catch { target = null; }
+  if (!target || typeof liked !== "boolean") return NextResponse.json({ error: "INVALID_TARGET" }, { status: 400 });
   const now = Date.now();
   for (const [key, bucket] of visitors) if (now - bucket.start >= 60_000) visitors.delete(key);
   const key = createHash("sha256").update(request.headers.get("x-forwarded-for")?.split(",")[0]?.trim() || request.headers.get("x-real-ip") || "anonymous").digest("hex");
@@ -38,8 +43,10 @@ export async function POST(request: Request) {
   bucket.count++;
   visitors.set(key, bucket);
   try {
-    const count = await incrementCardLike(target);
-    return count === null ? NextResponse.json({ error: "NOT_FOUND" }, { status: 404 }) : NextResponse.json({ count });
+    const user = await getCurrentUser();
+    if (!user) return NextResponse.json({ error: "LOGIN_REQUIRED" }, { status: 401 });
+    const result = await setCardLike(target, user.id, liked);
+    return result === null ? NextResponse.json({ error: "NOT_FOUND" }, { status: 404 }) : NextResponse.json(result);
   } catch {
     return NextResponse.json({ error: "UNAVAILABLE" }, { status: 503 });
   }
