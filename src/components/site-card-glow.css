@@ -1,0 +1,39 @@
+/* A decorative portal preserves every existing card's layout and surface. */
+.rb-border-glow.enhe-edge-effect {
+  position: fixed;
+  z-index: 1000;
+  display: block;
+  border: 0;
+  border-radius: inherit;
+  background: transparent;
+  box-shadow: none;
+  transform: none;
+  pointer-events: none;
+  overflow: clip;
+}
+
+.enhe-edge-effect::before {
+  padding: 1px;
+  mask-image:
+    conic-gradient(from var(--cursor-angle), black 25%, transparent 40%, transparent 60%, black 75%),
+    linear-gradient(black, black),
+    linear-gradient(black, black);
+  mask-clip: border-box, content-box, border-box;
+  mask-composite: intersect, exclude;
+}
+
+.enhe-edge-effect::before,
+.enhe-edge-effect::after,
+.enhe-edge-effect > .edge-light {
+  pointer-events: none;
+}
+
+.enhe-edge-effect > .rb-border-glow-inner {
+  display: none;
+}
+
+@media (pointer: coarse), (prefers-reduced-motion: reduce), (forced-colors: active) {
+  .rb-border-glow.enhe-edge-effect {
+    display: none;
+  }
+}

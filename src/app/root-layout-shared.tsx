@@ -68,9 +68,9 @@ export function RootDocument({
             <>
               <InteractiveBackground />
               <CursorGlow />
-              <BorderGlowController />
             </>
           ) : null}
+          <BorderGlowController />
           <AnalyticsTracker />
           {children}
         </SiteThemeProvider>
