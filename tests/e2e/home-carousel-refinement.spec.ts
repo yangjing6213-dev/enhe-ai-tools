@@ -116,8 +116,8 @@ for (const route of ["/", "/en"]) {
       await folder.hover();
       await expect(trigger).toHaveAttribute("aria-expanded", "true");
       await expect(folder).toHaveAttribute("data-live", "");
-      await folder.locator(".folder-float__item").click();
-      await expect(page).toHaveURL(route === "/" ? /\/software$/ : /\/en\/software$/);
+      await folder.locator(".folder-float__item").first().click();
+      await expect(page).toHaveURL(route === "/" ? /\/software\?category=video$/ : /\/en\/software\?category=video$/);
     });
   }
 }
@@ -133,7 +133,7 @@ test("folders remain usable on a touch screen with reduced motion", async ({ bro
     await expect(trigger).toHaveAttribute("aria-expanded", "true");
     await page.waitForTimeout(1000);
     await expect(folder).not.toHaveAttribute("data-live");
-    await folder.locator(".folder-float__item").tap();
-    await expect(page).toHaveURL(/\/en\/software$/);
+    await folder.locator(".folder-float__item").first().tap();
+    await expect(page).toHaveURL(/\/en\/software\?category=video$/);
   } finally { await context.close(); }
 });

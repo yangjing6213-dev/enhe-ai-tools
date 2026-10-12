@@ -1,7 +1,7 @@
 import { PrismaClient } from "@prisma/client";
 import { expect, test } from "@playwright/test";
 import { randomBytes } from "node:crypto";
-import { hashSessionToken, signSessionCookieValue } from "../../src/lib/auth-security";
+import { hashSessionToken, signSessionCookieValue, signHeaderUserCookieValue } from "../../src/lib/auth-security";
 
 const enabled = process.env.ENHE_E2E_ALLOW_DATABASE_MUTATION === "1" && !!process.env.DATABASE_URL;
 test.skip(!enabled, "Requires the dedicated local test database, never production data.");
@@ -26,6 +26,8 @@ test.beforeAll(async () => {
   }
   await db.newsArticle.create({ data: { id: newsId, slug: newsId, title: "喜欢按钮测试资讯", englishTitle: "Card like test news", summary: "验证卡片喜欢按钮。", englishSummary: "A dedicated local news article for checking saved card likes.", content: "仅用于测试。", englishContent: "This dedicated local news article checks repeated clicks, persistence, language switches and accessible card controls without changing production content. Readers can use the heart button independently of the article link, see the saved total after refreshing the page, and switch languages while keeping the same shared count. The test also checks large numbers and unsuccessful saves on a narrow mobile screen.", status: "published", publishedAt: new Date() } });
   await db.comment.create({ data: { toolId, userId, content: "[[zh]]本地已审核评分测试[[/zh]][[en]]An approved local review for checking read-only star ratings.[[/en]]", rating: 4, status: "approved" } });
+  await db.newsTag.create({data:{id:`${newsId}-tag`, name:`UI ${suffix}`, slug:`${newsId}-tag`}});
+  await db.newsArticleTag.create({data:{articleId:newsId, tagId:`${newsId}-tag`}});
 });
 test.afterAll(async () => {
   if (!enabled) return;
@@ -33,12 +35,40 @@ test.afterAll(async () => {
   await db.siteSetting.deleteMany({ where: { key: { in: [toolId, skillId].map(id => `card-like:tool:${id}`) } } });
   await db.tool.deleteMany({ where: { id: { in: [toolId, skillId] } } });
   await db.newsArticle.deleteMany({ where: { id: newsId } });
+  await db.newsTag.deleteMany({where:{id:`${newsId}-tag`}});
   await db.user.deleteMany({ where: { id: userId } });
   await db.$disconnect();
 });
 
 test.beforeEach(async ({ context }) => {
   await context.addCookies([{ name: "enhe_session", value: cookieValue, url: process.env.PLAYWRIGHT_BASE_URL! }]);
+});
+
+test("news cards stack, badges stay white, and the authenticated account matches navigation text", async ({ page, context }) => {
+  const payload = Buffer.from(JSON.stringify({nickname:"测试用户", email:null, role:"user"})).toString('base64url');
+  await context.addCookies([{name:'enhe_header_user',value:signHeaderUserCookieValue(payload,process.env.AUTH_SECRET!),url:process.env.PLAYWRIGHT_BASE_URL!}]);
+  await page.setViewportSize({width: 1440, height: 1000});
+  await page.goto(`/ai-news/${newsId}`);
+  const account = page.locator('.redesign-desktop-nav .redesign-avatar-trigger');
+  await expect(account).toHaveCSS('background-color', 'rgba(0, 0, 0, 0)');
+  const nav = page.locator('.redesign-desktop-nav .redesign-nav-link').first();
+  for (const property of ['font-family', 'font-size', 'font-weight', 'color']) {
+    const expected = await nav.evaluate((n, p) => getComputedStyle(n).getPropertyValue(p), property);
+    await expect(account).toHaveCSS(property, expected);
+  }
+  for (const width of [320, 768, 1440]) {
+    await page.setViewportSize({width, height:1000});
+    expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBeLessThanOrEqual(width);
+    for (const grid of await page.locator('.ai-news-page .grid:not(form):not(.ai-news-filter-surface)').all()) {
+      expect(await grid.evaluate(n => getComputedStyle(n).gridTemplateColumns.split(' ').length)).toBe(1);
+    }
+    const badges = page.locator('.ai-news-page .rounded-full.bg-muted');
+    expect(await badges.count()).toBeGreaterThan(0);
+    for (const badge of await badges.all()) {
+      await expect(badge).toHaveCSS('background-color', 'rgb(255, 255, 255)');
+      await expect(badge).toHaveCSS('-webkit-text-fill-color', 'rgb(0, 0, 0)');
+    }
+  }
 });
 for (const [route, kind, id] of [["/software", "tool", toolId], ["/ai-skills", "tool", skillId], ["/ai-news", "news", newsId]] as const) {
   test(`account likes cancel, persist and share bilingual state on ${route}`, async ({ page }) => {

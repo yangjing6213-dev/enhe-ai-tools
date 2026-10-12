@@ -54,7 +54,7 @@ test("site pages keep white surfaces and black neutral text, including interacti
     document.body.append(probe);
   });
   const legacy = page.locator("[data-legacy-brand-probe]");
-  await expect(legacy.locator(".site-user-chip")).toHaveCSS("background-color", "rgb(4, 98, 194)");
+  await expect(legacy.locator(".site-user-chip")).toHaveCSS("background-color", "rgba(0, 0, 0, 0)");
   await expect(legacy.locator(".site-language-switcher a.is-active")).toHaveCSS("background-color", "rgb(4, 98, 194)");
   await expect(legacy.locator(".site-language-switcher a.is-active")).toHaveCSS("color", "rgb(255, 255, 255)");
   await expect(legacy.locator("footer")).toHaveCSS("background-color", "rgb(13, 58, 109)");
@@ -69,8 +69,8 @@ test("site pages keep white surfaces and black neutral text, including interacti
   await legacy.locator(".site-footer-filings a").hover();
   await expect(legacy.locator(".site-footer-filings a")).toHaveCSS("color", "rgb(255, 255, 255)");
   await legacy.locator(".site-user-chip").hover();
-  await expect(legacy.locator(".site-user-chip")).toHaveCSS("background-color", "rgb(4, 98, 194)");
-  await expect(legacy.locator(".site-user-chip")).toHaveCSS("color", "rgb(255, 255, 255)");
+  await expect(legacy.locator(".site-user-chip")).toHaveCSS("background-color", "rgba(0, 0, 0, 0)");
+  await expect(legacy.locator(".site-user-chip")).toHaveCSS("color", "rgb(0, 0, 0)");
   await legacy.evaluate((element) => element.remove());
 
   await page.setViewportSize({ width: 390, height: 844 });

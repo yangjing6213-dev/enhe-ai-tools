@@ -2,6 +2,7 @@
 
 import type { RedesignLocale } from "@/components/redesign/types";
 import FolderFloat from "@/components/FolderFloat";
+import { SOFTWARE_CATEGORIES } from "@/lib/redesign/software/software-categories";
 
 export const HOME_FEATURES: ReadonlyArray<{
   title: Record<RedesignLocale, string>;
@@ -32,12 +33,14 @@ export function EnheRedesignFeatures({ locale }: { locale: RedesignLocale }) {
       aria-label={locale === "en" ? "Explore ENHE AI" : "探索 ENHE AI"}
     >
       <div className="redesign-home-features-inner">
-        {HOME_FEATURES.map(({ title, href }) => (
+        {HOME_FEATURES.map(({ title, href }, index) => (
           <div className="redesign-home-feature-folder" key={href[locale]}>
             <FolderFloat
               label={title[locale]}
               sublabel={locale === "zh" ? "点击或悬停探索" : "Open to explore"}
-              items={[{ label: locale === "zh" ? `查看${title[locale]}` : `Explore ${title[locale]}`, value: href[locale] }]}
+              items={index === 0
+                ? SOFTWARE_CATEGORIES.filter(category => !["all", "skill"].includes(category.id)).map(category => ({ label: category.label[locale], value: `${href[locale]}?category=${category.id}` }))
+                : [{ label: locale === "zh" ? `查看${title[locale]}` : `Explore ${title[locale]}`, value: href[locale] }]}
               trigger="hover"
               closeOnSelect
               physics
@@ -51,7 +54,7 @@ export function EnheRedesignFeatures({ locale }: { locale: RedesignLocale }) {
               width={200}
               height={148}
               radius={14}
-              spread={180}
+              spread={index === 0 ? 140 : 180}
               lift={26}
               tilt={8}
               flapAngle={34}

@@ -807,6 +807,9 @@
   .redesign-header-inner {
     width: min(100% - 32px, 1320px);
   }
+  .redesign-home-features-inner > .redesign-home-feature-folder:first-child {
+    grid-column: 1 / -1;
+  }
 
   .redesign-home-hero {
     min-height: 0;
@@ -940,6 +943,15 @@
 .redesign-header .redesign-language-link,
 .redesign-header .redesign-language-link:hover {
   color: #fff;
+}
+
+body :is(.site-user-chip.site-user-chip, .redesign-header .redesign-avatar-trigger) {
+  background: transparent !important;
+  color: var(--enhe-text, #000) !important;
+  -webkit-text-fill-color: currentColor !important;
+  font: inherit;
+  font-size: 0.875rem;
+  box-shadow: none !important;
 }
 
 body .redesign-footer,

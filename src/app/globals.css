@@ -5871,3 +5871,12 @@ body .site-language-switcher a.is-active {
   background: var(--brand-blue) !important;
   color: #fff !important;
 }
+
+body .site-user-chip.site-user-chip {
+  background: transparent !important;
+  color: var(--enhe-text, #000) !important;
+  -webkit-text-fill-color: currentColor !important;
+  font: inherit;
+  font-size: 0.875rem;
+  box-shadow: none !important;
+}

@@ -21,6 +21,21 @@
   font-family: var(--enhe-font-zh);
 }
 
+/* Keep news cards in reading order; filter fields keep their existing controls. */
+.enhe-redesign-production .ai-news-page .grid:not(form):not(.ai-news-filter-surface) {
+  grid-template-columns: minmax(0, 1fr);
+}
+.enhe-redesign-production .ai-news-page .grid > aside {
+  position: static;
+  min-width: 0;
+}
+.enhe-redesign-production .ai-news-page :is(.ai-news-card-tag, .rounded-full.bg-muted) {
+  background: #fff !important;
+  color: #000 !important;
+  -webkit-text-fill-color: #000 !important;
+  border-color: var(--enhe-border);
+}
+
 .enhe-redesign-production[lang="en"] .ai-news-page {
   font-family: var(--enhe-font-en);
 }
