@@ -13,7 +13,7 @@ export const HOME_FEATURES: ReadonlyArray<{
     href: { zh: "/software", en: "/en/software" },
   },
   {
-    title: { zh: "实用技能", en: "Practical skills" },
+    title: { zh: "AI 技能", en: "AI skills" },
     href: { zh: "/ai-skills", en: "/en/ai-skills" },
   },
   {
@@ -24,6 +24,18 @@ export const HOME_FEATURES: ReadonlyArray<{
     title: { zh: "AI 趋势", en: "AI trends" },
     href: { zh: "/ai-trends", en: "/en/ai-trends" },
   },
+];
+
+const SKILL_ITEMS = [
+  { zh: "AI 提示词", en: "AI prompts", path: "/skill-learning/ai-prompt-management" },
+  { zh: "AI Skill", en: "AI Skill", path: "/ai-skills" },
+];
+const NEWS_ITEMS = [
+  { zh: "AI 智能体", en: "AI agents", path: "/ai-news/topics/ai-agent" },
+  { zh: "AI 本地部署", en: "Local AI", path: "/ai-news/topics/local-ai" },
+  { zh: "开源大模型", en: "Open-source models", path: "/ai-news/topics/open-source-models" },
+  { zh: "AI 技能教程", en: "AI tutorials", path: "/ai-news/topics/ai-tutorials" },
+  { zh: "AI 监管与安全", en: "AI regulation", path: "/ai-news/topics/ai-regulation" },
 ];
 
 export function EnheRedesignFeatures({ locale }: { locale: RedesignLocale }) {
@@ -40,6 +52,8 @@ export function EnheRedesignFeatures({ locale }: { locale: RedesignLocale }) {
               sublabel={locale === "zh" ? "点击或悬停探索" : "Open to explore"}
               items={index === 0
                 ? SOFTWARE_CATEGORIES.filter(category => !["all", "skill"].includes(category.id)).map(category => ({ label: category.label[locale], value: `${href[locale]}?category=${category.id}` }))
+                : index === 1 || index === 2
+                ? (index === 1 ? SKILL_ITEMS : NEWS_ITEMS).map(item => ({ label: item[locale], value: `${locale === "en" ? "/en" : ""}${item.path}` }))
                 : [{ label: locale === "zh" ? `查看${title[locale]}` : `Explore ${title[locale]}`, value: href[locale] }]}
               trigger="hover"
               closeOnSelect
@@ -54,7 +68,7 @@ export function EnheRedesignFeatures({ locale }: { locale: RedesignLocale }) {
               width={200}
               height={148}
               radius={14}
-              spread={index === 0 ? 140 : 180}
+              spread={index === 0 || index === 2 ? 140 : 180}
               lift={26}
               tilt={8}
               flapAngle={34}

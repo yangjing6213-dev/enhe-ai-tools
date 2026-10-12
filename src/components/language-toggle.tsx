@@ -24,7 +24,7 @@ export function LanguageToggle({ locale, hrefs, label, className = "", zhLabel =
       clearTimeout(timer.current);
       timer.current = setTimeout(() => window.location.assign(hrefs[next]), 200);
     }} ariaLabel={locale === "en" ? "Switch language to Chinese" : "切换语言为英文"}
-      trackColor="#27272a" trackOnColor="#27272a" thumbColor="#4e4e51" thumbOnColor="#4e4e51"
+      trackColor="#0462c2" trackOnColor="#0462c2" thumbColor="#ffffff" thumbOnColor="#ffffff"
       width={76} height={38} radius={19} speed={50} stretch={36} hoverScale={1.035} colorDuration={320} />
     <a className="redesign-language-link" href={hrefs.en} lang="en" aria-current={locale === "en" ? "page" : undefined} onClick={() => select("en")}>EN</a>
   </span>;

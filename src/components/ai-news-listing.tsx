@@ -150,9 +150,9 @@ function NewsListingArticle({ article, labels, locale }: { article: NewsListingC
   return (
     <article className="ai-news-interactive-card glass group overflow-hidden rounded-2xl" data-news-id={article.id}>
       <Link href={article.href} className="block">
-        <div className="relative aspect-[16/9] overflow-hidden bg-[var(--marketing-card-soft)]">
+        {article.coverImage ? <div className="ai-news-card-cover relative overflow-hidden bg-[var(--marketing-card-soft)]">
           {article.coverImage ? <Image src={article.coverImage} alt={article.title} fill className="content-thumbnail-outline object-cover transition-transform duration-300 group-hover:scale-[1.03]" sizes="(min-width: 1024px) 400px, (min-width: 768px) 50vw, 100vw" unoptimized /> : null}
-        </div>
+        </div> : null}
         <div className="ai-news-card-body p-5">
           <div className="flex flex-wrap gap-2">
             {article.categoryName ? <Badge className="ai-news-card-tag">{article.categoryName}</Badge> : null}

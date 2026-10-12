@@ -57,3 +57,5 @@
 
 .enhe-language-toggle .redesign-language-link[lang="zh"] { left: 4px; }
 .enhe-language-toggle .redesign-language-link[lang="en"] { right: 4px; }
+
+.enhe-language-toggle .redesign-language-link[aria-current="page"] { color: #0462c2 !important; -webkit-text-fill-color: #0462c2 !important; }
