@@ -1,6 +1,7 @@
 "use client";
 
 import Image from "next/image";
+import { CardLikeAction } from "@/components/card-like-action";
 import { useState } from "react";
 import { ArrowUpRight, Check, Download, MousePointer2, UserRound } from "lucide-react";
 import { Card } from "@/components/ui/card";
@@ -103,6 +104,7 @@ export function EnheRedesignSoftwareCard({
             </div> : null}
           </div>
         </a>
+        <CardLikeAction kind="tool" id={product.id} locale={locale} />
       </article>
     </Card>
   );

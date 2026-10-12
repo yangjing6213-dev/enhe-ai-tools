@@ -44,7 +44,7 @@ describe("AI tools candidate responsive browsing", () => {
 
     expect(css).toContain("padding: 144px 24px 120px");
     expect(css).toContain("font-size: clamp(0.9rem, 2vw, 1.5rem)");
-    expect(css).toContain("height: 602px;");
+    expect(css).toContain("height: 658px;");
     expect(css).toContain("font-weight: 900;");
     expect(catalog).not.toContain("按公开发布时间展示最新上架的工具入口。");
     expect(catalog).not.toContain("通过已跟踪的编辑推荐字段筛选公开产品。");

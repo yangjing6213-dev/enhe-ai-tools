@@ -1,6 +1,7 @@
 "use client";
 
 import Image from "next/image";
+import { CardLikeAction } from "@/components/card-like-action";
 import Link from "next/link";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { useCallback, useEffect, useRef, useState, type MouseEvent } from "react";
@@ -115,7 +116,7 @@ export function AiNewsListing({
       <SectionTitle title={labels.latestTitle} />
       {articles.length ? (
         <div className="ai-news-latest-grid grid gap-5 md:grid-cols-2 lg:grid-cols-3">
-          {articles.map((article) => <NewsListingArticle key={article.id} article={article} labels={labels} />)}
+          {articles.map((article) => <NewsListingArticle key={article.id} article={article} labels={labels} locale={locale} />)}
           {pageCount > 1 ? Array.from({ length: Math.max(0, newsPageSize - articles.length) }, (_, index) => (
             <div key={`empty-slot-${index}`} className="ai-news-pagination-placeholder" aria-hidden="true">
               <div className="aspect-[16/9]" />
@@ -145,7 +146,7 @@ export function AiNewsListing({
   );
 }
 
-function NewsListingArticle({ article, labels }: { article: NewsListingCard; labels: ListingLabels }) {
+function NewsListingArticle({ article, labels, locale }: { article: NewsListingCard; labels: ListingLabels; locale: Locale }) {
   return (
     <article className="ai-news-interactive-card glass group overflow-hidden rounded-2xl" data-news-id={article.id}>
       <Link href={article.href} className="block">
@@ -169,6 +170,7 @@ function NewsListingArticle({ article, labels }: { article: NewsListingCard; lab
           <span className="mt-5 inline-flex text-sm font-bold text-[var(--marketing-accent)]">{labels.readMore}</span>
         </div>
       </Link>
+      <CardLikeAction kind="news" id={article.id} locale={locale} />
     </article>
   );
 }

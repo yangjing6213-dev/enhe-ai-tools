@@ -1,7 +1,7 @@
 import { expect, test } from "@playwright/test";
 
 for (const route of ["/", "/en"]) {
-  test(`blue folders replace old cards and fit the first screen on ${route}`, async ({ page }) => {
+  test(`blue folders keep their design with the requested larger hero spacing on ${route}`, async ({ page }) => {
     for (const viewport of [{ width: 1366, height: 768 }, { width: 1440, height: 900 }]) {
       await page.setViewportSize(viewport);
       await page.goto(route);
@@ -11,11 +11,15 @@ for (const route of ["/", "/en"]) {
       for (const folder of await folders.all()) {
         const bounds = (await folder.boundingBox())!;
         expect(bounds.y).toBeGreaterThan(0);
-        expect(bounds.y + bounds.height).toBeLessThanOrEqual(viewport.height);
         expect(await folder.evaluate(node => node.style.getPropertyValue("--ff-back"))).toBe("#f5f5f5");
         expect(await folder.evaluate(node => node.style.getPropertyValue("--ff-front"))).toBe("#3b82f6");
         await expect(folder.locator(".folder-float__label")).toHaveCSS("color", "rgb(245, 245, 245)");
       }
+      await expect(page.locator(".redesign-home-subtitle")).toHaveCSS("margin-top", "48px");
+      const spacing = await page.locator(".redesign-home-hero-inner").evaluate(node => ({ top: parseFloat(getComputedStyle(node).paddingTop), bottom: parseFloat(getComputedStyle(node).paddingBottom) }));
+      expect(spacing.top).toBeCloseTo(route === "/en" ? 52 : Math.min(114.4, viewport.width * 0.078), 1);
+      expect(spacing.bottom).toBeCloseTo(route === "/en" ? 48 : Math.min(105.6, viewport.width * 0.072), 1);
+      await expect(page.locator(".redesign-home-features-inner")).toHaveCSS("padding-top", "28.8px");
       await page.screenshot({ path: test.info().outputPath(`first-screen-${viewport.width}.png`) });
     }
   });

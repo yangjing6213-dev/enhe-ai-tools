@@ -31,7 +31,7 @@ describe("homepage UI polish", () => {
     expect(refreshStyles).toMatch(/\.redesign-home-hero\s*\{[^}]*background-image:\s*none[^}]*color:\s*var\(--enhe-text\)/);
     expect(refreshStyles).toMatch(/\.redesign-home-hero-inner\s*\{[^}]*text-align:\s*center/);
     expect(refreshStyles).toMatch(/\.redesign-home-hero\s*\{[^}]*min-height:\s*clamp\(400px,\s*34vw,\s*500px\)/);
-    expect(refreshStyles).toMatch(/\.redesign-home \.redesign-home-hero-inner\s*\{[^}]*padding:\s*clamp\(60px,\s*6vw,\s*88px\)/);
+    expect(refreshStyles).toMatch(/\.redesign-home \.redesign-home-hero-inner\s*\{[^}]*padding:\s*clamp\(78px,\s*7.8vw,\s*114.4px\)/);
     expect(tokens).toContain('--enhe-font-brand-label: "LXGW WenKai Lite"');
     expect(globalStyles).toContain("font-family: 'LXGW WenKai Lite'");
     expect(globalStyles).toContain("/fonts/lxgw-wenkai/lxgw-wenkai-home-label.woff");
@@ -161,7 +161,7 @@ describe("homepage UI polish", () => {
   it("keeps catalog cards at one height and preserves the existing hover motion", () => {
     expect(softwareStyles).toMatch(/\.redesign-software-page\s*\{[^}]*width:\s*min\(100%,\s*1280px\)/);
     expect(softwareStyles).toMatch(/\.redesign-software-grid\s*\{[^}]*grid-template-columns:\s*repeat\(3,\s*minmax\(0,\s*1fr\)\)/);
-    expect(softwareStyles).toMatch(/\.redesign-software-card\s*\{[^}]*height:\s*602px[^}]*min-height:\s*0/);
+    expect(softwareStyles).toMatch(/\.redesign-software-card\s*\{[^}]*height:\s*658px[^}]*min-height:\s*0/);
     expect(softwareStyles).toMatch(/\.redesign-software-card\s*\{[^}]*border-radius:\s*0/);
     expect(softwareStyles).toMatch(/\.redesign-software-card:hover\s*\{[^}]*transform:\s*translateY\(-3px\)/);
     expect(softwareStyles).toMatch(/\.redesign-software-card-description\s*\{[^}]*-webkit-line-clamp:\s*3/);

@@ -54,7 +54,7 @@ const getCachedSettingsMap = unstable_cache(
     const { prisma } = await import("@/lib/db");
 
     try {
-      const settings = await prisma.siteSetting.findMany();
+      const settings = await prisma.siteSetting.findMany({ where: { NOT: { key: { startsWith: "card-like:" } } } });
       return Object.fromEntries(settings.map((setting) => [setting.key, setting.value]));
     } catch (error) {
       if (isRecoverableSettingsReadError(error)) {

@@ -14,7 +14,7 @@ test("AI Skill page filters software-style cards as soon as the search text chan
 
   const cards = page.locator(".redesign-software-card");
   await expect(cards).toHaveCount(2);
-  await expect(cards.first()).toHaveCSS("height", "602px");
+  await expect(cards.first()).toHaveCSS("height", "658px");
   await expect(cards.first()).toHaveCSS("border-radius", "0px");
 
   await search.fill("本地开发");

@@ -13,7 +13,7 @@ describe("admin settings presentation contract", () => {
   });
 
   it("preserves the existing setting query, fields, and audited update action", () => {
-    expect(pageSource).toContain('prisma.siteSetting.findMany({ orderBy: { key: "asc" } })');
+    expect(pageSource).toContain('prisma.siteSetting.findMany({ where: { NOT: { key: { startsWith: "card-like:" } } }, orderBy: { key: "asc" } })');
     expect(pageSource).toContain("updateSiteSettingAction");
     expect(pageSource).toContain('name="key"');
     expect(pageSource).toContain('name="description"');

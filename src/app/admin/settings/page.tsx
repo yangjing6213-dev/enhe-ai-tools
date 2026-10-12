@@ -3,7 +3,7 @@ import { updateSiteSettingAction } from "@/app/admin/actions";
 import { AdminSection, Field, inputClass, SubmitButton, textareaClass } from "@/app/admin/admin-ui";
 
 export default async function AdminSettingsPage() {
-  const settings = await prisma.siteSetting.findMany({ orderBy: { key: "asc" } });
+  const settings = await prisma.siteSetting.findMany({ where: { NOT: { key: { startsWith: "card-like:" } } }, orderBy: { key: "asc" } });
   return (
     <AdminSection title="网站设置" intro="支付宝/微信收款码、网站名称、Logo、首页文案、用户协议、隐私政策、退款规则均存储在 site_settings。">
       <div className="enhe-admin-content-management enhe-admin-settings">
