@@ -1,6 +1,7 @@
 import { HOME_COPY } from "@/lib/redesign/home/home-copy";
 import type { RedesignLocale } from "@/components/redesign/types";
 import MaskedHeading from "@/components/MaskedHeading";
+import StarBorder from "@/components/StarBorder";
 
 export function EnheRedesignHero({ locale }: { locale: RedesignLocale }) {
   const copy = HOME_COPY[locale];
@@ -39,9 +40,27 @@ export function EnheRedesignHero({ locale }: { locale: RedesignLocale }) {
           ))}
         </h1>
         <p className="redesign-home-subtitle">{copy.subtitle}</p>
-        <a className="redesign-home-cta" href={copy.cta.href}>
+        <StarBorder
+          as="a"
+          className="redesign-home-cta"
+          href={copy.cta.href}
+          color="#ffffff"
+          trailColor="#ffffff"
+          textColor="#ffffff"
+          duration={4}
+          direction="clockwise"
+          stars={1}
+          trailLength={0.3}
+          thickness={1}
+          radius={12}
+          glow={0.6}
+          hover="lap"
+          sparkle={false}
+          clickPulse
+          theme="dark"
+        >
           {copy.cta.label}
-        </a>
+        </StarBorder>
       </div>
     </section>
   );
