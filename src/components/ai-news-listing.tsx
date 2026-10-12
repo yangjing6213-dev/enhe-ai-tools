@@ -167,7 +167,6 @@ function NewsListingArticle({ article, labels, locale }: { article: NewsListingC
             <span>{article.hasExternalSources ? labels.evidenceSourceAvailable : labels.evidenceSourceMissing}</span>
           </div>
           <div className="mt-5 flex flex-wrap gap-2">{article.tags.map((tag) => <Badge key={tag.id} className="ai-news-card-tag">{tag.name}</Badge>)}</div>
-          <span className="mt-5 inline-flex text-sm font-bold text-[var(--marketing-accent)]">{labels.readMore}</span>
         </div>
       </Link>
       <CardLikeAction kind="news" id={article.id} locale={locale} />
