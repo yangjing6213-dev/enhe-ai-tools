@@ -1,4 +1,3 @@
-import { RoundedBackIcon } from "@/components/rounded-back-icon";
 import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
@@ -609,12 +608,6 @@ export async function ToolDetailPageShell({
         ]}
       />
       <main>
-        <div className="mb-5">
-          <ButtonLink href={baseListingPath} variant="ghost">
-            <RoundedBackIcon />
-            {forceLocale === "en" ? "Back" : "返回"}
-          </ButtonLink>
-        </div>
         <section className="glass overflow-hidden rounded-[2rem] p-4 md:p-6 lg:p-8">
           <div className="tool-detail-hero-stack flex flex-col gap-8">
             <div className="tool-detail-cover-frame relative overflow-hidden rounded-[1.75rem] border border-[rgba(210,230,255,0.16)] bg-[#07101E]">

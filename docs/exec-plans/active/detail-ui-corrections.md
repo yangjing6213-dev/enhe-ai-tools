@@ -1,0 +1,6 @@
+# Detail UI corrections
+
+- Scope: locale links inside the switch track with white text; disable both edge glow implementations only on product detail; primary button text and WebKit fill white including descendants; remove duplicate back controls in product, order and daily analysis templates.
+- Root cause confirmed live: button color was white but webkitTextFillColor black due to globals.css text-white override. Previous color-only checks missed the rendered fill.
+- Verified: real local PostgreSQL/authenticated zh/en review forms and rating checks 3 passed, including white fill, one back and no product glow. Six locale interaction/geometry and five founder cases passed; separate non-product glow case passed. Full units 2804 passed/100 skipped, obsolete duplicate-back source assertion updated and targeted replacement passed. Lint/type checks passed.
+- Final production build passed. Focused production browser checks completed; pending scoped push/Compose release and live checks. No schema, dependency or credential changes. Disposable test database removed.

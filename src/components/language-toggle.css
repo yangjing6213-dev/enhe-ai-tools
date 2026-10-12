@@ -1,7 +1,9 @@
 .enhe-language-toggle.enhe-language-toggle.enhe-language-toggle {
   display: inline-flex;
   align-items: center;
-  gap: 4px;
+  position: relative;
+  width: 76px;
+  gap: 0;
   padding: 0;
   min-height: 44px;
   background: transparent !important;
@@ -12,11 +14,17 @@
 .enhe-language-toggle .redesign-language-link.redesign-language-link {
   display: inline-flex;
   align-items: center;
-  min-height: 44px;
+  min-height: 38px;
   min-width: 0;
   padding: 0;
   font-size: 11px;
-  color: inherit !important;
+  color: #fff !important;
+  -webkit-text-fill-color: #fff !important;
+  position: absolute;
+  top: 3px;
+  z-index: 2;
+  width: 30px;
+  justify-content: center;
   background: transparent !important;
 }
 .enhe-language-toggle .redesign-language-separator { display: none; }
@@ -46,3 +54,6 @@
   .enhe-language-toggle .squish-switch__thumb { transform: translateX(var(--ss-inset)) !important; }
   .enhe-language-toggle [data-on] .squish-switch__thumb { transform: translateX(calc(var(--ss-w) - var(--ss-inset) - var(--ss-thumb))) !important; }
 }
+
+.enhe-language-toggle .redesign-language-link[lang="zh"] { left: 4px; }
+.enhe-language-toggle .redesign-language-link[lang="en"] { right: 4px; }

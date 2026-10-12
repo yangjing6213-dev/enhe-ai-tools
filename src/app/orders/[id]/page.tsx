@@ -196,7 +196,6 @@ export default async function OrderDetailPage({ params, searchParams }: OrderDet
               去付款 / 重新提交凭证
             </Link>
           ) : null}
-          <Link href="/user" className="rounded-full border border-white/12 px-5 py-3 text-sm">返回用户中心</Link>
         </div>
       </div>
     </Container>

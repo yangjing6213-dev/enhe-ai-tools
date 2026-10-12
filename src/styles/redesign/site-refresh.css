@@ -181,8 +181,16 @@
 }
 
 .tool-detail-page [data-slot="button"][data-variant="default"],
+.tool-detail-page [data-slot="button"][data-variant="default"] *,
 .tool-detail-page [data-slot="button"][data-variant="default"]:is(:hover, :focus, :active) {
   color: #fff !important;
+  -webkit-text-fill-color: #fff !important;
+}
+.tool-detail-page :is(.glass, .evidence-card, .dossier-card, .surface-panel, .surface-panel-soft, .filter-surface, .admin-shell-card, .tool-detail-copy-card)::after {
+  content: none !important;
+  display: none !important;
+  background: none !important;
+  filter: none !important;
 }
 .tool-detail-page .tool-download-button,
 .tool-detail-page .tool-download-button:is(:hover, :focus, :active) {

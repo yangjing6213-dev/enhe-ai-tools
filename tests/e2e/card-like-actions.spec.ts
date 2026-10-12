@@ -174,8 +174,19 @@ for (const [locale, width] of [["zh", 320], ["en", 1440]] as const) {
     const content = `本地评分保存测试 ${locale} ${suffix}`;
     await page.locator("#tool-comment-content").fill(content);
     const submit = page.locator(".comment-submit-button");
+    await expect(page.locator('.site-back-nav-button')).toHaveCount(1);
+    await expect(page.locator('.tool-detail-page').getByRole('link', {name: locale === 'en' ? 'Back' : '返回', exact: true})).toHaveCount(0);
+    for (const primary of await page.locator('.tool-detail-page [data-slot="button"][data-variant="default"]').all()) {
+      await expect(primary).toHaveCSS("-webkit-text-fill-color", "rgb(255, 255, 255)");
+      for (const child of await primary.locator('span').all()) await expect(child).toHaveCSS("-webkit-text-fill-color", "rgb(255, 255, 255)");
+    }
+    const card = page.locator('.tool-detail-page .glass').last();
+    await card.hover();
+    expect(await card.evaluate(n => getComputedStyle(n, '::after').display)).toBe('none');
+    await expect(page.locator('.enhe-edge-effect')).toHaveCount(0);
     await submit.hover();
     await expect(submit).toHaveCSS("color", "rgb(255, 255, 255)");
+    await expect(submit).toHaveCSS("-webkit-text-fill-color", "rgb(255, 255, 255)");
     await submit.click();
     await expect.poll(() => db.comment.count({ where: { toolId, userId, content, rating: 4, status: "pending" } })).toBe(1);
     await group.evaluate(node => node.scrollIntoView({ block: "center", behavior: "instant" }));

@@ -12,6 +12,15 @@ for (const width of [320, 768, 1366, 1920]) {
       expect(rect.x).toBeGreaterThanOrEqual(0);
       expect(rect.x + rect.width).toBeLessThanOrEqual(width);
       await expect(toggle.locator('.squish-switch__track')).toHaveCSS("height", "38px");
+      const track = (await toggle.locator('.squish-switch__track').boundingBox())!;
+      for (const link of await toggle.locator('.redesign-language-link').all()) {
+        const text = (await link.boundingBox())!;
+        expect(text.x).toBeGreaterThanOrEqual(track.x);
+        expect(text.x + text.width).toBeLessThanOrEqual(track.x + track.width);
+        expect(text.y + text.height).toBeLessThanOrEqual(track.y + track.height);
+        await expect(link).toHaveCSS("color", "rgb(255, 255, 255)");
+        await expect(link).toHaveCSS("-webkit-text-fill-color", "rgb(255, 255, 255)");
+      }
       if (width >= 900) {
         await page.waitForTimeout(500);
         positions.push(await page.locator('h1, .redesign-home-subtitle, .redesign-home-cta, .redesign-home-features').evaluateAll(nodes => nodes.map(n => n.getBoundingClientRect().top)));
@@ -44,4 +53,13 @@ test("touch switch works with reduced motion", async ({ browser }) => {
   await expect(page).toHaveURL(/\/en\/about$/);
   await expect(page.locator('.redesign-header .squish-switch:visible')).toHaveAttribute("aria-checked", "true");
   await context.close();
+});
+
+test("non-product cards retain the edge glow interaction", async ({ page }) => {
+  await page.goto("/about");
+  const card = page.locator('.enhe-reference-editorial-card').first();
+  await card.scrollIntoViewIfNeeded();
+  const box = (await card.boundingBox())!;
+  await page.mouse.move(box.x + 2, box.y + box.height / 2);
+  await expect(page.locator('.enhe-edge-effect')).toBeVisible();
 });

@@ -1,6 +1,4 @@
-import { RoundedBackIcon } from "@/components/rounded-back-icon";
 import type { Metadata } from "next";
-import Link from "next/link";
 import { notFound } from "next/navigation";
 import { ExternalLink, LockKeyhole } from "lucide-react";
 import { Badge, ButtonLink, Container, SectionTitle } from "@/components/ui";
@@ -108,14 +106,6 @@ export async function AiTrendDailyDetailPageShell({
 
   return (
     <Container className="py-14">
-      <Link
-        href={buildLocalePath("/ai-trends/daily", forceLocale)}
-          className="inline-flex items-center gap-2 text-sm font-bold text-[var(--marketing-muted)] transition-colors hover:text-[var(--marketing-accent)]"
-      >
-        <RoundedBackIcon />
-        {text.back}
-      </Link>
-
       <article className="mt-6">
         <section className="surface-panel p-7 md:p-10">
           <div className="flex flex-wrap gap-2">

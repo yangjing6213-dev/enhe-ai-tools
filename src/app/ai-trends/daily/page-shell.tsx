@@ -117,7 +117,6 @@ export async function AiTrendDailyArchivePageShell({ forceLocale = "zh" }: { for
         <h1 className="mt-5 text-4xl font-black leading-tight text-[var(--marketing-text)] md:text-5xl">{text.title}</h1>
         <p className="mt-5 max-w-3xl text-base font-medium leading-8 text-[var(--marketing-muted)]">{text.intro}</p>
         <div className="mt-7 flex flex-wrap gap-3">
-          <ButtonLink href={buildLocalePath("/ai-trends", forceLocale)}>{text.back}</ButtonLink>
           {!isLoggedIn ? (
             <ButtonLink href={buildAiTrendLoginUrl(new Date().toISOString().slice(0, 10), forceLocale)} variant="ghost">
               {text.login}
