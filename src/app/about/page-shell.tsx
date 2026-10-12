@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
+import { AboutFounder } from "@/components/about-founder";
 import { StructuredData } from "@/components/structured-data";
 import { Container, SectionTitle } from "@/components/ui";
 import { enheOrganizationReference } from "@/lib/brand-entity";
@@ -300,6 +301,8 @@ export function AboutPageShell({ forceLocale }: { forceLocale: Locale }) {
             </article>
           ))}
         </section>
+
+        <AboutFounder locale={forceLocale} />
 
         <section className="enhe-reference-editorial-links mt-8 rounded-2xl p-6">
           <SectionTitle title={copy.topicLinksTitle} />
