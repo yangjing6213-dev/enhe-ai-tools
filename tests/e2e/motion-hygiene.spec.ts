@@ -141,7 +141,7 @@ test("review auto-rotation pauses while focused and resumes when focus leaves", 
   await expect(activeReview).not.toHaveAttribute("aria-label", focusedManualReview ?? "");
 });
 
-test("review auto-rotation pauses on hover and resumes after manual navigation", async ({ page }) => {
+test("review auto-rotation continues on hover and resumes after manual navigation", async ({ page }) => {
   await page.clock.install();
   await openFormalRoute(page, "/");
 
@@ -164,9 +164,9 @@ test("review auto-rotation pauses on hover and resumes after manual navigation",
 
   const beforeHover = await activeReview.getAttribute("aria-label");
   await section.dispatchEvent("mouseenter");
-  await expect(track).toHaveAttribute("aria-live", "polite");
-  await page.clock.fastForward(12_000);
-  await expect(activeReview).toHaveAttribute("aria-label", beforeHover ?? "");
+  await expect(track).toHaveAttribute("aria-live", "off");
+  await page.clock.fastForward(3_100);
+  await expect(activeReview).not.toHaveAttribute("aria-label", beforeHover ?? "");
   await section.dispatchEvent("mouseleave");
   await expect(track).toHaveAttribute("aria-live", "off");
   await page.clock.fastForward(5_100);

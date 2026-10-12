@@ -112,7 +112,6 @@ export function EnheRedesignExperienceReviews({
     let intervalId: number | null = null;
     let resumeTimeoutId: number | null = null;
     let isMounted = true;
-    let isHovered = false;
     let hasPointer = false;
     let manuallyPaused = false;
     let pointerStartX: number | null = null;
@@ -140,7 +139,6 @@ export function EnheRedesignExperienceReviews({
     const canRunAutomatically = () =>
       !reducedMotion &&
       !document.hidden &&
-      !isHovered &&
       !focusPausedRef.current &&
       !manuallyPaused &&
       !hasPointer &&
@@ -187,14 +185,6 @@ export function EnheRedesignExperienceReviews({
       }, REVIEW_MANUAL_RESUME_MS);
     };
 
-    const handleMouseEnter = () => {
-      isHovered = true;
-      pause();
-    };
-    const handleMouseLeave = () => {
-      isHovered = false;
-      resume();
-    };
     const handleFocusIn = () => {
       focusPausedRef.current = true;
       clearResumeTimeout();
@@ -271,8 +261,6 @@ export function EnheRedesignExperienceReviews({
       resumeManually,
     };
     setIsReducedMotion(reducedMotion);
-    section.addEventListener("mouseenter", handleMouseEnter);
-    section.addEventListener("mouseleave", handleMouseLeave);
     section.addEventListener("focusin", handleFocusIn);
     section.addEventListener("focusout", handleFocusOut);
     section.addEventListener("pointerdown", handlePointerDown);
@@ -289,8 +277,6 @@ export function EnheRedesignExperienceReviews({
       clearAutoInterval();
       clearResumeTimeout();
       timerActionsRef.current = null;
-      section.removeEventListener("mouseenter", handleMouseEnter);
-      section.removeEventListener("mouseleave", handleMouseLeave);
       section.removeEventListener("focusin", handleFocusIn);
       section.removeEventListener("focusout", handleFocusOut);
       section.removeEventListener("pointerdown", handlePointerDown);

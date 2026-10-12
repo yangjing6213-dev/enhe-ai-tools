@@ -35,6 +35,8 @@ for (const route of ["/", "/en"]) {
     await expect(control).toHaveAttribute("aria-pressed", "true");
     await control.evaluate((node: HTMLButtonElement) => node.click());
     await expect(control).toHaveAttribute("aria-pressed", "false");
+    await section.dispatchEvent("mouseenter");
+    await expect(section.locator(".redesign-home-reviews-track")).toHaveAttribute("aria-live", "off");
     for (let step = 0; step < 2; step++) {
       const before = await current.getAttribute("aria-label");
       await page.clock.runFor(2900);
@@ -49,3 +51,64 @@ for (const route of ["/", "/en"]) {
     await expect(current).toHaveAttribute("aria-label", paused!);
   });
 }
+
+for (const route of ["/", "/en"]) {
+  for (const width of [320, 768, 1440]) {
+    test(`product layout stays fixed and folders work on ${route} at ${width}px`, async ({ page }) => {
+      await page.setViewportSize({ width, height: 1000 });
+      await page.goto(route);
+      await page.addStyleTag({ content: "html { scroll-behavior: auto !important }" });
+      const stage = page.locator(".redesign-home-product-stage");
+      await stage.focus();
+      const geometry = () => stage.evaluate(node => {
+        const current = node.querySelector('[data-product-current="true"]')!;
+        const stageBox = node.getBoundingClientRect();
+        const frame = current.querySelector('.redesign-home-product-media-frame')!.getBoundingClientRect();
+        const detail = current.querySelector('.redesign-home-product-detail')!.getBoundingClientRect();
+        return { height: stageBox.height, frameHeight: frame.height, detailTop: detail.top - stageBox.top, detailHeight: detail.height };
+      });
+      const before = await geometry();
+      for (let i = 0; i < 5; i++) {
+        await page.keyboard.press("ArrowRight");
+        expect(await geometry()).toEqual(before);
+        await expect(stage.locator('[data-product-current="true"] img')).toHaveCSS("object-fit", "contain");
+      }
+      const folders = page.locator(".redesign-home-features .folder-float");
+      await expect(folders).toHaveCount(4);
+      expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBe(width);
+      if (width === 1440) await page.locator(".redesign-home-features").screenshot({ path: test.info().outputPath("folders.png") });
+      const folder = folders.first();
+      await folder.evaluate(node => node.scrollIntoView({ behavior: "instant", block: "center" }));
+      await page.mouse.move(0, 0);
+      await folder.dispatchEvent("pointerenter", { pointerType: "touch" });
+      await expect(folder).not.toHaveAttribute("data-open");
+      const trigger = folder.locator(".folder-float__trigger");
+      await trigger.focus();
+      await page.keyboard.press("Enter");
+      await expect(trigger).toHaveAttribute("aria-expanded", "true");
+      await page.keyboard.press("Escape");
+      await expect(trigger).toHaveAttribute("aria-expanded", "false");
+      await folder.hover();
+      await expect(trigger).toHaveAttribute("aria-expanded", "true");
+      await expect(folder).toHaveAttribute("data-live", "");
+      await folder.locator(".folder-float__item").click();
+      await expect(page).toHaveURL(route === "/" ? /\/software$/ : /\/en\/software$/);
+    });
+  }
+}
+
+test("folders remain usable on a touch screen with reduced motion", async ({ browser, baseURL }) => {
+  const context = await browser.newContext({ viewport: { width: 390, height: 900 }, hasTouch: true, reducedMotion: "reduce" });
+  try {
+    const page = await context.newPage();
+    await page.goto(`${baseURL}/en`);
+    const folder = page.locator(".redesign-home-features .folder-float").first();
+    const trigger = folder.locator(".folder-float__trigger");
+    await trigger.tap();
+    await expect(trigger).toHaveAttribute("aria-expanded", "true");
+    await page.waitForTimeout(1000);
+    await expect(folder).not.toHaveAttribute("data-live");
+    await folder.locator(".folder-float__item").tap();
+    await expect(page).toHaveURL(/\/en\/software$/);
+  } finally { await context.close(); }
+});

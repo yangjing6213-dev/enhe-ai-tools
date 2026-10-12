@@ -186,7 +186,7 @@ describe("homepage experience review candidate", () => {
     expect(reviewSource).toContain("matchMedia");
     expect(reviewSource).toContain("prefers-reduced-motion: reduce");
     expect(reviewSource).toContain("visibilitychange");
-    expect(reviewSource).toContain("mouseenter");
+    expect(reviewSource).not.toContain("mouseenter");
     expect(reviewSource).toContain("focusin");
     expect(reviewSource).toContain("pointerdown");
     expect(reviewSource).toContain("ArrowLeft");

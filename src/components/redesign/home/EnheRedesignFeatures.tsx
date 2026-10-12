@@ -1,4 +1,7 @@
+"use client";
+
 import type { RedesignLocale } from "@/components/redesign/types";
+import FolderFloat from "@/components/FolderFloat";
 import { EnheIconfontIcon, type EnheIconfontName } from "@/components/redesign/enhe-iconfont-icon";
 
 export const HOME_FEATURES: ReadonlyArray<{
@@ -41,13 +44,42 @@ export function EnheRedesignFeatures({ locale }: { locale: RedesignLocale }) {
     >
       <div className="redesign-home-features-inner">
         {HOME_FEATURES.map(({ title, description, href, icon: Icon }) => (
-          <a className="redesign-home-feature-card" href={href[locale]} key={href[locale]}>
+          <div className="redesign-home-feature-folder" key={href[locale]}>
+            <FolderFloat
+              label={title[locale]}
+              sublabel={locale === "zh" ? "点击或悬停探索" : "Open to explore"}
+              items={[{ label: locale === "zh" ? `查看${title[locale]}` : `Explore ${title[locale]}`, value: href[locale] }]}
+              trigger="hover"
+              closeOnSelect
+              physics
+              drift={0.5}
+              folderColor="#3f3f46"
+              frontColor="#52525b"
+              paperColor="#f5f5f5"
+              itemColor="#f5f5f5"
+              itemTextColor="#18181b"
+              labelColor="#f5f5f5"
+              width={200}
+              height={148}
+              radius={14}
+              spread={180}
+              lift={26}
+              tilt={8}
+              flapAngle={34}
+              restAngle={16}
+              openDuration={520}
+              stagger={45}
+              bounce={0.3}
+              onSelect={value => { window.location.assign(value); }}
+            />
+          <a className="redesign-home-feature-card" href={href[locale]}>
             <EnheIconfontIcon icon={Icon} className="redesign-home-feature-icon" />
             <span className="redesign-home-feature-copy">
               <strong>{title[locale]}</strong>
               <span>{description[locale]}</span>
             </span>
           </a>
+          </div>
         ))}
       </div>
     </section>

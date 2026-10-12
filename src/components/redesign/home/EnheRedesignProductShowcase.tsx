@@ -376,8 +376,8 @@ export function EnheRedesignProductShowcase({
                 data-media-status={mediaStatus}
                 src={product.mediaSrc}
                 alt={product.alt[locale]}
-                width={product.width}
-                height={product.height}
+                fill
+                sizes="(max-width: 767px) calc(100vw - 120px), (max-width: 1180px) calc(100vw - 216px), 964px"
                 loading="eager"
                 unoptimized
                 onLoad={() =>
