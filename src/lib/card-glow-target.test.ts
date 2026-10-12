@@ -6,12 +6,13 @@ describe("sitewide card glow coverage", () => {
     ["ARTICLE", []], ["DIV", ["enhe-reference-editorial-card"]],
     ["A", ["redesign-software-card"]], ["DIV", ["admin-shell-card"]],
     ["SECTION", ["surface-panel"]], ["DIV", ["rb-profile__body"]],
-    ["DIV", ["redesign-home-product-stage"]], ["DIV", ["details-panel"]],
+    ["DIV", ["details-panel"]],
     ["DIV", ["rounded-xl", "border"]], ["DIV", ["rounded-2xl", "bg-card"]],
   ] as [string, string[]][])("covers %s %j", (tag, classes) => {
     expect(isCardGlowTarget(tag, classes)).toBe(true);
   });
   it.each([
+    ["DIV", ["redesign-home-product-stage"]],
     ["BUTTON", ["rounded-xl", "border"]], ["INPUT", ["rounded-xl", "border"]],
     ["NAV", ["rounded-xl", "border"]], ["DIV", ["enhe-admin-card-grid"]],
     ["DIV", ["card-title"]], ["DIV", ["rounded-full", "border"]],

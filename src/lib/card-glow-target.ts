@@ -7,7 +7,6 @@ export function isCardGlowTarget(tag: string, classes: string[], slot?: string |
     "glass", "surface-panel", "surface-panel-soft", "filter-surface",
     "home-product-preview", "home-product-preview-empty", "home-fallback-link",
     "enhe-reference-editorial-links", "rb-profile__body",
-    "redesign-home-product-stage",
   ].includes(name))) return !classes.includes("rounded-full");
   const rounded = classes.some(name => name.startsWith("rounded") && name !== "rounded-full");
   const surface = classes.some(name => name === "border" || name === "bg-card" || name.startsWith("bg-[var(--marketing-card"));

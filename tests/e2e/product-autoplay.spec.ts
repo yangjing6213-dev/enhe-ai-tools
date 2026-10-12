@@ -11,19 +11,20 @@ test("featured products rotate, pause for reading and focus, and resume with a f
   await expect(section).toHaveAttribute("data-auto-rotating", "true");
   await page.clock.runFor(1);
   const first = await current.getAttribute("data-product-id");
-  await page.clock.runFor(6100);
+  // This test checks timer state, not every animation frame during the wait.
+  await page.clock.fastForward(6100);
   await expect(current).not.toHaveAttribute("data-product-id", first!);
   const second = await current.getAttribute("data-product-id");
 
   await section.hover();
   await expect(section).toHaveAttribute("data-auto-rotating", "false");
-  await page.clock.runFor(12000);
+  await page.clock.fastForward(12000);
   await expect(current).toHaveAttribute("data-product-id", second!);
   await page.mouse.move(0, 0);
   await expect(section).toHaveAttribute("data-auto-rotating", "true");
-  await page.clock.runFor(5900);
+  await page.clock.fastForward(5900);
   await expect(current).toHaveAttribute("data-product-id", second!);
-  await page.clock.runFor(200);
+  await page.clock.fastForward(200);
   await expect(current).not.toHaveAttribute("data-product-id", second!);
 
   const stage = section.locator(".redesign-home-product-stage");
@@ -31,12 +32,12 @@ test("featured products rotate, pause for reading and focus, and resume with a f
   await expect(section).toHaveAttribute("data-auto-rotating", "false");
   await page.keyboard.press("ArrowRight");
   const manual = await current.getAttribute("data-product-id");
-  await page.clock.runFor(12000);
+  await page.clock.fastForward(12000);
   await expect(current).toHaveAttribute("data-product-id", manual!);
   await section.getByRole("button", { name: "暂停产品轮播" }).click();
   await page.evaluate(() => (document.activeElement as HTMLElement)?.blur());
   await page.mouse.move(0, 0);
-  await page.clock.runFor(6100);
+  await page.clock.fastForward(6100);
   await expect(current).toHaveAttribute("data-product-id", manual!);
   await section.getByRole("button", { name: "继续产品轮播" }).click();
   await stage.scrollIntoViewIfNeeded();
@@ -44,7 +45,7 @@ test("featured products rotate, pause for reading and focus, and resume with a f
   await page.mouse.move(0, 0);
   await expect(section).toHaveAttribute("data-auto-rotating", "true");
   await page.clock.runFor(1);
-  await page.clock.runFor(6100);
+  await page.clock.fastForward(6100);
   await expect(current).not.toHaveAttribute("data-product-id", manual!);
 
   const beforeHidden = await current.getAttribute("data-product-id");
@@ -53,7 +54,7 @@ test("featured products rotate, pause for reading and focus, and resume with a f
     document.dispatchEvent(new Event("visibilitychange"));
   });
   await expect(section).toHaveAttribute("data-auto-rotating", "false");
-  await page.clock.runFor(12000);
+  await page.clock.fastForward(12000);
   await expect(current).toHaveAttribute("data-product-id", beforeHidden!);
   await page.evaluate(() => {
     delete (document as unknown as { hidden?: boolean }).hidden;
@@ -64,7 +65,7 @@ test("featured products rotate, pause for reading and focus, and resume with a f
   await page.locator(".redesign-header").scrollIntoViewIfNeeded();
   await expect(section).toHaveAttribute("data-auto-rotating", "false");
   const offscreen = await current.getAttribute("data-product-id");
-  await page.clock.runFor(12000);
+  await page.clock.fastForward(12000);
   await expect(current).toHaveAttribute("data-product-id", offscreen!);
 });
 

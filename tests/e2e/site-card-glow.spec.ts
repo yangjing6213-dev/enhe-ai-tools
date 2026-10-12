@@ -62,8 +62,12 @@ test("glow reaches public cards and dynamic account/admin cards without affectin
 
 test("touch and reduced motion disable the glow immediately", async ({ page }) => {
   await page.goto("/about");
+  await page.addStyleTag({ content: "html { scroll-behavior: auto !important; }" });
   const card = page.locator(".about-section-grid article").first();
-  await card.hover({ position: { x: 2, y: 60 } });
+  await card.evaluate(node => node.scrollIntoView({ behavior: "instant", block: "center" }));
+  await page.evaluate(() => new Promise<void>(resolve => requestAnimationFrame(() => requestAnimationFrame(() => resolve()))));
+  const bounds = (await card.boundingBox())!;
+  await page.mouse.move(bounds.x + 2, bounds.y + 60);
   await expect(page.locator(".enhe-edge-effect")).toBeVisible();
   await page.emulateMedia({ reducedMotion: "reduce" });
   await expect(page.locator(".enhe-edge-effect")).toBeHidden();
