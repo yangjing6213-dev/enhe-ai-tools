@@ -91,7 +91,8 @@ test("public header replaces the search link, opens recommendations, and submits
       await expect(panel).not.toBeVisible();
       await input.click();
       await expect(panel).toBeVisible();
-      await page.locator(".redesign-home-hero h1").click();
+      // The compact hero can sit behind the search panel; use a genuine outside point.
+      await page.locator(".redesign-home-feature-folder").first().click({ position: { x: 1, y: 1 } });
       await expect(panel).not.toBeVisible();
     }
     const input = page.locator(".redesign-header").getByRole("combobox");

@@ -133,7 +133,7 @@
 }
 
 .redesign-home-hero {
-  min-height: clamp(560px, 44vw, 680px);
+  min-height: clamp(400px, 34vw, 500px);
   display: flex;
   align-items: center;
   background-color: var(--enhe-page-bg);
@@ -145,8 +145,14 @@
   width: min(100%, 1040px);
   max-width: 1040px;
   margin-inline: auto;
-  padding: clamp(84px, 10vw, 128px) 24px;
+  padding: clamp(60px, 6vw, 88px) 24px;
   text-align: center;
+}
+
+@media (width >= 900px) {
+  .redesign-home[data-locale="en"] .redesign-home-hero-inner {
+    padding-block: 40px;
+  }
 }
 
 .redesign-home .redesign-home-hero-inner h1 {
@@ -313,7 +319,7 @@
   padding: 36px 0;
   border: 0;
   gap: 28px;
-  padding-top: 84px;
+  padding-top: 24px;
 }
 
 .redesign-home-feature-folder {
@@ -322,14 +328,6 @@
   flex-direction: column;
   align-items: center;
   gap: 20px;
-}
-
-.redesign-home-feature-folder .redesign-home-feature-card {
-  align-items: start;
-  width: 100%;
-  max-width: 260px;
-  box-sizing: border-box;
-  min-height: 100px;
 }
 
 .enhe-redesign-production .redesign-home-features .folder-float__trigger {
@@ -353,12 +351,12 @@
 }
 
 .redesign-home-features .folder-float__label { font-size: 20px; font-weight: 700; }
-.redesign-home-features .folder-float__sub { opacity: 0.85; }
+.redesign-home-features .folder-float__sub { opacity: 1; }
+.redesign-home-features .folder-float__front { background: linear-gradient(180deg, #3b82f6, #2563eb); }
 .redesign-home-features .folder-float[data-open] .folder-float__items::before { left: -100px; width: 200px; }
 
 @media (width < 520px) {
-  .redesign-home-features .redesign-home-features-inner { grid-template-columns: 1fr; gap: 64px; padding-top: 80px; }
-  .redesign-home-feature-folder .redesign-home-feature-card { min-height: 72px; }
+  .redesign-home-features .redesign-home-features-inner { grid-template-columns: 1fr; gap: 64px; padding-top: 48px; }
 }
 
 .redesign-home-feature-card {
@@ -791,7 +789,7 @@
   }
 
   .redesign-home .redesign-home-hero-inner {
-    padding: 92px 22px 108px;
+    padding: 64px 22px 48px;
   }
 
   .redesign-home .redesign-home-hero-inner h1 {

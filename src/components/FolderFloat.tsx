@@ -149,6 +149,8 @@ const FolderFloat: React.FC<FolderFloatProps> = ({
   className = ''
 }) => {
   const [open, setOpen] = useState(defaultOpen);
+  const [ready, setReady] = useState(false);
+  useEffect(() => setReady(true), []);
   const [popped, setPopped] = useState(-1);
   const [live, setLive] = useState(false);
   const [sizes, setSizes] = useState<Size[]>([]);
@@ -490,6 +492,7 @@ const FolderFloat: React.FC<FolderFloatProps> = ({
         <button
           type="button"
           className="folder-float__trigger"
+          disabled={!ready}
           aria-expanded={open}
           aria-label={`${label}, ${sub}`}
           onClick={() => set(!open)}

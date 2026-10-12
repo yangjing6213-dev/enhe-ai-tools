@@ -30,8 +30,8 @@ describe("homepage UI polish", () => {
     expect(refreshStyles).toMatch(/\.redesign-header\[data-home="true"\][^{]*\{[^}]*background:\s*var\(--enhe-page-bg\)[^}]*color:\s*var\(--enhe-text\)/);
     expect(refreshStyles).toMatch(/\.redesign-home-hero\s*\{[^}]*background-image:\s*none[^}]*color:\s*var\(--enhe-text\)/);
     expect(refreshStyles).toMatch(/\.redesign-home-hero-inner\s*\{[^}]*text-align:\s*center/);
-    expect(refreshStyles).toMatch(/\.redesign-home-hero\s*\{[^}]*min-height:\s*clamp\(560px,\s*44vw,\s*680px\)/);
-    expect(refreshStyles).toMatch(/\.redesign-home \.redesign-home-hero-inner\s*\{[^}]*padding:\s*clamp\(84px,\s*10vw,\s*128px\)/);
+    expect(refreshStyles).toMatch(/\.redesign-home-hero\s*\{[^}]*min-height:\s*clamp\(400px,\s*34vw,\s*500px\)/);
+    expect(refreshStyles).toMatch(/\.redesign-home \.redesign-home-hero-inner\s*\{[^}]*padding:\s*clamp\(60px,\s*6vw,\s*88px\)/);
     expect(tokens).toContain('--enhe-font-brand-label: "LXGW WenKai Lite"');
     expect(globalStyles).toContain("font-family: 'LXGW WenKai Lite'");
     expect(globalStyles).toContain("/fonts/lxgw-wenkai/lxgw-wenkai-home-label.woff");
@@ -149,14 +149,13 @@ describe("homepage UI polish", () => {
     expect(softwareStyles).not.toContain(".redesign-software-card-meta");
   });
 
-  it("uses the Iconfont collection for all four homepage feature icons", () => {
+  it("replaces the old feature links with four blue folder entries", () => {
     const features = read("src/components/redesign/home/EnheRedesignFeatures.tsx");
-    const iconFont = read("src/components/redesign/enhe-iconfont-icon.tsx");
-    expect(features).toContain('icon: "code"');
-    expect(features).toContain('icon: "training"');
-    expect(features).toContain('icon: "file-common"');
-    expect(features).toContain('icon: "data-view"');
-    expect(iconFont).toContain("cid=22664");
+    expect(features).toContain('frontColor="#3b82f6"');
+    expect(features).toContain('folderColor="#f5f5f5"');
+    expect(features).not.toContain("redesign-home-feature-card");
+    expect(features).not.toContain("EnheIconfontIcon");
+    for (const href of ["/software", "/ai-skills", "/ai-news", "/ai-trends"]) expect(features).toContain(`"${href}"`);
   });
 
   it("keeps catalog cards at one height and preserves the existing hover motion", () => {

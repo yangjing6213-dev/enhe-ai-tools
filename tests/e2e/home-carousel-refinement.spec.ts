@@ -1,6 +1,27 @@
 import { expect, test } from "@playwright/test";
 
 for (const route of ["/", "/en"]) {
+  test(`blue folders replace old cards and fit the first screen on ${route}`, async ({ page }) => {
+    for (const viewport of [{ width: 1366, height: 768 }, { width: 1440, height: 900 }]) {
+      await page.setViewportSize(viewport);
+      await page.goto(route);
+      await expect(page.locator(".redesign-home-feature-card")).toHaveCount(0);
+      const folders = page.locator(".redesign-home-features .folder-float");
+      await expect(folders).toHaveCount(4);
+      for (const folder of await folders.all()) {
+        const bounds = (await folder.boundingBox())!;
+        expect(bounds.y).toBeGreaterThan(0);
+        expect(bounds.y + bounds.height).toBeLessThanOrEqual(viewport.height);
+        expect(await folder.evaluate(node => node.style.getPropertyValue("--ff-back"))).toBe("#f5f5f5");
+        expect(await folder.evaluate(node => node.style.getPropertyValue("--ff-front"))).toBe("#3b82f6");
+        await expect(folder.locator(".folder-float__label")).toHaveCSS("color", "rgb(245, 245, 245)");
+      }
+      await page.screenshot({ path: test.info().outputPath(`first-screen-${viewport.width}.png`) });
+    }
+  });
+}
+
+for (const route of ["/", "/en"]) {
   test(`product showcase has no edge glow on ${route}`, async ({ page }) => {
     await page.goto(route);
     await page.addStyleTag({ content: "html { scroll-behavior: auto !important; }" });

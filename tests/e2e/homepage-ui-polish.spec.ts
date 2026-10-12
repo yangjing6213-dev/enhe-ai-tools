@@ -102,7 +102,8 @@ test("homepage polish stays readable, responsive, and interactive without extern
       await page.locator(".redesign-drawer-close").click();
     }
 
-    const featureCards = page.locator(".redesign-home-feature-card");
+    await expect(page.locator(".redesign-home-feature-card")).toHaveCount(0);
+    const featureCards = page.locator(".redesign-home-feature-folder");
     await expect(featureCards).toHaveCount(4);
     for (let index = 0; index < 4; index += 1) {
       for (const borderProperty of ["border-top-width", "border-right-width", "border-bottom-width", "border-left-width"]) {

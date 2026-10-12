@@ -14,7 +14,7 @@ test("site pages keep white surfaces and black neutral text, including interacti
 
   const homeColors = await page.evaluate(() => {
     const main = document.querySelector<HTMLElement>("main");
-    const card = document.querySelector<HTMLElement>(".redesign-home-feature-card");
+    const card = document.querySelector<HTMLElement>(".redesign-home-features");
     const action = document.querySelector<HTMLElement>(".redesign-home-cta");
     const eyebrow = document.querySelector<HTMLElement>(".redesign-home-products-eyebrow");
     if (!main || !card || !action || !eyebrow) throw new Error("The homepage main area, feature cards, eyebrow, and call to action must render.");
