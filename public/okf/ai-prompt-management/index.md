@@ -5,7 +5,7 @@ description: Agent-readable profile for the free ENHE AI bilingual prompt librar
 resource: https://www.enhe-tech.com.cn/okf/ai-prompt-management/index.md
 canonical: https://www.enhe-tech.com.cn/skill-learning/ai-prompt-management
 tags: [ai-prompts, prompt-library, prompt-engineering, productivity, writing, image-generation]
-timestamp: 2026-07-15
+timestamp: 2026-10-13
 ---
 
 # ENHE AI Prompt Management System
@@ -18,6 +18,13 @@ ENHE AI Prompt Management System is a free public prompt library with 418 Chines
 - English tool: https://www.enhe-tech.com.cn/en/skill-learning/ai-prompt-management
 - Chinese dataset: https://www.enhe-tech.com.cn/data/ai-prompt-management/zh.json
 - English dataset: https://www.enhe-tech.com.cn/data/ai-prompt-management/en.json
+
+## Access and Delivery
+
+- The public web library is free to use without signing in.
+- The desktop download is a separate paid offer. Check the product page for the current price, included files, supported system, and delivery terms.
+- Desktop product: https://www.enhe-tech.com.cn/software/ai-prompt-management-system-418-bilingual-prompts-for-writing-seo-and-ai-creation
+- Free web access does not include the paid desktop download.
 
 ## Main Scenarios
 

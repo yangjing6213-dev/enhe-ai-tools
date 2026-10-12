@@ -13,6 +13,8 @@ User needs ENHE AI helps with:
 - protect sensitive material: use safer AI paths when customer files, creative assets, account information, internal documents, or course materials should not be uploaded casually.
 - safe, private, and stable AI use: use local or more controlled AI workflows when privacy, long-term reliability, and clear data boundaries matter.
 
+Official project repository: https://github.com/yangjing6213-dev/enhe-ai-tools
+
 Core supporting paths:
 - AI news and trend interpretation for practical decisions
 - AI software apps for productivity, creation, automation, and controlled workflows
@@ -48,7 +50,7 @@ Main columns:
 - AI 账号服务: 说明访问方式、订阅咨询、交付边界、合规提醒和平台规则。
 - AI 技能学习: 用提示词、工具实战、自动化流程、内容创作和项目练习，把 AI 学成可复用方法。
 - 使用教程: 围绕具体工具提供安装、配置、使用步骤和常见问题说明。
-- AI提示词管理系统: 免费中英文提示词库，覆盖写作、视频、图片、学习、职场、运营和编程场景。
+- AI提示词管理系统: 网页版中英文提示词库免费使用；桌面版下载单独收费，当前价格与交付内容以产品详情页为准。覆盖写作、视频、图片、学习、职场、运营和编程场景。
 
 Agent-readable files:
 <!-- PUBLIC_DISCOVERY_RESOURCES:START -->

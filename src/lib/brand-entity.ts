@@ -25,7 +25,7 @@ export function buildEnheOrganizationSchema(
     name: siteName,
     id: enheOrganizationId,
     alternateName: ["恩禾 ENHE AI", "恩禾AI"],
-    sameAs: ["https://github.com/hqwzhu/enhe-ai-tools"],
+    sameAs: ["https://github.com/yangjing6213-dev/enhe-ai-tools"],
     knowsAbout: [
       "AI tools",
       "AI productivity workflows",

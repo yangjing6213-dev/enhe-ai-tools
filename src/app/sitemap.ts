@@ -7,6 +7,7 @@ import {
 import { aiNewsTopics, getAiNewsTopicPath } from "@/lib/ai-news-topics";
 import { getPublicAiNewsTopics } from "@/lib/ai-news-topic-config";
 import { prisma } from "@/lib/db";
+import { getPublicNewsListing } from "@/lib/public-content";
 import {
   buildCanonicalToolPath,
   getCanonicalAiNewsSlug,
@@ -75,7 +76,7 @@ function isKnownAiNewsTopicPath(path: string) {
 }
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-  const [tools, newsArticles, publicAiNewsTopics] = await Promise.all([
+  const [tools, newsArticles, publicAiNewsTopics, chineseListing, englishListing] = await Promise.all([
     prisma.tool
       .findMany({
         where: { status: "published" },
@@ -104,14 +105,16 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       })
       .catch(() => []),
     getPublicAiNewsTopics().catch(() => aiNewsTopics),
+    getPublicNewsListing({ locale: "zh", sort: "latest", take: 0 }),
+    getPublicNewsListing({ locale: "en", sort: "latest", take: 0 }),
   ]);
 
   const latestNewsUpdate = newsArticles.reduce<Date>(
     (latest, article) => (article.updatedAt > latest ? article.updatedAt : latest),
     new Date("2026-06-18T00:00:00.000Z"),
   );
-  const chineseNewsPageCount = getNewsPageCount(newsArticles.length);
-  const englishNewsTotal = newsArticles.filter(isEnglishNewsArticleIndexable).length;
+  const chineseNewsPageCount = getNewsPageCount(chineseListing.total);
+  const englishNewsTotal = englishListing.total;
   const englishNewsPageCount = getNewsPageCount(englishNewsTotal);
   const newsPaginationEntries = [
     ...Array.from({ length: Math.max(0, chineseNewsPageCount - 1) }, (_, index) => index + 2).map((page) => {

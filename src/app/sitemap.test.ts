@@ -16,8 +16,17 @@ vi.mock("@/lib/db", () => ({
   prisma: prismaMock
 }));
 
+const listingMock = vi.fn();
+vi.mock("@/lib/public-content", () => ({ getPublicNewsListing: listingMock }));
+
 describe("sitemap canonical URL contract", () => {
   beforeEach(() => {
+    listingMock.mockReset();
+    listingMock.mockImplementation(async ({ locale }) => {
+      const rows = await prismaMock.newsArticle.findMany();
+      const { isEnglishNewsArticleIndexable } = await import("@/lib/ai-news");
+      return { articles: [], total: locale === "en" ? (rows ?? []).filter(isEnglishNewsArticleIndexable).length : (rows ?? []).length };
+    });
     prismaMock.tool.findMany.mockReset();
     prismaMock.newsArticle.findMany.mockReset();
     prismaMock.productDemo.findMany.mockReset();
@@ -310,4 +319,22 @@ describe("sitemap canonical URL contract", () => {
     expect(urls).toContain("https://www.enhe-tech.com.cn/en/ai-news/page/2");
     expect(urls.some((url) => url.includes("/ai-news?page="))).toBe(false);
   });
+  it("uses deduplicated listing totals so raw duplicates cannot create a nonexistent last page", async () => {
+    prismaMock.tool.findMany.mockResolvedValue([]);
+    prismaMock.newsArticle.findMany.mockResolvedValue(Array.from({ length: 19 }, (_, index) => ({
+      slug: `raw-${index}`, title: `Raw ${index}`, englishTitle: `English article ${index}`,
+      englishSummary: "This article explains a useful workflow for English readers.",
+      englishContent: "A practical workflow explanation with clear steps and sources for English readers. ".repeat(5),
+      updatedAt: new Date("2026-10-13T00:00:00Z"),
+    })));
+    listingMock.mockImplementation(async ({ locale }) => ({ articles: [], total: locale === "en" ? 9 : 18 }));
+    const { default: sitemap } = await import("@/app/sitemap");
+    const entries = await sitemap(); const urls = entries.map(entry => entry.url);
+    expect(urls).toContain("https://www.enhe-tech.com.cn/ai-news/page/2");
+    expect(urls).not.toContain("https://www.enhe-tech.com.cn/ai-news/page/3");
+    expect(urls).not.toContain("https://www.enhe-tech.com.cn/en/ai-news/page/2");
+    expect(entries.find(entry => entry.url.endsWith("/ai-news/page/2"))?.alternates?.languages).not.toHaveProperty("en-US");
+    expect(listingMock).toHaveBeenCalledWith(expect.objectContaining({ locale: "en", take: 0 }));
+  });
+
 });

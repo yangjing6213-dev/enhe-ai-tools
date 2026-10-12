@@ -41,16 +41,16 @@ const topicPath = "/ai-trends";
 
 const content = {
   zh: {
-    title: "人类最渴望用 AI 解决哪些问题",
+    title: "用 AI 解决工作与创作任务",
     description:
       "ENHE AI 持续整理公开趋势信号，观察用户最希望用 AI 解决的工作效率、视频生成、内容创作、编程、学习、搜索研究、营销销售和生活辅助问题，帮助判断下一步工具、技能和内容行动。",
     hero:
-      "核心结论：用户最渴望 AI 解决的不是抽象智能问题，而是把高频、耗时、需要专业判断的任务变成可复用、可验证、可交付的工作流。",
-    demandTitle: "需求热度排行",
+      "编辑建议：从高频、耗时、需要专业判断的实际任务开始，验证 AI 能否形成可复用、可检查的工作流。",
+    demandTitle: "AI 应用方向参考",
     demandIntro:
-      "热度不是单一搜索量，而是综合公开趋势信号、产品更新密度、创作者和开发者讨论、商业化成熟度后的判断。",
-    scenarioTitle: "工作效率细分场景排行",
-    scenarioIntro: "当工作效率位居最高热度时，下一步开发不应只停留在泛效率工具，而要优先看具体任务的频次、痛感、付费意愿和接入难度。",
+      "以下方向由编辑按常见任务整理，不是实时统计排行，不代表搜索量或市场份额。请结合具体工具、官方来源和自身场景判断。",
+    scenarioTitle: "工作效率场景参考",
+    scenarioIntro: "以下是工作效率任务的编辑参考，顺序与开发优先级不是统计排名。评估产品前，请自行验证任务频次、需求、使用成本和接入难度。",
     scenarioPriority: "开发优先级",
     prioritiesTitle: "机会优先级建议",
     prioritiesIntro: "优先做高频、低合规风险、能明确节省时间或增加收入的任务型产品。",
@@ -65,16 +65,16 @@ const content = {
     aiTrends: "AI 趋势分析"
   },
   en: {
-    title: "What People Most Want AI To Solve",
+    title: "Using AI For Work And Creative Tasks",
     description:
       "ENHE AI tracks public demand signals showing where people want AI help with productivity, video, content, coding, learning, research, and daily tasks.",
     hero:
-      "Core conclusion: people do not mainly want abstract intelligence. They want AI to turn high-frequency, time-consuming, judgment-heavy work into repeatable, verifiable, deliverable workflows.",
-    demandTitle: "Demand heat ranking",
+      "Editorial suggestion: start with frequent, time-consuming tasks that need judgment, then test whether AI can turn them into repeatable, verifiable workflows.",
+    demandTitle: "AI application directions",
     demandIntro:
-      "Heat is not just search volume. It combines public demand signals, release cadence, creator discussion, developer momentum, and commercial maturity.",
-    scenarioTitle: "Work productivity scenario ranking",
-    scenarioIntro: "When productivity leads demand, planning should move beyond generic efficiency tools and rank concrete tasks by frequency, pain, willingness to pay, and integration difficulty.",
+      "These directions are editorially organized around common tasks, not a live statistical ranking, search-volume measurement, or market-share estimate.",
+    scenarioTitle: "Work productivity scenario reference",
+    scenarioIntro: "These productivity scenarios and development priorities are editorial suggestions, not measured rankings. Validate task frequency, demand, cost, and integration difficulty before planning a product.",
     scenarioPriority: "Development priority",
     prioritiesTitle: "Opportunity priorities",
     prioritiesIntro:
@@ -99,7 +99,7 @@ const aiTrendsGeoSections = {
     },
     {
       title: "需求热度代表什么",
-      body: "热度不是单一搜索量，而是多种信号的综合判断。排名靠前的方向通常意味着用户痛点更清晰、内容转化路径更短，也更适合优先产出教程、工具合集和落地案例。"
+      body: "本页不提供未经核验的热度分数。方向和场景为编辑整理，用于提出可以实际测试的任务，不代表用户调查或实时需求统计。"
     },
     {
       title: "如何连接站内资源",
@@ -113,7 +113,7 @@ const aiTrendsGeoSections = {
     },
     {
       title: "What demand heat means",
-      body: "Demand heat is not a single search-volume metric. It reflects multiple signals. Higher-ranked areas usually have clearer pain points, shorter conversion paths, and stronger potential for tutorials, tool collections, and implementation cases."
+      body: "This page does not publish unverified heat scores. Directions and scenarios are editorial references for tasks you can test, not a user survey or live demand statistics."
     },
     {
       title: "How to connect site resources",
@@ -123,8 +123,8 @@ const aiTrendsGeoSections = {
 } as const;
 
 const aiTrendsAnswerBlock = {
-  zh: "ENHE AI 趋势分析的核心判断是：用户最希望 AI 解决高频、耗时、需要专业判断的任务，例如办公自动化、视频生成、内容创作、编程开发、搜索研究和学习。下一步应把趋势转化为软件选择、技能学习和可交付工作流。",
-  en: "ENHE AI's trend analysis shows that users most want AI to solve frequent, time-consuming, judgment-heavy tasks such as office automation, video generation, content creation, coding, research, and learning. The next step is turning demand signals into software choices, skills, and deliverable workflows.",
+  zh: "ENHE AI 编辑建议从以下任务验证 AI 的价值：高频、耗时、需要专业判断的任务，例如办公自动化、视频生成、内容创作、编程开发、搜索研究和学习。下一步应把趋势转化为软件选择、技能学习和可交付工作流。",
+  en: "ENHE AI's editorial suggestion is to test AI on frequent, time-consuming, judgment-heavy tasks such as office automation, video generation, content creation, coding, research, and learning. The next step is turning demand signals into software choices, skills, and deliverable workflows.",
 } as const;
 
 const aiTrendsSourceLinks = [
@@ -147,7 +147,7 @@ const aiTrendsFaqItems = {
     {
       question: "AI趋势热度排行的数据应该如何理解？",
       answer:
-        "趋势热度不是单一搜索量，而是综合公开搜索趋势、产品发布密度、开发者生态、创作者讨论和商业成熟度后的方向性判断，适合用于内容选题和产品优先级规划。",
+        "本页方向与场景是编辑参考，不是实时统计排行。目前没有可复核的评分数据，因此不显示热度分数。报告与视频保留原始发布日期，外部链接用于进一步阅读。",
     },
     {
       question: "AI趋势页面如何帮助我决定下一步做什么？",
@@ -164,7 +164,7 @@ const aiTrendsFaqItems = {
     {
       question: "How should I interpret the AI demand heat ranking?",
       answer:
-        "Demand heat is not a single search-volume metric. It combines public search signals, release cadence, developer momentum, creator discussion, and commercial maturity for content and product planning.",
+        "Directions and scenarios are editorial references, not a live statistical ranking. No numeric scores are published without reproducible data. Reports and videos retain their original publication dates; external links are for further reading.",
     },
     {
       question: "How does the AI Trends page help me choose the next action?",
@@ -183,7 +183,6 @@ const demandDirections = [
   {
     zhName: "工作效率",
     enName: "Work productivity",
-    heat: 96,
     zhSignal: "搜索趋势 / SaaS 产品发布 / 企业预算",
     enSignal: "Search trends / SaaS releases / enterprise budgets",
     icon: BriefcaseBusiness
@@ -191,7 +190,6 @@ const demandDirections = [
   {
     zhName: "视频生成",
     enName: "Video generation",
-    heat: 92,
     zhSignal: "创作者社区 / 模型更新 / 工具榜单",
     enSignal: "Creator communities / model updates / tool rankings",
     icon: Video
@@ -199,7 +197,6 @@ const demandDirections = [
   {
     zhName: "内容创作",
     enName: "Content creation",
-    heat: 89,
     zhSignal: "社媒讨论 / 模板市场 / 自媒体需求",
     enSignal: "Social discussion / template markets / creator demand",
     icon: Sparkles
@@ -207,7 +204,6 @@ const demandDirections = [
   {
     zhName: "编程开发",
     enName: "Coding and development",
-    heat: 86,
     zhSignal: "开发者工具 / GitHub 生态 / IDE 集成",
     enSignal: "Developer tools / GitHub ecosystem / IDE integration",
     icon: Code2
@@ -215,7 +211,6 @@ const demandDirections = [
   {
     zhName: "学习教育",
     enName: "Learning and education",
-    heat: 81,
     zhSignal: "课程产品 / 家庭学习 / 语言学习",
     enSignal: "Course products / family learning / language learning",
     icon: GraduationCap
@@ -223,7 +218,6 @@ const demandDirections = [
   {
     zhName: "搜索研究",
     enName: "Search and research",
-    heat: 79,
     zhSignal: "AI 搜索 / 知识库 / 研究助手",
     enSignal: "AI search / knowledge bases / research assistants",
     icon: FileSearch
@@ -231,7 +225,6 @@ const demandDirections = [
   {
     zhName: "营销销售",
     enName: "Marketing and sales",
-    heat: 75,
     zhSignal: "CRM / 广告素材 / 客户触达",
     enSignal: "CRM / ad assets / customer outreach",
     icon: LineChart
@@ -239,7 +232,6 @@ const demandDirections = [
   {
     zhName: "办公自动化",
     enName: "Office automation",
-    heat: 72,
     zhSignal: "文档表格 / 会议纪要 / 流程编排",
     enSignal: "Docs and sheets / meeting notes / workflow orchestration",
     icon: WalletCards
@@ -247,7 +239,6 @@ const demandDirections = [
   {
     zhName: "情感陪伴",
     enName: "Companion experiences",
-    heat: 66,
     zhSignal: "消费应用 / 社区反馈 / 长时互动",
     enSignal: "Consumer apps / community feedback / long sessions",
     icon: HeartHandshake
@@ -255,7 +246,6 @@ const demandDirections = [
   {
     zhName: "财务法律辅助",
     enName: "Finance and legal support",
-    heat: 61,
     zhSignal: "高风险咨询 / 合同审阅 / 合规工具",
     enSignal: "Higher-risk advisory / contract review / compliance tools",
     icon: Scale
@@ -266,7 +256,6 @@ const workProductivityScenarioRanking = [
   {
     zhName: "会议纪要与行动项追踪",
     enName: "Meeting notes and action follow-up",
-    heat: 94,
     priority: "A",
     zhPain: "会后信息散落、责任人不清、CRM 和项目管理系统需要重复录入。",
     enPain: "Meeting context is scattered, owners are unclear, and CRM or project systems need duplicate updates.",
@@ -276,7 +265,6 @@ const workProductivityScenarioRanking = [
   {
     zhName: "文档和报告初稿",
     enName: "Document and report drafting",
-    heat: 90,
     priority: "A",
     zhPain: "空白页启动慢，资料整理和结构化表达耗时。",
     enPain: "Blank-page starts are slow, and turning raw material into structured writing takes time.",
@@ -286,7 +274,6 @@ const workProductivityScenarioRanking = [
   {
     zhName: "表格整理与数据清洗",
     enName: "Spreadsheet cleanup and data preparation",
-    heat: 87,
     priority: "A",
     zhPain: "大量运营、财务、销售表格需要去重、归类、补字段和解释异常。",
     enPain: "Operations, finance, and sales sheets need deduplication, grouping, field completion, and anomaly explanation.",
@@ -296,7 +283,6 @@ const workProductivityScenarioRanking = [
   {
     zhName: "邮件和客户回复草拟",
     enName: "Email and customer reply drafting",
-    heat: 84,
     priority: "A-",
     zhPain: "客服、销售和运营需要快速回复但又要保持语气、事实和上下文一致。",
     enPain: "Support, sales, and operations teams need fast replies while keeping tone, facts, and context consistent.",
@@ -306,7 +292,6 @@ const workProductivityScenarioRanking = [
   {
     zhName: "搜索研究与资料汇总",
     enName: "Research synthesis and source collection",
-    heat: 82,
     priority: "B+",
     zhPain: "信息源多、可信度参差、人工整理引用链路耗时。",
     enPain: "Sources are scattered, credibility varies, and manual citation trails take time.",
@@ -316,7 +301,6 @@ const workProductivityScenarioRanking = [
   {
     zhName: "跨应用流程自动化",
     enName: "Cross-app workflow automation",
-    heat: 78,
     priority: "B",
     zhPain: "数据在聊天、表格、邮件、CRM 和网盘之间来回搬运。",
     enPain: "Data keeps moving manually across chat, sheets, email, CRM, and cloud drives.",
@@ -525,6 +509,11 @@ export async function AiTrendTopicPageShell({ forceLocale = "zh" }: { forceLocal
 
         <section className="mt-12">
         <SectionTitle title={copy.demandTitle} intro={copy.demandIntro} />
+        <p className="mb-4 text-sm leading-7 text-[var(--marketing-muted)]" data-trend-evidence="editorial">
+          {forceLocale === "en"
+            ? "Editorial reference, not a live statistical ranking. Explanation updated: 2026-10-13; this is not a data collection date. Historical reports and videos keep their original dates. Reference links below are reading resources, not a scoring dataset."
+            : "编辑参考，不是实时统计排行。说明更新于2026-10-13，这不是数据采集日期；历史报告与视频保留原日期。下方参考链接是阅读资源，不是评分数据集。"}
+        </p>
         <div className="grid gap-4 md:grid-cols-2">
           {demandDirections.map((item) => (
             <article key={item.zhName} className="surface-panel-soft p-5">
@@ -542,11 +531,7 @@ export async function AiTrendTopicPageShell({ forceLocale = "zh" }: { forceLocal
                     </p>
                   </div>
                 </div>
-                <strong className="text-2xl font-black text-[var(--marketing-accent)]">{item.heat}</strong>
-              </div>
-              <div className="mt-4 h-2 rounded-full bg-slate-100">
-                <div className="h-full rounded-full bg-[var(--marketing-accent)]" style={{ width: `${item.heat}%` }} />
-              </div>
+                </div>
             </article>
           ))}
         </div>
@@ -565,24 +550,19 @@ export async function AiTrendTopicPageShell({ forceLocale = "zh" }: { forceLocal
           </summary>
           <div className="content-fold-body">
             <div className="grid gap-4 lg:grid-cols-3">
-              {workProductivityScenarioRanking.map((scenario, index) => (
+              {workProductivityScenarioRanking.map((scenario) => (
                 <article key={scenario.zhName} className="surface-panel-soft p-5">
                   <div className="flex items-start justify-between gap-4">
                     <div>
-                      <Badge className="text-[var(--marketing-accent)]">#{index + 1}</Badge>
                       <h2 className="mt-3 text-lg font-black leading-snug text-[var(--marketing-text)]">
                         {forceLocale === "en" ? scenario.enName : scenario.zhName}
                       </h2>
                     </div>
                     <div className="text-right">
-                      <strong className="block text-2xl font-black text-[var(--marketing-accent)]">{scenario.heat}</strong>
                       <span className="mt-1 block text-xs font-bold text-[var(--marketing-muted)]">
                         {copy.scenarioPriority} {scenario.priority}
                       </span>
                     </div>
-                  </div>
-                  <div className="mt-4 h-2 rounded-full bg-slate-100">
-                    <div className="h-full rounded-full bg-[var(--marketing-accent)]" style={{ width: `${scenario.heat}%` }} />
                   </div>
                   <p className="mt-4 text-sm leading-7 text-[var(--marketing-muted)]">
                     {forceLocale === "en" ? scenario.enPain : scenario.zhPain}

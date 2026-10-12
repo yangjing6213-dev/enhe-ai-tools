@@ -70,4 +70,14 @@ describe("E1-NB-R27 AI Trends human-facing answer labels", () => {
       expect(html).not.toContain('data-content-status="UNVERIFIED"');
     },
   );
+  it.each(["zh", "en"] as const)("labels %s editorial context without unsupported numeric scores", async (locale) => {
+    const { AiTrendTopicPageShell } = await import("@/app/ai-trends/page-shell");
+    const html = renderToStaticMarkup(await AiTrendTopicPageShell({ forceLocale: locale }));
+    expect(html).toContain('data-trend-evidence="editorial"');
+    expect(html).toContain("2026-10-13");
+    expect(html).toContain(locale === "zh" ? "不是实时统计排行" : "not a live statistical ranking");
+    expect(html).not.toMatch(/>96<|>92<|width:96%|width:92%/);
+    expect(html).not.toContain(locale === "zh" ? "需求热度排行" : "Demand heat ranking");
+  });
+
 });

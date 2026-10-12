@@ -21,7 +21,7 @@ describe("ENHE AI Organization source contracts", () => {
     expect(helper).toContain("name: siteName");
     expect(helper).toContain("buildOrganizationSchema");
     expect(helper).toContain("sameAs");
-    expect(helper).toContain("https://github.com/hqwzhu/enhe-ai-tools");
+    expect(helper).toContain("https://github.com/yangjing6213-dev/enhe-ai-tools");
     expect(helper).not.toContain('sameAs: [absoluteUrl(');
   });
 

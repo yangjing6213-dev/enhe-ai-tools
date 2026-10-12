@@ -34,7 +34,7 @@ describe("GEO entity graph", () => {
       name: "ENHE AI",
       alternateName: ["恩禾 ENHE AI", "恩禾AI"],
       knowsAbout: ["AI tools", "AI skill learning", "local AI deployment"],
-      sameAs: ["https://github.com/hqwzhu/enhe-ai-tools"],
+      sameAs: ["https://github.com/yangjing6213-dev/enhe-ai-tools"],
       subjectOf: [
         {
           name: "ENHE AI brand profile",
@@ -53,7 +53,7 @@ describe("GEO entity graph", () => {
       "@id": "https://www.enhe-tech.com.cn/#organization",
       alternateName: ["恩禾 ENHE AI", "恩禾AI"],
       knowsAbout: ["AI tools", "AI skill learning", "local AI deployment"],
-      sameAs: ["https://github.com/hqwzhu/enhe-ai-tools"],
+      sameAs: ["https://github.com/yangjing6213-dev/enhe-ai-tools"],
     });
     expect(organization.subjectOf).toHaveLength(2);
   });
@@ -75,7 +75,7 @@ describe("GEO entity graph", () => {
     expect(publicChrome).toContain('absoluteUrl("/#organization")');
     expect(publicChrome).toContain('absoluteUrl("/#website")');
     expect(brandEntity).toContain(
-      '"https://github.com/hqwzhu/enhe-ai-tools"',
+      '"https://github.com/yangjing6213-dev/enhe-ai-tools"',
     );
     expect(home).toContain('"@id": absoluteUrl("/#website")');
     expect(home).toContain("mainEntity: enheOrganizationReference");
