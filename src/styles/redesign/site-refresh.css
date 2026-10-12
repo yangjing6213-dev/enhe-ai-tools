@@ -1412,4 +1412,13 @@ body .customer-support-widget .customer-support-launcher,
   .redesign-home-features-inner > .redesign-home-feature-folder:nth-child(3) { grid-column: 1 / -1; }
 }
 
-.redesign-home-products-heading h2 { font-weight: 300 !important; }
+/* Match the product introduction to the hero description in both locales. */
+.redesign-home .redesign-home-subtitle,
+.redesign-home .redesign-home-products-heading h2 {
+  font-family: inherit;
+  font-size: clamp(1rem, 1.3vw, 1.2rem);
+  font-weight: 400 !important;
+  line-height: 1.65;
+  letter-spacing: normal;
+  color: var(--enhe-text-muted);
+}
