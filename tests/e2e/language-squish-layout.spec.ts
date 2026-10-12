@@ -59,7 +59,11 @@ test("non-product cards retain the edge glow interaction", async ({ page }) => {
   await page.goto("/about");
   const card = page.locator('.enhe-reference-editorial-card').first();
   await card.scrollIntoViewIfNeeded();
-  const box = (await card.boundingBox())!;
-  await page.mouse.move(box.x + 2, box.y + box.height / 2);
-  await expect(page.locator('.enhe-edge-effect')).toBeVisible();
+  // The controller attaches after hydration; repeat a real edge gesture while waiting.
+  await expect.poll(async () => {
+    const box = (await card.boundingBox())!;
+    await page.mouse.move(box.x + 1, box.y + box.height / 2);
+    await page.mouse.move(box.x + 3, box.y + box.height / 2);
+    return page.locator('.enhe-edge-effect').isVisible();
+  }).toBe(true);
 });
