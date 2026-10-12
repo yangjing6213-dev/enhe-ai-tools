@@ -3689,3 +3689,21 @@
     color: ButtonText;
   }
 }
+
+/* Admin cards retain their surfaces and focus indicators without edge glow. */
+.enhe-admin-shell :is(
+  .glass,
+  .evidence-card,
+  .dossier-card,
+  .surface-panel:not(.rounded-full),
+  .surface-panel-soft:not(.rounded-full),
+  .filter-surface,
+  .admin-shell-card,
+  .home-product-preview,
+  .home-product-preview-empty,
+  .home-fallback-link,
+  .tool-detail-copy-card
+)::after {
+  content: none;
+  display: none;
+}

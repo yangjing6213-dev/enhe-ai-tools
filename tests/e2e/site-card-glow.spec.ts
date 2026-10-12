@@ -78,7 +78,7 @@ test("touch and reduced motion disable the glow immediately", async ({ page }) =
   await expect.poll(() => card.evaluate(node => node.style.getPropertyValue("--edge-proximity"))).toBe("0");
 });
 
-test("admin cards use the same effect in the read-only local fixture", async ({ page, context, baseURL }) => {
+test("admin cards have no edge glow in the read-only local fixture", async ({ page, context, baseURL }) => {
   test.skip(process.env.ENHE_ADMIN_VISUAL_FIXTURE !== "1", "Requires the isolated local admin fixture.");
   await context.addCookies([{ name: "enhe_session", value: "fixture-only", url: baseURL! }]);
   for (const route of ["/admin", "/admin/comments", "/admin/users", "/admin/geo-monitoring"]) {
@@ -87,9 +87,16 @@ test("admin cards use the same effect in the read-only local fixture", async ({ 
     const card = page.locator("main .surface-panel, main .glass, main .admin-shell-card, main article, main .enhe-admin-card").first();
     await expect(card).toBeVisible();
     await card.hover({ position: { x: 3, y: 50 } });
-    await expect(page.locator(".enhe-edge-effect")).toBeVisible();
-    await expect(page.locator(".enhe-edge-effect")).toHaveAttribute("aria-hidden", "true");
-    await expect(page.locator(".enhe-edge-effect")).toHaveCSS("pointer-events", "none");
+    await page.evaluate(() => new Promise<void>(resolve => requestAnimationFrame(() => requestAnimationFrame(() => resolve()))));
+    await expect(page.locator(".enhe-edge-effect")).toHaveCount(0);
+    const decoratedCards = page.locator(".enhe-admin-shell .surface-panel, .enhe-admin-shell .glass, .enhe-admin-shell .admin-shell-card");
+    for (const item of await decoratedCards.all()) {
+      expect(await item.evaluate(node => getComputedStyle(node, "::after").content)).toBe("none");
+    }
+    const nav = page.locator(".admin-nav-link").first();
+    await nav.focus();
+    await expect(nav).toHaveCSS("outline-style", "solid");
+    await expect(page.locator(".enhe-edge-effect")).toHaveCount(0);
   }
 });
 
