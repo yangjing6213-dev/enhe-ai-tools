@@ -1,3 +1,4 @@
+import { RoundedBackIcon } from "@/components/rounded-back-icon";
 import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
@@ -610,7 +611,7 @@ export async function ToolDetailPageShell({
       <main>
         <div className="mb-5">
           <ButtonLink href={baseListingPath} variant="ghost">
-            <span aria-hidden="true">←</span>
+            <RoundedBackIcon />
             {forceLocale === "en" ? "Back" : "返回"}
           </ButtonLink>
         </div>
@@ -901,6 +902,7 @@ export async function ToolDetailPageShell({
                   ) : isDownloadProduct ? (
                     <ButtonLink
                       href={softwareDownloadCtaHref}
+                      className="tool-download-button" data-no-card-glow
                       data-analytics-event={softwareDownloadCtaEvent}
                       data-analytics-entity-type="tool"
                       data-analytics-entity-id={tool.id}
@@ -1362,6 +1364,7 @@ export async function ToolDetailPageShell({
                   <div>
                     <ButtonLink
                       href={protectedDownloadHref}
+                      className="tool-download-button" data-no-card-glow
                       data-analytics-event="product_download_click"
                       data-analytics-entity-type="tool"
                       data-analytics-entity-id={tool.id}

@@ -1,9 +1,9 @@
+import { RoundedBackIcon } from "@/components/rounded-back-icon";
 import type { ReactNode } from "react";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import {
   AlertTriangle,
-  ArrowLeft,
   Ban,
   CalendarClock,
   ChartNoAxesColumnIncreasing,
@@ -58,7 +58,7 @@ export default async function AdminSeoAuditRunDetailPage({
           href="/admin/seo-audit"
           className="inline-flex items-center gap-2 rounded-full border border-white/15 px-4 py-2 text-sm font-semibold text-[#E8EEF8] transition hover:border-[#48F5D3]/50 hover:text-[#48F5D3]"
         >
-          <ArrowLeft className="h-4 w-4" aria-hidden="true" />
+          <RoundedBackIcon />
           {t.back}
         </Link>
         {run.status === "failed" ? (

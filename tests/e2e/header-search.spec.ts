@@ -15,8 +15,8 @@ test("public header replaces the search link, opens recommendations, and submits
       await expect(page.locator(".redesign-home-cta")).toHaveCSS("border-radius", "12px");
       await expect(header.locator(".redesign-language-switch:visible")).toHaveCSS("border-width", "0px");
       if (width >= 768) await expect(header.locator(".redesign-login-link:visible")).toHaveCSS("border-width", "0px");
-      await expect(header.locator(".redesign-language-switch:visible")).toHaveCSS("background-color", "rgb(4, 98, 194)");
-      await expect(header.locator(".redesign-language-link:visible").first()).toHaveCSS("color", "rgb(255, 255, 255)");
+      await expect(header.locator(".redesign-language-switch:visible")).toHaveCSS("background-color", "rgba(0, 0, 0, 0)");
+      await expect(header.locator('.squish-switch:visible')).toHaveAttribute("aria-checked", english ? "true" : "false");
       const footer = page.locator(".redesign-footer");
       await expect(footer).toHaveCSS("background-color", "rgb(13, 58, 109)");
       await expect(footer.locator("h3").first()).toHaveCSS("color", "rgb(255, 255, 255)");
@@ -67,7 +67,7 @@ test("public header replaces the search link, opens recommendations, and submits
         const box = (selector: string) => el.querySelector(selector)!.getBoundingClientRect().toJSON();
         return { logo: box(".redesign-brand-mark"), search: box(".redesign-header-search"), nav: box(".redesign-desktop-nav"), scrollWidth: document.documentElement.scrollWidth };
       });
-      expect(layout.logo.width).toBe(154);
+      expect(layout.logo.width).toBe(width < 420 ? 120 : 154);
       expect(layout.scrollWidth).toBeLessThanOrEqual(width);
       const searchRatio = await input.evaluate((element) => {
         const form = element.closest(".redesign-header-search")!;

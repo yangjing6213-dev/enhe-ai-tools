@@ -1,3 +1,4 @@
+import { LanguageToggle } from "@/components/language-toggle";
 import { LayoutDashboard, Menu, Search } from "lucide-react";
 import { PrefetchLink } from "@/components/prefetch-link";
 import { PublicNavLink } from "@/components/public-nav-link";
@@ -80,21 +81,9 @@ export function MobileNavMenu({
           </PrefetchLink>
         ) : null}
         {languageItems.length ? (
-          <div className="mobile-nav-language" aria-label="Language">
-            {languageItems.map((item) => (
-              <PrefetchLink
-                key={item.href}
-                href={item.href}
-                prefetch={false}
-                className={item.active ? "mobile-nav-language-link is-active cursor-target" : "mobile-nav-language-link cursor-target"}
-                onClick={() => {
-                  document.cookie = `enhe_locale=${item.locale}; path=/; max-age=31536000; samesite=lax`;
-                }}
-              >
-                {item.label}
-              </PrefetchLink>
-            ))}
-          </div>
+          <LanguageToggle locale={languageItems.find(item => item.active)?.locale ?? "zh"}
+            hrefs={{ zh: languageItems.find(item => item.locale === "zh")?.href ?? "/", en: languageItems.find(item => item.locale === "en")?.href ?? "/en" }}
+            label="中文 / EN" className="mobile-nav-language" />
         ) : null}
         {showAdmin ? (
           <PrefetchLink href="/admin" prefetch={false} className="mobile-nav-link mobile-nav-admin cursor-target">

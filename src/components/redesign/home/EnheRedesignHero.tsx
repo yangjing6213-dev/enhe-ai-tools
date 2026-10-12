@@ -8,7 +8,7 @@ export function EnheRedesignHero({ locale }: { locale: RedesignLocale }) {
   const titleBreak = copy.h1.indexOf(" ");
   const titleLines = locale === "zh" && titleBreak >= 0
     ? [copy.h1.slice(0, titleBreak), copy.h1.slice(titleBreak + 1)]
-    : [copy.h1];
+    : copy.h1.split(/(?<=\.) /);
 
   return (
     <section className="redesign-home redesign-home-hero" data-locale={locale} aria-labelledby={`redesign-home-title-${locale}`}>
@@ -35,7 +35,7 @@ export function EnheRedesignHero({ locale }: { locale: RedesignLocale }) {
               weight={800}
               tracking={-0.03}
               lineHeight={1.06}
-              textScale={locale === "zh" ? 0.105 : 0.08}
+              textScale={locale === "zh" ? 0.105 : 0.065}
             />
           ))}
         </h1>

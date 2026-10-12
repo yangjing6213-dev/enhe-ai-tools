@@ -1,6 +1,6 @@
 "use client";
 
-import { ArrowLeft } from "lucide-react";
+import { RoundedBackIcon } from "@/components/rounded-back-icon";
 import { usePathname, useRouter } from "next/navigation";
 import { useEffect } from "react";
 import { getBackNavigationParentHref, shouldShowBackNavigation, shouldUseBrowserHistory } from "@/lib/back-navigation";
@@ -77,7 +77,7 @@ export function BackNavigationBar({ locale }: BackNavigationBarProps) {
           router.replace(parentHref);
         }}
       >
-        <ArrowLeft size={16} strokeWidth={1.8} aria-hidden="true" />
+        <RoundedBackIcon />
         <span>{label}</span>
       </button>
     </nav>

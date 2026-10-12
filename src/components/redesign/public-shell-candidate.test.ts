@@ -69,11 +69,14 @@ describe("ENHE redesign public shell candidate", () => {
 
     expect(languageSwitch).toContain("RedesignLanguageHrefs");
     expect(languageSwitch).toContain("useState(localeHrefs)");
-    expect(languageSwitch).toContain("href={currentHrefs.zh}");
-    expect(languageSwitch).toContain("href={currentHrefs.en}");
+    expect(languageSwitch).toContain("hrefs={currentHrefs}");
+    const toggle = readCandidate("components/language-toggle.tsx");
+    expect(toggle).toContain("href={hrefs.zh}");
+    expect(toggle).toContain("href={hrefs.en}");
     expect(languageSwitch).toContain("CustomEvent<RedesignLanguageHrefs>");
-    expect(languageSwitch).toContain("中文");
-    expect(languageSwitch).toContain("EN");
+    expect(toggle).toContain("中文");
+    expect(toggle).toContain("EN");
+    expect(toggle).toContain("SquishSwitch");
     expect(languageSwitch).not.toContain("window.location");
     expect(languageSwitch).not.toContain("pathname");
   });

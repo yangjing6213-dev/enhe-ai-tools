@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { LanguageToggle } from "@/components/language-toggle";
 import { newsListingNavigationEvent } from "@/lib/ai-news-listing";
 import type { RedesignLanguageHrefs, RedesignLocale } from "./types";
 
@@ -23,33 +24,5 @@ export function EnheRedesignLanguageSwitch({
     return () => window.removeEventListener(newsListingNavigationEvent, updateHrefs);
   }, [localeHrefs]);
 
-  const selectLocale = (locale: RedesignLocale) => {
-    document.cookie = `enhe_locale=${locale}; path=/; max-age=31536000; samesite=lax`;
-  };
-
-  return (
-    <span className="redesign-language-switch" aria-label={ariaLabel}>
-      <a
-        className="redesign-language-link"
-        href={currentHrefs.zh}
-        onClick={() => selectLocale("zh")}
-        aria-current={currentLocale === "zh" ? "page" : undefined}
-        lang="zh"
-      >
-        中文
-      </a>
-      <span className="redesign-language-separator" aria-hidden="true">
-        /
-      </span>
-      <a
-        className="redesign-language-link"
-        href={currentHrefs.en}
-        onClick={() => selectLocale("en")}
-        aria-current={currentLocale === "en" ? "page" : undefined}
-        lang="en"
-      >
-        EN
-      </a>
-    </span>
-  );
+  return <LanguageToggle locale={currentLocale} hrefs={currentHrefs} label={ariaLabel} className="redesign-language-switch" />;
 }

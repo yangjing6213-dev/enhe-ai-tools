@@ -17,8 +17,8 @@ for (const route of ["/", "/en"]) {
       }
       await expect(page.locator(".redesign-home-subtitle")).toHaveCSS("margin-top", "48px");
       const spacing = await page.locator(".redesign-home-hero-inner").evaluate(node => ({ top: parseFloat(getComputedStyle(node).paddingTop), bottom: parseFloat(getComputedStyle(node).paddingBottom) }));
-      expect(spacing.top).toBeCloseTo(route === "/en" ? 67.6 : Math.min(148.72, viewport.width * 0.1014), 1);
-      expect(spacing.bottom).toBeCloseTo(route === "/en" ? 48 : Math.min(105.6, viewport.width * 0.072), 1);
+      expect(spacing.top).toBeCloseTo(Math.min(148.72, viewport.width * 0.1014), 1);
+      expect(spacing.bottom).toBeCloseTo(Math.min(105.6, viewport.width * 0.072), 1);
       await expect(page.locator(".redesign-home-features-inner")).toHaveCSS("padding-top", "28.8px");
       await page.screenshot({ path: test.info().outputPath(`first-screen-${viewport.width}.png`) });
     }

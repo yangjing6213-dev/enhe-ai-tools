@@ -1,5 +1,6 @@
 "use client";
 
+import { LanguageToggle } from "@/components/language-toggle";
 import { usePathname } from "next/navigation";
 import type { Locale } from "@/lib/dictionaries";
 import { buildLanguageSwitcherHref } from "@/lib/seo";
@@ -13,20 +14,5 @@ export function LanguageSwitcher({
 }) {
   const pathname = usePathname() ?? "/";
 
-  return (
-    <div className="site-language-switcher hidden items-center sm:flex" aria-label={labels.label}>
-      {(["zh", "en"] as const).map((item) => (
-        <a
-          key={item}
-          href={buildLanguageSwitcherHref(pathname, item)}
-          className={locale === item ? "is-active cursor-target" : "cursor-target"}
-          onClick={() => {
-            document.cookie = `enhe_locale=${item}; path=/; max-age=31536000; samesite=lax`;
-          }}
-        >
-          {locale === "en" && item === "zh" ? "ZH" : labels[item]}
-        </a>
-      ))}
-    </div>
-  );
+  return <span className="hidden sm:flex"><LanguageToggle locale={locale} label={labels.label} zhLabel={locale === "en" ? "ZH" : labels.zh} hrefs={{zh: buildLanguageSwitcherHref(pathname, "zh"), en: buildLanguageSwitcherHref(pathname, "en")}} className="site-language-switcher" /></span>;
 }

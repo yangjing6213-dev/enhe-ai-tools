@@ -63,7 +63,7 @@ test("homepage polish stays readable, responsive, and interactive without extern
     expect(heroColor).toBe(expectedNeutralTextColor);
     expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBeLessThanOrEqual(width);
 
-    expect((await brand.boundingBox())?.width).toBe(154);
+    expect((await brand.boundingBox())?.width).toBe(width < 420 ? 120 : 154);
 
     if (width < 768) {
       const layout = await page.locator(".redesign-header-inner").evaluate((inner) => {
@@ -268,8 +268,8 @@ test("homepage polish stays readable, responsive, and interactive without extern
           menuLinkText: linkStyle.color,
         };
       });
-      expect(accountStyle.accountBorder).toBe(accountStyle.languageBorder);
-      expect(accountStyle.accountRadius).toBe(accountStyle.languageRadius);
+      await expect(language).toHaveCSS("border-width", "0px");
+      await expect(language.locator(".squish-switch__track")).toHaveCSS("border-radius", "19px");
       expect(accountStyle.menuText).toBe(expectedNeutralTextColor);
       expect(accountStyle.menuLinkText).toBe(expectedNeutralTextColor);
 

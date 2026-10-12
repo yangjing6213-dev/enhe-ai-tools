@@ -96,7 +96,7 @@ function resetCard(card: HTMLElement | null) {
 
 function findGlowCard(target: EventTarget | null) {
   let element = target instanceof Element ? target : null;
-  if (element?.closest(".redesign-home-product-stage")) return null;
+  if (element?.closest(".redesign-home-product-stage, [data-no-card-glow]")) return null;
   while (element && element !== document.body) {
     if (element instanceof HTMLElement && !element.closest(".enhe-edge-effect") &&
         (element.matches(CARD_SELECTOR) || isCardGlowTarget(element.tagName, Array.from(element.classList), element.dataset.slot))) {

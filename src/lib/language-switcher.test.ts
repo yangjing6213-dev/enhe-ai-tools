@@ -74,7 +74,10 @@ describe("language switcher source", () => {
     expect(component).toContain("buildLanguageSwitcherHref");
     expect(component).not.toContain("buildLocalePath(normalizedPath, item)");
     expect(component).not.toContain('import Link from "next/link"');
-    expect(component).toContain("<a");
+    expect(component).toContain("LanguageToggle");
+    const toggle = readFileSync(new URL("../components/language-toggle.tsx", import.meta.url), "utf8");
+    expect(toggle).toContain("<a");
+    expect(toggle).toContain("window.location.assign(hrefs[next])");
 
     expect(css).toContain(".site-language-switcher a");
     expect(css).toContain(".site-language-switcher a.is-active");

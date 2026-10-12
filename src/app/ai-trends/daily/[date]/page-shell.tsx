@@ -1,7 +1,8 @@
+import { RoundedBackIcon } from "@/components/rounded-back-icon";
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { ArrowLeft, ExternalLink, LockKeyhole } from "lucide-react";
+import { ExternalLink, LockKeyhole } from "lucide-react";
 import { Badge, ButtonLink, Container, SectionTitle } from "@/components/ui";
 import {
   buildAiTrendLoginUrl,
@@ -111,7 +112,7 @@ export async function AiTrendDailyDetailPageShell({
         href={buildLocalePath("/ai-trends/daily", forceLocale)}
           className="inline-flex items-center gap-2 text-sm font-bold text-[var(--marketing-muted)] transition-colors hover:text-[var(--marketing-accent)]"
       >
-        <ArrowLeft size={16} strokeWidth={1.8} aria-hidden="true" />
+        <RoundedBackIcon />
         {text.back}
       </Link>
 

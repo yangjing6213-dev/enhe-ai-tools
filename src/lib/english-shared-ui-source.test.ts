@@ -8,7 +8,7 @@ describe("english shared UI source", () => {
   it("keeps the English language switcher free of Chinese labels", () => {
     const switcher = readFileSync(new URL("../components/language-switcher.tsx", import.meta.url), "utf8");
 
-    expect(switcher).toContain('locale === "en" && item === "zh" ? "ZH" : labels[item]');
+    expect(switcher).toContain('zhLabel={locale === "en" ? "ZH" : labels.zh}');
     expect(getDictionary("en").language.zh).not.toBe("中文");
   });
 
