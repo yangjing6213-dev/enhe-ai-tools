@@ -97,6 +97,13 @@ export async function LoginPageShell({
         <FormSubmitButton className="login-submit-button mt-8 w-full text-base" pendingLabel={t.auth.loggingIn}>
           {t.auth.loginButton}
         </FormSubmitButton>
+        <a
+          href={`/api/auth/google/start?returnTo=${encodeURIComponent(returnTo)}`}
+          className="mt-4 flex min-h-12 w-full items-center justify-center gap-3 rounded-lg border border-slate-300 bg-white px-4 font-semibold text-slate-900 shadow-sm transition-colors hover:bg-slate-50"
+        >
+          <span aria-hidden="true" className="grid h-6 w-6 place-items-center rounded-full border border-slate-200 font-bold text-[#4285F4]">G</span>
+          {locale === "en" ? "Sign in with Google" : "使用 Google 账号登录"}
+        </a>
         <p className="mt-5 text-center text-sm text-[var(--marketing-muted)]">
           {t.auth.noAccount}
           <Link

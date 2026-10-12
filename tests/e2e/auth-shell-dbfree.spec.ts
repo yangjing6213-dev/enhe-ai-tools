@@ -64,12 +64,14 @@ for (const route of routes) {
       await expect(password).toHaveAttribute("type", "password");
       if (route.kind === "register") {
         await expect(form.getByLabel(route.locale === "en" ? "Email" : "邮箱", { exact: true })).toBeVisible();
-        const googleLink = form.getByRole("link", {
-          name: route.locale === "en" ? "Sign up with Google" : "使用 Google 账号注册",
-        });
-        await expect(googleLink).toBeVisible();
-        await expect(googleLink).toHaveAttribute("href", /\/api\/auth\/google\/start\?returnTo=/);
       }
+      const googleLink = form.getByRole("link", {
+        name: route.kind === "register"
+          ? route.locale === "en" ? "Sign up with Google" : "使用 Google 账号注册"
+          : route.locale === "en" ? "Sign in with Google" : "使用 Google 账号登录",
+      });
+      await expect(googleLink).toBeVisible();
+      await expect(googleLink).toHaveAttribute("href", /\/api\/auth\/google\/start\?returnTo=/);
       const submitButton = form.locator("button[type='submit']");
       await expect(submitButton).toBeVisible();
       await expect(submitButton).toHaveCSS("color", "rgb(255, 255, 255)");
