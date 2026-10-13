@@ -5,13 +5,13 @@ import { resolveUserAvatarSrc } from "@/lib/user-avatar";
 
 export const dynamic = "force-dynamic";
 
-export async function GET(request: Request) {
+export async function GET() {
   const user = await getCurrentUser();
   const source = user
     ? await resolveUserAvatarSrc(user.avatar) || getDefaultAvatar(user.id)
     : getDefaultAvatar("guest");
-  return NextResponse.redirect(new URL(source, request.url), {
+  return new NextResponse(null, {
     status: 307,
-    headers: { "Cache-Control": "private, no-store, max-age=0", Vary: "Cookie" },
+    headers: { Location: source, "Cache-Control": "private, no-store, max-age=0", Vary: "Cookie" },
   });
 }
