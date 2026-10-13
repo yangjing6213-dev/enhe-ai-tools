@@ -20,8 +20,8 @@ export const SOFTWARE_CATEGORIES = [
   {
     id: "all",
     label: {
-      zh: "全部商品",
-      en: "All products",
+      zh: "全部工具",
+      en: "All tools",
     },
   },
   {
@@ -67,3 +67,5 @@ export const SOFTWARE_CATEGORIES = [
     },
   },
 ] as const satisfies ReadonlyArray<SoftwareCategory>;
+
+export const SOFTWARE_FILTER_CATEGORIES = SOFTWARE_CATEGORIES.filter((category) => category.id !== "skill");

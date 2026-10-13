@@ -1422,3 +1422,22 @@ body .customer-support-widget .customer-support-launcher,
   letter-spacing: normal;
   color: var(--enhe-text-muted);
 }
+
+.redesign-header-user-avatar {
+  width: 28px;
+  height: 28px;
+  flex: 0 0 28px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+.redesign-header .redesign-avatar-trigger {
+  gap: 7px;
+}
+
+.redesign-header-user-name {
+  max-width: 120px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}

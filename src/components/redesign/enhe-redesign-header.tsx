@@ -1,3 +1,4 @@
+import { EnheHeaderAvatar } from "./enhe-header-avatar";
 import { EnheBrandLockup } from "./enhe-brand-lockup";
 import { EnheHeaderSearch } from "./enhe-header-search";
 import type { SearchRecommendation } from "@/lib/public-search-recommendations";
@@ -112,7 +113,8 @@ export function EnheRedesignHeader({
               ) : (
                 <details className="redesign-account-menu">
                   <summary className="redesign-avatar-trigger" aria-label={account.avatarLabel}>
-                    {account.displayName}
+                    <EnheHeaderAvatar name={account.displayName} />
+                    <span className="redesign-header-user-name">{account.displayName}</span>
                   </summary>
                   <div className="redesign-avatar-menu" role="menu" aria-label={userMenuLabel}>
                     <PrefetchLink href={account.userHref} prefetch={false} role="menuitem">

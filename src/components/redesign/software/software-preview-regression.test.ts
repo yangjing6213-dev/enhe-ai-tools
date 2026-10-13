@@ -8,7 +8,7 @@ import { describe, expect, it } from "vitest";
 
 import type { RedesignLocale } from "@/components/redesign/types";
 import { middleware } from "@/middleware";
-import { SOFTWARE_CATEGORIES } from "@/lib/redesign/software/software-categories";
+import { SOFTWARE_CATEGORIES, SOFTWARE_FILTER_CATEGORIES } from "@/lib/redesign/software/software-categories";
 import { buildValueSentence } from "@/lib/tool-card-highlights";
 import { getDictionary } from "@/lib/i18n";
 import { SOFTWARE_COPY } from "@/lib/redesign/software/software-copy";
@@ -140,7 +140,7 @@ describe("AI tools candidate bilingual preview regression", () => {
     assertLocaleSurface("en", renderCatalog("en"));
   });
 
-  it("keeps the exact 4/3/12 section contract, seven categories, 9 initial plus 3 hidden cards, and page-two pagination", () => {
+  it("keeps the exact 4/3/12 section contract, six filter choices, 9 initial plus 3 hidden cards, and page-two pagination", () => {
     const zhHtml = renderCatalog("zh");
     const enHtml = renderCatalog("en");
   const allProductsHtml = enHtml.slice(enHtml.indexOf('data-section="all-products"'));
@@ -153,11 +153,12 @@ describe("AI tools candidate bilingual preview regression", () => {
     expect(countMatches(allProductsHtml, /data-extra-card="true"/g)).toBe(3);
     expect(countMatches(allProductsHtml, /hidden=""/g)).toBe(3);
 
-    expect(countMatches(enHtml, /class="redesign-software-category-button"/g)).toBe(7);
-    expect(countMatches(zhHtml, /class="redesign-software-category-button"/g)).toBe(7);
+    expect(countMatches(enHtml, /class="redesign-software-category-button"/g)).toBe(6);
+    expect(countMatches(zhHtml, /class="redesign-software-category-button"/g)).toBe(6);
     expect(SOFTWARE_CATEGORIES).toHaveLength(7);
 
-    for (const category of SOFTWARE_CATEGORIES) {
+    expect(SOFTWARE_FILTER_CATEGORIES.map(category => category.id)).not.toContain("skill");
+    for (const category of SOFTWARE_FILTER_CATEGORIES) {
       expect(enHtml).toContain(escapeHtmlText(category.label.en));
       expect(zhHtml).toContain(escapeHtmlText(category.label.zh));
     }

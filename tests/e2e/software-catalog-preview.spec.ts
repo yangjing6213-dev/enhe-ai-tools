@@ -1,8 +1,8 @@
 import { expect, test, type Locator, type Page } from "@playwright/test";
 
 const locales = [
-  { query: "zh", triggerLabel: "全部商品" },
-  { query: "en", triggerLabel: "All products" },
+  { query: "zh", triggerLabel: "全部工具" },
+  { query: "en", triggerLabel: "All tools" },
 ] as const;
 
 async function openSoftwarePreview(page: Page, locale: "zh" | "en") {

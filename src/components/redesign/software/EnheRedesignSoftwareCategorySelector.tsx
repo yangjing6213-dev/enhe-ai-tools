@@ -12,7 +12,7 @@ import {
 
 import type { RedesignLocale } from "@/components/redesign/types";
 import {
-  SOFTWARE_CATEGORIES,
+  SOFTWARE_FILTER_CATEGORIES as SOFTWARE_CATEGORIES,
   type SoftwareCategoryId,
 } from "@/lib/redesign/software/software-categories";
 import {
