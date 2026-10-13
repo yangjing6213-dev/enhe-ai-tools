@@ -107,7 +107,7 @@ export function ProductDemoEditor({ demo, tools }: ProductDemoEditorProps) {
           <textarea name="faq" defaultValue={faqText} className={textareaClass} placeholder="这个演示适合谁？|适合想先查看真实工作流再购买的用户。" />
         </Field>
 
-        <SectionHeading title="关联与首页展示" />
+        <SectionHeading title="关联产品与旧版首页展示" />
         <Field label="关联已有产品" className="md:col-span-2">
           <select name="relatedProductId" defaultValue={demo?.relatedProductId ?? ""} className={selectClass}>
             <option value="">不关联产品</option>
@@ -138,7 +138,7 @@ export function ProductDemoEditor({ demo, tools }: ProductDemoEditorProps) {
         </Field>
         <label className="flex items-center gap-3 rounded-xl border border-white/12 bg-white/7 px-4 py-3 text-sm text-[var(--marketing-text)] md:col-span-2">
           <input name="isFeaturedOnHome" type="checkbox" defaultChecked={demo?.isFeaturedOnHome ?? false} />
-          首页展示
+          旧版首页展示（不影响当前首页推荐轮播）
         </label>
 
         <SectionHeading title="SEO / GEO" />
@@ -173,7 +173,7 @@ export function ProductDemoEditor({ demo, tools }: ProductDemoEditorProps) {
             <input type="hidden" name="id" value={demo.id} />
             <h2 className="text-lg font-black text-[var(--marketing-text)]">下架演示</h2>
             <p className="mt-2 text-sm leading-6 text-[var(--marketing-muted)]">
-              下架后不会在首页、聚合页、详情页和 sitemap 中展示。
+              下架后不会在视频演示聚合页、演示详情页和 sitemap 中展示；不会移除当前首页的推荐商品。
             </p>
             <div className="mt-4">
               <DangerButton>下架演示</DangerButton>

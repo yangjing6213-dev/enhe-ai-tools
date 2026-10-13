@@ -2,6 +2,7 @@ import Link from "next/link";
 import type { Prisma } from "@prisma/client";
 import { AdminContentShell, AdminSection, inputClass, selectClass } from "@/app/admin/admin-ui";
 import { DeleteProductDemoForm } from "@/app/admin/product-demo-editor";
+import { HOME_PRODUCTS } from "@/lib/redesign/home/home-products";
 import { prisma } from "@/lib/db";
 import { buildProductDemoPath, getProductDemoCategoryLabel } from "@/lib/product-demos";
 
@@ -52,10 +53,26 @@ export default async function AdminProductDemosPage({ searchParams }: AdminProdu
   const pageCount = Math.max(1, Math.ceil(total / pageSize));
 
   return (
-    <AdminSection title="产品演示管理" intro="维护首页产品效果演示、视频详情页、FAQ、文字稿、关联产品和 SEO/GEO 信息。">
+    <AdminSection title="产品演示管理" intro="查看首页实际展示的推荐产品，并维护独立的视频演示、FAQ、文字稿和关联产品。">
       <AdminContentShell className="enhe-admin-content-management">
+      <section className="mb-8 rounded-2xl border border-white/12 p-5" aria-labelledby="home-product-showcase-heading">
+        <h2 id="home-product-showcase-heading" className="text-xl font-bold">首页当前展示产品（{HOME_PRODUCTS.length} 项）</h2>
+        <p className="mt-2 text-sm text-[#8B95A7]">这份名单与首页“热门AI推荐”轮播使用同一份配置。下方视频演示是独立内容，不是这份首页推荐名单。</p>
+        <ol className="mt-4 divide-y divide-white/10">
+          {HOME_PRODUCTS.map((product, index) => (
+            <li key={product.id} data-home-showcase-product={product.id} className="flex flex-wrap items-center justify-between gap-3 py-3">
+              <div className="min-w-0">
+                <p className="font-semibold">{index + 1}. {product.name.zh}</p>
+                <p className="mt-1 text-sm text-[#8B95A7]">{product.description.zh}</p>
+              </div>
+              <Link href={product.detailHref.zh} target="_blank" rel="noopener noreferrer" className="shrink-0 rounded-full border border-white/15 px-4 py-2 text-sm">查看商品详情</Link>
+            </li>
+          ))}
+        </ol>
+      </section>
+      <h2 className="mb-4 text-xl font-bold">视频演示记录</h2>
       <div className="enhe-admin-content-toolbar mb-6 flex flex-wrap items-center justify-between gap-3">
-        <div className="text-sm text-[#8B95A7]">共 {total} 条产品演示</div>
+        <div className="text-sm text-[#8B95A7]">共 {total} 条视频演示</div>
         <Link href="/admin/product-demos/new" className="enhe-admin-content-primary-action rounded-full px-5 py-3 text-sm font-semibold">
           新增视频演示
         </Link>
@@ -80,9 +97,9 @@ export default async function AdminProductDemosPage({ searchParams }: AdminProdu
           <option value="account_service">AI账号服务</option>
         </select>
         <select name="featured" defaultValue={typeof featured === "boolean" ? String(featured) : ""} className={selectClass}>
-          <option value="">首页展示不限</option>
-          <option value="true">首页展示</option>
-          <option value="false">不在首页</option>
+          <option value="">旧版首页展示不限</option>
+          <option value="true">旧版首页展示</option>
+          <option value="false">不在旧版首页</option>
         </select>
         <button className="rounded-full bg-[#050505] px-5 py-3 text-sm font-bold text-white lg:col-span-5">筛选演示</button>
       </form>
@@ -92,7 +109,7 @@ export default async function AdminProductDemosPage({ searchParams }: AdminProdu
           <span>标题</span>
           <span>类型/标签</span>
           <span>状态</span>
-          <span>首页</span>
+          <span>旧版首页</span>
           <span>排序</span>
           <span>更新时间</span>
           <span className="text-right">操作</span>
