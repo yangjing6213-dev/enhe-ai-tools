@@ -1,6 +1,6 @@
 import { expect, test } from "@playwright/test";
 
-test("homepage language switch matches navigation text and uses a smaller capsule", async ({ page }) => {
+test("homepage language switch keeps smaller text within the capsule", async ({ page }) => {
   await page.goto("/");
   const toggle = page.locator(".redesign-desktop-nav .enhe-language-toggle");
   const metrics = await toggle.evaluate(element => {
@@ -11,7 +11,8 @@ test("homepage language switch matches navigation text and uses a smaller capsul
   });
   expect(metrics.width).toBe(68);
   expect(metrics.height).toBe(32);
-  expect(metrics.labelFont).toBe(metrics.navFont);
+  expect(metrics.labelFont).toBe("11px");
+  expect(parseFloat(metrics.labelFont)).toBeLessThan(parseFloat(metrics.navFont));
   await toggle.locator('a[lang="en"]').click();
   await expect(page).toHaveURL(/\/en$/);
 });

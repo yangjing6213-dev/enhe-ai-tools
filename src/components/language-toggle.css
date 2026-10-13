@@ -67,7 +67,8 @@
   top: 6px;
   min-height: 32px;
   width: 28px;
-  font-size: 14px;
+  font-size: 11px;
+  line-height: 1;
 }
 .enhe-language-toggle.is-compact .redesign-language-link[lang="zh"] { left: 2px; }
 .enhe-language-toggle.is-compact .redesign-language-link[lang="en"] { right: 2px; }

@@ -1,3 +1,4 @@
+import { EnheAccountMenu } from "./enhe-account-menu";
 import { EnheHeaderAvatar } from "./enhe-header-avatar";
 import { EnheBrandLockup } from "./enhe-brand-lockup";
 import { EnheHeaderSearch } from "./enhe-header-search";
@@ -111,7 +112,7 @@ export function EnheRedesignHeader({
                   {account.loginLabel}
                 </PrefetchLink>
               ) : (
-                <details className="redesign-account-menu">
+                <EnheAccountMenu>
                   <summary className="redesign-avatar-trigger" aria-label={account.avatarLabel}>
                     <EnheHeaderAvatar name={account.displayName} />
                     <span className="redesign-header-user-name">{account.displayName}</span>
@@ -122,7 +123,7 @@ export function EnheRedesignHeader({
                     </PrefetchLink>
                     {account.isAdmin ? <PrefetchLink href={account.adminHref} prefetch={false} role="menuitem">{account.adminLabel}</PrefetchLink> : null}
                   </div>
-                </details>
+                </EnheAccountMenu>
               )}
             </NavigationMenuItem>
             <NavigationMenuItem>
