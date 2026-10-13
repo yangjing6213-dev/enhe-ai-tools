@@ -24,5 +24,5 @@ export function EnheRedesignLanguageSwitch({
     return () => window.removeEventListener(newsListingNavigationEvent, updateHrefs);
   }, [localeHrefs]);
 
-  return <LanguageToggle locale={currentLocale} hrefs={currentHrefs} label={ariaLabel} className="redesign-language-switch" />;
+  return <LanguageToggle compact locale={currentLocale} hrefs={currentHrefs} label={ariaLabel} className="redesign-language-switch" />;
 }

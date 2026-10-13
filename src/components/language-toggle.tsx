@@ -4,8 +4,8 @@ import { useEffect, useRef, useState } from "react";
 import SquishSwitch from "@/components/SquishSwitch";
 import "./language-toggle.css";
 
-export function LanguageToggle({ locale, hrefs, label, className = "", zhLabel = "中文" }: {
-  locale: "zh" | "en"; hrefs: { zh: string; en: string }; label: string; className?: string; zhLabel?: string;
+export function LanguageToggle({ locale, hrefs, label, className = "", zhLabel = "中文", compact = false }: {
+  locale: "zh" | "en"; hrefs: { zh: string; en: string }; label: string; className?: string; zhLabel?: string; compact?: boolean;
 }) {
   const [checked, setChecked] = useState(locale === "en");
   const timer = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
@@ -14,7 +14,7 @@ export function LanguageToggle({ locale, hrefs, label, className = "", zhLabel =
   function select(next: "zh" | "en") {
     document.cookie = `enhe_locale=${next}; path=/; max-age=31536000; samesite=lax`;
   }
-  return <span className={`enhe-language-toggle ${className}`} aria-label={label}>
+  return <span className={`enhe-language-toggle ${compact ? "is-compact" : ""} ${className}`} aria-label={label}>
     <a className="redesign-language-link" href={hrefs.zh} lang="zh" aria-current={locale === "zh" ? "page" : undefined} onClick={() => select("zh")}>{zhLabel}</a>
     <span className="redesign-language-separator" aria-hidden="true">/</span>
     <SquishSwitch checked={checked} onChange={on => {
@@ -25,7 +25,7 @@ export function LanguageToggle({ locale, hrefs, label, className = "", zhLabel =
       timer.current = setTimeout(() => window.location.assign(hrefs[next]), 200);
     }} ariaLabel={locale === "en" ? "Switch language to Chinese" : "切换语言为英文"}
       trackColor="#0462c2" trackOnColor="#0462c2" thumbColor="#ffffff" thumbOnColor="#ffffff"
-      width={76} height={38} radius={19} speed={50} stretch={36} hoverScale={1.035} colorDuration={320} />
+      width={compact ? 68 : 76} height={compact ? 32 : 38} radius={compact ? 16 : 19} speed={50} stretch={36} hoverScale={1.035} colorDuration={320} />
     <a className="redesign-language-link" href={hrefs.en} lang="en" aria-current={locale === "en" ? "page" : undefined} onClick={() => select("en")}>EN</a>
   </span>;
 }
