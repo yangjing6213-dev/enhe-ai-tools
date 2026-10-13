@@ -3707,3 +3707,18 @@
   content: none;
   display: none;
 }
+
+.enhe-admin-shell .enhe-admin-tool-table[data-tool-type="software"] :is(.enhe-admin-tool-table-heading, .enhe-admin-tool-list-row) {
+  grid-template-columns: minmax(280px, 2fr) minmax(90px, 0.7fr) minmax(84px, 0.6fr) minmax(90px, 0.7fr) minmax(180px, 1.2fr) minmax(96px, 0.65fr);
+  column-gap: 8px;
+  padding-inline: 12px;
+}
+
+.enhe-admin-shell .enhe-admin-tool-table[data-tool-type="software"] :is(.enhe-admin-tool-table-heading, .enhe-admin-tool-list-rows) {
+  min-width: 900px;
+}
+
+.enhe-admin-shell .enhe-admin-tool-table[data-tool-type="software"] .enhe-admin-tool-list-row > div {
+  min-width: 0;
+  overflow-wrap: anywhere;
+}

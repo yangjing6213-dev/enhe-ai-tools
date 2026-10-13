@@ -226,7 +226,7 @@ export function ToolAdminList({
         </>
       ) : null}
 
-      <div className="enhe-admin-content-table enhe-admin-tool-table mt-8 overflow-x-auto rounded-2xl border border-white/12 bg-white/6">
+      <div data-tool-type={type} className="enhe-admin-content-table enhe-admin-tool-table mt-8 overflow-x-auto rounded-2xl border border-white/12 bg-white/6">
         <div className="enhe-admin-tool-table-heading grid min-w-[1080px] grid-cols-[1.4fr_0.8fr_0.6fr_0.8fr_1.1fr_0.6fr] gap-4 border-b border-white/10 px-5 py-3 text-xs uppercase tracking-wide text-[#8B95A7]">
           <span>{isSkillLearning ? copy.course : isAccountService ? copy.service : copy.tool}</span>
           <span>{copy.category}</span>
