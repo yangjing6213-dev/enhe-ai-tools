@@ -1,8 +1,19 @@
 import { describe, expect, it } from "vitest";
 import { existsSync } from "node:fs";
-import { DEFAULT_AVATAR_COUNT, getDefaultAvatar } from "./default-avatar";
+import { DEFAULT_AVATAR_COUNT, GENDER_AVATAR_COUNTS, getDefaultAvatar } from "./default-avatar";
 
 describe("default avatars", () => {
+  it("chooses only existing assets from the selected gender folder", () => {
+    for (const gender of ["male", "female"] as const) {
+      expect(GENDER_AVATAR_COUNTS[gender]).toBeGreaterThan(0);
+      for (let index = 0; index < 100; index++) {
+        const avatar = getDefaultAvatar(`user-${index}`, gender);
+        expect(avatar).toContain(`/user-avatars/${gender}/`);
+        expect(existsSync(`public${avatar}`)).toBe(true);
+        expect(getDefaultAvatar(`user-${index}`, gender)).toBe(avatar);
+      }
+    }
+  });
   it("keeps the assigned avatar stable for a user", () => {
     expect(getDefaultAvatar("user-1")).toBe(getDefaultAvatar("user-1"));
   });

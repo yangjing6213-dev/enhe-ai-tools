@@ -59,6 +59,17 @@ export async function RegisterPageShell({
           placeholder={locale === "en" ? "Choose a username" : "请输入用户名"}
           className="form-control-dark mt-2"
         />
+        <label htmlFor="register-gender" className="mt-5 block text-sm font-semibold text-[var(--marketing-text)]">
+          {locale === "en" ? "Gender" : "性别"}
+        </label>
+        <select id="register-gender" name="gender" defaultValue="unspecified" className="form-control-dark mt-2" aria-describedby="register-gender-help">
+          <option value="unspecified">{locale === "en" ? "Prefer not to select" : "暂不选择"}</option>
+          <option value="male">{locale === "en" ? "Male" : "男生"}</option>
+          <option value="female">{locale === "en" ? "Female" : "女生"}</option>
+        </select>
+        <p id="register-gender-help" className="mt-2 text-xs leading-5 text-[var(--marketing-muted)]">
+          {locale === "en" ? "Used to choose your default avatar. You can upload your own avatar later." : "用于分配对应的默认头像，注册后可自行上传更换。"}
+        </p>
         <label htmlFor="register-email" className="mt-8 block text-sm font-semibold text-[var(--marketing-text)]">{t.auth.email}</label>
         <input
           id="register-email"

@@ -64,6 +64,7 @@ export async function registerAction(formData: FormData) {
     password: formData.get("password")
   });
   const nickname = z.string().trim().min(1).max(40).parse(formData.get("nickname"));
+  const gender = z.enum(["male", "female", "unspecified"]).parse(formData.get("gender") ?? "unspecified");
   const exists = await prisma.user.findUnique({ where: { email: input.identifier } });
   if (exists) {
     const params = new URLSearchParams({ message: "account-exists", returnTo });
@@ -75,7 +76,7 @@ export async function registerAction(formData: FormData) {
       email: input.identifier,
       passwordHash: await hashPassword(input.password),
       nickname,
-      avatar: getDefaultAvatar(input.identifier)
+      avatar: getDefaultAvatar(input.identifier, gender)
     }
   });
   await signInUser(user.id);

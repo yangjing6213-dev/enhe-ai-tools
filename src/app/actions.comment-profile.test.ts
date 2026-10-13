@@ -77,6 +77,30 @@ describe("comment and user profile actions", () => {
     }) });
   });
 
+  it.each(["male", "female"])("uses the selected %s avatar pool when registering", async (gender) => {
+    mocks.findUser.mockResolvedValue(null);
+    mocks.createUser.mockResolvedValue({ id: "new-user" });
+    const form = new FormData();
+    form.set("email", "new-user@example.test");
+    form.set("nickname", "新用户");
+    form.set("password", "ExamplePassword123!");
+    form.set("gender", gender);
+    await expect(registerAction(form)).rejects.toThrow("NEXT_REDIRECT:/user");
+    expect(mocks.createUser).toHaveBeenCalledWith({ data: expect.objectContaining({
+      avatar: expect.stringContaining(`/images/user-avatars/${gender}/`)
+    }) });
+  });
+
+  it("rejects unsupported gender selections before creating an account", async () => {
+    const form = new FormData();
+    form.set("email", "new-user@example.test");
+    form.set("nickname", "新用户");
+    form.set("password", "ExamplePassword123!");
+    form.set("gender", "invalid");
+    await expect(registerAction(form)).rejects.toThrow();
+    expect(mocks.createUser).not.toHaveBeenCalled();
+  });
+
   it("stores a required 1–5 star rating with the pending comment", async () => {
     await createCommentAction(commentForm("5"));
 
