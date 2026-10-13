@@ -1,3 +1,4 @@
+import { EmojiField, EmojiTextarea } from "@/app/admin/emoji-textarea";
 ﻿import { updateToolTagsAction, upsertToolTagAction } from "@/app/admin/actions";
 import { AdminContentShell, AdminSection, Field, inputClass, selectClass, SubmitButton, textareaClass } from "@/app/admin/admin-ui";
 import { prisma } from "@/lib/db";
@@ -25,7 +26,7 @@ export default async function AdminTagsPage() {
             <option value="disabled">禁用</option>
           </select>
         </Field>
-        <Field label="描述" className="md:col-span-3"><textarea name="description" className={textareaClass} /></Field>
+        <EmojiField label="描述" className="md:col-span-3"><EmojiTextarea name="description" className={textareaClass} /></EmojiField>
         <div className="md:col-span-3"><SubmitButton>新增标签</SubmitButton></div>
       </form>
 
@@ -43,7 +44,7 @@ export default async function AdminTagsPage() {
                 <option value="disabled">禁用</option>
               </select>
             </Field>
-            <Field label="描述"><textarea name="description" defaultValue={tag.description ?? ""} className={textareaClass} /></Field>
+            <EmojiField label="描述"><EmojiTextarea name="description" defaultValue={tag.description ?? ""} className={textareaClass} /></EmojiField>
             <SubmitButton>保存标签</SubmitButton>
           </form>
         ))}
@@ -55,9 +56,9 @@ export default async function AdminTagsPage() {
           <form key={tool.id} action={updateToolTagsAction} className="enhe-admin-tag-binding-form enhe-admin-content-form glass grid gap-3 rounded-2xl p-5">
             <input type="hidden" name="toolId" value={tool.id} />
             <p className="font-semibold">{tool.name}</p>
-            <Field label="标签，逗号或换行分隔">
-              <textarea name="tags" defaultValue={tool.tagLinks.map((link) => link.tag.name).join(", ")} className={textareaClass} />
-            </Field>
+            <EmojiField label="标签，逗号或换行分隔">
+              <EmojiTextarea name="tags" defaultValue={tool.tagLinks.map((link) => link.tag.name).join(", ")} className={textareaClass} />
+            </EmojiField>
             <SubmitButton>保存工具标签</SubmitButton>
           </form>
         ))}

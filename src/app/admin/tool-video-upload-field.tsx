@@ -2,6 +2,8 @@
 
 import { useRef, useState, type ChangeEvent } from "react";
 
+import { usePendingUploadGuard } from "@/app/admin/use-pending-upload-guard";
+
 type UploadState = {
   status: "idle" | "uploading" | "success" | "error";
   progress: number;
@@ -42,6 +44,8 @@ export function ToolVideoUploadField({
     message: "",
   });
 
+  const rootRef = usePendingUploadGuard(state.status === "uploading");
+
   function setError(message: string) {
     if (fileInputRef.current) fileInputRef.current.value = "";
     setState({ status: "error", progress: 0, message });
@@ -67,7 +71,7 @@ export function ToolVideoUploadField({
 
     const xhr = new XMLHttpRequest();
     xhr.open("POST", "/api/admin/tool-video-upload");
-    setState({ status: "uploading", progress: 0, message: `正在上传：${file.name}` });
+    setState({ status: "uploading", progress: 0, message: `正在上传：${file.name}，完成后再保存产品信息。` });
 
     xhr.upload.onprogress = (progressEvent) => {
       if (!progressEvent.lengthComputable) {
@@ -114,7 +118,7 @@ export function ToolVideoUploadField({
   const barColor = state.status === "error" ? "bg-red-300" : "bg-[var(--marketing-accent)]";
 
   return (
-    <div className="grid gap-3">
+    <div ref={rootRef} className="grid gap-3" aria-busy={state.status === "uploading"}>
       <input
         name={urlName}
         value={videoUrl}

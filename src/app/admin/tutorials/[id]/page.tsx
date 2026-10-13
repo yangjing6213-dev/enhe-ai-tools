@@ -1,3 +1,4 @@
+import { EmojiField, EmojiTextarea } from "@/app/admin/emoji-textarea";
 ﻿import Link from "next/link";
 import { notFound } from "next/navigation";
 import { deleteTutorialAction, upsertTutorialAction } from "@/app/admin/actions";
@@ -59,9 +60,9 @@ export default async function AdminTutorialDetailPage({ params, searchParams }: 
             <option value="disabled">禁用</option>
           </select>
         </Field>
-        <Field label="教程正文" className="md:col-span-2"><textarea name="content" required defaultValue={tutorial?.content ?? ""} className={textareaClass} /></Field>
-        <Field label="注意事项" className="md:col-span-2"><textarea name="notes" defaultValue={tutorial?.notes ?? ""} className={textareaClass} /></Field>
-        <Field label="常见错误" className="md:col-span-2"><textarea name="commonErrors" defaultValue={tutorial?.commonErrors ?? ""} className={textareaClass} /></Field>
+        <EmojiField label="教程正文" className="md:col-span-2"><EmojiTextarea name="content" required defaultValue={tutorial?.content ?? ""} className={textareaClass} /></EmojiField>
+        <EmojiField label="注意事项" className="md:col-span-2"><EmojiTextarea name="notes" defaultValue={tutorial?.notes ?? ""} className={textareaClass} /></EmojiField>
+        <EmojiField label="常见错误" className="md:col-span-2"><EmojiTextarea name="commonErrors" defaultValue={tutorial?.commonErrors ?? ""} className={textareaClass} /></EmojiField>
         <div className="md:col-span-2"><SubmitButton>{tutorial ? "保存教程" : "新增教程"}</SubmitButton></div>
       </form>
 

@@ -100,3 +100,9 @@ describe("tool download link visibility", () => {
     ).toBe("#download-purchase");
   });
 });
+
+it("preserves authored delivery indentation, blank lines and emoji", () => {
+  const content = "  您好 ✅\n\n    下载说明\n\n\n完成 👍🏽  ";
+  expect(getDownloadLinkContent({ fileUrl: content })).toBe(content);
+  expect(linkifyDownloadLinkContent(content).map(segment => segment.text).join("")).toBe(content);
+});

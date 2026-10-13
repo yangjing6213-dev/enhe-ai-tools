@@ -29,6 +29,7 @@ type LocalizedTutorialInput = {
   notes?: string | null;
   commonErrors?: string | null;
   videoUrl?: string | null;
+  imageUrl?: string | null;
 };
 
 type LocalizedTagInput = {
@@ -167,16 +168,7 @@ function getUserFirstToolCopyOverride(
 }
 
 function normalizeRichText(value: string | null | undefined) {
-  return (
-    value
-      ?.replace(/\r\n?/g, "\n")
-      .replace(/\u00a0/g, " ")
-      .split("\n")
-      .map((line) => line.replace(/[ \t]+/g, " ").trim())
-      .join("\n")
-      .replace(/\n{3,}/g, "\n\n")
-      .trim() ?? ""
-  );
+  return value?.trim() ? value.replace(/\r\n?/g, "\n") : "";
 }
 
 function isPlaceholderSummary(value: string) {
@@ -215,10 +207,7 @@ function extractLocalizedBlocks(value: string | null | undefined) {
 
 function extractImplicitLocalizedBlocks(value: string | null | undefined) {
   const source = normalizeRichText(value);
-  const lines = source
-    .split(/\n+/)
-    .map((line) => line.trim())
-    .filter(Boolean);
+  const lines = source.split("\n");
   if (lines.length < 2) return null;
 
   const englishStart = lines.findIndex((line, index) => {
@@ -235,8 +224,8 @@ function extractImplicitLocalizedBlocks(value: string | null | undefined) {
   if (englishStart < 1) return null;
 
   return {
-    zh: lines.slice(0, englishStart).join("\n\n"),
-    en: lines.slice(englishStart).join("\n\n"),
+    zh: lines.slice(0, englishStart).join("\n").trim(),
+    en: lines.slice(englishStart).join("\n").trim(),
   } satisfies Record<Locale, string>;
 }
 
@@ -326,9 +315,12 @@ function isLocalizedEnglishCopy(value: string, minimumWords = 2) {
 export function buildLocalizedToolOptionalText(
   value: string | null | undefined,
   locale: Locale,
+  options: { allowUntranslated?: boolean } = {},
 ) {
-  const localized = resolveLocalizedInlineCopy(value, locale, normalizeText);
-  if (locale === "en" && !isLocalizedEnglishCopy(localized, 1)) return "";
+  const localized = resolveLocalizedInlineCopy(value, locale, normalizeRichText);
+  if (options.allowUntranslated) return localized || resolveLocalizedInlineCopy(value, "zh", normalizeRichText);
+  const emojiOnly = /\p{Extended_Pictographic}|\p{Emoji_Presentation}/u.test(localized) && !localized.replace(/[\p{Extended_Pictographic}\p{Emoji_Presentation}\p{Emoji_Modifier}\p{Number}\p{Punctuation}\p{White_Space}\u200d\ufe0f]/gu, "");
+  if (locale === "en" && !isLocalizedEnglishCopy(localized, 1) && !emojiOnly) return "";
   return localized;
 }
 
@@ -664,17 +656,18 @@ function buildEnglishToolSentence(tool: LocalizedToolInput) {
 export function buildLocalizedToolSummary(
   tool: LocalizedToolInput,
   locale: Locale,
+  options: { preferAuthored?: boolean } = {},
 ) {
-  const englishOverride = englishToolContentOverrides[tool.slug];
+  const englishOverride = options.preferAuthored ? undefined : englishToolContentOverrides[tool.slug];
   if (locale === "en" && englishOverride) return englishOverride.summary;
 
   const override = getUserFirstToolCopyOverride(tool, locale);
-  if (locale === "zh" && override) return override;
+  if (locale === "zh" && override && !options.preferAuthored) return override;
 
   const shortDescription = resolveLocalizedInlineCopy(
     tool.shortDescription,
     locale,
-    normalizeText,
+    normalizeRichText,
   );
   if (locale === "zh")
     return tool.type === "online"
@@ -694,8 +687,9 @@ export function buildLocalizedToolSummary(
 export function buildLocalizedToolLongContent(
   tool: LocalizedToolInput,
   locale: Locale,
+  options: { preferAuthored?: boolean } = {},
 ) {
-  const englishOverride = englishToolContentOverrides[tool.slug];
+  const englishOverride = options.preferAuthored ? undefined : englishToolContentOverrides[tool.slug];
   if (locale === "en" && englishOverride) return englishOverride.content;
 
   const content = normalizeRichText(tool.content);
@@ -1136,7 +1130,7 @@ export function buildLocalizedToolFaqItems(
     return ensureMinimumLocalizedFaqItems(
       localizedFaqs.map((faq) => ({
         ...faq,
-        answer: sanitizeAccountServiceCopy(faq.answer, "zh"),
+        answer: sanitizeAccountServiceRichCopy(faq.answer, "zh"),
       })),
       tool,
       locale,

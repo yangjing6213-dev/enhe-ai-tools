@@ -103,3 +103,8 @@ export function buildPublicUploadUrl(fileName: string, now = Date.now()) {
     .replace(/^-+|-+$/g, "");
   return `/uploads/${now}-${safeName || "file"}`;
 }
+
+export function parseOptionalMultilineText(value: FormDataEntryValue | null) {
+  const text = String(value ?? "").replace(/\r\n?/g, "\n");
+  return text.trim() ? text : null;
+}

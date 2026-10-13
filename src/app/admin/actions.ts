@@ -19,6 +19,7 @@ import {
   parseBooleanField,
   parseNumberField,
   parseOptionalString,
+  parseOptionalMultilineText,
   resolveToolSlug
 } from "@/lib/admin-form";
 import { parseNewsRelationIds, resolveAiNewsCanonicalSlug, resolveNewsSlug } from "@/lib/ai-news";
@@ -232,7 +233,7 @@ async function resolvePaymentQrCodeInput(urlValue: FormDataEntryValue | null, fi
 }
 
 function parseDownloadFileUrl(value: FormDataEntryValue | null) {
-  return parseOptionalString(value);
+  return parseOptionalMultilineText(value);
 }
 
 function getToolListingPath(type: "software" | "online" | "skill_learning" | "ai_skill") {
@@ -1279,7 +1280,9 @@ export async function upsertToolAction(formData: FormData) {
     const safeToolKey = resolvedSlug;
     const uploadedCoverImage = await saveAdminImageUpload(formData.get("coverImageFile"), `tool-cover-${safeToolKey}`);
     const downloadFileUrl = parseDownloadFileUrl(formData.get("downloadFileUrl"));
-    const selectedDownloadFileId = parseOptionalString(formData.get("downloadFileId"));
+    const selectedDownloadFileId = type === "software" && formData.has("downloadFileUrl") && !downloadFileUrl
+      ? null
+      : parseOptionalString(formData.get("downloadFileId"));
     const priceSpecs = parseToolPriceSpecsFromFormData(formData);
     const primaryPriceSpec = getPrimaryToolPriceSpec(priceSpecs);
     const isDownloadProduct = type === "software" || type === "ai_skill";
@@ -1301,15 +1304,15 @@ export async function upsertToolAction(formData: FormData) {
       screenshots: mergeToolProductImages(existingProductImages, uploadedProductImages),
       videoUrl: parseOptionalString(formData.get("videoUrl")),
       videoTitle: parseOptionalString(formData.get("videoTitle")),
-      videoDescription: parseOptionalString(formData.get("videoDescription")),
+      videoDescription: parseOptionalMultilineText(formData.get("videoDescription")),
       videoUrl2: parseOptionalString(formData.get("videoUrl2")),
       videoTitle2: parseOptionalString(formData.get("videoTitle2")),
-      videoDescription2: parseOptionalString(formData.get("videoDescription2")),
+      videoDescription2: parseOptionalMultilineText(formData.get("videoDescription2")),
       videoUrl3: parseOptionalString(formData.get("videoUrl3")),
       videoTitle3: parseOptionalString(formData.get("videoTitle3")),
-      videoDescription3: parseOptionalString(formData.get("videoDescription3")),
+      videoDescription3: parseOptionalMultilineText(formData.get("videoDescription3")),
       version: parseOptionalString(formData.get("version")),
-      systemRequirement: parseOptionalString(formData.get("systemRequirement")),
+      systemRequirement: parseOptionalMultilineText(formData.get("systemRequirement")),
       supportedAgents: type === "ai_skill" ? normalizeSupportedAgents(formData.getAll("supportedAgents").map(String)) : [],
       isVipRequired: parseBooleanField(formData.get("isVipRequired")),
       isDownloadPaid: isDownloadProduct && resolvedPurchasePrice > 0,
@@ -1475,8 +1478,8 @@ export async function upsertTutorialAction(formData: FormData) {
     content: normalizeToolContentForStorage(z.string().min(1).parse(formData.get("content"))),
     imageUrl: parseOptionalString(formData.get("imageUrl")),
     videoUrl: parseOptionalString(formData.get("videoUrl")),
-    notes: parseOptionalString(formData.get("notes")),
-    commonErrors: parseOptionalString(formData.get("commonErrors")),
+    notes: parseOptionalMultilineText(formData.get("notes")),
+    commonErrors: parseOptionalMultilineText(formData.get("commonErrors")),
     sortOrder: parseNumberField(formData.get("sortOrder"), 0),
     status: z.enum(["active", "disabled"]).parse(formData.get("status") ?? "active")
   };

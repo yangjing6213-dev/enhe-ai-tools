@@ -4,7 +4,8 @@ export function canShowDownloadLinkArea(input: { hasDownloadLink: boolean; isDow
 }
 
 export function getDownloadLinkContent(file?: { filePath?: string | null; fileUrl?: string | null } | null) {
-  return (file?.fileUrl ?? file?.filePath ?? "").trim();
+  const content = file?.fileUrl ?? file?.filePath ?? "";
+  return content.trim() ? content.replace(/\r\n?/g, "\n") : "";
 }
 
 export type DownloadLinkContentSegment =

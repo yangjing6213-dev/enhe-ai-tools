@@ -1,3 +1,4 @@
+import { EmojiField, EmojiTextarea } from "@/app/admin/emoji-textarea";
 import Link from "next/link";
 import Image from "next/image";
 import { deleteToolAction, upsertToolAction } from "@/app/admin/actions";
@@ -457,12 +458,12 @@ export function ToolEditor({
 
         <EditorSection title={copy.detailSection} intro={copy.detailSectionIntro}>
           <div className="grid gap-4">
-            <Field label={copy.shortDescription}>
-              <textarea name="shortDescription" required defaultValue={tool?.shortDescription ?? ""} className={textareaClass} />
-            </Field>
-            <Field label={copy.content}>
-              <textarea name="content" required defaultValue={tool?.content ?? ""} className={textareaClass} />
-            </Field>
+            <EmojiField label={copy.shortDescription}>
+              <EmojiTextarea locale={locale} name="shortDescription" required defaultValue={tool?.shortDescription ?? ""} className={textareaClass} />
+            </EmojiField>
+            <EmojiField label={copy.content}>
+              <EmojiTextarea locale={locale} name="content" required defaultValue={tool?.content ?? ""} className={textareaClass} />
+            </EmojiField>
             <div>
               <p className="mb-2 block text-sm text-[#F6FAFF]">{copy.productVideo}</p>
               <div className="rounded-2xl border border-white/10 bg-white/6 p-4">
@@ -482,9 +483,9 @@ export function ToolEditor({
                       <Field label={`${copy.productVideoTitle} 1`}>
                         <input name="videoTitle" defaultValue={tool?.videoTitle ?? ""} placeholder={copy.productVideoTitlePlaceholder} className={inputClass} />
                       </Field>
-                      <Field label={`${copy.productVideoDescription} 1`}>
-                        <textarea name="videoDescription" defaultValue={tool?.videoDescription ?? ""} placeholder={copy.productVideoDescriptionPlaceholder} className={textareaClass} />
-                      </Field>
+                      <EmojiField label={`${copy.productVideoDescription} 1`}>
+                        <EmojiTextarea locale={locale} name="videoDescription" defaultValue={tool?.videoDescription ?? ""} placeholder={copy.productVideoDescriptionPlaceholder} className={textareaClass} />
+                      </EmojiField>
                     </div>
                     {tool?.videoUrl ? (
                       <p className="mt-4 break-all rounded-xl border border-white/10 bg-white/6 px-4 py-3 text-sm text-[#C5D0E2]">
@@ -508,9 +509,9 @@ export function ToolEditor({
                       <Field label={`${copy.productVideoTitle} 2`}>
                         <input name="videoTitle2" defaultValue={tool?.videoTitle2 ?? ""} placeholder={copy.productVideoTitlePlaceholder} className={inputClass} />
                       </Field>
-                      <Field label={`${copy.productVideoDescription} 2`}>
-                        <textarea name="videoDescription2" defaultValue={tool?.videoDescription2 ?? ""} placeholder={copy.productVideoDescriptionPlaceholder} className={textareaClass} />
-                      </Field>
+                      <EmojiField label={`${copy.productVideoDescription} 2`}>
+                        <EmojiTextarea locale={locale} name="videoDescription2" defaultValue={tool?.videoDescription2 ?? ""} placeholder={copy.productVideoDescriptionPlaceholder} className={textareaClass} />
+                      </EmojiField>
                     </div>
                     {tool?.videoUrl2 ? (
                       <p className="mt-4 break-all rounded-xl border border-white/10 bg-white/6 px-4 py-3 text-sm text-[#C5D0E2]">
@@ -534,9 +535,9 @@ export function ToolEditor({
                       <Field label={`${copy.productVideoTitle} 3`}>
                         <input name="videoTitle3" defaultValue={tool?.videoTitle3 ?? ""} placeholder={copy.productVideoTitlePlaceholder} className={inputClass} />
                       </Field>
-                      <Field label={`${copy.productVideoDescription} 3`}>
-                        <textarea name="videoDescription3" defaultValue={tool?.videoDescription3 ?? ""} placeholder={copy.productVideoDescriptionPlaceholder} className={textareaClass} />
-                      </Field>
+                      <EmojiField label={`${copy.productVideoDescription} 3`}>
+                        <EmojiTextarea locale={locale} name="videoDescription3" defaultValue={tool?.videoDescription3 ?? ""} placeholder={copy.productVideoDescriptionPlaceholder} className={textareaClass} />
+                      </EmojiField>
                     </div>
                     {tool?.videoUrl3 ? (
                       <p className="mt-4 break-all rounded-xl border border-white/10 bg-white/6 px-4 py-3 text-sm text-[#C5D0E2]">
@@ -598,8 +599,8 @@ export function ToolEditor({
                 }}
               />
             ) : !isAccountService ? (
-              <Field label={copy.downloadFileUrl}>
-                <textarea
+              <EmojiField label={copy.downloadFileUrl}>
+                <EmojiTextarea locale={locale}
                   name="downloadFileUrl"
                   defaultValue={directDownloadUrl}
                   placeholder={copy.downloadFileUrlPlaceholder}
@@ -608,7 +609,7 @@ export function ToolEditor({
                 <span className="mt-2 block text-xs leading-5 text-[#8B95A7]">
                   {copy.downloadFileUrlHint}
                 </span>
-              </Field>
+              </EmojiField>
             ) : null}
           </div>
         </EditorSection>

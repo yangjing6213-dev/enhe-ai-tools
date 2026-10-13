@@ -1,3 +1,4 @@
+import { EmojiField, EmojiTextarea } from "@/app/admin/emoji-textarea";
 ﻿import Link from "next/link";
 import { notFound } from "next/navigation";
 import { deleteToolFaqAction, upsertToolFaqAction } from "@/app/admin/actions";
@@ -57,7 +58,7 @@ export default async function AdminFaqDetailPage({ params, searchParams }: Admin
           </select>
         </Field>
         <Field label="问题" className="md:col-span-2"><input name="question" required defaultValue={faq?.question ?? ""} className={inputClass} /></Field>
-        <Field label="答案" className="md:col-span-2"><textarea name="answer" required defaultValue={faq?.answer ?? ""} className={textareaClass} /></Field>
+        <EmojiField label="答案" className="md:col-span-2"><EmojiTextarea name="answer" required defaultValue={faq?.answer ?? ""} className={textareaClass} /></EmojiField>
         <div className="md:col-span-2"><SubmitButton>{faq ? "保存 FAQ" : "新增 FAQ"}</SubmitButton></div>
       </form>
 

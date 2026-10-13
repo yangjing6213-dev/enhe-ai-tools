@@ -1,6 +1,7 @@
 "use client";
 
 import { useRef, useState } from "react";
+import { usePendingUploadGuard } from "@/app/admin/use-pending-upload-guard";
 import { Upload, X } from "lucide-react";
 
 type Labels = {
@@ -27,6 +28,7 @@ export function AiSkillPackageUploadField({
   const [fileName, setFileName] = useState(currentFileName ?? "");
   const [status, setStatus] = useState("");
   const [uploading, setUploading] = useState(false);
+  const rootRef = usePendingUploadGuard(uploading);
 
   async function uploadPackage(file: File) {
     setUploading(true);
@@ -59,7 +61,7 @@ export function AiSkillPackageUploadField({
   }
 
   return (
-    <div className="rounded-2xl border border-white/10 bg-white/6 p-4">
+    <div ref={rootRef} aria-busy={uploading} className="rounded-2xl border border-white/10 bg-white/6 p-4">
       <input type="hidden" name="downloadFileId" value={fileId} />
       <p className="text-sm font-semibold text-[#F6FAFF]">{labels.title}</p>
       <p className="mt-2 text-xs leading-5 text-[#8B95A7]">{labels.hint}</p>

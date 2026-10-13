@@ -5880,3 +5880,9 @@ body .site-user-chip.site-user-chip {
   font-size: 0.875rem;
   box-shadow: none !important;
 }
+
+/* Preserve normal typography while providing native color-emoji glyphs. */
+.enhe-authored-text {
+  font-family: var(--font-sans), "Apple Color Emoji", "Segoe UI Emoji", "Noto Color Emoji";
+  overflow-wrap: anywhere;
+}

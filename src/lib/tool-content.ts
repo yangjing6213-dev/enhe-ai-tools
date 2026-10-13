@@ -8,7 +8,6 @@ const unorderedListPattern = /^\s*(?:[-*]|\u2022)\s+(.+)$/;
 const orderedListPattern = /^\s*(?:(\d+)[.)\u3001]|[\uFF08(](\d+)[\uFF09)])\s*(.+)$/;
 const markdownHeadingPattern = /^\s*#{1,4}\s+(.+)$/;
 const colonListLinePattern = /^\s*([^:：\n]{2,24})[:：]\s*(\S.+)$/;
-const sentenceSplitPattern = /([^\u3002\uFF01\uFF1F\uFF1B.!?;]+[\u3002\uFF01\uFF1F\uFF1B.!?;]+)(?=\s*|$)/g;
 const absoluteHttpUrlPresencePattern = /https?:\/\//i;
 const knownStandaloneHeadingLabels = new Set([
   "主要功能",
@@ -38,7 +37,9 @@ export function tagSlug(name: string) {
     .toLowerCase()
     .replace(/[^a-z0-9]+/g, "-")
     .replace(/^-+|-+$/g, "");
-  return ascii || encodeURIComponent(name.trim()).replace(/%/g, "").toLowerCase();
+  const encoded = encodeURIComponent(name.trim()).replace(/%/g, "").toLowerCase();
+  if (/\p{Extended_Pictographic}/u.test(name)) return [ascii, encoded].filter(Boolean).join("-");
+  return ascii || encoded;
 }
 
 export function parseTagNames(value: string) {
@@ -63,47 +64,12 @@ function normalizeInlineSpace(value: string) {
   return value.replace(/[ \t]+/g, " ").trim();
 }
 
-function normalizeFormattedLines(value: string) {
-  return normalizeLineBreaks(value)
-    .split("\n")
-    .map((line) => normalizeInlineSpace(line))
-    .join("\n")
-    .replace(/\n{3,}/g, "\n\n")
-    .trim();
-}
-
-function hasMeaningfulLineBreaks(value: string) {
-  return normalizeLineBreaks(value).split("\n").filter((line) => line.trim()).length > 1;
-}
-
-function splitDenseSentences(value: string) {
-  const normalized = normalizeInlineSpace(value);
-  if (!normalized) return [];
-
-  const matches = Array.from(normalized.matchAll(sentenceSplitPattern));
-  const sentences = matches.map((match) => normalizeInlineSpace(match[1])).filter(Boolean);
-  const lastMatch = matches.at(-1);
-  const matchedLength = lastMatch ? (lastMatch.index ?? 0) + lastMatch[0].length : 0;
-  const tail = normalizeInlineSpace(normalized.slice(matchedLength));
-  if (tail) sentences.push(tail);
-
-  return sentences.length ? sentences : [normalized];
-}
-
 export function normalizeToolSummaryForStorage(value: string) {
-  return normalizeLineBreaks(value).replace(/\s+/g, " ").trim();
+  return value.trim() ? value.replace(/\r\n?/g, "\n") : "";
 }
 
 export function normalizeToolContentForStorage(value: string) {
-  const normalized = normalizeFormattedLines(value);
-  if (!normalized) return "";
-  if (absoluteHttpUrlPresencePattern.test(normalized)) return normalized;
-  if (hasMeaningfulLineBreaks(normalized)) return normalized;
-
-  const sentences = splitDenseSentences(normalized);
-  if (sentences.length <= 1) return normalized;
-
-  return sentences.join("\n\n");
+  return value.trim() ? value.replace(/\r\n?/g, "\n") : "";
 }
 
 function normalizeHeadingText(value: string) {

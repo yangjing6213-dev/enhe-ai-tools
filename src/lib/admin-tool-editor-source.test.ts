@@ -19,7 +19,7 @@ describe("admin tool editor source", () => {
     expect(source).not.toContain("下载链接 URL");
     expect(source).not.toContain("Download link URL");
     expect(source.indexOf("{copy.productImages}")).toBeLessThan(source.indexOf('name="downloadFileUrl"'));
-    expect(source).toMatch(/<textarea\s+name="downloadFileUrl"/);
+    expect(source).toMatch(/<EmojiTextarea\s+locale=\{locale\}\s+name="downloadFileUrl"/);
   });
 
   it("uses a client-side media upload guard before the server action submit", () => {
@@ -85,7 +85,7 @@ describe("admin tool editor source", () => {
     expect(source).toContain("<Field label={copy.version}>");
     expect(source).toContain("<Field label={copy.systemRequirement}>");
     expect(source).not.toContain('name="onlineUrl"');
-    expect(source).toContain("<Field label={copy.downloadFileUrl}");
+    expect(source).toContain("<EmojiField label={copy.downloadFileUrl}");
     expect(source).toContain("isAccountService ? copy.deleteService : copy.deleteTool");
   });
 

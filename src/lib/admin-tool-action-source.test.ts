@@ -7,7 +7,7 @@ describe("admin tool action source", () => {
     const source = readFileSync(join(process.cwd(), "src/app/admin/actions.ts"), "utf8");
 
     expect(source).toContain("function parseDownloadFileUrl");
-    expect(source).toContain("return parseOptionalString(value);");
+    expect(source).toContain("return parseOptionalMultilineText(value);");
     expect(source).not.toContain("下载链接需以");
   });
 

@@ -1,3 +1,4 @@
+import { EmojiField, EmojiTextarea } from "@/app/admin/emoji-textarea";
 ﻿import Link from "next/link";
 import { notFound } from "next/navigation";
 import { deleteToolChangelogAction, upsertToolChangelogAction } from "@/app/admin/actions";
@@ -59,7 +60,7 @@ export default async function AdminChangelogDetailPage({ params, searchParams }:
             <option value="disabled">禁用</option>
           </select>
         </Field>
-        <Field label="更新内容" className="md:col-span-2"><textarea name="content" required defaultValue={changelog?.content ?? ""} className={textareaClass} /></Field>
+        <EmojiField label="更新内容" className="md:col-span-2"><EmojiTextarea name="content" required defaultValue={changelog?.content ?? ""} className={textareaClass} /></EmojiField>
         <div className="md:col-span-2"><SubmitButton>{changelog ? "保存版本记录" : "新增版本记录"}</SubmitButton></div>
       </form>
 

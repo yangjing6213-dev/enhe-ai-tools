@@ -21,19 +21,9 @@ describe("tool content helpers", () => {
     expect(parseTagNames("AI\uFF0C\u81EA\u52A8\u5316\u3001\u6548\u7387")).toEqual(["AI", "\u81EA\u52A8\u5316", "\u6548\u7387"]);
   });
 
-  it("formats a dense product introduction into readable paragraphs for storage", () => {
-    const raw =
-      "This tool cleans batch filenames, removes duplicate text, and prepares files before publishing. It is useful for creators, operators, and course teams. You can use it before uploads, archives, and daily delivery.";
-
-    expect(normalizeToolContentForStorage(raw)).toBe(
-      [
-        "This tool cleans batch filenames, removes duplicate text, and prepares files before publishing.",
-        "",
-        "It is useful for creators, operators, and course teams.",
-        "",
-        "You can use it before uploads, archives, and daily delivery."
-      ].join("\n")
-    );
+  it("keeps authored dense copy unchanged instead of inserting paragraphs", () => {
+    const raw = "First sentence. Second sentence. Third sentence.";
+    expect(normalizeToolContentForStorage(raw)).toBe(raw);
   });
 
   it("keeps existing bullets and parses them as a list block", () => {
@@ -128,7 +118,17 @@ describe("tool content helpers", () => {
     ]);
   });
 
-  it("keeps short descriptions compact instead of turning them into article content", () => {
-    expect(normalizeToolSummaryForStorage("  Fast cleanup.\n\nWorks locally.  ")).toBe("Fast cleanup. Works locally.");
+  it("preserves line breaks in short descriptions", () => {
+    expect(normalizeToolSummaryForStorage("  Fast cleanup.\n\nWorks locally.  ")).toBe("  Fast cleanup.\n\nWorks locally.  ");
   });
+});
+
+it("preserves emoji, indentation and repeated blank lines through storage", () => {
+  const copy = "Hello 👩🏽‍💻\n\n  Step ✅\n\n\nDone 👨‍👩‍👧‍👦";
+  expect(normalizeToolContentForStorage(copy)).toBe(copy);
+  expect(normalizeToolSummaryForStorage(copy)).toBe(copy);
+});
+
+it("does not collapse distinct emoji tag names into the same slug", () => {
+  expect(tagSlug("Video ✅")).not.toBe(tagSlug("Video ❌"));
 });

@@ -177,3 +177,22 @@ describe("tool localization bilingual blocks", () => {
     ).toBe("Product overview");
   });
 });
+
+ describe("authored card layout", () => {
+  it("preserves lines, blank lines, indentation and compound emoji in optional copy", () => {
+    const copy = "您好 👨‍👩‍👧‍👦\n\n  下载说明 ✅\n    第二步 👍🏽\n\n\n结束 🎉";
+    expect(buildLocalizedToolOptionalText(copy, "zh")).toBe(copy);
+    expect(buildLocalizedToolOptionalText("Hello 👩🏽‍💻\n\n  Download here ✅", "en")).toBe("Hello 👩🏽‍💻\n\n  Download here ✅");
+  });
+ });
+
+it("allows edited product descriptions to override fixed marketing copy on detail pages", () => {
+  const tool = { slug: "windows-ai", name: "Lumi", type: "software" as const, shortDescription: "Edited summary\nSecond line", content: "Edited content" };
+  expect(buildLocalizedToolSummary(tool, "zh", { preferAuthored: true })).toBe(tool.shortDescription);
+});
+
+it("keeps original delivery instructions when no English translation exists", () => {
+  const copy = "下载说明 ✅\n\n  提取码：abcd";
+  expect(buildLocalizedToolOptionalText(copy, "en", { allowUntranslated: true })).toBe(copy);
+  expect(buildLocalizedToolOptionalText("👨‍👩‍👧‍👦 👍🏽 ✅", "en")).toBe("👨‍👩‍👧‍👦 👍🏽 ✅");
+});

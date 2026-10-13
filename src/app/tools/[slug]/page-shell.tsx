@@ -18,7 +18,7 @@ import { enheOrganizationReference } from "@/lib/brand-entity";
 import { prisma } from "@/lib/db";
 import { getDictionary, type Locale } from "@/lib/dictionaries";
 import { resolveToolImageSrc } from "@/lib/tool-image";
-import { resolveProductVideos } from "@/lib/product-video";
+import { resolveProductVideos, resolveProductVideoSrc } from "@/lib/product-video";
 import {
   buildCanonicalToolPath,
   getCanonicalToolSlug,
@@ -273,10 +273,12 @@ export async function ToolDetailPageShell({
   const localizedSummary = buildLocalizedToolSummary(
     toolLocalizationInput,
     forceLocale,
+    { preferAuthored: true },
   );
   const localizedLongContent = buildLocalizedToolLongContent(
     toolLocalizationInput,
     forceLocale,
+    { preferAuthored: true },
   );
   const visibleTutorials = buildLocalizedToolTutorialItems(
     tool.tutorials,
@@ -383,10 +385,7 @@ export async function ToolDetailPageShell({
       ? forceLocale === "en"
         ? "Use the protected download button below to get the current Skill package."
         : "请使用下方受保护的下载按钮获取当前 Skill 压缩包。"
-      : buildLocalizedToolOptionalText(downloadLinkContent, forceLocale) ||
-        (forceLocale === "en"
-          ? "Use the download button below to open the current delivery entry."
-          : downloadLinkContent);
+      : buildLocalizedToolOptionalText(downloadLinkContent, forceLocale, { allowUntranslated: true });
   const visibleDownloadFileName =
     buildLocalizedToolOptionalText(
       tool.downloadFile?.fileName,
@@ -690,7 +689,7 @@ export async function ToolDetailPageShell({
                     {localizedTool.secondaryName}
                   </p>
                 ) : null}
-                <p className="mt-5 max-w-3xl text-base leading-8 text-[#8F9DB2] md:text-lg">
+                <p className="enhe-authored-text whitespace-pre-wrap break-words mt-5 max-w-3xl text-base leading-8 text-[#8F9DB2] md:text-lg">
                   {localizedSummary}
                 </p>
 
@@ -978,7 +977,7 @@ export async function ToolDetailPageShell({
                         <h3 className="mt-2 font-semibold text-[#F6FAFF]">
                           {item.title}
                         </h3>
-                        <p className="mt-2 line-clamp-2 text-sm leading-6 text-[#8F9DB2]">
+                        <p className="enhe-authored-text mt-2 whitespace-pre-wrap break-words text-sm leading-6 text-[#8F9DB2]">
                           {item.content}
                         </p>
                       </div>
@@ -1039,7 +1038,7 @@ export async function ToolDetailPageShell({
                   </p>
                 ) : (
                   <>
-                    <p className="text-sm leading-6 text-[#C5D0E2]">
+                    <p className="enhe-authored-text whitespace-pre-wrap break-words text-sm leading-6 text-[#C5D0E2]">
                       {tool.systemRequirement ?? td.browser}
                     </p>
                     <p className="mt-2 text-xs text-[#8F9DB2]">
@@ -1114,7 +1113,7 @@ export async function ToolDetailPageShell({
                         </h2>
                       ) : null}
                       {video.description ? (
-                        <p className="mt-2 whitespace-pre-line text-sm leading-6 text-[#8F9DB2]">
+                        <p className="mt-2 enhe-authored-text whitespace-pre-wrap text-sm leading-6 text-[#8F9DB2]">
                           {video.description}
                         </p>
                       ) : null}
@@ -1196,12 +1195,17 @@ export async function ToolDetailPageShell({
                       tone="muted"
                       className="mt-3 text-sm leading-7"
                     />
+                    {resolveToolImageSrc(tutorial.imageUrl) ? (
+                      <div className="mt-4">
+                        <Image src={resolveToolImageSrc(tutorial.imageUrl)!} alt={tutorial.title} width={1200} height={800} className="h-auto w-full rounded-xl object-contain" unoptimized />
+                      </div>
+                    ) : null}
                     {tutorial.notes ? (
                       <div className="mt-4 rounded-xl border border-[#5EF1C7]/20 bg-[#5EF1C7]/8 p-4">
                         <p className="text-sm font-semibold text-[#5EF1C7]">
                           {td.notes}
                         </p>
-                        <p className="mt-2 whitespace-pre-line text-sm leading-6 text-[#8F9DB2]">
+                        <p className="mt-2 enhe-authored-text whitespace-pre-wrap text-sm leading-6 text-[#8F9DB2]">
                           {tutorial.notes}
                         </p>
                       </div>
@@ -1211,15 +1215,18 @@ export async function ToolDetailPageShell({
                         <p className="text-sm font-semibold text-[#FFB86B]">
                           {td.commonErrors}
                         </p>
-                        <p className="mt-2 whitespace-pre-line text-sm leading-6 text-[#8F9DB2]">
+                        <p className="mt-2 enhe-authored-text whitespace-pre-wrap text-sm leading-6 text-[#8F9DB2]">
                           {tutorial.commonErrors}
                         </p>
                       </div>
                     ) : null}
                     {tutorial.videoUrl ? (
-                      <p className="mt-3 text-sm text-[#C4B5FD]">
-                        {tutorial.videoUrl}
-                      </p>
+                      <div className="mt-4">
+                        {resolveProductVideoSrc(tutorial.videoUrl) ? (
+                          <ProductVideoPlayer src={resolveProductVideoSrc(tutorial.videoUrl)!} title={tutorial.title} fallbackText={forceLocale === "en" ? "Video playback is unavailable." : "当前浏览器无法播放此视频。"} playLabel={forceLocale === "en" ? "Play tutorial video" : "播放教程视频"} deferUntilClicked />
+                        ) : null}
+                        <a href={resolveProductVideoSrc(tutorial.videoUrl) ?? undefined} target="_blank" rel="noopener noreferrer" className="mt-2 inline-block text-sm text-[var(--marketing-accent)] underline">{forceLocale === "en" ? "Open tutorial video" : "打开教程视频"}</a>
+                      </div>
                     ) : null}
                   </div>
                 ))}
@@ -1244,7 +1251,7 @@ export async function ToolDetailPageShell({
                     <summary className="cursor-pointer list-none font-semibold text-[#F6FAFF] [&::-webkit-details-marker]:hidden">
                       {faq.question}
                     </summary>
-                    <p className="mt-3 whitespace-pre-line text-sm leading-7 text-[#8F9DB2]">
+                    <p className="mt-3 enhe-authored-text whitespace-pre-wrap text-sm leading-7 text-[#8F9DB2]">
                       {faq.answer}
                     </p>
                   </details>
@@ -1326,7 +1333,7 @@ export async function ToolDetailPageShell({
                     </div>
                     <CommentRatingDisplay rating={comment.rating} locale={forceLocale} />
                   </div>
-                  <p className="mt-2 leading-7">{comment.localizedContent}</p>
+                  <p className="enhe-authored-text mt-2 whitespace-pre-wrap break-words leading-7">{comment.localizedContent}</p>
                 </div>
               ))}
             </div>
@@ -1396,7 +1403,7 @@ function Info({ label, value, numeric = false }: { label: string; value: string;
   return (
     <div className="rounded-xl border border-white/10 bg-white/8 p-4">
       <p className="text-xs text-[#8F9DB2]">{label}</p>
-      <p className={`mt-2 font-semibold text-[#F6FAFF]${numeric ? " tabular-nums" : ""}`}>{value}</p>
+      <p className={`enhe-authored-text whitespace-pre-wrap break-words mt-2 font-semibold text-[#F6FAFF]${numeric ? " tabular-nums" : ""}`}>{value}</p>
     </div>
   );
 }
@@ -1420,7 +1427,7 @@ function LinkedDownloadLinkContent({ content }: { content: string }) {
   const segments = linkifyDownloadLinkContent(content);
 
   return (
-    <p className="mt-2 whitespace-pre-wrap break-words text-base font-semibold leading-7 text-[#F6FAFF]">
+    <p className="enhe-authored-text mt-2 whitespace-pre-wrap break-words text-base font-normal leading-7 text-[#F6FAFF]">
       {segments.map((segment, index) =>
         segment.type === "link" ? (
           <a

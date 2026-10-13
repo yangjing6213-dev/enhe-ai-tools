@@ -1,62 +1,23 @@
 import React from "react";
 import { renderToStaticMarkup } from "react-dom/server";
 import { describe, expect, it, vi } from "vitest";
-
 import { ToolRichContent } from "@/components/tool-rich-content";
 
-function extractOrderedMarkers(html: string) {
-  return Array.from(
-    html.matchAll(/<span class="flex h-7 w-7[^"]*">(\d+)<\/span>/g),
-    (match) => match[1]
-  );
-}
-
-describe("ToolRichContent", () => {
-  it("emphasizes colon-led product feature labels inside lists", () => {
+describe("ToolRichContent authored formatting", () => {
+  it("keeps line breaks, spaces, literal list markers and emoji without adding headings", () => {
     vi.stubGlobal("React", React);
-
-    const html = renderToStaticMarkup(
-      React.createElement(ToolRichContent, {
-        content: ["Features:", "Work companion: turn rough ideas into next actions."].join("\n")
-      })
-    );
-
-    expect(html).toContain("<strong");
-    expect(html).toContain("Work companion:");
-    expect(html).toContain("turn rough ideas into next actions.");
-  });
-
-  it("keeps ordered markers increasing when descriptions split numbered items", () => {
-    vi.stubGlobal("React", React);
-
-    const content = [
-      "Features:",
-      "1. Text to speech TTS",
-      "Generate natural audio for courses, videos, and voiceovers.",
-      "",
-      "2. Voice cloning",
-      "Create a consistent voice style from authorized samples.",
-      "",
-      "3. Voice design",
-      "Describe a target voice and generate a matching style."
-    ].join("\n");
-
+    const content = "Hello 👨‍👩‍👧‍👦\n\n  Steps:\n1. Download ✅\n2. Open 👍🏽\n\n\n  Done";
     const html = renderToStaticMarkup(React.createElement(ToolRichContent, { content }));
-
-    expect(extractOrderedMarkers(html)).toEqual(["1", "2", "3"]);
+    expect(html).toContain(content);
+    expect(html).toContain("whitespace-pre-wrap");
+    expect(html).not.toContain("<h3");
+    expect(html).not.toContain("<ol");
   });
-
-  it("renders bare Feishu tutorial URLs as links without changing query strings", () => {
+  it("keeps clickable URLs and escapes authored HTML", () => {
     vi.stubGlobal("React", React);
-
-    const url = "https://qcnerk9meslu.feishu.cn/wiki/CEqtwGF9BiOQXNkzEmVcWecGnWe?from=from_copylink";
-    const html = renderToStaticMarkup(
-      React.createElement(ToolRichContent, {
-        content: ["领取链接", url].join("\n")
-      })
-    );
-
-    expect(html).toContain(`href="${url}"`);
-    expect(html).toContain(`>${url}</a>`);
+    const html = renderToStaticMarkup(React.createElement(ToolRichContent, { content: 'Hi ✅\nhttps://example.test/file?x=1&y=2\n<script>alert(1)</script>' }));
+    expect(html).toContain('href="https://example.test/file?x=1&amp;y=2"');
+    expect(html).toContain("&lt;script&gt;");
+    expect(html).not.toContain("<script>");
   });
 });
