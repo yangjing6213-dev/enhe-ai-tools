@@ -197,7 +197,7 @@ export async function deleteUserForAdmin(
     await savepoint(tx, "admin_user_delete");
     try {
       const deleted = await tx.user.deleteMany({
-        where: { id: user.id, isTestData: true },
+        where: { id: user.id },
       });
       if (deleted.count !== 1) {
         await rollbackSavepoint(tx, "admin_user_delete");
@@ -240,7 +240,7 @@ export async function deleteUserForAdmin(
           action: "user.delete",
           targetType: "user",
           targetId: user.id,
-          summary: "Deleted an empty test user.",
+          summary: "Deleted a user without protected business records.",
           metadata: {
             email: user.email,
             phone: user.phone,

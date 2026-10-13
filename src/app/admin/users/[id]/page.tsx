@@ -3,7 +3,7 @@ import { notFound } from "next/navigation";
 import { deleteUserAdminAction, resetUserPasswordAction, updateUserAdminAction } from "@/app/admin/actions";
 import { AdminContentShell, AdminSection, DangerButton, Field, inputClass, selectClass, SubmitButton } from "@/app/admin/admin-ui";
 import { PasswordInput } from "@/components/password-input";
-import { decideAdminUserHardDelete } from "@/lib/admin-delete-protection";
+import { decideAdminUserHardDelete, getAdminUserProtectedRecordCount, type AdminUserProtectedCounts } from "@/lib/admin-delete-protection";
 import { prisma } from "@/lib/db";
 import { getCurrentLocale, type Locale } from "@/lib/i18n";
 
@@ -34,8 +34,8 @@ const copy = {
     resetPassword: "重置密码",
     passwordPlaceholder: "至少 8 位临时密码",
     deleteTitle: "删除用户",
-    deleteIntro: "仅无订单、支付、退款、权益、巡检或管理员审计关系的空测试账号允许硬删除。受保护账号只能停用，业务证据会永久保留。",
-    confirmDelete: "我确认这是无任何受保护业务关系的空测试账号。",
+    deleteIntro: "没有订单、支付、退款、权益、评论、使用、巡检或管理员审计记录的空账号可以删除。登录记录不影响删除；有业务记录的账号只能禁用，相关记录会保留。",
+    confirmDelete: "我确认删除此空账号及其登录记录、通知、点赞和收藏，删除后无法恢复。",
     deleteUser: "删除用户"
   },
   en: {
@@ -59,8 +59,8 @@ const copy = {
     resetPassword: "Reset password",
     passwordPlaceholder: "At least 8 temporary characters",
     deleteTitle: "Delete user",
-    deleteIntro: "Only an empty test account without orders, payments, refunds, entitlements, audits, or admin history can be hard-deleted. Protected accounts can only be disabled.",
-    confirmDelete: "I confirm this is an empty test account without protected business records.",
+    deleteIntro: "Accounts without protected orders, payments, refunds, entitlements, comments, usage, audits or admin history can be deleted. Login sessions do not block deletion. Protected accounts can only be disabled.",
+    confirmDelete: "I confirm permanent deletion of this empty account and its login sessions, notifications, likes and favorites.",
     deleteUser: "Delete user"
   }
 } as const;
@@ -218,8 +218,8 @@ export default async function AdminUserDetailPage({ params, searchParams }: Admi
           ) : (
             <p className="mt-4 text-sm leading-6 text-red-100">
               {locale === "en"
-                ? `Hard deletion blocked (${deleteDecision.code}). Set the account status to Disabled instead.`
-                : `硬删除已阻止（${deleteDecision.code}）。请将账号状态改为“禁用”。`}
+                ? "This account has protected business records and cannot be deleted. Disable it to preserve these records."
+                : "该账号存在需要保留的业务记录，暂不支持删除。可将账号状态改为“禁用”，相关记录会保留。"}
             </p>
           )}
         </div>
@@ -255,7 +255,7 @@ function formatUsageCounts(template: string, downloads: number, usages: number) 
     .replace("{usages}", String(usages));
 }
 
-function formatProtectedCounts(counts: Record<string, number>, locale: Locale) {
-  const total = Object.values(counts).reduce((sum, count) => sum + count, 0);
+function formatProtectedCounts(counts: AdminUserProtectedCounts, locale: Locale) {
+  const total = getAdminUserProtectedRecordCount(counts);
   return locale === "en" ? `${total} protected business records` : `${total} 条受保护业务记录`;
 }

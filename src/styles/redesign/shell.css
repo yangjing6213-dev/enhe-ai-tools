@@ -3742,3 +3742,12 @@
   vertical-align: middle;
   overflow-wrap: anywhere;
 }
+
+body .enhe-admin-shell .enhe-admin-users :is(.enhe-admin-content-primary-action, button[type="submit"], button:not([type])) {
+  color: #fff !important;
+  -webkit-text-fill-color: #fff !important;
+}
+
+.enhe-admin-shell .enhe-admin-user-danger-panel button[type="submit"] {
+  background: #b42318 !important;
+}

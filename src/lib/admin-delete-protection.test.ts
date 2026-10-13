@@ -127,17 +127,14 @@ describe("admin hard-delete protection", () => {
     ).toEqual({ allowed: true });
   });
 
-  it("blocks and disables non-test users with a stable error code", () => {
-    expect(
-      decideAdminUserHardDelete({
-        isTestData: false,
-        protectedCounts: emptyUserCounts,
-      }),
-    ).toEqual({
-      allowed: false,
-      code: "ADMIN_USER_DELETE_NOT_TEST_DATA",
-      fallback: "disable",
-    });
+  it("allows an empty normal registration account with only disposable account data", () => {
+    expect(decideAdminUserHardDelete({ isTestData: false, protectedCounts: {
+      ...emptyUserCounts, sessions: 2, analyticsEvents: 2, notifications: 1, newsLikes: 1, newsFavorites: 1
+    } })).toEqual({ allowed: true });
+  });
+
+  it.each(["orders", "memberships", "paymentProofs", "reviewedProofs", "comments", "downloadLogs", "toolUsageLogs", "toolPurchases", "vipAdjustments", "vipOperations", "refundRecords", "refundRequests", "adminAuditLogs", "seoAuditProjects", "seoAuditRuns", "seoAuditCredits", "seoAuditSubscriptions"] as const)("still blocks normal accounts owning %s", field => {
+    expect(decideAdminUserHardDelete({ isTestData: false, protectedCounts: { ...emptyUserCounts, [field]: 1 } })).toEqual({ allowed: false, code: "ADMIN_USER_DELETE_PROTECTED_RECORDS", fallback: "disable" });
   });
 
   it("blocks tools with orders or purchase entitlements", () => {

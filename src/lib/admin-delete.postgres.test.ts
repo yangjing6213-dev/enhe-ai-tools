@@ -306,7 +306,7 @@ describePostgres("PostgreSQL admin hard-delete protection", () => {
     }
   }, 30_000);
 
-  it("rejects non-test orders and disables non-test users", async () => {
+  it("rejects non-test orders but permits normal accounts after protected records are removed", async () => {
     const user = await createUser(false);
     const order = await createOrder(user.id, {
       orderStatus: "cancelled",
@@ -334,12 +334,8 @@ describePostgres("PostgreSQL admin hard-delete protection", () => {
           adminId,
           auditContext,
         }),
-      ).toEqual({
-        status: "blocked",
-        code: "ADMIN_USER_DELETE_NOT_TEST_DATA",
-        disabled: true,
-      });
-      expect((await db.user.findUniqueOrThrow({ where: { id: user.id } })).status).toBe("disabled");
+      ).toEqual({ status: "deleted", userId: user.id });
+      expect(await db.user.findUnique({ where: { id: user.id } })).toBeNull();
     } finally {
       await db.order.deleteMany({ where: { id: order.id } });
       await db.adminAuditLog.deleteMany({ where: { targetId: user.id } });

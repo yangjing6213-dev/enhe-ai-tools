@@ -81,18 +81,18 @@ export function decideAdminOrderHardDelete(input: {
   return { allowed: true as const };
 }
 
+// Login sessions and account preferences are disposable; analytics remain via SetNull.
+const removableUserRelations = new Set(["sessions", "notifications", "newsFavorites", "newsLikes", "analyticsEvents"]);
+
+export function getAdminUserProtectedRecordCount(counts: AdminUserProtectedCounts) {
+  return Object.entries(counts).reduce((total, [key, count]) => total + (removableUserRelations.has(key) ? 0 : count), 0);
+}
+
 export function decideAdminUserHardDelete(input: {
   isTestData: boolean;
   protectedCounts: AdminUserProtectedCounts;
 }) {
-  if (!input.isTestData) {
-    return {
-      allowed: false as const,
-      code: ADMIN_USER_DELETE_NOT_TEST_DATA,
-      fallback: "disable" as const,
-    };
-  }
-  if (hasProtectedRecords(input.protectedCounts)) {
+  if (getAdminUserProtectedRecordCount(input.protectedCounts) > 0) {
     return {
       allowed: false as const,
       code: ADMIN_USER_DELETE_PROTECTED_RECORDS,
