@@ -62,14 +62,26 @@ describe("admin tool editor source", () => {
     expect(managerSource).toContain("productImageMoveDown");
   });
 
-  it("lets admins mark a tool as recommended for the homepage", () => {
+  it("keeps the AI software list featured option and explains its scope", () => {
     const editorSource = readFileSync(join(process.cwd(), "src/app/admin/tool-admin-list.tsx"), "utf8");
     const actionsSource = readFileSync(join(process.cwd(), "src/app/admin/actions.ts"), "utf8");
 
     expect(editorSource).toContain('name="isHomeRecommended"');
     expect(editorSource).toContain("homeRecommended");
+    expect(editorSource).toContain("首页推荐仅影响 AI 工具精选区域，不影响首页产品展示卡片");
     expect(actionsSource).toContain("isHomeRecommended: parseBooleanField(formData.get(\"isHomeRecommended\"))");
     expect(actionsSource).toContain('revalidatePath("/")');
+  });
+
+  it("explains protected product deletion and its safe fallback", () => {
+    const source = readFileSync(join(process.cwd(), "src/app/admin/tool-admin-list.tsx"), "utf8");
+
+    expect(source).toContain("copy.deleteProtectedIntro");
+    expect(source).toContain("deleteDecision?.allowed === false");
+    expect(source).toContain("copy.deleteProtectedFallback");
+    expect(source).toContain("notice?.error === ADMIN_TOOL_DELETE_PROTECTED_RECORDS) return null");
+    expect(source).not.toContain("Hard deletion blocked (");
+    expect(source).not.toContain("硬删除已阻止（${deleteDecision?.code}）");
   });
 
   it("uses account-service copy and hides software/download-only fields for online tools", () => {

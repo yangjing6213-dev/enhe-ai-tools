@@ -9,7 +9,7 @@ import { ToolVideoUploadField } from "@/app/admin/tool-video-upload-field";
 import { AiSkillPackageUploadField } from "@/app/admin/ai-skill-package-upload-field";
 import { supportedAiAgentOptions } from "@/lib/ai-skill";
 import { getAdminToolBasePath, getAdminToolEditPath, getAdminToolNewPath } from "@/lib/admin-tool-routes";
-import { decideAdminToolHardDelete } from "@/lib/admin-delete-protection";
+import { ADMIN_TOOL_DELETE_PROTECTED_RECORDS, decideAdminToolHardDelete } from "@/lib/admin-delete-protection";
 import type { Locale } from "@/lib/i18n";
 import { resolveToolImageSrc } from "@/lib/tool-image";
 import { getPrimaryToolPrice, type ToolPriceSpecStatus } from "@/lib/tool-price-specs";
@@ -86,6 +86,7 @@ function NoticeBar({ notice, locale }: { notice?: Notice; locale: Locale }) {
   if (notice?.deleted) {
     return <p className="status-success mt-4">{copy.deleted}</p>;
   }
+  if (notice?.error === ADMIN_TOOL_DELETE_PROTECTED_RECORDS) return null;
   if (notice?.error) {
     return <p className="mt-4 rounded-xl border border-red-400/30 bg-red-400/10 px-4 py-3 text-sm text-red-100">{copy.failed}: {notice.error}</p>;
   }
@@ -400,6 +401,7 @@ export function ToolEditor({
             <label className="flex min-h-14 items-center gap-3 rounded-xl border border-white/10 bg-white/6 px-4 py-3 text-sm text-[#F6FAFF]">
               <input name="isHomeRecommended" type="checkbox" defaultChecked={tool?.isHomeRecommended ?? false} /> {copy.homeRecommended}
             </label>
+            <p className="text-xs leading-5 text-[#8B95A7] md:col-span-2">{copy.homeRecommendedHint}</p>
             <Field label={copy.coverUpload}>
               <ToolMediaUploadGuard name="coverImageFile" inputClass={inputClass} />
               <span className="mt-2 block text-xs leading-5 text-[#8B95A7]">
@@ -629,11 +631,9 @@ export function ToolEditor({
           <input type="hidden" name="type" value={type} />
           <DangerButton>{isSkillLearning ? copy.deleteCourse : isAccountService ? copy.deleteService : copy.deleteTool}</DangerButton>
         </form>
-      ) : tool ? (
-        <p className="mt-4 rounded-xl border border-red-400/30 bg-red-400/10 px-4 py-3 text-sm text-red-100">
-          {locale === "en"
-            ? `Hard deletion blocked (${deleteDecision?.code}). Orders and purchase entitlements are retained.`
-            : `硬删除已阻止（${deleteDecision?.code}）。订单和购买权益会保留。`}
+      ) : tool && deleteDecision?.allowed === false ? (
+        <p role="status" className="mt-4 rounded-xl border border-amber-400/30 bg-amber-400/8 px-4 py-3 text-sm text-amber-100">
+          {copy.deleteProtectedIntro} {copy.deleteProtectedFallback}
         </p>
       ) : null}
     </AdminContentShell>
@@ -691,7 +691,7 @@ const toolAdminCopy = {
     basicToolIntro: "维护 AI 软件应用名称、分类、状态和排序。",
     basicServiceIntro: "维护 AI 账号服务名称、分类、状态和排序。",
     displaySection: "展示设置",
-    displaySectionIntro: "设置首页推荐、封面上传和软件基础运行信息。",
+    displaySectionIntro: "设置 AI 工具精选、封面上传和软件基础运行信息。首页产品展示卡片在“首页推荐产品管理”中单独维护。",
     priceSpecSection: "规格与价格",
     softwarePriceSpecIntro: "按授权规格设置购买价格。第一条启用且大于 0 的规格会作为列表和筛选中的主价格。",
     servicePriceSpecIntro: "按服务规格设置服务价格。可配置不同账号、时长或套餐规格。",
@@ -732,7 +732,10 @@ const toolAdminCopy = {
     unbound: "不绑定",
     needVip: "需要付费",
     downloadLinkVipOnly: "下载链接需购买后可见",
-    homeRecommended: "首页推荐",
+    homeRecommended: "AI 工具列表精选",
+    homeRecommendedHint: "首页推荐仅影响 AI 工具精选区域，不影响首页产品展示卡片。",
+    deleteProtectedIntro: "该产品关联了历史订单或购买权益，因此暂不支持删除。",
+    deleteProtectedFallback: "如需停止展示，请将状态改为“下架”；原有交易记录和权益会保留。",
     servicePrice: "服务价格",
     shortDescription: "简介",
     content: "详细介绍",
@@ -817,7 +820,7 @@ const toolAdminCopy = {
     basicToolIntro: "Maintain AI software app name, category, status, and display order.",
     basicServiceIntro: "Maintain AI account service name, category, status, and display order.",
     displaySection: "Display settings",
-    displaySectionIntro: "Set homepage recommendation, cover upload, and software runtime basics.",
+    displaySectionIntro: "Set AI tool-list highlights, cover uploads, and software runtime basics. Manage homepage product cards separately in “Homepage Featured Products”.",
     priceSpecSection: "Specifications and prices",
     softwarePriceSpecIntro: "Set purchase prices by authorization specification. The first active price above zero becomes the primary list price.",
     servicePriceSpecIntro: "Set service prices by account, duration, or package specification.",
@@ -858,7 +861,10 @@ const toolAdminCopy = {
     unbound: "Unbound",
     needVip: "Requires payment",
     downloadLinkVipOnly: "Download link visible after purchase",
-    homeRecommended: "Homepage recommended",
+    homeRecommended: "Featured in AI tool lists",
+    homeRecommendedHint: "This option affects the AI tools featured area, not the homepage product cards.",
+    deleteProtectedIntro: "This product has historical orders or purchase entitlements, so it cannot be deleted.",
+    deleteProtectedFallback: "To stop showing it, change its status to “Offline”. Existing transactions and entitlements will be retained.",
     servicePrice: "Service price",
     shortDescription: "Short description",
     content: "Detailed introduction",

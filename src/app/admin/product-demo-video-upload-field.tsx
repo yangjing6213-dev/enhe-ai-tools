@@ -13,6 +13,9 @@ type ProductDemoVideoUploadFieldProps = {
   currentUrl?: string | null;
   inputClass: string;
   slug?: string | null;
+  folderPrefix?: string;
+  fieldName?: string | null;
+  onUrlChange?: (url: string) => void;
 };
 
 const maxVideoBytes = 500 * 1024 * 1024;
@@ -30,6 +33,9 @@ export function ProductDemoVideoUploadField({
   currentUrl,
   inputClass,
   slug,
+  folderPrefix,
+  fieldName = "videoUrl",
+  onUrlChange,
 }: ProductDemoVideoUploadFieldProps) {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [videoUrl, setVideoUrl] = useState(currentUrl ?? "");
@@ -60,7 +66,7 @@ export function ProductDemoVideoUploadField({
 
     const formData = new FormData();
     formData.append("file", file);
-    formData.append("toolSlug", `product-demo-videos/${slug || "demo"}`);
+    formData.append("toolSlug", folderPrefix ? `${folderPrefix}/${slug || "showcase"}` : `product-demo-videos/${slug || "demo"}`);
 
     const xhr = new XMLHttpRequest();
     xhr.open("POST", "/api/admin/tool-video-upload");
@@ -88,6 +94,7 @@ export function ProductDemoVideoUploadField({
 
       if (uploadResponse.ok) {
         setVideoUrl(uploadResponse.videoUrl);
+        onUrlChange?.(uploadResponse.videoUrl);
         setState({
           status: "success",
           progress: 100,
@@ -115,7 +122,7 @@ export function ProductDemoVideoUploadField({
 
   return (
     <div className="grid gap-3">
-      <input name="videoUrl" type="hidden" value={videoUrl} readOnly />
+      {fieldName ? <input name={fieldName} type="hidden" value={videoUrl} readOnly /> : null}
       <input
         ref={fileInputRef}
         type="file"

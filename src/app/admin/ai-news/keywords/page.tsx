@@ -55,6 +55,15 @@ export default async function AdminAiNewsKeywordsPage({
       <div className="enhe-admin-content-toolbar flex flex-wrap items-center justify-between gap-3">
         <p className="text-sm text-[var(--marketing-muted)]">共 {interventions.length} 条人工关键词规则</p>
       </div>
+      <section className="mb-8 rounded-2xl border border-white/12 bg-white/5 p-5" aria-labelledby="keyword-admin-guidance">
+        <h2 id="keyword-admin-guidance" className="text-lg font-bold text-[var(--marketing-text)]">这个页面的作用</h2>
+        <p className="mt-2 text-sm leading-6 text-[var(--marketing-muted)]">
+          这里维护 AI 前沿资讯页面的热门关键词云，不是 AI 资讯文章本身。系统从已发布资讯的关键词、SEO 词和标签汇总候选词，再结合近 30 天站内搜索和文章阅读热度排序。
+        </p>
+        <p className="mt-2 text-sm leading-6 text-[var(--marketing-muted)]">
+          置顶、隐藏、改名和权重只调整已有候选词；每个词至少关联 3 篇资讯才会进入前台，因此没有足够资讯支撑的新词不会出现在前台。要增加新热点，先发布相关资讯并填写关键词或标签。
+        </p>
+      </section>
       {params.saved ? (
         <p className="mb-5 rounded-xl border border-[#48F5D3]/30 bg-[#48F5D3]/10 px-4 py-3 text-sm text-[#48F5D3]">
           关键词干预规则已保存。

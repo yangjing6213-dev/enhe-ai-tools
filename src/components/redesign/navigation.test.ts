@@ -32,7 +32,7 @@ describe("public navigation current-page state", () => {
   });
 
   it("keeps the language switch at the far right after the account control", () => {
-    const accountControlIndex = headerSource.indexOf('className="redesign-account-menu"');
+    const accountControlIndex = headerSource.indexOf("<EnheAccountMenu>");
     const languageSwitchIndex = headerSource.indexOf("<EnheRedesignLanguageSwitch");
 
     expect(accountControlIndex).toBeGreaterThanOrEqual(0);

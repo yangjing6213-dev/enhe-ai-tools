@@ -1,8 +1,9 @@
 import Link from "next/link";
 import type { Prisma } from "@prisma/client";
 import { AdminContentShell, AdminSection, inputClass, selectClass } from "@/app/admin/admin-ui";
+import { HomeProductShowcaseManager } from "@/app/admin/home-product-showcase-manager";
 import { DeleteProductDemoForm } from "@/app/admin/product-demo-editor";
-import { HOME_PRODUCTS } from "@/lib/redesign/home/home-products";
+import { getHomeProductShowcase } from "@/lib/redesign/home/home-product-showcase-data";
 import { prisma } from "@/lib/db";
 import { buildProductDemoPath, getProductDemoCategoryLabel } from "@/lib/product-demos";
 
@@ -40,7 +41,7 @@ export default async function AdminProductDemosPage({ searchParams }: AdminProdu
         }
       : {}),
   };
-  const [demos, total] = await Promise.all([
+  const [demos, total, featuredProducts] = await Promise.all([
     prisma.productDemo.findMany({
       where,
       include: { relatedProduct: true },
@@ -49,28 +50,21 @@ export default async function AdminProductDemosPage({ searchParams }: AdminProdu
       take: pageSize,
     }),
     prisma.productDemo.count({ where }),
+    getHomeProductShowcase(),
   ]);
   const pageCount = Math.max(1, Math.ceil(total / pageSize));
 
   return (
-    <AdminSection title="产品演示管理" intro="查看首页实际展示的推荐产品，并维护独立的视频演示、FAQ、文字稿和关联产品。">
+    <AdminSection title="首页推荐产品管理" intro="编辑首页推荐轮播，可新增、删除、排序产品，更新中英文介绍、展示图片或视频，以及产品详情链接。">
       <AdminContentShell className="enhe-admin-content-management">
-      <section className="mb-8 rounded-2xl border border-white/12 p-5" aria-labelledby="home-product-showcase-heading">
-        <h2 id="home-product-showcase-heading" className="text-xl font-bold">首页当前展示产品（{HOME_PRODUCTS.length} 项）</h2>
-        <p className="mt-2 text-sm text-[#8B95A7]">这份名单与首页“热门AI推荐”轮播使用同一份配置。下方视频演示是独立内容，不是这份首页推荐名单。</p>
-        <ol className="mt-4 divide-y divide-white/10">
-          {HOME_PRODUCTS.map((product, index) => (
-            <li key={product.id} data-home-showcase-product={product.id} className="flex flex-wrap items-center justify-between gap-3 py-3">
-              <div className="min-w-0">
-                <p className="font-semibold">{index + 1}. {product.name.zh}</p>
-                <p className="mt-1 text-sm text-[#8B95A7]">{product.description.zh}</p>
-              </div>
-              <Link href={product.detailHref.zh} target="_blank" rel="noopener noreferrer" className="shrink-0 rounded-full border border-white/15 px-4 py-2 text-sm">查看商品详情</Link>
-            </li>
-          ))}
-        </ol>
+      {params.saved ? <p className="status-success mb-5" role="status">首页推荐产品已保存。</p> : null}
+      {params.error === "invalid_showcase" ? <p className="status-danger mb-5" role="alert">保存失败：请检查每项推荐的中英文名称、介绍、图片或视频地址及详情链接。</p> : null}
+      <section className="mb-10 rounded-2xl border border-white/12 p-5" aria-labelledby="home-product-showcase-heading">
+        <h2 id="home-product-showcase-heading" className="mb-2 text-xl font-bold">首页推荐轮播（{featuredProducts.length} 项）</h2>
+        <p className="mb-5 text-sm text-[#8B95A7]">这里直接控制首页当前展示的产品。视频可粘贴地址，也可上传视频；保存后同步更新中英文首页。</p>
+        <HomeProductShowcaseManager initialProducts={featuredProducts} />
       </section>
-      <h2 className="mb-4 text-xl font-bold">视频演示记录</h2>
+      <h2 className="mb-4 text-xl font-bold">独立视频演示库</h2>
       <div className="enhe-admin-content-toolbar mb-6 flex flex-wrap items-center justify-between gap-3">
         <div className="text-sm text-[#8B95A7]">共 {total} 条视频演示</div>
         <Link href="/admin/product-demos/new" className="enhe-admin-content-primary-action rounded-full px-5 py-3 text-sm font-semibold">
@@ -97,9 +91,9 @@ export default async function AdminProductDemosPage({ searchParams }: AdminProdu
           <option value="account_service">AI账号服务</option>
         </select>
         <select name="featured" defaultValue={typeof featured === "boolean" ? String(featured) : ""} className={selectClass}>
-          <option value="">旧版首页展示不限</option>
-          <option value="true">旧版首页展示</option>
-          <option value="false">不在旧版首页</option>
+          <option value="">演示库精选不限</option>
+          <option value="true">演示库精选</option>
+          <option value="false">普通演示</option>
         </select>
         <button className="rounded-full bg-[#050505] px-5 py-3 text-sm font-bold text-white lg:col-span-5">筛选演示</button>
       </form>
@@ -109,7 +103,7 @@ export default async function AdminProductDemosPage({ searchParams }: AdminProdu
           <span>标题</span>
           <span>类型/标签</span>
           <span>状态</span>
-          <span>旧版首页</span>
+          <span>演示库精选</span>
           <span>排序</span>
           <span>更新时间</span>
           <span className="text-right">操作</span>

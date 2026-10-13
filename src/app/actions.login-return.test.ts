@@ -118,7 +118,12 @@ describe("admin login return path", () => {
     await expect(registerAction(formData)).rejects.toThrow("NEXT_REDIRECT:/en/user");
 
     expect(mocks.createUser).toHaveBeenCalledWith({
-      data: { email: "new-user@example.com", passwordHash: "hashed-password", nickname: "New User" }
+      data: expect.objectContaining({
+        email: "new-user@example.com",
+        passwordHash: "hashed-password",
+        nickname: "New User",
+        avatar: expect.stringMatching(/^\/images\/user-avatars\/avatar-\d{2}\.webp$/),
+      }),
     });
   });
 });

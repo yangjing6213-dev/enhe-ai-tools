@@ -61,7 +61,7 @@ describe("product demo feature source contract", () => {
     expect(editor).toContain("ProductDemoVideoUploadField");
     expect(editor).not.toContain('<input name="videoUrl" defaultValue={demo?.videoUrl ?? ""}');
     expect(uploadField).not.toContain('name="videoFile"');
-    expect(uploadField).toContain('name="videoUrl"');
+    expect(uploadField).toContain('fieldName = "videoUrl"');
     expect(uploadField).toContain('type="hidden"');
     expect(editor).toContain('name="coverImageFile"');
     expect(editor).not.toContain("封面 Alt 文案");

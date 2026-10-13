@@ -63,6 +63,10 @@ import { getPrimaryToolPriceSpec, parseToolPriceSpecsFromFormData, type ToolPric
 import { mergeToolProductImages } from "@/lib/tool-product-images";
 import { buildCanonicalAiNewsPath, buildCanonicalToolPath } from "@/lib/public-slugs";
 import { parseTopicDelimitedRows } from "@/lib/ai-news-topic-config";
+import {
+  HOME_PRODUCT_SHOWCASE_SETTING_KEY,
+  parseHomeProductShowcaseConfig,
+} from "@/lib/redesign/home/home-product-showcase";
 import { adminFileUploadMaxBytes } from "@/lib/upload-limits";
 import { generateAiNewsEnglishDraft } from "@/lib/ai-news-translation";
 import { buildProductDemoPath } from "@/lib/product-demos";
@@ -1654,6 +1658,45 @@ export async function updateSiteSettingAction(formData: FormData) {
   revalidatePath("/account-services");
 }
 
+export async function saveHomeProductShowcaseAction(formData: FormData) {
+  const admin = await requireAdmin();
+  const productsJson = z.string().min(1).parse(formData.get("productsJson"));
+  const products = parseHomeProductShowcaseConfig(productsJson);
+  if (!products) redirect("/admin/product-demos?error=invalid_showcase");
+
+  await prisma.siteSetting.upsert({
+    where: { key: HOME_PRODUCT_SHOWCASE_SETTING_KEY },
+    update: {
+      value: JSON.stringify({ version: 1, products }),
+      description: "Bilingual homepage featured product carousel configuration.",
+    },
+    create: {
+      key: HOME_PRODUCT_SHOWCASE_SETTING_KEY,
+      value: JSON.stringify({ version: 1, products }),
+      description: "Bilingual homepage featured product carousel configuration.",
+    },
+  });
+
+  await writeAdminAuditLog({
+    adminId: admin.id,
+    action: "home_product_showcase.update",
+    targetType: "site_setting",
+    targetId: HOME_PRODUCT_SHOWCASE_SETTING_KEY,
+    summary: "Updated homepage featured products.",
+    metadata: {
+      count: products.length,
+      ids: products.map(({ id }) => id),
+      mediaTypes: products.map(({ mediaType }) => mediaType),
+    },
+  });
+
+  revalidateTag("site-settings");
+  revalidatePath("/");
+  revalidatePath("/en");
+  revalidatePath("/admin/product-demos");
+  redirect("/admin/product-demos?saved=1");
+}
+
 export async function updatePaymentQrCodesAction(formData: FormData) {
   const admin = await requireAdmin();
   let alipayQr = "";
@@ -2418,6 +2461,7 @@ export async function upsertNewsKeywordInterventionAction(formData: FormData) {
     metadata: { keyword, locale, isPinned, isHidden, displayName, weightBoost }
   });
 
+  revalidateTag("public-news");
   revalidatePath("/admin/ai-news");
   revalidatePath("/admin/ai-news/keywords");
   revalidatePath("/ai-news");
@@ -2443,6 +2487,7 @@ export async function deleteNewsKeywordInterventionAction(formData: FormData) {
     metadata: { keyword: deleted.keyword, locale: deleted.locale }
   });
 
+  revalidateTag("public-news");
   revalidatePath("/admin/ai-news");
   revalidatePath("/admin/ai-news/keywords");
   revalidatePath("/ai-news");

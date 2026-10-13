@@ -17,9 +17,12 @@ import type { RedesignLocale } from "@/components/redesign/types";
 import {
   HOME_PRODUCT_COUNT,
   HOME_PRODUCT_DEFAULT_INDEX,
-  HOME_PRODUCTS,
 } from "@/lib/redesign/home/home-products";
-import type { RedesignProductId } from "@/lib/redesign/home/home-products";
+import {
+  createDefaultHomeProductShowcase,
+  resolveHomeShowcaseMediaSrc,
+  type HomeProductShowcaseItem,
+} from "@/lib/redesign/home/home-product-showcase";
 import {
   PRODUCT_STAGE_MOTION_REST_TRANSFORM,
   resolveProductStageMotion,
@@ -33,33 +36,30 @@ import styles from "./EnheRedesignProductStageMotion.module.css";
 export { resolveProductStageMotion };
 
 export type ProductMediaStatus = "loading" | "ready" | "error";
-export type ProductMediaState = Record<RedesignProductId, ProductMediaStatus>;
+export type ProductMediaState = Record<string, ProductMediaStatus>;
 
 type InterruptedProductStyle = {
-  productId: RedesignProductId;
+  productId: string;
   opacity: string;
   transform: string;
   transitionKey: number;
 };
 
-export function getWrappedProductIndex(index: number, delta: -1 | 1) {
-  return (index + delta + HOME_PRODUCT_COUNT) % HOME_PRODUCT_COUNT;
+export function getWrappedProductIndex(index: number, delta: -1 | 1, count: number = HOME_PRODUCT_COUNT) {
+  return count > 0 ? (index + delta + count) % count : 0;
 }
 
 export function updateProductMediaState(
   state: Readonly<ProductMediaState>,
-  productId: RedesignProductId,
+  productId: string,
   status: ProductMediaStatus,
 ): ProductMediaState {
   return { ...state, [productId]: status };
 }
 
-const INITIAL_MEDIA_STATE = Object.fromEntries(
-  HOME_PRODUCTS.map(({ id }) => [id, "loading" as const]),
-) as ProductMediaState;
-
 const REDUCED_MOTION_QUERY = "(prefers-reduced-motion: reduce)";
 const PRODUCT_AUTO_INTERVAL_MS = 6000;
+const DEFAULT_HOME_PRODUCTS = createDefaultHomeProductShowcase();
 
 const SHOWCASE_COPY = {
   zh: {
@@ -67,8 +67,8 @@ const SHOWCASE_COPY = {
     heading: "勇于跨出这一步，你就离成功更近一步。",
     previous: "上一款产品",
     next: "下一款产品",
-    loading: "正在加载产品封面…",
-    error: "产品封面暂时无法加载。",
+    loading: "正在加载推荐内容…",
+    error: "推荐内容暂时无法加载。",
     detail: "查看产品",
     pause: "暂停产品轮播",
     resume: "继续产品轮播",
@@ -78,8 +78,8 @@ const SHOWCASE_COPY = {
     heading: "Take one step forward, and you're closer to success.",
     previous: "Previous product",
     next: "Next product",
-    loading: "Loading product cover…",
-    error: "This product cover could not be loaded.",
+    loading: "Loading featured content…",
+    error: "This featured content could not be loaded.",
     detail: "View product",
     pause: "Pause product slideshow",
     resume: "Resume product slideshow",
@@ -101,8 +101,10 @@ const SHOWCASE_COPY = {
 
 export function EnheRedesignProductShowcase({
   locale,
+  products = DEFAULT_HOME_PRODUCTS,
 }: {
   locale: RedesignLocale;
+  products?: readonly HomeProductShowcaseItem[];
 }) {
   const [index, setIndex] = useState(HOME_PRODUCT_DEFAULT_INDEX);
   const [previousIndex, setPreviousIndex] = useState<number | null>(null);
@@ -119,7 +121,7 @@ export function EnheRedesignProductShowcase({
   const isAutoRotating = inView && pageVisible && !prefersReducedMotion && !manuallyPaused && !hovered && !focused;
   const [transitionKey, setTransitionKey] = useState(0);
   const [mediaState, setMediaState] =
-    useState<ProductMediaState>(INITIAL_MEDIA_STATE);
+    useState<ProductMediaState>(() => Object.fromEntries(products.map(({ id }) => [id, "loading"])));
   const indexRef = useRef(HOME_PRODUCT_DEFAULT_INDEX);
   const transitionKeyRef = useRef(0);
   const currentRef = useRef<HTMLDivElement>(null);
@@ -129,9 +131,10 @@ export function EnheRedesignProductShowcase({
     null,
   );
   const copy = SHOWCASE_COPY[locale];
-  const product = HOME_PRODUCTS[index];
+  const currentIndex = index < products.length ? index : 0;
+  const product = products[currentIndex];
   const previousProduct =
-    previousIndex === null ? null : HOME_PRODUCTS[previousIndex];
+    previousIndex === null ? null : products[previousIndex] ?? null;
   const panelId = `redesign-home-product-panel-${locale}`;
   const motionProfile: ProductStageMotionProfile =
     inputModality === "keyboard"
@@ -163,6 +166,14 @@ export function EnheRedesignProductShowcase({
   }, []);
 
   useEffect(() => stopActiveAnimations, [stopActiveAnimations]);
+
+  useEffect(() => {
+    if (index >= products.length) {
+      indexRef.current = 0;
+      setIndex(0);
+      setPreviousIndex(null);
+    }
+  }, [index, products.length]);
 
   useEffect(() => {
     const stage = stageRef.current;
@@ -283,10 +294,11 @@ export function EnheRedesignProductShowcase({
 
   const move = useCallback(
     (delta: -1 | 1, modality: ProductStageInputModality) => {
+      if (products.length <= 1) return;
       const outgoingIndex = indexRef.current;
-      const nextIndex = getWrappedProductIndex(outgoingIndex, delta);
+      const nextIndex = getWrappedProductIndex(outgoingIndex, delta, products.length);
       const returningLayer = previousRef.current;
-      const returningProductId = HOME_PRODUCTS[nextIndex].id;
+      const returningProductId = products[nextIndex].id;
 
       stopActiveAnimations();
       const returningStyle =
@@ -310,7 +322,7 @@ export function EnheRedesignProductShowcase({
       setIndex(nextIndex);
       setTransitionKey(transitionKeyRef.current);
     },
-    [stopActiveAnimations],
+    [products, stopActiveAnimations],
   );
 
   const handleKeyDown = (event: KeyboardEvent<HTMLDivElement>) => {
@@ -336,7 +348,7 @@ export function EnheRedesignProductShowcase({
   }, [isAutoRotating, move, transitionKey]);
 
   const renderProduct = (
-    product: (typeof HOME_PRODUCTS)[number],
+    product: HomeProductShowcaseItem,
     isPrevious: boolean,
   ) => {
     const mediaStatus = mediaState[product.id];
@@ -371,26 +383,42 @@ export function EnheRedesignProductShowcase({
                   {copy.loading}
                 </p>
               )}
-              <Image
-                className="redesign-home-product-media"
-                data-media-status={mediaStatus}
-                src={product.mediaSrc}
-                alt={product.alt[locale]}
-                fill
-                sizes="(max-width: 767px) calc(100vw - 120px), (max-width: 1180px) calc(100vw - 216px), 964px"
-                loading="eager"
-                unoptimized
-                onLoad={() =>
-                  setMediaState((current) =>
-                    updateProductMediaState(current, product.id, "ready"),
-                  )
-                }
-                onError={() =>
-                  setMediaState((current) =>
-                    updateProductMediaState(current, product.id, "error"),
-                  )
-                }
-              />
+              {product.mediaType === "video" ? (
+                <video
+                  className="redesign-home-product-media"
+                  data-media-status={mediaStatus}
+                  src={resolveHomeShowcaseMediaSrc(product.mediaSrc)}
+                  aria-label={product.alt[locale]}
+                  autoPlay
+                  muted
+                  loop
+                  playsInline
+                  preload="metadata"
+                  onCanPlay={() =>
+                    setMediaState((current) => updateProductMediaState(current, product.id, "ready"))
+                  }
+                  onError={() =>
+                    setMediaState((current) => updateProductMediaState(current, product.id, "error"))
+                  }
+                />
+              ) : (
+                <Image
+                  className="redesign-home-product-media"
+                  data-media-status={mediaStatus}
+                  src={resolveHomeShowcaseMediaSrc(product.mediaSrc)}
+                  alt={product.alt[locale]}
+                  fill
+                  sizes="(max-width: 767px) calc(100vw - 120px), (max-width: 1180px) calc(100vw - 216px), 964px"
+                  loading="eager"
+                  unoptimized
+                  onLoad={() =>
+                    setMediaState((current) => updateProductMediaState(current, product.id, "ready"))
+                  }
+                  onError={() =>
+                    setMediaState((current) => updateProductMediaState(current, product.id, "error"))
+                  }
+                />
+              )}
             </>
           )}
         </div>
@@ -473,6 +501,7 @@ export function EnheRedesignProductShowcase({
             <button
               type="button"
               className="redesign-home-product-control"
+              disabled={products.length <= 1}
               onClick={(event) =>
                 move(-1, event.detail === 0 ? "keyboard" : "pointer")
               }
@@ -487,6 +516,7 @@ export function EnheRedesignProductShowcase({
             <button
               type="button"
               className="redesign-home-product-control"
+              disabled={products.length <= 1}
               onClick={(event) =>
                 move(1, event.detail === 0 ? "keyboard" : "pointer")
               }
@@ -506,7 +536,7 @@ export function EnheRedesignProductShowcase({
 
         <noscript>
           <ol>
-            {HOME_PRODUCTS.map((fallbackProduct) => (
+            {products.map((fallbackProduct) => (
               <li key={fallbackProduct.id} data-product-id={fallbackProduct.id}>
                 <h3>{fallbackProduct.name[locale]}</h3>
                 <p>{fallbackProduct.description[locale]}</p>

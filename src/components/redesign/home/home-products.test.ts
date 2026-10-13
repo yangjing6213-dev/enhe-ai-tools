@@ -14,6 +14,7 @@ import {
   HOME_PRODUCT_DEFAULT_INDEX,
   HOME_PRODUCTS,
 } from "@/lib/redesign/home/home-products";
+import { createDefaultHomeProductShowcase } from "@/lib/redesign/home/home-product-showcase";
 
 const showcaseSource = readFileSync(
   join(process.cwd(), "src/components/redesign/home/EnheRedesignProductShowcase.tsx"),
@@ -46,6 +47,8 @@ describe("homepage approved product showcase", () => {
   it("wraps product navigation at both ends", () => {
     expect(getWrappedProductIndex(0, -1)).toBe(4);
     expect(getWrappedProductIndex(4, 1)).toBe(0);
+    expect(getWrappedProductIndex(1, 1, 3)).toBe(2);
+    expect(getWrappedProductIndex(0, -1, 0)).toBe(0);
   });
 
   it("updates media status by product ID without changing another product", () => {
@@ -113,13 +116,27 @@ describe("homepage approved product showcase", () => {
     expect(fallback).not.toContain("<img");
   });
 
+  it("renders an uploaded video when a featured card is configured as video", () => {
+    const products = createDefaultHomeProductShowcase().slice(0, 1).map((product) => ({
+      ...product,
+      mediaType: "video" as const,
+      mediaSrc: "cos://bucket/tool-videos/home/demo.mp4",
+    }));
+    const html = renderToStaticMarkup(createElement(EnheRedesignProductShowcase, { locale: "zh", products }));
+
+    expect(html).toContain("<video");
+    expect(html).toContain(`src="/api/tool-videos?src=${encodeURIComponent(products[0].mediaSrc)}"`);
+    expect(html).toContain('playsInline=""');
+    expect(html.match(/<li\b/g) ?? []).toHaveLength(1);
+  });
+
   it("keeps manual selection keyboard accessible alongside product autoplay", () => {
     expect(showcaseSource).toContain('"use client"');
     expect(showcaseSource).toContain("ArrowLeft");
     expect(showcaseSource).toContain("ArrowRight");
     expect(showcaseSource).toContain("tabIndex={0}");
     expect(showcaseSource).toContain("onKeyDown");
-    expect(showcaseSource).toContain("HOME_PRODUCTS[index]");
+    expect(showcaseSource).toContain("products[currentIndex]");
     expect(showcaseSource).toContain("role=\"status\"");
     expect(showcaseSource).toContain("role=\"region\"");
     expect(showcaseSource).toContain("key={product.id}");
@@ -128,6 +145,8 @@ describe("homepage approved product showcase", () => {
     expect(showcaseSource).toContain('unoptimized');
     expect(showcaseSource).toContain("setMediaState");
     expect(showcaseSource).toContain("onError");
+    expect(showcaseSource).toContain("product.mediaType === \"video\"");
+    expect(showcaseSource).toContain("playsInline");
     expect(showcaseSource).not.toMatch(/setInterval|Audio\(|fetch\(|prisma|database|delivery/i);
   });
 

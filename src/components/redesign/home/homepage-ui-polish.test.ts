@@ -52,7 +52,7 @@ describe("homepage UI polish", () => {
   });
 
   it("keeps language at the far right after the account control without a theme switch", () => {
-    const accountControl = header.indexOf('className="redesign-account-menu"');
+    const accountControl = header.indexOf("<EnheAccountMenu>");
     const languageControl = header.indexOf("<EnheRedesignLanguageSwitch");
 
     expect(accountControl).toBeGreaterThanOrEqual(0);
