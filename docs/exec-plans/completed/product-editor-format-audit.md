@@ -6,7 +6,7 @@ Scope: preserve authored product-card text layout and emoji; check product field
 2. Audit editor-save-display paths, media and related-content controls using local isolated records only; repair observed defects and record limitations.
 3. Run scoped tests, lint, types/build and diff review; publish using the previously authorized release process and verify public service health.
 
-Status: inspection in progress. Download optional-text localization collapses whitespace; rich renderer joins paragraph lines; storage summary/content helpers can rewrite authored text. Existing Unicode text is supported; add explicit editor insertion and emoji font fallbacks. Local Docker is starting for isolated mutation checks.
+Status: implementation and scoped verification complete; live authenticated persistence remains NOT_RUN. Download optional-text localization collapses whitespace; rich renderer joins paragraph lines; storage summary/content helpers can rewrite authored text. Existing Unicode text is supported; add explicit editor insertion and emoji font fallbacks. Local Docker is starting for isolated mutation checks.
 
 
 ## Findings and repairs
@@ -33,4 +33,9 @@ Status: inspection in progress. Download optional-text localization collapses wh
 | Real PostgreSQL save/reload | Local Docker daemon unavailable; no live product changes used as probes | NOT_RUN |
 | Live COS upload / authenticated paid-account delivery | No production credentials or business content used for tests | NOT_RUN |
 
-Validation: 20 focused suites, 113 tests passed; 4 browser cases passed across targeted runs. Type check and focused lint passed. Final production build/release verification pending. Existing untracked SEO audit artifacts preserved.
+Validation: 20 focused suites, 113 tests passed; 4 browser cases passed across targeted runs. Type check and focused lint passed. Final production build passed. Release 0a50a0fd15c2538dbc9454b526cad3a1b8d32de4 deployed successfully; app and worker services healthy. Live Chinese/English product-page checks passed for pre-wrap formatting, emoji font fallback, no mobile overflow and hidden unpaid delivery content; health HTTP 200. Existing untracked SEO audit artifacts preserved.
+
+
+Production proxy limits were read without changes: client_max_body_size 520m, matching the 520mb action-body limit and 500MB file cap. No new database migration was introduced. No real product, account, purchase or cloud object was modified as a test. The routine deployment rollback drill passed on an isolated database clone.
+
+Overall: PASS for repaired code, local/simulated checks and deployed public smoke checks; PARTIAL for a full authenticated production editor/upload round trip because no real admin session or live COS write test was used.
