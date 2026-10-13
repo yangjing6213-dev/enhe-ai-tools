@@ -1,6 +1,7 @@
 "use client";
 
 import Image from "next/image";
+import { getDefaultAvatar } from "@/lib/default-avatar";
 import { useEffect, useState } from "react";
 
 export function UserAvatar({
@@ -11,39 +12,13 @@ export function UserAvatar({
   alt: string;
 }) {
   const [failed, setFailed] = useState(false);
-  const initial = alt.trim().slice(0, 1).toUpperCase() || "U";
-
   useEffect(() => {
     setFailed(false);
   }, [src]);
 
-  if (!src || failed) {
-    return (
-      <span
-        className="user-avatar-placeholder"
-        role="img"
-        aria-label={alt}
-        style={{
-          display: "grid",
-          width: 64,
-          height: 64,
-          flex: "0 0 64px",
-          placeItems: "center",
-          borderRadius: "50%",
-          background: "var(--marketing-accent)",
-          color: "#fff",
-          fontSize: 24,
-          fontWeight: 700,
-        }}
-      >
-        {initial}
-      </span>
-    );
-  }
-
   return (
     <Image
-      src={src}
+      src={!src || failed ? getDefaultAvatar(alt) : src}
       alt={alt}
       width={64}
       height={64}

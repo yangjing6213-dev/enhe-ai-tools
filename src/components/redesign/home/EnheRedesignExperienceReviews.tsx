@@ -1,6 +1,7 @@
 "use client";
 
 import Image from "next/image";
+import { getDefaultAvatar } from "@/lib/default-avatar";
 import { Pause, Play, UserRound } from "lucide-react";
 import { useEffect, useRef, useState, type KeyboardEvent } from "react";
 import type { RedesignLocale } from "@/components/redesign/types";
@@ -76,8 +77,8 @@ export function EnheRedesignExperienceReviews({
   const reviewCount = reviews.length;
   const disclosure = featuredReviewCards.length
     ? locale === "zh"
-      ? "以下评论由用户提交并经审核后展示。"
-      : "These user-submitted comments were reviewed before being featured."
+      ? "以下评论由真实用户提交评价"
+      : "These reviews were submitted by real users."
     : copy.disclosure;
   const reviewSectionRef = useRef<HTMLElement | null>(null);
   const timerActionsRef = useRef<ReviewTimerActions | null>(null);
@@ -353,6 +354,11 @@ export function EnheRedesignExperienceReviews({
                         className="redesign-home-review-avatar"
                         src={review.avatarSrc}
                         alt={review.avatarAlt}
+                        unoptimized
+                        onError={(event) => {
+                          const fallback = getDefaultAvatar(review.displayName);
+                          if (!event.currentTarget.src.endsWith(fallback)) event.currentTarget.src = fallback;
+                        }}
                         width={56}
                         height={56}
                       />

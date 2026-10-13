@@ -2,6 +2,8 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 
 const mocks = vi.hoisted(() => ({
   createComment: vi.fn(),
+  createUser: vi.fn(),
+  findUser: vi.fn(),
   findTool: vi.fn(),
   getCurrentLocale: vi.fn(),
   redirect: vi.fn((path: string) => {
@@ -14,13 +16,15 @@ const mocks = vi.hoisted(() => ({
   updateUser: vi.fn()
 }));
 
+vi.mock("@/lib/csrf", () => ({ assertValidCsrfToken: vi.fn() }));
+
 vi.mock("next/cache", () => ({ revalidatePath: mocks.revalidatePath }));
 vi.mock("next/navigation", () => ({ redirect: mocks.redirect }));
 vi.mock("@/lib/db", () => ({
   prisma: {
     comment: { create: mocks.createComment },
     tool: { findUnique: mocks.findTool },
-    user: { update: mocks.updateUser }
+    user: { update: mocks.updateUser, create: mocks.createUser, findUnique: mocks.findUser }
   }
 }));
 vi.mock("@/lib/auth", () => ({
@@ -38,7 +42,7 @@ vi.mock("@/lib/auth", () => ({
 vi.mock("@/lib/i18n", () => ({ getCurrentLocale: mocks.getCurrentLocale }));
 vi.mock("@/lib/storage", () => ({ saveUploadedFile: mocks.saveUploadedFile }));
 
-import { createCommentAction, updateUserAvatarAction, updateUserProfileAction } from "@/app/actions";
+import { registerAction, createCommentAction, updateUserAvatarAction, updateUserProfileAction } from "@/app/actions";
 
 function commentForm(rating: string) {
   const formData = new FormData();
@@ -57,6 +61,20 @@ describe("comment and user profile actions", () => {
     mocks.createComment.mockResolvedValue({ id: "comment-1" });
     mocks.updateUser.mockResolvedValue({ email: "private@example.test", nickname: "新昵称", role: "user" });
     mocks.saveUploadedFile.mockResolvedValue({ fileUrl: "/uploads/user-avatars/avatar.png" });
+  });
+
+  it("assigns a default avatar at registration without changing upload behavior", async () => {
+    mocks.findUser.mockResolvedValue(null);
+    mocks.createUser.mockResolvedValue({ id: "new-user" });
+    const form = new FormData();
+    form.set("email", "new-user@example.test");
+    form.set("nickname", "新用户");
+    form.set("password", "ExamplePassword123!");
+    await expect(registerAction(form)).rejects.toThrow("NEXT_REDIRECT:/user");
+    expect(mocks.createUser).toHaveBeenCalledWith({ data: expect.objectContaining({
+      avatar: expect.stringMatching(/^\/images\/user-avatars\/avatar-\d{2}\.webp$/),
+      nickname: "新用户"
+    }) });
   });
 
   it("stores a required 1–5 star rating with the pending comment", async () => {

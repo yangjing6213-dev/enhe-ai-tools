@@ -2,6 +2,7 @@ import { randomBytes, timingSafeEqual } from "node:crypto";
 import { cookies } from "next/headers";
 import { NextResponse, type NextRequest } from "next/server";
 import { hashPassword, signInUser } from "@/lib/auth";
+import { getDefaultAvatar } from "@/lib/default-avatar";
 import { prisma } from "@/lib/db";
 import { getGoogleRedirectUri, googleOAuthStateCookieName, verifyGoogleIdToken, type GoogleIdentity } from "@/lib/google-oauth";
 import { localeCookieName } from "@/lib/locale-routing";
@@ -94,6 +95,7 @@ async function findOrCreateGoogleUser(identity: GoogleIdentity) {
         email: identity.email,
         nickname,
         googleSubject: identity.subject,
+        avatar: getDefaultAvatar(identity.subject),
         passwordHash,
       },
       select: { id: true },

@@ -51,6 +51,7 @@ import { buildLocalePath } from "@/lib/seo";
 import { resolveToolOrderPriceSpec } from "@/lib/tool-price-specs";
 import { resolveSafeReturnPath } from "@/lib/safe-return-path";
 import { isValidAvatarFile, MAX_AVATAR_FILE_BYTES } from "@/lib/avatar-file";
+import { getDefaultAvatar } from "@/lib/default-avatar";
 import { saveUploadedFile } from "@/lib/storage";
 
 export async function registerAction(formData: FormData) {
@@ -73,7 +74,8 @@ export async function registerAction(formData: FormData) {
     data: {
       email: input.identifier,
       passwordHash: await hashPassword(input.password),
-      nickname
+      nickname,
+      avatar: getDefaultAvatar(input.identifier)
     }
   });
   await signInUser(user.id);

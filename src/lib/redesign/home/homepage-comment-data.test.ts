@@ -1,5 +1,7 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
+vi.mock("@/lib/user-avatar", () => ({ resolveUserAvatarSrc: vi.fn(async (value: string) => value?.startsWith("/uploads/") ? value.replace("/uploads/", "/api/uploads/") : value) }));
+
 const { findMany } = vi.hoisted(() => ({ findMany: vi.fn() }));
 
 vi.mock("@/lib/db", () => ({
@@ -32,7 +34,7 @@ describe("getHomepageCommentCards", () => {
         displayName: "Mia",
         productLabel: "Product Name",
         quote: "A real selected comment.",
-        avatarSrc: "/uploads/mia.png",
+        avatarSrc: "/api/uploads/mia.png",
         avatarAlt: "Mia",
         stars: 4
       }

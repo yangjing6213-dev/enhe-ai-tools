@@ -26,7 +26,7 @@ export const HOME_COPY: Record<RedesignLocale, RedesignHomeCopy> = {
     subtitle: "发现值得使用的 AI 工具、实用方法与行业动态，让工作更高效，让创作更自由。",
     cta: { label: "探索 AI 工具", href: "/software" },
     review: {
-      heading: "客户的心得",
+      heading: "用户评价",
       disclosure: "AI 生成示例（非真实用户反馈）",
     },
     value: {

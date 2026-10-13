@@ -27,7 +27,7 @@ describe("homepage approved copy", () => {
 
   it("keeps later review and value copy in the typed dictionary", () => {
     expect(HOME_COPY.zh.review).toEqual({
-      heading: "客户的心得",
+      heading: "用户评价",
       disclosure: "AI 生成示例（非真实用户反馈）",
     });
     expect(HOME_COPY.en.review).toEqual({

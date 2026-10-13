@@ -14,7 +14,7 @@ describe("user center page source", () => {
     expect(source).toContain("t.userCenter.availableOnlineTools");
   });
 
-  it("resolves private cloud avatars before rendering and replaces failed images with an initial", () => {
+  it("resolves private cloud avatars before rendering and replaces failed images with a supplied default avatar", () => {
     const source = readFileSync(resolve(root, "src/app/user/page-shell.tsx"), "utf8");
     const avatarPath = resolve(root, "src/components/user-avatar.tsx");
 
@@ -25,6 +25,6 @@ describe("user center page source", () => {
 
     const avatar = readFileSync(avatarPath, "utf8");
     expect(avatar).toContain("onError");
-    expect(avatar).toContain("avatar-placeholder");
+    expect(avatar).toContain("!src || failed ? getDefaultAvatar(alt) : src");
   });
 });

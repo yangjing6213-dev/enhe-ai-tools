@@ -99,7 +99,7 @@ describe("homepage UI polish", () => {
     expect(reviews).toContain('<Pause aria-hidden="true"');
     expect(reviews).not.toContain("暂停自动播放");
     expect(reviews).not.toContain("Pause automatic playback");
-    expect(HOME_COPY.zh.review.heading).toBe("客户的心得");
+    expect(HOME_COPY.zh.review.heading).toBe("用户评价");
     expect(HOME_COPY.zh.review.disclosure).toBe("AI 生成示例（非真实用户反馈）");
     expect(HOME_COPY.en.review.heading).toBe("Customer stories");
     expect(HOME_COPY.en.review.disclosure).toBe("AI-generated examples (not real customer feedback).");
