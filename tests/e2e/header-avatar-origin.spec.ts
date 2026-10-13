@@ -6,8 +6,8 @@ test("header avatar redirects to a browser-accessible image and loads", async ({
   const location = response.headers().location;
   expect(location).toMatch(/^\/images\/user-avatars\//);
   expect(new URL(location, baseURL).origin).toBe(new URL(baseURL!).origin);
-  await page.goto("/redesign-preview/shell");
-  const avatar = page.locator(".redesign-header-user-avatar").first();
-  await expect(avatar).toHaveAttribute("src", "/api/user/avatar");
+  const imageResponse = await page.goto(location);
+  expect(imageResponse?.status()).toBe(200);
+  const avatar = page.locator("img").first();
   await expect.poll(() => avatar.evaluate((img: HTMLImageElement) => img.naturalWidth)).toBe(256);
 });

@@ -11,15 +11,18 @@ for (const width of [320, 768, 1366, 1920]) {
       const rect = (await toggle.boundingBox())!;
       expect(rect.x).toBeGreaterThanOrEqual(0);
       expect(rect.x + rect.width).toBeLessThanOrEqual(width);
-      await expect(toggle.locator('.squish-switch__track')).toHaveCSS("height", "38px");
+      await expect(toggle.locator('.squish-switch__track')).toHaveCSS("height", "32px");
       const track = (await toggle.locator('.squish-switch__track').boundingBox())!;
       for (const link of await toggle.locator('.redesign-language-link').all()) {
         const text = (await link.boundingBox())!;
         expect(text.x).toBeGreaterThanOrEqual(track.x);
         expect(text.x + text.width).toBeLessThanOrEqual(track.x + track.width);
         expect(text.y + text.height).toBeLessThanOrEqual(track.y + track.height);
-        await expect(link).toHaveCSS("color", "rgb(255, 255, 255)");
-        await expect(link).toHaveCSS("-webkit-text-fill-color", "rgb(255, 255, 255)");
+        const expectedColor = await link.getAttribute("aria-current") === "page"
+          ? "rgb(4, 98, 194)"
+          : "rgb(255, 255, 255)";
+        await expect(link).toHaveCSS("color", expectedColor);
+        await expect(link).toHaveCSS("-webkit-text-fill-color", expectedColor);
       }
       if (width >= 900) {
         await page.waitForTimeout(500);

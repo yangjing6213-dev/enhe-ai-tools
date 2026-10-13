@@ -1,6 +1,7 @@
 import { expect, test } from "@playwright/test";
 
 test("account menu closes on outside click and Escape without blocking inside interactions", async ({ page }) => {
+  test.skip(process.env.PLAYWRIGHT_USE_PRODUCTION_SERVER === "1", "The signed-in menu preview is intentionally unavailable in production builds.");
   await page.goto("/redesign-preview/shell");
   const menu = page.locator(".redesign-account-menu").first();
   const trigger = menu.locator("summary");

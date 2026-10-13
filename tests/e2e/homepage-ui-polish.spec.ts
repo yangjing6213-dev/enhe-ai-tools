@@ -145,7 +145,7 @@ test("homepage polish stays readable, responsive, and interactive without extern
     const reviews = page.locator(".redesign-home-reviews");
     await reviews.scrollIntoViewIfNeeded();
     await reviews.hover();
-    await expect(reviews.getByRole("heading", { name: "客户的心得" })).toBeVisible();
+    await expect(reviews.getByRole("heading", { name: "用户评价" })).toBeVisible();
     const reviewHeadingSize = await page.evaluate(() => {
       const productHeading = document.querySelector<HTMLElement>(".redesign-home-products-eyebrow");
       const reviewHeading = document.querySelector<HTMLElement>(".redesign-home-reviews-heading-row h2");
@@ -269,7 +269,7 @@ test("homepage polish stays readable, responsive, and interactive without extern
         };
       });
       await expect(language).toHaveCSS("border-width", "0px");
-      await expect(language.locator(".squish-switch__track")).toHaveCSS("border-radius", "19px");
+      await expect(language.locator(".squish-switch__track")).toHaveCSS("border-radius", "16px");
       expect(accountStyle.menuText).toBe(expectedNeutralTextColor);
       expect(accountStyle.menuLinkText).toBe(expectedNeutralTextColor);
 

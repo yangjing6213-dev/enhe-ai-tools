@@ -1,6 +1,7 @@
 import { expect, test } from "@playwright/test";
 
 test("header avatar is small and aligned beside the username", async ({ page }) => {
+  test.skip(process.env.PLAYWRIGHT_USE_PRODUCTION_SERVER === "1", "The authenticated avatar layout uses a local preview route that is disabled in production.");
   await page.route("**/api/user/avatar", route => route.fulfill({ status: 307, headers: { location: "/images/user-avatars/avatar-01.webp" } }));
   await page.goto("/redesign-preview/shell");
   for (const width of [1440, 1024, 800]) {
@@ -22,9 +23,11 @@ test("header avatar is small and aligned beside the username", async ({ page }) 
 });
 
 test("tool category menu uses All tools and excludes AI Skill", async ({ page }) => {
+  test.skip(process.env.PLAYWRIGHT_USE_PRODUCTION_SERVER === "1", "This catalog interaction is covered on the local preview route; preview routes are disabled in production.");
   await page.goto("/redesign-preview/software");
-  await expect(page.locator("#redesign-software-category-trigger")).toContainText("全部工具");
-  await page.locator("#redesign-software-category-trigger").click();
+  const trigger = page.locator(".redesign-software-category-trigger");
+  await expect(trigger).toContainText("全部工具");
+  await trigger.click();
   const options = page.locator(".redesign-software-category-button");
   await expect(options).toHaveCount(6);
   await expect(options.filter({ hasText: "AI Skill" })).toHaveCount(0);
