@@ -1473,7 +1473,7 @@
 }
 
 .enhe-admin-shell .enhe-admin-content-record-rows {
-  width: max-content;
+  width: 100%;
 }
 
 .enhe-admin-shell .enhe-admin-content-row {
@@ -2799,7 +2799,7 @@
 }
 
 .enhe-admin-shell .enhe-admin-user-record-rows {
-  width: max-content;
+  width: 100%;
 }
 
 .enhe-admin-shell .enhe-admin-user-row {
@@ -3011,7 +3011,7 @@
 }
 
 .enhe-admin-shell .enhe-admin-commerce-record-rows {
-  width: max-content;
+  width: 100%;
 }
 
 .enhe-admin-shell .enhe-admin-commerce-row {
@@ -3232,7 +3232,7 @@
 }
 
 .enhe-admin-shell .enhe-admin-refund-record-rows {
-  width: max-content;
+  width: 100%;
 }
 
 .enhe-admin-shell .enhe-admin-refund-row {
@@ -3720,5 +3720,25 @@
 
 .enhe-admin-shell .enhe-admin-tool-table[data-tool-type="software"] .enhe-admin-tool-list-row > div {
   min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+/* Shared list geometry keeps headings and records on the same compact grid. */
+.enhe-admin-shell :is(.enhe-admin-content-table, .enhe-admin-content-records, .enhe-admin-refund-records) > .grid,
+.enhe-admin-shell :is(.enhe-admin-content-table, .enhe-admin-content-records, .enhe-admin-refund-records) > [class*="divide-y"] > .grid {
+  column-gap: 8px;
+  padding-inline: 12px;
+  align-items: center;
+}
+
+.enhe-admin-shell :is(.enhe-admin-content-table, .enhe-admin-content-records, .enhe-admin-refund-records) > .grid > *,
+.enhe-admin-shell :is(.enhe-admin-content-table, .enhe-admin-content-records, .enhe-admin-refund-records) > [class*="divide-y"] > .grid > * {
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+.enhe-admin-shell main table :is(th, td) {
+  padding-inline: 8px;
+  vertical-align: middle;
   overflow-wrap: anywhere;
 }
