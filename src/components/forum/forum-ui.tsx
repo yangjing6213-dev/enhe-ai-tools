@@ -1,4 +1,5 @@
 import Link from "next/link";
+import Image from "next/image";
 import { UserAvatar } from "@/components/user-avatar";
 import { getForumCategoryLabel, type ForumCategory } from "@/lib/forum-rules";
 import type { Locale } from "@/lib/i18n";
@@ -13,7 +14,8 @@ const categories: ForumCategory[] = ["question", "experience", "workflow", "show
 
 function copy(locale: Locale) {
   return locale === "en" ? {
-    title: "Co-create AI",
+    title: "AI Community Forum",
+    coverAlt: "ENHE AI website shown on a laptop and phone",
     intro: "Ask questions, share useful workflows, and learn from the ENHE AI community.",
     newPost: "Start a discussion",
     all: "All topics",
@@ -39,7 +41,8 @@ function copy(locale: Locale) {
     sendReply: "Send for review",
     back: "Back to discussions",
   } : {
-    title: "共创 AI",
+    title: "共创AI论坛",
+    coverAlt: "笔记本电脑和手机上的 ENHE 官网画面",
     intro: "在这里提问、分享实用工作流，与 ENHE AI 用户一起交流。",
     newPost: "发布新话题",
     all: "全部话题",
@@ -114,6 +117,16 @@ export function ForumIndexContent({ locale, posts, selectedCategory, isAuthentic
   const t = copy(locale);
   return (
     <main className="forum-page">
+      <div className="forum-cover">
+        <Image
+          src="/images/forum-cover.png"
+          alt={t.coverAlt}
+          fill
+          priority
+          sizes="(max-width: 768px) 100vw, 1120px"
+          className="forum-cover-image"
+        />
+      </div>
       <section className="forum-heading">
         <div><p className="forum-eyebrow">ENHE AI COMMUNITY</p><h1>{t.title}</h1><p>{t.intro}</p></div>
         <Link className="forum-primary-button" href={pageHref(locale, "/forum/new")}>{t.newPost}</Link>

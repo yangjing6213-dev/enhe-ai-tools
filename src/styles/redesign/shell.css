@@ -2164,9 +2164,9 @@
 }
 
 .enhe-admin-shell .admin-nav-link[aria-current="page"] {
-  background: var(--enhe-action);
+  background: color-mix(in srgb, var(--enhe-action) 10%, var(--enhe-page-bg));
   border-color: var(--enhe-action);
-  color: #fff;
+  color: #0462c2;
 }
 
 .enhe-admin-shell .admin-nav-link:focus-visible,

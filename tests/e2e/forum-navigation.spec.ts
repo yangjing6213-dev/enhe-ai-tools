@@ -26,6 +26,11 @@ test("homepage exposes the community forum in Chinese and English navigation and
   await expect(page.getByRole("link", { name: "Co-create AI", exact: true }).first()).toHaveAttribute("href", "/en/forum");
   await expect(page.getByRole("link", { name: "Explore AI tools" })).toHaveAttribute("href", "/en/software");
   await expect(page.getByRole("link", { name: "Co-create AI Forum" })).toHaveAttribute("href", "/en/forum");
+  await page.goto("/forum");
+  await expect(page.getByRole("heading", { level: 1, name: "共创AI论坛" })).toBeVisible();
+  await expect(page.getByRole("img", { name: "笔记本电脑和手机上的 ENHE 官网画面" })).toBeVisible();
+  await page.goto("/en/forum");
+  await expect(page.getByRole("heading", { level: 1, name: "AI Community Forum" })).toBeVisible();
 });
 
 test("homepage forum button stacks with the existing tool button on a narrow screen", async ({ page }) => {

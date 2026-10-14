@@ -1,10 +1,11 @@
 import Link from "next/link";
-import Image from "next/image";
+import { UserAvatar } from "@/components/user-avatar";
 import { deleteCommentAction, saveAdminCommentReplyAction, updateCommentHomepageDisplayAction, updateCommentPinAction, updateCommentStatusAction } from "@/app/actions";
 import { AdminContentShell, SubmitButton, inputClass, selectClass, textareaClass } from "@/app/admin/admin-ui";
 import { buildAdminCommentPageHref, buildAdminCommentWhere, parseAdminCommentListParams } from "@/lib/admin-list";
 import { prisma } from "@/lib/db";
 import { getCurrentLocale, type Locale } from "@/lib/i18n";
+import { resolveUserAvatarSrc } from "@/lib/user-avatar";
 
 type AdminCommentsPageProps = {
   searchParams: Promise<Record<string, string | undefined>>;
@@ -106,6 +107,12 @@ export default async function AdminCommentsPage({ searchParams }: AdminCommentsP
     }),
     prisma.comment.count({ where })
   ]);
+  const commentsWithAvatarSrc = await Promise.all(
+    comments.map(async (comment) => ({
+      ...comment,
+      avatarSrc: await resolveUserAvatarSrc(comment.user.avatar),
+    })),
+  );
   const pageCount = Math.max(1, Math.ceil(total / filters.pageSize));
 
   return (
@@ -150,17 +157,17 @@ export default async function AdminCommentsPage({ searchParams }: AdminCommentsP
       </div>
 
       <div className="enhe-admin-comment-list mt-8 space-y-4">
-        {comments.map((comment) => (
+        {commentsWithAvatarSrc.map((comment) => (
           <article key={comment.id} className="enhe-admin-comment-card glass rounded-2xl p-6">
             <div className="flex flex-wrap items-center justify-between gap-4">
               <div className="flex min-w-0 items-center gap-3">
-                {comment.user.avatar ? (
-                  <Image src={comment.user.avatar} alt="" width={48} height={48} unoptimized className="h-12 w-12 shrink-0 rounded-full object-cover" />
-                ) : (
-                  <span aria-hidden="true" className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-white/10 font-semibold text-white">
-                    {(comment.user.nickname || t.userFallback).slice(0, 1)}
-                  </span>
-                )}
+                <UserAvatar
+                  src={comment.avatarSrc}
+                  alt=""
+                  fallbackSeed={comment.user.id}
+                  size={48}
+                  className="h-12 w-12 shrink-0 rounded-full object-cover"
+                />
                 <div className="min-w-0">
                   <p className="truncate font-semibold text-[#E8EEF8]">{comment.user.nickname?.trim() || t.userFallback}</p>
                   <p className="mt-1 truncate text-sm text-[#8B95A7]" title={locale === "en" ? comment.tool.englishName || comment.tool.name : comment.tool.name}>

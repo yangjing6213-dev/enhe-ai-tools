@@ -46,7 +46,6 @@ describe("shared shadcn site components", () => {
       ["login action", /\.enhe-auth-page \.login-submit-button\s*\{[^}]*\}/],
       ["admin content action", /\.enhe-admin-content-primary-action\s*\{[^}]*\}/],
       ["admin content action hover", /\.enhe-admin-content-primary-action:hover\s*\{[^}]*\}/],
-      ["admin selected navigation", /\.admin-nav-link\[aria-current="page"\]\s*\{[^}]*\}/],
       ["admin payment submit", /\.enhe-admin-payment-codes-form button\[type="submit"\]\s*\{[^}]*\}/],
       ["admin plans CTA", /\.enhe-admin-plans-cta\s*\{[^}]*\}/],
     ];
@@ -62,6 +61,14 @@ describe("shared shadcn site components", () => {
       const rule = sources.map((source) => source.match(selector)?.[0]).find(Boolean) ?? "";
       expect(rule, name).toContain("color: #fff");
     }
+    const activeNavigation =
+      sources
+        .map((source) =>
+          source.match(/\.admin-nav-link\[aria-current="page"\]\s*\{[^}]*\}/)?.[0],
+        )
+        .find(Boolean) ?? "";
+    expect(activeNavigation, "admin selected navigation").toContain("color: #0462c2");
+    expect(activeNavigation, "admin selected navigation").not.toContain("color: #fff");
   });
 
   it("uses theme-aware text on admin actions with the marketing accent background", () => {

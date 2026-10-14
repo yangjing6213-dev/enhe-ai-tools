@@ -5,8 +5,13 @@ import {
 import { createRuntimeHeartbeatLifecycle } from "./runtime-heartbeat-lifecycle.mjs";
 import { resolve } from "node:path";
 import { fileURLToPath } from "node:url";
+import {
+  getShanghaiForumClock,
+  isDailyAiForumTopicDue
+} from "../../../src/lib/forum-topic-schedule.mjs";
 
 let stopping = false;
+let forumTopicHandledDate = null;
 
 function required(name) {
   const value = process.env[name]?.trim();
@@ -61,6 +66,40 @@ async function enqueue(config) {
   }
 }
 
+async function publishDailyForumTopicWhenDue(config) {
+  const due = isDailyAiForumTopicDue();
+  if (!due.due || forumTopicHandledDate === due.date) return;
+
+  const clock = getShanghaiForumClock();
+  const controller = new AbortController();
+  const timeout = setTimeout(() => controller.abort(), 15_000);
+  try {
+    const response = await fetch(
+      `${config.baseUrl}/api/internal/forum-topics/daily-publish`,
+      {
+        method: "POST",
+        headers: {
+          authorization: `Bearer ${config.token}`,
+          "content-type": "application/json"
+        },
+        body: JSON.stringify({ localDate: clock.date }),
+        redirect: "error",
+        signal: controller.signal
+      }
+    );
+    if (!response.ok) throw new Error("FORUM_TOPIC_SCHEDULER_REQUEST_FAILED");
+    const result = await response.json();
+    if (!result || result.ok !== true) {
+      throw new Error("FORUM_TOPIC_SCHEDULER_REQUEST_FAILED");
+    }
+    if (result.status === "published" || result.status === "already_published") {
+      forumTopicHandledDate = clock.date;
+    }
+  } finally {
+    clearTimeout(timeout);
+  }
+}
+
 function sleep(milliseconds) {
   return new Promise((resolve) => setTimeout(resolve, milliseconds));
 }
@@ -73,12 +112,18 @@ async function main() {
     writer: writeRuntimeHeartbeat
   });
   while (!stopping) {
+    let status = "ok";
+    try {
+      await publishDailyForumTopicWhenDue(config);
+    } catch {
+      status = "blocked";
+    }
     try {
       await enqueue(config);
-      await heartbeat.write({ status: "ok" });
     } catch {
-      await heartbeat.write({ status: "blocked" });
+      status = "blocked";
     }
+    await heartbeat.write({ status });
     if (!stopping) await sleep(config.intervalMs);
   }
 }

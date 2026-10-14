@@ -46,6 +46,11 @@ describe("admin shell foundation", () => {
     expect(ui).toContain("enhe-admin-input");
     expect(shell).toContain(".enhe-redesign-production.enhe-admin-shell");
     expect(shell).toContain(".enhe-admin-shell .admin-nav-link[aria-current=\"page\"]");
+    const activeNavigation = shell.match(
+      /\.enhe-admin-shell \.admin-nav-link\[aria-current="page"\]\s*\{[^}]*\}/,
+    )?.[0];
+    expect(activeNavigation).toContain("color: #0462c2;");
+    expect(activeNavigation).not.toContain("color: #fff;");
     expect(shell).toContain(".enhe-admin-shell :is(input, select, textarea, button, a):focus-visible");
     const adminFocusRule = shell.match(
       /\.enhe-admin-shell \.admin-nav-link:focus-visible,[\s\S]*?outline-offset: 3px;[\s\S]*?\}/,
