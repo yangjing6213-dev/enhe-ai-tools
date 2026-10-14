@@ -35,6 +35,19 @@ describe("sitemap canonical URL contract", () => {
     process.env.NEXT_PUBLIC_APP_URL = "https://www.enhe-tech.com.cn";
   });
 
+  it("includes the canonical forum homepage exactly once without inventing lastModified", async () => {
+    prismaMock.tool.findMany.mockResolvedValue([]);
+    prismaMock.newsArticle.findMany.mockResolvedValue([]);
+
+    const { default: sitemap } = await import("@/app/sitemap");
+    const entries = await sitemap();
+    const forumUrl = "https://www.enhe-tech.com.cn/forum";
+    const forumEntries = entries.filter((entry) => entry.url === forumUrl);
+
+    expect(forumEntries).toHaveLength(1);
+    expect(forumEntries[0]).not.toHaveProperty("lastModified");
+  });
+
   it("includes only public canonical routes and excludes private or legacy routes", async () => {
     prismaMock.tool.findMany.mockResolvedValue([
       {

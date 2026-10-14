@@ -141,6 +141,11 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   ];
 
   const entries = [
+    {
+      url: absoluteSitemapUrl("/forum"),
+      changeFrequency: "weekly" as const,
+      priority: 0.7,
+    },
     ...publicDiscoveryRoutes.filter((route) => !sitemapExcludedPaths.has(route.path)).map((route) => ({
       url: absoluteSitemapUrl(route.path),
       lastModified: new Date(route.lastModified),
