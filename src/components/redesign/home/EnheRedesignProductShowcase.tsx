@@ -72,6 +72,8 @@ const SHOWCASE_COPY = {
     detail: "查看产品",
     pause: "暂停产品轮播",
     resume: "继续产品轮播",
+    chooseProduct: "选择推荐产品",
+    showProduct: (number: number) => `显示第 ${number} 款产品`,
   },
   en: {
     eyebrow: "Popular AI picks",
@@ -83,6 +85,8 @@ const SHOWCASE_COPY = {
     detail: "View product",
     pause: "Pause product slideshow",
     resume: "Resume product slideshow",
+    chooseProduct: "Choose a featured product",
+    showProduct: (number: number) => `Show product ${number}`,
   },
 } satisfies Record<
   RedesignLocale,
@@ -96,6 +100,8 @@ const SHOWCASE_COPY = {
     detail: string;
     pause: string;
     resume: string;
+    chooseProduct: string;
+    showProduct: (number: number) => string;
   }
 >;
 
@@ -325,6 +331,33 @@ export function EnheRedesignProductShowcase({
     [products, stopActiveAnimations],
   );
 
+  const selectProduct = useCallback((targetIndex: number) => {
+    const outgoingIndex = indexRef.current;
+    if (targetIndex === outgoingIndex || targetIndex < 0 || targetIndex >= products.length || products.length <= 1) return;
+    const forwardDistance = (targetIndex - outgoingIndex + products.length) % products.length;
+    const backwardDistance = (outgoingIndex - targetIndex + products.length) % products.length;
+    const nextDirection: ProductStageDirection = forwardDistance <= backwardDistance ? 1 : -1;
+
+    stopActiveAnimations();
+    const returningLayer = previousRef.current;
+    const returningStyle = returningLayer?.dataset.productId === products[targetIndex].id
+      ? window.getComputedStyle(returningLayer)
+      : null;
+    indexRef.current = targetIndex;
+    transitionKeyRef.current += 1;
+    interruptedIncomingStyleRef.current = returningStyle ? {
+      productId: products[targetIndex].id,
+      opacity: returningStyle.opacity,
+      transform: returningStyle.transform,
+      transitionKey: transitionKeyRef.current,
+    } : null;
+    setPreviousIndex(outgoingIndex);
+    setDirection(nextDirection);
+    setInputModality("pointer");
+    setIndex(targetIndex);
+    setTransitionKey(transitionKeyRef.current);
+  }, [products, stopActiveAnimations]);
+
   const handleKeyDown = (event: KeyboardEvent<HTMLDivElement>) => {
     if (event.target instanceof HTMLAnchorElement) {
       return;
@@ -367,60 +400,74 @@ export function EnheRedesignProductShowcase({
         aria-hidden={isPrevious ? true : undefined}
         inert={isPrevious ? true : undefined}
       >
-        <div className="redesign-home-product-media-frame">
-          {mediaStatus === "error" ? (
-            <p className="redesign-home-product-media-fallback" role="status">
-              {copy.error}
-            </p>
-          ) : (
-            <>
-              {mediaStatus === "loading" && (
-                <p
-                  className="redesign-home-product-media-fallback"
-                  role="status"
-                  aria-live="polite"
-                >
-                  {copy.loading}
+          <div className="redesign-home-product-media-frame">
+            <div className="redesign-home-product-media-inner">
+              {mediaStatus === "error" ? (
+                <p className="redesign-home-product-media-fallback" role="status">
+                  {copy.error}
                 </p>
-              )}
-              {product.mediaType === "video" ? (
-                <video
-                  className="redesign-home-product-media"
-                  data-media-status={mediaStatus}
-                  src={resolveHomeShowcaseMediaSrc(product.mediaSrc)}
-                  aria-label={product.alt[locale]}
-                  autoPlay
-                  muted
-                  loop
-                  playsInline
-                  preload="metadata"
-                  onCanPlay={() =>
-                    setMediaState((current) => updateProductMediaState(current, product.id, "ready"))
-                  }
-                  onError={() =>
-                    setMediaState((current) => updateProductMediaState(current, product.id, "error"))
-                  }
-                />
               ) : (
-                <Image
-                  className="redesign-home-product-media"
-                  data-media-status={mediaStatus}
-                  src={resolveHomeShowcaseMediaSrc(product.mediaSrc)}
-                  alt={product.alt[locale]}
-                  fill
-                  sizes="(max-width: 767px) calc(100vw - 120px), (max-width: 1180px) calc(100vw - 216px), 964px"
-                  loading="eager"
-                  unoptimized
-                  onLoad={() =>
-                    setMediaState((current) => updateProductMediaState(current, product.id, "ready"))
-                  }
-                  onError={() =>
-                    setMediaState((current) => updateProductMediaState(current, product.id, "error"))
-                  }
-                />
+                <>
+                  {mediaStatus === "loading" && (
+                    <p
+                      className="redesign-home-product-media-fallback"
+                      role="status"
+                      aria-live="polite"
+                    >
+                      {copy.loading}
+                    </p>
+                  )}
+                  {product.mediaType === "video" ? (
+                    <video
+                      className="redesign-home-product-media"
+                      data-media-status={mediaStatus}
+                      src={resolveHomeShowcaseMediaSrc(product.mediaSrc)}
+                      aria-label={product.alt[locale]}
+                      autoPlay
+                      muted
+                      loop
+                      playsInline
+                      preload="metadata"
+                      onCanPlay={() =>
+                        setMediaState((current) => updateProductMediaState(current, product.id, "ready"))
+                      }
+                      onError={() =>
+                        setMediaState((current) => updateProductMediaState(current, product.id, "error"))
+                      }
+                    />
+                  ) : (
+                    <Image
+                      className="redesign-home-product-media"
+                      data-media-status={mediaStatus}
+                      src={resolveHomeShowcaseMediaSrc(product.mediaSrc)}
+                      alt={product.alt[locale]}
+                      fill
+                      sizes="(max-width: 767px) calc(100vw - 120px), (max-width: 1180px) calc(100vw - 216px), 964px"
+                      loading="eager"
+                      unoptimized
+                      onLoad={() =>
+                        setMediaState((current) => updateProductMediaState(current, product.id, "ready"))
+                      }
+                      onError={() =>
+                        setMediaState((current) => updateProductMediaState(current, product.id, "error"))
+                      }
+                    />
+                  )}
+                </>
               )}
-            </>
-          )}
+          </div>
+          <nav className="redesign-home-product-indicators" aria-label={copy.chooseProduct}>
+            {products.map((item, itemIndex) => (
+              <button
+                key={item.id}
+                type="button"
+                aria-label={copy.showProduct(itemIndex + 1)}
+                aria-current={itemIndex === currentIndex ? "true" : undefined}
+                aria-controls={panelId}
+                onClick={() => selectProduct(itemIndex)}
+              />
+            ))}
+          </nav>
         </div>
 
         <div className="redesign-home-product-detail">

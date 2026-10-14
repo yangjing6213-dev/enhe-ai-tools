@@ -150,6 +150,13 @@ describe("homepage approved product showcase", () => {
     expect(showcaseSource).not.toMatch(/setInterval|Audio\(|fetch\(|prisma|database|delivery/i);
   });
 
+  it("renders one accessible indicator for each featured product", () => {
+    const html = renderToStaticMarkup(createElement(EnheRedesignProductShowcase, { locale: "zh" }));
+    expect(html).toContain('aria-label="选择推荐产品"');
+    expect(html.match(/aria-label="显示第 \d 款产品"/g) ?? []).toHaveLength(HOME_PRODUCT_COUNT);
+    expect(html).toContain('aria-current="true"');
+  });
+
   it("keeps product detail links touchable and mobile controls beside the card", () => {
     const mobileStyles = homeStyles.slice(homeStyles.lastIndexOf("@media (width < 768px)"));
 

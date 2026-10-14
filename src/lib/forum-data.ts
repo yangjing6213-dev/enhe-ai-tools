@@ -35,8 +35,8 @@ export async function getForumPosts(category?: ForumCategory, locale: "zh" | "en
     include: {
       author: { select: { id: true, nickname: true, avatar: true } },
       likes: { where: { userId: viewerId ?? "" }, select: { id: true }, take: 1 },
-      attachments: { select: attachmentDisplaySelect, orderBy: { createdAt: "asc" } },
-      _count: { select: { likes: true, replies: { where: { status: "approved" } } } },
+      attachments: { where: { discardedAt: null }, select: attachmentDisplaySelect, orderBy: { createdAt: "asc" } },
+      _count: { select: { likes: true, replies: { where: { status: "approved", content: { not: "" } } } } },
     },
     orderBy: { createdAt: "desc" },
     take: 30,
@@ -52,7 +52,7 @@ export async function getForumPost(postId: string, locale: "zh" | "en" = "zh", v
     include: {
       author: { select: { id: true, nickname: true, avatar: true } },
       likes: { where: { userId: viewerId ?? "" }, select: { id: true }, take: 1 },
-      attachments: { select: attachmentDisplaySelect, orderBy: { createdAt: "asc" } },
+      attachments: { where: { discardedAt: null }, select: attachmentDisplaySelect, orderBy: { createdAt: "asc" } },
       _count: { select: { likes: true } },
     },
   });
@@ -62,7 +62,7 @@ export async function getForumPost(postId: string, locale: "zh" | "en" = "zh", v
     include: {
       author: { select: { id: true, nickname: true, avatar: true } },
       likes: { where: { userId: viewerId ?? "" }, select: { id: true }, take: 1 },
-      attachments: { select: attachmentDisplaySelect, orderBy: { createdAt: "asc" } },
+      attachments: { where: { discardedAt: null }, select: attachmentDisplaySelect, orderBy: { createdAt: "asc" } },
       _count: { select: { likes: true } },
     },
     orderBy: { createdAt: "asc" },
@@ -72,7 +72,7 @@ export async function getForumPost(postId: string, locale: "zh" | "en" = "zh", v
   return {
     ...publicPost,
     isLiked: Boolean(likes?.length),
-    replyCount: safeReplies.length,
+    replyCount: safeReplies.filter((reply) => reply.content.trim()).length,
     author: await safeAuthor(post.author, locale),
     replies: buildForumReplyTree(safeReplies),
   };

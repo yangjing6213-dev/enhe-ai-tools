@@ -72,7 +72,7 @@ describe("forum reply tree", () => {
     expect(mocks.postFindMany).toHaveBeenCalledWith(expect.objectContaining({
       include: expect.objectContaining({
         likes: expect.objectContaining({ where: { userId: "viewer-1" }, select: { id: true } }),
-        attachments: expect.objectContaining({ select: { id: true, kind: true, mimeType: true, originalName: true } }),
+        attachments: expect.objectContaining({ where: { discardedAt: null }, select: { id: true, kind: true, mimeType: true, originalName: true } }),
       }),
     }));
   });
@@ -81,12 +81,38 @@ describe("forum reply tree", () => {
     const author = { id: "author", nickname: "用户", avatar: null };
     mocks.postFindFirst.mockResolvedValue({ id: "post-1", author, likes: [] });
     mocks.replyFindMany.mockResolvedValue([
-      { id: "reply-1", parentId: null, author, likes: [] },
-      { id: "reply-2", parentId: "reply-1", author, likes: [{ id: "like-2" }] },
+      { id: "reply-1", parentId: null, author, content: "正文", likes: [] },
+      { id: "reply-2", parentId: "reply-1", author, content: "子回复", likes: [{ id: "like-2" }] },
     ]);
     const post = await getForumPost("post-1", "zh", "viewer-1");
     expect(post?.replyCount).toBe(2);
     expect(post?.replies[0].children[0].isLiked).toBe(true);
     expect(mocks.replyFindMany).toHaveBeenCalledWith(expect.objectContaining({ where: { postId: "post-1", status: "approved" } }));
+  });
+
+  it("preserves deleted reply context but excludes tombstones from counts", async () => {
+    const author = { id: "author", nickname: "用户", avatar: null };
+    mocks.postFindFirst.mockResolvedValue({ id: "post-1", author, likes: [] });
+    mocks.replyFindMany.mockResolvedValue([
+      { id: "deleted", parentId: null, author, content: "", likes: [], attachments: [], _count: { likes: 0 } },
+      { id: "child", parentId: "deleted", author, content: "保留的后续回复", likes: [], attachments: [], _count: { likes: 0 } },
+    ]);
+
+    const post = await getForumPost("post-1", "zh");
+    expect(post?.replyCount).toBe(1);
+    expect(post?.replies[0].content).toBe("");
+    expect(post?.replies[0].children[0].content).toBe("保留的后续回复");
+    expect(mocks.replyFindMany).toHaveBeenCalledWith(expect.objectContaining({
+      include: expect.objectContaining({ attachments: expect.objectContaining({ where: { discardedAt: null } }) }),
+    }));
+  });
+
+  it("excludes deleted reply bodies from topic-list counts", async () => {
+    await getForumPosts();
+    expect(mocks.postFindMany).toHaveBeenCalledWith(expect.objectContaining({
+      include: expect.objectContaining({
+        _count: { select: { likes: true, replies: { where: { status: "approved", content: { not: "" } } } } },
+      }),
+    }));
   });
 });

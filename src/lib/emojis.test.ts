@@ -1,12 +1,28 @@
 import { describe, expect, it } from "vitest";
+import { existsSync } from "node:fs";
+import { join } from "node:path";
 import { defaultEmojis, parseEmojiCatalog, splitEmojiText, validateEmojiEdits } from "./emojis";
 import { insertEmojiAtCaret, isOrdinaryTextField } from "./emojis-input";
 
 describe("managed emojis", () => {
-  it("ships all 26 original assets with immutable tokens", () => {
+  it("ships 26 transparent high-resolution assets and preserves immutable tokens", () => {
     expect(defaultEmojis).toHaveLength(26);
     expect(new Set(defaultEmojis.map((entry) => entry.id)).size).toBe(26);
-    expect(defaultEmojis[0].url).toBe("/images/emojis/enhe_01.webp");
+    expect(defaultEmojis[0].url).toBe("/images/emojis/enhe_01-transparent.webp");
+    expect(defaultEmojis.every((entry) => existsSync(join(process.cwd(), "public", entry.url)))).toBe(true);
+  });
+
+  it("moves saved built-in emoji URLs to transparent assets without changing custom URLs", () => {
+    const saved = [
+      { ...defaultEmojis[0], url: "/images/emojis/enhe_01.webp", enabled: false },
+      { ...defaultEmojis[1], url: "/uploads/emojis/123-enhe_custom.webp" },
+    ];
+    const parsed = parseEmojiCatalog(JSON.stringify(saved));
+    expect(parsed.find((entry) => entry.id === "enhe_01")).toMatchObject({
+      url: defaultEmojis[0].url,
+      enabled: false,
+    });
+    expect(parsed.find((entry) => entry.id === "enhe_02")?.url).toBe("/uploads/emojis/123-enhe_custom.webp");
   });
 
   it("keeps archived stickers renderable and unknown tokens as plain text", () => {

@@ -11,12 +11,16 @@ const mocks = vi.hoisted(() => ({
   replyCount: vi.fn(),
   replyCreate: vi.fn(),
   replyFindUnique: vi.fn(),
+  replyUpdateMany: vi.fn(),
   likeCount: vi.fn(),
   likeFindFirst: vi.fn(),
   likeCreate: vi.fn(),
   likeDelete: vi.fn(),
   attachmentFindMany: vi.fn(),
   attachmentUpdateMany: vi.fn(),
+  likeDeleteForReply: vi.fn(),
+  writeAdminAuditLog: vi.fn(),
+  deleteStoredMedia: vi.fn(),
   transaction: vi.fn(),
 }));
 
@@ -27,14 +31,16 @@ vi.mock("@/lib/i18n", () => ({ getCurrentLocale: mocks.currentLocale }));
 vi.mock("@/lib/db", () => ({
   prisma: {
     forumPost: { count: mocks.postCount, create: mocks.postCreate, findUnique: mocks.postFindUnique },
-    forumReply: { count: mocks.replyCount, create: mocks.replyCreate, findUnique: mocks.replyFindUnique },
+    forumReply: { count: mocks.replyCount, create: mocks.replyCreate, findUnique: mocks.replyFindUnique, updateMany: mocks.replyUpdateMany },
     forumLike: { count: mocks.likeCount, findFirst: mocks.likeFindFirst, create: mocks.likeCreate, deleteMany: mocks.likeDelete },
     forumAttachment: { findMany: mocks.attachmentFindMany, updateMany: mocks.attachmentUpdateMany },
     $transaction: mocks.transaction,
   },
 }));
+vi.mock("@/lib/forum-media-storage", () => ({ deleteForumMediaStoredFile: mocks.deleteStoredMedia }));
+vi.mock("@/lib/admin-audit", () => ({ writeAdminAuditLog: mocks.writeAdminAuditLog }));
 
-import { createForumPostAction, createForumReplyAction, toggleForumLikeAction } from "@/app/forum/actions";
+import { createForumPostAction, createForumReplyAction, deleteForumReplyAction, toggleForumLikeAction } from "@/app/forum/actions";
 
 function form(entries: Record<string, string>) {
   const data = new FormData();
@@ -54,14 +60,18 @@ describe("forum member actions", () => {
     mocks.postFindUnique.mockResolvedValue({ status: "approved" });
     mocks.replyCreate.mockResolvedValue({ id: "reply-1" });
     mocks.replyFindUnique.mockResolvedValue(null);
+    mocks.replyUpdateMany.mockResolvedValue({ count: 1 });
     mocks.likeFindFirst.mockResolvedValue(null);
     mocks.likeCreate.mockResolvedValue({ id: "like-1" });
     mocks.likeDelete.mockResolvedValue({ count: 1 });
     mocks.attachmentFindMany.mockResolvedValue([]);
     mocks.attachmentUpdateMany.mockResolvedValue({ count: 1 });
+    mocks.likeDeleteForReply.mockResolvedValue({ count: 0 });
+    mocks.deleteStoredMedia.mockResolvedValue(true);
     mocks.transaction.mockImplementation(async (run) => run({
       forumPost: { create: mocks.postCreate },
-      forumReply: { create: mocks.replyCreate },
+      forumReply: { create: mocks.replyCreate, updateMany: mocks.replyUpdateMany },
+      forumLike: { deleteMany: mocks.likeDeleteForReply },
       forumAttachment: { findMany: mocks.attachmentFindMany, updateMany: mocks.attachmentUpdateMany },
     }));
   });
@@ -146,14 +156,65 @@ describe("forum member actions", () => {
     expect(mocks.likeCreate).not.toHaveBeenCalled();
   });
 
+  it("lets an author delete their reply while preserving a tombstone and cleaning its media", async () => {
+    mocks.replyFindUnique.mockResolvedValueOnce({
+      id: "reply-1", postId: "post-1", authorId: "user-1", status: "approved",
+      content: "要删除的回复", post: { status: "approved" },
+      attachments: [{ id: "attachment-1", filePath: "/uploads/forum-media/reply.webp" }],
+    });
+
+    await deleteForumReplyAction(form({ replyId: "reply-1" }));
+
+    expect(mocks.replyUpdateMany).toHaveBeenCalledWith({
+      where: { id: "reply-1", authorId: "user-1", status: "approved" },
+      data: { content: "" },
+    });
+    expect(mocks.likeDeleteForReply).toHaveBeenCalledWith({ where: { replyId: "reply-1" } });
+    expect(mocks.deleteStoredMedia).toHaveBeenCalledWith("/uploads/forum-media/reply.webp");
+    expect(mocks.revalidatePath).toHaveBeenCalledWith("/forum/post-1");
+    expect(mocks.revalidatePath).toHaveBeenCalledWith("/en/forum/post-1");
+  });
+
+  it("denies a member from deleting another member's reply", async () => {
+    mocks.replyFindUnique.mockResolvedValueOnce({
+      id: "reply-1", postId: "post-1", authorId: "other-user", status: "approved",
+      content: "他人的回复", post: { status: "approved" }, attachments: [],
+    });
+
+    await expect(deleteForumReplyAction(form({ replyId: "reply-1" }))).rejects.toThrow("FORUM_REPLY_DELETE_FORBIDDEN");
+    expect(mocks.replyUpdateMany).not.toHaveBeenCalled();
+  });
+
+  it("allows administrators to delete any reply", async () => {
+    mocks.requireUser.mockResolvedValueOnce({ id: "admin-1", role: "admin" });
+    mocks.replyFindUnique.mockResolvedValueOnce({
+      id: "reply-1", postId: "post-1", authorId: "other-user", status: "approved",
+      content: "他人的回复", post: { status: "approved" }, attachments: [],
+    });
+
+    await deleteForumReplyAction(form({ replyId: "reply-1" }));
+
+    expect(mocks.replyUpdateMany).toHaveBeenCalledWith({
+      where: { id: "reply-1", status: "approved" },
+      data: { content: "" },
+    });
+    expect(mocks.writeAdminAuditLog).toHaveBeenCalledWith(expect.objectContaining({ action: "forum.reply.delete", targetId: "reply-1" }));
+  });
+
   it("rejects cross-post replies and nesting beyond five levels", async () => {
     mocks.postFindUnique.mockResolvedValueOnce({ status: "approved" });
-    mocks.replyFindUnique.mockResolvedValueOnce({ id: "reply-1", postId: "other-post", parentId: null, status: "approved" });
+    mocks.replyFindUnique.mockResolvedValueOnce({ id: "reply-1", postId: "other-post", parentId: null, status: "approved", content: "有效回复" });
     await expect(createForumReplyAction(form({ postId: "post-1", parentId: "reply-1", content: "跨帖回复" }))).rejects.toThrow("FORUM_PARENT_NOT_AVAILABLE");
 
     mocks.postFindUnique.mockResolvedValueOnce({ status: "approved" });
-    mocks.replyFindUnique.mockResolvedValue({ id: "reply", postId: "post-1", parentId: "reply-parent", status: "approved" });
+    mocks.replyFindUnique.mockResolvedValue({ id: "reply", postId: "post-1", parentId: "reply-parent", status: "approved", content: "有效回复" });
     await expect(createForumReplyAction(form({ postId: "post-1", parentId: "reply", content: "第六层" }))).rejects.toThrow("FORUM_REPLY_DEPTH_LIMIT");
+    expect(mocks.replyCreate).not.toHaveBeenCalled();
+  });
+
+  it("does not allow a new reply to target a deleted reply", async () => {
+    mocks.replyFindUnique.mockResolvedValueOnce({ id: "deleted-reply", postId: "post-1", parentId: null, status: "approved", content: "" });
+    await expect(createForumReplyAction(form({ postId: "post-1", parentId: "deleted-reply", content: "继续回复" }))).rejects.toThrow("FORUM_PARENT_NOT_AVAILABLE");
     expect(mocks.replyCreate).not.toHaveBeenCalled();
   });
 
@@ -167,6 +228,12 @@ describe("forum member actions", () => {
     mocks.likeCount.mockResolvedValueOnce(0).mockResolvedValueOnce(3);
     await expect(toggleForumLikeAction(form({ postId: "post-1" }))).resolves.toEqual({ liked: true, count: 3 });
     expect(mocks.likeCreate).toHaveBeenCalledWith({ data: { userId: "user-1", postId: "post-1" } });
+  });
+
+  it("does not accept likes for deleted reply tombstones", async () => {
+    mocks.replyFindUnique.mockResolvedValueOnce({ status: "approved", postId: "post-1", content: "" });
+    await expect(toggleForumLikeAction(form({ replyId: "deleted-reply" }))).rejects.toThrow("FORUM_CONTENT_NOT_AVAILABLE");
+    expect(mocks.likeCreate).not.toHaveBeenCalled();
   });
 
   it("removes an existing like when the member selects it again", async () => {

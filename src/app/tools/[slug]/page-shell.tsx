@@ -4,6 +4,7 @@ import Link from "next/link";
 import { notFound, permanentRedirect } from "next/navigation";
 import {
   createCommentAction,
+  deletePublicCommentAction,
   createSoftwareDownloadOrderAction,
 } from "@/app/actions";
 import { FormSubmitButton } from "@/components/form-submit-button";
@@ -1357,6 +1358,14 @@ export async function ToolDetailPageShell({
                         <EmojiText text={comment.localizedAdminReply} />
                       </p>
                     </div>
+                  ) : null}
+                  {user && (user.role === "admin" || comment.user.id === user.id) ? (
+                    <form action={deletePublicCommentAction} className="mt-3 flex justify-end">
+                      <input type="hidden" name="id" value={comment.id} />
+                      <button type="submit" className="rounded-lg border border-rose-400/40 px-3 py-2 text-sm font-semibold text-rose-300 hover:bg-rose-400/10">
+                        {forceLocale === "en" ? "Delete comment" : "删除评论"}
+                      </button>
+                    </form>
                   ) : null}
                 </div>
               ))}

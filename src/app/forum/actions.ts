@@ -2,11 +2,14 @@
 
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
+import { z } from "zod";
 import { prisma } from "@/lib/db";
 import { requireUser } from "@/lib/auth";
 import { getCurrentLocale } from "@/lib/i18n";
 import { buildLocalePath } from "@/lib/seo";
+import { writeAdminAuditLog } from "@/lib/admin-audit";
 import { assertForumAttachmentSelection, forumAttachmentLifetimeMs, readForumAttachmentIds } from "@/lib/forum-media";
+import { deleteForumMediaStoredFile } from "@/lib/forum-media-storage";
 import {
   canCreateForumContent,
   canLikeForumContent,
@@ -85,15 +88,18 @@ export async function createForumReplyAction(formData: FormData) {
   let parentDepth = 0;
   if (parentId) {
     let currentId: string | null = parentId;
+    let isDirectParent = true;
     while (currentId) {
-      const parent: { id: string; postId: string; parentId: string | null; status: string } | null = await prisma.forumReply.findUnique({
+      const parent: { id: string; postId: string; parentId: string | null; status: string; content: string } | null = await prisma.forumReply.findUnique({
         where: { id: currentId },
-        select: { id: true, postId: true, parentId: true, status: true },
+        select: { id: true, postId: true, parentId: true, status: true, content: true },
       });
       if (!parent || parent.postId !== postId || parent.status !== "approved") throw new Error("FORUM_PARENT_NOT_AVAILABLE");
+      if (isDirectParent && !parent.content.trim()) throw new Error("FORUM_PARENT_NOT_AVAILABLE");
       parentDepth += 1;
       if (parentDepth >= forumReplyMaxDepth) throw new Error("FORUM_REPLY_DEPTH_LIMIT");
       currentId = parent.parentId;
+      isDirectParent = false;
     }
   }
   if (getForumReplyDepth(parentDepth) === null) throw new Error("FORUM_REPLY_DEPTH_LIMIT");
@@ -122,6 +128,60 @@ export async function createForumReplyAction(formData: FormData) {
   redirect(`${forumPath(locale, postId)}?replySubmitted=1#replies`);
 }
 
+export async function deleteForumReplyAction(formData: FormData) {
+  const user = await requireUser();
+  const replyId = z.string().min(1).parse(readText(formData, "replyId").trim());
+  const reply = await prisma.forumReply.findUnique({
+    where: { id: replyId },
+    select: {
+      id: true,
+      postId: true,
+      authorId: true,
+      status: true,
+      content: true,
+      post: { select: { status: true } },
+      attachments: { where: { discardedAt: null }, select: { id: true, filePath: true } },
+    },
+  });
+  if (!reply || reply.status !== "approved" || reply.post.status !== "approved" || !reply.content.trim()) {
+    throw new Error("FORUM_REPLY_NOT_AVAILABLE");
+  }
+
+  const isAdmin = user.role === "admin";
+  if (!isAdmin && reply.authorId !== user.id) throw new Error("FORUM_REPLY_DELETE_FORBIDDEN");
+  const where = { id: reply.id, ...(isAdmin ? {} : { authorId: user.id }), status: "approved" as const };
+  const now = new Date();
+  await prisma.$transaction(async (tx) => {
+    const deleted = await tx.forumReply.updateMany({ where, data: { content: "" } });
+    if (deleted.count !== 1) throw new Error("FORUM_REPLY_NOT_AVAILABLE");
+    await tx.forumLike.deleteMany({ where: { replyId: reply.id } });
+    await tx.forumAttachment.updateMany({
+      where: { replyId: reply.id, discardedAt: null },
+      data: { discardedAt: now },
+    });
+  });
+
+  await Promise.all(reply.attachments.map(async (attachment) => {
+    try {
+      await deleteForumMediaStoredFile(attachment.filePath);
+    } catch {
+      // The discarded marker blocks public access even if storage cleanup must be retried.
+    }
+  }));
+
+  if (isAdmin) {
+    await writeAdminAuditLog({
+      adminId: user.id,
+      action: "forum.reply.delete",
+      targetType: "forum_reply",
+      targetId: reply.id,
+      summary: "Soft-deleted a public forum reply.",
+      metadata: { postId: reply.postId },
+    });
+  }
+  await revalidateForum(reply.postId);
+}
+
 export async function toggleForumLikeAction(formData: FormData) {
   const user = await requireUser();
   const postId = readText(formData, "postId").trim();
@@ -133,8 +193,8 @@ export async function toggleForumLikeAction(formData: FormData) {
     const record = await prisma.forumPost.findUnique({ where: { id: postId }, select: { status: true } });
     if (record?.status !== "approved") throw new Error("FORUM_CONTENT_NOT_AVAILABLE");
   } else {
-    const record = await prisma.forumReply.findUnique({ where: { id: replyId }, select: { status: true, postId: true } });
-    if (record?.status !== "approved") throw new Error("FORUM_CONTENT_NOT_AVAILABLE");
+    const record = await prisma.forumReply.findUnique({ where: { id: replyId }, select: { status: true, postId: true, content: true } });
+    if (record?.status !== "approved" || !record.content.trim()) throw new Error("FORUM_CONTENT_NOT_AVAILABLE");
     targetPostId = record.postId;
   }
 

@@ -281,8 +281,27 @@
   position: relative;
   aspect-ratio: 16 / 9;
   min-width: 0;
+  padding: clamp(8px, 1.15vw, 16px);
+  border: 1px solid color-mix(in srgb, #f4c15d 45%, #fff 12%);
+  border-radius: 22px;
   overflow: hidden;
-  background: var(--enhe-surface-muted, #eef1ea);
+  background: radial-gradient(ellipse at 78% 6%, rgb(238 177 66 / 20%), transparent 42%), linear-gradient(135deg, #151515, #080808 62%, #211b10);
+  box-shadow: 0 20px 52px rgb(9 11 16 / 20%), inset 0 0 0 1px rgb(255 255 255 / 9%);
+  transition: transform 220ms ease, box-shadow 220ms ease;
+}
+
+.redesign-home-product-media-frame:hover {
+  transform: perspective(1400px) rotateY(-1deg) translateY(-2px);
+  box-shadow: 0 24px 58px rgb(9 11 16 / 24%), inset 0 0 0 1px rgb(255 255 255 / 12%);
+}
+
+.redesign-home-product-media-inner {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  border-radius: 15px;
+  background: #090a0c;
 }
 
 .redesign-home-product-media {
@@ -312,6 +331,45 @@
   color: var(--enhe-text, #080808);
   text-align: center;
   transform: translate(-50%, -50%);
+}
+
+.redesign-home-product-indicators {
+  position: absolute;
+  z-index: 2;
+  right: 50%;
+  bottom: clamp(14px, 2vw, 24px);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 11px;
+  border: 1px solid rgb(255 255 255 / 20%);
+  border-radius: 999px;
+  background: rgb(5 8 12 / 66%);
+  box-shadow: 0 4px 18px rgb(0 0 0 / 22%);
+  transform: translateX(50%);
+  backdrop-filter: blur(8px);
+}
+
+.redesign-home-product-indicators button {
+  width: 8px;
+  min-width: 8px;
+  height: 8px;
+  padding: 0;
+  border: 0;
+  border-radius: 999px;
+  background: rgb(255 255 255 / 62%);
+  cursor: pointer;
+  transition: width 180ms ease, background-color 180ms ease;
+}
+
+.redesign-home-product-indicators button[aria-current="true"] {
+  width: 24px;
+  background: #f5b43c;
+}
+
+.redesign-home-product-indicators button:focus-visible {
+  outline: 2px solid white;
+  outline-offset: 3px;
 }
 
 .redesign-home-product-detail {
@@ -709,6 +767,16 @@
   .redesign-home-product-media {
     transform: none;
     transition: opacity 1ms linear;
+  }
+
+  .redesign-home-product-media-frame,
+  .redesign-home-product-media-frame:hover {
+    transform: none;
+    transition: none;
+  }
+
+  .redesign-home-product-indicators button {
+    transition: none;
   }
 
   .redesign-home-product-media[data-media-status="loading"] {

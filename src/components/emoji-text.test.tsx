@@ -9,9 +9,10 @@ describe("safe sticker text rendering", () => {
 
   it("renders a registered shortcode as an accessible inline image", () => {
     const html = renderToStaticMarkup(React.createElement(EmojiText, { text: "你好 :enhe_01:" }));
-    expect(html).toContain('src="/images/emojis/enhe_01.webp"');
+    expect(html).toContain('src="/images/emojis/enhe_01-transparent.webp"');
     expect(html).toContain('alt="[出发]"');
     expect(html).toContain("enhe-inline-emoji");
+    expect(html).toContain('width="64" height="64"');
     expect(html).not.toContain(":enhe_01:");
   });
 

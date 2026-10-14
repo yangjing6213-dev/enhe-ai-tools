@@ -19,10 +19,13 @@ const labels = [
 
 export const defaultEmojis: EmojiEntry[] = labels.map((label, index) => {
   const id = `enhe_${String(index + 1).padStart(2, "0")}`;
-  return { id, label, url: `/images/emojis/${id}.webp`, enabled: true, order: index };
+  return { id, label, url: `/images/emojis/${id}-transparent.webp`, enabled: true, order: index };
 });
 
+const defaultEmojiById = new Map(defaultEmojis.map((entry) => [entry.id, entry]));
+
 export function isSafeEmojiUrl(value: string) {
+  if (/^\/images\/emojis\/enhe_[a-z0-9_-]+\.png$/.test(value)) return true;
   if (/^\/(?:images\/emojis|uploads\/emojis)\/[a-z0-9_-]+\.webp$/.test(value)) return true;
   if (/^\/uploads\/[0-9]+-emojis-[0-9]+-enhe-[a-z0-9]{2,32}\.webp$/.test(value)) return true;
   try {
@@ -60,8 +63,13 @@ export function parseEmojiCatalog(raw?: string | null): EmojiEntry[] {
     const entries: unknown = JSON.parse(raw);
     if (!Array.isArray(entries) || entries.length > maxEmojiEntries || !entries.every(isEmojiEntry)
       || new Set(entries.map((entry) => entry.id)).size !== entries.length) return defaultEmojis;
-    const ids = new Set(entries.map((entry) => entry.id));
-    const merged = [...entries, ...defaultEmojis.filter((entry) => !ids.has(entry.id))];
+    const savedEntries = entries.map((entry) => {
+      const fallback = defaultEmojiById.get(entry.id);
+      const previousBuiltInUrl = `/images/emojis/${entry.id}.${entry.id === "enhe_13" ? "png" : "webp"}`;
+      return fallback && entry.url === previousBuiltInUrl ? { ...entry, url: fallback.url } : entry;
+    });
+    const ids = new Set(savedEntries.map((entry) => entry.id));
+    const merged = [...savedEntries, ...defaultEmojis.filter((entry) => !ids.has(entry.id))];
     return merged.length <= maxEmojiEntries ? sortEmojis(merged) : defaultEmojis;
   } catch {
     return defaultEmojis;

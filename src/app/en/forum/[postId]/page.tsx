@@ -8,5 +8,5 @@ export default async function EnglishForumPostPage({ params, searchParams }: { p
   const [{ postId }, query, user] = await Promise.all([params, searchParams, getCurrentUser()]);
   const post = await getForumPost(postId, "en", user?.id);
   if (!post) notFound();
-  return <PublicSiteChrome forceLocale="en"><ForumPostContent locale="en" post={post} isAuthenticated={Boolean(user)} replySubmitted={query.replySubmitted === "1"} /></PublicSiteChrome>;
+  return <PublicSiteChrome forceLocale="en"><ForumPostContent locale="en" post={post} isAuthenticated={Boolean(user)} currentUserId={user?.id} isAdmin={user?.role === "admin"} replySubmitted={query.replySubmitted === "1"} /></PublicSiteChrome>;
 }

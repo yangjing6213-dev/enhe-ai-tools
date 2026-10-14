@@ -600,6 +600,45 @@ export async function deleteCommentAction(formData: FormData) {
   revalidatePath(buildCanonicalToolPath(deleted.tool, "en"));
 }
 
+export async function deletePublicCommentAction(formData: FormData) {
+  const locale = await getCurrentLocale();
+  const user = await requireUser();
+  const id = z.string().min(1).parse(formData.get("id"));
+  const comment = await prisma.comment.findUnique({
+    where: { id },
+    select: {
+      userId: true,
+      status: true,
+      tool: { select: { slug: true, name: true, englishName: true, type: true } },
+    },
+  });
+  if (!comment || comment.status === "deleted") throw new Error("COMMENT_NOT_AVAILABLE");
+
+  const isAdmin = user.role === "admin";
+  if (!isAdmin && comment.userId !== user.id) throw new Error("COMMENT_DELETE_FORBIDDEN");
+  const deleted = await prisma.comment.updateMany({
+    where: { id, status: { not: "deleted" }, ...(isAdmin ? {} : { userId: user.id }) },
+    data: { status: "deleted", showOnHomepage: false, isPinned: false },
+  });
+  if (deleted.count !== 1) throw new Error("COMMENT_NOT_AVAILABLE");
+
+  if (isAdmin) {
+    await writeAdminAuditLog({
+      adminId: user.id,
+      action: "comment.soft_delete",
+      targetType: "comment",
+      targetId: id,
+      summary: "Soft-deleted a public comment.",
+    });
+  }
+  revalidatePath("/admin/comments");
+  revalidatePath("/");
+  revalidatePath("/en");
+  revalidatePath(buildCanonicalToolPath(comment.tool, "zh"));
+  revalidatePath(buildCanonicalToolPath(comment.tool, "en"));
+  revalidatePath(buildLocalePath("/user", locale));
+}
+
 export async function updateCommentHomepageDisplayAction(formData: FormData) {
   const admin = await requireAdmin();
   const id = z.string().min(1).parse(formData.get("id"));

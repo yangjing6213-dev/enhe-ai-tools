@@ -5,7 +5,7 @@ import { getForumCategoryLabel, type ForumCategory } from "@/lib/forum-rules";
 import type { Locale } from "@/lib/i18n";
 import { buildLocalePath } from "@/lib/seo";
 import { getForumPost } from "@/lib/forum-data";
-import { createForumPostAction, createForumReplyAction } from "@/app/forum/actions";
+import { createForumPostAction, createForumReplyAction, deleteForumReplyAction } from "@/app/forum/actions";
 import { ForumLikeButton } from "@/components/forum/forum-like-button";
 import { ForumMediaEditor } from "@/components/forum/forum-media-editor";
 import { ForumMediaDisplay } from "@/components/forum/forum-media-display";
@@ -40,6 +40,8 @@ function copy(locale: Locale) {
     replyPlaceholder: "Write a helpful reply",
     sendReply: "Publish reply",
     back: "Back to discussions",
+    replyDeleted: "This reply was deleted.",
+    deleteReply: "Delete reply",
   } : {
     title: "共创AI论坛",
     coverAlt: "笔记本电脑和手机上的 ENHE 官网画面",
@@ -63,6 +65,8 @@ function copy(locale: Locale) {
     replyPlaceholder: "写下你的回复",
     sendReply: "发布回复",
     back: "返回话题列表",
+    replyDeleted: "这条回复已删除。",
+    deleteReply: "删除回复",
   };
 }
 
@@ -132,20 +136,22 @@ function ReplyForm({ locale, postId, parentId }: { locale: Locale; postId: strin
   );
 }
 
-function ReplyBranch({ locale, postId, replies, isAuthenticated }: { locale: Locale; postId: string; replies: ForumPostView["replies"]; isAuthenticated: boolean }) {
+function ReplyBranch({ locale, postId, replies, isAuthenticated, currentUserId, isAdmin }: { locale: Locale; postId: string; replies: ForumPostView["replies"]; isAuthenticated: boolean; currentUserId?: string; isAdmin: boolean }) {
   const t = copy(locale);
   return <div className="forum-reply-tree">{replies.map((reply) => (
-    <article className="forum-reply-card" key={reply.id}>
+    <article className={`forum-reply-card${reply.content.trim() ? "" : " forum-reply-deleted"}`} key={reply.id}>
       <div className="forum-author-line"><UserAvatar src={reply.author.avatar} alt={reply.author.displayName} size={34} className="forum-avatar" /><span><EmojiText text={reply.author.displayName} /></span><time dateTime={reply.createdAt.toISOString()}>{dateLabel(reply.createdAt, locale)}</time></div>
-      <p className="forum-reply-content"><EmojiText text={reply.content} /></p>
-      <ForumMediaDisplay locale={locale} attachments={reply.attachments ?? []} />
-      <div className="forum-post-meta"><ForumLikeButton locale={locale} replyId={reply.id} count={reply._count.likes} isLiked={reply.isLiked} isAuthenticated={isAuthenticated} returnTo={`/forum/${postId}`} />{isAuthenticated ? <ReplyForm locale={locale} postId={postId} parentId={reply.id} /> : null}</div>
-      {reply.children.length ? <ReplyBranch locale={locale} postId={postId} replies={reply.children} isAuthenticated={isAuthenticated} /> : null}
+      <p className="forum-reply-content">{reply.content.trim() ? <EmojiText text={reply.content} /> : t.replyDeleted}</p>
+      {reply.content.trim() ? <>
+        <ForumMediaDisplay locale={locale} attachments={reply.attachments ?? []} />
+        <div className="forum-post-meta"><ForumLikeButton locale={locale} replyId={reply.id} count={reply._count.likes} isLiked={reply.isLiked} isAuthenticated={isAuthenticated} returnTo={`/forum/${postId}`} />{isAuthenticated ? <ReplyForm locale={locale} postId={postId} parentId={reply.id} /> : null}{isAuthenticated && (isAdmin || reply.author.id === currentUserId) ? <form action={deleteForumReplyAction}><input type="hidden" name="replyId" value={reply.id} /><button type="submit" className="forum-delete-reply">{t.deleteReply}</button></form> : null}</div>
+      </> : null}
+      {reply.children.length ? <ReplyBranch locale={locale} postId={postId} replies={reply.children} isAuthenticated={isAuthenticated} currentUserId={currentUserId} isAdmin={isAdmin} /> : null}
     </article>
   ))}</div>;
 }
 
-export function ForumPostContent({ locale, post, isAuthenticated, replySubmitted }: { locale: Locale; post: ForumPostView; isAuthenticated: boolean; replySubmitted: boolean }) {
+export function ForumPostContent({ locale, post, isAuthenticated, currentUserId, isAdmin = false, replySubmitted }: { locale: Locale; post: ForumPostView; isAuthenticated: boolean; currentUserId?: string; isAdmin?: boolean; replySubmitted: boolean }) {
   const t = copy(locale);
   return (
     <main className="forum-page">
@@ -159,7 +165,7 @@ export function ForumPostContent({ locale, post, isAuthenticated, replySubmitted
       </article>
       <section className="forum-replies" id="replies">
         <div className="forum-section-heading">{isAuthenticated ? <ReplyForm locale={locale} postId={post.id} /> : <JoinLink locale={locale} />}</div>
-        {post.replies.length ? <ReplyBranch locale={locale} postId={post.id} replies={post.replies} isAuthenticated={isAuthenticated} /> : <p className="forum-empty-state">{locale === "en" ? "No replies yet." : "还没有回复。"}</p>}
+        {post.replies.length ? <ReplyBranch locale={locale} postId={post.id} replies={post.replies} isAuthenticated={isAuthenticated} currentUserId={currentUserId} isAdmin={isAdmin} /> : <p className="forum-empty-state">{locale === "en" ? "No replies yet." : "还没有回复。"}</p>}
       </section>
     </main>
   );
