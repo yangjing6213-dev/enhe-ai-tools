@@ -35,6 +35,10 @@ const emptyUserCounts = {
   notifications: 0,
   newsFavorites: 0,
   newsLikes: 0,
+  forumPosts: 0,
+  forumReplies: 0,
+  forumLikes: 0,
+  forumReports: 0,
   seoAuditProjects: 0,
   seoAuditRuns: 0,
   seoAuditCredits: 0,
@@ -129,11 +133,11 @@ describe("admin hard-delete protection", () => {
 
   it("allows an empty normal registration account with only disposable account data", () => {
     expect(decideAdminUserHardDelete({ isTestData: false, protectedCounts: {
-      ...emptyUserCounts, sessions: 2, analyticsEvents: 2, notifications: 1, newsLikes: 1, newsFavorites: 1
+      ...emptyUserCounts, sessions: 2, analyticsEvents: 2, notifications: 1, newsLikes: 1, newsFavorites: 1, forumLikes: 1, forumReports: 1
     } })).toEqual({ allowed: true });
   });
 
-  it.each(["orders", "memberships", "paymentProofs", "reviewedProofs", "comments", "downloadLogs", "toolUsageLogs", "toolPurchases", "vipAdjustments", "vipOperations", "refundRecords", "refundRequests", "adminAuditLogs", "seoAuditProjects", "seoAuditRuns", "seoAuditCredits", "seoAuditSubscriptions"] as const)("still blocks normal accounts owning %s", field => {
+  it.each(["orders", "memberships", "paymentProofs", "reviewedProofs", "comments", "downloadLogs", "toolUsageLogs", "toolPurchases", "vipAdjustments", "vipOperations", "refundRecords", "refundRequests", "adminAuditLogs", "seoAuditProjects", "seoAuditRuns", "seoAuditCredits", "seoAuditSubscriptions", "forumPosts", "forumReplies"] as const)("still blocks normal accounts owning %s", field => {
     expect(decideAdminUserHardDelete({ isTestData: false, protectedCounts: { ...emptyUserCounts, [field]: 1 } })).toEqual({ allowed: false, code: "ADMIN_USER_DELETE_PROTECTED_RECORDS", fallback: "disable" });
   });
 

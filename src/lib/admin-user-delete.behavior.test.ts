@@ -4,7 +4,7 @@ import { deleteUserForAdmin } from "./admin-delete";
 import type { AdminUserProtectedCounts } from "./admin-delete-protection";
 
 const emptyCounts: AdminUserProtectedCounts = {
-  orders: 0, memberships: 0, paymentProofs: 0, reviewedProofs: 0, comments: 0, downloadLogs: 0, toolUsageLogs: 0, analyticsEvents: 0, toolPurchases: 0, vipAdjustments: 0, vipOperations: 0, refundRecords: 0, refundRequests: 0, adminAuditLogs: 0, sessions: 0, notifications: 0, newsFavorites: 0, newsLikes: 0, seoAuditProjects: 0, seoAuditRuns: 0, seoAuditCredits: 0, seoAuditSubscriptions: 0,
+  orders: 0, memberships: 0, paymentProofs: 0, reviewedProofs: 0, comments: 0, downloadLogs: 0, toolUsageLogs: 0, analyticsEvents: 0, toolPurchases: 0, vipAdjustments: 0, vipOperations: 0, refundRecords: 0, refundRequests: 0, adminAuditLogs: 0, sessions: 0, notifications: 0, newsFavorites: 0, newsLikes: 0, forumPosts: 0, forumReplies: 0, forumLikes: 0, forumReports: 0, seoAuditProjects: 0, seoAuditRuns: 0, seoAuditCredits: 0, seoAuditSubscriptions: 0,
 };
 const tx = {
   $queryRaw: vi.fn(), $executeRawUnsafe: vi.fn(),

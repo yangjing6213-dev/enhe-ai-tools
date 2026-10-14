@@ -40,27 +40,32 @@ export function EnheRedesignHero({ locale }: { locale: RedesignLocale }) {
           ))}
         </h1>
         <p className="redesign-home-subtitle">{copy.subtitle}</p>
-        <StarBorder
-          as="a"
-          className="redesign-home-cta"
-          href={copy.cta.href}
-          color="#ffffff"
-          trailColor="#ffffff"
-          textColor="#ffffff"
-          duration={4}
-          direction="clockwise"
-          stars={1}
-          trailLength={0.3}
-          thickness={1}
-          radius={12}
-          glow={0.6}
-          hover="lap"
-          sparkle={false}
-          clickPulse
-          theme="dark"
-        >
-          {copy.cta.label}
-        </StarBorder>
+        <div className="redesign-home-cta-row">
+          {[copy.cta, copy.forumCta].map((cta) => (
+            <StarBorder
+              key={cta.href}
+              as="a"
+              className="redesign-home-cta"
+              href={cta.href}
+              color="#ffffff"
+              trailColor="#ffffff"
+              textColor="#ffffff"
+              duration={4}
+              direction="clockwise"
+              stars={1}
+              trailLength={0.3}
+              thickness={1}
+              radius={12}
+              glow={0.6}
+              hover="lap"
+              sparkle={false}
+              clickPulse
+              theme="dark"
+            >
+              {cta.label}
+            </StarBorder>
+          ))}
+        </div>
       </div>
     </section>
   );

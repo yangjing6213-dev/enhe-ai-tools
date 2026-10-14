@@ -1,0 +1,166 @@
+"use server";
+
+import { revalidatePath } from "next/cache";
+import { redirect } from "next/navigation";
+import { prisma } from "@/lib/db";
+import { requireUser } from "@/lib/auth";
+import { getCurrentLocale } from "@/lib/i18n";
+import { buildLocalePath } from "@/lib/seo";
+import {
+  canCreateForumContent,
+  canLikeForumContent,
+  canReportForumContent,
+  forumLikeWindowMs,
+  forumPostInputSchema,
+  forumReplyInputSchema,
+  forumReportInputSchema,
+  forumReportWindowMs,
+  forumReplyMaxDepth,
+  forumSubmissionWindowMs,
+  getForumReplyDepth,
+} from "@/lib/forum-rules";
+
+function readText(formData: FormData, key: string) {
+  const value = formData.get(key);
+  return typeof value === "string" ? value : "";
+}
+
+function forumPath(locale: "zh" | "en", postId?: string) {
+  return buildLocalePath(postId ? `/forum/${encodeURIComponent(postId)}` : "/forum", locale);
+}
+
+async function revalidateForum(postId?: string) {
+  for (const locale of ["zh", "en"] as const) {
+    revalidatePath(forumPath(locale));
+    if (postId) revalidatePath(forumPath(locale, postId));
+  }
+}
+
+export async function createForumPostAction(formData: FormData) {
+  const user = await requireUser();
+  const locale = await getCurrentLocale();
+  const parsed = forumPostInputSchema.safeParse({
+    category: readText(formData, "category"),
+    title: readText(formData, "title"),
+    content: readText(formData, "content"),
+  });
+  if (!parsed.success) throw new Error("FORUM_INVALID_POST");
+
+  const since = new Date(Date.now() - forumSubmissionWindowMs);
+  const [posts, replies] = await Promise.all([
+    prisma.forumPost.count({ where: { authorId: user.id, createdAt: { gte: since } } }),
+    prisma.forumReply.count({ where: { authorId: user.id, createdAt: { gte: since } } }),
+  ]);
+  if (!canCreateForumContent(posts + replies)) throw new Error("FORUM_SUBMISSION_LIMIT");
+
+  await prisma.forumPost.create({ data: { ...parsed.data, authorId: user.id, status: "pending" } });
+  await revalidateForum();
+  redirect(`${buildLocalePath("/forum/new", locale)}?submitted=1`);
+}
+
+export async function createForumReplyAction(formData: FormData) {
+  const user = await requireUser();
+  const locale = await getCurrentLocale();
+  const postId = readText(formData, "postId").trim();
+  const parentId = readText(formData, "parentId").trim() || null;
+  if (!postId) throw new Error("FORUM_INVALID_TARGET");
+  const parsed = forumReplyInputSchema.safeParse({ content: readText(formData, "content") });
+  if (!parsed.success) throw new Error("FORUM_INVALID_REPLY");
+
+  const post = await prisma.forumPost.findUnique({ where: { id: postId }, select: { status: true } });
+  if (post?.status !== "approved") throw new Error("FORUM_POST_NOT_AVAILABLE");
+
+  let parentDepth = 0;
+  if (parentId) {
+    let currentId: string | null = parentId;
+    while (currentId) {
+      const parent: { id: string; postId: string; parentId: string | null; status: string } | null = await prisma.forumReply.findUnique({
+        where: { id: currentId },
+        select: { id: true, postId: true, parentId: true, status: true },
+      });
+      if (!parent || parent.postId !== postId || parent.status !== "approved") throw new Error("FORUM_PARENT_NOT_AVAILABLE");
+      parentDepth += 1;
+      if (parentDepth >= forumReplyMaxDepth) throw new Error("FORUM_REPLY_DEPTH_LIMIT");
+      currentId = parent.parentId;
+    }
+  }
+  if (getForumReplyDepth(parentDepth) === null) throw new Error("FORUM_REPLY_DEPTH_LIMIT");
+
+  const since = new Date(Date.now() - forumSubmissionWindowMs);
+  const [posts, replies] = await Promise.all([
+    prisma.forumPost.count({ where: { authorId: user.id, createdAt: { gte: since } } }),
+    prisma.forumReply.count({ where: { authorId: user.id, createdAt: { gte: since } } }),
+  ]);
+  if (!canCreateForumContent(posts + replies)) throw new Error("FORUM_SUBMISSION_LIMIT");
+
+  await prisma.forumReply.create({ data: { ...parsed.data, postId, parentId, authorId: user.id, status: "pending" } });
+  await revalidateForum(postId);
+  redirect(`${forumPath(locale, postId)}?replySubmitted=1#replies`);
+}
+
+export async function toggleForumLikeAction(formData: FormData) {
+  const user = await requireUser();
+  const locale = await getCurrentLocale();
+  const postId = readText(formData, "postId").trim();
+  const replyId = readText(formData, "replyId").trim();
+  if (Boolean(postId) === Boolean(replyId)) throw new Error("FORUM_INVALID_TARGET");
+  const target = postId ? { postId } : { replyId };
+  let targetPostId = postId || undefined;
+  if (postId) {
+    const record = await prisma.forumPost.findUnique({ where: { id: postId }, select: { status: true } });
+    if (record?.status !== "approved") throw new Error("FORUM_CONTENT_NOT_AVAILABLE");
+  } else {
+    const record = await prisma.forumReply.findUnique({ where: { id: replyId }, select: { status: true, postId: true } });
+    if (record?.status !== "approved") throw new Error("FORUM_CONTENT_NOT_AVAILABLE");
+    targetPostId = record.postId;
+  }
+
+  const existing = await prisma.forumLike.findFirst({ where: { userId: user.id, ...target }, select: { id: true } });
+  if (existing) {
+    await prisma.forumLike.delete({ where: { id: existing.id } });
+  } else {
+    const since = new Date(Date.now() - forumLikeWindowMs);
+    const recent = await prisma.forumLike.count({ where: { userId: user.id, createdAt: { gte: since } } });
+    if (!canLikeForumContent(recent)) throw new Error("FORUM_LIKE_LIMIT");
+    try {
+      await prisma.forumLike.create({ data: { userId: user.id, ...target } });
+    } catch (error) {
+      if (!(error && typeof error === "object" && "code" in error && error.code === "P2002")) throw error;
+    }
+  }
+  await revalidateForum(targetPostId);
+}
+
+export async function reportForumContentAction(formData: FormData) {
+  const user = await requireUser();
+  const locale = await getCurrentLocale();
+  const postId = readText(formData, "postId").trim();
+  const replyId = readText(formData, "replyId").trim();
+  if (Boolean(postId) === Boolean(replyId)) throw new Error("FORUM_INVALID_TARGET");
+  const parsed = forumReportInputSchema.safeParse({ reason: readText(formData, "reason") });
+  if (!parsed.success) throw new Error("FORUM_INVALID_REPORT");
+  const target = postId ? { postId } : { replyId };
+  let targetPostId = postId || undefined;
+  if (postId) {
+    const record = await prisma.forumPost.findUnique({ where: { id: postId }, select: { status: true } });
+    if (record?.status !== "approved") throw new Error("FORUM_CONTENT_NOT_AVAILABLE");
+  } else {
+    const record = await prisma.forumReply.findUnique({ where: { id: replyId }, select: { status: true, postId: true } });
+    if (record?.status !== "approved") throw new Error("FORUM_CONTENT_NOT_AVAILABLE");
+    targetPostId = record.postId;
+  }
+
+  const since = new Date(Date.now() - forumReportWindowMs);
+  const recent = await prisma.forumReport.count({ where: { reporterId: user.id, createdAt: { gte: since } } });
+  if (!canReportForumContent(recent)) throw new Error("FORUM_REPORT_LIMIT");
+  const existing = await prisma.forumReport.findFirst({ where: { reporterId: user.id, ...target }, select: { id: true } });
+  if (existing) throw new Error("FORUM_DUPLICATE_REPORT");
+  try {
+    await prisma.forumReport.create({ data: { reporterId: user.id, ...target, reason: parsed.data.reason } });
+  } catch (error) {
+    if (error && typeof error === "object" && "code" in error && error.code === "P2002") throw new Error("FORUM_DUPLICATE_REPORT");
+    throw error;
+  }
+  await revalidateForum(targetPostId);
+  redirect(`${forumPath(locale, targetPostId)}?reported=1#replies`);
+}

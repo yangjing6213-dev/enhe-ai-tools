@@ -43,6 +43,10 @@ export type AdminUserProtectedCounts = {
   notifications: number;
   newsFavorites: number;
   newsLikes: number;
+  forumPosts: number;
+  forumReplies: number;
+  forumLikes: number;
+  forumReports: number;
   seoAuditProjects: number;
   seoAuditRuns: number;
   seoAuditCredits: number;
@@ -82,7 +86,7 @@ export function decideAdminOrderHardDelete(input: {
 }
 
 // Login sessions and account preferences are disposable; analytics remain via SetNull.
-const removableUserRelations = new Set(["sessions", "notifications", "newsFavorites", "newsLikes", "analyticsEvents"]);
+const removableUserRelations = new Set(["sessions", "notifications", "newsFavorites", "newsLikes", "forumLikes", "forumReports", "analyticsEvents"]);
 
 export function getAdminUserProtectedRecordCount(counts: AdminUserProtectedCounts) {
   return Object.entries(counts).reduce((total, [key, count]) => total + (removableUserRelations.has(key) ? 0 : count), 0);

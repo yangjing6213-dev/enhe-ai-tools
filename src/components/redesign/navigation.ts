@@ -8,6 +8,7 @@ export const REDESIGN_NAV_ITEMS = {
   zh: [
     { label: "首页", href: "/" },
     { label: "AI工具", href: "/software" },
+    { label: "共创AI", href: "/forum" },
     {
       label: "AI Skill",
       href: "/ai-skills",
@@ -23,6 +24,7 @@ export const REDESIGN_NAV_ITEMS = {
   en: [
     { label: "Home", href: "/en" },
     { label: "AI Tools", href: "/en/software" },
+    { label: "Co-create AI", href: "/en/forum" },
     {
       label: "AI Skills",
       href: "/en/ai-skills",

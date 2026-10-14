@@ -137,6 +137,24 @@ enum CommentStatus {
   deleted
 }
 
+enum ForumCategory {
+  question
+  experience
+  workflow
+  showcase
+}
+
+enum ForumContentStatus {
+  pending
+  approved
+  rejected
+}
+
+enum ForumReportStatus {
+  pending
+  resolved
+}
+
 enum ContentStatus {
   active
   disabled
@@ -257,6 +275,10 @@ model User {
   newsFavorites         NewsArticleFavorite[]
   newsLikes             NewsArticleLike[]
   toolLikes             ToolLike[]
+  forumPosts            ForumPost[]              @relation("ForumPostAuthor")
+  forumReplies          ForumReply[]             @relation("ForumReplyAuthor")
+  forumLikes            ForumLike[]
+  forumReports          ForumReport[]            @relation("ForumReportAuthor")
   seoAuditProjects      SeoAuditProject[]
   seoAuditRuns          SeoAuditRun[]
   seoAuditCredits       SeoAuditCredit[]
@@ -929,6 +951,83 @@ model Comment {
 
   @@index([toolId, status])
   @@map("comments")
+}
+
+model ForumPost {
+  id        String             @id @default(cuid())
+  authorId  String             @map("author_id")
+  category  ForumCategory
+  title     String
+  content   String
+  status    ForumContentStatus @default(pending)
+  createdAt DateTime           @default(now()) @map("created_at")
+  updatedAt DateTime           @updatedAt @map("updated_at")
+  author    User               @relation("ForumPostAuthor", fields: [authorId], references: [id])
+  replies   ForumReply[]
+  likes     ForumLike[]
+  reports   ForumReport[]
+
+  @@index([status, category, createdAt])
+  @@index([authorId, createdAt])
+  @@map("forum_posts")
+}
+
+model ForumReply {
+  id        String             @id @default(cuid())
+  postId    String             @map("post_id")
+  authorId  String             @map("author_id")
+  parentId  String?            @map("parent_id")
+  content   String
+  status    ForumContentStatus @default(pending)
+  createdAt DateTime           @default(now()) @map("created_at")
+  updatedAt DateTime           @updatedAt @map("updated_at")
+  post      ForumPost          @relation(fields: [postId], references: [id], onDelete: Cascade)
+  author    User               @relation("ForumReplyAuthor", fields: [authorId], references: [id])
+  parent    ForumReply?        @relation("ForumReplyTree", fields: [parentId], references: [id], onDelete: SetNull)
+  children  ForumReply[]       @relation("ForumReplyTree")
+  likes     ForumLike[]
+  reports   ForumReport[]
+
+  @@index([postId, status, createdAt])
+  @@index([authorId, createdAt])
+  @@index([parentId])
+  @@map("forum_replies")
+}
+
+model ForumLike {
+  id        String     @id @default(cuid())
+  userId    String     @map("user_id")
+  postId    String?    @map("post_id")
+  replyId   String?    @map("reply_id")
+  createdAt DateTime   @default(now()) @map("created_at")
+  user      User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+  post      ForumPost? @relation(fields: [postId], references: [id], onDelete: Cascade)
+  reply     ForumReply? @relation(fields: [replyId], references: [id], onDelete: Cascade)
+
+  @@index([userId, createdAt])
+  @@index([postId])
+  @@index([replyId])
+  @@map("forum_likes")
+}
+
+model ForumReport {
+  id         String            @id @default(cuid())
+  reporterId String            @map("reporter_id")
+  postId     String?           @map("post_id")
+  replyId    String?           @map("reply_id")
+  reason     String
+  status     ForumReportStatus @default(pending)
+  createdAt  DateTime          @default(now()) @map("created_at")
+  resolvedAt DateTime?         @map("resolved_at")
+  reporter   User              @relation("ForumReportAuthor", fields: [reporterId], references: [id], onDelete: Cascade)
+  post       ForumPost?        @relation(fields: [postId], references: [id], onDelete: Cascade)
+  reply      ForumReply?       @relation(fields: [replyId], references: [id], onDelete: Cascade)
+
+  @@index([status, createdAt])
+  @@index([reporterId, createdAt])
+  @@index([postId])
+  @@index([replyId])
+  @@map("forum_reports")
 }
 
 model DownloadLog {

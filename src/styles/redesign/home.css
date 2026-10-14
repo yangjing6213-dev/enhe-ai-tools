@@ -66,13 +66,22 @@
   line-height: 1.65;
 }
 
+.redesign-home .redesign-home-cta-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  margin-top: 40px;
+}
+
 .redesign-home .redesign-home-cta {
   display: inline-flex;
   min-height: 48px;
   align-items: center;
   justify-content: center;
   box-sizing: border-box;
-  margin-top: 40px;
+  margin-top: 0;
   padding: 12px 24px;
   border: 2px solid var(--enhe-action, #527e54);
   border-radius: var(--enhe-button-r, 4px);
@@ -82,6 +91,10 @@
   font-weight: 700;
   line-height: 1.2;
   text-decoration: none;
+}
+
+.redesign-home .redesign-home-cta-row .redesign-home-cta {
+  margin-top: 0;
 }
 
 .redesign-home .redesign-home-cta:hover {
@@ -140,6 +153,11 @@
 
   .redesign-home .redesign-home-cta {
     width: min(100%, 280px);
+  }
+
+  .redesign-home .redesign-home-cta-row {
+    flex-direction: column;
+    gap: 12px;
     margin-top: 32px;
   }
 

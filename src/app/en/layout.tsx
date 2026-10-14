@@ -4,6 +4,7 @@ import "@/styles/redesign/shell.css";
 import "@/styles/redesign/home.css";
 import "@/styles/redesign/ai-news.css";
 import "@/styles/redesign/site-refresh.css";
+import "@/styles/redesign/forum.css";
 import { headers } from "next/headers";
 import { RootDocument, sharedRootMetadata } from "@/app/root-layout-shared";
 

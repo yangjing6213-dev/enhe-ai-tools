@@ -15,12 +15,14 @@ describe("homepage approved copy", () => {
     expect(HOME_COPY.zh.h1).toBe("AI一站式平台 创造未来 改变生活");
     expect(HOME_COPY.zh.subtitle).toBe("发现值得使用的 AI 工具、实用方法与行业动态，让工作更高效，让创作更自由。");
     expect(HOME_COPY.zh.cta).toEqual({ label: "探索 AI 工具", href: "/software" });
+    expect(HOME_COPY.zh.forumCta).toEqual({ label: "共创AI论坛", href: "/forum" });
     expect(HOME_COPY.zh.value.heading).toBe("让每一个人，都能驾驭AI，创造价值。");
 
     expect(HOME_COPY.en.label).toBe("Give your life an AI superpower");
     expect(HOME_COPY.en.h1).toBe("Your all-in-one AI platform. Let’s create the future together.");
     expect(HOME_COPY.en.subtitle).toBe("Discover practical AI tools, skills, and industry signals to work faster and create with confidence.");
     expect(HOME_COPY.en.cta).toEqual({ label: "Explore AI tools", href: "/en/software" });
+    expect(HOME_COPY.en.forumCta).toEqual({ label: "Co-create AI Forum", href: "/en/forum" });
     expect(HOME_COPY.en.value.heading).toBe("Help everyone master AI and create value.");
     expect(HOME_COPY.zh.value).toEqual({ heading: "让每一个人，都能驾驭AI，创造价值。" });
   });
@@ -44,7 +46,7 @@ describe("homepage approved copy", () => {
   it("keeps the hero server-rendered and semantically minimal", () => {
     expect(heroSource.match(/<h1\b/g)).toHaveLength(1);
     expect(heroSource).toContain('<p className="redesign-home-subtitle">');
-    expect(heroSource).toContain("href={copy.cta.href}");
+    expect(heroSource).toContain("[copy.cta, copy.forumCta]");
     expect(heroSource).not.toContain('"use client"');
     expect(heroSource).not.toMatch(/prisma|database|fetch\(|\/api\//i);
   });

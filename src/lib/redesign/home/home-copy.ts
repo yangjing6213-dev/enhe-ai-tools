@@ -10,6 +10,7 @@ export type RedesignHomeCopy = {
   h1: string;
   subtitle: string;
   cta: RedesignHomeCta;
+  forumCta: RedesignHomeCta;
   review: {
     heading: string;
     disclosure: string;
@@ -25,6 +26,7 @@ export const HOME_COPY: Record<RedesignLocale, RedesignHomeCopy> = {
     h1: "AI一站式平台 创造未来 改变生活",
     subtitle: "发现值得使用的 AI 工具、实用方法与行业动态，让工作更高效，让创作更自由。",
     cta: { label: "探索 AI 工具", href: "/software" },
+    forumCta: { label: "共创AI论坛", href: "/forum" },
     review: {
       heading: "用户评价",
       disclosure: "AI 生成示例（非真实用户反馈）",
@@ -38,6 +40,7 @@ export const HOME_COPY: Record<RedesignLocale, RedesignHomeCopy> = {
     h1: "Your all-in-one AI platform. Let’s create the future together.",
     subtitle: "Discover practical AI tools, skills, and industry signals to work faster and create with confidence.",
     cta: { label: "Explore AI tools", href: "/en/software" },
+    forumCta: { label: "Co-create AI Forum", href: "/en/forum" },
     review: {
       heading: "Customer stories",
       disclosure: "AI-generated examples (not real customer feedback).",

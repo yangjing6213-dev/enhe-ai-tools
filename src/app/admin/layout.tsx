@@ -1,6 +1,7 @@
 import "../globals.css";
 import "@/styles/redesign/tokens.css";
 import "@/styles/redesign/shell.css";
+import "@/styles/redesign/forum.css";
 import { RootDocument, sharedRootMetadata } from "@/app/root-layout-shared";
 import { requireAdmin } from "@/lib/auth";
 import { Container } from "@/components/ui";
@@ -39,6 +40,7 @@ const adminNav = [
   ["faqs", "/admin/faqs"],
   ["changelogs", "/admin/changelogs"],
   ["comments", "/admin/comments"],
+  ["forum", "/admin/forum"],
   ["files", "/admin/files"],
   ["licenseGenerator", "/admin/license-generator"],
   ["audit", "/admin/audit"],
