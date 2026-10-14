@@ -82,4 +82,33 @@ describe("FAQ, category, tag, and changelog admin presentation", () => {
       expect(shell).toContain(selector);
     }
   });
+
+  it("keeps tag editors compact while preserving the tool binding form", () => {
+    const tags = read("app/admin/tags/page.tsx");
+    const actions = read("app/admin/actions.ts");
+    const detail = readRepo("src/app/tools/[slug]/page-shell.tsx");
+    const cardGrid = tags.slice(tags.indexOf("enhe-admin-content-card-grid"), tags.indexOf("工具标签绑定"));
+    const bindingSection = tags.slice(tags.indexOf("工具标签绑定"));
+    const updateBindings = actions.slice(
+      actions.indexOf("export async function updateToolTagsAction"),
+      actions.indexOf("export async function deleteToolAction")
+    );
+
+    expect(tags).toContain("将标签绑定到工具后，会显示在对应工具详情页");
+    expect(cardGrid).toContain("xl:grid-cols-3");
+    expect(cardGrid).toContain("grid grid-cols-2 items-start gap-3");
+    expect(cardGrid).toContain('style={{ padding: "12px" }}');
+    expect(cardGrid).toContain('rows={2} style={{ minHeight: "4.5rem" }}');
+    expect(bindingSection).toContain("action={updateToolTagsAction}");
+    expect(bindingSection).toContain('name="toolId"');
+    expect(bindingSection).toContain('name="tags"');
+    expect(bindingSection).toContain('tool.tagLinks.map((link) => link.tag.name).join(", ")');
+    expect(updateBindings).toContain('parseTagNames(String(formData.get("tags") ?? ""))');
+    expect(updateBindings).toContain("prisma.toolTagLink.deleteMany({ where: { toolId } })");
+    expect(updateBindings).toContain("prisma.toolTagLink.create({ data: { toolId, tagId: tag.id } })");
+    expect(detail).toContain("tagLinks: {");
+    expect(detail).toContain("include: { tag: true }");
+    expect(detail).toContain("tool.tagLinks,");
+    expect(detail).toContain("localizedTagItems.map((tag) =>");
+  });
 });

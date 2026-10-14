@@ -10,7 +10,7 @@ export default async function AdminTagsPage() {
   ]);
 
   return (
-    <AdminSection title="标签管理" intro="管理工具标签，并为每个工具维护标签列表。">
+    <AdminSection title="标签管理" intro="管理工具标签。将标签绑定到工具后，会显示在对应工具详情页。">
       <AdminContentShell className="enhe-admin-content-management">
       <div className="enhe-admin-content-toolbar flex flex-wrap items-center justify-between gap-3">
         <p className="text-sm text-[var(--marketing-muted)]">共 {tags.length} 个标签，绑定 {tools.length} 个工具</p>
@@ -30,22 +30,22 @@ export default async function AdminTagsPage() {
         <div className="md:col-span-3"><SubmitButton>新增标签</SubmitButton></div>
       </form>
 
-      <div className="enhe-admin-content-card-grid grid gap-4 md:grid-cols-2">
+      <div className="enhe-admin-content-card-grid grid gap-4 md:grid-cols-2 xl:grid-cols-3">
         {tags.map((tag) => (
-          <form key={tag.id} action={upsertToolTagAction} className="enhe-admin-tag-card enhe-admin-content-form glass grid gap-3 rounded-2xl p-5">
+          <form key={tag.id} action={upsertToolTagAction} className="enhe-admin-tag-card enhe-admin-content-form glass grid grid-cols-2 items-start gap-3 rounded-2xl" style={{ padding: "12px" }}>
             <input type="hidden" name="id" value={tag.id} />
-            <Field label="标签名"><input name="name" defaultValue={tag.name} className={inputClass} /></Field>
-            <Field label="Slug"><input name="slug" defaultValue={tag.slug} className={inputClass} /></Field>
-            <Field label="颜色"><input name="color" defaultValue={tag.color ?? ""} className={inputClass} /></Field>
-            <Field label="排序"><input name="sortOrder" type="number" defaultValue={tag.sortOrder} className={inputClass} /></Field>
-            <Field label="状态">
+            <Field label="标签名" className="col-span-2 min-w-0"><input name="name" defaultValue={tag.name} className={inputClass} /></Field>
+            <Field label="Slug" className="min-w-0"><input name="slug" defaultValue={tag.slug} className={inputClass} /></Field>
+            <Field label="颜色" className="min-w-0"><input name="color" defaultValue={tag.color ?? ""} className={inputClass} /></Field>
+            <Field label="排序" className="min-w-0"><input name="sortOrder" type="number" defaultValue={tag.sortOrder} className={inputClass} /></Field>
+            <Field label="状态" className="min-w-0">
               <select name="status" defaultValue={tag.status} className={selectClass}>
                 <option value="active">启用</option>
                 <option value="disabled">禁用</option>
               </select>
             </Field>
-            <EmojiField label="描述"><EmojiTextarea name="description" defaultValue={tag.description ?? ""} className={textareaClass} /></EmojiField>
-            <SubmitButton>保存标签</SubmitButton>
+            <EmojiField label="描述" className="col-span-2 min-w-0"><EmojiTextarea name="description" defaultValue={tag.description ?? ""} rows={2} style={{ minHeight: "4.5rem" }} className={textareaClass} /></EmojiField>
+            <div className="col-span-2"><SubmitButton>保存标签</SubmitButton></div>
           </form>
         ))}
       </div>
