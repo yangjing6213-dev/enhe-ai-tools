@@ -9,7 +9,7 @@ export function EnheBrandLockup({ href, label }: { href: string; label: string }
         alt=""
         width={434}
         height={145}
-        sizes="154px"
+        sizes="(max-width: 420px) 120px, 154px"
       />
     </a>
   );
