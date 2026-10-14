@@ -52,7 +52,7 @@ export async function createForumPostAction(formData: FormData) {
   ]);
   if (!canCreateForumContent(posts + replies)) throw new Error("FORUM_SUBMISSION_LIMIT");
 
-  const data = { ...parsed.data, authorId: user.id, status: "pending" as const };
+  const data = { ...parsed.data, authorId: user.id, status: "approved" as const };
   if (attachmentIds.length) {
     await prisma.$transaction(async (tx) => {
       const where = { id: { in: attachmentIds }, authorId: user.id, postId: null, replyId: null, discardedAt: null, createdAt: { gte: new Date(Date.now() - forumAttachmentLifetimeMs) } };
@@ -105,7 +105,7 @@ export async function createForumReplyAction(formData: FormData) {
   ]);
   if (!canCreateForumContent(posts + replies)) throw new Error("FORUM_SUBMISSION_LIMIT");
 
-  const data = { ...parsed.data, postId, parentId, authorId: user.id, status: "pending" as const };
+  const data = { ...parsed.data, postId, parentId, authorId: user.id, status: "approved" as const };
   if (attachmentIds.length) {
     await prisma.$transaction(async (tx) => {
       const where = { id: { in: attachmentIds }, authorId: user.id, postId: null, replyId: null, discardedAt: null, createdAt: { gte: new Date(Date.now() - forumAttachmentLifetimeMs) } };

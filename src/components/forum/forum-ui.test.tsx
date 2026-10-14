@@ -29,6 +29,7 @@ describe("forum public surfaces", () => {
     expect(html).toContain('href="#replies">2 条回复</a>');
     expect(html).toContain('aria-pressed="true"');
     expect(html).toContain('<summary class="forum-primary-button">回复</summary>');
+    expect(html).not.toContain("<h2>回复</h2>");
     expect(html).toContain("◀");
     expect(html).not.toContain("←");
     expect(html).not.toContain("举报");
@@ -36,10 +37,12 @@ describe("forum public surfaces", () => {
     expect(html).toContain('/api/forum/media/image-1');
   });
 
-  it("offers images and video for topics while preserving authentication guidance", () => {
+  it("offers images and video for topics and explains immediate public posting", () => {
     const html = renderToStaticMarkup(<ForumNewPostContent locale="en" submitted={false} isAuthenticated />);
     expect(html).toContain('accept="video/mp4,video/webm"');
     expect(html).toContain('accept="image/jpeg,image/png,image/webp,image/gif"');
+    expect(html).toContain("Posts appear publicly right after publishing.");
+    expect(html).toContain("Publish topic");
     const guest = renderToStaticMarkup(<ForumNewPostContent locale="en" submitted={false} isAuthenticated={false} />);
     expect(guest).toContain("Sign in to join the discussion");
     expect(guest).not.toContain('type="file"');

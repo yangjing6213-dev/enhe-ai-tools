@@ -22,7 +22,10 @@ describe("ENHE typography source contract", () => {
 
     expect(css).toContain("@font-face");
     expect(css).toContain("font-family: 'Alimama Fang Yuan Ti'");
-    expect(css).toContain("/fonts/alimama/AlimamaFangYuanTiVF-Thin.woff2");
+    expect(css).toContain("/fonts/alimama/AlimamaFangYuanTiVF-Thin-2f36da22906ae5d6.woff2");
+    const nextConfig = readFileSync(join(projectRoot, "next.config.ts"), "utf8");
+    expect(nextConfig).toContain("public, max-age=31536000, immutable");
+    expect(nextConfig).toContain("/fonts/alimama/AlimamaFangYuanTiVF-Thin-2f36da22906ae5d6.woff2");
     expect(css).not.toContain('@import "../../public/fonts/misans/MiSans-Regular.min.css"');
     expect(css).not.toContain('@import "../../public/fonts/misans/MiSans-Semibold.min.css"');
     expect(css).not.toContain('@import "../../public/fonts/misans/MiSans-Bold.min.css"');

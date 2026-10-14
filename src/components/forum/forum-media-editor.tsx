@@ -18,11 +18,11 @@ export function ForumMediaEditor({ locale, allowVideo }: { locale: "zh" | "en"; 
   const blocked = Boolean(error) || items.some((item) => item.status !== "ready");
   const text = locale === "zh" ? {
     image: "添加图片", video: "添加视频", remove: "移除", dismiss: "清除提示", uploading: "正在上传", removing: "正在移除", uploaded: "上传完成", finish: "请等待附件上传完成，或移除失败的附件后再提交。",
-    hint: allowVideo ? "最多 6 张图片，每张 8MB；1 个 MP4/WebM 视频，最多 100MB。随正文一起审核。" : "最多 4 张图片，每张 8MB。随回复一起审核。",
+    hint: allowVideo ? "最多 6 张图片，每张 8MB；1 个 MP4/WebM 视频，最多 100MB。话题发布后，媒体会公开展示。" : "最多 4 张图片，每张 8MB。回复发布后，图片会公开展示。",
     count: allowVideo ? "最多添加 6 张图片和 1 个视频。" : "回复最多添加 4 张图片。", invalid: "请选择 JPG、PNG、WebP、GIF 图片或支持的视频。", size: "文件太大，请压缩后再上传。", login: "登录已过期，请重新登录后上传。", limit: "上传次数较多，请稍后再试。", failed: "上传失败，请移除后重试。", removeFailed: "移除失败，请稍后重试。",
   } : {
     image: "Add images", video: "Add video", remove: "Remove", dismiss: "Dismiss", uploading: "Uploading", removing: "Removing", uploaded: "Uploaded", finish: "Wait for uploads to finish or remove failed attachments before submitting.",
-    hint: allowVideo ? "Up to 6 images, 8MB each, and 1 MP4/WebM video up to 100MB. Reviewed with your post." : "Up to 4 images, 8MB each. Reviewed with your reply.",
+    hint: allowVideo ? "Up to 6 images, 8MB each, and 1 MP4/WebM video up to 100MB. Media is public with your post." : "Up to 4 images, 8MB each. Images are public with your reply.",
     count: allowVideo ? "You can add up to 6 images and 1 video." : "Replies can contain up to 4 images.", invalid: "Choose JPG, PNG, WebP, GIF images or a supported video.", size: "The file is too large. Compress it before uploading.", login: "Your session expired. Sign in again to upload.", limit: "Too many uploads. Try again later.", failed: "Upload failed. Remove the file and try again.", removeFailed: "Could not remove this file. Try again later.",
   };
 

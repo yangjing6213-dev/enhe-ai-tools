@@ -148,6 +148,12 @@ const nextConfig: NextConfig = {
         value: "public, s-maxage=300, stale-while-revalidate=86400"
       }
     ];
+    const immutableAssetCacheHeaders = [
+      {
+        key: "Cache-Control",
+        value: "public, max-age=31536000, immutable"
+      }
+    ];
     const pricingAssetCacheHeaders = [
       {
         key: "Cache-Control",
@@ -167,6 +173,7 @@ const nextConfig: NextConfig = {
       { source: "/:path*", headers: securityHeaders },
       { source: "/robots.txt", headers: publicAssetCacheHeaders },
       { source: "/sitemap.xml", headers: publicAssetCacheHeaders },
+      { source: "/fonts/alimama/AlimamaFangYuanTiVF-Thin-2f36da22906ae5d6.woff2", headers: immutableAssetCacheHeaders },
       { source: "/llms.txt", headers: publicAssetCacheHeaders },
       { source: "/pricing.md", headers: pricingAssetCacheHeaders },
       { source: "/okf/index.md", headers: publicAssetCacheHeaders },

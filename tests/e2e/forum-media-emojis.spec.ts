@@ -68,6 +68,8 @@ test("forum cover, category spacing, full reply count and saved heart state work
   for (const width of [390, 1440]) {
     await page.setViewportSize({ width, height: 1000 });
     await page.goto("/forum");
+    await expect(page.locator(".redesign-brand-mark")).toHaveAttribute("sizes", "154px");
+    await expect(page.locator(".redesign-footer .footer-brand-logo")).toHaveAttribute("sizes", "240px");
     const cover = page.locator(".forum-cover-image");
     const bounds = (await cover.boundingBox())!;
     expect(bounds.width / bounds.height).toBeCloseTo(1448 / 620, 1);
@@ -104,8 +106,10 @@ test("forum cover, category spacing, full reply count and saved heart state work
   await reduced.close();
 });
 
-test("images, playable video and reply pictures remain private until actual admin approval", async ({ page, browser, baseURL }) => {
+test("images, playable video and replies become public immediately after publishing", async ({ page, browser, baseURL }) => {
+  await page.setViewportSize({ width: 1440, height: 1000 });
   await page.goto("/forum/new");
+  expect((await page.locator(".forum-form-card").boundingBox())!.width).toBeGreaterThan(900);
   const title = `附件话题 ${prefix}`;
   await page.getByLabel("标题", { exact: true }).fill(title);
   const content = page.getByLabel("内容", { exact: true });
@@ -114,12 +118,18 @@ test("images, playable video and reply pictures remain private until actual admi
   await page.getByRole("button", { name: "插入表情", exact: true }).click();
   await page.getByRole("button", { name: "插入出发表情", exact: true }).click();
   await expect(content).toHaveValue(/:enhe_01:/);
+  const emojiButton = page.getByRole("button", { name: "插入表情", exact: true });
+  await expect(emojiButton).toHaveCSS("position", "static");
+  const contentBounds = (await content.boundingBox())!;
+  const emojiBounds = (await emojiButton.boundingBox())!;
+  expect(emojiBounds.y).toBeGreaterThanOrEqual(contentBounds.y + contentBounds.height);
+  expect(Math.abs(emojiBounds.x - contentBounds.x)).toBeLessThanOrEqual(2);
   let releaseUpload!: () => void;
   const uploadGate = new Promise<void>((resolve) => { releaseUpload = resolve; });
   await page.route("**/api/forum/media", async (route) => { await uploadGate; await route.continue(); });
   const imageResponse = page.waitForResponse((response) => response.url().endsWith("/api/forum/media") && response.request().method() === "POST");
   await page.locator('input[type="file"][accept^="image/"]').setInputFiles(resolve("public/images/emojis/enhe_01.webp"));
-  await expect(page.getByRole("button", { name: "提交审核", exact: true })).toBeDisabled();
+  await expect(page.getByRole("button", { name: "发布话题", exact: true })).toBeDisabled();
   releaseUpload();
   const imageUpload = await imageResponse;
   expect(imageUpload.status()).toBe(201);
@@ -129,23 +139,13 @@ test("images, playable video and reply pictures remain private until actual admi
   const videoResponse = page.waitForResponse((response) => response.url().endsWith("/api/forum/media") && response.request().method() === "POST");
   await page.locator('input[type="file"][accept^="video/"]').setInputFiles(resolve("tests/fixtures/forum-media-video.mp4"));
   expect((await videoResponse).status()).toBe(201);
-  await expect(page.getByRole("button", { name: "提交审核", exact: true })).toBeEnabled();
-  await page.getByRole("button", { name: "提交审核", exact: true }).click();
+  await expect(page.getByRole("button", { name: "发布话题", exact: true })).toBeEnabled();
+  await page.getByRole("button", { name: "发布话题", exact: true }).click();
   await expect(page).toHaveURL(/submitted=1/);
   const post = await db.forumPost.findFirstOrThrow({ where: { authorId: userId, title }, include: { attachments: true } });
-  expect(post.status).toBe("pending");
+  expect(post.status).toBe("approved");
   expect(post.attachments).toHaveLength(2);
   const guest = await browser.newContext();
-  expect((await guest.request.get(`${baseURL}/api/forum/media/${imageId}`)).status()).toBe(404);
-  expect((await page.request.get(`/api/forum/media/${imageId}`)).status()).toBe(200);
-  const admin = await browser.newContext();
-  await admin.addCookies([{ name: "enhe_session", value: adminCookie, url: baseURL! }]);
-  const adminPage = await admin.newPage();
-  await adminPage.goto("/admin/forum");
-  const pendingCard = adminPage.locator(".forum-admin-card").filter({ hasText: title }).first();
-  await expect(pendingCard.locator(".forum-media-display__image")).toBeVisible();
-  await pendingCard.getByRole("button", { name: "通过", exact: true }).click();
-  await expect.poll(async () => (await db.forumPost.findUniqueOrThrow({ where: { id: post.id } })).status).toBe("approved");
   expect((await guest.request.get(`${baseURL}/api/forum/media/${imageId}`)).status()).toBe(200);
   const video = post.attachments.find((item) => item.kind === "video")!;
   const range = await guest.request.get(`${baseURL}/api/forum/media/${video.id}`, { headers: { Range: "bytes=0-15" } });
@@ -158,22 +158,22 @@ test("images, playable video and reply pictures remain private until actual admi
   await page.locator(".forum-section-heading .forum-reply-form > summary").click();
   const form = page.locator(".forum-section-heading .forum-reply-form form");
   await form.locator("textarea").fill("这是一条带图片的回复 :enhe_02:");
+  const postWidth = (await page.locator(".forum-post-detail").boundingBox())!.width;
+  const replyFormWidth = (await form.boundingBox())!.width;
+  expect(Math.abs(postWidth - replyFormWidth)).toBeLessThanOrEqual(2);
   const replyUpload = page.waitForResponse((response) => response.url().endsWith("/api/forum/media") && response.request().method() === "POST");
   await form.locator('input[type="file"]').setInputFiles(resolve("public/images/emojis/enhe_02.webp"));
   expect((await replyUpload).status()).toBe(201);
-  await expect(form.getByRole("button", { name: "提交审核", exact: true })).toBeEnabled();
-  await form.getByRole("button", { name: "提交审核", exact: true }).click();
+  await expect(form.getByRole("button", { name: "发布回复", exact: true })).toBeEnabled();
+  await form.getByRole("button", { name: "发布回复", exact: true }).click();
   await expect(page).toHaveURL(/replySubmitted=1/);
   const replyRecord = await db.forumReply.findFirstOrThrow({ where: { postId: post.id, authorId: userId }, include: { attachments: true } });
-  expect((await guest.request.get(`${baseURL}/api/forum/media/${replyRecord.attachments[0].id}`)).status()).toBe(404);
-  await adminPage.reload();
-  await adminPage.locator(".forum-admin-card").filter({ hasText: "这是一条带图片的回复" }).getByRole("button", { name: "通过", exact: true }).click();
-  await expect.poll(async () => (await db.forumReply.findUniqueOrThrow({ where: { id: replyRecord.id } })).status).toBe("approved");
+  expect(replyRecord.status).toBe("approved");
+  expect((await guest.request.get(`${baseURL}/api/forum/media/${replyRecord.attachments[0].id}`)).status()).toBe(200);
   await page.reload();
   await expect(page.locator(".forum-post-detail .forum-post-meta")).toContainText("1 条回复");
   await expect(page.locator(".forum-reply-card .forum-media-display__image")).toBeVisible();
   await page.screenshot({ path: test.info().outputPath("forum-published-media.png"), fullPage: true });
-  await admin.close();
   await guest.close();
 });
 

@@ -95,6 +95,7 @@ export function EnheRedesignFooter({
               alt={locale === "en" ? "ENHE brand" : "ENHE 品牌标志"}
               width={2172}
               height={724}
+              sizes="240px"
             />
             <nav className="footer-social-links" aria-label={locale === "en" ? "ENHE AI social media" : "ENHE AI 社交平台"}>
               <a href="https://github.com/yangjing6213-dev/yangjing6213-dev" target="_blank" rel="noreferrer" aria-label="GitHub">

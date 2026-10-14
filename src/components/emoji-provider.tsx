@@ -12,11 +12,27 @@ type TextField = HTMLInputElement | HTMLTextAreaElement;
 export function EmojiProvider({ children }: { children: React.ReactNode }) {
   const [entries, setEntries] = useState<readonly EmojiEntry[]>(defaultEmojis);
   const [field, setField] = useState<TextField | null>(null);
+  const [mount, setMount] = useState<HTMLElement | null>(null);
   const [open, setOpen] = useState(false);
   const [message, setMessage] = useState("");
   const pickerRef = useRef<HTMLDivElement>(null);
   const refreshCatalogRef = useRef<() => void>(() => {});
   const selectionRef = useRef<{ start: number | null; end: number | null }>({ start: null, end: null });
+
+  useEffect(() => {
+    if (!field?.isConnected) { setMount(null); return; }
+    const anchor = field.closest("label") ?? field;
+    const parent = anchor.parentElement;
+    if (!parent) { setMount(null); return; }
+    const host = document.createElement("div");
+    host.className = "enhe-emoji-picker-host";
+    parent.insertBefore(host, anchor.nextSibling);
+    setMount(host);
+    return () => {
+      host.remove();
+      setMount((current) => current === host ? null : current);
+    };
+  }, [field]);
 
   useEffect(() => {
     const controller = new AbortController();
@@ -37,16 +53,22 @@ export function EmojiProvider({ children }: { children: React.ReactNode }) {
   }, []);
 
   useEffect(() => {
+    let dismissTimer: number | undefined;
     const focus = (event: FocusEvent) => {
       const target = event.target;
+      if (dismissTimer) window.clearTimeout(dismissTimer);
       if (target instanceof Node && pickerRef.current?.contains(target)) return;
       if ((target instanceof HTMLInputElement || target instanceof HTMLTextAreaElement) && isOrdinaryTextField(target)) {
         setField(target);
+        setOpen(false);
         selectionRef.current = { start: target.selectionStart, end: target.selectionEnd };
         setMessage("");
       } else {
-        setField(null);
-        setOpen(false);
+        dismissTimer = window.setTimeout(() => {
+          if (document.activeElement instanceof HTMLInputElement || document.activeElement instanceof HTMLTextAreaElement) return;
+          setField(null);
+          setOpen(false);
+        }, 150);
       }
     };
     const rememberSelection = (event: Event) => {
@@ -67,6 +89,7 @@ export function EmojiProvider({ children }: { children: React.ReactNode }) {
     document.addEventListener("keydown", dismiss);
     document.addEventListener("submit", submit, true);
     return () => {
+      if (dismissTimer) window.clearTimeout(dismissTimer);
       document.removeEventListener("focusin", focus);
       document.removeEventListener("select", rememberSelection, true);
       document.removeEventListener("keyup", rememberSelection, true);
@@ -93,7 +116,7 @@ export function EmojiProvider({ children }: { children: React.ReactNode }) {
   return (
     <EmojiContext.Provider value={entries}>
       {children}
-      {field ? createPortal(
+      {field && mount ? createPortal(
         <div className="enhe-emoji-picker" ref={pickerRef}>
           {open ? (
             <div className="enhe-emoji-popover" id="enhe-emoji-picker-panel" role="dialog" aria-label="选择站内表情">
@@ -115,7 +138,7 @@ export function EmojiProvider({ children }: { children: React.ReactNode }) {
           <button className="enhe-emoji-toggle" type="button" aria-haspopup="dialog" aria-expanded={open} aria-controls={open ? "enhe-emoji-picker-panel" : undefined} onClick={() => { if (!open) refreshCatalogRef.current(); setOpen(!open); }}>
             <span aria-hidden="true">☺</span> 插入表情
           </button>
-        </div>, field.closest("dialog, [role='dialog']") ?? document.body
+        </div>, mount
       ) : null}
     </EmojiContext.Provider>
   );

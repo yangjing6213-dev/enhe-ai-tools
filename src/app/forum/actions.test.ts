@@ -66,16 +66,16 @@ describe("forum member actions", () => {
     }));
   });
 
-  it("requires login and queues new posts for review", async () => {
+  it("requires login and publishes new posts immediately", async () => {
     mocks.requireUser.mockRejectedValueOnce(new Error("UNAUTHORIZED"));
     await expect(createForumPostAction(form({ category: "question", title: "求助", content: "如何开始？" }))).rejects.toThrow("UNAUTHORIZED");
     expect(mocks.postCreate).not.toHaveBeenCalled();
 
     await createForumPostAction(form({ category: "question", title: "求助", content: "如何开始？" }));
-    expect(mocks.postCreate).toHaveBeenCalledWith({ data: expect.objectContaining({ authorId: "user-1", status: "pending", title: "求助" }) });
+    expect(mocks.postCreate).toHaveBeenCalledWith({ data: expect.objectContaining({ authorId: "user-1", status: "approved", title: "求助" }) });
   });
 
-  it("requires an approved post and queues replies for review", async () => {
+  it("requires an approved post and publishes replies immediately", async () => {
     const data = form({ postId: "post-1", content: "我也想了解。" });
     mocks.postFindUnique.mockResolvedValueOnce({ status: "pending" });
     await expect(createForumReplyAction(data)).rejects.toThrow("FORUM_POST_NOT_AVAILABLE");
@@ -83,7 +83,7 @@ describe("forum member actions", () => {
 
     mocks.postFindUnique.mockResolvedValueOnce({ status: "approved" });
     await createForumReplyAction(data);
-    expect(mocks.replyCreate).toHaveBeenCalledWith({ data: expect.objectContaining({ postId: "post-1", authorId: "user-1", status: "pending" }) });
+    expect(mocks.replyCreate).toHaveBeenCalledWith({ data: expect.objectContaining({ postId: "post-1", authorId: "user-1", status: "approved" }) });
   });
 
   it("rejects attachments owned by another member before creating a post", async () => {
@@ -94,7 +94,7 @@ describe("forum member actions", () => {
     expect(mocks.postCreate).not.toHaveBeenCalled();
   });
 
-  it("claims validated post uploads atomically and still queues the post for review", async () => {
+  it("claims validated post uploads atomically and publishes the post immediately", async () => {
     const data = form({ category: "showcase", title: "我的作品", content: "作品说明" });
     data.append("attachmentIds", "attachment-1");
     mocks.attachmentFindMany.mockResolvedValue([{ id: "attachment-1", authorId: "user-1", kind: "image", fileSize: 1024, postId: null, replyId: null, discardedAt: null, createdAt: new Date() }]);
@@ -104,7 +104,7 @@ describe("forum member actions", () => {
       where: expect.objectContaining({ authorId: "user-1", postId: null, replyId: null, discardedAt: null, id: { in: ["attachment-1"] } }),
       data: { postId: "post-1" },
     }));
-    expect(mocks.postCreate).toHaveBeenCalledWith({ data: expect.objectContaining({ status: "pending" }) });
+    expect(mocks.postCreate).toHaveBeenCalledWith({ data: expect.objectContaining({ status: "approved" }) });
   });
 
   it("rejects video uploads and more than four images on a reply", async () => {

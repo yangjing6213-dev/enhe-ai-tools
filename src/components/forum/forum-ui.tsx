@@ -27,18 +27,18 @@ function copy(locale: Locale) {
     signIn: "Sign in to join the discussion",
     like: "Like",
     replies: "replies",
-    submitHint: "Your discussion will appear after an administrator reviews it.",
-    submit: "Submit for review",
+    submitHint: "Posts appear publicly right after publishing.",
+    submit: "Publish topic",
     titleLabel: "Title",
     contentLabel: "Details",
     categoryLabel: "Topic",
     contentPlaceholder: "Share enough context for others to help.",
     titlePlaceholder: "What would you like to discuss?",
-    pending: "Thanks. Your post is waiting for review.",
-    replyPending: "Thanks. Your reply is waiting for review.",
+    published: "Your topic is now public.",
+    replyPublished: "Your reply is now public.",
     reply: "Reply",
     replyPlaceholder: "Write a helpful reply",
-    sendReply: "Send for review",
+    sendReply: "Publish reply",
     back: "Back to discussions",
   } : {
     title: "共创AI论坛",
@@ -50,18 +50,18 @@ function copy(locale: Locale) {
     signIn: "登录后参与交流",
     like: "喜欢",
     replies: "条回复",
-    submitHint: "话题通过管理员审核后会公开显示。",
-    submit: "提交审核",
+    submitHint: "发布后会立即公开显示。",
+    submit: "发布话题",
     titleLabel: "标题",
     contentLabel: "内容",
     categoryLabel: "话题分类",
     contentPlaceholder: "补充背景和细节，方便大家理解并回复。",
     titlePlaceholder: "你想讨论什么？",
-    pending: "已收到，话题正在等待管理员审核。",
-    replyPending: "已收到，回复正在等待管理员审核。",
+    published: "话题已发布，现在公开可见。",
+    replyPublished: "回复已发布，现在公开可见。",
     reply: "回复",
     replyPlaceholder: "写下你的回复",
-    sendReply: "提交审核",
+    sendReply: "发布回复",
     back: "返回话题列表",
   };
 }
@@ -150,7 +150,7 @@ export function ForumPostContent({ locale, post, isAuthenticated, replySubmitted
   return (
     <main className="forum-page">
       <Link className="forum-back-link" href={pageHref(locale, "/forum")}><span aria-hidden="true">◀</span> {t.back}</Link>
-      {replySubmitted ? <p className="forum-success-notice">{t.replyPending}</p> : null}
+      {replySubmitted ? <p className="forum-success-notice">{t.replyPublished}</p> : null}
       <article className="forum-post-card forum-post-detail">
         <div className="forum-post-header"><div className="forum-author-line"><UserAvatar src={post.author.avatar} alt={post.author.displayName} size={44} className="forum-avatar" /><span><EmojiText text={post.author.displayName} /></span><time dateTime={post.createdAt.toISOString()}>{dateLabel(post.createdAt, locale)}</time></div><span className="forum-category-tag">{getForumCategoryLabel(post.category, locale)}</span></div>
         <h1><EmojiText text={post.title} /></h1><p className="forum-detail-content"><EmojiText text={post.content} /></p>
@@ -158,7 +158,7 @@ export function ForumPostContent({ locale, post, isAuthenticated, replySubmitted
         <div className="forum-post-meta"><ForumLikeButton locale={locale} postId={post.id} count={post._count.likes} isLiked={post.isLiked} isAuthenticated={isAuthenticated} returnTo={`/forum/${post.id}`} /><a href="#replies">{post.replyCount} {t.replies}</a></div>
       </article>
       <section className="forum-replies" id="replies">
-        <div className="forum-section-heading"><h2>{locale === "en" ? "Replies" : "回复"}</h2>{isAuthenticated ? <ReplyForm locale={locale} postId={post.id} /> : <JoinLink locale={locale} />}</div>
+        <div className="forum-section-heading">{isAuthenticated ? <ReplyForm locale={locale} postId={post.id} /> : <JoinLink locale={locale} />}</div>
         {post.replies.length ? <ReplyBranch locale={locale} postId={post.id} replies={post.replies} isAuthenticated={isAuthenticated} /> : <p className="forum-empty-state">{locale === "en" ? "No replies yet." : "还没有回复。"}</p>}
       </section>
     </main>
@@ -173,7 +173,7 @@ export function ForumNewPostContent({ locale, submitted, isAuthenticated }: { lo
       <section className="forum-form-card">
         <h1>{t.newPost}</h1>
         <p>{t.submitHint}</p>
-        {submitted ? <p className="forum-success-notice">{t.pending}</p> : null}
+        {submitted ? <p className="forum-success-notice">{t.published}</p> : null}
         {isAuthenticated ? <form action={createForumPostAction}>
           <label><span>{t.categoryLabel}</span><select name="category" required defaultValue="question">{categories.map((category) => <option key={category} value={category}>{getForumCategoryLabel(category, locale)}</option>)}</select></label>
           <label><span>{t.titleLabel}</span><input name="title" required minLength={2} maxLength={120} placeholder={t.titlePlaceholder} /></label>
