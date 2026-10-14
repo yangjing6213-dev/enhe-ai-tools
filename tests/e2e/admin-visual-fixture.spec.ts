@@ -745,6 +745,8 @@ test("Admin dashboard cards stack vertically, blue actions stay legible, and app
   await expect(commentCard).toContainText("Local visual fixture tool");
   await expect(commentCard).toContainText("★★★★★");
   await expect(commentCard.locator("img")).toHaveCount(1);
+  await expect(commentCard.getByLabel("管理员回复")).toBeVisible();
+  await expect(commentCard.getByRole("button", { name: "保存回复" })).toBeVisible();
   await expect(page.getByRole("button", { name: "展示" })).toBeVisible();
 
   await page.goto("/admin/manuals", { waitUntil: "load" });

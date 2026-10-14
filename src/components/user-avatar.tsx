@@ -7,9 +7,15 @@ import { useEffect, useState } from "react";
 export function UserAvatar({
   src,
   alt,
+  fallbackSeed = alt,
+  size = 64,
+  className = "h-16 w-16 shrink-0 rounded-full object-cover",
 }: {
   src: string | null;
   alt: string;
+  fallbackSeed?: string;
+  size?: number;
+  className?: string;
 }) {
   const [failed, setFailed] = useState(false);
   useEffect(() => {
@@ -18,13 +24,13 @@ export function UserAvatar({
 
   return (
     <Image
-      src={!src || failed ? getDefaultAvatar(alt) : src}
+      src={!src || failed ? getDefaultAvatar(fallbackSeed) : src}
       alt={alt}
-      width={64}
-      height={64}
+      width={size}
+      height={size}
       unoptimized
       onError={() => setFailed(true)}
-      className="h-16 w-16 shrink-0 rounded-full object-cover"
+      className={className}
     />
   );
 }

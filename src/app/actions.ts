@@ -642,6 +642,38 @@ export async function updateCommentPinAction(formData: FormData) {
   revalidatePath(buildCanonicalToolPath(comment.tool, "zh"));
 }
 
+export async function saveAdminCommentReplyAction(formData: FormData) {
+  const admin = await requireAdmin();
+  const locale = await getCurrentLocale();
+  const id = z.string().min(1).parse(formData.get("id"));
+  const reply = z.string().trim().min(2).max(1000).parse(formData.get("reply"));
+  const comment = await prisma.comment.findUnique({
+    where: { id },
+    select: {
+      status: true,
+      tool: { select: { id: true, slug: true, name: true, englishName: true, type: true } },
+    },
+  });
+  if (!comment) throw new Error("COMMENT_NOT_FOUND");
+  if (comment.status !== "approved") throw new Error("COMMENT_NOT_APPROVED");
+
+  await prisma.comment.update({
+    where: { id },
+    data: { adminReply: reply, adminReplyAt: new Date() },
+  });
+  await writeAdminAuditLog({
+    adminId: admin.id,
+    action: "comment.admin_reply.save",
+    targetType: "comment",
+    targetId: id,
+    summary: "Saved an administrator reply to a user comment.",
+    metadata: { toolId: comment.tool.id },
+  });
+
+  revalidatePath("/admin/comments");
+  revalidatePath(buildCanonicalToolPath(comment.tool, locale));
+}
+
 export async function getSessionSnapshot() {
   const user = await getCurrentUser();
   return user;

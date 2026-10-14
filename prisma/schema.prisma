@@ -920,6 +920,8 @@ model Comment {
   likeCount Int           @default(0) @map("like_count")
   isPinned  Boolean       @default(false) @map("is_pinned")
   showOnHomepage Boolean  @default(false) @map("show_on_homepage")
+  adminReply String?      @map("admin_reply")
+  adminReplyAt DateTime?  @map("admin_reply_at")
   createdAt DateTime      @default(now()) @map("created_at")
   updatedAt DateTime      @updatedAt @map("updated_at")
   user      User          @relation(fields: [userId], references: [id])

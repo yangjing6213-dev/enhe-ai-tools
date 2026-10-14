@@ -13,11 +13,14 @@ import { StructuredData } from "@/components/structured-data";
 import { Badge, ButtonLink, Container, SectionTitle } from "@/components/ui";
 import { ToolCard } from "@/components/tool-card";
 import { ToolRichContent } from "@/components/tool-rich-content";
+import { UserAvatar } from "@/components/user-avatar";
 import { getCurrentUser } from "@/lib/auth";
 import { enheOrganizationReference } from "@/lib/brand-entity";
 import { prisma } from "@/lib/db";
+import { getDefaultAvatar } from "@/lib/default-avatar";
 import { getDictionary, type Locale } from "@/lib/dictionaries";
 import { resolveToolImageSrc } from "@/lib/tool-image";
+import { resolveUserAvatarSrc } from "@/lib/user-avatar";
 import { resolveProductVideos, resolveProductVideoSrc } from "@/lib/product-video";
 import {
   buildCanonicalToolPath,
@@ -292,9 +295,12 @@ export async function ToolDetailPageShell({
   );
   const visibleFaqPreview = visibleFaqs.slice(0, 3);
   const visibleChangelogs = tool.changelogs;
-  const visibleComments = tool.comments
-    .map((comment) => ({
+  const visibleComments = (await Promise.all(
+    tool.comments.map(async (comment) => ({
       ...comment,
+      avatarSrc:
+        (await resolveUserAvatarSrc(comment.user.avatar)) ||
+        getDefaultAvatar(comment.user.id),
       localizedAuthor:
         buildLocalizedToolOptionalText(comment.user.nickname, forceLocale) ||
         (forceLocale === "en" ? "Guest" : "匿名用户"),
@@ -302,8 +308,13 @@ export async function ToolDetailPageShell({
         comment.content,
         forceLocale,
       ),
-    }))
-    .filter((comment) => Boolean(comment.localizedContent));
+      localizedAdminReply: comment.adminReply
+        ? buildLocalizedToolOptionalText(comment.adminReply, forceLocale, {
+            allowUntranslated: true,
+          })
+        : "",
+    })),
+  )).filter((comment) => Boolean(comment.localizedContent));
   const isAccountService = tool.type === "online";
   const isSkillLearning = tool.type === "skill_learning";
   const isAiSkill = tool.type === "ai_skill";
@@ -1320,11 +1331,13 @@ export async function ToolDetailPageShell({
                 >
                   <div className="flex flex-wrap items-center justify-between gap-3">
                     <div className="flex min-w-0 items-center gap-3">
-                      {comment.user.avatar ? (
-                        <Image src={comment.user.avatar} alt="" width={40} height={40} unoptimized className="h-10 w-10 rounded-full object-cover" />
-                      ) : (
-                        <span aria-hidden="true" className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-white/10 text-sm font-semibold text-white">{comment.localizedAuthor.slice(0, 1)}</span>
-                      )}
+                      <UserAvatar
+                        src={comment.avatarSrc}
+                        alt=""
+                        fallbackSeed={comment.user.id}
+                        size={40}
+                        className="h-10 w-10 shrink-0 rounded-full object-cover"
+                      />
                       <p className="truncate text-sm text-[#8F9DB2]">{comment.localizedAuthor}{" "}
                     {comment.isPinned ? (
                       <span className="text-[#FFB86B]">· {td.pinned}</span>
@@ -1334,6 +1347,16 @@ export async function ToolDetailPageShell({
                     <CommentRatingDisplay rating={comment.rating} locale={forceLocale} />
                   </div>
                   <p className="enhe-authored-text mt-2 whitespace-pre-wrap break-words leading-7">{comment.localizedContent}</p>
+                  {comment.localizedAdminReply ? (
+                    <div className="mt-4 rounded-xl border border-sky-400/20 bg-sky-400/10 p-4">
+                      <p className="text-xs font-semibold text-sky-300">
+                        {forceLocale === "en" ? "ENHE team reply" : "ENHE 团队回复"}
+                      </p>
+                      <p className="enhe-authored-text mt-2 whitespace-pre-wrap break-words text-sm leading-6">
+                        {comment.localizedAdminReply}
+                      </p>
+                    </div>
+                  ) : null}
                 </div>
               ))}
             </div>

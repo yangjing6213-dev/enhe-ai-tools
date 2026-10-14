@@ -1,7 +1,7 @@
 import Link from "next/link";
 import Image from "next/image";
-import { deleteCommentAction, updateCommentHomepageDisplayAction, updateCommentPinAction, updateCommentStatusAction } from "@/app/actions";
-import { AdminContentShell, SubmitButton, inputClass, selectClass } from "@/app/admin/admin-ui";
+import { deleteCommentAction, saveAdminCommentReplyAction, updateCommentHomepageDisplayAction, updateCommentPinAction, updateCommentStatusAction } from "@/app/actions";
+import { AdminContentShell, SubmitButton, inputClass, selectClass, textareaClass } from "@/app/admin/admin-ui";
 import { buildAdminCommentPageHref, buildAdminCommentWhere, parseAdminCommentListParams } from "@/lib/admin-list";
 import { prisma } from "@/lib/db";
 import { getCurrentLocale, type Locale } from "@/lib/i18n";
@@ -34,6 +34,11 @@ const copy = {
     display: "展示",
     hide: "取消展示",
     displayedSuffix: "已展示到首页",
+    adminReply: "管理员回复",
+    replyPlaceholder: "输入 2 到 1000 个字符的公开回复",
+    replyHelp: "保存后会显示在对应产品详情页的评论下方。",
+    saveReply: "保存回复",
+    approveBeforeReply: "评论审核通过后才能回复。",
     empty: "暂无匹配评论。",
     status: {
       pending: "待审核",
@@ -65,6 +70,11 @@ const copy = {
     display: "Show on home",
     hide: "Hide from home",
     displayedSuffix: "Shown on home",
+    adminReply: "Administrator reply",
+    replyPlaceholder: "Enter a public reply of 2 to 1000 characters",
+    replyHelp: "The reply will appear below this comment on the product detail page.",
+    saveReply: "Save reply",
+    approveBeforeReply: "Approve this comment before replying.",
     empty: "No matching comments.",
     status: {
       pending: "Pending",
@@ -170,6 +180,32 @@ export default async function AdminCommentsPage({ searchParams }: AdminCommentsP
               </div>
             </div>
             <p className="mt-3 leading-7">{comment.content}</p>
+            <form action={saveAdminCommentReplyAction} className="mt-5 rounded-xl border border-white/10 bg-white/5 p-4">
+              <input type="hidden" name="id" value={comment.id} />
+              {comment.status === "approved" ? (
+                <>
+                  <label htmlFor={`admin-reply-${comment.id}`} className="mb-2 block text-sm font-semibold text-[#E8EEF8]">
+                    {t.adminReply}
+                  </label>
+                  <textarea
+                    id={`admin-reply-${comment.id}`}
+                    name="reply"
+                    required
+                    minLength={2}
+                    maxLength={1000}
+                    defaultValue={comment.adminReply ?? ""}
+                    placeholder={t.replyPlaceholder}
+                    className={textareaClass}
+                  />
+                  <p className="mt-2 text-xs text-[#8B95A7]">{t.replyHelp}</p>
+                  <SubmitButton pendingLabel={locale === "zh" ? "保存中..." : "Saving..."} className="mt-3 px-5 py-2 text-sm">
+                    {t.saveReply}
+                  </SubmitButton>
+                </>
+              ) : (
+                <p className="text-sm text-[#8B95A7]">{t.adminReply}：{t.approveBeforeReply}</p>
+              )}
+            </form>
             <div className="enhe-admin-comment-actions mt-5 flex flex-wrap gap-3">
               <CommentStatusForm id={comment.id} status="approved" label={t.approve} primary />
               <CommentStatusForm id={comment.id} status="rejected" label={t.reject} />

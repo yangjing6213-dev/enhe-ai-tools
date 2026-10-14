@@ -25,6 +25,7 @@ describe("user center page source", () => {
 
     const avatar = readFileSync(avatarPath, "utf8");
     expect(avatar).toContain("onError");
-    expect(avatar).toContain("!src || failed ? getDefaultAvatar(alt) : src");
+    expect(avatar).toContain("fallbackSeed = alt");
+    expect(avatar).toContain("!src || failed ? getDefaultAvatar(fallbackSeed) : src");
   });
 });
