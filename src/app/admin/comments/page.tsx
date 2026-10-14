@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { UserAvatar } from "@/components/user-avatar";
+import { EmojiText } from "@/components/emoji-text";
 import { deleteCommentAction, saveAdminCommentReplyAction, updateCommentHomepageDisplayAction, updateCommentPinAction, updateCommentStatusAction } from "@/app/actions";
 import { AdminContentShell, SubmitButton, inputClass, selectClass, textareaClass } from "@/app/admin/admin-ui";
 import { buildAdminCommentPageHref, buildAdminCommentWhere, parseAdminCommentListParams } from "@/lib/admin-list";
@@ -169,7 +170,7 @@ export default async function AdminCommentsPage({ searchParams }: AdminCommentsP
                   className="h-12 w-12 shrink-0 rounded-full object-cover"
                 />
                 <div className="min-w-0">
-                  <p className="truncate font-semibold text-[#E8EEF8]">{comment.user.nickname?.trim() || t.userFallback}</p>
+                  <p className="truncate font-semibold text-[#E8EEF8]"><EmojiText text={comment.user.nickname?.trim() || t.userFallback} /></p>
                   <p className="mt-1 truncate text-sm text-[#8B95A7]" title={locale === "en" ? comment.tool.englishName || comment.tool.name : comment.tool.name}>
                     {locale === "en" ? comment.tool.englishName || comment.tool.name : comment.tool.name}
                   </p>
@@ -186,7 +187,7 @@ export default async function AdminCommentsPage({ searchParams }: AdminCommentsP
                 </p>
               </div>
             </div>
-            <p className="mt-3 leading-7">{comment.content}</p>
+            <p className="mt-3 leading-7"><EmojiText text={comment.content} /></p>
             <form action={saveAdminCommentReplyAction} className="mt-5 rounded-xl border border-white/10 bg-white/5 p-4">
               <input type="hidden" name="id" value={comment.id} />
               {comment.status === "approved" ? (

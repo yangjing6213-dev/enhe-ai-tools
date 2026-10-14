@@ -1,6 +1,7 @@
 "use client";
 
 import Image from "next/image";
+import { EmojiText } from "@/components/emoji-text";
 import { getDefaultAvatar } from "@/lib/default-avatar";
 import { Pause, Play, UserRound } from "lucide-react";
 import { useEffect, useRef, useState, type KeyboardEvent } from "react";
@@ -368,7 +369,7 @@ export function EnheRedesignExperienceReviews({
                       </span>
                     )}
                     <div className="redesign-home-review-person">
-                      <strong>{review.displayName}</strong>
+                      <strong><EmojiText text={review.displayName} /></strong>
                       <span>{review.productLabel}</span>
                     </div>
                     {review.stars ? (
@@ -377,7 +378,7 @@ export function EnheRedesignExperienceReviews({
                       </span>
                     ) : null}
                   </div>
-                  <blockquote>{review.quote}</blockquote>
+                  <blockquote><EmojiText text={review.quote} /></blockquote>
                 </article>
               );
             })}

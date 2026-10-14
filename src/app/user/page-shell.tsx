@@ -23,6 +23,7 @@ import { buildUserToolEntitlements, type UserEntitlementTool } from "@/lib/user-
 import { formatCurrency } from "@/lib/utils";
 import { resolveUserAvatarSrc } from "@/lib/user-avatar";
 import { UserAvatar } from "@/components/user-avatar";
+import { EmojiText } from "@/components/emoji-text";
 
 export type UserCenterSearchParams = Promise<Record<string, string | undefined>>;
 
@@ -122,7 +123,7 @@ export async function UserCenterPageShell({
                 alt={user.nickname ?? (locale === "en" ? "User avatar" : "用户头像")}
               />
               <div className="min-w-0">
-                <p className="truncate font-semibold text-[var(--marketing-text)]">{user.nickname || (locale === "en" ? "Set a username" : "请设置用户名")}</p>
+                <p className="truncate font-semibold text-[var(--marketing-text)]"><EmojiText text={user.nickname || (locale === "en" ? "Set a username" : "请设置用户名")} /></p>
                 <p className="mt-1 text-xs text-[var(--marketing-muted)]">{locale === "en" ? "Your name and avatar may appear with comments you choose to feature." : "你选择展示的评论可能会同时显示用户名和头像。"}</p>
               </div>
             </div>
@@ -349,7 +350,7 @@ export async function UserCenterPageShell({
             {comments.length ? (
               comments.map((comment) => (
                 <p key={comment.id} className="border-b border-[var(--marketing-border)] py-3 text-sm text-[var(--marketing-muted)]">
-                  {comment.tool.name} 路 {formatStatus(comment.status, locale)} 路 {comment.content}
+                  {comment.tool.name} 路 {formatStatus(comment.status, locale)} 路 <EmojiText text={comment.content} />
                   {comment.status === "pending" ? <span> 路 {getReviewNotice(locale)}</span> : null}
                 </p>
               ))

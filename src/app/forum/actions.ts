@@ -6,15 +6,13 @@ import { prisma } from "@/lib/db";
 import { requireUser } from "@/lib/auth";
 import { getCurrentLocale } from "@/lib/i18n";
 import { buildLocalePath } from "@/lib/seo";
+import { assertForumAttachmentSelection, forumAttachmentLifetimeMs, readForumAttachmentIds } from "@/lib/forum-media";
 import {
   canCreateForumContent,
   canLikeForumContent,
-  canReportForumContent,
   forumLikeWindowMs,
   forumPostInputSchema,
   forumReplyInputSchema,
-  forumReportInputSchema,
-  forumReportWindowMs,
   forumReplyMaxDepth,
   forumSubmissionWindowMs,
   getForumReplyDepth,
@@ -45,6 +43,7 @@ export async function createForumPostAction(formData: FormData) {
     content: readText(formData, "content"),
   });
   if (!parsed.success) throw new Error("FORUM_INVALID_POST");
+  const attachmentIds = readForumAttachmentIds(formData, "post");
 
   const since = new Date(Date.now() - forumSubmissionWindowMs);
   const [posts, replies] = await Promise.all([
@@ -53,7 +52,19 @@ export async function createForumPostAction(formData: FormData) {
   ]);
   if (!canCreateForumContent(posts + replies)) throw new Error("FORUM_SUBMISSION_LIMIT");
 
-  await prisma.forumPost.create({ data: { ...parsed.data, authorId: user.id, status: "pending" } });
+  const data = { ...parsed.data, authorId: user.id, status: "pending" as const };
+  if (attachmentIds.length) {
+    await prisma.$transaction(async (tx) => {
+      const where = { id: { in: attachmentIds }, authorId: user.id, postId: null, replyId: null, discardedAt: null, createdAt: { gte: new Date(Date.now() - forumAttachmentLifetimeMs) } };
+      const attachments = await tx.forumAttachment.findMany({ where });
+      assertForumAttachmentSelection(attachmentIds, attachments, user.id, "post");
+      const post = await tx.forumPost.create({ data });
+      const claimed = await tx.forumAttachment.updateMany({ where, data: { postId: post.id } });
+      if (claimed.count !== attachmentIds.length) throw new Error("FORUM_INVALID_ATTACHMENTS");
+    });
+  } else {
+    await prisma.forumPost.create({ data });
+  }
   await revalidateForum();
   redirect(`${buildLocalePath("/forum/new", locale)}?submitted=1`);
 }
@@ -66,6 +77,7 @@ export async function createForumReplyAction(formData: FormData) {
   if (!postId) throw new Error("FORUM_INVALID_TARGET");
   const parsed = forumReplyInputSchema.safeParse({ content: readText(formData, "content") });
   if (!parsed.success) throw new Error("FORUM_INVALID_REPLY");
+  const attachmentIds = readForumAttachmentIds(formData, "reply");
 
   const post = await prisma.forumPost.findUnique({ where: { id: postId }, select: { status: true } });
   if (post?.status !== "approved") throw new Error("FORUM_POST_NOT_AVAILABLE");
@@ -93,14 +105,25 @@ export async function createForumReplyAction(formData: FormData) {
   ]);
   if (!canCreateForumContent(posts + replies)) throw new Error("FORUM_SUBMISSION_LIMIT");
 
-  await prisma.forumReply.create({ data: { ...parsed.data, postId, parentId, authorId: user.id, status: "pending" } });
+  const data = { ...parsed.data, postId, parentId, authorId: user.id, status: "pending" as const };
+  if (attachmentIds.length) {
+    await prisma.$transaction(async (tx) => {
+      const where = { id: { in: attachmentIds }, authorId: user.id, postId: null, replyId: null, discardedAt: null, createdAt: { gte: new Date(Date.now() - forumAttachmentLifetimeMs) } };
+      const attachments = await tx.forumAttachment.findMany({ where });
+      assertForumAttachmentSelection(attachmentIds, attachments, user.id, "reply");
+      const reply = await tx.forumReply.create({ data });
+      const claimed = await tx.forumAttachment.updateMany({ where, data: { replyId: reply.id } });
+      if (claimed.count !== attachmentIds.length) throw new Error("FORUM_INVALID_ATTACHMENTS");
+    });
+  } else {
+    await prisma.forumReply.create({ data });
+  }
   await revalidateForum(postId);
   redirect(`${forumPath(locale, postId)}?replySubmitted=1#replies`);
 }
 
 export async function toggleForumLikeAction(formData: FormData) {
   const user = await requireUser();
-  const locale = await getCurrentLocale();
   const postId = readText(formData, "postId").trim();
   const replyId = readText(formData, "replyId").trim();
   if (Boolean(postId) === Boolean(replyId)) throw new Error("FORUM_INVALID_TARGET");
@@ -117,7 +140,7 @@ export async function toggleForumLikeAction(formData: FormData) {
 
   const existing = await prisma.forumLike.findFirst({ where: { userId: user.id, ...target }, select: { id: true } });
   if (existing) {
-    await prisma.forumLike.delete({ where: { id: existing.id } });
+    await prisma.forumLike.deleteMany({ where: { id: existing.id, userId: user.id } });
   } else {
     const since = new Date(Date.now() - forumLikeWindowMs);
     const recent = await prisma.forumLike.count({ where: { userId: user.id, createdAt: { gte: since } } });
@@ -129,38 +152,9 @@ export async function toggleForumLikeAction(formData: FormData) {
     }
   }
   await revalidateForum(targetPostId);
-}
-
-export async function reportForumContentAction(formData: FormData) {
-  const user = await requireUser();
-  const locale = await getCurrentLocale();
-  const postId = readText(formData, "postId").trim();
-  const replyId = readText(formData, "replyId").trim();
-  if (Boolean(postId) === Boolean(replyId)) throw new Error("FORUM_INVALID_TARGET");
-  const parsed = forumReportInputSchema.safeParse({ reason: readText(formData, "reason") });
-  if (!parsed.success) throw new Error("FORUM_INVALID_REPORT");
-  const target = postId ? { postId } : { replyId };
-  let targetPostId = postId || undefined;
-  if (postId) {
-    const record = await prisma.forumPost.findUnique({ where: { id: postId }, select: { status: true } });
-    if (record?.status !== "approved") throw new Error("FORUM_CONTENT_NOT_AVAILABLE");
-  } else {
-    const record = await prisma.forumReply.findUnique({ where: { id: replyId }, select: { status: true, postId: true } });
-    if (record?.status !== "approved") throw new Error("FORUM_CONTENT_NOT_AVAILABLE");
-    targetPostId = record.postId;
-  }
-
-  const since = new Date(Date.now() - forumReportWindowMs);
-  const recent = await prisma.forumReport.count({ where: { reporterId: user.id, createdAt: { gte: since } } });
-  if (!canReportForumContent(recent)) throw new Error("FORUM_REPORT_LIMIT");
-  const existing = await prisma.forumReport.findFirst({ where: { reporterId: user.id, ...target }, select: { id: true } });
-  if (existing) throw new Error("FORUM_DUPLICATE_REPORT");
-  try {
-    await prisma.forumReport.create({ data: { reporterId: user.id, ...target, reason: parsed.data.reason } });
-  } catch (error) {
-    if (error && typeof error === "object" && "code" in error && error.code === "P2002") throw new Error("FORUM_DUPLICATE_REPORT");
-    throw error;
-  }
-  await revalidateForum(targetPostId);
-  redirect(`${forumPath(locale, targetPostId)}?reported=1#replies`);
+  const [ownLike, count] = await Promise.all([
+    prisma.forumLike.findFirst({ where: { userId: user.id, ...target }, select: { id: true } }),
+    prisma.forumLike.count({ where: target }),
+  ]);
+  return { liked: Boolean(ownLike), count };
 }

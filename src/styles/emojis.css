@@ -1,0 +1,22 @@
+.enhe-inline-emoji { display: inline-block; width: 1.8em; height: 1.8em; object-fit: contain; vertical-align: -.45em; margin-inline: .08em; }
+.enhe-emoji-picker { position: fixed; right: max(16px, env(safe-area-inset-right)); bottom: max(16px, env(safe-area-inset-bottom)); z-index: 1100; color: #151515; font-family: inherit; }
+.enhe-emoji-toggle { display: flex; align-items: center; gap: 8px; min-height: 44px; border: 1px solid #2478ef; border-radius: 999px; background: #2478ef; color: #fff; padding: 8px 16px; box-shadow: 0 6px 24px #0002; font-size: 14px; font-weight: 600; cursor: pointer; }
+.enhe-emoji-toggle > span { color: #fff; font-size: 24px; line-height: 1; }
+.enhe-emoji-popover { width: min(360px, calc(100vw - 32px)); max-height: min(480px, calc(100dvh - 100px)); overflow: auto; margin-bottom: 10px; border: 1px solid #d8d8d8; border-radius: 18px; padding: 14px; background: #fff; box-shadow: 0 12px 40px #0003; }
+.enhe-emoji-heading { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
+.enhe-emoji-heading > button { width: 44px; height: 44px; border-radius: 10px; color: #151515; background: #fff; font-size: 24px; cursor: pointer; }
+.enhe-emoji-grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 6px; }
+.enhe-emoji-grid > button { min-height: 88px; border: 1px solid #d8d8d8; border-radius: 10px; background: #fff; color: #151515; padding: 5px; cursor: pointer; }
+.enhe-emoji-grid img { display: block; width: 56px; height: 56px; object-fit: contain; margin-inline: auto; }
+.enhe-emoji-grid span { display: block; font-size: 11px; margin-top: 4px; overflow-wrap: anywhere; }
+.enhe-emoji-grid > button:hover, .enhe-emoji-heading > button:hover { background-color: #eef5ff; }
+.enhe-emoji-toggle:hover { background-color: #1766d1; }
+.enhe-emoji-picker button:focus-visible { outline: 2px solid #2478ef; outline-offset: 3px; }
+.enhe-emoji-hint { margin-top: 12px; font-size: 12px; color: #5f665f; }
+.enhe-emoji-error { margin-top: 8px; color: #b32e1e; font-size: 13px; }
+.enhe-emoji-admin-list { display: grid; gap: 12px; margin-top: 24px; }
+.enhe-emoji-admin button.enhe-emoji-admin-primary { color: #fff !important; }
+.enhe-emoji-admin-row { display: grid; grid-template-columns: 72px minmax(140px, 1fr) 100px auto; gap: 12px; align-items: center; border: 1px solid #d8d8d8; border-radius: 14px; background: #fff; color: #151515; padding: 12px; }
+.enhe-emoji-admin-row img { width: 64px; height: 64px; object-fit: contain; }
+.enhe-emoji-admin-row small { display: block; margin-top: 4px; color: #5f665f; font-size: 11px; overflow-wrap: anywhere; }
+@media (max-width: 600px) { .enhe-emoji-admin-row { grid-template-columns: 56px minmax(0, 1fr); } .enhe-emoji-admin-row img { width: 48px; height: 48px; } }

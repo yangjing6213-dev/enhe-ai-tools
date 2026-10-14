@@ -263,7 +263,7 @@ export async function saveUploadedFile(file: File, options: SaveUploadOptions): 
   const buffer = Buffer.from(await file.arrayBuffer());
 
   if (isCosStorageConfigured()) {
-    return saveToCos(file, buffer, objectKey, mimeType);
+    return saveToCos(file, buffer, objectKey, mimeType, options.access);
   }
 
   if (options.access === "private") {
@@ -356,7 +356,7 @@ async function withStorageRetry<T>(operation: () => Promise<T>, maxAttempts: num
   throw lastError;
 }
 
-async function saveToCos(file: File, buffer: Buffer, objectKey: string, mimeType: string): Promise<StoredUpload> {
+async function saveToCos(file: File, buffer: Buffer, objectKey: string, mimeType: string, access?: "public" | "private"): Promise<StoredUpload> {
   const secretId = process.env.TENCENT_COS_SECRET_ID;
   const secretKey = process.env.TENCENT_COS_SECRET_KEY;
   const bucket = process.env.TENCENT_COS_BUCKET;
@@ -380,7 +380,8 @@ async function saveToCos(file: File, buffer: Buffer, objectKey: string, mimeType
             Key: objectKey,
             Body: buffer,
             ContentLength: buffer.length,
-            ContentType: mimeType
+            ContentType: mimeType,
+            ...(access === "private" ? { ACL: "private" } : {})
           },
           (error: unknown, data: { Location?: string }) => {
             if (error) reject(error);

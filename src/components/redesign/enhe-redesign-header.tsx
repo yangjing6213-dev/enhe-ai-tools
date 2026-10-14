@@ -1,4 +1,5 @@
 import { EnheAccountMenu } from "./enhe-account-menu";
+import { EmojiText } from "@/components/emoji-text";
 import { EnheHeaderAvatar } from "./enhe-header-avatar";
 import { EnheBrandLockup } from "./enhe-brand-lockup";
 import { EnheHeaderSearch } from "./enhe-header-search";
@@ -115,7 +116,7 @@ export function EnheRedesignHeader({
                 <EnheAccountMenu>
                   <summary className="redesign-avatar-trigger" aria-label={account.avatarLabel}>
                     <EnheHeaderAvatar name={account.displayName} />
-                    <span className="redesign-header-user-name">{account.displayName}</span>
+                    <span className="redesign-header-user-name"><EmojiText text={account.displayName} /></span>
                   </summary>
                   <div className="redesign-avatar-menu" role="menu" aria-label={userMenuLabel}>
                     <PrefetchLink href={account.userHref} prefetch={false} role="menuitem">

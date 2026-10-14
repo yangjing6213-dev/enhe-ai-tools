@@ -14,6 +14,7 @@ import { Badge, ButtonLink, Container, SectionTitle } from "@/components/ui";
 import { ToolCard } from "@/components/tool-card";
 import { ToolRichContent } from "@/components/tool-rich-content";
 import { UserAvatar } from "@/components/user-avatar";
+import { EmojiText } from "@/components/emoji-text";
 import { getCurrentUser } from "@/lib/auth";
 import { enheOrganizationReference } from "@/lib/brand-entity";
 import { prisma } from "@/lib/db";
@@ -1338,7 +1339,7 @@ export async function ToolDetailPageShell({
                         size={40}
                         className="h-10 w-10 shrink-0 rounded-full object-cover"
                       />
-                      <p className="truncate text-sm text-[#8F9DB2]">{comment.localizedAuthor}{" "}
+                      <p className="truncate text-sm text-[#8F9DB2]"><EmojiText text={comment.localizedAuthor} />{" "}
                     {comment.isPinned ? (
                       <span className="text-[#FFB86B]">· {td.pinned}</span>
                     ) : null}
@@ -1346,14 +1347,14 @@ export async function ToolDetailPageShell({
                     </div>
                     <CommentRatingDisplay rating={comment.rating} locale={forceLocale} />
                   </div>
-                  <p className="enhe-authored-text mt-2 whitespace-pre-wrap break-words leading-7">{comment.localizedContent}</p>
+                  <p className="enhe-authored-text mt-2 whitespace-pre-wrap break-words leading-7"><EmojiText text={comment.localizedContent || ""} /></p>
                   {comment.localizedAdminReply ? (
                     <div className="mt-4 rounded-xl border border-sky-400/20 bg-sky-400/10 p-4">
                       <p className="text-xs font-semibold text-sky-300">
                         {forceLocale === "en" ? "ENHE team reply" : "ENHE 团队回复"}
                       </p>
                       <p className="enhe-authored-text mt-2 whitespace-pre-wrap break-words text-sm leading-6">
-                        {comment.localizedAdminReply}
+                        <EmojiText text={comment.localizedAdminReply} />
                       </p>
                     </div>
                   ) : null}

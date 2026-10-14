@@ -8,6 +8,6 @@ export default async function EnglishForumIndexPage({ searchParams }: { searchPa
   const [{ category: rawCategory }, user] = await Promise.all([searchParams, getCurrentUser()]);
   const parsed = forumCategorySchema.safeParse(rawCategory);
   const category = parsed.success ? parsed.data : undefined;
-  const posts = await getForumPosts(category, "en");
+  const posts = await getForumPosts(category, "en", user?.id);
   return <PublicSiteChrome forceLocale="en"><ForumIndexContent locale="en" posts={posts} selectedCategory={category} isAuthenticated={Boolean(user)} /></PublicSiteChrome>;
 }

@@ -1,6 +1,7 @@
 "use client";
 
 import { UserRound } from "lucide-react";
+import { EmojiText } from "@/components/emoji-text";
 import { PrefetchLink } from "@/components/prefetch-link";
 import type { Locale } from "@/lib/dictionaries";
 import { buildLocalePath } from "@/lib/seo";
@@ -38,7 +39,7 @@ export function HeaderAccountControls({
     <>
       <PrefetchLink href={userPath} className="site-user-chip cursor-target hidden sm:inline-flex">
         <UserRound size={16} />
-        <span className="truncate">{user.nickname ?? user.email ?? labels.userFallback}</span>
+        <span className="truncate"><EmojiText text={user.nickname ?? user.email ?? labels.userFallback} /></span>
       </PrefetchLink>
     </>
   );

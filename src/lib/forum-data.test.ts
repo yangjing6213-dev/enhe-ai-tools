@@ -64,4 +64,29 @@ describe("forum reply tree", () => {
     expect(mocks.postFindFirst).toHaveBeenCalledWith(expect.objectContaining({ where: { id: "pending-post", status: "approved" } }));
     expect(mocks.replyFindMany).not.toHaveBeenCalled();
   });
+
+  it("loads only the viewer's like state and attachment display metadata", async () => {
+    mocks.postFindMany.mockResolvedValue([{ id: "post-1", author: { id: "author", nickname: "用户", avatar: null }, likes: [{ id: "like-1" }] }]);
+    const posts = await getForumPosts(undefined, "zh", "viewer-1");
+    expect(posts[0].isLiked).toBe(true);
+    expect(mocks.postFindMany).toHaveBeenCalledWith(expect.objectContaining({
+      include: expect.objectContaining({
+        likes: expect.objectContaining({ where: { userId: "viewer-1" }, select: { id: true } }),
+        attachments: expect.objectContaining({ select: { id: true, kind: true, mimeType: true, originalName: true } }),
+      }),
+    }));
+  });
+
+  it("counts approved nested replies together and preserves each viewer like state", async () => {
+    const author = { id: "author", nickname: "用户", avatar: null };
+    mocks.postFindFirst.mockResolvedValue({ id: "post-1", author, likes: [] });
+    mocks.replyFindMany.mockResolvedValue([
+      { id: "reply-1", parentId: null, author, likes: [] },
+      { id: "reply-2", parentId: "reply-1", author, likes: [{ id: "like-2" }] },
+    ]);
+    const post = await getForumPost("post-1", "zh", "viewer-1");
+    expect(post?.replyCount).toBe(2);
+    expect(post?.replies[0].children[0].isLiked).toBe(true);
+    expect(mocks.replyFindMany).toHaveBeenCalledWith(expect.objectContaining({ where: { postId: "post-1", status: "approved" } }));
+  });
 });

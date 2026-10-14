@@ -53,6 +53,7 @@ services:
       - "127.0.0.1:3001:3000"
     volumes:
       - ./uploads:/app/public/uploads
+      - ./forum-media:/app/private-uploads/forum-media
       - ./secrets:/app/secrets:ro
       - ./logs:/app/logs
       - ./runtime:/app/runtime

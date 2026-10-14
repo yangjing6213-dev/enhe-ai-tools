@@ -1,6 +1,7 @@
 "use client";
 
 import { animate } from "motion/react";
+import { EmojiText } from "@/components/emoji-text";
 import {
   useCallback,
   useEffect,
@@ -495,7 +496,7 @@ export function EnheRedesignMobileMenu({
                 </a>
               ) : (
                 <>
-                  <span className="redesign-mobile-account-label">{account.displayName}</span>
+                  <span className="redesign-mobile-account-label"><EmojiText text={account.displayName} /></span>
                   <a
                     href={account.userHref}
                     onClick={(event) => close(getClickModality(event))}

@@ -39,6 +39,9 @@ web-access
 uploads
 **/uploads
 public/uploads
+private-uploads
+**/private-uploads
+deploy/enhe-ai-tools/forum-media
 !src/app/api/uploads/
 !src/app/api/uploads/**
 secrets

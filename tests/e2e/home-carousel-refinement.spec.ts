@@ -64,16 +64,20 @@ for (const route of ["/", "/en"]) {
     await expect(section.locator(".redesign-home-reviews-track")).toHaveAttribute("aria-live", "off");
     for (let step = 0; step < 2; step++) {
       const before = await current.getAttribute("aria-label");
-      await page.clock.runFor(2900);
+      await page.clock.fastForward(2900);
       await expect(current).toHaveAttribute("aria-label", before!);
-      await page.clock.runFor(100);
+      await page.clock.fastForward(100);
       await expect(current).not.toHaveAttribute("aria-label", before!);
     }
     await control.evaluate((node: HTMLButtonElement) => node.click());
     await expect(control).toHaveAttribute("aria-pressed", "true");
     const paused = await current.getAttribute("aria-label");
-    await page.clock.runFor(9000);
-    await expect(current).toHaveAttribute("aria-label", paused!);
+    // No carousel tick is expected while paused. Check each period instead of
+    // replaying every unrelated animation frame or allowing a full-cycle alias.
+    for (let step = 0; step < 3; step++) {
+      await page.clock.fastForward(3000);
+      await expect(current).toHaveAttribute("aria-label", paused!);
+    }
   });
 }
 

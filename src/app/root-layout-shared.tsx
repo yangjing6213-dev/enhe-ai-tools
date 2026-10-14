@@ -4,6 +4,8 @@ import { BorderGlowController } from "@/components/border-glow-controller";
 import { CursorGlow } from "@/components/cursor-glow";
 import { InteractiveBackground } from "@/components/interactive-background";
 import { SiteThemeProvider } from "@/components/site-theme-provider";
+import { EmojiProvider } from "@/components/emoji-provider";
+import "@/styles/emojis.css";
 import {
   defaultSiteDescription,
   getSiteBaseUrl,
@@ -64,15 +66,17 @@ export function RootDocument({
       </head>
       <body>
         <SiteThemeProvider>
-          {!disableLegacyVisualEffects ? (
-            <>
-              <InteractiveBackground />
-              <CursorGlow />
-            </>
-          ) : null}
-          <BorderGlowController />
-          <AnalyticsTracker />
-          {children}
+          <EmojiProvider>
+            {!disableLegacyVisualEffects ? (
+              <>
+                <InteractiveBackground />
+                <CursorGlow />
+              </>
+            ) : null}
+            <BorderGlowController />
+            <AnalyticsTracker />
+            {children}
+          </EmojiProvider>
         </SiteThemeProvider>
       </body>
     </html>

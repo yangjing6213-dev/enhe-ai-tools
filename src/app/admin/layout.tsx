@@ -41,6 +41,7 @@ const adminNav = [
   ["changelogs", "/admin/changelogs"],
   ["comments", "/admin/comments"],
   ["forum", "/admin/forum"],
+  ["emojis", "/admin/emojis"],
   ["files", "/admin/files"],
   ["licenseGenerator", "/admin/license-generator"],
   ["audit", "/admin/audit"],
