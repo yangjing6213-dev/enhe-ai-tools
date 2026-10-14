@@ -456,18 +456,6 @@ export function EnheRedesignProductShowcase({
                 </>
               )}
           </div>
-          <nav className="redesign-home-product-indicators" aria-label={copy.chooseProduct}>
-            {products.map((item, itemIndex) => (
-              <button
-                key={item.id}
-                type="button"
-                aria-label={copy.showProduct(itemIndex + 1)}
-                aria-current={itemIndex === currentIndex ? "true" : undefined}
-                aria-controls={panelId}
-                onClick={() => selectProduct(itemIndex)}
-              />
-            ))}
-          </nav>
         </div>
 
         <div className="redesign-home-product-detail">
@@ -575,6 +563,18 @@ export function EnheRedesignProductShowcase({
                 className="redesign-home-product-triangle"
               />
             </button>
+            <nav className="redesign-home-product-indicators" aria-label={copy.chooseProduct}>
+              {products.map((item, itemIndex) => (
+                <button
+                  key={item.id}
+                  type="button"
+                  aria-label={copy.showProduct(itemIndex + 1)}
+                  aria-current={itemIndex === currentIndex ? "true" : undefined}
+                  aria-controls={panelId}
+                  onClick={() => selectProduct(itemIndex)}
+                />
+              ))}
+            </nav>
           </div>
           <span className="sr-only" aria-live={isAutoRotating ? "off" : "polite"} aria-atomic="true">
             {product.name[locale]}

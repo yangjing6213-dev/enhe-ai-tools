@@ -248,11 +248,11 @@
   pointer-events: auto;
 }
 
-.redesign-home-product-control:first-child {
+.redesign-home-product-control:first-of-type {
   left: calc(-1 * clamp(44px, 6vw, 80px));
 }
 
-.redesign-home-product-control:last-child {
+.redesign-home-product-control:last-of-type {
   right: calc(-1 * clamp(44px, 6vw, 80px));
 }
 
@@ -348,6 +348,7 @@
   box-shadow: 0 4px 18px rgb(0 0 0 / 22%);
   transform: translateX(50%);
   backdrop-filter: blur(8px);
+  pointer-events: auto;
 }
 
 .redesign-home-product-indicators button {
@@ -443,11 +444,11 @@
     left: 40px;
   }
 
-  .redesign-home-product-control:first-child {
+  .redesign-home-product-control:first-of-type {
     left: -40px;
   }
 
-  .redesign-home-product-control:last-child {
+  .redesign-home-product-control:last-of-type {
     right: -40px;
   }
 
