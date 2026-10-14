@@ -12,6 +12,15 @@ test("homepage exposes the community forum in Chinese and English navigation and
   expect(forumBox).not.toBeNull();
   expect(Math.abs(forumBox!.y - toolsBox!.y)).toBeLessThan(2);
   expect(forumBox!.x).toBeGreaterThan(toolsBox!.x);
+  const toolsStyle = await page.getByRole("link", { name: "探索 AI 工具" }).evaluate((element) => {
+    const style = getComputedStyle(element);
+    return { backgroundColor: style.backgroundColor, borderRadius: style.borderRadius, fontSize: style.fontSize, height: style.height };
+  });
+  const forumStyle = await page.getByRole("link", { name: "共创AI论坛" }).evaluate((element) => {
+    const style = getComputedStyle(element);
+    return { backgroundColor: style.backgroundColor, borderRadius: style.borderRadius, fontSize: style.fontSize, height: style.height };
+  });
+  expect(forumStyle).toEqual(toolsStyle);
 
   await page.goto("/en");
   await expect(page.getByRole("link", { name: "Co-create AI", exact: true }).first()).toHaveAttribute("href", "/en/forum");

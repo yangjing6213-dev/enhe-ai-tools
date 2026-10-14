@@ -42,9 +42,9 @@
 .enhe-language-toggle .squish-switch:focus-visible { outline: 2px solid var(--enhe-action, #0063ce); outline-offset: 2px; border-radius: 19px; }
 .enhe-language-toggle .squish-switch__track { box-shadow: inset 0 0 0 1px #d4d4d8; }
 @media (768px <= width < 900px) {
-  .redesign-header .redesign-desktop-nav-list { gap: 2px; }
-  .redesign-header .redesign-nav-link { padding-inline: 4px; }
-  .redesign-header .redesign-login-link { padding-inline: 6px; }
+  .redesign-header .redesign-desktop-nav-list { gap: 0; }
+  .redesign-header .redesign-nav-link { padding-inline: 2px; }
+  .redesign-header .redesign-login-link { padding-inline: 4px; }
 }
 @media (width < 420px) {
   .redesign-header .redesign-header-inner { grid-template-columns: 120px minmax(0, 1fr); }

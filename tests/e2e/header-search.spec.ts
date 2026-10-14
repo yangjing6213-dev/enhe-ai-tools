@@ -12,7 +12,7 @@ test("public header replaces the search link, opens recommendations, and submits
       await expect(input).toBeVisible();
       await expect(header.locator(".redesign-brand-label")).toHaveCount(0);
       await expect(header.locator('.redesign-nav-link[href$="/search"]')).toHaveCount(0);
-      await expect(page.locator(".redesign-home-cta")).toHaveCSS("border-radius", "12px");
+      await expect(page.locator(".redesign-home-cta").first()).toHaveCSS("border-radius", "12px");
       await expect(header.locator(".redesign-language-switch:visible")).toHaveCSS("border-width", "0px");
       if (width >= 768) await expect(header.locator(".redesign-login-link:visible")).toHaveCSS("border-width", "0px");
       await expect(header.locator(".redesign-language-switch:visible")).toHaveCSS("background-color", "rgba(0, 0, 0, 0)");

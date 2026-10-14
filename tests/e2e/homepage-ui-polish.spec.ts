@@ -282,7 +282,7 @@ test("homepage polish stays readable, responsive, and interactive without extern
       );
       expect(navGap).toBeGreaterThanOrEqual(width <= 980 ? 12 : 16);
 
-      const cta = page.locator(".redesign-home-hero .redesign-home-cta");
+      const cta = page.locator(".redesign-home-hero .redesign-home-cta").first();
       const transition = await cta.evaluate((element) => getComputedStyle(element).transitionDuration);
       expect(transition).toContain("0.1s");
       await cta.hover();

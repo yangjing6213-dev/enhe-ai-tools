@@ -1,4 +1,4 @@
-import { beforeEach, describe, expect, it, vi } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 const mocks = vi.hoisted(() => ({
   postFindMany: vi.fn(),
@@ -15,9 +15,14 @@ import { buildForumReplyTree, getForumPost, getForumPosts } from "@/lib/forum-da
 
 beforeEach(() => {
   vi.clearAllMocks();
+  vi.stubEnv("DATABASE_URL", "postgresql://localhost/enhe_test");
   mocks.postFindMany.mockResolvedValue([]);
   mocks.postFindFirst.mockResolvedValue(null);
   mocks.replyFindMany.mockResolvedValue([]);
+});
+
+afterEach(() => {
+  vi.unstubAllEnvs();
 });
 
 describe("forum reply tree", () => {
@@ -42,6 +47,16 @@ describe("forum reply tree", () => {
       where: { status: "approved", category: "question" },
       take: 30,
     }));
+  });
+
+  it("returns empty public results without a database URL and does not query Prisma", async () => {
+    vi.stubEnv("DATABASE_URL", "");
+
+    await expect(getForumPosts()).resolves.toEqual([]);
+    await expect(getForumPost("public-post")).resolves.toBeNull();
+    expect(mocks.postFindMany).not.toHaveBeenCalled();
+    expect(mocks.postFindFirst).not.toHaveBeenCalled();
+    expect(mocks.replyFindMany).not.toHaveBeenCalled();
   });
 
   it("does not query replies for a post that is not public", async () => {

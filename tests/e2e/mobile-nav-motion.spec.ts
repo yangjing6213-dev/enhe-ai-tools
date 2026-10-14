@@ -785,10 +785,11 @@ test("navigation and language links remain immediate after search moves into the
   const items = drawer.locator(
     ".redesign-mobile-nav > a, .redesign-mobile-nav > details",
   );
-  await expect(items).toHaveCount(6);
+  await expect(items).toHaveCount(7);
   await expect(items).toHaveText([
     "首页",
     "AI工具",
+    "共创AI",
     "AI SkillAI 提示词AI Skill",
     "AI资讯",
     "AI趋势",

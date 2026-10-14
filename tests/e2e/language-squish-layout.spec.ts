@@ -26,7 +26,7 @@ for (const width of [320, 768, 1366, 1920]) {
       }
       if (width >= 900) {
         await page.waitForTimeout(500);
-        positions.push(await page.locator('h1, .redesign-home-subtitle, .redesign-home-cta, .redesign-home-features').evaluateAll(nodes => nodes.map(n => n.getBoundingClientRect().top)));
+        positions.push(await page.locator('h1, .redesign-home-subtitle, .redesign-home-cta-row > .redesign-home-cta:first-child, .redesign-home-features').evaluateAll(nodes => nodes.map(n => n.getBoundingClientRect().top)));
       }
       expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBeLessThanOrEqual(width);
     }

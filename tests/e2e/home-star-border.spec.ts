@@ -8,7 +8,7 @@ for (const [path, locale, width, destination] of [
     await page.context().addCookies([{ name: "enhe_locale", value: locale, url: baseURL! }]);
     await page.setViewportSize({ width, height: 844 });
     await page.goto(path);
-    const link = page.locator(".redesign-home-hero .redesign-home-cta");
+    const link = page.locator(".redesign-home-hero .redesign-home-cta").first();
     const canvas = link.locator("canvas.star-border__light");
     await expect(link).toHaveAttribute("href", destination);
     await expect(canvas).toHaveAttribute("aria-hidden", "true");
@@ -35,7 +35,7 @@ for (const [path, locale, width, destination] of [
 test("StarBorder click adds a visible border pulse", async ({ page }) => {
   await page.clock.install();
   await page.goto("/");
-  const link = page.locator(".redesign-home-hero .redesign-home-cta");
+  const link = page.locator(".redesign-home-hero .redesign-home-cta").first();
   const canvas = link.locator("canvas.star-border__light");
   await link.hover();
   await page.clock.runFor(3000);
@@ -64,7 +64,7 @@ test("StarBorder stops drawing when offscreen or hidden and responds to reduced 
   });
   await page.goto("/");
   const draws = () => page.evaluate(() => (window as typeof window & { starBorderDraws: number }).starBorderDraws);
-  const link = page.locator(".redesign-home-hero .redesign-home-cta");
+  const link = page.locator(".redesign-home-hero .redesign-home-cta").first();
   await expect.poll(draws).toBeGreaterThan(3);
   await page.locator(".redesign-footer").scrollIntoViewIfNeeded();
   await page.waitForTimeout(150);

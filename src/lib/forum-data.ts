@@ -26,6 +26,8 @@ async function safeAuthor<T extends { id: string; nickname: string | null; avata
 }
 
 export async function getForumPosts(category?: ForumCategory, locale: "zh" | "en" = "zh") {
+  if (!process.env.DATABASE_URL?.trim()) return [];
+
   const posts = await prisma.forumPost.findMany({
     where: { status: "approved", ...(category ? { category } : {}) },
     include: {
@@ -39,6 +41,8 @@ export async function getForumPosts(category?: ForumCategory, locale: "zh" | "en
 }
 
 export async function getForumPost(postId: string, locale: "zh" | "en" = "zh") {
+  if (!process.env.DATABASE_URL?.trim()) return null;
+
   const post = await prisma.forumPost.findFirst({
     where: { id: postId, status: "approved" },
     include: {
