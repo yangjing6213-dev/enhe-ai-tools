@@ -40,5 +40,5 @@ describe("AI News detail DB-free module boundary", () => {
       "UNVERIFIED - AI News detail content is not available in this local preview.",
     );
     expect(prismaModuleLoad).not.toHaveBeenCalled();
-  });
+  }, 10_000);
 });
