@@ -481,7 +481,9 @@ describe("production release workflow", () => {
     );
     const branchParameter = wrapper.indexOf("[string]$Branch");
     const branchValidation = wrapper.indexOf("& git check-ref-format --branch $Branch");
-    const remoteBranchInterpolation = wrapper.indexOf("git fetch --depth=1 origin '$Branch'");
+    const remoteBranchInterpolation = wrapper.indexOf(
+      "git fetch --depth=1 --refmap= origin 'refs/heads/$Branch'",
+    );
     const branchPattern = wrapper.match(
       /\[ValidatePattern\('([^']+)'\)\]\s*\[string\]\$Branch/,
     )?.[1];

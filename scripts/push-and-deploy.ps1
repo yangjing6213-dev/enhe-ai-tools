@@ -376,7 +376,7 @@ $remoteCommand = @(
   "cd '$RemoteProjectDir'"
   'test -z "$(git status --porcelain --untracked-files=all)"'
   'previous_release_ref="$(git rev-parse HEAD)"'
-  "git fetch --depth=1 origin '$Branch'"
+  "git fetch --depth=1 --refmap= origin 'refs/heads/$Branch'"
   "test `"`$(git rev-parse FETCH_HEAD)`" = '$ReleaseRef'"
   "git checkout --detach '$ReleaseRef'"
   'flock -u 9'
