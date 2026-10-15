@@ -156,8 +156,14 @@ test("homepage polish stays readable, responsive, and interactive without extern
       };
       return [typography(productHeading), typography(reviewHeading)];
     });
-    expect(reviewHeadingSize[1], `review and product headings share one size at ${width}px`).toEqual(reviewHeadingSize[0]);
-    expect(reviewHeadingSize[0].size).toBe("32px");
+    const expectedProductHeadingSize = width < 768
+      ? Math.min(36, Math.max(28, width * 0.08))
+      : Math.min(48, Math.max(36, width * 0.03));
+    expect(
+      Number.parseFloat(reviewHeadingSize[0].size),
+      `product showcase heading size at ${width}px`,
+    ).toBeCloseTo(expectedProductHeadingSize, 1);
+    expect(reviewHeadingSize[1].size, `review heading remains 32px at ${width}px`).toBe("32px");
     await expect(reviews.locator(".redesign-home-reviews-disclosure")).toHaveText("AI 生成示例（非真实用户反馈）");
     await expect(reviews.locator(".redesign-home-reviews-control, .redesign-home-review-triangle")).toHaveCount(0);
     await expect(reviews.getByRole("button", { name: "上一条评价" })).toHaveCount(0);
