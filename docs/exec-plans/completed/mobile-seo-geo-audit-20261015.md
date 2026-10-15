@@ -16,7 +16,10 @@
 - Existing unrelated changes in the original worktree are untouched.
 - Verified: mobile browser regression 4 passed/2 database-dependent skipped; unit suite 3038 passed/100 skipped with 4 workers (default-concurrency first run had one pre-existing script timeout); full lint via preserve-symlinks, typecheck, production build and independent code review.
 - Verified: local production browser/HTTP, centered footer in both languages, optimized homepage image 200 WebP 9848 bytes at 390px/DPR1; forum metadata correct.
-- Pending: authorized established release flow and live verification. No production mutation performed by the audit.
+- Verified: complete release browser suite 386 passed/175 conditional skips; release dependency audit and disposable migration/operational drills passed. Image delivery regression assertions updated to inspect optimized endpoint plus real media identity, retaining duplicate-request and image visibility checks.
+- Complete: code pushed and production deployed at `1c5014c5aad2538fc4d2bebcfe5843169795a3a1`; the initial remote GitHub TLS interruption was resolved by retrying only the failed fetch/deploy step for the exact validated commit. Production health checks passed; no pending migrations.
+- Verified live at 2026-10-15 19:51 Asia/Shanghai: Chinese/English footer centers at 0px offset; product navigation scrolls away with white text; guest purchase return path correct; homepage image 200 WebP 9848 bytes; localized forum metadata and duplicate post noindex correct. Sitemap 200 valid XML, 926 -> 929 URLs, zero duplicates/lost originals; public image robots exception and private disallows correct.
+- Evidence: ignored `output/mobile-seo-audit/release.log`, `deploy-retry.log`, `release-verification.json`, `live-seo-verification.json`, footer screenshots. The final documentation-only commit records these results; runtime code remains the verified release above. No production content/account/order mutation performed by the audit.
 
 ## Known limits
 - Public HTTP/browser checks do not prove Google indexing, real-user Core Web Vitals or a change in conversion rate; Search Console/analytics evidence must be distinguished from local measurements.
