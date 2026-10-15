@@ -66,4 +66,14 @@ describe("tool image sources", () => {
       resolvePublicToolImageSrc("tool-9", "/images/%2e%2e/api/private.png"),
     ).toBeNull();
   });
+
+  it("versions a catalog cover URL using its real record update time", () => {
+    const source =
+      "https://enhe-ai-tools-1303691623.cos.ap-shanghai.myqcloud.com/tool-cover-a-skill/cover.png";
+    const revision = new Date("2026-10-15T10:20:30.000Z");
+
+    expect(resolvePublicToolImageSrc("tool-1", source, revision)).toBe(
+      `/api/tool-images?id=tool-1&v=${revision.getTime().toString(36)}`,
+    );
+  });
 });

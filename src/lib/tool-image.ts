@@ -32,11 +32,16 @@ export function resolveToolImageSrc(value?: string | null) {
 export function resolvePublicToolImageSrc(
   toolId: string,
   value?: string | null,
+  revision?: Date | string,
 ) {
   const source = value?.trim();
   if (!source) return null;
   if (isToolImageSource(source)) {
-    return `/api/tool-images?id=${encodeURIComponent(toolId)}`;
+    const revisionDate = revision instanceof Date ? revision : revision ? new Date(revision) : null;
+    const revisionValue = revisionDate && !Number.isNaN(revisionDate.getTime())
+      ? `&v=${revisionDate.getTime().toString(36)}`
+      : "";
+    return `/api/tool-images?id=${encodeURIComponent(toolId)}${revisionValue}`;
   }
   if (/^[a-z][a-z\d+.-]*:\/\//i.test(source)) return null;
 

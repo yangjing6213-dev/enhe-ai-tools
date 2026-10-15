@@ -1,4 +1,4 @@
-import { beforeEach, describe, expect, it, vi } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 const mocks = vi.hoisted(() => ({
   findFirst: vi.fn(),
@@ -23,6 +23,10 @@ import { GET } from "./route";
 describe("public tool image proxy", () => {
   beforeEach(() => {
     vi.clearAllMocks();
+  });
+
+  afterEach(() => {
+    vi.unstubAllGlobals();
   });
 
   it("resolves an opaque published tool id to a short-lived media redirect", async () => {
@@ -73,5 +77,64 @@ describe("public tool image proxy", () => {
     expect(response.status).toBe(404);
     expect(mocks.findFirst).not.toHaveBeenCalled();
     expect(mocks.getSecureCosMediaUrl).not.toHaveBeenCalled();
+  });
+
+  it("streams a bounded image body only for published catalog covers", async () => {
+    const source = "cos://enhe-ai-tools-1303691623/tool-cover-public/cover.png";
+    const signedUrl = "https://signed.example/temporary-cover.png";
+    const imageBytes = new Uint8Array([137, 80, 78, 71]);
+    mocks.getPublicSoftwareCatalogCovers.mockResolvedValue([
+      { id: "tool-3", coverImage: source },
+    ]);
+    mocks.getSecureCosMediaUrl.mockResolvedValue(signedUrl);
+    const fetchImage = vi.fn().mockResolvedValue(
+      new Response(imageBytes, {
+        headers: { "content-type": "image/png", "content-length": String(imageBytes.length) },
+      }),
+    );
+    vi.stubGlobal("fetch", fetchImage);
+
+    const response = await GET(
+      new Request(
+        "https://www.enhe-tech.com.cn/api/tool-images?id=tool-3&mode=optimizer-source",
+      ),
+    );
+
+    expect(response.status).toBe(200);
+    expect(response.headers.get("content-type")).toBe("image/png");
+    expect(response.headers.get("cache-control")).toContain("s-maxage=60");
+    expect(response.headers.get("location")).toBeNull();
+    expect(new Uint8Array(await response.arrayBuffer())).toEqual(imageBytes);
+    expect(fetchImage).toHaveBeenCalledWith(
+      signedUrl,
+      expect.objectContaining({ cache: "no-store", redirect: "error" }),
+    );
+  });
+
+  it("rejects oversized and non-image catalog objects before serving their contents", async () => {
+    const source = "cos://enhe-ai-tools-1303691623/tool-cover-public/cover.png";
+    mocks.getPublicSoftwareCatalogCovers.mockResolvedValue([
+      { id: "tool-4", coverImage: source },
+    ]);
+    mocks.getSecureCosMediaUrl.mockResolvedValue("https://signed.example/temporary-cover.png");
+
+    for (const responseFromStorage of [
+      new Response(null, {
+        headers: {
+          "content-type": "image/png",
+          "content-length": String(8 * 1024 * 1024 + 1),
+        },
+      }),
+      new Response("not an image", { headers: { "content-type": "text/html" } }),
+    ]) {
+      vi.stubGlobal("fetch", vi.fn().mockResolvedValue(responseFromStorage));
+      const response = await GET(
+        new Request(
+          "https://www.enhe-tech.com.cn/api/tool-images?id=tool-4&mode=optimizer-source",
+        ),
+      );
+      expect(response.status).toBe(404);
+      vi.unstubAllGlobals();
+    }
   });
 });

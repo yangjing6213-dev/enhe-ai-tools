@@ -32,6 +32,9 @@ export function EnheRedesignSoftwareCard({
   const t = getDictionary(locale).toolCard;
   const summary = buildValueSentence(product.description, locale);
   const metrics = getVisibleToolMetrics(product);
+  const catalogImageSrc = product.media?.src.startsWith("/api/tool-images?")
+    ? `${product.media.src}&mode=optimizer-source`
+    : product.media?.src;
 
   return (
     <Card
@@ -56,12 +59,11 @@ export function EnheRedesignSoftwareCard({
             {product.media && !showTextCover ? (
               <Image
                 className="redesign-software-card-media"
-                src={product.media.src}
+                src={catalogImageSrc ?? product.media.src}
                 alt={product.media.alt}
                 width={product.media.width}
                 height={product.media.height}
                 sizes="(min-width: 768px) 392px, 84vw"
-                unoptimized={product.media.src.startsWith("/api/tool-images?")}
                 onError={() => setMediaFailed(true)}
               />
             ) : null}

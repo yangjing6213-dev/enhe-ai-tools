@@ -228,6 +228,7 @@ const getCachedPublicSoftwareCatalogRows = unstable_cache(
           usageCount: true,
           sortOrder: true,
           createdAt: true,
+          updatedAt: true,
           category: { select: { name: true } },
           priceSpecs: {
             where: { status: "active" },
@@ -250,7 +251,7 @@ const getCachedPublicSoftwareCatalogCovers = unstable_cache(
   async () =>
     prisma.tool.findMany({
       where: publicSoftwareCatalogWhere,
-      select: { id: true, coverImage: true },
+      select: { id: true, coverImage: true, updatedAt: true },
     }),
   ["public-software-catalog-covers"],
   { revalidate: publicContentRevalidate, tags: ["public-tools"] },

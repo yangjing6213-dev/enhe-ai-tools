@@ -33,6 +33,7 @@ export type PublicSoftwareCatalogRow = {
   usageCount?: number;
   sortOrder: number;
   createdAt: Date | string;
+  updatedAt?: Date | string;
   category: { name: string } | null;
   priceSpecs: Array<{
     price: unknown;
@@ -376,7 +377,7 @@ function buildCatalogItem(
     (row.type === "software" || row.type === "ai_skill"
       ? row.isDownloadPaid
       : true);
-  const mediaSrc = resolvePublicToolImageSrc(row.id, row.coverImage);
+  const mediaSrc = resolvePublicToolImageSrc(row.id, row.coverImage, row.updatedAt);
 
   return {
     id: row.id,
