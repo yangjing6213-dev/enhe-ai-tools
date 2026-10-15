@@ -2,7 +2,6 @@
 
 import Image from "next/image";
 import { animate } from "motion/react";
-import { Pause, Play } from "lucide-react";
 import { EnheIconfontIcon } from "@/components/redesign/enhe-iconfont-icon";
 import {
   useCallback,
@@ -70,8 +69,6 @@ const SHOWCASE_COPY = {
     loading: "正在加载推荐内容…",
     error: "推荐内容暂时无法加载。",
     detail: "查看产品",
-    pause: "暂停产品轮播",
-    resume: "继续产品轮播",
     chooseProduct: "选择推荐产品",
     showProduct: (number: number) => `显示第 ${number} 款产品`,
   },
@@ -83,8 +80,6 @@ const SHOWCASE_COPY = {
     loading: "Loading featured content…",
     error: "This featured content could not be loaded.",
     detail: "View product",
-    pause: "Pause product slideshow",
-    resume: "Resume product slideshow",
     chooseProduct: "Choose a featured product",
     showProduct: (number: number) => `Show product ${number}`,
   },
@@ -98,8 +93,6 @@ const SHOWCASE_COPY = {
     loading: string;
     error: string;
     detail: string;
-    pause: string;
-    resume: string;
     chooseProduct: string;
     showProduct: (number: number) => string;
   }
@@ -118,13 +111,12 @@ export function EnheRedesignProductShowcase({
   const [inputModality, setInputModality] =
     useState<ProductStageInputModality>("pointer");
   const [prefersReducedMotion, setPrefersReducedMotion] = useState(false);
-  const [manuallyPaused, setManuallyPaused] = useState(false);
   const [hovered, setHovered] = useState(false);
   const [focused, setFocused] = useState(false);
   const [inView, setInView] = useState(false);
   const [pageVisible, setPageVisible] = useState(false);
   const stageRef = useRef<HTMLDivElement>(null);
-  const isAutoRotating = inView && pageVisible && !prefersReducedMotion && !manuallyPaused && !hovered && !focused;
+  const isAutoRotating = inView && pageVisible && !prefersReducedMotion && !hovered && !focused;
   const [transitionKey, setTransitionKey] = useState(0);
   const [mediaState, setMediaState] =
     useState<ProductMediaState>(() => Object.fromEntries(products.map(({ id }) => [id, "loading"])));
@@ -486,23 +478,10 @@ export function EnheRedesignProductShowcase({
     >
       <div className="redesign-home-products-inner">
         <div className="redesign-home-products-heading">
-          <div>
-            <p className="redesign-home-products-eyebrow">{copy.eyebrow}</p>
-            <h2 id={`redesign-home-products-title-${locale}`}>
-              {copy.heading}
-            </h2>
-          </div>
-          <button
-            type="button"
-            className="redesign-home-product-autoplay"
-            aria-label={manuallyPaused ? copy.resume : copy.pause}
-            aria-pressed={manuallyPaused}
-            aria-controls={panelId}
-            disabled={prefersReducedMotion}
-            onClick={() => setManuallyPaused((paused) => !paused)}
-          >
-            {manuallyPaused || prefersReducedMotion ? <Play size={18} aria-hidden="true" /> : <Pause size={18} aria-hidden="true" />}
-          </button>
+          <p className="redesign-home-products-eyebrow">{copy.eyebrow}</p>
+          <h2 id={`redesign-home-products-title-${locale}`}>
+            {copy.heading}
+          </h2>
         </div>
 
         <div

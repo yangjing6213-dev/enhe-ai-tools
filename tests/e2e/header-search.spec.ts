@@ -48,7 +48,7 @@ test("public header replaces the search link, opens recommendations, and submits
         expect(layout.valueRight).toBeLessThan(layout.menusLeft);
         if (width === 1920) expect(Math.abs(layout.logoLeft - ((width - 1200) / 2 - 240))).toBeLessThan(1);
       }
-      for (const selector of [".redesign-home-product-autoplay", ".redesign-home-reviews-rotation"]) {
+      for (const selector of [".redesign-home-reviews-rotation"]) {
         const rotationButton = page.locator(selector);
         await expect(rotationButton).toHaveCSS("color", "rgb(0, 0, 0)");
         await expect(rotationButton).toHaveCSS("background-color", "rgba(0, 0, 0, 0)");

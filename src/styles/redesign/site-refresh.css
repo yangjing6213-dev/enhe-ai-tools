@@ -1364,35 +1364,7 @@ body .customer-support-widget .customer-support-launcher,
   }
 }
 
-.redesign-home-products-heading {
-  position: relative;
-}
-
-.redesign-home-product-autoplay {
-  position: absolute;
-  top: 0;
-  right: 0;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  min-width: 44px;
-  min-height: 44px;
-  border: 0;
-  background: transparent;
-  color: #000;
-  cursor: pointer;
-}
-
-.redesign-home-product-autoplay:focus-visible {
-  outline: 2px solid var(--enhe-focus);
-  outline-offset: 2px;
-}
-
 @media (width < 768px) {
-  .redesign-home-product-autoplay {
-    position: static;
-  }
-
   .redesign-footer {
     padding-bottom: 72px;
   }
@@ -1412,15 +1384,29 @@ body .customer-support-widget .customer-support-launcher,
   .redesign-home-features-inner > .redesign-home-feature-folder:nth-child(3) { grid-column: 1 / -1; }
 }
 
-/* Match the product introduction to the hero description in both locales. */
-.redesign-home .redesign-home-subtitle,
-.redesign-home .redesign-home-products-heading h2 {
+/* Keep the homepage hero subtitle typography consistent in both locales. */
+.redesign-home .redesign-home-subtitle {
   font-family: inherit;
   font-size: clamp(1rem, 1.3vw, 1.2rem);
   font-weight: 400 !important;
   line-height: 1.65;
   letter-spacing: normal;
   color: var(--enhe-text-muted);
+}
+
+.redesign-home .redesign-home-products-heading h2 {
+  font-family: inherit;
+  font-size: clamp(1.125rem, 1.6vw, 1.75rem);
+  font-weight: 400 !important;
+  line-height: 1.65;
+  letter-spacing: normal;
+  color: var(--enhe-text, #080808);
+}
+
+@media (width < 768px) {
+  .redesign-home .redesign-home-products-heading h2 {
+    font-size: clamp(1rem, 4.5vw, 1.25rem);
+  }
 }
 
 .redesign-header-user-avatar {

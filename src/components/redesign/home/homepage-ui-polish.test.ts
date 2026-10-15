@@ -78,9 +78,11 @@ describe("homepage UI polish", () => {
     expect(showcase).toContain('icon="arrow-left-bold"');
     expect(showcase).toContain('icon="arrow-right-bold"');
     expect(showcase).toContain('icon="arrow-right"');
+    expect(showcase).not.toContain("redesign-home-product-autoplay");
     expect(homeStyles).toMatch(/\.redesign-home-products-heading\s*\{[^}]*text-align:\s*center/);
-    expect(homeStyles).toMatch(/\.redesign-home-products-eyebrow\s*\{[^}]*font-size:\s*2rem/);
-    expect(homeStyles).toMatch(/\.redesign-home-products-heading h2\s*\{[^}]*font-size:\s*clamp\([^}]*1\.2rem\)/);
+    expect(homeStyles).toMatch(/\.redesign-home-products-inner\s*\{[^}]*width:\s*min\(100%,\s*1440px\)/);
+    expect(homeStyles).toMatch(/\.redesign-home-products-eyebrow\s*\{[^}]*font-size:\s*clamp\(2\.25rem,\s*3vw,\s*3rem\)/);
+    expect(homeStyles).toMatch(/\.redesign-home-products-heading h2\s*\{[^}]*font-size:\s*clamp\([^}]*1\.75rem\)/);
     expect(homeStyles).not.toMatch(/\.redesign-home-products-heading h2\s*\{[^}]*white-space:\s*nowrap/);
     expect(homeStyles).toMatch(/\.redesign-home-product-control\s*\{[^}]*border:\s*0[^}]*border-radius:\s*0/);
     expect(refreshStyles).toMatch(/\.redesign-home-product-media-frame\s*\{[^}]*overflow:\s*hidden[^}]*border-radius:\s*22px/);

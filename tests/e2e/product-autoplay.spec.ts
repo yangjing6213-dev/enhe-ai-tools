@@ -1,11 +1,24 @@
 import { expect, test } from "@playwright/test";
 
-test("featured products rotate, pause for reading and focus, and resume with a fresh interval", async ({ page }) => {
+test("featured products autoplay, pause for reading and focus, and resume automatically", async ({ page }) => {
   test.setTimeout(60_000);
+  await page.setViewportSize({ width: 1440, height: 1000 });
   await page.clock.install();
   await page.goto("/");
   const section = page.locator(".redesign-home-products");
   const current = section.locator('[data-product-current="true"]');
+  await expect(section.locator(".redesign-home-product-autoplay")).toHaveCount(0);
+  await expect(section.locator(".redesign-home-products-heading")).toHaveCSS("text-align", "center");
+  await expect(section.locator(".redesign-home-products-heading")).toHaveCSS("flex-direction", "column");
+  expect(
+    await section.locator(".redesign-home-products-eyebrow").evaluate((element) =>
+      Number.parseFloat(getComputedStyle(element).fontSize),
+    ),
+  ).toBeGreaterThanOrEqual(40);
+  await expect(section.locator(".redesign-home-product-indicators")).toHaveCSS(
+    "background-color",
+    "rgb(255, 255, 255)",
+  );
   await section.scrollIntoViewIfNeeded();
   await page.mouse.move(0, 0);
   await expect(section).toHaveAttribute("data-auto-rotating", "true");
@@ -34,15 +47,9 @@ test("featured products rotate, pause for reading and focus, and resume with a f
   const manual = await current.getAttribute("data-product-id");
   await page.clock.fastForward(12000);
   await expect(current).toHaveAttribute("data-product-id", manual!);
-  await section.getByRole("button", { name: "暂停产品轮播" }).click();
   await page.evaluate(() => (document.activeElement as HTMLElement)?.blur());
   await page.mouse.move(0, 0);
-  await page.clock.fastForward(6100);
-  await expect(current).toHaveAttribute("data-product-id", manual!);
-  await section.getByRole("button", { name: "继续产品轮播" }).click();
   await stage.scrollIntoViewIfNeeded();
-  await page.evaluate(() => (document.activeElement as HTMLElement)?.blur());
-  await page.mouse.move(0, 0);
   await expect(section).toHaveAttribute("data-auto-rotating", "true");
   await page.clock.runFor(1);
   await page.clock.fastForward(6100);
@@ -78,9 +85,9 @@ test("reduced motion disables automatic rotation but keeps manual product select
   await page.mouse.move(0, 0);
   await expect(section).toHaveAttribute("data-auto-rotating", "false");
   const current = section.locator('[data-product-current="true"]');
+  await expect(section.locator(".redesign-home-product-autoplay")).toHaveCount(0);
   await page.clock.runFor(12000);
   await expect(current).toHaveAttribute("data-product-id", "ultimate-edition");
   await section.getByRole("button", { name: "Next product" }).click();
   await expect(current).toHaveAttribute("data-product-id", "infinitetalk");
-  await expect(section.getByRole("button", { name: "Pause product slideshow" })).toBeDisabled();
 });

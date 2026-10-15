@@ -173,9 +173,9 @@
 
 .redesign-home-products-inner {
   box-sizing: border-box;
-  width: min(100%, 1180px);
+  width: min(100%, 1440px);
   margin-inline: auto;
-  padding: clamp(72px, 10vw, 128px) 24px clamp(88px, 12vw, 144px);
+  padding: clamp(48px, 5vw, 72px) 24px clamp(88px, 12vw, 144px);
 }
 
 .redesign-home-products-heading {
@@ -183,17 +183,17 @@
   align-items: center;
   justify-content: center;
   flex-direction: column;
-  gap: 24px;
-  margin-bottom: 40px;
+  gap: 0;
+  margin-bottom: 44px;
   text-align: center;
 }
 
 .redesign-home-products-eyebrow {
-  margin: 0 0 14px;
+  margin: 0 0 16px;
   color: var(--enhe-action-text, #0462C2);
-  font-size: 2rem;
+  font-size: clamp(2.25rem, 3vw, 3rem);
   font-weight: 700;
-  letter-spacing: 0.08em;
+  letter-spacing: 0.01em;
   text-transform: uppercase;
 }
 
@@ -201,7 +201,7 @@
   max-width: 100%;
   margin: 0;
   color: var(--enhe-text, #080808);
-  font-size: clamp(1rem, 1.3vw, 1.2rem);
+  font-size: clamp(1.125rem, 1.6vw, 1.75rem);
   letter-spacing: -0.02em;
   line-height: 1.65;
   white-space: normal;
@@ -341,11 +341,11 @@
   display: flex;
   align-items: center;
   gap: 8px;
-  padding: 8px 11px;
-  border: 1px solid rgb(255 255 255 / 20%);
+  padding: 8px 14px;
+  border: 1px solid rgb(12 18 28 / 12%);
   border-radius: 999px;
-  background: rgb(5 8 12 / 66%);
-  box-shadow: 0 4px 18px rgb(0 0 0 / 22%);
+  background: rgb(255 255 255 / 96%);
+  box-shadow: 0 4px 18px rgb(0 0 0 / 16%);
   transform: translateX(50%);
   backdrop-filter: blur(8px);
   pointer-events: auto;
@@ -358,7 +358,7 @@
   padding: 0;
   border: 0;
   border-radius: 999px;
-  background: rgb(255 255 255 / 62%);
+  background: #c6cbd2;
   cursor: pointer;
   transition: width 180ms ease, background-color 180ms ease;
 }
@@ -431,8 +431,17 @@
   .redesign-home-products-heading {
     align-items: center;
     flex-direction: column;
-    gap: 20px;
+    gap: 0;
     margin-bottom: 28px;
+  }
+
+  .redesign-home-products-eyebrow {
+    margin-bottom: 12px;
+    font-size: clamp(1.75rem, 8vw, 2.25rem);
+  }
+
+  .redesign-home-products-heading h2 {
+    font-size: clamp(1rem, 4.5vw, 1.25rem);
   }
 
   .redesign-home-product-stage {

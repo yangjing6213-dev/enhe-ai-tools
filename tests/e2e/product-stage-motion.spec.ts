@@ -61,6 +61,11 @@ for (const width of viewports) {
       const previous = page.getByRole("button", { name: locale.previous });
       const next = page.getByRole("button", { name: locale.next });
       await stage.scrollIntoViewIfNeeded();
+      await stage.hover();
+      await expect(page.locator(".redesign-home-products")).toHaveAttribute(
+        "data-auto-rotating",
+        "false",
+      );
 
       await expect(currentProduct(stage)).toHaveAttribute(
         "data-product-id",
