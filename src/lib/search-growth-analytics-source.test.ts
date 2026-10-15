@@ -13,7 +13,7 @@ describe("search growth analytics triggers", () => {
     const analyticsClient = read("./analytics-client.ts");
 
     expect(source).toContain('data-analytics-event="product_use_cta_click"');
-    expect(source).toContain('data-analytics-event="begin_checkout"');
+    expect(source).toContain('data-analytics-event={user ? "begin_checkout" : undefined}');
     expect(source).toContain('data-analytics-event="product_download_click"');
     expect(source).toMatch(/<FormSubmitButton[\s\S]*?data-analytics-event="product_purchase_cta_click"/);
     expect(source).toMatch(/<ButtonLink[\s\S]*?data-analytics-event=\{softwareDownloadCtaEvent\}/);

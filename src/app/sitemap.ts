@@ -37,6 +37,16 @@ const sitemapExcludedPaths = new Set(
     .filter((route) => route.indexable === false)
     .map((route) => route.path),
 );
+// Manifest dates describe source edits, not changes to these live database listings.
+const dynamicListingPaths = new Set([
+  "/software",
+  "/ai-skills",
+  "/account-services",
+  "/skill-learning",
+  "/ai-news",
+  "/product-demos",
+  "/tutorials",
+]);
 
 function getPriority(path: string) {
   if (path === "/" || path === "/en") return 1;
@@ -76,7 +86,7 @@ function isKnownAiNewsTopicPath(path: string) {
 }
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-  const [tools, newsArticles, publicAiNewsTopics, chineseListing, englishListing] = await Promise.all([
+  const [tools, newsArticles, publicAiNewsTopics, chineseListing, englishListing, forumPosts] = await Promise.all([
     prisma.tool
       .findMany({
         where: { status: "published" },
@@ -107,12 +117,12 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     getPublicAiNewsTopics().catch(() => aiNewsTopics),
     getPublicNewsListing({ locale: "zh", sort: "latest", take: 0 }),
     getPublicNewsListing({ locale: "en", sort: "latest", take: 0 }),
+    prisma.forumPost.findMany({
+      where: { status: "approved" },
+      select: { id: true, updatedAt: true },
+    }).catch(() => []),
   ]);
 
-  const latestNewsUpdate = newsArticles.reduce<Date>(
-    (latest, article) => (article.updatedAt > latest ? article.updatedAt : latest),
-    new Date("2026-06-18T00:00:00.000Z"),
-  );
   const chineseNewsPageCount = getNewsPageCount(chineseListing.total);
   const englishNewsTotal = englishListing.total;
   const englishNewsPageCount = getNewsPageCount(englishNewsTotal);
@@ -122,7 +132,6 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       const locales = getNewsPaginationLocales(page, englishNewsTotal);
       return {
         url: absoluteUrl(path),
-        lastModified: latestNewsUpdate,
         alternates: { languages: buildAvailableLanguageAlternates(path, [...locales]) },
         changeFrequency: "daily" as const,
         priority: 0.68,
@@ -132,7 +141,6 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       const canonicalPath = `/ai-news/page/${page}`;
       return {
         url: absoluteUrl(`/en${canonicalPath}`),
-        lastModified: latestNewsUpdate,
         alternates: { languages: buildAvailableLanguageAlternates(canonicalPath, ["zh", "en"]) },
         changeFrequency: "daily" as const,
         priority: 0.64,
@@ -141,14 +149,22 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   ];
 
   const entries = [
-    {
-      url: absoluteSitemapUrl("/forum"),
+    ...(["/forum", "/en/forum"] as const).map((path) => ({
+      url: absoluteSitemapUrl(path),
+      alternates: { languages: buildLanguageAlternates("/forum") },
       changeFrequency: "weekly" as const,
       priority: 0.7,
-    },
+    })),
+    ...forumPosts.map((post) => ({
+      url: absoluteSitemapUrl(`/forum/${encodeURIComponent(post.id)}`),
+      lastModified: post.updatedAt,
+      alternates: { languages: buildAvailableLanguageAlternates(`/forum/${encodeURIComponent(post.id)}`, ["zh"]) },
+      changeFrequency: "weekly" as const,
+      priority: 0.6,
+    })),
     ...publicDiscoveryRoutes.filter((route) => !sitemapExcludedPaths.has(route.path)).map((route) => ({
       url: absoluteSitemapUrl(route.path),
-      lastModified: new Date(route.lastModified),
+      ...(dynamicListingPaths.has(stripLocalePrefix(route.path)) ? {} : { lastModified: new Date(route.lastModified) }),
       alternates: {
         languages: buildLanguageAlternates(getCanonicalSourcePath(route.path)),
       },

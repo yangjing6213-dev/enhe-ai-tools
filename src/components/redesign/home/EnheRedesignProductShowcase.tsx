@@ -435,8 +435,8 @@ export function EnheRedesignProductShowcase({
                       alt={product.alt[locale]}
                       fill
                       sizes="(max-width: 767px) calc(100vw - 120px), (max-width: 1180px) calc(100vw - 216px), 964px"
-                      loading="eager"
-                      unoptimized
+                      loading="lazy"
+                      unoptimized={!DEFAULT_HOME_PRODUCTS.some((item) => item.mediaSrc === product.mediaSrc)}
                       onLoad={() =>
                         setMediaState((current) => updateProductMediaState(current, product.id, "ready"))
                       }

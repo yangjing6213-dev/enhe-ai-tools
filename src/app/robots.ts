@@ -23,6 +23,8 @@ const publicAllow = [
   "/product-paths",
   "/product-demos",
   "/api/uploads/",
+  "/api/tool-images$",
+  "/api/tool-images?",
 ];
 
 const answerEngineUserAgents = [

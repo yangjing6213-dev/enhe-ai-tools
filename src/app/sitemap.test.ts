@@ -9,6 +9,9 @@ const prismaMock = {
   },
   productDemo: {
     findMany: vi.fn()
+  },
+  forumPost: {
+    findMany: vi.fn()
   }
 };
 
@@ -31,6 +34,8 @@ describe("sitemap canonical URL contract", () => {
     prismaMock.newsArticle.findMany.mockReset();
     prismaMock.productDemo.findMany.mockReset();
     prismaMock.productDemo.findMany.mockResolvedValue([]);
+    prismaMock.forumPost.findMany.mockReset();
+    prismaMock.forumPost.findMany.mockResolvedValue([]);
     process.env.APP_URL = "https://www.enhe-tech.com.cn";
     process.env.NEXT_PUBLIC_APP_URL = "https://www.enhe-tech.com.cn";
   });
@@ -46,6 +51,48 @@ describe("sitemap canonical URL contract", () => {
 
     expect(forumEntries).toHaveLength(1);
     expect(forumEntries[0]).not.toHaveProperty("lastModified");
+  });
+
+  it("includes both forum lists and only approved Chinese canonical post URLs with their real update time", async () => {
+    prismaMock.tool.findMany.mockResolvedValue([]);
+    prismaMock.newsArticle.findMany.mockResolvedValue([]);
+    const updatedAt = new Date("2026-10-14T08:00:00.000Z");
+    const rows = [
+      { id: "approved-post", status: "approved", updatedAt },
+      { id: "pending-post", status: "pending", updatedAt },
+      { id: "rejected-post", status: "rejected", updatedAt },
+    ];
+    prismaMock.forumPost.findMany.mockImplementation(async ({ where }) => rows.filter((row) => row.status === where.status));
+
+    const { default: sitemap } = await import("@/app/sitemap");
+    const entries = await sitemap();
+    const forumEntries = entries.filter((entry) => new URL(entry.url).pathname.includes("/forum"));
+    expect(forumEntries.map((entry) => entry.url)).toEqual([
+      "https://www.enhe-tech.com.cn/forum",
+      "https://www.enhe-tech.com.cn/en/forum",
+      "https://www.enhe-tech.com.cn/forum/approved-post",
+    ]);
+    expect(prismaMock.forumPost.findMany).toHaveBeenCalledWith({
+      where: { status: "approved" }, select: { id: true, updatedAt: true },
+    });
+    expect(forumEntries[0].alternates?.languages?.["en-US"]).toBe("https://www.enhe-tech.com.cn/en/forum");
+    expect(forumEntries[1].alternates?.languages?.["zh-CN"]).toBe("https://www.enhe-tech.com.cn/forum");
+    expect(forumEntries[2].lastModified).toBe(updatedAt);
+    expect(forumEntries[2].alternates?.languages).not.toHaveProperty("en-US");
+  });
+
+  it("omits hard-coded update dates from dynamic listing URLs without removing the URLs", async () => {
+    prismaMock.tool.findMany.mockResolvedValue([]);
+    prismaMock.newsArticle.findMany.mockResolvedValue([]);
+    const { default: sitemap } = await import("@/app/sitemap");
+    const entries = await sitemap();
+    for (const path of ["/software", "/ai-skills", "/account-services", "/skill-learning", "/ai-news", "/product-demos", "/tutorials"]) {
+      for (const prefix of ["", "/en"]) {
+        const entry = entries.find((entry) => entry.url === `https://www.enhe-tech.com.cn${prefix}${path}`);
+        expect(entry).toBeDefined();
+        expect(entry).not.toHaveProperty("lastModified");
+      }
+    }
   });
 
   it("includes only public canonical routes and excludes private or legacy routes", async () => {
@@ -331,6 +378,11 @@ describe("sitemap canonical URL contract", () => {
     expect(urls).toContain("https://www.enhe-tech.com.cn/ai-news/page/2");
     expect(urls).toContain("https://www.enhe-tech.com.cn/en/ai-news/page/2");
     expect(urls.some((url) => url.includes("/ai-news?page="))).toBe(false);
+    for (const path of ["/ai-news/page/2", "/en/ai-news/page/2"]) {
+      const entry = entries.find((entry) => entry.url === `https://www.enhe-tech.com.cn${path}`);
+      expect(entry).toBeDefined();
+      expect(entry).not.toHaveProperty("lastModified");
+    }
   });
   it("uses deduplicated listing totals so raw duplicates cannot create a nonexistent last page", async () => {
     prismaMock.tool.findMany.mockResolvedValue([]);

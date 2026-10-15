@@ -66,6 +66,7 @@ import {
   resolveSoftwareDownloadCtaHref,
 } from "@/lib/tool-download-link";
 import { getVisibleToolMetrics } from "@/lib/tool-metrics";
+import { resolveSafeReturnPath } from "@/lib/safe-return-path";
 
 export const toolDetailPageRevalidate = publicPageCacheSeconds;
 
@@ -392,6 +393,12 @@ export async function ToolDetailPageShell({
     (paidDownloadProduct && !hasDownloadPurchase) ||
     (isPurchasableAccountService && !hasDownloadPurchase) ||
     (paidSkillCourse && !hasDownloadPurchase);
+  const PurchaseFormTag = user ? "form" : "div";
+  const purchaseReturnPath = resolveSafeReturnPath(
+    `${buildCanonicalToolPath(tool, forceLocale)}#tool-purchase`,
+    buildLocalePath("/software", forceLocale),
+  );
+  const purchaseLoginHref = `${buildLocalePath("/login", forceLocale)}?returnTo=${encodeURIComponent(purchaseReturnPath)}`;
   const downloadLinkContent = getDownloadLinkContent(tool.downloadFile);
   const visibleDownloadLinkContent =
     isAiSkill
@@ -791,15 +798,15 @@ export async function ToolDetailPageShell({
                   className="tool-detail-purchase-panel scroll-mt-24 mt-7 flex flex-wrap gap-3"
                 >
                   {shouldShowPurchaseForm ? (
-                    <form
+                    <PurchaseFormTag
                       id={
                         isAccountService
                           ? "service-purchase"
                           : "download-purchase"
                       }
-                      action={createSoftwareDownloadOrderAction}
+                      action={user ? createSoftwareDownloadOrderAction : undefined}
                       className="grid w-full gap-4"
-                      data-analytics-event="begin_checkout"
+                      data-analytics-event={user ? "begin_checkout" : undefined}
                       data-analytics-entity-type="tool"
                       data-analytics-entity-id={tool.id}
                     >
@@ -889,21 +896,33 @@ export async function ToolDetailPageShell({
                               : "请选择后续付款页面实际使用的支付方式。"}
                           </p>
                         </div>
-                        <FormSubmitButton
-                          className="w-full sm:w-auto sm:justify-self-start"
-                          data-analytics-event="product_purchase_cta_click"
-                          data-analytics-entity-type="tool"
-                          data-analytics-entity-id={tool.id}
-                          pendingLabel={
-                            forceLocale === "en"
-                              ? "Generating payment QR..."
-                              : "生成支付二维码中..."
-                          }
-                        >
-                          {purchaseButtonLabel}
-                        </FormSubmitButton>
+                        {user ? (
+                          <FormSubmitButton
+                            className="w-full sm:w-auto sm:justify-self-start"
+                            data-analytics-event="product_purchase_cta_click"
+                            data-analytics-entity-type="tool"
+                            data-analytics-entity-id={tool.id}
+                            pendingLabel={
+                              forceLocale === "en"
+                                ? "Generating payment QR..."
+                                : "生成支付二维码中..."
+                            }
+                          >
+                            {purchaseButtonLabel}
+                          </FormSubmitButton>
+                        ) : (
+                          <ButtonLink
+                            href={purchaseLoginHref}
+                            className="w-full sm:w-auto sm:justify-self-start"
+                            data-analytics-event="product_purchase_cta_click"
+                            data-analytics-entity-type="tool"
+                            data-analytics-entity-id={tool.id}
+                          >
+                            {forceLocale === "en" ? "Sign in to purchase" : "登录后购买"}
+                          </ButtonLink>
+                        )}
                       </div>
-                    </form>
+                    </PurchaseFormTag>
                   ) : isDownloadProduct ? (
                     <ButtonLink
                       href={softwareDownloadCtaHref}

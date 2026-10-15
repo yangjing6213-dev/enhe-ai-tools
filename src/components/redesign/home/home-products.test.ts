@@ -130,6 +130,32 @@ describe("homepage approved product showcase", () => {
     expect(html.match(/<li\b/g) ?? []).toHaveLength(1);
   });
 
+  it("defers the bundled cover and provides responsive optimized sources", () => {
+    const html = renderToStaticMarkup(createElement(EnheRedesignProductShowcase, { locale: "zh" }));
+    const image = html.match(/<img\b[^>]*>/)?.[0] ?? "";
+
+    expect(image).toContain('loading="lazy"');
+    expect(image).toContain('srcSet="/_next/image?');
+    expect(image).toContain('sizes="(max-width: 767px)');
+    expect(image).toContain(encodeURIComponent(HOME_PRODUCTS[0].mediaSrc));
+    expect(html).not.toContain('rel="preload"');
+  });
+
+  it.each([
+    "https://media.example/cover.png",
+    "/api/tool-images?id=tool-1",
+    "/redesign/home/../../api/private/cover.png",
+  ])("keeps configured non-bundled media outside the optimizer: %s", (mediaSrc) => {
+    const products = [{ ...createDefaultHomeProductShowcase()[0], mediaSrc }];
+    const html = renderToStaticMarkup(createElement(EnheRedesignProductShowcase, { locale: "zh", products }));
+    const image = html.match(/<img\b[^>]*>/)?.[0] ?? "";
+
+    expect(image).toContain(`src="${mediaSrc}"`);
+    expect(image).toContain('loading="lazy"');
+    expect(image).not.toContain("/_next/image?");
+    expect(image).not.toContain("srcSet=");
+  });
+
   it("keeps manual selection keyboard accessible alongside product autoplay", () => {
     expect(showcaseSource).toContain('"use client"');
     expect(showcaseSource).toContain("ArrowLeft");
@@ -141,7 +167,7 @@ describe("homepage approved product showcase", () => {
     expect(showcaseSource).toContain("role=\"region\"");
     expect(showcaseSource).toContain("key={product.id}");
     expect(showcaseSource).toContain('from \"next/image\"');
-    expect(showcaseSource).toContain('loading=\"eager\"');
+    expect(showcaseSource).toContain('loading=\"lazy\"');
     expect(showcaseSource).toContain('unoptimized');
     expect(showcaseSource).toContain("setMediaState");
     expect(showcaseSource).toContain("onError");

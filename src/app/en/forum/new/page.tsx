@@ -1,6 +1,9 @@
 import { PublicSiteChrome } from "@/components/public-site-chrome";
 import { ForumNewPostContent } from "@/components/forum/forum-ui";
 import { getCurrentUser } from "@/lib/auth";
+import { generateForumNewPostMetadata } from "@/lib/forum-seo";
+
+export const generateMetadata = () => generateForumNewPostMetadata("en");
 
 export default async function EnglishNewForumPostPage({ searchParams }: { searchParams: Promise<{ submitted?: string }> }) {
   const [{ submitted }, user] = await Promise.all([searchParams, getCurrentUser()]);

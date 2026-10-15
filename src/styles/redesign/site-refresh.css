@@ -1109,6 +1109,14 @@ body .redesign-footer nav {
     gap: 28px;
   }
 
+  .redesign-footer .footer-brand {
+    transform: none;
+  }
+
+  .redesign-footer .footer-social-links {
+    margin-inline-end: 0;
+  }
+
   .footer-navigation {
     flex-wrap: wrap;
     gap: 8px 20px;
