@@ -137,14 +137,18 @@ function monitorErrors(page: Page) {
 }
 
 function monitorHomeProductMediaRequests(page: Page) {
-  const productMediaRequests: string[] = [];
+  const productMediaRequests: Array<{ pathname: string; mediaSrc: string }> = [];
   page.on("request", (request) => {
-    const pathname = new URL(request.url()).pathname;
+    const url = new URL(request.url());
+    const mediaSrc = url.pathname === "/_next/image"
+      ? url.searchParams.get("url")
+      : url.pathname;
     if (
       request.resourceType() === "image" &&
-      HOME_PRODUCTS.some((product) => product.mediaSrc === pathname)
+      mediaSrc &&
+      HOME_PRODUCTS.some((product) => product.mediaSrc === mediaSrc)
     ) {
-      productMediaRequests.push(pathname);
+      productMediaRequests.push({ pathname: url.pathname, mediaSrc });
     }
   });
   return productMediaRequests;
@@ -819,8 +823,8 @@ for (const route of homeSsrRoutes) {
       await expect(currentProduct(page)).toBeVisible();
       await expect(currentProduct(page).getByRole("link")).toBeVisible();
       await expect
-        .poll(() => [...new Set(productMediaRequests)])
-        .toEqual([HOME_PRODUCTS[0].mediaSrc]);
+        .poll(() => productMediaRequests)
+        .toEqual([{ pathname: "/_next/image", mediaSrc: HOME_PRODUCTS[0].mediaSrc }]);
       expect(
         await page.locator("[id]").evaluateAll((elements) => {
           const ids = elements.map((element) => element.id);
@@ -858,11 +862,16 @@ for (const route of homeSsrRoutes) {
       "data-product-id",
       "ultimate-edition",
     );
-    expect(
+    const currentImageUrl = new URL(
       await currentProduct(page)
         .locator(".redesign-home-product-media")
-        .evaluate((element) => new URL((element as HTMLImageElement).src).pathname),
-    ).toBe(HOME_PRODUCTS[0].mediaSrc);
+        .evaluate((element) => {
+          const image = element as HTMLImageElement;
+          return image.currentSrc || image.src;
+        }),
+    );
+    expect(currentImageUrl.pathname).toBe("/_next/image");
+    expect(currentImageUrl.searchParams.get("url")).toBe(HOME_PRODUCTS[0].mediaSrc);
     await expect
       .poll(() =>
         page.locator(".redesign-home-product-media").evaluate((element) => {
@@ -871,8 +880,8 @@ for (const route of homeSsrRoutes) {
         }),
       )
       .toBe(true);
-    expect([...new Set(productMediaRequests)]).toEqual([
-      HOME_PRODUCTS[0].mediaSrc,
+    expect(productMediaRequests).toEqual([
+      { pathname: "/_next/image", mediaSrc: HOME_PRODUCTS[0].mediaSrc },
     ]);
 
     await page.getByRole("button", { name: route.next, exact: true }).click();
