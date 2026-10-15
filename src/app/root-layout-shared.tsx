@@ -30,12 +30,12 @@ export const sharedRootMetadata: Metadata = {
   manifest: "/manifest.webmanifest",
   icons: {
     icon: [
-      { url: "/favicon.ico", type: "image/x-icon", sizes: "any" },
-      { url: "/icon-192.png", type: "image/png", sizes: "192x192" },
-      { url: "/icon-512.png", type: "image/png", sizes: "512x512" }
+      { url: "/favicon.ico?v=blue-mascot-20261015", type: "image/x-icon", sizes: "any" },
+      { url: "/icon-192.png?v=blue-mascot-20261015", type: "image/png", sizes: "192x192" },
+      { url: "/icon-512.png?v=blue-mascot-20261015", type: "image/png", sizes: "512x512" }
     ],
-    shortcut: "/favicon.ico",
-    apple: [{ url: "/apple-icon.png", type: "image/png", sizes: "180x180" }]
+    shortcut: "/favicon.ico?v=blue-mascot-20261015",
+    apple: [{ url: "/apple-icon.png?v=blue-mascot-20261015", type: "image/png", sizes: "180x180" }]
   }
 };
 

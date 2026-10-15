@@ -1,0 +1,20 @@
+# Brand assets, language switch and font delivery
+
+## Contract
+- Replace favicon/app icons with the supplied blue mascot and the orange symbol in the existing sharing image with the supplied white mark.
+- Smooth the shared language switch edge while preserving its size, links, interaction and focus indication.
+- Keep the existing rounded font unchanged: the user chose to defer font size reduction after the font-splitting license could not be confirmed.
+- No database/schema changes or unrelated UI changes. Release through existing checks and verify the production URLs.
+
+## Plan and verification
+1. Inspect asset/font sources and browser behavior, implement scoped branding and switch changes. Verify exact source provenance, dimensions and responsive browser rendering.
+2. Verify the supplied icon provenance, generated sizes/transparency, sharing-image patch and browser language-switch behavior. Preserve typography and its existing caching rules.
+3. Run focused and release checks, push/deploy, verify public assets, font transfers and service health. Preserve pre-existing changes.
+
+## Evidence
+- Baseline: clean worktree at d41a10c247991ad1dd29a5dab72eea2791d1f9dd; full Alimama WOFF2 is 2,408,604 bytes.
+- No font splitting performed. User explicitly selected keeping the rounded font and deferring size reduction.
+- Shared language track currently adds a grey inset shadow to its blue capsule.
+- New icons derive from the supplied blue mascot; sharing image changes only the upper-left mark. New metadata asset URLs avoid reusing old preview/icon caches.
+- PASS: 36 focused tests (icons, sharing image, metadata, typography preservation, home polish), typecheck, targeted ESLint and `git diff --check`.
+- In progress: complete release gates, browser checks and production verification.

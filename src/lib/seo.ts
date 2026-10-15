@@ -7,7 +7,7 @@ export const siteName = "ENHE AI";
 export const defaultSiteDescription =
   "ENHE AI helps users apply AI to real tasks: work faster, create content, organize material, learn skills, and choose safer AI paths.";
 export const defaultBrandIcon = "/images/brand/enhe-icon-gradient-white-bg-cropped.png";
-export const defaultOgImage = "/images/brand/enhe-ai-og-1200x630.png";
+export const defaultOgImage = "/images/brand/enhe-ai-og-white-1200x630.png";
 
 type PageMetadataInput = {
   title: string;

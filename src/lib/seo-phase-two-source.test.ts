@@ -48,12 +48,12 @@ describe("seo phase two source contracts", () => {
     expect(publicChrome).toContain('inLanguage: forceLocale === "en" ? "en-US" : "zh-CN"');
     expect(layout).toContain("icons:");
     expect(seo).toContain('export const defaultBrandIcon = "/images/brand/enhe-icon-gradient-white-bg-cropped.png"');
-    expect(seo).toContain('export const defaultOgImage = "/images/brand/enhe-ai-og-1200x630.png"');
+    expect(seo).toContain('export const defaultOgImage = "/images/brand/enhe-ai-og-white-1200x630.png"');
     expect(seo).toContain("width: 1200");
     expect(seo).toContain("height: 630");
 
     const ogImage = readFileSync(
-      join(process.cwd(), "public/images/brand/enhe-ai-og-1200x630.png"),
+      join(process.cwd(), "public/images/brand/enhe-ai-og-white-1200x630.png"),
     );
     expect(ogImage.readUInt32BE(16)).toBe(1200);
     expect(ogImage.readUInt32BE(20)).toBe(630);
