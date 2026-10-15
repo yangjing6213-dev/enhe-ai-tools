@@ -42,7 +42,6 @@
 .enhe-language-toggle .squish-switch:focus-visible { outline: 2px solid var(--enhe-action, #0063ce); outline-offset: 2px; border-radius: 19px; }
 .enhe-language-toggle .squish-switch__track {
   overflow: hidden;
-  border-radius: 999px;
   box-shadow: none;
 }
 @media (768px <= width < 900px) {

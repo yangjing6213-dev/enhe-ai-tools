@@ -18,3 +18,7 @@
 - New icons derive from the supplied blue mascot; sharing image changes only the upper-left mark. New metadata asset URLs avoid reusing old preview/icon caches.
 - PASS: 36 focused tests (icons, sharing image, metadata, typography preservation, home polish), typecheck, targeted ESLint and `git diff --check`.
 - In progress: complete release gates, browser checks and production verification.
+- Release investigation: preserve-symlinks flags cannot be applied globally (duplicate React in unit tests); use the previously established temporary legacy ESLint config only for local lint compatibility. No dependency or production configuration changes.
+- PASS: dependency audit, disposable migration/recovery drills, 3041 unit tests (100 conditional skips), typecheck, standalone lint, production build. The existing Windows dependency-junction build warnings remain; production Docker build will also be checked.
+- Archived only the generated local standalone image cache after a stale WebP cache key stalled requests. A fresh image cache resolves the original news-page navigation timeouts; source assets and production caches unchanged.
+- Browser validation caught a computed-radius contract mismatch (999px vs original 16px). Preserve the original component radius; only remove the grey inset shadow and clip overflowing thumb pixels. Focused 36 tests pass again after this correction.
