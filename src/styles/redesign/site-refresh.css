@@ -1432,7 +1432,7 @@ body .customer-support-widget .customer-support-launcher,
   position: absolute;
   z-index: 3;
   top: -112px;
-  left: 68%;
+  left: min(calc(68% + 198px), calc(100% - 100px));
   display: block;
   width: 132px;
   margin-left: -66px;
@@ -1484,9 +1484,9 @@ body .customer-support-widget .customer-support-launcher,
     top: -14px;
     left: calc(100% + 6px);
     display: block;
-    width: 58px;
+    width: 72px;
     height: 0;
-    margin-left: -29px;
+    margin-left: -36px;
     transform-origin: 50% 0;
     animation: enhe-hanging-tag-swing 4.6s ease-in-out infinite;
     pointer-events: none;
@@ -1495,19 +1495,19 @@ body .customer-support-widget .customer-support-launcher,
   .redesign-mascot-cord {
     position: absolute;
     top: 0;
-    left: 28px;
+    left: 35px;
     width: 2px;
-    height: 48px;
+    height: 74px;
     border-radius: 2px;
     background: color-mix(in srgb, var(--enhe-action) 55%, #fff);
   }
 
   .redesign-hanging-mascot-image {
     position: absolute;
-    top: 43px;
+    top: 69px;
     left: 0;
     display: block;
-    width: 58px;
+    width: 72px;
     height: auto;
     filter: drop-shadow(0 5px 8px rgb(13 38 76 / 16%));
   }
@@ -1516,7 +1516,7 @@ body .customer-support-widget .customer-support-launcher,
 @media (max-width: 767px) {
   .redesign-footer-mascot {
     top: -84px;
-    left: 52%;
+    left: min(calc(52% + 147px), calc(100% - 82px));
     width: 98px;
     margin-left: -49px;
   }
