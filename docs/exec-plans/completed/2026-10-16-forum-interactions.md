@@ -1,6 +1,6 @@
 # Forum topic interaction bar
 
-Status: in_progress
+Status: PASS (requested feature and release; legacy test exception recorded below)
 
 ## Contract
 
@@ -26,4 +26,7 @@ Use the supplied TypeScript ClickSpark source with white line sparks: 8 sparks, 
 - PASS: additive migration applied successfully to a newly created local Docker test database. Only new bookmark/share tables, their indexes and foreign keys are introduced; no existing topic, reply or account rows are rewritten.
 - Independent implementation/diff review found no blocking issues. No new dependencies.
 - Additional legacy media browser case: FAIL before reaching its interaction assertions because its unchanged header-logo expectation is sizes=154px while the baseline header uses (max-width: 420px) 120px, 154px. This pre-existing assertion is recorded without changing the unrelated logo behavior. Directly affected interaction selectors in that test were updated; new interaction scenarios independently pass.
-- Production preflight was read-only and healthy on 4654e5db. User explicitly approved on 2026-10-17: back up first, add the two record tables, push and deploy. Release preparation is now authorized; deployment and final public verification are pending.
+- User explicitly approved on 2026-10-17: back up first, add the two record tables, push and deploy. Application release 2503b2dce0d2018da303a67818cdb5a527e1cd74 was pushed and deployed after backup/rollback compatibility checks succeeded. The sole new migration 20261016120000_add_forum_bookmarks_shares applied successfully; all 57 migrations are up to date; app, worker and scheduler are healthy.
+- PASS: live Chinese/English list and topic-detail pages at 390px and 1440px returned HTTP 200 with reply/share/like/bookmark in order, 44px targets on one row, correct reply anchors and guest login links. Guest copy feedback worked without account-writing actions or count changes; zero browser page errors.
+- Account mutation and cross-context persistence checks used only the isolated local test database, removed after verification. Production checks were read-only apart from the explicitly approved additive migration and normal deployment workflow.
+- No remaining feature/release work. This completion record is a documentation-only follow-up; the running application remains release 2503b2dc.
