@@ -32,6 +32,10 @@ describe("public mascot decorations", () => {
     expect(redesignStyles).toMatch(/@media\s*\(prefers-reduced-motion:\s*reduce\)[\s\S]*?\.redesign-hanging-mascot,\s*\.redesign-footer-mascot\s*\{\s*animation:\s*none/);
   });
 
+  it("gives the footer mascot a visible, gentle walking motion", () => {
+    expect(redesignStyles).toMatch(/@keyframes enhe-footer-mascot-walk[\s\S]*translate3d\(-12px, 0, 0\)[\s\S]*translate3d\(12px, 0, 0\)/);
+  });
+
   it("uses the requested smaller language-switcher type", () => {
     const switcherRules = shellStyles.match(/\.redesign-language-link\s*\{([^}]*)\}/)?.[1];
 
