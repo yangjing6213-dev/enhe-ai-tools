@@ -80,7 +80,16 @@ export async function SiteFooter({ forceLocale }: { forceLocale?: Locale }) {
   ];
 
   return (
-    <footer className="site-footer">
+    <div className="site-footer-decoration-shell">
+      <span className="site-footer-mascot" aria-hidden="true">
+        <Image
+          src="/images/mascots/enhe-dino-mascot.webp"
+          alt=""
+          width={406}
+          height={480}
+        />
+      </span>
+      <footer className="site-footer">
       <Container className="site-footer-inner">
         <div className="site-footer-top">
           <div className="site-footer-brand-block">
@@ -192,6 +201,7 @@ export async function SiteFooter({ forceLocale }: { forceLocale?: Locale }) {
           </div>
         </div>
       </Container>
-    </footer>
+      </footer>
+    </div>
   );
 }

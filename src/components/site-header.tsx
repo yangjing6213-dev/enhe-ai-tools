@@ -81,6 +81,22 @@ export async function SiteHeader({ forceLocale }: { forceLocale?: Locale }) {
                   </div>
                 </div>
               </div>
+            ) : href === buildLocalePath("/ai-trends", locale) ? (
+              <span key={href} className="site-nav-trends-anchor">
+                <PrefetchLink href={href} className="site-nav-link cursor-target">
+                  {label}
+                </PrefetchLink>
+                <span className="site-hanging-mascot" aria-hidden="true">
+                  <span className="site-mascot-cord" />
+                  <Image
+                    src="/images/mascots/enhe-welcome-tag.webp"
+                    alt=""
+                    width={334}
+                    height={480}
+                    className="site-hanging-mascot-image"
+                  />
+                </span>
+              </span>
             ) : (
               <PrefetchLink key={href} href={href} className="site-nav-link cursor-target">
                 {label}
