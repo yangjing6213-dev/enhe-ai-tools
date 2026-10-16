@@ -6,8 +6,14 @@ import sharp from "sharp";
 const source = resolve("public/images/brand/enhe-favicon-source.png");
 const resizeIcon = size => sharp(source).resize(size, size).png().toBuffer();
 
-for (const [size, path] of [[192, "icon-192.png"], [512, "icon-512.png"], [180, "apple-icon.png"]]) {
+for (const [size, path] of [[192, "icon-192.png"], [512, "icon-512.png"]]) {
   await writeFile(resolve("public", path), await resizeIcon(size));
+}
+
+// Keep an opaque Apple-specific tile, a fresh declared URL, and Apple's root fallback.
+const appleIcon = await sharp(source).resize(180, 180).flatten({ background: "#fff" }).png().toBuffer();
+for (const path of ["apple-touch-icon-20261016.png", "apple-touch-icon.png", "apple-icon.png"]) {
+  await writeFile(resolve("public", path), appleIcon);
 }
 
 const sizes = [16, 32, 48, 64];

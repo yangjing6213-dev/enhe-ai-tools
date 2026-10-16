@@ -33,7 +33,7 @@ describe("favicon and app icon source contract", () => {
     expect(sharedRootMetadata.manifest).toBe("/manifest.webmanifest");
     expect(sharedRootMetadata.icons).toMatchObject({
       shortcut: `/favicon.ico${version}`,
-      apple: [{ url: `/apple-icon.png${version}`, type: "image/png", sizes: "180x180" }]
+      apple: [{ url: "/apple-touch-icon-20261016.png", type: "image/png", sizes: "180x180" }]
     });
     expect(manifest().icons?.map(icon => icon.src)).toEqual([
       `/icon-192.png${version}`, `/icon-512.png${version}`
@@ -41,8 +41,21 @@ describe("favicon and app icon source contract", () => {
   });
 
   it("preserves the mascot colors and transparent corners in all app sizes", async () => {
-    for (const [file, size] of [["icon-192.png", 192], ["icon-512.png", 512], ["apple-icon.png", 180]] as const) {
+    for (const [file, size] of [["icon-192.png", 192], ["icon-512.png", 512]] as const) {
       await expectMascot(readFileSync(join(process.cwd(), "public", file)), size);
+    }
+  });
+
+  it("provides an opaque Apple home-screen icon and the conventional root fallback", async () => {
+    const expected = await sharp(source).resize(180, 180).flatten({ background: "#fff" }).raw().toBuffer();
+    for (const file of ["apple-touch-icon-20261016.png", "apple-touch-icon.png", "apple-icon.png"]) {
+      const icon = sharp(join(process.cwd(), "public", file));
+      const metadata = await icon.metadata();
+      expect(metadata.format).toBe("png");
+      expect(metadata.width).toBe(180);
+      expect(metadata.height).toBe(180);
+      expect(metadata.hasAlpha).toBe(false);
+      expect((await icon.raw().toBuffer()).equals(expected)).toBe(true);
     }
   });
 

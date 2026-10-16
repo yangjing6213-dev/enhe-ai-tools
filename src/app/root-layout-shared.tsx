@@ -35,7 +35,7 @@ export const sharedRootMetadata: Metadata = {
       { url: "/icon-512.png?v=blue-mascot-20261015", type: "image/png", sizes: "512x512" }
     ],
     shortcut: "/favicon.ico?v=blue-mascot-20261015",
-    apple: [{ url: "/apple-icon.png?v=blue-mascot-20261015", type: "image/png", sizes: "180x180" }]
+    apple: [{ url: "/apple-touch-icon-20261016.png", type: "image/png", sizes: "180x180" }]
   }
 };
 

@@ -22,3 +22,11 @@
 - PASS: dependency audit, disposable migration/recovery drills, 3041 unit tests (100 conditional skips), typecheck, standalone lint, production build. The existing Windows dependency-junction build warnings remain; production Docker build will also be checked.
 - Archived only the generated local standalone image cache after a stale WebP cache key stalled requests. A fresh image cache resolves the original news-page navigation timeouts; source assets and production caches unchanged.
 - Browser validation caught a computed-radius contract mismatch (999px vs original 16px). Preserve the original component radius; only remove the grey inset shadow and clip overflowing thumb pixels. Focused 36 tests pass again after this correction.
+
+## iPhone home-screen follow-up (2026-10-16)
+- Previous release `d1c73e69102c24dd7e17caaaa6eb1d68e1758a77` is deployed and verified: active release marker and all three runtime services match; 3041 unit tests and 386 browser tests passed, with 100/175 conditional skips. Production hashes matched all five icon/sharing assets; six viewport/locale checks and both catalog sharing previews passed.
+- User confirms the placeholder E appears in Safari's native Add to Home Screen sheet. Native iOS share-sheet reproduction is not available on this Windows workstation.
+- Live iPhone-UA investigation: declared icon is present in the raw HTML head and returns PNG/200, manifest returns 200, but `/apple-touch-icon.png` and the precomposed fallback return 404. The declared 180px icon retains transparency. These are observed compatibility gaps, not proof that transparency or the URL query alone caused the native failure.
+- Minimal fix: opaque white 180px Apple tile, a fresh query-free declared filename and the conventional root fallback; preserve all browser favicon/manifest artwork, page layout and fonts. Retain legacy Apple filename.
+- Regression was observed before implementation: metadata mismatch and missing fallback asset. After implementation 17 focused tests, typecheck and targeted ESLint pass; generated Apple artwork visually inspected.
+- Pending: release gates, deployment, live iPhone-UA no-JavaScript asset discovery and the user's physical iPhone recheck. Do not claim the native share sheet is verified without that result.
