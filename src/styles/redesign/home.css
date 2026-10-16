@@ -534,7 +534,7 @@
 .redesign-home-reviews-rotation {
   position: absolute;
   right: 0;
-  display: inline-grid;
+  display: none;
   width: 34px;
   min-width: 34px;
   height: 34px;
