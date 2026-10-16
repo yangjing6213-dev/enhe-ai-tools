@@ -180,14 +180,7 @@ async function SiteHeaderContent({ forceLocale }: { forceLocale?: Locale }) {
                     </NavigationMenuContent>
                   </NavigationMenuItem>
                 ) : (
-                  <NavigationMenuItem
-                    key={item.href}
-                    className={
-                      item.href === buildLocalePath("/ai-trends", locale)
-                        ? "site-nav-trends-anchor"
-                        : undefined
-                    }
-                  >
+                  <NavigationMenuItem key={item.href}>
                     <NavigationMenuLink asChild>
                       <PublicNavLink
                         href={item.href}
@@ -200,18 +193,6 @@ async function SiteHeaderContent({ forceLocale }: { forceLocale?: Locale }) {
                         <span>{item.label}</span>
                       </PublicNavLink>
                     </NavigationMenuLink>
-                    {item.href === buildLocalePath("/ai-trends", locale) ? (
-                      <span className="site-hanging-mascot" aria-hidden="true">
-                        <span className="site-mascot-cord" />
-                        <Image
-                          src="/images/mascots/enhe-welcome-tag.webp"
-                          alt=""
-                          width={512}
-                          height={512}
-                          className="site-hanging-mascot-image"
-                        />
-                      </span>
-                    ) : null}
                   </NavigationMenuItem>
                 ),
               )}

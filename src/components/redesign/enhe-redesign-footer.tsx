@@ -86,6 +86,14 @@ export function EnheRedesignFooter({
 
   return (
     <footer className="redesign-footer" aria-label={copy.ariaLabel}>
+      <span className="redesign-footer-mascot" aria-hidden="true">
+        <Image
+          src="/images/mascots/enhe-dino-mascot.webp"
+          alt=""
+          width={406}
+          height={480}
+        />
+      </span>
       <div className="redesign-footer-inner">
         <div className="footer-grid">
           <div className="footer-brand">

@@ -1,3 +1,4 @@
+import Image from "next/image";
 import { EnheAccountMenu } from "./enhe-account-menu";
 import { EmojiText } from "@/components/emoji-text";
 import { EnheHeaderAvatar } from "./enhe-header-avatar";
@@ -93,7 +94,14 @@ export function EnheRedesignHeader({
                   </NavigationMenuContent>
                 </NavigationMenuItem>
               ) : (
-                <NavigationMenuItem key={item.href}>
+                <NavigationMenuItem
+                  key={item.href}
+                  className={
+                    item.href === (locale === "en" ? "/en/ai-trends" : "/ai-trends")
+                      ? "redesign-nav-trends-anchor"
+                      : undefined
+                  }
+                >
                   <NavigationMenuLink asChild>
                     <PrefetchLink
                       className="redesign-nav-link"
@@ -104,6 +112,18 @@ export function EnheRedesignHeader({
                       <span>{item.label}</span>
                     </PrefetchLink>
                   </NavigationMenuLink>
+                  {item.href === (locale === "en" ? "/en/ai-trends" : "/ai-trends") ? (
+                    <span className="redesign-hanging-mascot" aria-hidden="true">
+                      <span className="redesign-mascot-cord" />
+                      <Image
+                        src="/images/mascots/enhe-welcome-tag.webp"
+                        alt=""
+                        width={512}
+                        height={512}
+                        className="redesign-hanging-mascot-image"
+                      />
+                    </span>
+                  ) : null}
                 </NavigationMenuItem>
               ),
             )}

@@ -7,11 +7,13 @@ describe("brand image alt text", () => {
     const source = readFileSync(join(process.cwd(), "src/components/site-header.tsx"), "utf8");
 
     expect(source).toContain("alt={`${brandWordmark} logo`}");
+    expect(source).not.toContain('alt=""');
   });
 
   it("keeps footer brand images descriptive for SEO crawlers", () => {
     const source = readFileSync(join(process.cwd(), "src/components/site-footer.tsx"), "utf8");
 
+    expect(source).not.toContain('alt=""');
     expect(source).toContain("alt={`${siteName} logo`}");
     expect(source).not.toContain("site-footer-gradient-icon");
   });

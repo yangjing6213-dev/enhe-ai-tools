@@ -1411,6 +1411,116 @@ body .customer-support-widget .customer-support-launcher,
   color: var(--enhe-text, #080808);
 }
 
+.redesign-nav-trends-anchor {
+  position: relative;
+}
+
+.redesign-header .redesign-nav-link {
+  position: relative;
+  z-index: 2;
+}
+
+.redesign-hanging-mascot {
+  display: none;
+}
+
+.redesign-footer {
+  position: relative;
+}
+
+.redesign-footer-mascot {
+  position: absolute;
+  z-index: 3;
+  top: -112px;
+  left: 68%;
+  display: block;
+  width: 132px;
+  margin-left: -66px;
+  transform-origin: 50% 100%;
+  animation: enhe-footer-mascot-walk 2.2s ease-in-out infinite;
+  pointer-events: none;
+}
+
+.redesign-footer-mascot img {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+@keyframes enhe-hanging-tag-swing {
+  0%,
+  100% {
+    transform: rotate(-2.5deg);
+  }
+
+  50% {
+    transform: rotate(2.5deg);
+  }
+}
+
+@keyframes enhe-footer-mascot-walk {
+  0%,
+  100% {
+    transform: translateX(-3px) rotate(-1deg);
+  }
+
+  50% {
+    transform: translateX(4px) rotate(1deg);
+  }
+}
+
+@media (min-width: 1024px) {
+  .redesign-hanging-mascot {
+    position: absolute;
+    z-index: 1;
+    top: -14px;
+    left: calc(100% + 6px);
+    display: block;
+    width: 58px;
+    height: 0;
+    margin-left: -29px;
+    transform-origin: 50% 0;
+    animation: enhe-hanging-tag-swing 4.6s ease-in-out infinite;
+    pointer-events: none;
+  }
+
+  .redesign-mascot-cord {
+    position: absolute;
+    top: 0;
+    left: 28px;
+    width: 2px;
+    height: 48px;
+    border-radius: 2px;
+    background: color-mix(in srgb, var(--enhe-action) 55%, #fff);
+  }
+
+  .redesign-hanging-mascot-image {
+    position: absolute;
+    top: 43px;
+    left: 0;
+    display: block;
+    width: 58px;
+    height: auto;
+    filter: drop-shadow(0 5px 8px rgb(13 38 76 / 16%));
+  }
+}
+
+@media (max-width: 767px) {
+  .redesign-footer-mascot {
+    top: -84px;
+    left: 52%;
+    width: 98px;
+    margin-left: -49px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .redesign-hanging-mascot,
+  .redesign-footer-mascot {
+    animation: none;
+  }
+}
+
 @media (width < 768px) {
   .redesign-home .redesign-home-products-heading h2 {
     font-size: clamp(1rem, 4.5vw, 1.25rem);
