@@ -8,6 +8,7 @@ const mocks = vi.hoisted(() => ({
   postCount: vi.fn(),
   postCreate: vi.fn(),
   postFindUnique: vi.fn(),
+  postUpdateMany: vi.fn(),
   replyCount: vi.fn(),
   replyCreate: vi.fn(),
   replyFindUnique: vi.fn(),
@@ -20,6 +21,8 @@ const mocks = vi.hoisted(() => ({
   attachmentUpdateMany: vi.fn(),
   likeDeleteForReply: vi.fn(),
   writeAdminAuditLog: vi.fn(),
+  getAuditContext: vi.fn(),
+  auditCreate: vi.fn(),
   deleteStoredMedia: vi.fn(),
   transaction: vi.fn(),
 }));
@@ -38,9 +41,13 @@ vi.mock("@/lib/db", () => ({
   },
 }));
 vi.mock("@/lib/forum-media-storage", () => ({ deleteForumMediaStoredFile: mocks.deleteStoredMedia }));
-vi.mock("@/lib/admin-audit", () => ({ writeAdminAuditLog: mocks.writeAdminAuditLog }));
+vi.mock("@/lib/admin-audit", async (importOriginal) => ({
+  ...await importOriginal<typeof import("@/lib/admin-audit")>(),
+  writeAdminAuditLog: mocks.writeAdminAuditLog,
+  getAdminAuditRequestContext: mocks.getAuditContext,
+}));
 
-import { createForumPostAction, createForumReplyAction, deleteForumReplyAction, toggleForumLikeAction } from "@/app/forum/actions";
+import { createForumPostAction, createForumReplyAction, deleteForumPostAction, deleteForumReplyAction, toggleForumLikeAction } from "@/app/forum/actions";
 
 function form(entries: Record<string, string>) {
   const data = new FormData();
@@ -58,6 +65,9 @@ describe("forum member actions", () => {
     mocks.likeCount.mockResolvedValue(0);
     mocks.postCreate.mockResolvedValue({ id: "post-1" });
     mocks.postFindUnique.mockResolvedValue({ status: "approved" });
+    mocks.postUpdateMany.mockResolvedValue({ count: 1 });
+    mocks.getAuditContext.mockResolvedValue({ ip: "127.0.0.1", userAgent: "forum-test" });
+    mocks.auditCreate.mockResolvedValue({ id: "audit-1" });
     mocks.replyCreate.mockResolvedValue({ id: "reply-1" });
     mocks.replyFindUnique.mockResolvedValue(null);
     mocks.replyUpdateMany.mockResolvedValue({ count: 1 });
@@ -69,10 +79,11 @@ describe("forum member actions", () => {
     mocks.likeDeleteForReply.mockResolvedValue({ count: 0 });
     mocks.deleteStoredMedia.mockResolvedValue(true);
     mocks.transaction.mockImplementation(async (run) => run({
-      forumPost: { create: mocks.postCreate },
+      forumPost: { create: mocks.postCreate, updateMany: mocks.postUpdateMany },
       forumReply: { create: mocks.replyCreate, updateMany: mocks.replyUpdateMany },
       forumLike: { deleteMany: mocks.likeDeleteForReply },
       forumAttachment: { findMany: mocks.attachmentFindMany, updateMany: mocks.attachmentUpdateMany },
+      adminAuditLog: { create: mocks.auditCreate },
     }));
   });
 
@@ -156,6 +167,70 @@ describe("forum member actions", () => {
     expect(mocks.likeCreate).not.toHaveBeenCalled();
   });
 
+  it("requires login before deleting a topic", async () => {
+    mocks.requireUser.mockRejectedValueOnce(new Error("UNAUTHORIZED"));
+    await expect(deleteForumPostAction(form({ postId: "post-1" }))).rejects.toThrow("UNAUTHORIZED");
+    expect(mocks.postUpdateMany).not.toHaveBeenCalled();
+    expect(mocks.transaction).not.toHaveBeenCalled();
+  });
+
+  it("denies topic deletion to ordinary members, including the author", async () => {
+    await expect(deleteForumPostAction(form({ postId: "post-1" }))).rejects.toThrow("FORUM_POST_DELETE_FORBIDDEN");
+    expect(mocks.postFindUnique).not.toHaveBeenCalled();
+    expect(mocks.postUpdateMany).not.toHaveBeenCalled();
+    expect(mocks.auditCreate).not.toHaveBeenCalled();
+  });
+
+  it("hides an approved topic and audits it in the same transaction while preserving replies and media", async () => {
+    mocks.requireUser.mockResolvedValueOnce({ id: "admin-1", role: "admin" });
+    await deleteForumPostAction(form({ postId: "post-1" }));
+
+    expect(mocks.transaction).toHaveBeenCalledTimes(1);
+    expect(mocks.postUpdateMany).toHaveBeenCalledWith({ where: { id: "post-1", status: "approved" }, data: { status: "rejected" } });
+    expect(mocks.auditCreate).toHaveBeenCalledWith({ data: expect.objectContaining({
+      adminId: "admin-1", action: "forum.post.delete", targetType: "forum_post", targetId: "post-1",
+      metadata: { previousStatus: "approved", status: "rejected" }, ip: "127.0.0.1", userAgent: "forum-test",
+    }) });
+    expect(mocks.replyUpdateMany).not.toHaveBeenCalled();
+    expect(mocks.attachmentUpdateMany).not.toHaveBeenCalled();
+    expect(mocks.deleteStoredMedia).not.toHaveBeenCalled();
+    expect(mocks.likeDeleteForReply).not.toHaveBeenCalled();
+    for (const path of ["/forum", "/en/forum", "/forum/post-1", "/en/forum/post-1", "/admin/forum", "/sitemap.xml"]) {
+      expect(mocks.revalidatePath).toHaveBeenCalledWith(path);
+    }
+    expect(mocks.redirect).toHaveBeenCalledWith("/forum?postDeleted=1");
+  });
+
+  it("returns administrators to the English list after deletion from the English forum", async () => {
+    mocks.requireUser.mockResolvedValueOnce({ id: "admin-1", role: "admin" });
+    mocks.currentLocale.mockResolvedValueOnce("en");
+    await deleteForumPostAction(form({ postId: "post-1" }));
+    expect(mocks.redirect).toHaveBeenCalledWith("/en/forum?postDeleted=1");
+  });
+
+  it("rejects an invalid topic id before writing", async () => {
+    mocks.requireUser.mockResolvedValueOnce({ id: "admin-1", role: "admin" });
+    await expect(deleteForumPostAction(form({ postId: " " }))).rejects.toThrow("FORUM_INVALID_TARGET");
+    expect(mocks.transaction).not.toHaveBeenCalled();
+  });
+
+  it("does not report a missing or already hidden topic as deleted", async () => {
+    mocks.requireUser.mockResolvedValueOnce({ id: "admin-1", role: "admin" });
+    mocks.postUpdateMany.mockResolvedValueOnce({ count: 0 });
+    await expect(deleteForumPostAction(form({ postId: "post-1" }))).rejects.toThrow("FORUM_POST_NOT_AVAILABLE");
+    expect(mocks.auditCreate).not.toHaveBeenCalled();
+    expect(mocks.revalidatePath).not.toHaveBeenCalled();
+    expect(mocks.redirect).not.toHaveBeenCalled();
+  });
+
+  it("does not announce deletion when its audit transaction fails", async () => {
+    mocks.requireUser.mockResolvedValueOnce({ id: "admin-1", role: "admin" });
+    mocks.auditCreate.mockRejectedValueOnce(new Error("audit unavailable"));
+    await expect(deleteForumPostAction(form({ postId: "post-1" }))).rejects.toThrow("audit unavailable");
+    expect(mocks.revalidatePath).not.toHaveBeenCalled();
+    expect(mocks.redirect).not.toHaveBeenCalled();
+  });
+
   it("lets an author delete their reply while preserving a tombstone and cleaning its media", async () => {
     mocks.replyFindUnique.mockResolvedValueOnce({
       id: "reply-1", postId: "post-1", authorId: "user-1", status: "approved",
@@ -231,9 +306,25 @@ describe("forum member actions", () => {
   });
 
   it("does not accept likes for deleted reply tombstones", async () => {
-    mocks.replyFindUnique.mockResolvedValueOnce({ status: "approved", postId: "post-1", content: "" });
+    mocks.replyFindUnique.mockResolvedValueOnce({ status: "approved", postId: "post-1", content: "", post: { status: "approved" } });
     await expect(toggleForumLikeAction(form({ replyId: "deleted-reply" }))).rejects.toThrow("FORUM_CONTENT_NOT_AVAILABLE");
     expect(mocks.likeCreate).not.toHaveBeenCalled();
+  });
+
+  it("does not accept likes for a reply whose topic was deleted", async () => {
+    mocks.replyFindUnique.mockResolvedValueOnce({ status: "approved", postId: "post-1", content: "保留的回复", post: { status: "rejected" } });
+    await expect(toggleForumLikeAction(form({ replyId: "reply-1" }))).rejects.toThrow("FORUM_CONTENT_NOT_AVAILABLE");
+    expect(mocks.likeCreate).not.toHaveBeenCalled();
+    expect(mocks.likeDelete).not.toHaveBeenCalled();
+  });
+
+  it("still allows likes for a reply in a public topic", async () => {
+    mocks.replyFindUnique.mockResolvedValueOnce({ status: "approved", postId: "post-1", content: "公开回复", post: { status: "approved" } });
+    await expect(toggleForumLikeAction(form({ replyId: "reply-1" }))).resolves.toEqual({ liked: false, count: 0 });
+    expect(mocks.replyFindUnique).toHaveBeenCalledWith(expect.objectContaining({
+      select: expect.objectContaining({ post: { select: { status: true } } }),
+    }));
+    expect(mocks.likeCreate).toHaveBeenCalledWith({ data: { userId: "user-1", replyId: "reply-1" } });
   });
 
   it("removes an existing like when the member selects it again", async () => {

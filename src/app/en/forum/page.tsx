@@ -7,10 +7,10 @@ import { generateForumIndexMetadata } from "@/lib/forum-seo";
 
 export const generateMetadata = () => generateForumIndexMetadata("en");
 
-export default async function EnglishForumIndexPage({ searchParams }: { searchParams: Promise<{ category?: string }> }) {
-  const [{ category: rawCategory }, user] = await Promise.all([searchParams, getCurrentUser()]);
+export default async function EnglishForumIndexPage({ searchParams }: { searchParams: Promise<{ category?: string; postDeleted?: string }> }) {
+  const [{ category: rawCategory, postDeleted }, user] = await Promise.all([searchParams, getCurrentUser()]);
   const parsed = forumCategorySchema.safeParse(rawCategory);
   const category = parsed.success ? parsed.data : undefined;
   const posts = await getForumPosts(category, "en", user?.id);
-  return <PublicSiteChrome forceLocale="en"><ForumIndexContent locale="en" posts={posts} selectedCategory={category} isAuthenticated={Boolean(user)} /></PublicSiteChrome>;
+  return <PublicSiteChrome forceLocale="en"><ForumIndexContent locale="en" posts={posts} selectedCategory={category} isAuthenticated={Boolean(user)} isAdmin={user?.role === "admin"} postDeleted={postDeleted === "1"} /></PublicSiteChrome>;
 }

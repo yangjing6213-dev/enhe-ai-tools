@@ -4,7 +4,7 @@ import { describe, expect, it, vi } from "vitest";
 import { ForumIndexContent, ForumNewPostContent, ForumPostContent } from "./forum-ui";
 
 Object.assign(globalThis, { React });
-vi.mock("@/app/forum/actions", () => ({ createForumPostAction: vi.fn(), createForumReplyAction: vi.fn(), deleteForumReplyAction: vi.fn(), toggleForumLikeAction: vi.fn() }));
+vi.mock("@/app/forum/actions", () => ({ createForumPostAction: vi.fn(), createForumReplyAction: vi.fn(), deleteForumPostAction: vi.fn(), deleteForumReplyAction: vi.fn(), toggleForumLikeAction: vi.fn() }));
 
 const author = { id: "author", displayName: "用户 :enhe_01:", nickname: "用户", avatar: "/images/default-avatars/avatar-01.webp" };
 const reply = { id: "reply-1", postId: "post-1", parentId: null, authorId: "author", status: "approved", author, createdAt: new Date("2026-10-14T00:00:00Z"), updatedAt: new Date("2026-10-14T00:00:00Z"), content: "回复正文", attachments: [], isLiked: false, _count: { likes: 0 }, children: [] };
@@ -15,6 +15,29 @@ const post = {
 } as unknown as Parameters<typeof ForumPostContent>[0]["post"];
 
 describe("forum public surfaces", () => {
+  it("offers topic deletion on both surfaces only to signed-in administrators", () => {
+    const listPosts = [post] as unknown as Parameters<typeof ForumIndexContent>[0]["posts"];
+    const adminList = renderToStaticMarkup(<ForumIndexContent locale="zh" posts={listPosts} isAuthenticated isAdmin />);
+    const adminDetail = renderToStaticMarkup(<ForumPostContent locale="zh" post={post} isAuthenticated isAdmin replySubmitted={false} />);
+    for (const html of [adminList, adminDetail]) {
+      expect(html).toContain("删除话题");
+      expect(html).toContain('name="postId" value="post-1"');
+    }
+    for (const [isAuthenticated, isAdmin] of [[true, false], [false, false], [false, true]]) {
+      const list = renderToStaticMarkup(<ForumIndexContent locale="zh" posts={listPosts} isAuthenticated={isAuthenticated} isAdmin={isAdmin} />);
+      const detail = renderToStaticMarkup(<ForumPostContent locale="zh" post={post} isAuthenticated={isAuthenticated} currentUserId="author" isAdmin={isAdmin} replySubmitted={false} />);
+      expect(list).not.toContain("删除话题");
+      expect(detail).not.toContain("删除话题");
+    }
+  });
+
+  it("shows localized deletion feedback on the topic list", () => {
+    const chinese = renderToStaticMarkup(<ForumIndexContent locale="zh" posts={[]} isAuthenticated isAdmin postDeleted />);
+    expect(chinese).toContain("话题已删除，话题及回复不再公开显示。");
+    const english = renderToStaticMarkup(<ForumIndexContent locale="en" posts={[]} isAuthenticated isAdmin postDeleted />);
+    expect(english).toContain("Topic deleted. The topic and its replies are no longer public.");
+  });
+
   it("keeps the cover's full image dimensions and separates the topic tag from the author", () => {
     const html = renderToStaticMarkup(<ForumIndexContent locale="zh" posts={[post] as unknown as Parameters<typeof ForumIndexContent>[0]["posts"]} isAuthenticated />);
     expect(html).toContain('width="1448" height="620"');

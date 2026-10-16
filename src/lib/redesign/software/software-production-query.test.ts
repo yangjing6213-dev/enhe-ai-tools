@@ -2,6 +2,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 const db = vi.hoisted(() => ({
   toolFindMany: vi.fn(),
+  getSecureCosMediaUrl: vi.fn(),
 }));
 
 const publicCache = vi.hoisted(() => new Map<string, unknown>());
@@ -27,6 +28,10 @@ vi.mock("@/lib/db", () => ({
   },
 }));
 
+vi.mock("@/lib/storage", () => ({
+  getSecureCosMediaUrl: db.getSecureCosMediaUrl,
+}));
+
 describe("production software public query", () => {
   beforeEach(() => {
     vi.resetModules();
@@ -37,6 +42,7 @@ describe("production software public query", () => {
 
   afterEach(() => {
     vi.unstubAllEnvs();
+    vi.unstubAllGlobals();
   });
 
   it("selects published Tool data without file or delivery fields", async () => {
@@ -113,8 +119,55 @@ describe("production software public query", () => {
 
     expect(db.toolFindMany).toHaveBeenCalledOnce();
     const query = db.toolFindMany.mock.calls[0]?.[0];
-    expect(query.where).toEqual({ status: "published", type: "software" });
+    expect(query.where).toEqual({
+      status: "published",
+      type: { in: ["software", "ai_skill"] },
+    });
     expect(query.select).toEqual({ id: true, coverImage: true });
+  });
+
+  it("serves uploaded AI Skill and software covers while keeping unpublished products private", async () => {
+    vi.stubEnv("DATABASE_URL", "postgresql://configured.invalid/enhe");
+    const products = [
+      { id: "public-skill", type: "ai_skill", status: "published" },
+      { id: "public-software", type: "software", status: "published" },
+      { id: "draft-skill", type: "ai_skill", status: "draft" },
+      { id: "draft-software", type: "software", status: "draft" },
+      { id: "other-product", type: "online", status: "published" },
+    ].map((product) => ({
+      ...product,
+      coverImage: `cos://enhe-bucket/tool-cover-${product.id}/cover.png`,
+    }));
+    db.toolFindMany.mockImplementation(async ({ where }) => products
+      .filter((product) => product.status === where.status && (
+        typeof where.type === "string"
+          ? product.type === where.type
+          : where.type.in.includes(product.type)
+      ))
+      .map(({ id, coverImage }) => ({ id, coverImage })));
+    db.getSecureCosMediaUrl.mockResolvedValue("https://signed.example/cover.png");
+    const imageBytes = new Uint8Array([137, 80, 78, 71]);
+    const fetchImage = vi.fn().mockImplementation(async () => new Response(imageBytes, {
+      headers: { "content-type": "image/png" },
+    }));
+    vi.stubGlobal("fetch", fetchImage);
+    const { GET } = await import("@/app/api/tool-images/route");
+
+    for (const product of products) {
+      const response = await GET(new Request(
+        `https://www.enhe-tech.com.cn/api/tool-images?id=${product.id}&mode=optimizer-source`,
+      ));
+      const isPublicCatalogProduct = product.id.startsWith("public-");
+      expect(response.status, product.id).toBe(isPublicCatalogProduct ? 200 : 404);
+      if (isPublicCatalogProduct) {
+        expect(new Uint8Array(await response.arrayBuffer())).toEqual(imageBytes);
+        expect(db.getSecureCosMediaUrl).toHaveBeenCalledWith(product.coverImage);
+      }
+    }
+
+    expect(db.toolFindMany).toHaveBeenCalledOnce();
+    expect(db.getSecureCosMediaUrl).toHaveBeenCalledTimes(2);
+    expect(fetchImage).toHaveBeenCalledTimes(2);
   });
 
   it("returns no catalog covers without querying Prisma when DATABASE_URL is unset", async () => {

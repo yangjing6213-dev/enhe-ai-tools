@@ -11,7 +11,7 @@ if (process.env.PLAYWRIGHT_USE_PRODUCTION_SERVER !== "1" || !process.env.DATABAS
 export default defineConfig({
   ...base,
   testDir: resolve(__dirname, "e2e"),
-  testMatch: "forum-media-emojis.spec.ts",
+  testMatch: ["forum-media-emojis.spec.ts", "forum-topic-delete.spec.ts"],
   outputDir: resolve(__dirname, "../test-results"),
   workers: 1,
   webServer: {

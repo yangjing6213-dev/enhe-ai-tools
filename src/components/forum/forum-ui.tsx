@@ -7,6 +7,7 @@ import { buildLocalePath } from "@/lib/seo";
 import { getForumPost } from "@/lib/forum-data";
 import { createForumPostAction, createForumReplyAction, deleteForumReplyAction } from "@/app/forum/actions";
 import { ForumLikeButton } from "@/components/forum/forum-like-button";
+import { ForumDeletePostButton } from "@/components/forum/forum-delete-post-button";
 import { ForumMediaEditor } from "@/components/forum/forum-media-editor";
 import { ForumMediaDisplay } from "@/components/forum/forum-media-display";
 import { EmojiText } from "@/components/emoji-text";
@@ -36,6 +37,7 @@ function copy(locale: Locale) {
     titlePlaceholder: "What would you like to discuss?",
     published: "Your topic is now public.",
     replyPublished: "Your reply is now public.",
+    postDeleted: "Topic deleted. The topic and its replies are no longer public.",
     reply: "Reply",
     replyPlaceholder: "Write a helpful reply",
     sendReply: "Publish reply",
@@ -61,6 +63,7 @@ function copy(locale: Locale) {
     titlePlaceholder: "你想讨论什么？",
     published: "话题已发布，现在公开可见。",
     replyPublished: "回复已发布，现在公开可见。",
+    postDeleted: "话题已删除，话题及回复不再公开显示。",
     reply: "回复",
     replyPlaceholder: "写下你的回复",
     sendReply: "发布回复",
@@ -83,7 +86,7 @@ function JoinLink({ locale, returnTo = "/forum" }: { locale: Locale; returnTo?: 
   return <Link className="forum-login-link" href={`${pageHref(locale, "/login")}?returnTo=${encodeURIComponent(pageHref(locale, returnTo))}`}>{t.signIn}</Link>;
 }
 
-export function ForumIndexContent({ locale, posts, selectedCategory, isAuthenticated }: { locale: Locale; posts: ForumPosts; selectedCategory?: ForumCategory; isAuthenticated: boolean }) {
+export function ForumIndexContent({ locale, posts, selectedCategory, isAuthenticated, isAdmin = false, postDeleted = false }: { locale: Locale; posts: ForumPosts; selectedCategory?: ForumCategory; isAuthenticated: boolean; isAdmin?: boolean; postDeleted?: boolean }) {
   const t = copy(locale);
   return (
     <main className="forum-page">
@@ -106,13 +109,14 @@ export function ForumIndexContent({ locale, posts, selectedCategory, isAuthentic
         <Link className={!selectedCategory ? "is-active" : ""} href={pageHref(locale, "/forum")}>{t.all}</Link>
         {categories.map((category) => <Link className={selectedCategory === category ? "is-active" : ""} key={category} href={`${pageHref(locale, "/forum")}?category=${category}`}>{getForumCategoryLabel(category, locale)}</Link>)}
       </nav>
+      {postDeleted && isAuthenticated && isAdmin ? <p className="forum-success-notice" role="status">{t.postDeleted}</p> : null}
       {posts.length ? <div className="forum-post-list">{posts.map((post) => (
         <article className="forum-post-card" key={post.id}>
           <div className="forum-post-header"><div className="forum-author-line"><UserAvatar src={post.author.avatar} alt={post.author.displayName} size={40} className="forum-avatar" /><span><EmojiText text={post.author.displayName} /></span><time dateTime={post.createdAt.toISOString()}>{dateLabel(post.createdAt, locale)}</time></div><span className="forum-category-tag">{getForumCategoryLabel(post.category, locale)}</span></div>
           <h2><Link href={pageHref(locale, `/forum/${post.id}`)}><EmojiText text={post.title} /></Link></h2>
           <p className="forum-post-excerpt"><EmojiText text={post.content} /></p>
           <ForumMediaDisplay locale={locale} attachments={post.attachments ?? []} />
-          <div className="forum-post-meta"><ForumLikeButton locale={locale} postId={post.id} count={post._count.likes} isLiked={post.isLiked} isAuthenticated={isAuthenticated} returnTo={`/forum/${post.id}`} /><Link href={pageHref(locale, `/forum/${post.id}`)}>{post._count.replies} {t.replies}</Link></div>
+          <div className="forum-post-meta"><ForumLikeButton locale={locale} postId={post.id} count={post._count.likes} isLiked={post.isLiked} isAuthenticated={isAuthenticated} returnTo={`/forum/${post.id}`} /><Link href={pageHref(locale, `/forum/${post.id}`)}>{post._count.replies} {t.replies}</Link>{isAuthenticated && isAdmin ? <ForumDeletePostButton locale={locale} postId={post.id} /> : null}</div>
         </article>
       ))}</div> : <p className="forum-empty-state">{t.empty}</p>}
       {!isAuthenticated ? <div className="forum-join-callout"><JoinLink locale={locale} /></div> : null}
@@ -161,7 +165,7 @@ export function ForumPostContent({ locale, post, isAuthenticated, currentUserId,
         <div className="forum-post-header"><div className="forum-author-line"><UserAvatar src={post.author.avatar} alt={post.author.displayName} size={44} className="forum-avatar" /><span><EmojiText text={post.author.displayName} /></span><time dateTime={post.createdAt.toISOString()}>{dateLabel(post.createdAt, locale)}</time></div><span className="forum-category-tag">{getForumCategoryLabel(post.category, locale)}</span></div>
         <h1><EmojiText text={post.title} /></h1><p className="forum-detail-content"><EmojiText text={post.content} /></p>
         <ForumMediaDisplay locale={locale} attachments={post.attachments ?? []} />
-        <div className="forum-post-meta"><ForumLikeButton locale={locale} postId={post.id} count={post._count.likes} isLiked={post.isLiked} isAuthenticated={isAuthenticated} returnTo={`/forum/${post.id}`} /><a href="#replies">{post.replyCount} {t.replies}</a></div>
+        <div className="forum-post-meta"><ForumLikeButton locale={locale} postId={post.id} count={post._count.likes} isLiked={post.isLiked} isAuthenticated={isAuthenticated} returnTo={`/forum/${post.id}`} /><a href="#replies">{post.replyCount} {t.replies}</a>{isAuthenticated && isAdmin ? <ForumDeletePostButton locale={locale} postId={post.id} /> : null}</div>
       </article>
       <section className="forum-replies" id="replies">
         <div className="forum-section-heading">{isAuthenticated ? <ReplyForm locale={locale} postId={post.id} /> : <JoinLink locale={locale} />}</div>
