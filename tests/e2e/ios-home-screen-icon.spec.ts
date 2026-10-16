@@ -28,32 +28,3 @@ for (const path of ["/", "/en"]) {
     expect((await fallback.body()).equals(bytes)).toBe(true);
   });
 }
-
-test("temporary iPhone probes differ only in icon delivery and cannot be indexed", async ({ page, request }) => {
-  const html: string[] = [];
-  const icons: Buffer[] = [];
-  for (const variant of ["file", "inline"]) {
-    const response = await page.goto(`/ios-icon-${variant}-20261016.html`, { waitUntil: "domcontentloaded" });
-    expect(response?.status()).toBe(200);
-    expect(response?.headers()["content-type"]).toMatch(/^text\/html/);
-    await expect(page.locator('head meta[name="robots"]')).toHaveAttribute("content", "noindex, nofollow, noarchive");
-    await expect(page.locator('head link[rel="manifest"]')).toHaveCount(0);
-    const link = page.locator('head link[rel="apple-touch-icon"]');
-    await expect(link).toHaveCount(1);
-    await expect(link).toHaveAttribute("sizes", "180x180");
-    const href = (await link.getAttribute("href"))!;
-    if (variant === "file") {
-      expect(href).toBe("/apple-touch-icon-20261016.png");
-      const icon = await request.get(href);
-      expect(icon.status()).toBe(200);
-      icons.push(await icon.body());
-    } else {
-      expect(href).toMatch(/^data:image\/png;base64,[A-Za-z0-9+/]+=*$/);
-      icons.push(Buffer.from(href.split(",")[1], "base64"));
-    }
-    html.push((await response!.text()).replace(`href="${href}"`, 'href="ICON_DELIVERY"'));
-  }
-  expect(html[0]).toBe(html[1]);
-  expect(icons[0].equals(icons[1])).toBe(true);
-  expect(await sharp(icons[1]).metadata()).toMatchObject({ width: 180, height: 180, hasAlpha: false });
-});
