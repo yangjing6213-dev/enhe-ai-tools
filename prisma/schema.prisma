@@ -278,6 +278,8 @@ model User {
   forumPosts            ForumPost[]              @relation("ForumPostAuthor")
   forumReplies          ForumReply[]             @relation("ForumReplyAuthor")
   forumLikes            ForumLike[]
+  forumBookmarks        ForumBookmark[]
+  forumShares           ForumShare[]
   forumReports          ForumReport[]            @relation("ForumReportAuthor")
   seoAuditProjects      SeoAuditProject[]
   seoAuditRuns          SeoAuditRun[]
@@ -965,6 +967,8 @@ model ForumPost {
   author    User               @relation("ForumPostAuthor", fields: [authorId], references: [id])
   replies   ForumReply[]
   likes     ForumLike[]
+  bookmarks ForumBookmark[]
+  shares    ForumShare[]
   reports   ForumReport[]
   attachments ForumAttachment[]
 
@@ -1031,6 +1035,32 @@ model ForumLike {
   @@index([postId])
   @@index([replyId])
   @@map("forum_likes")
+}
+
+model ForumBookmark {
+  id        String    @id @default(cuid())
+  userId    String    @map("user_id")
+  postId    String    @map("post_id")
+  createdAt DateTime  @default(now()) @map("created_at")
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  post      ForumPost @relation(fields: [postId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, postId])
+  @@index([postId])
+  @@map("forum_bookmarks")
+}
+
+model ForumShare {
+  id        String    @id @default(cuid())
+  userId    String    @map("user_id")
+  postId    String    @map("post_id")
+  createdAt DateTime  @default(now()) @map("created_at")
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  post      ForumPost @relation(fields: [postId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, postId])
+  @@index([postId])
+  @@map("forum_shares")
 }
 
 model ForumReport {

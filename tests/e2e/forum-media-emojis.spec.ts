@@ -84,16 +84,19 @@ test("forum cover, category spacing, full reply count and saved heart state work
   }
   await page.goto(`/forum/${postId}`);
   const meta = page.locator(".forum-post-detail .forum-post-meta");
-  await expect(meta.getByRole("link", { name: "2 条回复" })).toBeVisible();
+  await expect(meta.getByRole("link", { name: "回复：2" })).toBeVisible();
   await expect(page.locator(".forum-back-link")).toContainText("◀");
-  const heart = meta.getByRole("button", { name: "喜欢: 0", exact: true });
+  const heart = meta.locator('[data-forum-action="like"]');
   await heart.click();
-  await expect(meta.getByRole("button", { name: "喜欢: 1", exact: true })).toHaveAttribute("aria-pressed", "true");
-  await expect(meta.locator(".forum-like-heart")).toHaveCSS("animation-name", "forum-heart-pop");
+  await expect(heart).toHaveAttribute("aria-pressed", "true");
+  await expect(heart.locator(".forum-action-count")).toHaveText("1");
+  await expect(meta.locator("canvas").first()).toBeVisible();
   await page.reload();
-  await expect(meta.getByRole("button", { name: "喜欢: 1", exact: true })).toHaveAttribute("aria-pressed", "true");
-  await meta.getByRole("button", { name: "喜欢: 1", exact: true }).click();
-  await expect(meta.getByRole("button", { name: "喜欢: 0", exact: true })).toHaveAttribute("aria-pressed", "false");
+  await expect(heart).toHaveAttribute("aria-pressed", "true");
+  await expect(heart.locator(".forum-action-count")).toHaveText("1");
+  await heart.click();
+  await expect(heart).toHaveAttribute("aria-pressed", "false");
+  await expect(heart.locator(".forum-action-count")).toHaveText("0");
   const summary = page.locator(".forum-section-heading .forum-reply-form > summary");
   await expect(summary).toHaveCSS("color", "rgb(255, 255, 255)");
   expect(await summary.evaluate((node) => getComputedStyle(node, "::marker").content)).toBe('""');
@@ -101,8 +104,10 @@ test("forum cover, category spacing, full reply count and saved heart state work
   await reduced.addCookies([{ name: "enhe_session", value: userCookie, url: baseURL! }]);
   const reducedPage = await reduced.newPage();
   await reducedPage.goto(`/forum/${postId}`);
-  await reducedPage.locator(".forum-post-detail .forum-like-button").click();
-  await expect(reducedPage.locator(".forum-post-detail .forum-like-heart")).toHaveCSS("animation-name", "none");
+  const reducedLike = reducedPage.locator('.forum-post-detail [data-forum-action="like"]');
+  await reducedLike.click();
+  await expect(reducedLike).toHaveAttribute("aria-pressed", "true");
+  await expect(reducedPage.locator(".forum-post-detail canvas")).toHaveCount(0);
   await reduced.close();
 });
 
@@ -171,7 +176,7 @@ test("images, playable video and replies become public immediately after publish
   expect(replyRecord.status).toBe("approved");
   expect((await guest.request.get(`${baseURL}/api/forum/media/${replyRecord.attachments[0].id}`)).status()).toBe(200);
   await page.reload();
-  await expect(page.locator(".forum-post-detail .forum-post-meta")).toContainText("1 条回复");
+  await expect(page.locator('.forum-post-detail [data-forum-action="reply"]')).toHaveAttribute("aria-label", "回复：1");
   await expect(page.locator(".forum-reply-card .forum-media-display__image")).toBeVisible();
   await page.screenshot({ path: test.info().outputPath("forum-published-media.png"), fullPage: true });
   await guest.close();

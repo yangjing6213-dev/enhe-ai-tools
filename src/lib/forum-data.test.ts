@@ -111,8 +111,37 @@ describe("forum reply tree", () => {
     await getForumPosts();
     expect(mocks.postFindMany).toHaveBeenCalledWith(expect.objectContaining({
       include: expect.objectContaining({
-        _count: { select: { likes: true, replies: { where: { status: "approved", content: { not: "" } } } } },
+        _count: { select: { likes: true, shares: true, bookmarks: true, replies: { where: { status: "approved", content: { not: "" } } } } },
       }),
+    }));
+  });
+
+  it("loads only the viewer's bookmark and real interaction counts for topic cards", async () => {
+    mocks.postFindMany.mockResolvedValue([{ id: "post-1", author: { id: "author", nickname: "用户", avatar: null }, likes: [], bookmarks: [{ id: "bookmark-1" }], _count: { likes: 3, replies: 2, shares: 4, bookmarks: 5 } }]);
+    const posts = await getForumPosts(undefined, "zh", "viewer-1");
+    expect(posts[0]).toMatchObject({ isBookmarked: true, _count: { likes: 3, replies: 2, shares: 4, bookmarks: 5 } });
+    expect(posts[0]).not.toHaveProperty("bookmarks");
+    expect(mocks.postFindMany).toHaveBeenCalledWith(expect.objectContaining({
+      include: expect.objectContaining({ bookmarks: { where: { userId: "viewer-1" }, select: { id: true }, take: 1 } }),
+    }));
+  });
+
+  it("loads the same bookmark state and real counts on topic detail", async () => {
+    mocks.postFindFirst.mockResolvedValue({ id: "post-1", author: { id: "author", nickname: "用户", avatar: null }, likes: [], bookmarks: [{ id: "bookmark-1" }], _count: { likes: 2, shares: 3, bookmarks: 4 } });
+    const post = await getForumPost("post-1", "en", "viewer-1");
+    expect(post).toMatchObject({ isBookmarked: true, _count: { likes: 2, shares: 3, bookmarks: 4 } });
+    expect(post).not.toHaveProperty("bookmarks");
+    expect(mocks.postFindFirst).toHaveBeenCalledWith(expect.objectContaining({
+      include: expect.objectContaining({ bookmarks: { where: { userId: "viewer-1" }, select: { id: true }, take: 1 }, _count: { select: { likes: true, shares: true, bookmarks: true } } }),
+    }));
+  });
+
+  it("does not load any member's bookmark state for an anonymous viewer", async () => {
+    mocks.postFindMany.mockResolvedValue([{ id: "post-1", author: { id: "author", nickname: "用户", avatar: null }, likes: [], bookmarks: [], _count: { likes: 0, replies: 0, shares: 0, bookmarks: 0 } }]);
+    const posts = await getForumPosts();
+    expect(posts[0].isBookmarked).toBe(false);
+    expect(mocks.postFindMany).toHaveBeenCalledWith(expect.objectContaining({
+      include: expect.objectContaining({ bookmarks: { where: { userId: "" }, select: { id: true }, take: 1 } }),
     }));
   });
 });

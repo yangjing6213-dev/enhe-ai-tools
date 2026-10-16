@@ -7,6 +7,7 @@ import { buildLocalePath } from "@/lib/seo";
 import { getForumPost } from "@/lib/forum-data";
 import { createForumPostAction, createForumReplyAction, deleteForumReplyAction } from "@/app/forum/actions";
 import { ForumLikeButton } from "@/components/forum/forum-like-button";
+import { ForumPostActions } from "@/components/forum/forum-post-actions";
 import { ForumDeletePostButton } from "@/components/forum/forum-delete-post-button";
 import { ForumMediaEditor } from "@/components/forum/forum-media-editor";
 import { ForumMediaDisplay } from "@/components/forum/forum-media-display";
@@ -116,7 +117,7 @@ export function ForumIndexContent({ locale, posts, selectedCategory, isAuthentic
           <h2><Link href={pageHref(locale, `/forum/${post.id}`)}><EmojiText text={post.title} /></Link></h2>
           <p className="forum-post-excerpt"><EmojiText text={post.content} /></p>
           <ForumMediaDisplay locale={locale} attachments={post.attachments ?? []} />
-          <div className="forum-post-meta"><ForumLikeButton locale={locale} postId={post.id} count={post._count.likes} isLiked={post.isLiked} isAuthenticated={isAuthenticated} returnTo={`/forum/${post.id}`} /><Link href={pageHref(locale, `/forum/${post.id}`)}>{post._count.replies} {t.replies}</Link>{isAuthenticated && isAdmin ? <ForumDeletePostButton locale={locale} postId={post.id} /> : null}</div>
+          <div className="forum-post-meta forum-topic-meta"><ForumPostActions locale={locale} postId={post.id} title={post.title} replyCount={post._count.replies} shareCount={post._count.shares} likeCount={post._count.likes} isLiked={post.isLiked} isBookmarked={post.isBookmarked} isAuthenticated={isAuthenticated} replyHref={`${pageHref(locale, `/forum/${post.id}`)}#replies`} />{isAuthenticated && isAdmin ? <ForumDeletePostButton locale={locale} postId={post.id} /> : null}</div>
         </article>
       ))}</div> : <p className="forum-empty-state">{t.empty}</p>}
       {!isAuthenticated ? <div className="forum-join-callout"><JoinLink locale={locale} /></div> : null}
@@ -165,7 +166,7 @@ export function ForumPostContent({ locale, post, isAuthenticated, currentUserId,
         <div className="forum-post-header"><div className="forum-author-line"><UserAvatar src={post.author.avatar} alt={post.author.displayName} size={44} className="forum-avatar" /><span><EmojiText text={post.author.displayName} /></span><time dateTime={post.createdAt.toISOString()}>{dateLabel(post.createdAt, locale)}</time></div><span className="forum-category-tag">{getForumCategoryLabel(post.category, locale)}</span></div>
         <h1><EmojiText text={post.title} /></h1><p className="forum-detail-content"><EmojiText text={post.content} /></p>
         <ForumMediaDisplay locale={locale} attachments={post.attachments ?? []} />
-        <div className="forum-post-meta"><ForumLikeButton locale={locale} postId={post.id} count={post._count.likes} isLiked={post.isLiked} isAuthenticated={isAuthenticated} returnTo={`/forum/${post.id}`} /><a href="#replies">{post.replyCount} {t.replies}</a>{isAuthenticated && isAdmin ? <ForumDeletePostButton locale={locale} postId={post.id} /> : null}</div>
+        <div className="forum-post-meta forum-topic-meta"><ForumPostActions locale={locale} postId={post.id} title={post.title} replyCount={post.replyCount} shareCount={post._count.shares} likeCount={post._count.likes} isLiked={post.isLiked} isBookmarked={post.isBookmarked} isAuthenticated={isAuthenticated} replyHref="#replies" />{isAuthenticated && isAdmin ? <ForumDeletePostButton locale={locale} postId={post.id} /> : null}</div>
       </article>
       <section className="forum-replies" id="replies">
         <div className="forum-section-heading">{isAuthenticated ? <ReplyForm locale={locale} postId={post.id} /> : <JoinLink locale={locale} />}</div>

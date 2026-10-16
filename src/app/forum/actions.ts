@@ -248,3 +248,41 @@ export async function toggleForumLikeAction(formData: FormData) {
   ]);
   return { liked: Boolean(ownLike), count };
 }
+
+export async function setForumBookmarkAction(formData: FormData) {
+  const user = await requireUser();
+  const postId = readText(formData, "postId").trim();
+  if (!/^[a-zA-Z0-9_-]{1,100}$/.test(postId)) throw new Error("FORUM_INVALID_TARGET");
+  const bookmarked = readText(formData, "bookmarked");
+  if (bookmarked !== "true" && bookmarked !== "false") throw new Error("FORUM_INVALID_BOOKMARK_STATE");
+
+  const target = { userId: user.id, postId };
+  if (bookmarked === "false") {
+    // A member can remove their saved topic even after it leaves the public forum.
+    await prisma.forumBookmark.deleteMany({ where: target });
+  } else {
+    const post = await prisma.forumPost.findUnique({ where: { id: postId }, select: { status: true } });
+    if (post?.status !== "approved") throw new Error("FORUM_CONTENT_NOT_AVAILABLE");
+    await prisma.forumBookmark.createMany({ data: target, skipDuplicates: true });
+  }
+
+  await revalidateForum(postId);
+  const [ownBookmark, count] = await Promise.all([
+    prisma.forumBookmark.findUnique({ where: { userId_postId: target }, select: { id: true } }),
+    prisma.forumBookmark.count({ where: { postId } }),
+  ]);
+  return { bookmarked: Boolean(ownBookmark), count };
+}
+
+export async function recordForumShareAction(formData: FormData) {
+  const user = await requireUser();
+  const postId = readText(formData, "postId").trim();
+  if (!/^[a-zA-Z0-9_-]{1,100}$/.test(postId)) throw new Error("FORUM_INVALID_TARGET");
+  const post = await prisma.forumPost.findUnique({ where: { id: postId }, select: { status: true } });
+  if (post?.status !== "approved") throw new Error("FORUM_CONTENT_NOT_AVAILABLE");
+
+  // The client calls this only after its native share or clipboard operation succeeds.
+  await prisma.forumShare.createMany({ data: { userId: user.id, postId }, skipDuplicates: true });
+  await revalidateForum(postId);
+  return { count: await prisma.forumShare.count({ where: { postId } }) };
+}

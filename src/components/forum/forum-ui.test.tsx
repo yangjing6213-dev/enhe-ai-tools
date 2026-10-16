@@ -4,14 +4,14 @@ import { describe, expect, it, vi } from "vitest";
 import { ForumIndexContent, ForumNewPostContent, ForumPostContent } from "./forum-ui";
 
 Object.assign(globalThis, { React });
-vi.mock("@/app/forum/actions", () => ({ createForumPostAction: vi.fn(), createForumReplyAction: vi.fn(), deleteForumPostAction: vi.fn(), deleteForumReplyAction: vi.fn(), toggleForumLikeAction: vi.fn() }));
+vi.mock("@/app/forum/actions", () => ({ createForumPostAction: vi.fn(), createForumReplyAction: vi.fn(), deleteForumPostAction: vi.fn(), deleteForumReplyAction: vi.fn(), toggleForumLikeAction: vi.fn(), setForumBookmarkAction: vi.fn(), recordForumShareAction: vi.fn() }));
 
 const author = { id: "author", displayName: "用户 :enhe_01:", nickname: "用户", avatar: "/images/default-avatars/avatar-01.webp" };
 const reply = { id: "reply-1", postId: "post-1", parentId: null, authorId: "author", status: "approved", author, createdAt: new Date("2026-10-14T00:00:00Z"), updatedAt: new Date("2026-10-14T00:00:00Z"), content: "回复正文", attachments: [], isLiked: false, _count: { likes: 0 }, children: [] };
 const post = {
   id: "post-1", author, createdAt: new Date("2026-10-14T00:00:00Z"), category: "workflow", title: "测试话题", content: "话题正文 :enhe_01:",
-  attachments: [{ id: "image-1", kind: "image", mimeType: "image/webp", originalName: "image.webp" }], isLiked: true,
-  _count: { likes: 1, replies: 2 }, replyCount: 2, replies: [{ ...reply, children: [{ ...reply, id: "reply-2", children: [] }] }],
+  attachments: [{ id: "image-1", kind: "image", mimeType: "image/webp", originalName: "image.webp" }], isLiked: true, isBookmarked: true,
+  _count: { likes: 1, replies: 2, shares: 3, bookmarks: 1 }, replyCount: 2, replies: [{ ...reply, children: [{ ...reply, id: "reply-2", children: [] }] }],
 } as unknown as Parameters<typeof ForumPostContent>[0]["post"];
 
 describe("forum public surfaces", () => {
@@ -47,9 +47,38 @@ describe("forum public surfaces", () => {
     expect(html).toContain('class="enhe-inline-emoji"');
   });
 
-  it("places the full nested reply count with post likes and provides blue replies without arrows", () => {
+  it("orders icon actions consistently and keeps topic deletion after them", () => {
+    const listPosts = [post] as unknown as Parameters<typeof ForumIndexContent>[0]["posts"];
+    const list = renderToStaticMarkup(<ForumIndexContent locale="zh" posts={listPosts} isAuthenticated isAdmin />);
+    const detail = renderToStaticMarkup(<ForumPostContent locale="zh" post={post} isAuthenticated isAdmin replySubmitted={false} />);
+    for (const html of [list, detail]) {
+      const replyIndex = html.indexOf('data-forum-action="reply"');
+      const shareIndex = html.indexOf('data-forum-action="share"');
+      const likeIndex = html.indexOf('data-forum-action="like"');
+      const bookmarkIndex = html.indexOf('data-forum-action="bookmark"');
+      expect(replyIndex).toBeGreaterThan(-1);
+      expect(shareIndex).toBeGreaterThan(replyIndex);
+      expect(likeIndex).toBeGreaterThan(shareIndex);
+      expect(bookmarkIndex).toBeGreaterThan(likeIndex);
+      expect(html.indexOf('class="forum-delete-post"')).toBeGreaterThan(bookmarkIndex);
+      expect(html).toContain('aria-label="转发：3"');
+      expect(html).toContain('aria-label="取消收藏"');
+    }
+    expect(list).toContain('href="/forum/post-1#replies"');
+    expect(detail).toContain('href="#replies"');
+  });
+
+  it("keeps account actions behind sign-in with the localized return path", () => {
+    const html = renderToStaticMarkup(<ForumIndexContent locale="en" posts={[post] as unknown as Parameters<typeof ForumIndexContent>[0]["posts"]} isAuthenticated={false} />);
+    expect(html).toContain('/en/login?returnTo=%2Fen%2Fforum%2Fpost-1');
+    expect(html).toContain('aria-label="Sign in to like: 1"');
+    expect(html).toContain('aria-label="Sign in to bookmark"');
+    expect(html).toContain('aria-label="Share: 3"');
+  });
+
+  it("places the full nested reply count with post actions and preserves the reply controls", () => {
     const html = renderToStaticMarkup(<ForumPostContent locale="zh" post={post} isAuthenticated currentUserId="author" replySubmitted={false} />);
-    expect(html).toContain('href="#replies">2 条回复</a>');
+    expect(html).toContain('aria-label="回复：2"');
     expect(html).toContain('aria-pressed="true"');
     expect(html).toContain('<summary class="forum-primary-button">回复</summary>');
     expect(html).not.toContain("<h2>回复</h2>");

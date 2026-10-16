@@ -35,13 +35,14 @@ export async function getForumPosts(category?: ForumCategory, locale: "zh" | "en
     include: {
       author: { select: { id: true, nickname: true, avatar: true } },
       likes: { where: { userId: viewerId ?? "" }, select: { id: true }, take: 1 },
+      bookmarks: { where: { userId: viewerId ?? "" }, select: { id: true }, take: 1 },
       attachments: { where: { discardedAt: null }, select: attachmentDisplaySelect, orderBy: { createdAt: "asc" } },
-      _count: { select: { likes: true, replies: { where: { status: "approved", content: { not: "" } } } } },
+      _count: { select: { likes: true, shares: true, bookmarks: true, replies: { where: { status: "approved", content: { not: "" } } } } },
     },
     orderBy: { createdAt: "desc" },
     take: 30,
   });
-  return Promise.all(posts.map(async ({ likes, ...post }) => ({ ...post, isLiked: Boolean(likes?.length), author: await safeAuthor(post.author, locale) })));
+  return Promise.all(posts.map(async ({ likes, bookmarks, ...post }) => ({ ...post, isLiked: Boolean(likes?.length), isBookmarked: Boolean(bookmarks?.length), author: await safeAuthor(post.author, locale) })));
 }
 
 export async function getForumPost(postId: string, locale: "zh" | "en" = "zh", viewerId?: string) {
@@ -52,8 +53,9 @@ export async function getForumPost(postId: string, locale: "zh" | "en" = "zh", v
     include: {
       author: { select: { id: true, nickname: true, avatar: true } },
       likes: { where: { userId: viewerId ?? "" }, select: { id: true }, take: 1 },
+      bookmarks: { where: { userId: viewerId ?? "" }, select: { id: true }, take: 1 },
       attachments: { where: { discardedAt: null }, select: attachmentDisplaySelect, orderBy: { createdAt: "asc" } },
-      _count: { select: { likes: true } },
+      _count: { select: { likes: true, shares: true, bookmarks: true } },
     },
   });
   if (!post) return null;
@@ -68,10 +70,11 @@ export async function getForumPost(postId: string, locale: "zh" | "en" = "zh", v
     orderBy: { createdAt: "asc" },
   });
   const safeReplies = await Promise.all(replies.map(async ({ likes, ...reply }) => ({ ...reply, isLiked: Boolean(likes?.length), author: await safeAuthor(reply.author, locale) })));
-  const { likes, ...publicPost } = post;
+  const { likes, bookmarks, ...publicPost } = post;
   return {
     ...publicPost,
     isLiked: Boolean(likes?.length),
+    isBookmarked: Boolean(bookmarks?.length),
     replyCount: safeReplies.filter((reply) => reply.content.trim()).length,
     author: await safeAuthor(post.author, locale),
     replies: buildForumReplyTree(safeReplies),

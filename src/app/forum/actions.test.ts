@@ -17,6 +17,12 @@ const mocks = vi.hoisted(() => ({
   likeFindFirst: vi.fn(),
   likeCreate: vi.fn(),
   likeDelete: vi.fn(),
+  bookmarkCreateMany: vi.fn(),
+  bookmarkDeleteMany: vi.fn(),
+  bookmarkFindUnique: vi.fn(),
+  bookmarkCount: vi.fn(),
+  shareCreateMany: vi.fn(),
+  shareCount: vi.fn(),
   attachmentFindMany: vi.fn(),
   attachmentUpdateMany: vi.fn(),
   likeDeleteForReply: vi.fn(),
@@ -36,6 +42,8 @@ vi.mock("@/lib/db", () => ({
     forumPost: { count: mocks.postCount, create: mocks.postCreate, findUnique: mocks.postFindUnique },
     forumReply: { count: mocks.replyCount, create: mocks.replyCreate, findUnique: mocks.replyFindUnique, updateMany: mocks.replyUpdateMany },
     forumLike: { count: mocks.likeCount, findFirst: mocks.likeFindFirst, create: mocks.likeCreate, deleteMany: mocks.likeDelete },
+    forumBookmark: { createMany: mocks.bookmarkCreateMany, deleteMany: mocks.bookmarkDeleteMany, findUnique: mocks.bookmarkFindUnique, count: mocks.bookmarkCount },
+    forumShare: { createMany: mocks.shareCreateMany, count: mocks.shareCount },
     forumAttachment: { findMany: mocks.attachmentFindMany, updateMany: mocks.attachmentUpdateMany },
     $transaction: mocks.transaction,
   },
@@ -47,7 +55,7 @@ vi.mock("@/lib/admin-audit", async (importOriginal) => ({
   getAdminAuditRequestContext: mocks.getAuditContext,
 }));
 
-import { createForumPostAction, createForumReplyAction, deleteForumPostAction, deleteForumReplyAction, toggleForumLikeAction } from "@/app/forum/actions";
+import { createForumPostAction, createForumReplyAction, deleteForumPostAction, deleteForumReplyAction, recordForumShareAction, setForumBookmarkAction, toggleForumLikeAction } from "@/app/forum/actions";
 
 function form(entries: Record<string, string>) {
   const data = new FormData();
@@ -74,6 +82,12 @@ describe("forum member actions", () => {
     mocks.likeFindFirst.mockResolvedValue(null);
     mocks.likeCreate.mockResolvedValue({ id: "like-1" });
     mocks.likeDelete.mockResolvedValue({ count: 1 });
+    mocks.bookmarkCreateMany.mockResolvedValue({ count: 1 });
+    mocks.bookmarkDeleteMany.mockResolvedValue({ count: 1 });
+    mocks.bookmarkFindUnique.mockResolvedValue(null);
+    mocks.bookmarkCount.mockResolvedValue(0);
+    mocks.shareCreateMany.mockResolvedValue({ count: 1 });
+    mocks.shareCount.mockResolvedValue(0);
     mocks.attachmentFindMany.mockResolvedValue([]);
     mocks.attachmentUpdateMany.mockResolvedValue({ count: 1 });
     mocks.likeDeleteForReply.mockResolvedValue({ count: 0 });
@@ -347,6 +361,85 @@ describe("forum member actions", () => {
     mocks.likeFindFirst.mockResolvedValueOnce(null).mockResolvedValueOnce(null);
     mocks.likeCount.mockResolvedValueOnce(0).mockResolvedValueOnce(0);
     await expect(toggleForumLikeAction(form({ postId: "post-1" }))).resolves.toEqual({ liked: false, count: 0 });
+  });
+
+  it("requires a fresh login for every bookmark and share write", async () => {
+    mocks.requireUser.mockRejectedValue(new Error("UNAUTHORIZED"));
+    await expect(setForumBookmarkAction(form({ postId: "post-1", bookmarked: "true" }))).rejects.toThrow("UNAUTHORIZED");
+    await expect(setForumBookmarkAction(form({ postId: "post-1", bookmarked: "false" }))).rejects.toThrow("UNAUTHORIZED");
+    await expect(recordForumShareAction(form({ postId: "post-1" }))).rejects.toThrow("UNAUTHORIZED");
+    expect(mocks.requireUser).toHaveBeenCalledTimes(3);
+    expect(mocks.bookmarkCreateMany).not.toHaveBeenCalled();
+    expect(mocks.bookmarkDeleteMany).not.toHaveBeenCalled();
+    expect(mocks.shareCreateMany).not.toHaveBeenCalled();
+  });
+
+  it.each(["pending", "rejected", null])("refuses new bookmarks and shares for an unavailable topic (%s)", async (status) => {
+    mocks.postFindUnique.mockResolvedValue(status ? { status } : null);
+    await expect(setForumBookmarkAction(form({ postId: "post-1", bookmarked: "true" }))).rejects.toThrow("FORUM_CONTENT_NOT_AVAILABLE");
+    await expect(recordForumShareAction(form({ postId: "post-1" }))).rejects.toThrow("FORUM_CONTENT_NOT_AVAILABLE");
+    expect(mocks.bookmarkCreateMany).not.toHaveBeenCalled();
+    expect(mocks.shareCreateMany).not.toHaveBeenCalled();
+  });
+
+  it("validates the topic and explicit bookmark state before writing", async () => {
+    for (const postId of ["", "../post", "a".repeat(101)]) {
+      await expect(setForumBookmarkAction(form({ postId, bookmarked: "true" }))).rejects.toThrow("FORUM_INVALID_TARGET");
+      await expect(recordForumShareAction(form({ postId }))).rejects.toThrow("FORUM_INVALID_TARGET");
+    }
+    await expect(setForumBookmarkAction(form({ postId: "post-1", bookmarked: "toggle" }))).rejects.toThrow("FORUM_INVALID_BOOKMARK_STATE");
+    expect(mocks.bookmarkCreateMany).not.toHaveBeenCalled();
+    expect(mocks.shareCreateMany).not.toHaveBeenCalled();
+  });
+
+  it("saves only the authenticated member's bookmark and returns observed state and count", async () => {
+    mocks.bookmarkFindUnique.mockResolvedValue({ id: "bookmark-1" });
+    mocks.bookmarkCount.mockResolvedValue(4);
+    await expect(setForumBookmarkAction(form({ postId: "post-1", userId: "other-user", bookmarked: "true" }))).resolves.toEqual({ bookmarked: true, count: 4 });
+    expect(mocks.bookmarkCreateMany).toHaveBeenCalledWith({ data: { userId: "user-1", postId: "post-1" }, skipDuplicates: true });
+    expect(mocks.bookmarkFindUnique).toHaveBeenCalledWith({ where: { userId_postId: { userId: "user-1", postId: "post-1" } }, select: { id: true } });
+    expect(mocks.bookmarkCount).toHaveBeenCalledWith({ where: { postId: "post-1" } });
+    for (const path of ["/forum", "/en/forum", "/forum/post-1", "/en/forum/post-1"]) {
+      expect(mocks.revalidatePath).toHaveBeenCalledWith(path);
+    }
+  });
+
+  it("reliably cancels a bookmark for an unavailable topic without touching another account", async () => {
+    mocks.postFindUnique.mockResolvedValue({ status: "rejected" });
+    mocks.bookmarkCount.mockResolvedValue(2);
+    const data = form({ postId: "post-1", userId: "other-user", bookmarked: "false" });
+    await expect(setForumBookmarkAction(data)).resolves.toEqual({ bookmarked: false, count: 2 });
+    await expect(setForumBookmarkAction(data)).resolves.toEqual({ bookmarked: false, count: 2 });
+    expect(mocks.bookmarkDeleteMany).toHaveBeenCalledTimes(2);
+    expect(mocks.bookmarkDeleteMany).toHaveBeenCalledWith({ where: { userId: "user-1", postId: "post-1" } });
+    expect(mocks.postFindUnique).not.toHaveBeenCalled();
+    expect(mocks.bookmarkCreateMany).not.toHaveBeenCalled();
+  });
+
+  it("returns the actual bookmark state if another device changes it during a request", async () => {
+    mocks.bookmarkFindUnique.mockResolvedValue({ id: "replacement-bookmark" });
+    mocks.bookmarkDeleteMany.mockResolvedValue({ count: 0 });
+    mocks.bookmarkCount.mockResolvedValue(3);
+    await expect(setForumBookmarkAction(form({ postId: "post-1", bookmarked: "false" }))).resolves.toEqual({ bookmarked: true, count: 3 });
+  });
+
+  it("records shares only for the current account and returns the real deduplicated count", async () => {
+    mocks.shareCount.mockResolvedValue(6);
+    mocks.shareCreateMany.mockResolvedValue({ count: 0 });
+    await expect(recordForumShareAction(form({ postId: "post-1", userId: "other-user" }))).resolves.toEqual({ count: 6 });
+    expect(mocks.shareCreateMany).toHaveBeenCalledWith({ data: { userId: "user-1", postId: "post-1" }, skipDuplicates: true });
+    expect(mocks.shareCount).toHaveBeenCalledWith({ where: { postId: "post-1" } });
+    expect(mocks.revalidatePath).toHaveBeenCalledWith("/forum/post-1");
+  });
+
+  it("does not announce a successful bookmark or share if its database write fails", async () => {
+    mocks.bookmarkCreateMany.mockRejectedValueOnce(new Error("database unavailable"));
+    mocks.shareCreateMany.mockRejectedValueOnce(new Error("database unavailable"));
+    await expect(setForumBookmarkAction(form({ postId: "post-1", bookmarked: "true" }))).rejects.toThrow("database unavailable");
+    await expect(recordForumShareAction(form({ postId: "post-1" }))).rejects.toThrow("database unavailable");
+    expect(mocks.revalidatePath).not.toHaveBeenCalled();
+    expect(mocks.bookmarkCount).not.toHaveBeenCalled();
+    expect(mocks.shareCount).not.toHaveBeenCalled();
   });
 
 });
