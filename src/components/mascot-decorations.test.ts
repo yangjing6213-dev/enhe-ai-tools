@@ -17,9 +17,9 @@ describe("public mascot decorations", () => {
     expect(headerSource).toContain('aria-hidden="true"');
   });
 
-  it("places the walking dino at the footer top as decoration", () => {
+  it("places the mirrored dino at the footer top as decoration", () => {
     expect(footerSource).toContain('className="redesign-footer-mascot"');
-    expect(footerSource).toContain('src="/images/mascots/enhe-dino-mascot.webp"');
+    expect(footerSource).toContain('src="/images/mascots/enhe-dino-peek-mirrored.webp"');
     expect(footerSource.indexOf('className="redesign-footer-mascot"')).toBeLessThan(
       footerSource.indexOf('<div className="redesign-footer-inner">'),
     );

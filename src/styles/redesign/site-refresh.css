@@ -1426,16 +1426,36 @@ body .customer-support-widget .customer-support-launcher,
 
 .redesign-footer {
   position: relative;
+  z-index: 1;
+  isolation: isolate;
+}
+
+.redesign-footer::before {
+  position: absolute;
+  z-index: 2;
+  inset: 0;
+  background: inherit;
+  content: "";
+  pointer-events: none;
+}
+
+.redesign-footer-inner {
+  z-index: 3;
+}
+
+.enhe-redesign-production .redesign-home-reviews {
+  isolation: isolate;
 }
 
 .redesign-footer-mascot {
+  --footer-mascot-size: 396px;
   position: absolute;
-  z-index: 3;
-  top: -112px;
-  left: min(calc(68% + 198px), calc(100% - 100px));
+  z-index: 1;
+  top: calc(var(--footer-mascot-size) * -0.78);
+  left: 48px;
   display: block;
-  width: 132px;
-  margin-left: -66px;
+  width: var(--footer-mascot-size);
+  margin-left: 0;
   transform-origin: 50% 100%;
   animation: enhe-footer-mascot-walk 2.2s ease-in-out infinite;
   pointer-events: none;
@@ -1515,10 +1535,8 @@ body .customer-support-widget .customer-support-launcher,
 
 @media (max-width: 767px) {
   .redesign-footer-mascot {
-    top: -84px;
-    left: min(calc(52% + 147px), calc(100% - 82px));
-    width: 98px;
-    margin-left: -49px;
+    --footer-mascot-size: min(294px, calc(100vw - 96px));
+    left: 44px;
   }
 }
 

@@ -88,10 +88,11 @@ export function EnheRedesignFooter({
     <footer className="redesign-footer" aria-label={copy.ariaLabel}>
       <span className="redesign-footer-mascot" aria-hidden="true">
         <Image
-          src="/images/mascots/enhe-dino-mascot.webp"
+          src="/images/mascots/enhe-dino-peek-mirrored.webp"
           alt=""
-          width={406}
-          height={480}
+          width={1153}
+          height={1364}
+          sizes="(max-width: 767px) 294px, 396px"
         />
       </span>
       <div className="redesign-footer-inner">
