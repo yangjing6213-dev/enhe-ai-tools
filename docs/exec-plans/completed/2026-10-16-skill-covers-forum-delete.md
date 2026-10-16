@@ -1,6 +1,6 @@
 # AI Skill covers and administrator topic deletion
 
-Status: in_progress
+Status: PASS
 
 Scope: fix missing published AI Skill covers and add administrator-only topic deletion to the public forum. Preserve the existing site layout, mascot effects, reviews, user replies and unrelated work. No schema changes or production-content deletion during verification. Push and production deployment are authorized by the user.
 
@@ -18,4 +18,7 @@ Scope: fix missing published AI Skill covers and add administrator-only topic de
 - Implemented the narrow published-cover lookup fix and administrator-only, confirmed topic hiding with transactional audit records and localized controls.
 - PASS: 117 focused Vitest checks across 14 files; full lint and typecheck; production build; 3 browser tests in development mode and the same 3 tests against the production build. Browser tests used a new, dedicated local Docker test database and were restricted to forum-topic-delete.spec.ts; no production records or cloud-storage writes were used.
 - PASS: complete dependency audit (including development, optional and peer dependencies), zero vulnerabilities; independent source/diff review and test-data boundary review.
-- Remaining: push the reviewed release, deploy with the existing backup/rollback/health gates, confirm two affected public cover requests and all three rendered covers in Chinese/English at phone/desktop widths, and check signed-out forum pages.
+- Deployed release: 4654e5dbcf18e05daa447444a7d91bcf2e96998e on codex/enhe-mascot-production-20261016. Server checkout and active runtime identity matched; app, worker and scheduler healthy. Existing backup/rollback compatibility gates passed; no pending database migrations.
+- PASS: the two affected public cover endpoints returned HTTP 200 image responses (778348 and 1377010 bytes). All three AI Skill cards rendered images without fallback in Chinese/English at 390px and 1440px. Skill and forum pages returned HTTP 200; signed-out visitors had no topic deletion controls; zero browser page errors.
+- Production verification was read-only. Actual administrator deletion, cancellation, audit persistence and retained data were exercised only in the isolated local test database, which was removed afterward.
+- No remaining work for this scope. This completed record is a documentation-only follow-up; the deployed application remains release 4654e5db.
