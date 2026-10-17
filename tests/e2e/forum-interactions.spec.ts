@@ -67,6 +67,11 @@ test("topic bar keeps action order, reply navigation and narrow-screen targets",
       await expect(row.locator("[data-forum-action]")).toHaveCount(4);
       expect(await row.locator("[data-forum-action]").evaluateAll(nodes => nodes.map(node => node.getAttribute("data-forum-action")))).toEqual(["reply", "share", "like", "bookmark"]);
       await expect(row.locator("[data-forum-action=reply]")).toHaveAttribute("href", `${root}/${postId}#replies`);
+      for (const icon of await row.locator(".forum-action-icon").all()) {
+        await expect(icon).toHaveCSS("color", "rgb(0, 0, 0)");
+        await expect(icon).toHaveCSS("background-color", "rgba(0, 0, 0, 0)");
+        await expect(icon).toHaveCSS("border-top-width", "0px");
+      }
       const boxes = await row.locator(".forum-action-icon").evaluateAll(nodes => nodes.map(node => {
         const rect = node.getBoundingClientRect(); return { width: rect.width, height: rect.height, top: rect.top };
       }));
@@ -89,6 +94,7 @@ test("account bookmarks sync across browser contexts and stay separate between a
   await expect(bookmark).toHaveAttribute("aria-pressed", "false");
   await bookmark.click();
   await expect(bookmark).toHaveAttribute("aria-pressed", "true");
+  await expect(bookmark.locator(".forum-action-icon")).toHaveCSS("color", "rgb(4, 98, 194)");
   await expect.poll(() => db.forumBookmark.count({ where: { postId } })).toBe(1);
   const secondDevice = await browser.newContext();
   const otherAccount = await browser.newContext();
@@ -120,6 +126,7 @@ test("likes persist with the new visual controls and reduced motion does not ren
   const like = actions(page).locator("[data-forum-action=like]");
   await like.click();
   await expect(like).toHaveAttribute("aria-pressed", "true");
+  await expect(like.locator(".forum-action-icon")).toHaveCSS("color", "rgb(226, 59, 99)");
   await expect(like.locator(".forum-action-count")).toHaveText("1");
   expect(await actions(page).locator("canvas").count()).toBe(0);
   await page.reload();
@@ -139,6 +146,7 @@ test("desktop copy records a unique share and guests can copy without an account
   for (let repeat = 0; repeat < 2; repeat++) {
     await share.click();
     await expect(share.locator(".forum-action-count")).toHaveText("1");
+    await expect(share.locator(".forum-action-icon")).toHaveCSS("color", "rgb(22, 163, 74)");
     await expect(share).toBeEnabled();
   }
   expect(await page.evaluate(() => (window as unknown as { copiedTopicUrl: string }).copiedTopicUrl)).toBe(`${baseURL}/forum/${postId}`);
