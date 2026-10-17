@@ -6,7 +6,8 @@ import {
   upsertDevelopmentItemAction,
   upsertDevelopmentVersionAction
 } from "@/app/admin/actions";
-import { AdminSection, DangerButton, Field, inputClass, selectClass, SubmitButton, textareaClass } from "@/app/admin/admin-ui";
+import { AdminSection, Field, inputClass, selectClass, SubmitButton, textareaClass } from "@/app/admin/admin-ui";
+import { HoldDeleteForm } from "@/components/hold-delete-form";
 import { prisma } from "@/lib/db";
 import {
   calculateDevelopmentSummary,
@@ -190,14 +191,11 @@ export default async function AdminDevelopmentPage({
           {selectedVersion ? (
             <>
             <DevelopmentItemForm versionId={selectedVersion.id} locale={locale} />
-            <form action={deleteDevelopmentVersionAction} className="glass rounded-2xl border border-red-400/20 p-6">
+            <HoldDeleteForm action={deleteDevelopmentVersionAction} label={copy.deleteVersion} locale={locale} className="glass rounded-2xl border border-red-400/20 p-6" buttonClassName="mt-5">
               <input type="hidden" name="id" value={selectedVersion.id} />
               <h2 className="text-xl font-semibold text-red-100">{copy.deleteVersionTitle}</h2>
               <p className="mt-3 text-sm leading-6 text-[#8B95A7]">{copy.deleteVersionIntro}</p>
-              <div className="mt-5">
-                <DangerButton>{copy.deleteVersion}</DangerButton>
-              </div>
-            </form>
+            </HoldDeleteForm>
             </>
           ) : (
             <div className="glass rounded-2xl p-6 text-sm leading-6 text-[#8B95A7]">
@@ -273,10 +271,9 @@ function DevelopmentItemCard({ item, versionId, locale }: { item: DevelopmentIte
       </summary>
       <div className="mt-5 border-t border-white/10 pt-5">
         <DevelopmentItemForm item={item} versionId={versionId} locale={locale} />
-        <form action={deleteDevelopmentItemAction} className="mt-4">
+        <HoldDeleteForm action={deleteDevelopmentItemAction} label={copy.deleteItem} locale={locale} className="mt-4">
           <input type="hidden" name="id" value={item.id} />
-          <DangerButton>{copy.deleteItem}</DangerButton>
-        </form>
+        </HoldDeleteForm>
       </div>
     </details>
   );

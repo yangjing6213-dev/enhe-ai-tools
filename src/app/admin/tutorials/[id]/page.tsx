@@ -2,7 +2,8 @@ import { EmojiField, EmojiTextarea } from "@/app/admin/emoji-textarea";
 ﻿import Link from "next/link";
 import { notFound } from "next/navigation";
 import { deleteTutorialAction, upsertTutorialAction } from "@/app/admin/actions";
-import { AdminContentShell, AdminSection, DangerButton, Field, inputClass, selectClass, SubmitButton, textareaClass } from "@/app/admin/admin-ui";
+import { AdminContentShell, AdminSection, Field, inputClass, selectClass, SubmitButton, textareaClass } from "@/app/admin/admin-ui";
+import { HoldDeleteForm } from "@/components/hold-delete-form";
 import { prisma } from "@/lib/db";
 
 type AdminTutorialDetailPageProps = {
@@ -67,10 +68,9 @@ export default async function AdminTutorialDetailPage({ params, searchParams }: 
       </form>
 
       {tutorial ? (
-        <form action={deleteTutorialAction} className="enhe-admin-content-form enhe-admin-tutorial-danger-form mt-4">
+        <HoldDeleteForm action={deleteTutorialAction} label="删除教程" className="enhe-admin-content-form enhe-admin-tutorial-danger-form mt-4">
           <input type="hidden" name="id" value={tutorial.id} />
-          <DangerButton>删除教程</DangerButton>
-        </form>
+        </HoldDeleteForm>
       ) : null}
       </AdminContentShell>
     </AdminSection>

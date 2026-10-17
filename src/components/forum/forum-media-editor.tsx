@@ -2,6 +2,7 @@
 
 /* eslint-disable @next/next/no-img-element -- Uploaded previews must retain per-request authorization. */
 import { useEffect, useRef, useState } from "react";
+import HoldButton from "@/components/hold-button";
 import { forumImageMaxBytes, forumVideoMaxBytes } from "@/lib/forum-media-limits";
 
 type MediaItem = { key: string; name: string; kind: "image" | "video"; status: "uploading" | "ready" | "error" | "removing"; progress: number; id?: string; url?: string; error?: string };
@@ -100,8 +101,9 @@ export function ForumMediaEditor({ locale, allowVideo }: { locale: "zh" | "en"; 
       const response = await fetch(`/api/forum/media/${encodeURIComponent(item.id)}`, { method: "DELETE" });
       if (!response.ok) throw new Error("remove failed");
       updateItems((current) => current.filter((entry) => entry.key !== item.key));
-    } catch {
+    } catch (removeError) {
       updateItems((current) => current.map((entry) => entry.key === item.key ? { ...entry, status: "error", error: text.removeFailed } : entry));
+      throw removeError;
     }
   }
 
@@ -118,7 +120,7 @@ export function ForumMediaEditor({ locale, allowVideo }: { locale: "zh" | "en"; 
         {item.url && (item.kind === "image" ? <img className="forum-media-editor__preview" src={item.url} alt={item.name} /> : <video className="forum-media-editor__preview" src={item.url} controls playsInline preload="metadata" aria-label={item.name} />)}
         <span title={item.name}>{item.name}</span>
         <span className="forum-media-editor__status" role="status">{item.status === "uploading" ? `${text.uploading} ${item.progress}%` : item.status === "removing" ? text.removing : item.status === "ready" ? text.uploaded : item.error}</span>
-        <button className="forum-media-editor__remove" type="button" disabled={item.status === "removing"} onClick={() => void remove(item)} aria-label={`${text.remove} ${item.name}`}>{text.remove}</button>
+        <HoldButton disabled={item.status === "removing"} onHold={() => remove(item)} pendingLabel={text.removing} errorLabel={locale === "en" ? "Remove failed" : "移除失败"} doneLabel={locale === "en" ? "Removed" : "已移除"} hint={locale === "en" ? "Hold for 2 seconds" : "按住2秒"} aria-label={`${locale === "en" ? "Hold to remove" : "长按移除"} ${item.name}`}>{locale === "en" ? "Hold to remove" : "长按移除"}</HoldButton>
         {item.status === "ready" && item.id && <input type="hidden" name="attachmentIds" value={item.id} />}
       </div>)}
     </div>}

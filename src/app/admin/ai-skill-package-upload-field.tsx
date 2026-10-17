@@ -2,7 +2,8 @@
 
 import { useRef, useState } from "react";
 import { usePendingUploadGuard } from "@/app/admin/use-pending-upload-guard";
-import { Upload, X } from "lucide-react";
+import HoldButton from "@/components/hold-button";
+import { Upload } from "lucide-react";
 
 type Labels = {
   title: string;
@@ -18,10 +19,12 @@ export function AiSkillPackageUploadField({
   currentFileId,
   currentFileName,
   labels,
+  locale = "zh",
 }: {
   currentFileId?: string | null;
   currentFileName?: string | null;
   labels: Labels;
+  locale?: "zh" | "en";
 }) {
   const inputRef = useRef<HTMLInputElement>(null);
   const [fileId, setFileId] = useState(currentFileId ?? "");
@@ -82,20 +85,22 @@ export function AiSkillPackageUploadField({
           />
         </label>
         {fileId ? (
-          <button
-            type="button"
+          <HoldButton
             title={labels.remove}
-            aria-label={labels.remove}
-            className="inline-flex h-11 w-11 items-center justify-center rounded-full border border-white/15 text-[#E8EEF8]"
-            onClick={() => {
+            aria-label={locale === "en" ? `Hold to ${labels.remove}` : `长按${labels.remove}`}
+            pendingLabel={locale === "en" ? "Removing…" : "正在移除"}
+            errorLabel={locale === "en" ? "Remove failed" : "移除失败"}
+            doneLabel={locale === "en" ? "Removed" : "已移除"}
+            hint={locale === "en" ? "Hold for 2 seconds. Save to apply." : "按住2秒，保存后生效"}
+            onHold={() => {
               setFileId("");
               setFileName("");
               setStatus("");
               if (inputRef.current) inputRef.current.value = "";
             }}
           >
-            <X size={17} aria-hidden="true" />
-          </button>
+            {locale === "en" ? `Hold to ${labels.remove}` : `长按${labels.remove}`}
+          </HoldButton>
         ) : null}
       </div>
       {fileName ? <p className="mt-3 break-all text-sm text-[#C5D0E2]">{fileName}</p> : null}

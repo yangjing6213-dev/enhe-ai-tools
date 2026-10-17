@@ -5,13 +5,13 @@ import {
 import {
   AdminContentShell,
   AdminSection,
-  DangerButton,
   Field,
   inputClass,
   selectClass,
   SubmitButton
 } from "@/app/admin/admin-ui";
 import { prisma } from "@/lib/db";
+import { HoldDeleteForm } from "@/components/hold-delete-form";
 import { getPublicAiNewsDiscovery } from "@/lib/public-content";
 
 function isMissingKeywordInterventionTableError(error: unknown) {
@@ -175,10 +175,9 @@ export default async function AdminAiNewsKeywordsPage({
                   </label>
                   <SubmitButton>保存规则</SubmitButton>
                 </form>
-                <form action={deleteNewsKeywordInterventionAction} className="enhe-admin-keyword-delete-form mt-3">
+                <HoldDeleteForm action={deleteNewsKeywordInterventionAction} label="删除规则" className="enhe-admin-keyword-delete-form mt-3">
                   <input type="hidden" name="id" value={item.id} />
-                  <DangerButton>删除规则</DangerButton>
-                </form>
+                </HoldDeleteForm>
               </div>
             ))
           ) : (

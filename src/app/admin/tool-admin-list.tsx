@@ -2,7 +2,8 @@ import { EmojiField, EmojiTextarea } from "@/app/admin/emoji-textarea";
 import Link from "next/link";
 import Image from "next/image";
 import { deleteToolAction, upsertToolAction } from "@/app/admin/actions";
-import { AdminContentShell, DangerButton, Field, inputClass, selectClass, SubmitButton, textareaClass } from "@/app/admin/admin-ui";
+import { AdminContentShell, Field, inputClass, selectClass, SubmitButton, textareaClass } from "@/app/admin/admin-ui";
+import { HoldDeleteForm } from "@/components/hold-delete-form";
 import { ToolMediaUploadGuard } from "@/app/admin/tool-media-upload-guard";
 import { ToolProductImageManager } from "@/app/admin/tool-product-image-manager";
 import { ToolVideoUploadField } from "@/app/admin/tool-video-upload-field";
@@ -588,6 +589,7 @@ export function ToolEditor({
               </div>
             ) : isAiSkill ? (
               <AiSkillPackageUploadField
+                locale={locale}
                 currentFileId={tool?.downloadFileId}
                 currentFileName={tool?.downloadFile?.fileName}
                 labels={{
@@ -626,11 +628,10 @@ export function ToolEditor({
       </form>
 
       {tool && deleteDecision?.allowed ? (
-        <form action={deleteToolAction} className="enhe-admin-tool-danger-form mt-4">
+        <HoldDeleteForm action={deleteToolAction} label={isSkillLearning ? copy.deleteCourse : isAccountService ? copy.deleteService : copy.deleteTool} locale={locale} className="enhe-admin-tool-danger-form mt-4">
           <input type="hidden" name="id" value={tool.id} />
           <input type="hidden" name="type" value={type} />
-          <DangerButton>{isSkillLearning ? copy.deleteCourse : isAccountService ? copy.deleteService : copy.deleteTool}</DangerButton>
-        </form>
+        </HoldDeleteForm>
       ) : tool && deleteDecision?.allowed === false ? (
         <p role="status" className="mt-4 rounded-xl border border-amber-400/30 bg-amber-400/8 px-4 py-3 text-sm text-amber-100">
           {copy.deleteProtectedIntro} {copy.deleteProtectedFallback}

@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { deleteNewsTopicAction } from "@/app/admin/actions";
-import { AdminContentShell, AdminSection, DangerButton } from "@/app/admin/admin-ui";
+import { AdminContentShell, AdminSection } from "@/app/admin/admin-ui";
+import { HoldDeleteForm } from "@/components/hold-delete-form";
 import { getAiNewsTopicPath } from "@/lib/ai-news-topics";
 import { prisma } from "@/lib/db";
 
@@ -119,12 +120,9 @@ export default async function AdminAiNewsTopicsPage({
                 >
                   编辑
                 </Link>
-                <form action={deleteNewsTopicAction}>
+                <HoldDeleteForm action={deleteNewsTopicAction} label="删除" size="sm">
                   <input type="hidden" name="id" value={topic.id} />
-                  <DangerButton className="px-3 py-2 text-xs" pendingLabel="删除中...">
-                    删除
-                  </DangerButton>
-                </form>
+                </HoldDeleteForm>
               </span>
             </div>
           ))}

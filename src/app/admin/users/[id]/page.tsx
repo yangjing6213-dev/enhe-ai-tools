@@ -1,7 +1,8 @@
 ﻿import Link from "next/link";
 import { notFound } from "next/navigation";
 import { deleteUserAdminAction, resetUserPasswordAction, updateUserAdminAction } from "@/app/admin/actions";
-import { AdminContentShell, AdminSection, DangerButton, Field, inputClass, selectClass, SubmitButton } from "@/app/admin/admin-ui";
+import { AdminContentShell, AdminSection, Field, inputClass, selectClass, SubmitButton } from "@/app/admin/admin-ui";
+import { HoldDeleteForm } from "@/components/hold-delete-form";
 import { PasswordInput } from "@/components/password-input";
 import { decideAdminUserHardDelete, getAdminUserProtectedRecordCount, type AdminUserProtectedCounts } from "@/lib/admin-delete-protection";
 import { prisma } from "@/lib/db";
@@ -215,14 +216,13 @@ export default async function AdminUserDetailPage({ params, searchParams }: Admi
           <h3 className="font-semibold text-red-100">{t.deleteTitle}</h3>
           <p className="mt-2 text-sm leading-6 text-red-100/80">{t.deleteIntro}</p>
           {deleteDecision.allowed ? (
-            <form action={deleteUserAdminAction} className="mt-4">
+            <HoldDeleteForm action={deleteUserAdminAction} label={t.deleteUser} locale={locale} className="mt-4">
               <input type="hidden" name="id" value={user.id} />
               <label className="mb-4 flex gap-3 text-sm text-red-100">
                 <input name="confirmDelete" type="checkbox" required value="DELETE_USER" className="mt-1" />
                 <span>{t.confirmDelete}</span>
               </label>
-              <DangerButton>{t.deleteUser}</DangerButton>
-            </form>
+            </HoldDeleteForm>
           ) : (
             <p className="mt-4 text-sm leading-6 text-red-100">
               {locale === "en"

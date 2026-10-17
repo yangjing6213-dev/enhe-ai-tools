@@ -7,6 +7,7 @@ import { prisma } from "@/lib/db";
 import { canRecordRefundForOrder, getRefundRecordActorLabel } from "@/lib/order-rules";
 import { getStatusLabel, orderStatusLabels, proofStatusLabels, refundStatusLabels } from "@/lib/status-labels";
 import { formatCurrency } from "@/lib/utils";
+import { HoldDeleteForm } from "@/components/hold-delete-form";
 
 const orderStatusOptions = [
   ["pending_payment", "待支付"],
@@ -206,11 +207,10 @@ export default async function AdminOrderDetailPage({ params, searchParams }: Adm
 
       <div className="enhe-admin-order-danger-panel mt-6 rounded-2xl border border-red-400/30 bg-red-400/5 p-5">
         {deleteDecision.allowed ? (
-          <form action={deleteOrderAdminAction}>
+          <HoldDeleteForm action={deleteOrderAdminAction} label="删除订单">
             <input type="hidden" name="id" value={order.id} />
             <p className="mb-3 text-xs leading-6 text-red-100/80">仅无任何业务关系的已取消测试订单允许硬删除。</p>
-            <SubmitButton variant="danger" pendingLabel="删除中...">删除订单</SubmitButton>
-          </form>
+          </HoldDeleteForm>
         ) : (
           <p className="text-sm leading-6 text-red-100">
             该订单不可硬删除（{deleteDecision.code}）。支付、退款、权益和巡检报告证据会永久保留。

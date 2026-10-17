@@ -60,7 +60,7 @@ describe("forum public surfaces", () => {
       expect(shareIndex).toBeGreaterThan(replyIndex);
       expect(likeIndex).toBeGreaterThan(shareIndex);
       expect(bookmarkIndex).toBeGreaterThan(likeIndex);
-      expect(html.indexOf('class="forum-delete-post"')).toBeGreaterThan(bookmarkIndex);
+      expect(html.indexOf('data-delete-kind="forum-post"')).toBeGreaterThan(bookmarkIndex);
       expect(html).toContain('aria-label="转发：3"');
       expect(html).toContain('aria-label="取消收藏"');
     }
@@ -87,7 +87,7 @@ describe("forum public surfaces", () => {
     expect(html).not.toContain("举报");
     expect(html).not.toContain('accept="video/mp4,video/webm"');
     expect(html).toContain('/api/forum/media/image-1');
-    expect(html.match(/删除回复/g) ?? []).toHaveLength(2);
+    expect(html.match(/data-delete-kind="forum-reply"/g) ?? []).toHaveLength(2);
   });
 
   it("keeps a deleted reply as a tombstone so nested replies remain in context", () => {
@@ -95,7 +95,7 @@ describe("forum public surfaces", () => {
     const html = renderToStaticMarkup(<ForumPostContent locale="zh" post={deletedPost} isAuthenticated currentUserId="author" replySubmitted={false} />);
     expect(html).toContain("这条回复已删除。");
     expect(html).toContain("仍然保留的后续回复");
-    expect(html.match(/删除回复/g) ?? []).toHaveLength(1);
+    expect(html.match(/data-delete-kind="forum-reply"/g) ?? []).toHaveLength(1);
   });
 
   it("offers images and video for topics and explains immediate public posting", () => {

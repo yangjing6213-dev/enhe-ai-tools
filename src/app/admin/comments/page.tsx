@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { UserAvatar } from "@/components/user-avatar";
 import { EmojiText } from "@/components/emoji-text";
+import { HoldDeleteForm } from "@/components/hold-delete-form";
 import { deleteCommentAction, saveAdminCommentReplyAction, updateCommentHomepageDisplayAction, updateCommentPinAction, updateCommentStatusAction } from "@/app/actions";
 import { AdminContentShell, SubmitButton, inputClass, selectClass, textareaClass } from "@/app/admin/admin-ui";
 import { buildAdminCommentPageHref, buildAdminCommentWhere, parseAdminCommentListParams } from "@/lib/admin-list";
@@ -217,10 +218,9 @@ export default async function AdminCommentsPage({ searchParams }: AdminCommentsP
             <div className="enhe-admin-comment-actions mt-5 flex flex-wrap gap-3">
               <CommentStatusForm id={comment.id} status="approved" label={t.approve} primary />
               <CommentStatusForm id={comment.id} status="rejected" label={t.reject} />
-              <form action={deleteCommentAction}>
+              <HoldDeleteForm action={deleteCommentAction} label={t.delete} locale={locale}>
                 <input type="hidden" name="id" value={comment.id} />
-                <SubmitButton variant="danger" pendingLabel={locale === "zh" ? "删除中..." : "Deleting..."} className="px-5 py-2 text-sm">{t.delete}</SubmitButton>
-              </form>
+              </HoldDeleteForm>
               {comment.status === "approved" ? (
                 <form action={updateCommentHomepageDisplayAction}>
                   <input type="hidden" name="id" value={comment.id} />

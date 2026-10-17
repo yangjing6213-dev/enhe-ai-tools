@@ -1,6 +1,7 @@
 import Link from "next/link";
 import Image from "next/image";
 import { UserAvatar } from "@/components/user-avatar";
+import { HoldDeleteForm } from "@/components/hold-delete-form";
 import { getForumCategoryLabel, type ForumCategory } from "@/lib/forum-rules";
 import type { Locale } from "@/lib/i18n";
 import { buildLocalePath } from "@/lib/seo";
@@ -149,7 +150,7 @@ function ReplyBranch({ locale, postId, replies, isAuthenticated, currentUserId, 
       <p className="forum-reply-content">{reply.content.trim() ? <EmojiText text={reply.content} /> : t.replyDeleted}</p>
       {reply.content.trim() ? <>
         <ForumMediaDisplay locale={locale} attachments={reply.attachments ?? []} />
-        <div className="forum-post-meta"><ForumLikeButton locale={locale} replyId={reply.id} count={reply._count.likes} isLiked={reply.isLiked} isAuthenticated={isAuthenticated} returnTo={`/forum/${postId}`} />{isAuthenticated ? <ReplyForm locale={locale} postId={postId} parentId={reply.id} /> : null}{isAuthenticated && (isAdmin || reply.author.id === currentUserId) ? <form action={deleteForumReplyAction}><input type="hidden" name="replyId" value={reply.id} /><button type="submit" className="forum-delete-reply">{t.deleteReply}</button></form> : null}</div>
+        <div className="forum-post-meta"><ForumLikeButton locale={locale} replyId={reply.id} count={reply._count.likes} isLiked={reply.isLiked} isAuthenticated={isAuthenticated} returnTo={`/forum/${postId}`} />{isAuthenticated ? <ReplyForm locale={locale} postId={postId} parentId={reply.id} /> : null}{isAuthenticated && (isAdmin || reply.author.id === currentUserId) ? <HoldDeleteForm action={deleteForumReplyAction} locale={locale} label={t.deleteReply} data-delete-kind="forum-reply"><input type="hidden" name="replyId" value={reply.id} /></HoldDeleteForm> : null}</div>
       </> : null}
       {reply.children.length ? <ReplyBranch locale={locale} postId={postId} replies={reply.children} isAuthenticated={isAuthenticated} currentUserId={currentUserId} isAdmin={isAdmin} /> : null}
     </article>

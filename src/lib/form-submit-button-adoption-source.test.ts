@@ -16,7 +16,7 @@ describe("main form submit buttons use duplicate-submit protection", () => {
     expect(refundAdmin).toContain('SubmitButton name="status" value="completed"');
     expect(refundAdmin).toContain('SubmitButton name="status" value="rejected"');
     expect(commentsAdmin).toContain("SubmitButton");
-    expect(filesAdmin).toContain('SubmitButton variant="danger" pendingLabel="删除中..."');
+    expect(filesAdmin).toContain('<HoldDeleteForm action={deleteFileAdminAction}');
     expect(orderDetail).toContain("FormSubmitButton");
     expect(orderDetail).toContain('pendingLabel="提交中..."');
   });

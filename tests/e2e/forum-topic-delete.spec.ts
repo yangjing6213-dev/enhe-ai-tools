@@ -1,5 +1,5 @@
 import { PrismaClient } from "@prisma/client";
-import { expect, test } from "@playwright/test";
+import { expect, test, type Locator, type Page } from "@playwright/test";
 import { randomBytes } from "node:crypto";
 import { hashSessionToken, signSessionCookieValue } from "../../src/lib/auth-security";
 import { isSameLoopbackOrigin } from "../fixtures/loopback-origin";
@@ -63,6 +63,16 @@ async function createTopic(suffix: string) {
   }, include: { replies: true } });
 }
 
+async function hold(page: Page, button: Locator, duration = 2150) {
+  await button.scrollIntoViewIfNeeded();
+  const box = (await button.boundingBox())!;
+  await page.mouse.move(box.x + box.width / 2, box.y + box.height / 2);
+  await page.mouse.down();
+  // Real elapsed time is part of the deletion contract, not a readiness delay.
+  await page.waitForTimeout(duration);
+  await page.mouse.up();
+}
+
 test("guests and ordinary topic authors have no delete control", async ({ page, context, baseURL }) => {
   const post = await createTopic("permissions");
   for (const role of ["guest", "user"]) {
@@ -71,10 +81,10 @@ test("guests and ordinary topic authors have no delete control", async ({ page, 
       const root = locale === "en" ? "/en/forum" : "/forum";
       await page.goto(root);
       await expect(page.locator(".forum-post-card").filter({ hasText: post.title })).toBeVisible();
-      await expect(page.locator(".forum-delete-post")).toHaveCount(0);
+      await expect(page.locator('[data-delete-kind="forum-post"]')).toHaveCount(0);
       await page.goto(`${root}/${post.id}`);
       await expect(page.getByRole("heading", { level: 1, name: post.title })).toBeVisible();
-      await expect(page.locator(".forum-delete-post")).toHaveCount(0);
+      await expect(page.locator('[data-delete-kind="forum-post"]')).toHaveCount(0);
     }
   }
 });
@@ -90,22 +100,18 @@ for (const [locale, surface, width] of [["zh", "list", 1440], ["en", "detail", 3
     const root = locale === "en" ? "/en/forum" : "/forum";
     await page.goto(surface === "list" ? root : `${root}/${post.id}`);
     const card = surface === "list" ? page.locator(".forum-post-card").filter({ hasText: post.title }) : page.locator(".forum-post-detail");
-    const button = card.getByRole("button", { name: locale === "en" ? "Delete topic" : "删除话题", exact: true });
+    const button = card.getByRole("button", { name: locale === "en" ? "Hold to delete topic" : "长按删除话题", exact: true });
     await expect(button).toBeVisible();
-    const cancelDialog = page.waitForEvent("dialog");
-    const cancelClick = button.click();
-    const cancelled = await cancelDialog;
-    expect(cancelled.type()).toBe("confirm");
-    await cancelled.dismiss();
-    await cancelClick;
+    await button.scrollIntoViewIfNeeded();
+    // The intentionally absent fixture image must finish before it can shift the hold target.
+    await expect.poll(() => card.locator("img").evaluateAll(images => images.every(image => image instanceof HTMLImageElement && image.complete))).toBe(true);
+    await button.click();
+    await hold(page, button, 400);
     await expect(button).toBeVisible();
     expect((await db.forumPost.findUniqueOrThrow({ where: { id: post.id } })).status).toBe("approved");
     expect(await db.adminAuditLog.count({ where: { targetId: post.id } })).toBe(0);
     await page.screenshot({ path: test.info().outputPath(`delete-control-${locale}-${width}.png`), fullPage: true });
-    const confirmDialog = page.waitForEvent("dialog");
-    const confirmClick = button.click();
-    await (await confirmDialog).accept();
-    await confirmClick;
+    await hold(page, button);
     await expect(page).toHaveURL(new RegExp(`${root}\\?postDeleted=1$`));
     await expect(page.locator(".forum-success-notice")).toContainText(locale === "en" ? "Topic deleted" : "话题已删除");
     await expect(page.locator(".forum-post-card").filter({ hasText: post.title })).toHaveCount(0);

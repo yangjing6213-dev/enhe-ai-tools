@@ -6,6 +6,7 @@ import { getStorageDiagnostics } from "@/lib/storage-diagnostics";
 import { parseCosFilePath } from "@/lib/storage";
 import { AdminFileUploadForm } from "@/app/admin/files/upload-progress-form";
 import Link from "next/link";
+import { HoldDeleteForm } from "@/components/hold-delete-form";
 
 export default async function AdminFilesPage({ searchParams }: { searchParams: Promise<Record<string, string | undefined>> }) {
   const params = await searchParams;
@@ -160,15 +161,12 @@ export default async function AdminFilesPage({ searchParams }: { searchParams: P
               <div className="flex items-end"><SubmitButton>保存文件</SubmitButton></div>
             </form>
 
-            <form action={deleteFileAdminAction} className="enhe-admin-file-danger-form mt-4 border-t border-white/10 pt-4">
+            <HoldDeleteForm action={deleteFileAdminAction} label="删除文件" className="enhe-admin-file-danger-form mt-4 border-t border-white/10 pt-4">
               <input type="hidden" name="id" value={file.id} />
-              <SubmitButton variant="danger" pendingLabel="删除中...">
-                删除文件
-              </SubmitButton>
               <span className="ml-3 text-xs text-[#8B95A7]">
                 删除时会解绑作为下载文件使用的工具，并清理该文件的下载记录。
               </span>
-            </form>
+            </HoldDeleteForm>
           </article>
         ))}
       </div>

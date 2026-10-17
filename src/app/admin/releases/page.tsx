@@ -2,7 +2,8 @@
   deleteProductReleaseAction,
   upsertProductReleaseAction
 } from "@/app/admin/actions";
-import { AdminSection, DangerButton, Field, inputClass, selectClass, SubmitButton, textareaClass } from "@/app/admin/admin-ui";
+import { AdminSection, Field, inputClass, selectClass, SubmitButton, textareaClass } from "@/app/admin/admin-ui";
+import { HoldDeleteForm } from "@/components/hold-delete-form";
 import { prisma } from "@/lib/db";
 import { productReleaseStatusMeta, releaseLayerLabels, summarizeReleaseLayers } from "@/lib/release-layer";
 
@@ -85,10 +86,9 @@ export default async function AdminProductReleasesPage({
                 <summary className="cursor-pointer text-sm font-semibold text-[#E8EEF8]">查看 / 编辑</summary>
                 <div className="mt-5 border-t border-white/10 pt-5">
                   <ProductReleaseForm release={release} developmentVersions={developmentVersions} />
-                  <form action={deleteProductReleaseAction} className="mt-4">
+                  <HoldDeleteForm action={deleteProductReleaseAction} label="删除产品版本" className="mt-4">
                     <input type="hidden" name="id" value={release.id} />
-                    <DangerButton>删除产品版本</DangerButton>
-                  </form>
+                  </HoldDeleteForm>
                 </div>
               </details>
             </div>

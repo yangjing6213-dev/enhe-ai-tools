@@ -1,6 +1,7 @@
 import { prisma } from "@/lib/db";
 import { deleteCategoryAction, upsertCategoryAction } from "@/app/admin/actions";
-import { AdminContentShell, AdminSection, DangerButton, Field, inputClass, selectClass, SubmitButton, textareaClass } from "@/app/admin/admin-ui";
+import { AdminContentShell, AdminSection, Field, inputClass, selectClass, SubmitButton, textareaClass } from "@/app/admin/admin-ui";
+import { HoldDeleteForm } from "@/components/hold-delete-form";
 
 export default async function AdminCategoriesPage() {
   const categories = await prisma.toolCategory.findMany({ orderBy: [{ type: "asc" }, { sortOrder: "asc" }] });
@@ -54,10 +55,9 @@ export default async function AdminCategoriesPage() {
               <Field label="描述"><textarea name="description" defaultValue={category.description ?? ""} className={textareaClass} /></Field>
               <SubmitButton>保存分类</SubmitButton>
             </form>
-            <form action={deleteCategoryAction} className="enhe-admin-category-danger-form mt-3">
+            <HoldDeleteForm action={deleteCategoryAction} className="enhe-admin-category-danger-form mt-3">
               <input type="hidden" name="id" value={category.id} />
-              <DangerButton />
-            </form>
+            </HoldDeleteForm>
           </div>
         ))}
       </div>

@@ -8,6 +8,7 @@ import {
   createSoftwareDownloadOrderAction,
 } from "@/app/actions";
 import { FormSubmitButton } from "@/components/form-submit-button";
+import { HoldDeleteForm } from "@/components/hold-delete-form";
 import { StarRatingInput, CommentRatingDisplay } from "@/components/star-rating-input";
 import { ProductVideoPlayer } from "@/components/product-video-player";
 import { StructuredData } from "@/components/structured-data";
@@ -1379,12 +1380,9 @@ export async function ToolDetailPageShell({
                     </div>
                   ) : null}
                   {user && (user.role === "admin" || comment.user.id === user.id) ? (
-                    <form action={deletePublicCommentAction} className="mt-3 flex justify-end">
+                    <HoldDeleteForm action={deletePublicCommentAction} locale={forceLocale} label={forceLocale === "en" ? "Delete comment" : "删除评论"} className="mt-3 flex justify-end" data-delete-kind="public-comment">
                       <input type="hidden" name="id" value={comment.id} />
-                      <button type="submit" className="rounded-lg border border-rose-400/40 px-3 py-2 text-sm font-semibold text-rose-300 hover:bg-rose-400/10">
-                        {forceLocale === "en" ? "Delete comment" : "删除评论"}
-                      </button>
-                    </form>
+                    </HoldDeleteForm>
                   ) : null}
                 </div>
               ))}

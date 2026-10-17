@@ -6,6 +6,7 @@ import {
 } from "@/app/admin/actions";
 import { DangerButton, Field, inputClass, selectClass, SubmitButton, textareaClass } from "@/app/admin/admin-ui";
 import { ProductDemoVideoUploadField } from "@/app/admin/product-demo-video-upload-field";
+import { HoldDeleteForm } from "@/components/hold-delete-form";
 import { buildCanonicalToolPath } from "@/lib/public-slugs";
 
 type ProductDemoWithProduct = Prisma.ProductDemoGetPayload<{
@@ -235,11 +236,8 @@ function formatFaqText(value?: Prisma.JsonValue) {
 
 export function DeleteProductDemoForm({ id }: { id: string }) {
   return (
-    <form action={deleteProductDemoAction}>
+    <HoldDeleteForm action={deleteProductDemoAction} label="删除" size="sm">
       <input type="hidden" name="id" value={id} />
-      <DangerButton className="px-3 py-2 text-xs" pendingLabel="删除中...">
-        删除
-      </DangerButton>
-    </form>
+    </HoldDeleteForm>
   );
 }

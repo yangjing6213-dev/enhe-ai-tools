@@ -1,7 +1,8 @@
 import Link from "next/link";
 import type { Prisma } from "@prisma/client";
 import { deleteNewsArticleAction } from "@/app/admin/actions";
-import { AdminContentShell, AdminProvenanceNotice, AdminSection, DangerButton, inputClass, selectClass } from "@/app/admin/admin-ui";
+import { AdminContentShell, AdminProvenanceNotice, AdminSection, inputClass, selectClass } from "@/app/admin/admin-ui";
+import { HoldDeleteForm } from "@/components/hold-delete-form";
 import { prisma } from "@/lib/db";
 import { buildCanonicalAiNewsPath } from "@/lib/public-slugs";
 
@@ -137,10 +138,9 @@ export default async function AdminAiNewsPage({ searchParams }: { searchParams: 
                 <Link href={`/admin/ai-news/${article.id}`} className="rounded-full border border-white/15 px-4 py-2 text-xs font-semibold transition hover:border-[#48F5D3]/50 hover:text-[#48F5D3]">
                   编辑
                 </Link>
-                <form action={deleteNewsArticleAction}>
+                <HoldDeleteForm action={deleteNewsArticleAction} label="删除" size="sm">
                   <input type="hidden" name="id" value={article.id} />
-                  <DangerButton className="px-3 py-2 text-xs" pendingLabel="删除中...">删除</DangerButton>
-                </form>
+                </HoldDeleteForm>
               </span>
             </div>
           ))}

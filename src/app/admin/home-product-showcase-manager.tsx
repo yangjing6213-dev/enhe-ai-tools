@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import HoldButton from "@/components/hold-button";
 import { saveHomeProductShowcaseAction } from "@/app/admin/actions";
 import { Field, inputClass, selectClass, textareaClass } from "@/app/admin/admin-ui";
 import { ProductDemoVideoUploadField } from "@/app/admin/product-demo-video-upload-field";
@@ -49,7 +50,7 @@ export function HomeProductShowcaseManager({
           <div className="flex flex-wrap gap-2">
             <button type="button" onClick={() => setProducts((current) => moveHomeShowcaseProduct(current, product.id, -1))} disabled={index === 0} className="rounded-full border border-white/15 px-4 py-2 text-sm disabled:opacity-40">上移</button>
             <button type="button" onClick={() => setProducts((current) => moveHomeShowcaseProduct(current, product.id, 1))} disabled={index === products.length - 1} className="rounded-full border border-white/15 px-4 py-2 text-sm disabled:opacity-40">下移</button>
-            <button type="button" onClick={() => setProducts((current) => current.length > 1 ? current.filter(({ id }) => id !== product.id) : current)} disabled={products.length <= 1} className="rounded-full border border-red-300/40 px-4 py-2 text-sm text-red-100 disabled:opacity-40">删除此项</button>
+            <HoldButton onHold={() => setProducts((current) => current.length > 1 ? current.filter(({ id }) => id !== product.id) : current)} disabled={products.length <= 1} title="保存首页推荐后生效，只会移出首页推荐，不会删除商品、订单或演示记录。" hint="按住2秒，保存后生效" pendingLabel="删除中…" errorLabel="删除失败" doneLabel="已移除">长按删除此项</HoldButton>
           </div>
 
           <div className="grid gap-4 md:grid-cols-2">

@@ -2,7 +2,8 @@ import { EmojiField, EmojiTextarea } from "@/app/admin/emoji-textarea";
 ﻿import Link from "next/link";
 import { notFound } from "next/navigation";
 import { deleteToolFaqAction, upsertToolFaqAction } from "@/app/admin/actions";
-import { AdminContentShell, AdminSection, DangerButton, Field, inputClass, selectClass, SubmitButton, textareaClass } from "@/app/admin/admin-ui";
+import { AdminContentShell, AdminSection, Field, inputClass, selectClass, SubmitButton, textareaClass } from "@/app/admin/admin-ui";
+import { HoldDeleteForm } from "@/components/hold-delete-form";
 import { prisma } from "@/lib/db";
 
 type AdminFaqDetailPageProps = {
@@ -63,10 +64,9 @@ export default async function AdminFaqDetailPage({ params, searchParams }: Admin
       </form>
 
       {faq ? (
-        <form action={deleteToolFaqAction} className="enhe-admin-faq-danger-form mt-4">
+        <HoldDeleteForm action={deleteToolFaqAction} label="删除 FAQ" className="enhe-admin-faq-danger-form mt-4">
           <input type="hidden" name="id" value={faq.id} />
-          <DangerButton>删除 FAQ</DangerButton>
-        </form>
+        </HoldDeleteForm>
       ) : null}
       </AdminContentShell>
     </AdminSection>

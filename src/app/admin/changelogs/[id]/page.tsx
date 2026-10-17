@@ -2,7 +2,8 @@ import { EmojiField, EmojiTextarea } from "@/app/admin/emoji-textarea";
 ﻿import Link from "next/link";
 import { notFound } from "next/navigation";
 import { deleteToolChangelogAction, upsertToolChangelogAction } from "@/app/admin/actions";
-import { AdminContentShell, AdminSection, DangerButton, Field, inputClass, selectClass, SubmitButton, textareaClass } from "@/app/admin/admin-ui";
+import { AdminContentShell, AdminSection, Field, inputClass, selectClass, SubmitButton, textareaClass } from "@/app/admin/admin-ui";
+import { HoldDeleteForm } from "@/components/hold-delete-form";
 import { prisma } from "@/lib/db";
 
 type AdminChangelogDetailPageProps = {
@@ -65,10 +66,9 @@ export default async function AdminChangelogDetailPage({ params, searchParams }:
       </form>
 
       {changelog ? (
-        <form action={deleteToolChangelogAction} className="mt-4">
+        <HoldDeleteForm action={deleteToolChangelogAction} label="删除版本记录" className="mt-4">
           <input type="hidden" name="id" value={changelog.id} />
-          <DangerButton>删除版本记录</DangerButton>
-        </form>
+        </HoldDeleteForm>
       ) : null}
       </AdminContentShell>
     </AdminSection>
