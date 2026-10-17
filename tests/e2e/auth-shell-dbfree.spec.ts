@@ -72,15 +72,18 @@ for (const route of routes) {
       });
       await expect(googleLink).toBeVisible();
       await expect(googleLink).toHaveAttribute("href", /\/api\/auth\/google\/start\?returnTo=/);
-      const submitButton = form.locator("button[type='submit']");
-      await expect(submitButton).toBeVisible();
-      await expect(submitButton).toHaveCSS("color", "rgb(255, 255, 255)");
+      const submitControl = form.getByRole("slider");
+      await expect(submitControl).toBeVisible();
+      await expect(form.locator(".slide-commit__track")).toHaveCSS("background-color", "rgb(38, 38, 38)");
+      await expect(form.locator(".slide-commit")).toHaveCSS("height", "56px");
       expect(await page.locator(".enhe-auth-page").evaluate((element) => getComputedStyle(element, "::before").display)).toBe("none");
-      await expect(submitButton).toHaveText(
-        route.kind === "login" ? route.title : route.locale === "en" ? "Create account" : "创建账号"
+      await expect(submitControl).toHaveAccessibleName(
+        route.kind === "login"
+          ? route.locale === "en" ? "Slide to log in" : "向右滑动登录"
+          : route.locale === "en" ? "Slide to create account" : "向右滑动创建账号"
       );
 
-      const visibleFields = form.locator("input:not([type='hidden']), button");
+      const visibleFields = form.locator("input:not([type='hidden']), button:visible, [role='slider']");
       for (const field of await visibleFields.all()) {
         const box = await field.boundingBox();
         expect(box).not.toBeNull();

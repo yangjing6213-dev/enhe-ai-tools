@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { registerAction } from "@/app/actions";
-import { FormSubmitButton } from "@/components/form-submit-button";
+import { AuthSlideSubmit } from "@/components/auth/auth-slide-submit";
 import { PasswordInput } from "@/components/password-input";
 import { Container } from "@/components/ui";
 import { getOrCreateCsrfToken } from "@/lib/csrf";
@@ -119,9 +119,15 @@ export async function RegisterPageShell({
         <p id="register-newsletter-email-help" className="mt-2 text-xs leading-5 text-[var(--marketing-muted)]">
           {locale === "en" ? "Optional. Leave blank to use your account email when needed." : "选填，留空时可继续使用账号邮箱。"}
         </p>
-        <FormSubmitButton className="login-submit-button mt-8 w-full text-base" pendingLabel={t.auth.creatingAccount}>
-          {t.auth.createAccount}
-        </FormSubmitButton>
+        <AuthSlideSubmit
+          submitAction={registerAction}
+          className="mt-8 w-full"
+          label={locale === "en" ? "Slide to create account" : "向右滑动创建账号"}
+          pendingLabel={t.auth.creatingAccount}
+          errorLabel={locale === "en" ? "Slide to retry registration" : "向右滑动重试创建账号"}
+          fallbackLabel={t.auth.createAccount}
+          error={Boolean(googleMessage)}
+        />
         <a
           href={googleRegisterHref}
           className="mt-4 flex min-h-12 w-full items-center justify-center gap-3 rounded-lg border border-slate-300 bg-white px-4 font-semibold text-slate-900 shadow-sm transition-colors hover:bg-slate-50"
