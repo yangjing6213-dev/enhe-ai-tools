@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
-import Image from "next/image";
 import Link from "next/link";
 import { AboutFounder } from "@/components/about-founder";
+import { PageCover } from "@/components/page-cover";
 import { StructuredData } from "@/components/structured-data";
 import { Container, SectionTitle } from "@/components/ui";
 import { enheOrganizationReference } from "@/lib/brand-entity";
@@ -259,17 +259,10 @@ export function AboutPageShell({ forceLocale }: { forceLocale: Locale }) {
     <main className="enhe-editorial-page enhe-reference-editorial">
       <Container className="enhe-reference-editorial-container py-14">
         <StructuredData data={[breadcrumbSchema, aboutPageSchema, faqSchema]} />
-        <section className="about-cover relative mb-10 aspect-video overflow-hidden rounded-xl" aria-label={forceLocale === "en" ? "ENHE AI brand cover" : "ENHE AI 品牌封面"}>
-          <Image
-            src="/images/about/enhe-about-cover.webp"
-            alt={forceLocale === "en" ? "ENHE AI illuminated brand mark" : "ENHE AI 品牌灯光标志"}
-            fill
-            priority
-            unoptimized
-            sizes="(max-width: 768px) 100vw, 1200px"
-            className="object-cover"
-          />
-        </section>
+        <PageCover
+          src="/images/about/enhe-about-cover.webp"
+          alt={forceLocale === "en" ? "ENHE AI illuminated brand mark" : "ENHE AI 品牌灯光标志"}
+        />
         <section className="enhe-reference-editorial-hero relative overflow-hidden p-0 text-left">
           <div className="relative max-w-4xl">
             <h1 className="mt-0 text-left text-4xl font-black leading-tight text-[var(--marketing-text)] md:text-6xl">

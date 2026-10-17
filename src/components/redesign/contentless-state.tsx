@@ -23,6 +23,7 @@ export type ContentlessStateProps = {
   className?: string;
   panelClassName?: string;
   dataStatusTarget?: "main" | "panel" | "both";
+  topContent?: ReactNode;
   children?: ReactNode;
 };
 
@@ -40,6 +41,7 @@ export function ContentlessState({
   className,
   panelClassName,
   dataStatusTarget = "main",
+  topContent,
   children,
 }: ContentlessStateProps) {
   const titleId = "contentless-state-title";
@@ -58,8 +60,10 @@ export function ContentlessState({
         className={cn(
           "enhe-contentless-container",
           className?.includes("ai-news-workspace") && "ai-news-workspace-container",
+          topContent && "enhe-contentless-container-with-top-content",
         )}
       >
+        {topContent}
         <section className="enhe-contentless-hero" aria-labelledby={titleId}>
           <div className="enhe-contentless-hero-copy">
             <p className="enhe-contentless-eyebrow">{eyebrow}</p>

@@ -24,7 +24,14 @@ for (const route of routes) {
       const wasCanceledAnalyticsOnNavigation =
         new URL(request.url()).pathname === "/api/analytics" &&
         request.failure()?.errorText === "net::ERR_ABORTED";
-      if (!wasCanceledNextPrefetch && !wasCanceledAnalyticsOnNavigation) {
+      const wasCanceledEmojiRequestOnNavigation =
+        new URL(request.url()).pathname === "/api/emojis" &&
+        request.failure()?.errorText === "net::ERR_ABORTED";
+      if (
+        !wasCanceledNextPrefetch &&
+        !wasCanceledAnalyticsOnNavigation &&
+        !wasCanceledEmojiRequestOnNavigation
+      ) {
         failedRequests.push(
           `${request.method()} ${request.url()} (${request.failure()?.errorText ?? "unknown"})`,
         );
@@ -164,3 +171,25 @@ for (const route of routes) {
     expect(failedRequests).toEqual([]);
   });
 }
+
+test("AI News and About covers match the forum cover frame", async ({ page }) => {
+  for (const width of [320, 390, 700, 701, 768, 1440]) {
+    await page.setViewportSize({ width, height: 900 });
+    const expectedWidth = width <= 700 ? width - 32 : Math.min(width - 40, 1120);
+
+    for (const route of ["/ai-news", "/about"] as const) {
+      await page.goto(route, { waitUntil: "domcontentloaded" });
+      const cover = page.locator(".enhe-page-cover");
+      const image = cover.locator("img");
+      await expect(cover).toBeVisible();
+      await expect(image).toBeVisible();
+
+      const frame = await cover.boundingBox();
+      expect(frame).not.toBeNull();
+      expect(frame!.width).toBeCloseTo(expectedWidth, 0);
+      expect(frame!.width / frame!.height).toBeCloseTo(1448 / 620, 2);
+      expect(await image.evaluate((element: HTMLImageElement) => element.naturalWidth)).toBeGreaterThan(0);
+      expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBeLessThanOrEqual(width);
+    }
+  }
+});

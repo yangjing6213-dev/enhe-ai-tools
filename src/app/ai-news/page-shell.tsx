@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { AiNewsListing } from "@/components/ai-news-listing";
+import { PageCover } from "@/components/page-cover";
 import { StructuredData } from "@/components/structured-data";
 import { ContentlessState } from "@/components/redesign/contentless-state";
 import {
@@ -294,6 +295,12 @@ export async function AiNewsPageShell({
       <ContentlessState
         locale={forceLocale}
         className="ai-news-page ai-news-workspace enhe-reference-workspace"
+        topContent={
+          <PageCover
+            src="/images/ai-news-cover.png"
+            alt={forceLocale === "en" ? "ENHE AI news and insights" : "ENHE AI 资讯品牌封面"}
+          />
+        }
         dataStatusTarget="panel"
         eyebrow={forceLocale === "en" ? "AI News" : "AI 前沿资讯"}
         title={t.aiNews.title}
@@ -385,8 +392,12 @@ export async function AiNewsPageShell({
     <main className="ai-news-page ai-news-workspace enhe-reference-workspace">
       <Container className="ai-news-workspace-container py-14">
         <StructuredData data={[breadcrumbSchema, collectionSchema, webPageSchema, faqSchema]} />
+        <PageCover
+          src="/images/ai-news-cover.png"
+          alt={forceLocale === "en" ? "ENHE AI news and insights" : "ENHE AI 资讯品牌封面"}
+        />
         <section
-          className="ai-news-workspace-hero mt-8"
+          className="ai-news-workspace-hero"
           data-ai-news-region="hero"
         >
           <div className="relative max-w-4xl">
