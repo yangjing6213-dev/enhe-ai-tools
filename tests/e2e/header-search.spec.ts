@@ -48,14 +48,7 @@ test("public header replaces the search link, opens recommendations, and submits
         expect(layout.valueRight).toBeLessThan(layout.menusLeft);
         if (width === 1920) expect(Math.abs(layout.logoLeft - ((width - 1200) / 2 - 240))).toBeLessThan(1);
       }
-      for (const selector of [".redesign-home-reviews-rotation"]) {
-        const rotationButton = page.locator(selector);
-        await expect(rotationButton).toHaveCSS("color", "rgb(0, 0, 0)");
-        await expect(rotationButton).toHaveCSS("background-color", "rgba(0, 0, 0, 0)");
-        await rotationButton.hover();
-        await expect(rotationButton).toHaveCSS("background-color", "rgba(0, 0, 0, 0)");
-        await page.mouse.move(0, 0);
-      }
+      await expect(page.locator(".redesign-home-reviews-rotation")).toBeHidden();
       await expect(page.locator(".redesign-home-brand-value-inner h2")).toHaveCSS("font-weight", "700");
       if ([1920, 1440, 390].includes(width)) {
         await footer.scrollIntoViewIfNeeded();

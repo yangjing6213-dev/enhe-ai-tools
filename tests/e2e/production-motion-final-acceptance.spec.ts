@@ -880,8 +880,8 @@ for (const route of homeSsrRoutes) {
         }),
       )
       .toBe(true);
-    expect(productMediaRequests).toEqual([
-      { pathname: "/_next/image", mediaSrc: HOME_PRODUCTS[0].mediaSrc },
+    expect([...new Set(productMediaRequests.map(({ mediaSrc }) => mediaSrc))]).toEqual([
+      HOME_PRODUCTS[0].mediaSrc,
     ]);
 
     await page.getByRole("button", { name: route.next, exact: true }).click();

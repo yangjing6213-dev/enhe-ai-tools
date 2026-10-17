@@ -187,11 +187,7 @@ test("homepage polish stays readable, responsive, and interactive without extern
     await expect.poll(() => activeReviewQuote.textContent()).toBe(initialReviewQuote);
     const reviewAvatar = reviews.locator('.redesign-home-review-card[data-position="0"] .redesign-home-review-avatar');
     await expect(reviewAvatar).toHaveAttribute("alt", /AI 生成的虚构人物/);
-    const pauseRotation = reviews.getByRole("button", { name: "暂停轮播" });
-    await expect(pauseRotation).toHaveAttribute("aria-pressed", "false");
-    await expect(pauseRotation).toHaveText("");
-    await pauseRotation.click();
-    await expect(reviews.getByRole("button", { name: "继续轮播" })).toHaveAttribute("aria-pressed", "true");
+    await expect(reviews.locator(".redesign-home-reviews-rotation")).toBeHidden();
     if (width === 1440) {
       await expect(reviews).toHaveAttribute("data-motion-modality", "keyboard");
       await expect(reviews.locator('.redesign-home-review-card[data-position="0"]')).toHaveCSS("transition-property", "none");

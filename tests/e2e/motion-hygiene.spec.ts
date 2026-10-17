@@ -122,7 +122,7 @@ test("review auto-rotation pauses while focused and resumes when focus leaves", 
   await expect(activeReview).toHaveCount(1);
   await expect(track).toHaveAttribute("aria-live", "off");
   const initialReview = await activeReview.getAttribute("aria-label");
-  await expect(page.getByRole("button", { name: /暂停轮播|继续轮播/ })).toHaveCount(1);
+  await expect(page.locator(".redesign-home-reviews-rotation")).toBeHidden();
 
   await section.focus();
   await expect(track).toHaveAttribute("aria-live", "polite");
@@ -148,9 +148,10 @@ test("review auto-rotation continues on hover and resumes after manual navigatio
   const section = page.locator(".redesign-home-reviews");
   const track = page.locator(".redesign-home-reviews-track");
   const activeReview = page.locator('.redesign-home-review-card[data-active="true"]');
-  const rotationButton = page.getByRole("button", { name: /暂停轮播|继续轮播/ });
+  const rotationButton = page.locator(".redesign-home-reviews-rotation");
 
   await expect(activeReview).toHaveCount(1);
+  await expect(rotationButton).toBeHidden();
   // The server-rendered card can appear before the browser installs the interval.
   // Toggle the control without pointer movement to confirm hydration and start a fresh interval.
   await rotationButton.evaluate((button: HTMLButtonElement) => button.click());
@@ -184,7 +185,7 @@ test("review auto-rotation continues on hover and resumes after manual navigatio
   await page.clock.fastForward(5_100);
   await expect(activeReview).not.toHaveAttribute("aria-label", manuallySelectedReview ?? "");
 
-  await expect(page.getByRole("button", { name: /暂停轮播|继续轮播/ })).toHaveCount(1);
+  await expect(rotationButton).toBeHidden();
 });
 
 test("reduced motion keeps product, review, and support controls functional", async ({ page }) => {
