@@ -38,11 +38,13 @@ for (const route of routes) {
       }
     });
 
+    await page.setViewportSize(viewports[0]);
+    const response = await page.goto(route, { waitUntil: "domcontentloaded" });
+    expect(response?.status()).toBe(200);
+    await page.waitForLoadState("networkidle");
+
     for (const viewport of viewports) {
       await page.setViewportSize(viewport);
-      const response = await page.goto(route, { waitUntil: "domcontentloaded" });
-
-      expect(response?.status()).toBe(200);
       await expect(page.locator("main.ai-news-page")).toBeVisible();
       await expect(page.locator('[data-content-status="UNVERIFIED"]')).toBeVisible();
 
@@ -73,7 +75,9 @@ for (const route of routes) {
         };
         await page.locator("main.ai-news-page").evaluate(
           (main, claim) => {
-            const card = document.createElement("article");
+            const card =
+              main.querySelector<HTMLElement>('[data-long-claim-fixture="true"]') ??
+              document.createElement("article");
             card.dataset.longClaimFixture = "true";
             card.className =
               "glass mt-8 w-full max-w-full overflow-hidden rounded-2xl p-5";
@@ -89,7 +93,7 @@ for (const route of routes) {
             summary.className = "mt-3 break-words text-sm leading-7";
             summary.textContent = claim.summary;
 
-            card.append(title, summary);
+            card.replaceChildren(title, summary);
             main.append(card);
           },
           longClaim,
