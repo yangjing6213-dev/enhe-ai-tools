@@ -279,16 +279,21 @@
 .forum-like-heart[data-animated] { animation: forum-heart-pop 420ms ease-out; }
 .forum-like-error { color: #b42318; font-size: 0.85rem; }
 .forum-post-actions-control { min-width: 0; max-width: 100%; }
-.forum-topic-meta { align-items: flex-start; }
-.forum-topic-meta > form { margin-top: 6px; }
+.forum-topic-meta { align-items: center; }
+.forum-topic-meta > form { display: flex; align-items: center; margin: 0; }
+.forum-topic-delete { align-self: center; }
+.forum-delete-post { box-sizing: border-box; height: 44px; border: 1px solid #000; --hb-shadow: none; --hb-glow: none; }
 .forum-post-actions { display: flex; align-items: center; flex-wrap: wrap; gap: 20px; }
 .forum-post-actions .forum-action { display: inline-flex; min-width: 44px; min-height: 44px; align-items: center; justify-content: center; gap: 7px; padding: 0; border: 0; background: transparent; color: var(--enhe-text-muted, #5f665f); font: inherit; text-decoration: none; cursor: pointer; }
 .forum-post-actions .forum-action:hover { text-decoration: none; }
 .forum-action-icon { box-sizing: border-box; display: inline-flex; width: 44px; height: 44px; flex: 0 0 auto; align-items: center; justify-content: center; border: 1px solid #4a4651; border-radius: 13px; background: linear-gradient(145deg, #36323d, #28252e); color: #f8f7fa; box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.08), 0 2px 4px rgba(22, 18, 28, 0.12); transition: background 160ms ease, border-color 160ms ease, color 160ms ease; }
 .forum-action:hover .forum-action-icon { background: #3d3846; border-color: #625b6f; }
 .forum-action-count { color: var(--enhe-text-muted, #5f665f); font-size: 0.9rem; font-weight: 650; font-variant-numeric: tabular-nums; line-height: 1; white-space: nowrap; }
-.forum-action--like[aria-pressed="true"] .forum-action-icon { color: #ff83a5; border-color: #a75370; }
-.forum-action--bookmark[aria-pressed="true"] .forum-action-icon { color: #80bcff; border-color: #497cad; }
+.forum-action--share .forum-action-icon, .forum-action--like .forum-action-icon, .forum-action--bookmark .forum-action-icon { border-color: #000; background: #fff; color: #000; box-shadow: none; }
+.forum-action--share:hover .forum-action-icon, .forum-action--like:hover .forum-action-icon, .forum-action--bookmark:hover .forum-action-icon { border-color: #000; background: #f2f2f2; color: #000; }
+.forum-action--share[data-shared="true"] .forum-action-icon, .forum-action--share[data-shared="true"]:hover .forum-action-icon { border-color: #000; background: #22c55e; color: #000; }
+.forum-action--like[aria-pressed="true"] .forum-action-icon, .forum-action--bookmark[aria-pressed="true"] .forum-action-icon { color: #000; border-color: #000; }
+.forum-action--share .forum-action-count, .forum-action--like .forum-action-count, .forum-action--bookmark .forum-action-count { color: #000; }
 .forum-post-actions .forum-action:disabled { cursor: wait; opacity: 0.55; }
 .forum-post-actions .forum-action:focus-visible { outline: 2px solid var(--blue-11, #0462c2); outline-offset: 4px; border-radius: 13px; }
 .forum-post-actions .forum-like-control--icon { display: contents; }

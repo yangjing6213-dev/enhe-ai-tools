@@ -63,6 +63,8 @@ describe("forum public surfaces", () => {
       expect(html.indexOf('data-delete-kind="forum-post"')).toBeGreaterThan(bookmarkIndex);
       expect(html).toContain('aria-label="转发：3"');
       expect(html).toContain('aria-label="取消收藏"');
+      expect(html).toContain('class="forum-topic-delete"');
+      expect(html).toContain('hold-button--md forum-delete-post');
     }
     expect(list).toContain('href="/forum/post-1#replies"');
     expect(detail).toContain('href="#replies"');

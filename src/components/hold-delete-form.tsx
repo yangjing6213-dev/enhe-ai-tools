@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useRef, type FormEvent, type FormHTMLAttributes, type ReactNode } from "react";
-import HoldButton, { type HoldButtonSize } from "@/components/hold-button";
+import HoldButton, { type HoldButtonProps, type HoldButtonSize } from "@/components/hold-button";
 import type { Locale } from "@/lib/i18n";
 
 type HoldDeleteFormProps = Omit<FormHTMLAttributes<HTMLFormElement>, "action" | "children" | "onSubmit" | "onSubmitCapture" | "title"> & {
@@ -10,6 +10,7 @@ type HoldDeleteFormProps = Omit<FormHTMLAttributes<HTMLFormElement>, "action" | 
   label?: string;
   locale?: Locale;
   buttonClassName?: string;
+  holdButtonProps?: Pick<HoldButtonProps, "backgroundColor" | "fillColor" | "textColor" | "fillTextColor" | "glow">;
   size?: HoldButtonSize;
   disabled?: boolean;
   title?: string;
@@ -17,7 +18,7 @@ type HoldDeleteFormProps = Omit<FormHTMLAttributes<HTMLFormElement>, "action" | 
 
 type Completion = { resolve: (result?: false) => void; reject: (reason: unknown) => void };
 
-export function HoldDeleteForm({ action, children, label, locale = "zh", buttonClassName, size = "md", disabled, title, ...formProps }: HoldDeleteFormProps) {
+export function HoldDeleteForm({ action, children, label, locale = "zh", buttonClassName, holdButtonProps, size = "md", disabled, title, ...formProps }: HoldDeleteFormProps) {
   const formRef = useRef<HTMLFormElement>(null);
   const submitRef = useRef<HTMLButtonElement>(null);
   const allowSubmit = useRef(false);
@@ -81,7 +82,7 @@ export function HoldDeleteForm({ action, children, label, locale = "zh", buttonC
   return <form {...formProps} ref={formRef} action={submitDeletion} onSubmit={guardSubmission} data-hold-delete-form="true">
     {children}
     <button ref={submitRef} type="submit" hidden tabIndex={-1} aria-hidden="true" disabled={disabled} />
-    <HoldButton onHold={confirmDeletion} className={buttonClassName} size={size} disabled={disabled} title={title} aria-label={holdLabel}
+    <HoldButton {...holdButtonProps} onHold={confirmDeletion} className={buttonClassName} size={size} disabled={disabled} title={title} aria-label={holdLabel}
       doneLabel={english ? "Deleted" : "已删除"}
       pendingLabel={english ? "Deleting…" : "删除中…"}
       errorLabel={english ? "Failed" : "删除失败"}

@@ -51,6 +51,7 @@ export function ForumPostActions({ locale, postId, title, replyCount, shareCount
 }) {
   const [shares, setShares] = useState(shareCount);
   const [bookmarked, setBookmarked] = useState(isBookmarked);
+  const [shared, setShared] = useState(false);
   const [shareMessage, setShareMessage] = useState("");
   const [shareError, setShareError] = useState("");
   const [bookmarkError, setBookmarkError] = useState("");
@@ -83,6 +84,7 @@ export function ForumPostActions({ locale, postId, title, replyCount, shareCount
       </a>
       <button className="forum-action forum-action--share" data-forum-action="share" type="button" aria-label={shareLabel} title={english ? "Share topic" : "转发话题"} disabled={sharePending} onClick={(event) => {
         const button = event.currentTarget;
+        setShared(false);
         setShareMessage("");
         setShareError("");
         setManualUrl("");
@@ -95,6 +97,7 @@ export function ForumPostActions({ locale, postId, title, replyCount, shareCount
             setShareError(english ? "Could not copy automatically. Select and copy this link." : "未能自动复制，请选中下方链接后复制。");
             return;
           }
+          setShared(true);
           setShareMessage(result === "shared" ? (english ? "Topic shared." : "话题已分享。") : (english ? "Topic link copied." : "话题链接已复制。"));
           showSpark(button);
           if (isAuthenticated) {
@@ -104,7 +107,7 @@ export function ForumPostActions({ locale, postId, title, replyCount, shareCount
             catch { setShareError(english ? "Sharing succeeded, but its count could not be saved. Please try again later." : "分享已完成，但未能保存转发记录，请稍后再试。"); }
           }
         });
-      }}><span className="forum-action-icon"><Repeat2 size={21} aria-hidden="true" /></span><span className="forum-action-count" aria-hidden="true">{shares}</span></button>
+      }} data-shared={shared || undefined}><span className="forum-action-icon"><Repeat2 size={21} aria-hidden="true" /></span><span className="forum-action-count" aria-hidden="true">{shares}</span></button>
       <ForumLikeButton locale={locale} postId={postId} count={likeCount} isLiked={isLiked} isAuthenticated={isAuthenticated} returnTo={`/forum/${postId}`} variant="icon" onSaved={showSpark} />
       {isAuthenticated ? <button className="forum-action forum-action--bookmark" data-forum-action="bookmark" type="button" aria-label={bookmarkLabel} title={bookmarkLabel} aria-pressed={bookmarked} disabled={bookmarkPending} onClick={(event) => {
         const button = event.currentTarget;
