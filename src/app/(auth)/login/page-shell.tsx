@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { loginAction } from "@/app/actions";
-import { AuthSlideSubmit } from "@/components/auth/auth-slide-submit";
+import { FormSubmitButton } from "@/components/form-submit-button";
 import { PasswordInput } from "@/components/password-input";
 import { Container } from "@/components/ui";
 import { getOrCreateCsrfToken } from "@/lib/csrf";
@@ -94,15 +94,9 @@ export async function LoginPageShell({
         <p id="login-password-help" className="mt-2 text-xs leading-5 text-[var(--marketing-muted)]">
           {locale === "en" ? "Required. Password validation happens after submission." : "必填，提交后会校验密码是否正确。"}
         </p>
-        <AuthSlideSubmit
-          submitAction={loginAction}
-          className="mt-8 w-full"
-          label={locale === "en" ? "Slide to log in" : "向右滑动登录"}
-          pendingLabel={t.auth.loggingIn}
-          errorLabel={locale === "en" ? "Slide to retry login" : "向右滑动重试登录"}
-          fallbackLabel={t.auth.loginButton}
-          error={Boolean(errorMessage)}
-        />
+        <FormSubmitButton className="login-submit-button mt-8 w-full text-base" pendingLabel={t.auth.loggingIn}>
+          {t.auth.loginButton}
+        </FormSubmitButton>
         <a
           href={`/api/auth/google/start?returnTo=${encodeURIComponent(returnTo)}`}
           className="mt-4 flex min-h-12 w-full items-center justify-center gap-3 rounded-lg border border-slate-300 bg-white px-4 font-semibold text-slate-900 shadow-sm transition-colors hover:bg-slate-50"
