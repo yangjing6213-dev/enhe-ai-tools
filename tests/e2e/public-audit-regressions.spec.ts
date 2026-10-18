@@ -32,8 +32,9 @@ test("homepage headline stays readable before JavaScript starts", async ({ brows
     expect(await words.count()).toBeGreaterThan(0);
     for (const word of await words.all()) {
       await expect(word).toBeVisible();
-      expect(await word.evaluate((element) => getComputedStyle(element).webkitTextFillColor)).toBe("rgb(4, 98, 194)");
+      expect(await word.evaluate((element) => getComputedStyle(element).webkitTextFillColor)).toBe("rgb(0, 0, 0)");
     }
+    expect(await page.locator(".redesign-home-hero .masked-heading__reveal").first().evaluate((element) => getComputedStyle(element).visibility)).toBe("hidden");
   } finally {
     await context.close();
   }
