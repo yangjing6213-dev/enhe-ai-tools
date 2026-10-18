@@ -43,6 +43,7 @@ describe("homepage UI polish", () => {
     expect(aiNewsPage).toContain('<h1 className="redesign-bold-copy mt-5');
     expect(aiTrendsPage).toContain('<h1 className="redesign-bold-copy mt-6');
     expect(aboutPage).toContain('<h1 className="redesign-bold-copy mt-0');
+    expect(aboutPage).toContain('<h3 className="redesign-bold-copy text-lg font-black leading-snug');
   });
 
   it("removes the tagline while keeping the centered light hero", () => {

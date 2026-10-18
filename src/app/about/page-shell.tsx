@@ -324,7 +324,7 @@ export function AboutPageShell({ forceLocale }: { forceLocale: Locale }) {
               {copy.faq.map((item) => (
                 <details key={item.question} className="content-fold">
                   <summary>
-                    <h3 className="text-lg font-black leading-snug text-[var(--marketing-text)]">
+                    <h3 className="redesign-bold-copy text-lg font-black leading-snug text-[var(--marketing-text)]">
                       {item.question}
                     </h3>
                   </summary>
