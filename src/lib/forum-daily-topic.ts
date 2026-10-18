@@ -60,6 +60,14 @@ function isUniqueConflict(error: unknown) {
   );
 }
 
+function readSourceArticleId(metadata: unknown) {
+  if (!metadata || typeof metadata !== "object" || Array.isArray(metadata)) {
+    return null;
+  }
+  const sourceArticleId = (metadata as Record<string, unknown>).sourceArticleId;
+  return typeof sourceArticleId === "string" ? sourceArticleId : null;
+}
+
 export async function publishDueDailyAiTipForumTopic(
   localDate: string,
   now = new Date(),
@@ -96,7 +104,8 @@ export async function publishDueDailyAiTipForumTopic(
             action: AUTOMATION_ACTION,
             createdAt: { gte: repeatSince },
           },
-          select: { targetId: true },
+          select: { metadata: true },
+          orderBy: { createdAt: "desc" },
           take: 30,
         }),
         tx.newsArticle.findMany({
@@ -123,7 +132,9 @@ export async function publishDueDailyAiTipForumTopic(
         }),
       ]);
       const recentlyUsed = new Set(
-        recentTopics.map((topic) => topic.targetId).filter(Boolean),
+        recentTopics
+          .map((topic) => readSourceArticleId(topic.metadata))
+          .filter((sourceArticleId): sourceArticleId is string => Boolean(sourceArticleId)),
       );
       const source = (sources as AiNewsTopicSource[]).find(
         (candidate) =>

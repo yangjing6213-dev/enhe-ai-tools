@@ -103,4 +103,34 @@ describe("daily AI forum topic automation", () => {
     ).resolves.toEqual({ status: "already_published" });
     expect(transaction.forumPost.create).toHaveBeenCalledTimes(1);
   });
+
+  it("skips a news article already used by an earlier daily forum topic", async () => {
+    const clock = getShanghaiForumClock();
+    const [year, month, day] = clock.date.split("-").map(Number);
+    const lateToday = new Date(Date.UTC(year, month - 1, day, 15, 59));
+    transaction.adminAuditLog.findUnique.mockResolvedValue(null);
+    transaction.adminAuditLog.findMany.mockResolvedValue([
+      {
+        targetId: "previous-forum-post",
+        metadata: { automationDate: "2026-10-17", sourceArticleId: "news-1" },
+      },
+    ]);
+    transaction.user.findFirst.mockResolvedValue({ id: "admin-1" });
+    transaction.newsArticle.findMany.mockResolvedValue([
+      { id: "news-1", title: "重复资讯", summary: "已用于旧话题。", slug: "repeat" },
+      { id: "news-2", title: "新资讯", summary: "用于新话题。", slug: "fresh" },
+    ]);
+    transaction.forumPost.create.mockResolvedValue({ id: "forum-post-2" });
+
+    const result = await publishDueDailyAiTipForumTopic(clock.date, lateToday);
+
+    expect(result).toEqual({ status: "published", postId: "forum-post-2" });
+    expect(transaction.forumPost.create).toHaveBeenCalledWith({
+      data: expect.objectContaining({
+        title: "把「新资讯」变成可复用 AI 工作流",
+        content: expect.stringContaining("/ai-news/fresh"),
+      }),
+      select: { id: true },
+    });
+  });
 });
