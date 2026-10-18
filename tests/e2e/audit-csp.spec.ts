@@ -19,8 +19,12 @@ for (const [path, language] of [
     expect(nonce).toBeTruthy();
     expect(response?.headers()["cache-control"]).toContain("no-store");
     const scripts = await page.locator("script").evaluateAll((elements) =>
-      elements.filter((element) => !element.type || /^(?:module|text\/javascript|application\/javascript)$/.test(element.type))
-        .map((element) => element.nonce),
+      elements
+        .filter((element) => {
+          const type = element.getAttribute("type");
+          return !type || /^(?:module|text\/javascript|application\/javascript)$/.test(type);
+        })
+        .map((element) => element.getAttribute("nonce")),
     );
     // The dedicated unknown-address response needs no app bootstrap. Keep it
     // entirely script-free instead of allowing nonced framework hydration.
