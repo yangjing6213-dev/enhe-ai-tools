@@ -9,6 +9,24 @@ normalize_enhe_runtime_user() {
   esac
 }
 
+create_enhe_runtime_user_override_path() {
+  runtime_dir="$1"
+  temporary_path="$(mktemp "$runtime_dir/.runtime-user.XXXXXX")" || return 1
+  override_path="$temporary_path.json"
+
+  if ! ln "$temporary_path" "$override_path"; then
+    rm -f "$temporary_path"
+    return 1
+  fi
+
+  if ! rm -f "$temporary_path"; then
+    rm -f "$override_path"
+    return 1
+  fi
+
+  printf '%s\n' "$override_path"
+}
+
 write_enhe_runtime_user_override() {
   runtime_image_id="$1"
   runtime_override_path="$2"

@@ -244,7 +244,7 @@ export RELEASE_REF APP_IMAGE_TAG
 
 cd "$APP_DIR"
 mkdir -p "$RUNTIME_DIR"
-runtime_user_override="$(mktemp "$RUNTIME_DIR/.runtime-user.XXXXXX.json")"
+runtime_user_override="$(create_enhe_runtime_user_override_path "$RUNTIME_DIR")"
 trap 'rm -f "$runtime_user_override"' EXIT
 trap 'exit 1' HUP INT TERM
 write_enhe_runtime_user_override "$image_id" "$runtime_user_override"
