@@ -1,4 +1,5 @@
 import { expect, test } from "@playwright/test";
+import { auditPublicRequests } from "./helpers/public-request-audit";
 
 const knownRoutes = [
   "/ai-news/topics/ai-agent",
@@ -11,29 +12,16 @@ const unknownRoutes = [
 ] as const;
 
 for (const route of knownRoutes) {
-  test(`${route} keeps the DB-free topic shell inside the light editorial boundary`, async ({
-    page,
-  }) => {
-    const consoleErrors: string[] = [];
-    const pageErrors: string[] = [];
-    const failedRequests: string[] = [];
+  for (const viewport of [{ width: 390, height: 844 }, { width: 1440, height: 900 }]) {
+    test(`${route} keeps the DB-free topic shell inside the light editorial boundary at ${viewport.width}px`, async ({
+      page,
+    }) => {
+      const requestAudit = auditPublicRequests(page);
 
-    await page.route("**/api/analytics", (route) =>
-      route.fulfill({ status: 204 }),
-    );
+      await page.route("**/api/analytics", (route) =>
+        route.fulfill({ status: 204 }),
+      );
 
-    page.on("console", (message) => {
-      if (message.type() === "error") consoleErrors.push(message.text());
-    });
-    page.on("pageerror", (error) => pageErrors.push(error.message));
-    page.on("requestfailed", (request) => {
-      failedRequests.push(`${request.method()} ${request.url()}`);
-    });
-
-    for (const viewport of [
-      { width: 390, height: 844 },
-      { width: 1440, height: 900 },
-    ]) {
       await page.setViewportSize(viewport);
       const response = await page.goto(route, { waitUntil: "domcontentloaded" });
 
@@ -156,12 +144,9 @@ for (const route of knownRoutes) {
       expect(styles.panelBoxShadow).toBe("none");
       expect(styles.scrollWidth).toBeLessThanOrEqual(styles.viewportWidth);
       expect(styles.mainRight).toBeLessThanOrEqual(styles.viewportWidth);
-    }
-
-    expect(consoleErrors).toEqual([]);
-    expect(pageErrors).toEqual([]);
-    expect(failedRequests).toEqual([]);
-  });
+      await requestAudit.verify();
+    });
+  }
 }
 
 for (const route of unknownRoutes) {

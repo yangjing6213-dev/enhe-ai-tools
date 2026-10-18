@@ -57,6 +57,7 @@ DOCKER_LOG="$TMP_ROOT/docker.log"
 mkdir -p "$LEGACY_SCRIPTS" "$LEGACY_APP/deploy/enhe-ai-tools/runtime" "$FAKE_BIN"
 cp "$REPO_DIR/deploy/enhe-ai-tools/scripts/enhe-operation-lock.sh" "$LEGACY_SCRIPTS/"
 cp "$REPO_DIR/deploy/enhe-ai-tools/scripts/enhe-start.sh" "$LEGACY_SCRIPTS/"
+cp "$REPO_DIR/deploy/enhe-ai-tools/scripts/enhe-runtime-user.sh" "$LEGACY_SCRIPTS/"
 : > "$LEGACY_APP/deploy/enhe-ai-tools/.env"
 : > "$LEGACY_APP/zpay.env"
 
@@ -154,6 +155,8 @@ exit 0
 EOF
 chmod +x "$BACKUP_BIN/date" "$BACKUP_BIN/docker"
 
+printf 'historic-recovery-point\n' > "$BACKUP_DIR/enhe-ai-tools-preserved.dump"
+touch -t 202001010000 "$BACKUP_DIR/enhe-ai-tools-preserved.dump"
 first_backup="$(
   PATH="$BACKUP_BIN:$PATH" APP_DIR="$BACKUP_APP" BACKUP_DIR="$BACKUP_DIR" \
     sh "$BACKUP_SCRIPTS/enhe-backup-db.sh"
@@ -165,6 +168,8 @@ second_backup="$(
 [ "$first_backup" != "$second_backup" ] || fail "same-second backups collided"
 [ -f "$first_backup" ] || fail "first backup was overwritten"
 [ -f "$second_backup" ] || fail "second backup was not created"
+[ -f "$BACKUP_DIR/enhe-ai-tools-preserved.dump" ] || fail "repair unexpectedly pruned historic recovery points"
+[ "$(stat -c %a "$first_backup")" = 600 ] || fail "new backup permissions are not private"
 (cd "$BACKUP_DIR" && sha256sum -c "$(basename "$first_backup").sha256" >/dev/null)
 (cd "$BACKUP_DIR" && sha256sum -c "$(basename "$second_backup").sha256" >/dev/null)
 
@@ -175,6 +180,7 @@ RECOVERY_LOG="$TMP_ROOT/recovery-docker.log"
 mkdir -p "$RECOVERY_SCRIPTS" "$RECOVERY_BIN"
 cp "$REPO_DIR/deploy/enhe-ai-tools/scripts/enhe-operation-lock.sh" "$RECOVERY_SCRIPTS/"
 cp "$REPO_DIR/deploy/enhe-ai-tools/scripts/enhe-recover-pre-migration-runtime.sh" "$RECOVERY_SCRIPTS/"
+cp "$REPO_DIR/deploy/enhe-ai-tools/scripts/enhe-runtime-user.sh" "$RECOVERY_SCRIPTS/"
 
 app_image="sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
 worker_image="sha256:bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
@@ -185,6 +191,7 @@ set -eu
 printf '%s\n' "$*" >> "$RECOVERY_LOG"
 if [ "$1" = "inspect" ]; then
   case "$*" in
+    *"{{.Config.User}}"*) printf '\n' ;;
     *"{{.Image}}"*enhe-ai-tools-app*) printf '%s\n' "$RECOVERY_APP_IMAGE" ;;
     *"{{.Image}}"*enhe-ai-tools-seo-audit-worker*) printf '%s\n' "$RECOVERY_WORKER_IMAGE" ;;
     *"{{.Image}}"*enhe-ai-tools-seo-audit-scheduler*) printf '%s\n' "$RECOVERY_SCHEDULER_IMAGE" ;;

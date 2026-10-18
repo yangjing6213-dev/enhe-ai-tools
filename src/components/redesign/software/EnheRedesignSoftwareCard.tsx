@@ -32,6 +32,7 @@ export function EnheRedesignSoftwareCard({
   const t = getDictionary(locale).toolCard;
   const summary = buildValueSentence(product.description, locale);
   const metrics = getVisibleToolMetrics(product);
+  const CardElement = listItem ? "div" : "article";
   const catalogImageSrc = product.media?.src.startsWith("/api/tool-images?")
     ? `${product.media.src}&mode=optimizer-source`
     : product.media?.src;
@@ -41,7 +42,7 @@ export function EnheRedesignSoftwareCard({
       asChild
       className="redesign-software-card"
     >
-      <article
+      <CardElement
         data-catalog-card
         data-category={product.categoryId}
         data-section={sectionId}
@@ -107,7 +108,7 @@ export function EnheRedesignSoftwareCard({
           </div>
         </a>
         <CardLikeAction kind="tool" id={product.id} locale={locale} />
-      </article>
+      </CardElement>
     </Card>
   );
 }

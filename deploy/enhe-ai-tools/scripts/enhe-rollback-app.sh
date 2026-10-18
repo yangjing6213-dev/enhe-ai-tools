@@ -8,6 +8,11 @@ ZPAY_ENV_FILE="$APP_DIR/zpay.env"
 RUNTIME_DIR="$APP_DIR/deploy/enhe-ai-tools/runtime"
 LOCK_HELPER="$APP_DIR/deploy/enhe-ai-tools/scripts/enhe-operation-lock.sh"
 COMPATIBILITY_PROBE="$APP_DIR/deploy/enhe-ai-tools/scripts/legacy-rollback-compatibility.cjs"
+RUNTIME_USER_HELPER="$APP_DIR/deploy/enhe-ai-tools/scripts/enhe-runtime-user.sh"
+
+compose() {
+  docker compose --env-file "$ENV_FILE" -f "$COMPOSE_FILE" -f "$runtime_user_override" "$@"
+}
 
 is_release_ref() {
   case "$1" in
@@ -69,8 +74,10 @@ test -f "$ENV_FILE" || { echo "Missing env file: $ENV_FILE" >&2; exit 1; }
 test -f "$ZPAY_ENV_FILE" || { echo "Missing payment env file: $ZPAY_ENV_FILE" >&2; exit 1; }
 test -f "$LOCK_HELPER" || { echo "Operation lock helper not found: $LOCK_HELPER" >&2; exit 1; }
 test -f "$COMPATIBILITY_PROBE" || { echo "Rollback compatibility probe not found: $COMPATIBILITY_PROBE" >&2; exit 1; }
+test -f "$RUNTIME_USER_HELPER" || { echo "Runtime user helper not found." >&2; exit 1; }
 . "$LOCK_HELPER"
 acquire_enhe_operation_lock
+. "$RUNTIME_USER_HELPER"
 
 APP_IMAGE_TAG="$ROLLBACK_IMAGE"
 rollback_release_ref="$(printf '%s' "$ROLLBACK_RELEASE_REF" | tr 'A-F' 'a-f')"
@@ -116,8 +123,14 @@ else
   fi
 fi
 
-docker compose --env-file "$ENV_FILE" -f "$COMPOSE_FILE" config -q
-docker compose --env-file "$ENV_FILE" -f "$COMPOSE_FILE" up -d db
+mkdir -p "$RUNTIME_DIR"
+runtime_user_override="$(mktemp "$RUNTIME_DIR/.runtime-user.XXXXXX.json")"
+trap 'rm -f "$runtime_user_override"' EXIT
+trap 'exit 1' HUP INT TERM
+write_enhe_runtime_user_override "$rollback_image_id" "$runtime_user_override"
+
+compose config -q
+compose up -d db
 attempt=1
 while ! container_is_healthy enhe-ai-tools-db; do
   if [ "$attempt" -ge 30 ]; then
@@ -127,10 +140,10 @@ while ! container_is_healthy enhe-ai-tools-db; do
   attempt=$((attempt + 1))
   sleep 2
 done
-docker compose --env-file "$ENV_FILE" -f "$COMPOSE_FILE" run \
+compose run \
   --rm --no-deps -T app node - < "$COMPATIBILITY_PROBE"
 
-docker compose --env-file "$ENV_FILE" -f "$COMPOSE_FILE" stop \
+compose stop \
   seo-audit-worker seo-audit-scheduler app || true
 if [ "$ROLLBACK_TOPOLOGY" = "app-only" ]; then
   docker rm -f \
@@ -142,10 +155,10 @@ rm -f \
   "$RUNTIME_DIR/seo-audit-scheduler-heartbeat.json"
 
 if [ "$ROLLBACK_TOPOLOGY" = "full" ]; then
-  docker compose --env-file "$ENV_FILE" -f "$COMPOSE_FILE" up -d \
+  compose up -d \
     --no-build --force-recreate db app seo-audit-worker seo-audit-scheduler
 else
-  docker compose --env-file "$ENV_FILE" -f "$COMPOSE_FILE" up -d \
+  compose up -d \
     --no-build --force-recreate db app
 fi
 
@@ -158,7 +171,7 @@ fi
 attempt=1
 while :; do
   if container_is_healthy enhe-ai-tools-app && \
-     docker compose --env-file "$ENV_FILE" -f "$COMPOSE_FILE" exec -T app \
+     compose exec -T app \
        node -e "fetch('http://127.0.0.1:3000$app_health_path').then(r=>{if(!r.ok)process.exit(1)}).catch(()=>process.exit(1))"; then
     if [ "$ROLLBACK_TOPOLOGY" = "app-only" ] || \
        { container_is_healthy enhe-ai-tools-seo-audit-worker && \
@@ -168,8 +181,8 @@ while :; do
   fi
   if [ "$attempt" -ge 45 ]; then
     echo "Rolled-back runtime health check failed for topology $ROLLBACK_TOPOLOGY." >&2
-    docker compose --env-file "$ENV_FILE" -f "$COMPOSE_FILE" ps >&2
-    docker compose --env-file "$ENV_FILE" -f "$COMPOSE_FILE" logs --tail=80 \
+    compose ps >&2
+    compose logs --tail=80 \
       app seo-audit-worker seo-audit-scheduler >&2
     exit 1
   fi

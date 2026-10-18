@@ -3,6 +3,7 @@ set -eu
 
 APP_DIR="${APP_DIR:-/opt/enhe-ai-tools}"
 LOCK_HELPER="$APP_DIR/deploy/enhe-ai-tools/scripts/enhe-operation-lock.sh"
+RUNTIME_USER_HELPER="$APP_DIR/deploy/enhe-ai-tools/scripts/enhe-runtime-user.sh"
 APP_CONTAINER="enhe-ai-tools-app"
 WORKER_CONTAINER="enhe-ai-tools-seo-audit-worker"
 SCHEDULER_CONTAINER="enhe-ai-tools-seo-audit-scheduler"
@@ -48,6 +49,10 @@ assert_container_image() {
     echo "Refusing pre-migration recovery because $container no longer uses the recorded image." >&2
     exit 1
   fi
+  # Restart the exact old container with its recorded Docker user, rather than
+  # recreating it under the new release's non-root Compose configuration.
+  actual_user="$(docker inspect --format '{{.Config.User}}' "$container")"
+  normalize_enhe_runtime_user "$actual_user" >/dev/null
 }
 
 container_is_ready() {
@@ -56,8 +61,10 @@ container_is_ready() {
 }
 
 test -f "$LOCK_HELPER" || { echo "Operation lock helper not found: $LOCK_HELPER" >&2; exit 1; }
+test -f "$RUNTIME_USER_HELPER" || { echo "Runtime user helper not found." >&2; exit 1; }
 . "$LOCK_HELPER"
 acquire_enhe_operation_lock
+. "$RUNTIME_USER_HELPER"
 
 validate_flag PREVIOUS_APP_WAS_RUNNING "$PREVIOUS_APP_WAS_RUNNING"
 validate_flag PREVIOUS_WORKER_WAS_RUNNING "$PREVIOUS_WORKER_WAS_RUNNING"

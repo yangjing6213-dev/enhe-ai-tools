@@ -149,6 +149,12 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   ];
 
   const entries = [
+    ...(["/ai-news/topics", "/en/ai-news/topics"] as const).map((path) => ({
+      url: absoluteSitemapUrl(path),
+      alternates: { languages: buildLanguageAlternates("/ai-news/topics") },
+      changeFrequency: "weekly" as const,
+      priority: 0.7,
+    })),
     ...(["/forum", "/en/forum"] as const).map((path) => ({
       url: absoluteSitemapUrl(path),
       alternates: { languages: buildLanguageAlternates("/forum") },

@@ -952,11 +952,13 @@ export function buildAiNewsSerpTitle({
   categoryName,
   locale,
   maxLength,
+  preserveCompletePhrase = false,
 }: {
   title: string;
   categoryName?: string | null;
   locale: "zh" | "en";
   maxLength: number;
+  preserveCompletePhrase?: boolean;
 }) {
   if (maxLength <= 0) return "";
   if (maxLength === 1) return "";
@@ -970,6 +972,13 @@ export function buildAiNewsSerpTitle({
       : stripGenericChineseNewsTitlePrefix(normalizedTitle);
   const localizedTitle = strippedTitle || normalizedTitle;
   const source = cleanAiNewsSerpTitle(localizedTitle) || normalizedCategory || "AI";
+  if (preserveCompletePhrase) {
+    // Search snippets have no fixed character limit. Prefer a complete leading
+    // clause, but never split Chinese words or an English product name to fit.
+    if (source.length <= maxLength) return source;
+    const firstClause = source.split(/[：:｜|，,；;。!?！？]/u, 1)[0]?.trim();
+    return firstClause && firstClause.length >= 8 ? firstClause : source;
+  }
   const compactTitle = truncateAiNewsSerpTitle(source, maxLength);
   if (compactTitle) return compactTitle;
 

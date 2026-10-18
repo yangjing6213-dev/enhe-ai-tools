@@ -49,6 +49,13 @@ export function AiTrendVideoBriefing({
   dailyHref
 }: AiTrendVideoBriefingProps) {
   const text = copy[locale];
+  // Video metadata can be Chinese-only while the briefing has an English edition.
+  const displayTitle = videoTitle && !(locale === "en" && /\p{Script=Han}/u.test(videoTitle))
+    ? videoTitle
+    : title;
+  const displayDescription = videoDescription && !(locale === "en" && /\p{Script=Han}/u.test(videoDescription))
+    ? videoDescription
+    : null;
 
   return (
     <section className="ai-trend-video-briefing surface-panel-soft mt-10 overflow-hidden p-6 md:p-7" aria-labelledby="ai-trend-video-briefing-title">
@@ -56,7 +63,7 @@ export function AiTrendVideoBriefing({
         <div className="ai-trend-video-briefing-media overflow-hidden rounded-2xl border border-white/10 bg-black/35">
           <ProductVideoPlayer
             src={videoUrl}
-            title={videoTitle || title}
+            title={displayTitle}
             fallbackText={text.fallbackText}
             playLabel={text.playLabel}
             poster={videoPosterUrl}
@@ -76,11 +83,11 @@ export function AiTrendVideoBriefing({
               {slug}
             </time>
             <h3 className="mt-4 text-lg font-black leading-snug text-[var(--marketing-text)]">
-              {videoTitle || title}
+              {displayTitle}
             </h3>
-            {videoDescription ? (
+            {displayDescription ? (
               <p className="mt-3 text-sm leading-7 text-[var(--marketing-muted)]">
-                <span className="font-bold text-[var(--marketing-text)]">{text.videoLabel}:</span> {videoDescription}
+                <span className="font-bold text-[var(--marketing-text)]">{text.videoLabel}:</span> {displayDescription}
               </p>
             ) : null}
             <p className="mt-4 text-sm leading-7 text-[var(--marketing-muted)]">

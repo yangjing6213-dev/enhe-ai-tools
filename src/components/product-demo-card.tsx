@@ -33,6 +33,7 @@ export function ProductDemoCard({ demo, locale, variant = "listing" }: ProductDe
   const tags = getLocalizedProductDemoTags(demo, locale).slice(0, variant === "home" ? 3 : 5);
   const productLabel = locale === "en" ? "View product" : "查看产品";
   const demoLabel = locale === "en" ? "Watch demo" : "观看演示";
+  const Heading = variant === "listing" ? "h2" : "h3";
 
   return (
     <ProductDemoMotionCard>
@@ -60,9 +61,9 @@ export function ProductDemoCard({ demo, locale, variant = "listing" }: ProductDe
           <span>{getProductDemoCategoryLabel(demo.category, locale)}</span>
           {localizedProductType ? <span>{localizedProductType}</span> : null}
         </div>
-        <h3>
+        <Heading>
           <Link href={demoHref}>{localizedTitle}</Link>
-        </h3>
+        </Heading>
         <p>{localizedDescription}</p>
         {tags.length ? (
           <div className="product-demo-card-tags" aria-label={locale === "en" ? "Keywords" : "关键词标签"}>

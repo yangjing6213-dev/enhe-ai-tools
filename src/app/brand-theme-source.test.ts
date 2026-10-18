@@ -21,11 +21,11 @@ describe("ENHE shared design tokens", () => {
     expect(css).toContain("color-scheme: light");
   });
 
-  it("keeps the shared site font on the supplied Alimama font family", () => {
+  it("keeps the shared site font on the approved OFL rounded font family", () => {
     const css = readFileSync(resolve(root, "src/app/globals.css"), "utf8");
 
-    expect(css).toContain("font-family: 'Alimama Fang Yuan Ti'");
-    expect(css).toContain("--font-sans: 'Alimama Fang Yuan Ti'");
+    expect(css).toContain("font-family: 'ENHE Rounded'");
+    expect(css).toContain("--font-sans: 'ENHE Rounded'");
   });
 
   it("uses white text when legacy accent backgrounds are remapped to blue", () => {

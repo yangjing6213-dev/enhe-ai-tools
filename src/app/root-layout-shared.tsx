@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { headers } from "next/headers";
 import { AnalyticsTracker } from "@/components/analytics-tracker";
 import { BorderGlowController } from "@/components/border-glow-controller";
 import { CursorGlow } from "@/components/cursor-glow";
@@ -17,10 +18,6 @@ export const sharedRootMetadata: Metadata = {
   applicationName: siteName,
   title: siteName,
   description: defaultSiteDescription,
-  robots: {
-    index: true,
-    follow: true
-  },
   verification: {
     other: {
       "baidu-site-verification": "codeva-LZTyTXt0Fq",
@@ -39,7 +36,7 @@ export const sharedRootMetadata: Metadata = {
   }
 };
 
-export function RootDocument({
+export async function RootDocument({
   lang,
   children,
   disableLegacyVisualEffects = false
@@ -48,6 +45,7 @@ export function RootDocument({
   children: React.ReactNode;
   disableLegacyVisualEffects?: boolean;
 }>) {
+  const nonce = (await headers()).get("x-nonce") ?? undefined;
   return (
     <html lang={lang} suppressHydrationWarning>
       <head>
@@ -65,7 +63,7 @@ export function RootDocument({
         />
       </head>
       <body>
-        <SiteThemeProvider>
+        <SiteThemeProvider nonce={nonce}>
           <EmojiProvider>
             {!disableLegacyVisualEffects ? (
               <>

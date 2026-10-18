@@ -67,7 +67,8 @@ const securityHeaders = [
     })
   },
   {
-    key: "Content-Security-Policy-Report-Only",
+    // Static/non-document fallback; middleware applies a strict nonce policy to HTML.
+    key: "Content-Security-Policy",
     value:
       "default-src 'self'; base-uri 'self'; object-src 'none'; frame-ancestors 'self'; form-action 'self'; img-src 'self' data: blob: https:; media-src 'self' blob: https:; font-src 'self' data:; style-src 'self' 'unsafe-inline'; script-src 'self' 'unsafe-inline' https://lf1-cdn-tos.bytegoofy.com; connect-src 'self' https:; frame-src 'self' https:; report-uri /api/csp-report; report-to csp-endpoint"
   }
@@ -173,7 +174,7 @@ const nextConfig: NextConfig = {
       { source: "/:path*", headers: securityHeaders },
       { source: "/robots.txt", headers: publicAssetCacheHeaders },
       { source: "/sitemap.xml", headers: publicAssetCacheHeaders },
-      { source: "/fonts/alimama/AlimamaFangYuanTiVF-Thin-2f36da22906ae5d6.woff2", headers: immutableAssetCacheHeaders },
+      { source: "/fonts/enhe-rounded/ENHERounded-Regular-full-bc07a6d90a6685fe.woff2", headers: immutableAssetCacheHeaders },
       { source: "/llms.txt", headers: publicAssetCacheHeaders },
       { source: "/pricing.md", headers: pricingAssetCacheHeaders },
       { source: "/okf/index.md", headers: publicAssetCacheHeaders },

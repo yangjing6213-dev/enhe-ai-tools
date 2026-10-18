@@ -1,9 +1,11 @@
 import { NextResponse } from "next/server";
 import { z } from "zod";
 import { requireUser } from "@/lib/auth";
+import { sendPaymentProofSubmittedAdminEmail } from "@/lib/admin-email-notifications";
 import { prisma } from "@/lib/db";
 import { resolveFormRedirectUrlFromRequest } from "@/lib/redirect-url";
 import { saveUploadedFile } from "@/lib/storage";
+import { sendUserFlowAdminEmail } from "@/lib/user-flow-admin-email";
 
 const maxProofBytes = 8 * 1024 * 1024;
 
@@ -62,6 +64,7 @@ export async function POST(request: Request) {
 
   const stored = await saveUploadedFile(file, {
     folder: "payment-proofs",
+    access: "private",
     maxBytes: maxProofBytes,
     accept: (value) => value.type.startsWith("image/"),
     invalidTypeMessage: "付款凭证必须是图片。"
@@ -73,7 +76,7 @@ export async function POST(request: Request) {
       update: {
         paymentMethod: paymentMethodResult.data,
         paymentRemark,
-        proofImage: stored.storage === "cos" ? stored.filePath : stored.fileUrl,
+        proofImage: stored.filePath,
         reviewStatus: "pending",
         reviewerId: null,
         reviewedAt: null,
@@ -84,7 +87,7 @@ export async function POST(request: Request) {
         userId: user.id,
         paymentMethod: paymentMethodResult.data,
         paymentRemark,
-        proofImage: stored.storage === "cos" ? stored.filePath : stored.fileUrl,
+        proofImage: stored.filePath,
         reviewStatus: "pending"
       }
     }),
@@ -94,5 +97,6 @@ export async function POST(request: Request) {
     })
   ]);
 
+  await sendUserFlowAdminEmail(() => sendPaymentProofSubmittedAdminEmail(orderId), "payment_proof_submitted");
   return redirectToOrder(request, orderId, { uploaded: "1" });
 }

@@ -24,11 +24,11 @@ const trendPage = read("src/app/ai-trends/page-shell.tsx");
 const productPage = read("src/app/tools/[slug]/page-shell.tsx");
 
 describe("ENHE public visual refresh contract", () => {
-  it("loads the selected official rounded font locally and uses one bilingual family", () => {
-    expect(globalStyles).toMatch(/@font-face\s*\{[\s\S]*?AlimamaFangYuanTi[\s\S]*?\.woff2[\s\S]*?font-display:\s*swap/);
-    expect(globalStyles).toContain("--font-sans: 'Alimama Fang Yuan Ti'");
-    expect(tokens).toContain('--enhe-font-zh: "Alimama Fang Yuan Ti"');
-    expect(tokens).toContain('--enhe-font-en: "Alimama Fang Yuan Ti"');
+  it("loads the approved full rounded font locally and uses one bilingual family", () => {
+    expect(globalStyles).toMatch(/@font-face\s*\{[\s\S]*?ENHERounded[\s\S]*?\.woff2[\s\S]*?font-display:\s*swap/);
+    expect(globalStyles).toContain("--font-sans: 'ENHE Rounded'");
+    expect(tokens).toContain('--enhe-font-zh: "ENHE Rounded"');
+    expect(tokens).toContain('--enhe-font-en: "ENHE Rounded"');
   });
 
   it("adds four factual linked benefit cards below the home hero", () => {

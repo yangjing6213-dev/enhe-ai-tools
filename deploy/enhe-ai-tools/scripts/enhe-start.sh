@@ -8,6 +8,7 @@ ZPAY_ENV_FILE="$APP_DIR/zpay.env"
 RUNTIME_DIR="$APP_DIR/deploy/enhe-ai-tools/runtime"
 ACTIVE_STATE_FILE="$RUNTIME_DIR/active-release.env"
 LOCK_HELPER="$APP_DIR/deploy/enhe-ai-tools/scripts/enhe-operation-lock.sh"
+RUNTIME_USER_HELPER="$APP_DIR/deploy/enhe-ai-tools/scripts/enhe-runtime-user.sh"
 RELEASE_REF="${RELEASE_REF:-}"
 APP_IMAGE_TAG="${APP_IMAGE_TAG:-}"
 ROLLBACK_RELEASE_REF="${ROLLBACK_RELEASE_REF:-}"
@@ -15,6 +16,10 @@ release_identity_verified="${RELEASE_IDENTITY_VERIFIED:-}"
 rollback_topology="${ROLLBACK_TOPOLOGY:-}"
 legacy_image_id="${LEGACY_IMAGE_ID:-${ROLLBACK_LEGACY_IMAGE_ID:-}}"
 state_loaded=0
+
+compose() {
+  docker compose --env-file "$ENV_FILE" -f "$COMPOSE_FILE" -f "$runtime_user_override" "$@"
+}
 
 is_release_ref() {
   case "$1" in
@@ -83,8 +88,10 @@ invalid_active_state() {
 test -f "$ENV_FILE" || { echo "Missing env file: $ENV_FILE" >&2; exit 1; }
 test -f "$ZPAY_ENV_FILE" || { echo "Missing payment env file: $ZPAY_ENV_FILE" >&2; exit 1; }
 test -f "$LOCK_HELPER" || { echo "Operation lock helper not found: $LOCK_HELPER" >&2; exit 1; }
+test -f "$RUNTIME_USER_HELPER" || { echo "Runtime user helper not found." >&2; exit 1; }
 . "$LOCK_HELPER"
 acquire_enhe_operation_lock
+. "$RUNTIME_USER_HELPER"
 
 if [ -z "$APP_IMAGE_TAG" ] && \
    [ -z "$RELEASE_REF" ] && \
@@ -236,8 +243,12 @@ fi
 export RELEASE_REF APP_IMAGE_TAG
 
 cd "$APP_DIR"
-docker compose --env-file "$ENV_FILE" -f "$COMPOSE_FILE" config -q
 mkdir -p "$RUNTIME_DIR"
+runtime_user_override="$(mktemp "$RUNTIME_DIR/.runtime-user.XXXXXX.json")"
+trap 'rm -f "$runtime_user_override"' EXIT
+trap 'exit 1' HUP INT TERM
+write_enhe_runtime_user_override "$image_id" "$runtime_user_override"
+compose config -q
 rm -f \
   "$RUNTIME_DIR/seo-audit-worker-heartbeat.json" \
   "$RUNTIME_DIR/seo-audit-scheduler-heartbeat.json"
@@ -246,10 +257,10 @@ if [ "$rollback_topology" = "app-only" ]; then
   docker rm -f \
     enhe-ai-tools-seo-audit-worker \
     enhe-ai-tools-seo-audit-scheduler >/dev/null 2>&1 || true
-  docker compose --env-file "$ENV_FILE" -f "$COMPOSE_FILE" up -d --no-build db app
+  compose up -d --no-build db app
   app_health_command="fetch('http://127.0.0.1:3000/api/health?scope=app').then(r=>{if(!r.ok)process.exit(1)}).catch(()=>process.exit(1))"
 else
-  docker compose --env-file "$ENV_FILE" -f "$COMPOSE_FILE" up -d --no-build
+  compose up -d --no-build
   app_health_command="fetch('http://127.0.0.1:3000/api/health').then(r=>{if(!r.ok)process.exit(1)}).catch(()=>process.exit(1))"
 fi
 
@@ -257,7 +268,7 @@ attempt=1
 while :; do
   runtime_healthy=0
   if container_is_healthy enhe-ai-tools-app && \
-     docker compose --env-file "$ENV_FILE" -f "$COMPOSE_FILE" exec -T app \
+     compose exec -T app \
        node -e "$app_health_command"; then
     if [ "$rollback_topology" = "app-only" ] || \
        { container_is_healthy enhe-ai-tools-seo-audit-worker && \
@@ -271,22 +282,22 @@ while :; do
   if [ "$attempt" -ge 60 ]; then
     if [ "$rollback_topology" = "full" ]; then
       echo "Full runtime health check failed." >&2
-      docker compose --env-file "$ENV_FILE" -f "$COMPOSE_FILE" logs --tail=80 \
+      compose logs --tail=80 \
         app seo-audit-worker seo-audit-scheduler >&2
     else
       echo "App-only runtime health check failed." >&2
-      docker compose --env-file "$ENV_FILE" -f "$COMPOSE_FILE" logs --tail=80 app >&2
+      compose logs --tail=80 app >&2
     fi
-    docker compose --env-file "$ENV_FILE" -f "$COMPOSE_FILE" ps >&2
+    compose ps >&2
     exit 1
   fi
   attempt=$((attempt + 1))
   sleep 2
 done
 
-docker compose --env-file "$ENV_FILE" -f "$COMPOSE_FILE" ps
+compose ps
 if [ "$rollback_topology" = "full" ]; then
-  docker compose --env-file "$ENV_FILE" -f "$COMPOSE_FILE" exec -T app \
+  compose exec -T app \
     sh -lc 'cd /app && ./node_modules/.bin/prisma migrate status'
 fi
 

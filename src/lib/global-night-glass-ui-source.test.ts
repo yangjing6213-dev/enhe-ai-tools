@@ -13,8 +13,8 @@ describe("global blue and white UI source contract", () => {
     expect(css).not.toMatch(/\.dark\s*\{/);
     expect(css).toContain("--marketing-bg: #ffffff");
     expect(css).toContain("--marketing-accent: var(--blue-11)");
-    expect(css).toContain("--font-sans: 'Alimama Fang Yuan Ti', 'Microsoft YaHei', Arial, sans-serif");
-    expect(css).toContain("--font-heading-zh: 'Alimama Fang Yuan Ti', 'Microsoft YaHei', Arial, sans-serif");
+    expect(css).toContain("--font-sans: 'ENHE Rounded', 'Microsoft YaHei', Arial, sans-serif");
+    expect(css).toContain("--font-heading-zh: 'ENHE Rounded', 'Microsoft YaHei', Arial, sans-serif");
     expect(refresh).toContain(".enhe-redesign-production :is(.glass, .evidence-card, .dossier-card, .surface-panel");
     expect(refresh).toContain("background: var(--enhe-page-bg);");
     expect(css).toContain(".surface-panel");

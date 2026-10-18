@@ -32,6 +32,19 @@ for (const route of ["/ai-news", "/en/ai-news"] as const) {
 
         card.append(title, summary, action);
         main.append(card);
+
+        // The DB-free listing is a preview, so exercise the production CTA's
+        // descendant text-fill cascade alongside the synthetic content card.
+        if (!main.querySelector(".ai-news-subscribe-action")) {
+          const subscribe = document.createElement("a");
+          subscribe.href = "/user";
+          subscribe.className = "ai-news-subscribe-action inline-flex text-sm font-bold text-white px-4 py-2";
+          const label = document.createElement("span");
+          label.className = "relative z-10 inline-flex text-white";
+          label.textContent = "User center";
+          subscribe.append(label);
+          main.append(subscribe);
+        }
       });
 
       await page.addScriptTag({ content: axe.source });
@@ -55,12 +68,23 @@ for (const route of ["/ai-news", "/en/ai-news"] as const) {
       });
 
       expect(result.pageColor).toBe("rgb(0, 0, 0)");
-      expect(result.themeTextColor).toBe("#000");
+      expect(result.themeTextColor).toMatch(/^#000(?:000)?$/);
       expect(result.cardBackground).toBe("rgb(255, 255, 255)");
       expect(result.headingColor).toBe("rgb(0, 0, 0)");
       expect(result.actionBackground).toBe("rgb(255, 255, 255)");
       expect(result.actionColor).toBe("rgb(0, 0, 0)");
       expect(result.violations).toEqual([]);
+
+      const subscribeAction = page.locator(".ai-news-subscribe-action");
+      await expect(subscribeAction).toBeVisible();
+      const subscribeInk = await subscribeAction.evaluate((element) => {
+        const textElement = element.querySelector("span") ?? element;
+        return {
+          background: getComputedStyle(element).backgroundColor,
+          fill: getComputedStyle(textElement).webkitTextFillColor,
+        };
+      });
+      expect(subscribeInk).toEqual({ background: "rgb(4, 98, 194)", fill: "rgb(255, 255, 255)" });
 
       const card = page.locator(".ai-news-interactive-card");
       const action = card.locator("button.ai-news-action");

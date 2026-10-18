@@ -12,6 +12,7 @@ import { prisma } from "@/lib/db";
 import { createOrderNo } from "@/lib/order";
 import {
   assertLoginNotLimited,
+  assertRegistrationNotLimited,
   getCurrentUser,
   hashPassword,
   recordLoginAttempt,
@@ -20,6 +21,7 @@ import {
   requireUser,
   signInUser,
   signOutUser,
+  updatePasswordAndRevokeSessions,
   verifyPassword
 } from "@/lib/auth";
 import { assertValidCsrfToken } from "@/lib/csrf";
@@ -27,10 +29,10 @@ import {
   sendAdminLoginSecurityEmail,
   sendNewOrderAdminEmail,
   sendOrderReceiptAdminEmail,
-  sendPaymentProofSubmittedAdminEmail,
   sendPaymentReviewAdminEmail,
   sendRefundRequestAdminEmail
 } from "@/lib/admin-email-notifications";
+import { sendUserFlowAdminEmail } from "@/lib/user-flow-admin-email";
 import { activateVipForOrder } from "@/lib/membership";
 import {
   buildPaymentReviewNotification,
@@ -44,7 +46,7 @@ import {
   hasExistingRefundAttempt,
   normalizeRefundRecordAmount
 } from "@/lib/order-rules";
-import { validatePasswordChangeInput } from "@/lib/password";
+import { isPasswordWithinBcryptLimit, validatePasswordChangeInput } from "@/lib/password";
 import { getCurrentLocale } from "@/lib/i18n";
 import { buildCanonicalToolPath } from "@/lib/public-slugs";
 import { buildLocalePath } from "@/lib/seo";
@@ -65,6 +67,16 @@ export async function registerAction(formData: FormData) {
   });
   const nickname = z.string().trim().min(1).max(40).parse(formData.get("nickname"));
   const gender = z.enum(["male", "female", "unspecified"]).parse(formData.get("gender") ?? "unspecified");
+  z.string().refine(isPasswordWithinBcryptLimit, "Password must be at most 72 UTF-8 bytes.").parse(input.password);
+  try {
+    await assertRegistrationNotLimited(input.identifier);
+  } catch (error) {
+    if (error instanceof Error && error.message === "REGISTER_LIMITED") {
+      const params = new URLSearchParams({ message: "register-limited", returnTo });
+      redirect(`${buildLocalePath("/login", locale)}?${params.toString()}`);
+    }
+    throw error;
+  }
   const exists = await prisma.user.findUnique({ where: { email: input.identifier } });
   if (exists) {
     const params = new URLSearchParams({ message: "account-exists", returnTo });
@@ -92,8 +104,9 @@ export async function loginAction(formData: FormData) {
     identifier: formData.get("email"),
     password: formData.get("password")
   });
+  let attemptId: string;
   try {
-    await assertLoginNotLimited(input.identifier);
+    attemptId = await assertLoginNotLimited(input.identifier);
   } catch (e) {
     if (e instanceof Error && e.message === "LOGIN_LIMITED") {
       const params = new URLSearchParams({ message: "login-limited", returnTo });
@@ -102,12 +115,17 @@ export async function loginAction(formData: FormData) {
     throw e;
   }
   const user = await prisma.user.findUnique({ where: { email: input.identifier } });
+  if (user?.status === "active" && user.googleSubject) {
+    await recordLoginAttempt(input.identifier, false, attemptId);
+    const params = new URLSearchParams({ message: "google-login-required", returnTo });
+    redirect(`${buildLocalePath("/login", locale)}?${params.toString()}`);
+  }
   if (!user || user.status !== "active" || !(await verifyPassword(input.password, user.passwordHash))) {
-    await recordLoginAttempt(input.identifier, false);
+    await recordLoginAttempt(input.identifier, false, attemptId);
     const params = new URLSearchParams({ message: "invalid", returnTo });
     redirect(`${buildLocalePath("/login", locale)}?${params.toString()}`);
   }
-  await recordLoginAttempt(input.identifier, true);
+  await recordLoginAttempt(input.identifier, true, attemptId);
   await signInUser(user.id);
   if (user.role === "admin") {
     const requestInfo = await getRequestSecurityInfo();
@@ -153,6 +171,9 @@ export async function logoutAction() {
 export async function changePasswordAction(formData: FormData) {
   const locale = await getCurrentLocale();
   const user = await requireUser();
+  if (user.googleSubject) {
+    redirect(`${buildLocalePath("/user", locale)}?password=google-managed`);
+  }
   const currentPassword = String(formData.get("currentPassword") ?? "");
   const newPassword = String(formData.get("newPassword") ?? "");
   const confirmPassword = String(formData.get("confirmPassword") ?? "");
@@ -167,10 +188,8 @@ export async function changePasswordAction(formData: FormData) {
     redirect(`${buildLocalePath("/user", locale)}?password=${encodeURIComponent("当前密码不正确")}`);
   }
 
-  await prisma.user.update({
-    where: { id: user.id },
-    data: { passwordHash: await hashPassword(newPassword) }
-  });
+  await updatePasswordAndRevokeSessions(user.id, newPassword);
+  await signInUser(user.id);
 
   redirect(`${buildLocalePath("/user", locale)}?password=changed`);
 }
@@ -246,35 +265,6 @@ export async function createSoftwareDownloadOrderAction(formData: FormData) {
   });
   await sendUserFlowAdminEmail(() => sendNewOrderAdminEmail(order.id), "order_created");
   redirect(`/orders/${order.id}/pay`);
-}
-
-export async function submitPaymentProofAction(formData: FormData) {
-  const locale = await getCurrentLocale();
-  const user = await requireUser();
-  const orderId = z.string().min(1).parse(formData.get("orderId"));
-  const paymentMethod = z.enum(["alipay", "wechat"]).parse(formData.get("paymentMethod"));
-  const proofImage = z.string().min(1, "请填写付款截图地址").parse(formData.get("proofImage"));
-  const paymentRemark = z.string().optional().parse(formData.get("paymentRemark") ?? undefined);
-
-  const order = await prisma.order.findFirst({ where: { id: orderId, userId: user.id } });
-  if (!order) throw new Error("订单不存在");
-
-  await prisma.paymentProof.upsert({
-    where: { orderId },
-    update: { paymentMethod, paymentRemark, proofImage, reviewStatus: "pending" },
-    create: { orderId, userId: user.id, paymentMethod, paymentRemark, proofImage, reviewStatus: "pending" }
-  });
-  await prisma.order.update({ where: { id: orderId }, data: { orderStatus: "pending_review", paymentMethod } });
-  await trackAnalyticsEvent({
-    eventName: "payment_proof_submitted",
-    path: `/orders/${orderId}/pay`,
-    entityType: "order",
-    entityId: orderId,
-    userId: user.id,
-    metadata: { paymentMethod }
-  });
-  await sendPaymentProofSubmittedAdminEmail(orderId);
-  redirect(`${buildLocalePath("/user", locale)}?tab=orders`);
 }
 
 export async function cancelOrderAction(formData: FormData) {
@@ -724,25 +714,4 @@ async function getRequestSecurityInfo() {
     ip: headerStore.get("x-forwarded-for")?.split(",")[0]?.trim() ?? null,
     userAgent: headerStore.get("user-agent")
   };
-}
-
-async function sendUserFlowAdminEmail(send: () => Promise<void>, eventLabel: string) {
-  const waitMs = parsePositiveInteger(process.env.ADMIN_EMAIL_ACTION_WAIT_MS, 1500);
-  let timeout: ReturnType<typeof setTimeout> | undefined;
-  const sendPromise = send().catch((error) => {
-    console.error(`[admin-email] ${eventLabel} failed during user flow`, error);
-  });
-  const timeoutPromise = new Promise<"timeout">((resolve) => {
-    timeout = setTimeout(() => resolve("timeout"), waitMs);
-  });
-  const result = await Promise.race([sendPromise.then(() => "sent" as const), timeoutPromise]);
-  if (timeout) clearTimeout(timeout);
-  if (result === "timeout") {
-    console.warn(`[admin-email] ${eventLabel} did not finish within ${waitMs}ms; continuing user flow`);
-  }
-}
-
-function parsePositiveInteger(value: string | undefined, fallback: number) {
-  const number = Number(value);
-  return Number.isInteger(number) && number > 0 ? number : fallback;
 }

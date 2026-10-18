@@ -11,6 +11,13 @@
   color: transparent;
 }
 
+/* Keep the hero readable before its SVG measurements and texture are ready. */
+.masked-heading[data-initial-fallback]:not([data-mask-ready]) .masked-heading__measure,
+.masked-heading[data-initial-fallback]:not([data-mask-ready]) .masked-heading__word {
+  color: #0462c2 !important;
+  -webkit-text-fill-color: #0462c2 !important;
+}
+
 .masked-heading__word {
   display: inline-block;
   white-space: pre;

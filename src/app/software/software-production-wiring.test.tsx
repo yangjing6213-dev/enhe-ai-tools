@@ -130,6 +130,8 @@ describe("production software route wiring", () => {
     expect(html).toContain('role="list"');
     expect(html).toContain('aria-labelledby="all-products-heading"');
     expect(html).toContain('role="listitem"');
+    expect(html).toMatch(/<div\b[^>]*role="listitem"/i);
+    expect(html).not.toMatch(/<article\b[^>]*role="listitem"/i);
     const productCardTags = Array.from(html.matchAll(/<article\b[^>]*>/gi), ([tag]) => tag);
     expect(productCardTags.length).toBeGreaterThan(0);
     expect(productCardTags.every((tag) => !/\shidden(?:=|\s|>)/i.test(tag))).toBe(true);

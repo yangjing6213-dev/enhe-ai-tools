@@ -75,9 +75,11 @@ const FOOTER_COPY: Record<RedesignLocale, RedesignFooterCopy> = {
 export function EnheRedesignFooter({
   locale,
   filing,
+  showMascot = true,
 }: {
   locale: RedesignLocale;
   filing?: ProductionFiling;
+  showMascot?: boolean;
 }) {
   const copy = FOOTER_COPY[locale];
   const filingEntries = [filing?.icp, filing?.publicSecurity].filter(
@@ -86,7 +88,7 @@ export function EnheRedesignFooter({
 
   return (
     <footer className="redesign-footer" aria-label={copy.ariaLabel}>
-      <span className="redesign-footer-mascot" aria-hidden="true">
+      {showMascot ? <span className="redesign-footer-mascot" aria-hidden="true">
         <Image
           src="/images/mascots/enhe-dino-peek-mirrored.webp"
           alt=""
@@ -94,7 +96,7 @@ export function EnheRedesignFooter({
           height={1364}
           sizes="(max-width: 767px) 294px, 396px"
         />
-      </span>
+      </span> : null}
       <div className="redesign-footer-inner">
         <div className="footer-grid">
           <div className="footer-brand">

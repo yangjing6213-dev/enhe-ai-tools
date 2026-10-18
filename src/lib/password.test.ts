@@ -33,4 +33,10 @@ describe("validatePasswordChangeInput", () => {
   it("accepts a valid password change", () => {
     expect(validatePasswordChangeInput("old-password", "new-password", "new-password")).toEqual({ ok: true });
   });
+
+  it("rejects passwords beyond bcrypt's UTF-8 byte limit", () => {
+    expect(validatePasswordChangeInput("old-password", "a".repeat(73), "a".repeat(73)).ok).toBe(false);
+    expect(validatePasswordChangeInput("old-password", "密".repeat(25), "密".repeat(25)).ok).toBe(false);
+    expect(validatePasswordChangeInput("old-password", "a".repeat(72), "a".repeat(72)).ok).toBe(true);
+  });
 });

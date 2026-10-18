@@ -1,4 +1,5 @@
 import { expect, test } from "@playwright/test";
+import { auditPublicRequests } from "./helpers/public-request-audit";
 
 const routes = [
   { path: "/ai-news", locale: "zh" },
@@ -15,17 +16,8 @@ test.beforeEach(async ({ page }) => {
 
 for (const route of routes) {
   test(`${route.path} remains readable at 200% text zoom`, async ({ page }) => {
-    const pageErrors: string[] = [];
-    const consoleErrors: string[] = [];
-    const failedRequests: string[] = [];
+    const requestAudit = auditPublicRequests(page);
 
-    page.on("pageerror", (error) => pageErrors.push(error.message));
-    page.on("console", (message) => {
-      if (message.type() === "error") consoleErrors.push(message.text());
-    });
-    page.on("requestfailed", (request) => {
-      failedRequests.push(`${request.method()} ${request.url()}`);
-    });
 
     await page.setViewportSize({ width: 390, height: 844 });
     const response = await page.goto(route.path, { waitUntil: "networkidle" });
@@ -64,25 +56,14 @@ for (const route of routes) {
     expect(layout.statusRight).toBeLessThanOrEqual(layout.viewportWidth);
     expect(layout.statusTextVisible).toBe(true);
     expect(layout.headingVisible).toBe(true);
-    expect(pageErrors).toEqual([]);
-    expect(consoleErrors).toEqual([]);
-    expect(failedRequests).toEqual([]);
+    await requestAudit.verify();
   });
 
   test(`${route.path} keeps content and focus visible in forced colors`, async ({
     page,
   }) => {
-    const pageErrors: string[] = [];
-    const consoleErrors: string[] = [];
-    const failedRequests: string[] = [];
+    const requestAudit = auditPublicRequests(page);
 
-    page.on("pageerror", (error) => pageErrors.push(error.message));
-    page.on("console", (message) => {
-      if (message.type() === "error") consoleErrors.push(message.text());
-    });
-    page.on("requestfailed", (request) => {
-      failedRequests.push(`${request.method()} ${request.url()}`);
-    });
 
     await page.emulateMedia({ forcedColors: "active" });
     await page.setViewportSize({ width: 390, height: 844 });
@@ -139,8 +120,6 @@ for (const route of routes) {
     expect(focusStyles.active).toBe(true);
     expect(focusStyles.outlineStyle).not.toBe("none");
     expect(focusStyles.outlineWidth).not.toBe("0px");
-    expect(pageErrors).toEqual([]);
-    expect(consoleErrors).toEqual([]);
-    expect(failedRequests).toEqual([]);
+    await requestAudit.verify();
   });
 }

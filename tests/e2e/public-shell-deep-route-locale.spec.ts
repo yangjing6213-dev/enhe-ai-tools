@@ -1,4 +1,5 @@
 import { expect, test } from "@playwright/test";
+import { auditPublicRequests } from "./helpers/public-request-audit";
 
 const routes = [
   {
@@ -27,17 +28,8 @@ for (const route of routes) {
   test(`${route.path} keeps one section navigation and global locale links on desktop and mobile`, async ({
     page,
   }) => {
-    const pageErrors: string[] = [];
-    const consoleErrors: string[] = [];
-    const failedRequests: string[] = [];
+    const requestAudit = auditPublicRequests(page);
 
-    page.on("pageerror", (error) => pageErrors.push(error.message));
-    page.on("console", (message) => {
-      if (message.type() === "error") consoleErrors.push(message.text());
-    });
-    page.on("requestfailed", (request) => {
-      failedRequests.push(`${request.method()} ${request.url()}`);
-    });
 
     await page.setViewportSize({ width: 1440, height: 900 });
     const desktopResponse = await page.goto(route.path, { waitUntil: "load" });
@@ -52,6 +44,7 @@ for (const route of routes) {
     await expect(desktopLanguageLink).toHaveCount(1);
     await expect(desktopLanguageLink).toHaveAttribute("lang", route.targetLocale);
 
+    await page.waitForLoadState("networkidle");
     await page.setViewportSize({ width: 390, height: 844 });
     const mobileResponse = await page.goto(route.path, { waitUntil: "load" });
     expect(mobileResponse?.status()).toBe(200);
@@ -70,8 +63,6 @@ for (const route of routes) {
     await expect(mobileNav.locator('a[aria-current="location"]')).toBeFocused();
     await page.keyboard.press("Tab");
     await expect.poll(() => page.evaluate(() => Boolean(document.activeElement?.closest(".ai-news-section-nav")))).toBe(false);
-    expect(pageErrors).toEqual([]);
-    expect(consoleErrors).toEqual([]);
-    expect(failedRequests).toEqual([]);
+    await requestAudit.verify();
   });
 }

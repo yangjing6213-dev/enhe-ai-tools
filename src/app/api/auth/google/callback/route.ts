@@ -71,20 +71,8 @@ async function findOrCreateGoogleUser(identity: GoogleIdentity) {
   });
   if (existingEmail) {
     if (existingEmail.status !== "active") throw new Error("GOOGLE_ACCOUNT_DISABLED");
-    if (existingEmail.googleSubject && existingEmail.googleSubject !== identity.subject) {
-      throw new Error("GOOGLE_ACCOUNT_CONFLICT");
-    }
-    try {
-      const linked = await prisma.user.update({
-        where: { id: existingEmail.id },
-        data: { googleSubject: identity.subject },
-        select: { id: true },
-      });
-      return linked.id;
-    } catch (error) {
-      if (isUniqueConstraintError(error)) throw new Error("GOOGLE_ACCOUNT_CONFLICT");
-      throw error;
-    }
+    // Local email addresses are unverified. Matching text is not proof of account ownership.
+    throw new Error("GOOGLE_ACCOUNT_CONFLICT");
   }
 
   const nickname = identity.name || identity.email.split("@", 1)[0]?.slice(0, 40) || "Google user";

@@ -19,6 +19,7 @@ coverage
 public/uploads
 /private-uploads
 /deploy/enhe-ai-tools/forum-media/
+/deploy/enhe-ai-tools/private-uploads/
 test-results
 tmp-ebos-optimized-redeploy-test/
 playwright-report

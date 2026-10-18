@@ -14,7 +14,7 @@ describe("read-only admin auth fixture", () => {
 
   it.each([
     "assertLoginNotLimited", "recordLoginAttempt", "refreshHeaderUserCookieSnapshot",
-    "signInUser", "signOutUser", "verifyPassword", "hashPassword"
+    "signInUser", "signOutUser", "verifyPassword", "hashPassword", "assertRegistrationNotLimited", "updatePasswordAndRevokeSessions"
   ])("exports %s but refuses authentication or user operations", async (name) => {
     const fixture = await import(fixturePath) as Record<string, unknown>;
     expect(typeof fixture[name]).toBe("function");

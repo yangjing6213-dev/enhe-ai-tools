@@ -1,10 +1,28 @@
 name: enhe-ai-tools
 
+x-bounded-logs: &bounded-logs
+  driver: json-file
+  options:
+    max-size: "10m"
+    max-file: "5"
+
+x-app-sandbox: &app-sandbox
+  user: "1000:1000"
+  security_opt:
+    - no-new-privileges:true
+  cap_drop:
+    - ALL
+  pids_limit: 256
+  logging: *bounded-logs
+
 services:
   db:
     image: postgres:16-alpine
     container_name: enhe-ai-tools-db
     restart: unless-stopped
+    logging: *bounded-logs
+    mem_limit: 1536m
+    pids_limit: 256
     environment:
       POSTGRES_DB: ${POSTGRES_DB}
       POSTGRES_USER: ${POSTGRES_USER}
@@ -22,6 +40,9 @@ services:
       - enhe-ai-tools-net
 
   app:
+    <<: *app-sandbox
+    mem_limit: 1536m
+    cpus: 2.0
     build:
       context: ../..
       dockerfile: deploy/enhe-ai-tools/Dockerfile
@@ -53,6 +74,7 @@ services:
       - "127.0.0.1:3001:3000"
     volumes:
       - ./uploads:/app/public/uploads
+      - ./private-uploads:/app/private-uploads
       - ./forum-media:/app/private-uploads/forum-media
       - ./secrets:/app/secrets:ro
       - ./logs:/app/logs
@@ -67,6 +89,9 @@ services:
       - enhe-ai-tools-net
 
   seo-audit-worker:
+    <<: *app-sandbox
+    mem_limit: 1024m
+    cpus: 1.5
     image: enhe-ai-tools:${APP_IMAGE_TAG:-${RELEASE_REF:-local}}
     container_name: enhe-ai-tools-seo-audit-worker
     restart: unless-stopped
@@ -98,6 +123,9 @@ services:
       - enhe-ai-tools-net
 
   seo-audit-scheduler:
+    <<: *app-sandbox
+    mem_limit: 256m
+    cpus: 0.5
     image: enhe-ai-tools:${APP_IMAGE_TAG:-${RELEASE_REF:-local}}
     container_name: enhe-ai-tools-seo-audit-scheduler
     restart: unless-stopped

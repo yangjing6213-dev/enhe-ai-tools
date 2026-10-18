@@ -18,6 +18,6 @@ export function normalizeAccountIdentifier(value: unknown) {
 export function parseAccountCredentials(input: { identifier: unknown; password: unknown }) {
   return {
     identifier: normalizeAccountIdentifier(input.identifier),
-    password: z.string().min(6, "Password must be at least 6 characters.").parse(input.password)
+    password: z.string().min(6, "Password must be at least 6 characters.").max(128, "Password must be at most 128 characters.").parse(input.password)
   };
 }

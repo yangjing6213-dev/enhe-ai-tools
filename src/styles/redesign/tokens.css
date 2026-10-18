@@ -41,10 +41,10 @@
   --enhe-z-header: 20;
   --enhe-z-layer: 40;
   --enhe-z-focus: 60;
-  --enhe-font-zh: "Alimama Fang Yuan Ti", "Microsoft YaHei", Arial, sans-serif;
-  --enhe-font-en: "Alimama Fang Yuan Ti", "Microsoft YaHei", Arial, sans-serif;
-  --enhe-font-display: "Alimama Fang Yuan Ti", "Microsoft YaHei", Arial, sans-serif;
-  --enhe-font-utility: "Alimama Fang Yuan Ti", "Microsoft YaHei", Arial, sans-serif;
+  --enhe-font-zh: "ENHE Rounded", "Microsoft YaHei", Arial, sans-serif;
+  --enhe-font-en: "ENHE Rounded", "Microsoft YaHei", Arial, sans-serif;
+  --enhe-font-display: "ENHE Rounded", "Microsoft YaHei", Arial, sans-serif;
+  --enhe-font-utility: "ENHE Rounded", "Microsoft YaHei", Arial, sans-serif;
   --enhe-font-brand-label: "LXGW WenKai Lite", var(--enhe-font-zh);
 
   /* Typeshare comparison tokens: layout rhythm only, never reference-brand assets. */

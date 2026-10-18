@@ -19,11 +19,15 @@ describe("admin email notification wiring", () => {
     const source = readFileSync(join(process.cwd(), "src/app/actions.ts"), "utf8");
 
     expect(source).toContain("sendNewOrderAdminEmail");
-    expect(source).toContain("sendPaymentProofSubmittedAdminEmail");
     expect(source).toContain("sendPaymentReviewAdminEmail");
     expect(source).toContain("sendRefundRequestAdminEmail");
     expect(source).toContain("sendOrderReceiptAdminEmail");
     expect(source).toContain("submitOrderReceiptAction");
+    const upload = readFileSync(join(process.cwd(), "src/app/api/uploads/payment-proof/route.ts"), "utf8");
+    expect(upload).toContain("await requireUser()");
+    expect(upload).toContain("access: \"private\"");
+    expect(upload).toContain("await sendUserFlowAdminEmail(() => sendPaymentProofSubmittedAdminEmail(orderId)");
+    expect(upload.indexOf("await sendUserFlowAdminEmail")).toBeGreaterThan(upload.indexOf("await prisma.$transaction"));
   });
 
   it("uses a bounded delivery window for user-facing order emails", () => {
@@ -31,9 +35,11 @@ describe("admin email notification wiring", () => {
 
     expect(source).toContain("await sendUserFlowAdminEmail(() => sendNewOrderAdminEmail(order.id)");
     expect(source).toContain("await sendUserFlowAdminEmail(() => sendOrderReceiptAdminEmail(order.id");
-    expect(source).toContain("ADMIN_EMAIL_ACTION_WAIT_MS");
-    expect(source).toContain("Promise.race");
-    expect(source).toContain("setTimeout");
+    const helper = readFileSync(join(process.cwd(), "src/lib/user-flow-admin-email.ts"), "utf8");
+    expect(source).toContain('import { sendUserFlowAdminEmail } from "@/lib/user-flow-admin-email"');
+    expect(helper).toContain("ADMIN_EMAIL_ACTION_WAIT_MS");
+    expect(helper).toContain("Promise.race");
+    expect(helper).toContain("setTimeout");
     expect(source).not.toContain("void sendNewOrderAdminEmail(order.id)");
     expect(source).not.toContain("void sendOrderReceiptAdminEmail(order.id");
     expect(source).not.toContain("await sendNewOrderAdminEmail(order.id)");

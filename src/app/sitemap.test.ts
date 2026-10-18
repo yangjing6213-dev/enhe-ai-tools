@@ -40,6 +40,23 @@ describe("sitemap canonical URL contract", () => {
     process.env.NEXT_PUBLIC_APP_URL = "https://www.enhe-tech.com.cn";
   });
 
+  it("includes both topic collection indexes once with reciprocal language URLs", async () => {
+    prismaMock.tool.findMany.mockResolvedValue([]);
+    prismaMock.newsArticle.findMany.mockResolvedValue([]);
+    const { default: sitemap } = await import("@/app/sitemap");
+    const entries = await sitemap();
+    for (const path of ["/ai-news/topics", "/en/ai-news/topics"]) {
+      const matches = entries.filter((entry) => entry.url === `https://www.enhe-tech.com.cn${path}`);
+      expect(matches).toHaveLength(1);
+      expect(matches[0]).not.toHaveProperty("lastModified");
+      expect(matches[0].alternates?.languages).toEqual({
+        "zh-CN": "https://www.enhe-tech.com.cn/ai-news/topics",
+        "en-US": "https://www.enhe-tech.com.cn/en/ai-news/topics",
+        "x-default": "https://www.enhe-tech.com.cn/ai-news/topics",
+      });
+    }
+  });
+
   it("includes the canonical forum homepage exactly once without inventing lastModified", async () => {
     prismaMock.tool.findMany.mockResolvedValue([]);
     prismaMock.newsArticle.findMany.mockResolvedValue([]);

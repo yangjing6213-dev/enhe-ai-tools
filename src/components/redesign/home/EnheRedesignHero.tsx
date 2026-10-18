@@ -21,6 +21,8 @@ export function EnheRedesignHero({ locale }: { locale: RedesignLocale }) {
               className="redesign-home-animated-line"
               text={line}
               src="/redesign/home/blue-energy-city.webp"
+              priority
+              initialFallback
               fillScale={1.25}
               parallax={26}
               drift={18}

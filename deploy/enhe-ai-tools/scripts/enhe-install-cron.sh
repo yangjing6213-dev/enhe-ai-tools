@@ -1,6 +1,11 @@
 #!/bin/sh
 set -eu
 
+if [ "$(id -u)" -ne 0 ]; then
+  echo '[enhe-install-cron] install as root so backup identity matches deployment' >&2
+  exit 1
+fi
+
 APP_DIR="${APP_DIR:-/opt/enhe-ai-tools}"
 CRON_MARKER="enhe-ai-tools launch operations"
 BACKUP_LOG="$APP_DIR/backups/backup.log"
@@ -20,4 +25,11 @@ crontab -l 2>/dev/null | grep -v "$CRON_MARKER" > "$tmp_file" || true
   echo "* * * * * /usr/bin/flock -n $APP_DIR/backups/order-expiry.lock /usr/bin/docker exec -w /app enhe-ai-tools-app node --import tsx scripts/expire-unpaid-orders.ts >> $ORDER_EXPIRY_LOG 2>&1 # $CRON_MARKER order-expiry"
 } | crontab -
 
-echo "[enhe-install-cron] installed daily backup, 5-minute health watch and 1-minute unpaid-order expiry"
+# Install the replacement first, then remove only this application's old jobs.
+# If root installation fails, the previous schedule is still present.
+if id ubuntu >/dev/null 2>&1; then
+  (crontab -u ubuntu -l 2>/dev/null || true) | grep -v "$CRON_MARKER" > "$tmp_file" || true
+  crontab -u ubuntu "$tmp_file"
+fi
+
+echo "[enhe-install-cron] root jobs installed: daily backup, 5-minute site/backup health watch and 1-minute unpaid-order expiry"

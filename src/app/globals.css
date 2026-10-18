@@ -7,11 +7,11 @@
 @custom-variant dark (&:is(.dark *));
 
 @font-face {
-  font-family: 'Alimama Fang Yuan Ti';
-  src: url('/fonts/alimama/AlimamaFangYuanTiVF-Thin-2f36da22906ae5d6.woff2') format('woff2');
+  font-family: 'ENHE Rounded';
+  src: url('/fonts/enhe-rounded/ENHERounded-Regular-full-bc07a6d90a6685fe.woff2') format('woff2');
   font-display: swap;
   font-style: normal;
-  font-weight: 100 900;
+  font-weight: 400;
 }
 
 @font-face {
@@ -23,8 +23,8 @@
 }
 
 @theme {
-  --font-sans: 'Alimama Fang Yuan Ti', 'Microsoft YaHei', Arial, sans-serif;
-  --font-heading: 'Alimama Fang Yuan Ti', 'Microsoft YaHei', Arial, sans-serif;
+  --font-sans: 'ENHE Rounded', 'Microsoft YaHei', Arial, sans-serif;
+  --font-heading: 'ENHE Rounded', 'Microsoft YaHei', Arial, sans-serif;
 }
 
 :root {
@@ -42,9 +42,9 @@
   --blue-11: var(--brand-blue);
   --blue-12: var(--brand-blue);
   color-scheme: light;
-  --font-sans: 'Alimama Fang Yuan Ti', 'Microsoft YaHei', Arial, sans-serif;
-  --font-heading-en: 'Alimama Fang Yuan Ti', var(--font-sans);
-  --font-heading-zh: 'Alimama Fang Yuan Ti', 'Microsoft YaHei', Arial, sans-serif;
+  --font-sans: 'ENHE Rounded', 'Microsoft YaHei', Arial, sans-serif;
+  --font-heading-en: 'ENHE Rounded', var(--font-sans);
+  --font-heading-zh: 'ENHE Rounded', 'Microsoft YaHei', Arial, sans-serif;
   --mouse-x: 72vw;
   --mouse-y: 18vh;
   --marketing-bg: #ffffff;
@@ -3249,7 +3249,7 @@ select option:disabled {
   .product-demo-card:is(:hover, :focus-within) .product-demo-card-media img,
   .product-demo-card:is(:hover, :focus-within) .product-demo-card-placeholder,
   .product-demo-card:is(:hover, :focus-within) .product-demo-card-play,
-  .product-demo-card:is(:hover, :focus-within) .product-demo-card-body > h3,
+  .product-demo-card:is(:hover, :focus-within) .product-demo-card-body > :is(h2, h3),
   .product-demo-card:is(:hover, :focus-within) .product-demo-card-body > p,
   .product-demo-card:is(:hover, :focus-within) .product-demo-card-tags,
   .product-demo-card:is(:hover, :focus-within) .product-demo-card-actions {
@@ -3318,7 +3318,7 @@ select option:disabled {
   color: var(--marketing-accent);
 }
 
-.product-demo-card h3 {
+.product-demo-card :is(h2, h3) {
   margin: 1rem 0 0;
   color: var(--marketing-text);
   font-size: 1.12rem;
@@ -3326,7 +3326,7 @@ select option:disabled {
   line-height: 1.35;
 }
 
-.product-demo-card h3 a:hover {
+.product-demo-card :is(h2, h3) a:hover {
   color: var(--marketing-accent);
 }
 
@@ -5608,8 +5608,8 @@ select option:disabled {
 }
 
 @theme inline {
-  --font-heading: 'Alimama Fang Yuan Ti', 'Microsoft YaHei', Arial, sans-serif;
-  --font-sans: 'Alimama Fang Yuan Ti', 'Microsoft YaHei', Arial, sans-serif;
+  --font-heading: 'ENHE Rounded', 'Microsoft YaHei', Arial, sans-serif;
+  --font-sans: 'ENHE Rounded', 'Microsoft YaHei', Arial, sans-serif;
   --color-sidebar-ring: var(--sidebar-ring);
   --color-sidebar-border: var(--sidebar-border);
   --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);

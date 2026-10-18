@@ -70,8 +70,8 @@ export async function EnheRedesignPublicHeader({
   );
 }
 
-export function EnheRedesignPublicFooter({ locale }: { locale: Locale }) {
+export function EnheRedesignPublicFooter({ locale, showMascot }: { locale: Locale; showMascot?: boolean }) {
   const redesignLocale = toRedesignLocale(locale);
 
-  return <EnheRedesignFooter locale={redesignLocale} filing={PRODUCTION_FILING[redesignLocale]} />;
+  return <EnheRedesignFooter locale={redesignLocale} filing={PRODUCTION_FILING[redesignLocale]} showMascot={showMascot} />;
 }

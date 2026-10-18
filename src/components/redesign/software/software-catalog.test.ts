@@ -93,7 +93,9 @@ describe("AI tools candidate catalog", () => {
     expect(SOFTWARE_PRODUCTS.every((product) => product.detailHref.en.startsWith("/en/"))).toBe(true);
     expect(SOFTWARE_PRODUCTS.every((product) => !/^https?:/i.test(product.detailHref.zh))).toBe(true);
     expect(SOFTWARE_PRODUCTS.every((product) => !/^https?:/i.test(product.detailHref.en))).toBe(true);
-    expect(card).toContain("<article");
+    expect(card).toContain('const CardElement = listItem ? "div" : "article"');
+    expect(card).toContain("<CardElement");
+    expect(card).toContain('role={listItem ? "listitem" : undefined}');
     expect(card).toContain("detailHref");
     expect(card).toContain("alt=");
     expect(card).toContain("onError");

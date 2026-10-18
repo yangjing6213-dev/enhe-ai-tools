@@ -132,6 +132,10 @@ export async function LegalPageShell({
             ENHE Compliance
           </p>
           <h1 className="text-4xl font-semibold text-[var(--marketing-text)]">{page.title}</h1>
+          <p className="mt-3 text-sm text-[var(--marketing-muted)]">
+            {forceLocale === "en" ? "Updated and effective: " : "更新及生效日期："}
+            <time dateTime={page.updatedAt}>{page.updatedAt}</time>
+          </p>
           <p className="mt-5 leading-8 text-[var(--marketing-muted)]">{page.summary}</p>
           <div className="mt-10 space-y-8">
             {page.sections.map((section) => (

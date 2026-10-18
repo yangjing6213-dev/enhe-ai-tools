@@ -1,4 +1,5 @@
 import { expect, test } from "@playwright/test";
+import { auditPublicRequests } from "./helpers/public-request-audit";
 
 const routes = [
   "/about",
@@ -25,17 +26,7 @@ for (const route of routes) {
   test(`${route} exposes the editorial shell without horizontal overflow`, async ({
     page,
   }) => {
-    const consoleErrors: string[] = [];
-    const pageErrors: string[] = [];
-    const failedRequests: string[] = [];
-
-    page.on("console", (message) => {
-      if (message.type() === "error") consoleErrors.push(message.text());
-    });
-    page.on("pageerror", (error) => pageErrors.push(error.message));
-    page.on("requestfailed", (request) => {
-      failedRequests.push(`${request.method()} ${request.url()}`);
-    });
+    const requestAudit = auditPublicRequests(page);
 
     await page.setViewportSize({ width: 390, height: 844 });
     const response = await page.goto(route, { waitUntil: "load" });
@@ -58,8 +49,6 @@ for (const route of routes) {
       await expect(main).toHaveAttribute("data-content-status", "UNVERIFIED");
     }
 
-    expect(consoleErrors, route).toEqual([]);
-    expect(pageErrors, route).toEqual([]);
-    expect(failedRequests, route).toEqual([]);
+    await requestAudit.verify();
   });
 }

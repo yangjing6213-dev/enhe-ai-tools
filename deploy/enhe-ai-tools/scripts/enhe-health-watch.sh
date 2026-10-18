@@ -9,11 +9,13 @@ ALERT_INTERVAL_SECONDS="${ALERT_INTERVAL_SECONDS:-1800}"
 mkdir -p "$(dirname "$STATE_FILE")"
 
 response="$(curl -fsS --max-time 10 "$HEALTH_URL" 2>&1 || true)"
-if printf '%s' "$response" | grep -q '"status":"ok"'; then
+backup_status="$(sh "$APP_DIR/deploy/enhe-ai-tools/scripts/enhe-check-backup.sh" 2>&1)" && backup_ok=1 || backup_ok=0
+if printf '%s' "$response" | grep -q '"status":"ok"' && [ "$backup_ok" -eq 1 ]; then
   rm -f "$STATE_FILE"
   echo "[enhe-health-watch] ok"
   exit 0
 fi
+response="$response; $backup_status"
 
 now="$(date +%s)"
 last_alert="0"
@@ -27,7 +29,6 @@ if [ "$elapsed" -lt "$ALERT_INTERVAL_SECONDS" ]; then
   exit 1
 fi
 
-printf '%s' "$now" > "$STATE_FILE"
 echo "[enhe-health-watch] unhealthy, sending alert: $response" >&2
 
 docker exec -i \
@@ -38,7 +39,7 @@ docker exec -i \
 const nodemailer = require("nodemailer");
 
 function recipients() {
-  const value = process.env.ADMIN_ALERT_EMAILS || process.env.ADMIN_ALERT_EMAIL || "huqingwei5942@gmail.com";
+  const value = process.env.ADMIN_ALERT_EMAILS || process.env.ADMIN_ALERT_EMAIL || "";
   return value.split(/[;,]/).map((item) => item.trim()).filter(Boolean);
 }
 
@@ -48,7 +49,7 @@ async function main() {
   const from = process.env.SMTP_FROM || process.env.SMTP_USER;
   if (!host || !port || !from || !recipients().length) {
     console.error("[enhe-health-watch] SMTP is not configured, cannot send alert email");
-    process.exit(0);
+    process.exit(1);
   }
 
   const secure = process.env.SMTP_SECURE === "true" || port === 465;
@@ -61,7 +62,7 @@ async function main() {
       : undefined
   });
 
-  const subject = "[ENHE AI] 站点健康检查异常";
+  const subject = "[ENHE AI] 网站或数据库备份检查异常";
   const lines = [
     `检查时间：${process.env.ENHE_HEALTH_CHECKED_AT || new Date().toISOString()}`,
     `检查地址：${process.env.ENHE_HEALTH_URL || ""}`,
@@ -87,4 +88,5 @@ main().catch((error) => {
 });
 NODE
 
+printf '%s' "$now" > "$STATE_FILE"
 exit 1

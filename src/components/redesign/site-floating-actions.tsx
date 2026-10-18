@@ -215,7 +215,7 @@ export function SiteFloatingActions({
     <div
       ref={rootRef}
       className="site-floating-actions"
-      role="group"
+      role="region"
       aria-label={isEnglish ? "Account shortcuts" : "个人中心快捷入口"}
     >
       <div className="site-floating-action-container">

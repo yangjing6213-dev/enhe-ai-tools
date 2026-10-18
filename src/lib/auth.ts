@@ -2,6 +2,8 @@ import { cookies } from "next/headers";
 import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 import bcrypt from "bcryptjs";
+import { isIP } from "node:net";
+import { Prisma } from "@prisma/client";
 import { prisma } from "@/lib/db";
 import { headerUserCookieName } from "@/lib/header-user-cookie";
 import { getCurrentLocale, type Locale } from "@/lib/i18n";
@@ -9,7 +11,6 @@ import {
   createSessionToken,
   getAuthSecret,
   hashSessionToken,
-  isLoginLimited,
   signHeaderUserCookieValue,
   signSessionCookieValue,
   verifyHeaderUserCookieValue,
@@ -34,6 +35,26 @@ export async function verifyPassword(password: string, hash: string) {
   return bcrypt.compare(password, hash);
 }
 
+export async function updatePasswordAndRevokeSessions(userId: string, password: string) {
+  const passwordHash = await hashPassword(password);
+  await prisma.$transaction(async (tx) => {
+    const user = await tx.user.findUnique({ where: { id: userId }, select: { googleSubject: true } });
+    if (!user) throw new Error("USER_NOT_FOUND");
+    if (user.googleSubject) throw new Error("GOOGLE_MANAGED_PASSWORD");
+    await tx.user.update({ where: { id: userId }, data: { passwordHash } });
+    await tx.session.updateMany({
+      where: { userId, revokedAt: null },
+      data: { revokedAt: new Date() }
+    });
+  });
+}
+
+function trustedClientIp(headerStore: Headers) {
+  // The edge proxy overwrites X-Real-IP; a forwarded-for prefix can be supplied by the client.
+  const ip = headerStore.get("x-real-ip")?.trim();
+  return ip && isIP(ip) ? ip : "unknown";
+}
+
 export async function signInUser(userId: string) {
   const cookieStore = await cookies();
   const headerStore = await headers();
@@ -44,7 +65,7 @@ export async function signInUser(userId: string) {
       userId,
       tokenHash: hashSessionToken(token),
       userAgent: headerStore.get("user-agent"),
-      ip: headerStore.get("x-forwarded-for")?.split(",")[0] ?? null,
+      ip: trustedClientIp(headerStore),
       expiresAt
     }
   });
@@ -108,7 +129,8 @@ export async function getCurrentUser() {
     status: session.user.status,
     createdAt: session.user.createdAt,
     newsletterEmail: session.user.newsletterEmail,
-    acceptEmailUpdates: session.user.acceptEmailUpdates
+    acceptEmailUpdates: session.user.acceptEmailUpdates,
+    googleSubject: session.user.googleSubject
   };
 }
 
@@ -149,31 +171,42 @@ export async function requireAdmin(localeOverride?: Locale) {
 }
 
 export async function assertLoginNotLimited(identifier: string) {
-  const headerStore = await headers();
-  const ip = headerStore.get("x-forwarded-for")?.split(",")[0] ?? null;
-  const attempts = await prisma.loginAttempt.findMany({
-    where: {
-      identifier,
-      success: false,
-      createdAt: { gte: new Date(Date.now() - 15 * 60 * 1000) },
-      ...(ip ? { OR: [{ ip }, { identifier }] } : {})
-    },
-    select: { createdAt: true }
-  });
-  if (isLoginLimited(attempts.map((attempt) => attempt.createdAt))) {
-    throw new Error("LOGIN_LIMITED");
-  }
+  return reserveAuthAttempt(identifier, "login");
 }
 
-export async function recordLoginAttempt(identifier: string, success: boolean) {
-  const headerStore = await headers();
-  await prisma.loginAttempt.create({
-    data: {
-      identifier,
-      success,
-      ip: headerStore.get("x-forwarded-for")?.split(",")[0] ?? null
+export async function assertRegistrationNotLimited(identifier: string) {
+  await reserveAuthAttempt(identifier, "register");
+}
+
+async function reserveAuthAttempt(identifier: string, purpose: "login" | "register") {
+  const ip = trustedClientIp(await headers());
+  const registration = purpose === "register";
+  const storedIdentifier = registration ? `register:${identifier}` : identifier;
+  const windowMs = registration ? 60 * 60 * 1000 : 15 * 60 * 1000;
+  const createdAt = { gte: new Date(Date.now() - windowMs) };
+
+  return prisma.$transaction(async (tx) => {
+    // Reserve before password hashing/account creation, serializing both scopes across app instances.
+    const lockKeys = [`${purpose}:account:${identifier}`, `${purpose}:ip:${ip}`].sort();
+    for (const key of lockKeys) {
+      await tx.$queryRaw(Prisma.sql`SELECT pg_advisory_xact_lock(hashtext(${key}))::text`);
     }
+    const accountCount = await tx.loginAttempt.count({
+      where: { identifier: storedIdentifier, createdAt, ...(registration ? {} : { success: false }) }
+    });
+    const ipCount = await tx.loginAttempt.count({
+      where: { ip, createdAt, ...(registration ? { identifier: { startsWith: "register:" } } : { success: false }) }
+    });
+    if (accountCount >= (registration ? 3 : 5) || ipCount >= (registration ? 10 : 30)) {
+      throw new Error(registration ? "REGISTER_LIMITED" : "LOGIN_LIMITED");
+    }
+    const attempt = await tx.loginAttempt.create({ data: { identifier: storedIdentifier, ip, success: registration } });
+    return attempt.id;
   });
+}
+
+export async function recordLoginAttempt(identifier: string, success: boolean, attemptId: string) {
+  await prisma.loginAttempt.update({ where: { id: attemptId, identifier }, data: { success } });
 }
 
 function setHeaderUserCookie(

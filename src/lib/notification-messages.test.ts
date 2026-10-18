@@ -35,7 +35,7 @@ describe("notification messages", () => {
     expect(buildRefundRequestNotification({ orderId: "order-1", orderNo: "NO1" })).toMatchObject({
       type: "refund_request",
       title: "售后/退款申请已提交",
-      content: "订单 NO1 的售后/退款申请已提交，管理员处理后会在这里通知你。将在2个小时完成审核。",
+      content: "订单 NO1 的售后/退款申请已提交，管理员处理后会在这里通知你。审核目标为2个小时内；需补充材料或人工核验时可能延长，请在订单页查看进度或联系客服。",
       linkUrl: "/orders/order-1"
     });
 

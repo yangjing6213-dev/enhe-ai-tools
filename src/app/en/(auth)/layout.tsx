@@ -20,7 +20,7 @@ export default async function EnglishAuthLayout({ children }: { children: React.
       <div id="main-content" tabIndex={-1}>
         <div className="fade-in">{children}</div>
       </div>
-      <EnheRedesignPublicFooter locale="en" />
+      <EnheRedesignPublicFooter locale="en" showMascot={false} />
     </div>
   );
 }

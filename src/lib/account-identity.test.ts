@@ -21,4 +21,9 @@ describe("account identity", () => {
       password: "Example123!"
     });
   });
+
+  it("rejects oversized password input before hashing", () => {
+    expect(() => parseAccountCredentials({ identifier: "Sadmin", password: "a".repeat(129) })).toThrow();
+    expect(parseAccountCredentials({ identifier: "Sadmin", password: "a".repeat(128) }).password).toHaveLength(128);
+  });
 });

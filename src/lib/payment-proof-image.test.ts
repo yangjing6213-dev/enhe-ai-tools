@@ -8,11 +8,15 @@ describe("getPaymentProofImageSrc", () => {
     );
   });
 
-  it("keeps local and public proof image URLs renderable", () => {
-    expect(getPaymentProofImageSrc({ id: "proof-1", proofImage: "/uploads/proof.png" })).toBe("/api/uploads/proof.png");
+  it("routes local and legacy public proofs through ownership checks", () => {
+    expect(getPaymentProofImageSrc({ id: "proof-1", proofImage: "/uploads/proof.png" })).toBe("/api/payment-proofs/proof-1/image");
     expect(getPaymentProofImageSrc({ id: "proof-1", proofImage: "https://cdn.example/proof.png" })).toBe(
-      "https://cdn.example/proof.png"
+      "/api/payment-proofs/proof-1/image"
     );
+  });
+
+  it("does not expose a private local disk path", () => {
+    expect(getPaymentProofImageSrc({ id: "proof-1", proofImage: "private-uploads/payment-proofs/proof.png" })).toBe("/api/payment-proofs/proof-1/image");
   });
 
   it("treats protected proof image routes as renderable images", () => {

@@ -1,6 +1,6 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
-vi.mock("@/lib/user-avatar", () => ({ resolveUserAvatarSrc: vi.fn(async (value: string) => value?.startsWith("/uploads/") ? value.replace("/uploads/", "/api/uploads/") : value) }));
+import { buildHomepageAvatarSrc } from "@/lib/homepage-avatar";
 
 const { findMany } = vi.hoisted(() => ({ findMany: vi.fn() }));
 
@@ -23,7 +23,7 @@ describe("getHomepageCommentCards", () => {
         id: "comment-1",
         content: "A real selected comment.",
         tool: { name: "产品名称", englishName: "Product Name" },
-        user: { nickname: "Mia", avatar: "/uploads/mia.png" },
+        user: { id: "user-1", nickname: "Mia", avatar: "/uploads/user-avatars/mia.png" },
         rating: 4
       }
     ]);
@@ -34,7 +34,7 @@ describe("getHomepageCommentCards", () => {
         displayName: "Mia",
         productLabel: "Product Name",
         quote: "A real selected comment.",
-        avatarSrc: "/api/uploads/mia.png",
+        avatarSrc: buildHomepageAvatarSrc("user-1", "/uploads/user-avatars/mia.png"),
         avatarAlt: "Mia",
         stars: 4
       }
@@ -46,7 +46,7 @@ describe("getHomepageCommentCards", () => {
         content: true,
         rating: true,
         tool: { select: { name: true, englishName: true } },
-        user: { select: { nickname: true, avatar: true } }
+        user: { select: { id: true, nickname: true, avatar: true } }
       },
       orderBy: [{ updatedAt: "desc" }, { createdAt: "desc" }],
       take: 5

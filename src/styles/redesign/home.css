@@ -14,7 +14,7 @@
 }
 
 .redesign-home[data-locale="en"] {
-  font-family: var(--enhe-font-en, 'Alimama Fang Yuan Ti', 'Microsoft YaHei', Arial, sans-serif);
+  font-family: var(--enhe-font-en, 'ENHE Rounded', 'Microsoft YaHei', Arial, sans-serif);
 }
 
 .redesign-home .redesign-home-hero-inner {

@@ -1,4 +1,4 @@
-import { resolveUserAvatarSrc } from "@/lib/user-avatar";
+import { buildHomepageAvatarSrc } from "@/lib/homepage-avatar";
 import { getDefaultAvatar } from "@/lib/default-avatar";
 import { prisma } from "@/lib/db";
 import type { RedesignLocale } from "@/components/redesign/types";
@@ -15,22 +15,22 @@ export async function getHomepageCommentCards(locale: RedesignLocale): Promise<H
         content: true,
         rating: true,
         tool: { select: { name: true, englishName: true } },
-        user: { select: { nickname: true, avatar: true } }
+        user: { select: { id: true, nickname: true, avatar: true } }
       },
       orderBy: [{ updatedAt: "desc" }, { createdAt: "desc" }],
       take: 5
     });
 
     return mapHomepageCommentCards(
-      await Promise.all(comments.map(async (comment) => ({
+      comments.map((comment) => ({
         id: comment.id,
         content: comment.content,
         rating: comment.rating,
         nickname: comment.user.nickname,
-        avatar: await resolveUserAvatarSrc(comment.user.avatar) || getDefaultAvatar(comment.user.nickname || comment.id),
+        avatar: buildHomepageAvatarSrc(comment.user.id, comment.user.avatar) || getDefaultAvatar(comment.user.nickname || comment.id),
         toolName: comment.tool.name,
         englishToolName: comment.tool.englishName
-      }))),
+      })),
       locale
     );
   } catch {

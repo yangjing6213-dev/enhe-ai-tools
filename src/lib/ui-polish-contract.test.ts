@@ -12,8 +12,8 @@ describe("ENHE visual polish contract", () => {
   it("uses the approved rounded font for Chinese and English", () => {
     const tokens = read("src/styles/redesign/tokens.css");
 
-    expect(tokens).toMatch(/--enhe-font-zh:\s*"Alimama Fang Yuan Ti"/);
-    expect(tokens).toMatch(/--enhe-font-en:\s*"Alimama Fang Yuan Ti"/);
+    expect(tokens).toMatch(/--enhe-font-zh:\s*"ENHE Rounded"/);
+    expect(tokens).toMatch(/--enhe-font-en:\s*"ENHE Rounded"/);
     expect(tokens).not.toContain('"Source Sans 3"');
   });
 

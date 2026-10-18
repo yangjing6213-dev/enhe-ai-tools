@@ -175,6 +175,11 @@
   color: #fff;
 }
 
+.enhe-redesign-production .ai-news-page .ai-news-subscribe-action,
+.enhe-redesign-production .ai-news-page .ai-news-subscribe-action * {
+  -webkit-text-fill-color: #fff !important;
+}
+
 .enhe-redesign-production .ai-news-page .ai-news-subscribe-action:hover {
   box-shadow: 0 6px 16px rgb(4 98 194 / 20%);
 }

@@ -10,6 +10,7 @@ import {
   normalizePathForRequestedLocale,
 } from "@/lib/locale-routing";
 import { isLocalizedPublicPath } from "@/lib/seo";
+import { buildContentSecurityPolicy } from "@/lib/content-security-policy";
 
 export function middleware(request: NextRequest) {
   if (request.nextUrl.hostname.toLowerCase() === "enhe-tech.com.cn") {
@@ -129,11 +130,34 @@ export function middleware(request: NextRequest) {
   requestHeaders.set("x-enhe-html-locale", htmlLocale);
   requestHeaders.set("x-enhe-pathname", pathname);
 
+  // Never accept a client-supplied nonce. Next reads the request CSP when
+  // adding the nonce to its streamed bootstrap scripts.
+  requestHeaders.delete("x-nonce");
+  requestHeaders.delete("Content-Security-Policy");
+  const isDocumentPath = request.headers.get("rsc") !== "1" &&
+    !pathname.startsWith("/fonts/") &&
+    !/\.(?:xml|txt|md|json|webmanifest|png|jpe?g|webp|gif|svg|ico|woff2?)$/i.test(pathname);
+  const nonce = isDocumentPath
+    ? btoa(String.fromCharCode(...crypto.getRandomValues(new Uint8Array(16))))
+    : null;
+  const contentSecurityPolicy = nonce
+    ? buildContentSecurityPolicy(nonce, process.env.NODE_ENV === "development")
+    : null;
+  if (nonce && contentSecurityPolicy) {
+    requestHeaders.set("x-nonce", nonce);
+    requestHeaders.set("Content-Security-Policy", contentSecurityPolicy);
+  }
+
   const response = NextResponse.next({
     request: {
       headers: requestHeaders
     }
   });
+  if (contentSecurityPolicy) {
+    response.headers.set("Content-Security-Policy", contentSecurityPolicy);
+    // A nonce belongs to this HTML response, never to a shared cached copy.
+    response.headers.set("Cache-Control", "private, no-store, max-age=0");
+  }
   if (isRedesignPreviewPath && requestedLocale) {
     response.cookies.set(localeCookieName, requestedLocale, {
       path: "/",

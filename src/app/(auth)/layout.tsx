@@ -32,7 +32,7 @@ export default async function AuthLayout({ children }: { children: React.ReactNo
         <div id="main-content" tabIndex={-1}>
           <div className="fade-in">{children}</div>
         </div>
-        <EnheRedesignPublicFooter locale={locale} />
+        <EnheRedesignPublicFooter locale={locale} showMascot={false} />
       </div>
     </RootDocument>
   );

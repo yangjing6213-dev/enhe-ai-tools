@@ -52,7 +52,7 @@ export function ProductDemoMotionCard({ children }: ProductDemoMotionCardProps) 
           );
           const playBadge = card.querySelector<HTMLElement>(".product-demo-card-play");
           const bodyCopy = card.querySelectorAll<HTMLElement>(
-            ".product-demo-card-body > h3, .product-demo-card-body > p, .product-demo-card-tags",
+            ".product-demo-card-body > :is(h2, h3), .product-demo-card-body > p, .product-demo-card-tags",
           );
           const actions = card.querySelector<HTMLElement>(".product-demo-card-actions");
           const timeline = gsap.timeline({

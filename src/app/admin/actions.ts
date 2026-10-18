@@ -24,7 +24,8 @@ import {
 } from "@/lib/admin-form";
 import { parseNewsRelationIds, resolveAiNewsCanonicalSlug, resolveNewsSlug } from "@/lib/ai-news";
 import { normalizeSupportedAgents } from "@/lib/ai-skill";
-import { hashPassword, requireAdmin } from "@/lib/auth";
+import { requireAdmin, updatePasswordAndRevokeSessions } from "@/lib/auth";
+import { isPasswordWithinBcryptLimit } from "@/lib/password";
 import {
   createRefundRecordForAdmin,
   prepareRefundExecutionForAdmin,
@@ -445,12 +446,13 @@ export async function updateUserAdminAction(formData: FormData) {
 export async function resetUserPasswordAction(formData: FormData) {
   const admin = await requireAdmin();
   const id = idSchema.parse(formData.get("id"));
-  const password = z.string().min(8).parse(formData.get("password"));
+  const password = z.string().min(8).max(72).refine(isPasswordWithinBcryptLimit).parse(formData.get("password"));
 
-  await prisma.user.update({
-    where: { id },
-    data: { passwordHash: await hashPassword(password) }
-  });
+  const user = await prisma.user.findUnique({ where: { id }, select: { googleSubject: true } });
+  if (user?.googleSubject) {
+    redirect(`/admin/users/${id}?error=${encodeURIComponent("此账号通过 Google 登录，请在 Google 账号中管理密码。")}`);
+  }
+  await updatePasswordAndRevokeSessions(id, password);
   await writeAdminAuditLog({
     adminId: admin.id,
     action: "user.password.reset",

@@ -2,9 +2,10 @@
 
 import { ThemeProvider } from "next-themes";
 
-export function SiteThemeProvider({ children }: { children: React.ReactNode }) {
+export function SiteThemeProvider({ children, nonce }: { children: React.ReactNode; nonce?: string }) {
   return (
     <ThemeProvider
+      nonce={nonce}
       attribute="class"
       defaultTheme="light"
       forcedTheme="light"

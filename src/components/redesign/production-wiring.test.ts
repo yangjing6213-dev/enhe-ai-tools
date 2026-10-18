@@ -108,6 +108,7 @@ describe("ENHE Phase 2C.1 production wiring", () => {
     for (const layout of [auth, enAuth]) {
       expect(layout).toContain("EnheRedesignPublicHeader");
       expect(layout).toContain("EnheRedesignPublicFooter");
+      expect(layout).toContain("showMascot={false}");
     }
     for (const layout of [user, orders]) {
       expect(layout).toContain("PublicSiteChrome");

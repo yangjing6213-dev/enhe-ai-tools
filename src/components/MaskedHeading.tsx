@@ -33,6 +33,8 @@ export interface MaskedHeadingProps {
   tracking?: number;
   lineHeight?: number;
   textScale?: number;
+  priority?: boolean;
+  initialFallback?: boolean;
   className?: string;
   style?: CSSProperties;
   [key: string]: unknown;
@@ -59,6 +61,8 @@ const MaskedHeading: React.FC<MaskedHeadingProps> = ({
   tracking = -0.03,
   lineHeight = 1.06,
   textScale = 0.115,
+  priority = false,
+  initialFallback = false,
   className = '',
   style,
   ...rest
@@ -67,6 +71,7 @@ const MaskedHeading: React.FC<MaskedHeadingProps> = ({
   const measureRef = useRef<HTMLSpanElement | null>(null);
   const revealRef = useRef<HTMLSpanElement | null>(null);
   const mediaRef = useRef<HTMLSpanElement | null>(null);
+  const imageReadyRef = useRef(false);
   const wordRefs = useRef<(HTMLSpanElement | null)[]>([]);
   const baseRefs = useRef<(HTMLElement | null)[]>([]);
   const glyphRefs = useRef<(SVGTextElement | null)[]>([]);
@@ -126,6 +131,7 @@ const MaskedHeading: React.FC<MaskedHeadingProps> = ({
       glyph.style.letterSpacing = cs.letterSpacing;
     }
     place();
+    if (imageReadyRef.current) root.dataset.maskReady = 'true';
   }, [place]);
 
   useEffect(() => {
@@ -289,6 +295,7 @@ const MaskedHeading: React.FC<MaskedHeadingProps> = ({
     <TagAny
       ref={rootRef}
       className={`masked-heading ${className}`.trim()}
+      data-initial-fallback={initialFallback || undefined}
       style={{
         textAlign: align,
         fontWeight: weight,
@@ -341,7 +348,19 @@ const MaskedHeading: React.FC<MaskedHeadingProps> = ({
             {mediaType === 'video' ? (
               <video className="masked-heading__source" src={src} poster={poster} autoPlay muted loop playsInline />
             ) : (
-              <Image className="masked-heading__source" src={src} alt="" draggable={false} fill sizes="100vw" />
+              <Image
+                className="masked-heading__source"
+                src={src}
+                alt=""
+                draggable={false}
+                fill
+                sizes="100vw"
+                priority={priority}
+                onLoad={() => {
+                  imageReadyRef.current = true;
+                  sync();
+                }}
+              />
             )}
           </span>
         </span>

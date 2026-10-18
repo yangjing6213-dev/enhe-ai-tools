@@ -2,9 +2,16 @@
 set -eu
 umask 077
 
+if [ "$(id -u)" -ne 0 ]; then
+  echo "[enhe-backup-db] run as root; scheduled and deployment backups must use the same identity" >&2
+  exit 1
+fi
+
 APP_DIR="${APP_DIR:-/opt/enhe-ai-tools}"
 BACKUP_DIR="${BACKUP_DIR:-$APP_DIR/backups/db}"
-RETENTION_DAYS="${RETENTION_DAYS:-14}"
+# Preserve existing recovery points during the operations repair. A shorter
+# lifecycle must be explicitly configured after backup retention is reviewed.
+RETENTION_DAYS="${RETENTION_DAYS:-36500}"
 DB_CONTAINER="enhe-ai-tools-db"
 LOCK_HELPER="$APP_DIR/deploy/enhe-ai-tools/scripts/enhe-operation-lock.sh"
 
@@ -18,10 +25,10 @@ if ! docker container inspect "$DB_CONTAINER" >/dev/null 2>&1; then
 fi
 
 mkdir -p "$BACKUP_DIR"
+chown root:root "$BACKUP_DIR"
 chmod 700 "$BACKUP_DIR"
-find "$BACKUP_DIR" -maxdepth 1 -type f \
-  \( -name 'enhe-ai-tools-*.dump' -o -name 'enhe-ai-tools-*.dump.sha256' \) \
-  -exec chmod 600 {} +
+# Existing archives are immutable. Do not let ownership of a historic backup
+# prevent creating today's backup; only the newly created files need chmod.
 timestamp="$(date -u +%Y%m%dT%H%M%SZ)"
 tmp_file="$(mktemp "$BACKUP_DIR/.enhe-ai-tools-$timestamp.XXXXXX")"
 unique_suffix="${tmp_file##*.}"

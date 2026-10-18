@@ -42,7 +42,10 @@ COPY --from=builder /app/src ./src
 COPY --from=builder /app/tsconfig.json ./tsconfig.json
 COPY --from=builder /app/deploy/enhe-ai-tools/scripts ./deploy/enhe-ai-tools/scripts
 COPY deploy/enhe-ai-tools/scripts/app-entrypoint.sh ./app-entrypoint.sh
-RUN chmod +x ./app-entrypoint.sh
+RUN chmod +x ./app-entrypoint.sh \
+    && mkdir -p /app/.next/cache /app/runtime /app/logs /app/public/uploads /app/private-uploads/forum-media \
+    && chown -R node:node /app/.next /app/runtime /app/logs /app/public/uploads /app/private-uploads
 
 EXPOSE 3000
+USER node
 CMD ["./app-entrypoint.sh"]

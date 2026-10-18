@@ -225,7 +225,11 @@ export async function UserCenterPageShell({
             {passwordMessage ? (
               <p className={`mt-4 ${passwordMessage.type === "success" ? "status-success" : "status-danger"}`}>{passwordMessage.text}</p>
             ) : null}
-            <form action={changePasswordAction} className="mt-5 grid gap-3">
+            {user.googleSubject ? (
+              <p className="mt-5 text-sm text-[var(--marketing-muted)]">
+                {locale === "en" ? "This account uses Google sign-in. Manage your password in your Google account." : "此账号通过 Google 登录，密码请在 Google 账号中管理。"}
+              </p>
+            ) : <form action={changePasswordAction} className="mt-5 grid gap-3">
             <PasswordInput
               wrapperClassName="user-center-password-input"
               name="currentPassword"
@@ -259,7 +263,7 @@ export async function UserCenterPageShell({
                 className="form-control-dark text-sm"
               />
               <FormSubmitButton pendingLabel={locale === "en" ? "Saving..." : "保存中..."}>{t.userCenter.changePassword}</FormSubmitButton>
-            </form>
+            </form>}
           </Panel>
         </aside>
 
@@ -439,6 +443,7 @@ function getPasswordMessage(value: string | undefined, locale: Locale) {
   if (!value) return null;
   const t = getDictionary(locale);
   if (value === "changed") return { type: "success" as const, text: t.userCenter.passwordChanged };
+  if (value === "google-managed") return { type: "error" as const, text: locale === "en" ? "This account uses Google sign-in. Manage your password in your Google account." : "此账号通过 Google 登录，密码请在 Google 账号中管理。" };
   return { type: "error" as const, text: locale === "en" ? "Password update failed. Please check your input." : value };
 }
 

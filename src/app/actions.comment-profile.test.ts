@@ -29,6 +29,8 @@ vi.mock("@/lib/db", () => ({
 }));
 vi.mock("@/lib/auth", () => ({
   assertLoginNotLimited: vi.fn(),
+  assertRegistrationNotLimited: vi.fn(),
+  updatePasswordAndRevokeSessions: vi.fn(),
   getCurrentUser: vi.fn(),
   hashPassword: vi.fn(),
   recordLoginAttempt: vi.fn(),

@@ -2,6 +2,7 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 
 const mocks = vi.hoisted(() => ({
   assertValidCsrfToken: vi.fn(),
+  assertRegistrationNotLimited: vi.fn(),
   createUser: vi.fn(),
   findUser: vi.fn(),
   hashPassword: vi.fn(),
@@ -13,6 +14,8 @@ const mocks = vi.hoisted(() => ({
   }),
   sendAdminLoginSecurityEmail: vi.fn(),
   signInUser: vi.fn(),
+  requireUser: vi.fn(),
+  updatePasswordAndRevokeSessions: vi.fn(),
   verifyPassword: vi.fn(),
 }));
 
@@ -21,15 +24,17 @@ vi.mock("next/navigation", () => ({ redirect: mocks.redirect }));
 vi.mock("@/lib/db", () => ({ prisma: { user: { findUnique: mocks.findUser, create: mocks.createUser } } }));
 vi.mock("@/lib/auth", () => ({
   assertLoginNotLimited: vi.fn(),
+  assertRegistrationNotLimited: mocks.assertRegistrationNotLimited,
   getCurrentUser: vi.fn(),
   hashPassword: mocks.hashPassword,
   recordLoginAttempt: mocks.recordLoginAttempt,
   requireAdmin: vi.fn(),
-  requireUser: vi.fn(),
+  requireUser: mocks.requireUser,
   refreshHeaderUserCookieSnapshot: vi.fn(),
   signInUser: mocks.signInUser,
   signOutUser: vi.fn(),
   verifyPassword: mocks.verifyPassword,
+  updatePasswordAndRevokeSessions: mocks.updatePasswordAndRevokeSessions,
 }));
 vi.mock("@/lib/csrf", () => ({ assertValidCsrfToken: mocks.assertValidCsrfToken }));
 vi.mock("@/lib/i18n", () => ({ getCurrentLocale: mocks.getCurrentLocale }));
@@ -42,7 +47,7 @@ vi.mock("@/lib/admin-email-notifications", () => ({
   sendRefundRequestAdminEmail: vi.fn(),
 }));
 
-import { loginAction, registerAction } from "@/app/actions";
+import { changePasswordAction, loginAction, registerAction } from "@/app/actions";
 
 function loginForm(returnTo: string) {
   const formData = new FormData();
@@ -79,6 +84,7 @@ describe("admin login return path", () => {
     mocks.verifyPassword.mockResolvedValue(true);
     mocks.hashPassword.mockResolvedValue("hashed-password");
     mocks.createUser.mockResolvedValue({ id: "new-user-1" });
+    mocks.requireUser.mockResolvedValue({ id: "admin-1", googleSubject: null });
   });
 
   it("returns an admin to the requested English admin page after login", async () => {
@@ -91,6 +97,37 @@ describe("admin login return path", () => {
 
   it("keeps the admin dashboard as the fallback for ordinary login", async () => {
     await expect(loginAction(loginForm("/en/user"))).rejects.toThrow("NEXT_REDIRECT:/admin");
+  });
+
+  it("rejects old local passwords on Google-managed accounts", async () => {
+    mocks.findUser.mockResolvedValueOnce({ id: "google-user", status: "active", googleSubject: "verified-subject", passwordHash: "old-local-hash" });
+    await expect(loginAction(loginForm("/en/user"))).rejects.toThrow("google-login-required");
+    expect(mocks.verifyPassword).not.toHaveBeenCalled();
+    expect(mocks.signInUser).not.toHaveBeenCalled();
+  });
+
+  it("rejects limited registration before querying or creating an account", async () => {
+    mocks.assertRegistrationNotLimited.mockRejectedValueOnce(new Error("REGISTER_LIMITED"));
+    await expect(registerAction(registrationForm())).rejects.toThrow("register-limited");
+    expect(mocks.findUser).not.toHaveBeenCalled();
+    expect(mocks.createUser).not.toHaveBeenCalled();
+  });
+
+  it("revokes previous sessions before issuing a new session after a password change", async () => {
+    const formData = new FormData();
+    formData.set("currentPassword", "old-password");
+    formData.set("newPassword", "new-password");
+    formData.set("confirmPassword", "new-password");
+    await expect(changePasswordAction(formData)).rejects.toThrow("password=changed");
+    expect(mocks.updatePasswordAndRevokeSessions).toHaveBeenCalledWith("admin-1", "new-password");
+    expect(mocks.updatePasswordAndRevokeSessions.mock.invocationCallOrder[0]).toBeLessThan(mocks.signInUser.mock.invocationCallOrder[0]);
+  });
+
+  it("refuses local password changes for Google-managed accounts", async () => {
+    mocks.requireUser.mockResolvedValueOnce({ id: "google-user", googleSubject: "verified-subject" });
+    await expect(changePasswordAction(new FormData())).rejects.toThrow("password=google-managed");
+    expect(mocks.updatePasswordAndRevokeSessions).not.toHaveBeenCalled();
+    expect(mocks.signInUser).not.toHaveBeenCalled();
   });
 
   it("sends a non-admin to their user area instead of an admin page", async () => {

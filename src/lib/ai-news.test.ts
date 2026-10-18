@@ -28,6 +28,19 @@ import {
 import { buildMetadataTitle } from "@/lib/seo";
 
 describe("AI news helpers", () => {
+  it.each([
+    ["Google 100 ZEROS 威尼斯 XR 首映｜Gemini 对话、空间影像与 2D 转 3D 同台", "Google 100 ZEROS 威尼斯 XR 首映"],
+    ["Claude Haiku 5.5选型指南：任务、价格、评测与升级规则", "Claude Haiku 5.5选型指南"],
+    ["GitHub Copilot用量指标新增AI credits", "GitHub Copilot用量指标新增AI credits"],
+  ])("keeps a complete news phrase instead of cutting %s at the display budget", (title, expected) => {
+    expect(buildAiNewsSerpTitle({ title, locale: "zh", maxLength: 25, preserveCompletePhrase: true })).toBe(expected);
+  });
+
+  it("preserves a complete English headline when its first phrase exceeds the soft budget", () => {
+    const title = "Three Google-supported Android XR projects premiere at Venice with Gemini conversations and spatial filmmaking";
+    expect(buildAiNewsSerpTitle({ title, locale: "en", maxLength: 48, preserveCompletePhrase: true })).toBe(title);
+  });
+
   it("preserves only allowlisted listing filters across locale links", () => {
     expect(
       buildAiNewsLanguageHrefs({

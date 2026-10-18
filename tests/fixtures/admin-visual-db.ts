@@ -147,7 +147,7 @@ const localVisualHomepageComment = {
   id: "local-visual-homepage-comment",
   content: "Local visual homepage comment only.",
   rating: 5,
-  user: { nickname: localVisualUser.nickname, avatar: localVisualUser.avatar },
+  user: { id: localVisualUser.id, nickname: localVisualUser.nickname, avatar: "/images/user-avatars/avatar-01.webp" },
   tool: { name: localVisualTool.name, englishName: localVisualTool.englishName }
 };
 const localVisualToolsById = [

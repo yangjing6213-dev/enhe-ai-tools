@@ -5,6 +5,7 @@ export type LegalPage = {
   title: string;
   summary: string;
   sections: { title: string; paragraphs: string[] }[];
+  updatedAt?: string;
 };
 
 export const legalSlugs = [
@@ -17,6 +18,8 @@ export const legalSlugs = [
 ] as const;
 
 export type LegalSlug = (typeof legalSlugs)[number];
+
+export const legalPolicyUpdatedAt = "2026-10-18";
 
 const zhIntro =
   "欢迎访问恩禾 ENHE AI工具站。为保障用户权益并规范网站服务，请您在注册、浏览、下载、使用AI账号服务或购买会员服务前，仔细阅读本声明及相关用户协议、隐私政策、会员服务规则。您访问、注册或使用本网站服务，即视为您已阅读、理解并同意遵守相关规则。";
@@ -134,7 +137,7 @@ const legalPageMap: Record<Locale, Record<LegalSlug, LegalPage>> = {
           paragraphs: [
             "本网站可能提供 VIP 会员服务。会员权益、有效期、价格、开通方式、适用范围、退款规则等，以网站页面公示的会员服务规则为准。",
             "本网站当前可能采用个人收款码、订单号备注、付款截图上传、后台人工审核等方式完成会员开通。用户付款时应仔细核对订单号、金额、套餐内容及收款信息。",
-            "用户付款后，应按照页面提示上传付款凭证。经后台审核确认后，本网站将为对应账号开通相应会员权益。将在2个小时完成审核。因用户未备注订单号、付款账号不一致、截图不清晰、重复付款、错误付款或其他原因导致无法核验的，用户应及时联系本站处理。",
+            "用户付款后，应按照页面提示上传付款凭证。经后台审核确认后，本网站将为对应账号开通相应会员权益。审核目标为2个小时内；需补充材料或人工核验时可能延长，请在订单页查看进度或联系客服。因用户未备注订单号、付款账号不一致、截图不清晰、重复付款、错误付款或其他原因导致无法核验的，用户应及时联系本站处理。",
             "会员服务属于数字化服务或虚拟权益服务，具体退款条件、退款时限、不可退款情形及售后处理方式，应以本网站单独公示的《会员服务与退款规则》为准。"
           ]
         },
@@ -202,7 +205,7 @@ const legalPageMap: Record<Locale, Record<LegalSlug, LegalPage>> = {
       summary: "说明 VIP 会员、软件下载付费、人工审核开通、退款条件和售后处理方式。",
       sections: [
         { title: "一、会员服务说明", paragraphs: ["本网站可能提供 VIP 会员服务。会员权益、有效期、价格、开通方式、适用范围、退款规则等，以网站页面公示的会员服务规则为准。", "本网站当前可能采用个人收款码、订单号备注、付款截图上传、后台人工审核等方式完成会员开通。用户付款时应仔细核对订单号、金额、套餐内容及收款信息。"] },
-        { title: "二、付款凭证与审核", paragraphs: ["用户付款后，应按照页面提示上传付款凭证。经后台审核确认后，本网站将为对应账号开通相应会员权益。将在2个小时完成审核。", "因用户未备注订单号、付款账号不一致、截图不清晰、重复付款、错误付款或其他原因导致无法核验的，用户应及时联系本站处理。"] },
+        { title: "二、付款凭证与审核", paragraphs: ["用户付款后，应按照页面提示上传付款凭证。经后台审核确认后，本网站将为对应账号开通相应会员权益。审核目标为2个小时内；需补充材料或人工核验时可能延长，请在订单页查看进度或联系客服。", "因用户未备注订单号、付款账号不一致、截图不清晰、重复付款、错误付款或其他原因导致无法核验的，用户应及时联系本站处理。"] },
         { title: "三、退款处理", paragraphs: ["会员服务属于数字化服务或虚拟权益服务。已经完成开通、下载或实际使用的服务，除法律法规另有规定或本站明确承诺外，原则上不支持无理由退款。", "如因重复付款、错误付款、未开通且可核验、未成年人未经监护人同意付费等情况需要处理，可通过联系邮箱 292055066@qq.com 提交订单号、支付凭证、账号信息和必要说明，本站将在核实后依法依规处理。"] },
         { title: "四、巡检报告交付与退款边界", paragraphs: ["SEO/GEO 巡检属于数字化报告服务。任务完成且报告已在账号内开放查看或下载，视为完成主要交付；用户已消耗的巡检次数或已交付报告，除报告无法访问、服务重大故障、重复付款、法律法规另有规定或页面明确承诺外，原则上不支持无理由退款。", "任务因本站系统原因未开始、长期失败且无法重试，或付款后未获得约定权益的，用户可提交订单号和任务编号申请核验。退款获批后，对应未使用次数、监控权益及报告访问权可被撤销；已发生的支付、退款和审计记录依法保留。"] },
         { title: "五、持续监控续购", paragraphs: ["持续监控是 30 天服务包，绑定一个规范化站点和一个可编辑计划，具体运行次数以购买页面公示权益为准。", "持续监控到期后需用户手动续购，本网站不会自动扣款。未续购时计划停止执行；续购成功后按新服务期恢复相应权益。"] }
@@ -336,7 +339,7 @@ const legalPageMap: Record<Locale, Record<LegalSlug, LegalPage>> = {
           paragraphs: [
             "The website may provide VIP membership services. Benefits, validity periods, prices, activation methods, scope, and refund rules are subject to the membership rules displayed on the website.",
             "The current version may use personal payment QR codes, order number remarks, payment screenshot uploads, and manual backend review to activate membership. Users should carefully verify the order number, amount, plan details, and payment recipient information before paying.",
-            "After payment, users should upload payment proof as instructed. After backend approval, the corresponding membership benefits will be activated for the account. Review will be completed within 2 hours. If the order cannot be verified due to missing order remarks, inconsistent payer accounts, unclear screenshots, duplicate payments, incorrect payments, or other reasons, users should contact us promptly.",
+            "After payment, users should upload payment proof as instructed. After backend approval, the corresponding membership benefits will be activated for the account. We aim to review within 2 hours; requests needing more information or manual verification may take longer. Check your order page or contact support for progress. If the order cannot be verified due to missing order remarks, inconsistent payer accounts, unclear screenshots, duplicate payments, incorrect payments, or other reasons, users should contact us promptly.",
             "Membership services are digital or virtual benefit services. Refund conditions, refund periods, non-refundable circumstances, and after-sales handling are governed by the separately published Membership and Refund Rules."
           ]
         },
@@ -404,7 +407,7 @@ const legalPageMap: Record<Locale, Record<LegalSlug, LegalPage>> = {
       summary: "Rules for VIP membership, paid software downloads, manual review, refund conditions, and after-sales handling.",
       sections: [
         { title: "1. Membership Services", paragraphs: ["The website may provide VIP membership services. Benefits, validity periods, prices, activation methods, scope, and refund rules are subject to the membership rules displayed on the website.", "The current version may use personal payment QR codes, order number remarks, payment screenshot uploads, and manual backend review to activate membership. Users should carefully verify the order number, amount, plan details, and recipient information before paying."] },
-        { title: "2. Payment Proof and Review", paragraphs: ["After payment, users should upload payment proof as instructed. After backend approval, the corresponding membership benefits will be activated for the account. Review will be completed within 2 hours.", "If verification fails due to missing order remarks, inconsistent payer accounts, unclear screenshots, duplicate payments, incorrect payments, or other reasons, users should contact us promptly."] },
+        { title: "2. Payment Proof and Review", paragraphs: ["After payment, users should upload payment proof as instructed. After backend approval, the corresponding membership benefits will be activated for the account. We aim to review within 2 hours; requests needing more information or manual verification may take longer. Check your order page or contact support for progress.", "If verification fails due to missing order remarks, inconsistent payer accounts, unclear screenshots, duplicate payments, incorrect payments, or other reasons, users should contact us promptly."] },
         { title: "3. Refund Handling", paragraphs: ["Membership services are digital services or virtual benefits. Once activated, downloaded, or actually used, they generally do not support no-reason refunds unless otherwise required by law or expressly promised by the website.", "For duplicate payments, incorrect payments, unactivated and verifiable orders, or payments made by minors without guardian consent, please email 292055066@qq.com with the order number, payment proof, account information, and necessary explanation. We will handle the matter after verification according to applicable laws and rules."] },
         { title: "4. Audit Report Delivery and Refund Boundaries", paragraphs: ["An SEO/GEO audit is a digital report service. The primary delivery is complete when a finished report is available to view or download in the user's account. A consumed audit run or delivered digital report generally does not qualify for a no-reason refund unless the report is inaccessible, the service has a material failure, payment was duplicated, applicable law requires otherwise, or the purchase page expressly promises a refund.", "If a task does not start, repeatedly fails for reasons attributable to our system and cannot be retried, or the paid entitlement is not granted, the user may submit the order and task identifiers for review. Once a refund is approved, unused runs, monitoring entitlements, and report access may be revoked; payment, refund, and audit records are retained as required by law."] },
         { title: "5. Continuous Monitoring Renewal", paragraphs: ["Continuous monitoring is a 30-day service package tied to one normalized site and one editable schedule. The included run limits are those displayed on the purchase page.", "Renewal is manual and there is no automatic debit. The schedule stops when the service expires; the corresponding entitlement resumes for a new service period after a successful manual renewal."] }
@@ -431,8 +434,78 @@ const legalPageMap: Record<Locale, Record<LegalSlug, LegalPage>> = {
   }
 };
 
-export const legalPages = legalSlugs.map((slug) => legalPageMap.zh[slug]);
+const privacySupplement: Record<Locale, LegalPage["sections"]> = {
+  zh: [
+    {
+      title: "五、Google 登录与第三方处理",
+      paragraphs: [
+        "Google 登录由用户主动选择，使用 openid、email、profile 权限。本站验证 Google 返回的身份标识、已验证邮箱和显示名称，用于识别账号、创建昵称及登录；本站不获取 Google 密码，也不申请 Gmail 邮件、云端文件或联系人读取权限。Google 自身按其隐私政策处理授权过程中的信息（https://policies.google.com/privacy）。",
+        "Google 登录不会仅因邮箱相同而自动合并已有本地账号。已通过 Google 创建或关联的账号使用 Google 登录，密码由 Google 管理。账号、订单及用户上传内容使用腾讯云服务器与对象存储提供服务；隐私及安全说明可查看 https://cloud.tencent.com/document/product/301/1140。",
+      ],
+    },
+    {
+      title: "六、账号与论坛内容保存期限",
+      paragraphs: [
+        "普通账号资料在提供账号、下载和售后服务期间保留，本站目前没有按账号闲置天数自动清除的功能。论坛话题、回复及关联上传在内容展示和管理期间保存；申请注销或删除时，由工作人员核验后处理账号、公开内容与关联文件。请勿在论坛上传付款凭证或其他不宜公开的个人资料。",
+        "订单、付款、退款、争议及必要安全审计记录可能因核验、财务和法定义务继续保留；客服会在处理删除申请时说明保留范围与原因。备份是恢复服务所需的副本，不代表生产页面继续公开展示；备份不会随一次页面删除立即逐份改写，恢复时需重新落实已确认的删除或去标识要求。",
+      ],
+    },
+    {
+      title: "七、注销、资料更正与删除申请",
+      paragraphs: [
+        "请向 292055066@qq.com 发送主题为“账号注销/资料删除”的邮件，说明注册账号、希望处理的资料或论坛链接。请勿发送密码、完整付款账号或登录凭据。本站目前通过客服人工受理，网站内没有一键注销入口。",
+        "客服将通过注册邮箱或其他与账号匹配的方式核验身份，并说明需补齐的材料、不能立即删除的记录及预计完成日期。处理时限以完成身份和范围核验后的书面回复为准；如需延长，客服应说明原因和新的日期，用户可通过同一邮件跟进。涉及未完成订单或争议的，将先告知处理次序，不在未核实归属时删除资料。",
+      ],
+    },
+  ],
+  en: [
+    {
+      title: "5. Google Sign-in and Service Providers",
+      paragraphs: [
+        "Google sign-in is optional and uses the openid, email and profile scopes. We verify the identity identifier, verified email and display name returned by Google to identify an account, create a nickname and sign in. We do not receive your Google password or request access to Gmail messages, cloud files or contacts. Google processes the authorization flow under its privacy policy: https://policies.google.com/privacy.",
+        "A matching email alone does not automatically merge an existing local account. Accounts created or linked through Google use Google sign-in, and Google manages their password. Tencent Cloud servers and object storage support account, order and uploaded-content services; provider information is available at https://cloud.tencent.com/document/product/301/1140.",
+      ],
+    },
+    {
+      title: "6. Account and Forum Retention",
+      paragraphs: [
+        "Ordinary account data is kept while account, download and support services are provided; there is currently no automatic inactivity-based account purge. Forum posts, replies and associated uploads are retained while displayed and administered. Verified deletion requests are handled manually for the account, public content and associated files. Do not upload payment proof or other private personal information to the forum.",
+        "Order, payment, refund, dispute and necessary security audit records may need longer retention for verification, financial or legal purposes; support explains the retained scope and reasons when handling a request. Recovery backups are separate copies and do not mean deleted content remains publicly displayed. A page deletion does not immediately rewrite every backup; confirmed deletion or de-identification requirements must be reapplied after restoration.",
+      ],
+    },
+    {
+      title: "7. Correction, Account Closure and Deletion Requests",
+      paragraphs: [
+        "Email 292055066@qq.com with the subject Account closure / data deletion, your registered account and the data or forum links to be handled. Do not send passwords, full payment account details or login credentials. Requests are handled manually by support; there is no one-click account deletion page.",
+        "Support verifies ownership through the registered email or another matching account method, then identifies missing materials, any records that cannot immediately be deleted and an expected completion date. The processing period is confirmed in writing after identity and scope verification; an extension should include a reason and revised date. Follow up in the same email thread. Pending orders or disputes are explained before handling, and data is not erased before ownership is verified.",
+      ],
+    },
+  ],
+};
+
+const supportSections: Record<Locale, LegalPage["sections"][number]> = {
+  zh: {
+    title: "联系渠道与处理范围",
+    paragraphs: ["账号、订单、退款、隐私与版权请求：292055066@qq.com。软件安装与使用：优先使用产品详情页公示的客服渠道（通用软件支持 amen.enhe@gmail.com；提示词产品支持 ENHEAI.life@protonmail.com）。这些渠道服务同一网站的不同事项，账号资料删除请统一向第一个邮箱提出。"],
+  },
+  en: {
+    title: "Contact Channels and Responsibilities",
+    paragraphs: ["Accounts, orders, refunds, privacy and copyright: 292055066@qq.com. Installation and product usage: use the support channel published on the product page (general software support amen.enhe@gmail.com; prompt-product support ENHEAI.life@protonmail.com). These channels cover different matters for the same website. Send account-data deletion requests to the first address."],
+  },
+};
+
+export const legalPages = legalSlugs.map((slug) => getLegalPage(slug)!);
 
 export function getLegalPage(slug: string, locale: Locale = "zh") {
-  return legalSlugs.includes(slug as LegalSlug) ? legalPageMap[locale][slug as LegalSlug] : undefined;
+  if (!legalSlugs.includes(slug as LegalSlug)) return undefined;
+  const page = legalPageMap[locale][slug as LegalSlug];
+  return {
+    ...page,
+    updatedAt: legalPolicyUpdatedAt,
+    sections: [
+      ...page.sections,
+      ...(slug === "privacy-policy" ? privacySupplement[locale] : []),
+      supportSections[locale],
+    ],
+  };
 }

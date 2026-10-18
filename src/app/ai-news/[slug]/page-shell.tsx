@@ -116,21 +116,23 @@ export async function generateAiNewsDetailPageMetadata(
     12,
     metadataTitleMaxLength - ` | ${t.brand}`.length,
   );
+  const metadataPageTitle = buildAiNewsSerpTitle({
+    title: resolveAiNewsMetadataTitle({
+      seoTitle: article.seoTitle,
+      englishSeoTitle: article.englishSeoTitle,
+      localizedTitle: localized.title,
+      locale: forceLocale,
+    }),
+    categoryName: article.category?.name,
+    locale: forceLocale,
+    maxLength: metadataPageTitleMaxLength,
+    preserveCompletePhrase: true,
+  });
   const metadata = buildPageMetadata({
     title: buildMetadataTitle({
-      pageTitle: buildAiNewsSerpTitle({
-        title: resolveAiNewsMetadataTitle({
-          seoTitle: article.seoTitle,
-          englishSeoTitle: article.englishSeoTitle,
-          localizedTitle: localized.title,
-          locale: forceLocale,
-        }),
-        categoryName: article.category?.name,
-        locale: forceLocale,
-        maxLength: metadataPageTitleMaxLength,
-      }),
+      pageTitle: metadataPageTitle,
       brand: t.brand,
-      maxLength: metadataTitleMaxLength,
+      maxLength: Math.max(metadataTitleMaxLength, metadataPageTitle.length + ` | ${t.brand}`.length),
     }),
     description: localized.description,
     path: `/ai-news/${canonicalSlug}`,

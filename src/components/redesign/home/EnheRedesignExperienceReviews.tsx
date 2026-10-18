@@ -1,8 +1,7 @@
 "use client";
 
-import Image from "next/image";
+import { UserAvatar } from "@/components/user-avatar";
 import { EmojiText } from "@/components/emoji-text";
-import { getDefaultAvatar } from "@/lib/default-avatar";
 import { Pause, Play, UserRound } from "lucide-react";
 import { useEffect, useRef, useState, type KeyboardEvent } from "react";
 import type { RedesignLocale } from "@/components/redesign/types";
@@ -351,17 +350,13 @@ export function EnheRedesignExperienceReviews({
                 >
                   <div className="redesign-home-review-top">
                     {review.avatarSrc && review.avatarAlt ? (
-                      <Image
+                      <UserAvatar
                         className="redesign-home-review-avatar"
                         src={review.avatarSrc}
                         alt={review.avatarAlt}
-                        unoptimized
-                        onError={(event) => {
-                          const fallback = getDefaultAvatar(review.displayName);
-                          if (!event.currentTarget.src.endsWith(fallback)) event.currentTarget.src = fallback;
-                        }}
-                        width={56}
-                        height={56}
+                        fallbackSeed={review.displayName}
+                        unoptimized={false}
+                        size={56}
                       />
                     ) : (
                       <span className="redesign-home-review-avatar-placeholder" aria-hidden="true">

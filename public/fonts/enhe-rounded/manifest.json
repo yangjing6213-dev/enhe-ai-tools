@@ -1,0 +1,37 @@
+{
+  "family": "ENHE Rounded",
+  "weight": 400,
+  "format": "woff2",
+  "originalFamily": "ChillRoundF",
+  "originalVersion": "3.200",
+  "source": "https://github.com/Warren2060/ChillRound/releases/tag/v3.200",
+  "sourceAsset": "ChillRoundFRegular.ttf",
+  "license": "SIL Open Font License 1.1",
+  "licenseSource": "https://github.com/Warren2060/ChillRound/blob/main/LICENSE",
+  "sourceSha256": "7ccfc2cd0e971edeac7f65516df8db379f0f84d0d8ff79ee4dfe377956418d3b",
+  "sourceBytes": 6205268,
+  "file": "ENHERounded-Regular-full-bc07a6d90a6685fe.woff2",
+  "sha256": "bc07a6d90a6685fe2a824560788d8ddd70b89e269d462d64a713ddd93cbedfa1",
+  "bytes": 2612604,
+  "glyphCount": 15865,
+  "mappedCodePointCount": 14304,
+  "originalGlyphCount": 15865,
+  "originalMappedCodePointCount": 14304,
+  "glyphOrderIdentical": true,
+  "unicodeMappingIdentical": true,
+  "horizontalMetricsIdentical": true,
+  "originalOutlinesSha256": "35a401c214bc5c56e966990e7007609eab54dd2ecebebdc2c494961a3816dbaf",
+  "convertedOutlinesSha256": "35a401c214bc5c56e966990e7007609eab54dd2ecebebdc2c494961a3816dbaf",
+  "subsetApplied": false,
+  "modifications": [
+    "Whole-font WOFF2 compression",
+    "Family and PostScript identity renamed to avoid reserved font names"
+  ],
+  "unchanged": [
+    "All glyphs",
+    "Unicode mapping",
+    "Glyph outlines",
+    "Horizontal metrics",
+    "Author copyright and license records"
+  ]
+}

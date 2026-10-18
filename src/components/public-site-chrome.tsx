@@ -59,8 +59,8 @@ export async function PublicSiteChrome({
     url: languageAlternates["x-default"],
     returnPolicyPath: buildLocalePath("/legal/membership-refund", forceLocale),
     contactPoint: {
-      email: "ENHEAI.life@protonmail.com",
-      contactType: "customer support",
+      email: "292055066@qq.com",
+      contactType: "account, order and privacy support",
       availableLanguage: ["zh-CN", "en-US"]
     }
   });

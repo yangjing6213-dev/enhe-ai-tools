@@ -101,7 +101,7 @@ for (const route of routes) {
         titleColor: "rgb(0, 0, 0)",
         titleTrackingRatio: -0.025,
       });
-      const expectedLocaleFont = "Alimama Fang Yuan Ti";
+      const expectedLocaleFont = "ENHE Rounded";
       expect(designTokens.bodyFont).toContain(expectedLocaleFont);
       expect(designTokens.titleFont).toContain(expectedLocaleFont);
       expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBeLessThanOrEqual(width);

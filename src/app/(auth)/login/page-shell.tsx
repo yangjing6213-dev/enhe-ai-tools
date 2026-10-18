@@ -46,7 +46,18 @@ export async function LoginPageShell({
   const errorMessages: Record<string, string> = {
     invalid: t.auth.loginErrorInvalid,
     "login-limited": t.auth.loginErrorLimited,
-    "account-exists": t.auth.loginErrorAccountExists
+    "account-exists": t.auth.loginErrorAccountExists,
+    "register-limited": locale === "en"
+      ? "Too many registration attempts. Please wait before trying again."
+      : "注册尝试过于频繁，请稍后再试。",
+    "google-login-required": locale === "en"
+      ? "This account uses Google sign-in. Please select Sign in with Google below."
+      : "此账号通过 Google 登录，请使用下方的 Google 登录按钮。",
+    "google-account-conflict": locale === "en"
+      ? "An account already uses this email. Sign in with its original method or contact support; accounts are not merged automatically."
+      : "此邮箱已有账号，请使用原登录方式或联系客服处理；系统不会自动合并账号。",
+    "google-auth-failed": locale === "en" ? "Google sign-in could not be completed. Please try again." : "Google 登录未能完成，请重试。",
+    "google-not-configured": locale === "en" ? "Google sign-in is temporarily unavailable. Please contact support if this is your account's sign-in method." : "Google 登录暂不可用；若此账号使用 Google 登录，请联系客服。",
   };
 
   const errorMessage = params.message ? errorMessages[params.message] || t.auth.loginErrorDefault : null;

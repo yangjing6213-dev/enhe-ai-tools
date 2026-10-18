@@ -18,7 +18,8 @@ export async function requireAdmin() {
     status: "active" as const,
     createdAt: new Date(0),
     newsletterEmail: null,
-    acceptEmailUpdates: false
+    acceptEmailUpdates: false,
+    googleSubject: null
   };
 }
 
@@ -40,6 +41,14 @@ export async function assertLoginNotLimited() {
   throw new Error("Login operations are disabled in the admin visual fixture.");
 }
 
+export async function assertRegistrationNotLimited() {
+  throw new Error("Registration operations are disabled in the admin visual fixture.");
+}
+
+export async function updatePasswordAndRevokeSessions() {
+  throw new Error("Password operations are disabled in the admin visual fixture.");
+}
+
 export async function recordLoginAttempt() {
   throw new Error("Login operations are disabled in the admin visual fixture.");
 }
@@ -55,7 +64,8 @@ export async function requireUser() {
     status: "active" as const,
     createdAt: new Date("2026-09-30T00:00:00.000Z"),
     newsletterEmail: null,
-    acceptEmailUpdates: false
+    acceptEmailUpdates: false,
+    googleSubject: null
   };
 }
 
