@@ -26,6 +26,8 @@ playwright-report
 output/
 *.log
 *.tsbuildinfo
+__pycache__/
+*.py[cod]
 .codex-logs/
 .dev-logs/
 web-access/
