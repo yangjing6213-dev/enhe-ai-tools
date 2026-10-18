@@ -11,11 +11,23 @@
   color: transparent;
 }
 
-/* Keep the hero readable before its SVG measurements and texture are ready. */
+/* Keep the hero readable while the image texture loads, without changing its color. */
 .masked-heading[data-initial-fallback]:not([data-mask-ready]) .masked-heading__measure,
 .masked-heading[data-initial-fallback]:not([data-mask-ready]) .masked-heading__word {
-  color: #0462c2 !important;
-  -webkit-text-fill-color: #0462c2 !important;
+  color: var(--enhe-text, #080808) !important;
+  -webkit-text-fill-color: var(--enhe-text, #080808) !important;
+}
+
+.masked-heading[data-initial-fallback]:not([data-mask-ready]) .masked-heading__reveal {
+  visibility: hidden;
+}
+
+.masked-heading[data-initial-fallback] .masked-heading__measure {
+  transition: opacity 180ms ease-out;
+}
+
+.masked-heading[data-initial-fallback][data-mask-ready] .masked-heading__measure {
+  opacity: 0;
 }
 
 .masked-heading__word {
@@ -67,4 +79,10 @@
   object-fit: cover;
   user-select: none;
   -webkit-user-drag: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .masked-heading[data-initial-fallback] .masked-heading__measure {
+    transition: none;
+  }
 }

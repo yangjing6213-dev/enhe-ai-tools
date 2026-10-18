@@ -3,6 +3,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
 import { AiNewsInteractions } from "@/components/ai-news-interactions";
+import { AiNewsVideo } from "@/components/ai-news-video";
 import { StructuredData } from "@/components/structured-data";
 import { Badge, ButtonLink, Container, SectionTitle } from "@/components/ui";
 import { ToolCard } from "@/components/tool-card";
@@ -317,24 +318,7 @@ export async function AiNewsDetailPageShell({
             </section>
 
             {articleVideo ? (
-              <section className="glass rounded-2xl p-6">
-                <h2 className="text-2xl font-black text-[var(--marketing-text)]">
-                  {articleVideo.title}
-                </h2>
-                {articleVideo.description ? (
-                  <p className="mt-4 text-base leading-8 text-[var(--marketing-muted)]">
-                    {articleVideo.description}
-                  </p>
-                ) : null}
-                <a
-                  href={articleVideo.url}
-                  target="_blank"
-                  rel="nofollow noopener noreferrer"
-              className="mt-5 inline-flex break-all rounded-xl border border-[var(--marketing-accent)]/40 px-4 py-3 text-sm font-bold text-[var(--marketing-accent)] transition-colors hover:border-[var(--marketing-accent)]"
-                >
-                  {articleVideo.url}
-                </a>
-              </section>
+              <AiNewsVideo video={articleVideo} locale={forceLocale} articleTitle={localized.title} />
             ) : null}
 
             {localized.impactNotes ? (
