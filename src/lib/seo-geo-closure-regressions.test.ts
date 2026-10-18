@@ -137,7 +137,7 @@ describe("SEO and GEO closure regressions", () => {
     for (const page of listingPages) {
       expect(page).toContain("headingLevel={2}");
     }
-    expect(softwareCatalog).toContain("<h1>");
+    expect(softwareCatalog).toMatch(/<h1(?:\s[^>]*)?>/);
     expect(softwareCatalog).toContain("<h2>");
     expect(softwareCard).toContain("<h3 id={headingId}");
   });

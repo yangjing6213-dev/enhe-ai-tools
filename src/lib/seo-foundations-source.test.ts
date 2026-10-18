@@ -28,7 +28,7 @@ describe("SEO foundations source contract", () => {
     expect(homeShell).toContain("buildHomeMetadataTitle");
 
     expect(software).toContain("buildListingMetadataTitle");
-    expect(softwareCatalog).toContain("<h1>");
+    expect(softwareCatalog).toMatch(/<h1(?:\s[^>]*)?>/);
 
     for (const page of [onlineTools, skillLearning, pricing, tutorials]) {
       expect(page).toContain('as="h1"');
