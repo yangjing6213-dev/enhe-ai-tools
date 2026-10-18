@@ -2,6 +2,39 @@ import { describe, expect, it } from "vitest";
 import { buildAiNewsImportPayloadFromHtml } from "@/lib/ai-news-html-import";
 
 describe("AI news HTML import parser", () => {
+  it.each(["section", "div", "article"])("preserves nested %s fields through the last English section and reads following fields", (tag) => {
+    const payload = buildAiNewsImportPayloadFromHtml({
+      publishMode: "draft",
+      html: `<article><h1>双语资讯导入</h1><p>中文摘要与正文。</p>
+        <section id="cms-fields">
+          <${tag} data-field="englishContent"><h3>English content</h3>
+            <${tag}><h2>Direct answer</h2><p>The update changes the editing workflow.</p></${tag}>
+            <${tag}><h2>Facts and source scope</h2><p>The feature is available to eligible accounts.</p>
+              <${tag}><figure><img src="https://images.unsplash.com/photo-demo" alt="Editor preview"><figcaption>Official workflow example.</figcaption></figure></${tag}>
+            </${tag}>
+            <${tag}><h2>Action guide</h2><ol><li>Open the editor.</li><li>Review the exported result.</li></ol>
+              <p>Read the <a href="/en/ai-news/workflow-guide">workflow guide</a>.</p>
+            </${tag}>
+            <${tag}><h2>FAQ</h2><h3>Can I export?</h3><p>Check the format before sharing.</p></${tag}>
+          </${tag}>
+          <section data-field="englishConclusion"><h3>English conclusion</h3><p>Keep the final review.</p></section>
+          <section data-field="videoUrl"><h3>Video URL</h3><p>https://example.com/demo.mp4</p></section>
+        </section></article>`,
+    });
+
+    const content = payload.article.englishContent ?? "";
+    expect(content.match(/^## /gm)).toHaveLength(4);
+    expect(content).toContain("## Facts and source scope");
+    expect(content).toContain("![Editor preview](https://images.unsplash.com/photo-demo");
+    expect(content).toContain("Official workflow example.");
+    expect(content).toContain("Review the exported result.");
+    expect(content).toContain("[workflow guide](/en/ai-news/workflow-guide)");
+    expect(content).toContain("Check the format before sharing.");
+    expect(content).not.toContain("Keep the final review.");
+    expect(payload.article.englishConclusion).toBe("Keep the final review.");
+    expect(payload.article.videoUrl).toBe("https://example.com/demo.mp4");
+  });
+
   it("keeps topic-specific inline article images after extracting the featured cover", () => {
     const payload = buildAiNewsImportPayloadFromHtml({
       html: `

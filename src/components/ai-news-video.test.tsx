@@ -25,15 +25,19 @@ describe("AI article video presentation", () => {
     expect(html).not.toContain("官方演示");
   });
 
-  it("keeps unsupported providers as external links without an iframe", () => {
-    const html = renderToStaticMarkup(<AiNewsVideo video={{ url: "https://example.com/demo", title: "Demo" }} locale="en" articleTitle="Article" />);
+  it("renders only the source link for unsupported providers", () => {
+    const html = renderToStaticMarkup(<AiNewsVideo video={{ url: "https://video.tv.adobe.com/v/3492442", title: "Adobe demo", description: "Official Adobe video." }} locale="en" articleTitle="Article" />);
+    expect(html).not.toContain("<section");
+    expect(html).not.toContain("<h2");
     expect(html).not.toContain("<video");
     expect(html).not.toContain("<iframe");
+    expect(html).toContain('href="https://video.tv.adobe.com/v/3492442"');
     expect(html).toContain("Watch on the source website");
   });
 
   it.each([undefined, "Legacy plain description", '{"zh":"仅外链","en":"Link only","presentation":"external_link"}'])("requires persisted embedding approval for recognized media: %s", (description) => {
     const html = renderToStaticMarkup(<AiNewsVideo video={{ url: "https://cdn.example.com/demo.mp4", title: "Demo", description }} locale="en" articleTitle="Article" />);
+    expect(html).not.toContain("<section");
     expect(html).not.toContain("<video");
     expect(html).not.toContain("<iframe");
     expect(html).toContain("Watch on the source website");

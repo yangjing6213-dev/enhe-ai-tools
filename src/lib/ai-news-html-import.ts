@@ -361,9 +361,9 @@ function convertImageBlock(outerHtml: string) {
   return image ? imageToMarkdown(image) : null;
 }
 
-function convertBlocksToMarkdown(html: string, { requireContent = true } = {}) {
+function convertBlocksToMarkdown(html: string, { requireContent = true, excludeCover = true } = {}) {
   const blocks: string[] = [];
-  const coverImage = extractCoverImage(html);
+  const coverImage = excludeCover ? extractCoverImage(html) : undefined;
   const blockPattern = /<(h1|h2|h3|p|ul|ol|blockquote|pre|figure)\b[^>]*>[\s\S]*?<\/\1>|<img\b[^>]*>/gi;
   let match: RegExpExecArray | null;
   let skippingSources = false;
@@ -506,7 +506,7 @@ function createCmsField(bodyHtml: string): CmsField {
   return {
     bodyHtml: body,
     text: textWithLineBreaks(body),
-    markdown: convertBlocksToMarkdown(body, { requireContent: false }),
+    markdown: convertBlocksToMarkdown(body, { requireContent: false, excludeCover: false }),
     items: extractItemsFromField(body)
   };
 }
@@ -517,15 +517,17 @@ function extractCmsFields(html: string) {
   if (!cmsOuterHtml) return fields;
 
   const cmsInnerHtml = stripWrappingTag(cmsOuterHtml);
-  const dataFieldPattern = /<([a-z][a-z0-9:-]*)\b[^>]*\sdata-field\s*=\s*(?:"[^"]+"|'[^']+'|[^\s>]+)[^>]*>[\s\S]*?<\/\1>/gi;
+  const dataFieldPattern = /<([a-z][a-z0-9:-]*)\b[^>]*\sdata-field\s*=\s*(?:"[^"]+"|'[^']+'|[^\s>]+)[^>]*>/gi;
   let dataMatch: RegExpExecArray | null;
 
   while ((dataMatch = dataFieldPattern.exec(cmsInnerHtml))) {
-    const outerHtml = dataMatch[0];
-    const openTag = outerHtml.match(/^<([a-z][a-z0-9:-]*)\b[^>]*>/i)?.[0] ?? "";
+    const openTag = dataMatch[0];
     const key = canonicalCmsFieldKey(getAttribute(openTag, "data-field"));
     if (!key || fields.has(key)) continue;
+    const outerHtml = extractBalancedElementFromStart(cmsInnerHtml, dataMatch.index, dataMatch[1]);
+    if (!outerHtml) continue;
     fields.set(key, createCmsField(stripWrappingTag(outerHtml)));
+    dataFieldPattern.lastIndex = dataMatch.index + outerHtml.length;
   }
 
   const headingPattern = /<h[3-4]\b[^>]*>([\s\S]*?)<\/h[3-4]>/gi;

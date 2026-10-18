@@ -17,12 +17,24 @@ export function AiNewsVideo({ video, locale, articleTitle }: AiNewsVideoProps) {
   const description = localizeArticleVideoText(video.description, locale);
   const english = locale === "en";
   const watchLabel = english ? "Watch on the source website" : "前往来源网站观看";
+  const sourceLink = (
+    <a
+      href={video.url}
+      target="_blank"
+      rel="nofollow noopener noreferrer"
+      className={`inline-flex max-w-full break-all text-[var(--marketing-accent)] underline underline-offset-4 ${media && !failed ? "mt-5" : ""}`}
+    >
+      {watchLabel}
+    </a>
+  );
+
+  if (!media || failed) return sourceLink;
 
   return (
     <section className="glass rounded-2xl p-6" aria-label={title}>
       <h2 className="text-2xl font-black text-[var(--marketing-text)]">{title}</h2>
       {description ? <p className="mt-4 text-base leading-8 text-[var(--marketing-muted)]">{description}</p> : null}
-      {media?.kind === "native" && !failed ? (
+      {media.kind === "native" ? (
         <video
           src={media.src}
           aria-label={title}
@@ -35,7 +47,7 @@ export function AiNewsVideo({ video, locale, articleTitle }: AiNewsVideoProps) {
           {english ? "Use the source link if the video cannot play." : "无法播放时，可使用下方来源链接。"}
         </video>
       ) : null}
-      {media?.kind === "embed" && !failed ? (
+      {media.kind === "embed" ? (
         loaded ? (
           <iframe
             src={media.src}
@@ -57,15 +69,7 @@ export function AiNewsVideo({ video, locale, articleTitle }: AiNewsVideoProps) {
           </button>
         )
       ) : null}
-      {failed ? <p role="status" className="mt-4 text-[var(--marketing-muted)]">{english ? "The video could not be loaded. You can still read the article or open the source link." : "视频暂时无法加载，你仍可阅读正文或打开来源链接。"}</p> : null}
-      <a
-        href={video.url}
-        target="_blank"
-        rel="nofollow noopener noreferrer"
-        className="mt-5 inline-flex break-all text-[var(--marketing-accent)] underline underline-offset-4"
-      >
-        {watchLabel}
-      </a>
+      {sourceLink}
     </section>
   );
 }
