@@ -75,7 +75,7 @@ describe("AI tools candidate catalog", () => {
       lastIndex = nextIndex;
     }
 
-    expect(catalog).toContain("<h1>");
+    expect(catalog).toMatch(/<h1(?:\s[^>]*)?>/);
     expect(catalog).toContain("{copy.page.h1}");
     expect(catalog).not.toContain("redesign-software-label");
     expect(previewCatalog).toContain("NEW_RELEASE_IDS");

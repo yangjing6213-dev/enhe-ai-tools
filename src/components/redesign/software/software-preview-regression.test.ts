@@ -50,7 +50,7 @@ function assertLocaleSurface(locale: RedesignLocale, html: string) {
   const copy = SOFTWARE_COPY[locale];
   const otherCopy = SOFTWARE_COPY[otherLocale];
 
-  expect(countMatches(html, /<h1>/g)).toBe(1);
+  expect(countMatches(html, /<h1(?:\s[^>]*)?>/g)).toBe(1);
   expect(html).toContain(copy.page.h1);
   expect(html).toContain(copy.page.intro);
   expect(html).toContain(copy.sections.newReleases.heading);

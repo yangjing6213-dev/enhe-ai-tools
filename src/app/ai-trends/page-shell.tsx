@@ -462,7 +462,7 @@ export async function AiTrendTopicPageShell({ forceLocale = "zh" }: { forceLocal
         <section className="surface-panel overflow-hidden p-7 md:p-10">
         <div className="max-w-4xl">
           <Badge className="text-[var(--marketing-accent)]">AI Demand Trends</Badge>
-          <h1 className="mt-6 max-w-4xl text-4xl font-black leading-tight text-[var(--marketing-text)] md:text-6xl">
+          <h1 className="redesign-bold-copy mt-6 max-w-4xl text-4xl font-black leading-tight text-[var(--marketing-text)] md:text-6xl">
             {copy.title}
           </h1>
           <p className="mt-5 max-w-3xl text-base font-medium leading-8 text-[var(--marketing-muted)] md:text-lg">

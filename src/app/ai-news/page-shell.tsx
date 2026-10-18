@@ -404,7 +404,7 @@ export async function AiNewsPageShell({
               <p className="text-sm font-bold tracking-[0.08em] text-[var(--marketing-accent)]">
                 ENHE AI INSIGHTS
               </p>
-              <h1 className="mt-5 text-4xl font-black leading-tight text-[var(--marketing-text)] md:text-6xl">
+              <h1 className="redesign-bold-copy mt-5 text-4xl font-black leading-tight text-[var(--marketing-text)] md:text-6xl">
                 {t.aiNews.title}
               </h1>
               <p className="mt-5 max-w-3xl text-base font-medium leading-8 text-[var(--marketing-muted)] md:text-lg">

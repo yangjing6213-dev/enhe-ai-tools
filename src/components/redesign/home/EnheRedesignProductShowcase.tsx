@@ -478,7 +478,7 @@ export function EnheRedesignProductShowcase({
     >
       <div className="redesign-home-products-inner">
         <div className="redesign-home-products-heading">
-          <p className="redesign-home-products-eyebrow">{copy.eyebrow}</p>
+          <p className="redesign-home-products-eyebrow redesign-bold-copy">{copy.eyebrow}</p>
           <h2 id={`redesign-home-products-title-${locale}`}>
             {copy.heading}
           </h2>

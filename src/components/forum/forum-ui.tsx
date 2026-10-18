@@ -104,7 +104,7 @@ export function ForumIndexContent({ locale, posts, selectedCategory, isAuthentic
         />
       </div>
       <section className="forum-heading">
-        <div><p className="forum-eyebrow">ENHE AI COMMUNITY</p><h1>{t.title}</h1><p>{t.intro}</p></div>
+        <div><p className="forum-eyebrow">ENHE AI COMMUNITY</p><h1 className="redesign-bold-copy">{t.title}</h1><p>{t.intro}</p></div>
         <Link className="forum-primary-button" href={pageHref(locale, "/forum/new")}>{t.newPost}</Link>
       </section>
       <nav className="forum-categories" aria-label={t.categoryLabel}>

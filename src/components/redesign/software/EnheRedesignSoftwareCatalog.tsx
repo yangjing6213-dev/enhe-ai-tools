@@ -116,7 +116,7 @@ function renderProductionCatalog({
       data-production-catalog
     >
       <section className="redesign-software-hero">
-        <h1>{copy.page.h1}</h1>
+        <h1 className="redesign-bold-copy">{copy.page.h1}</h1>
         <p className="redesign-software-intro">{copy.page.intro}</p>
       </section>
 
@@ -316,7 +316,7 @@ function renderPreviewCatalog({
       data-selected-category="all"
     >
       <section className="redesign-software-hero">
-        <h1>{copy.page.h1}</h1>
+        <h1 className="redesign-bold-copy">{copy.page.h1}</h1>
         <p className="redesign-software-intro">{copy.page.intro}</p>
       </section>
 

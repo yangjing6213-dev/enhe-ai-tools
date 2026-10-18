@@ -45,6 +45,10 @@
   color-scheme: inherit;
 }
 
+.redesign-bold-copy {
+  font-synthesis: weight;
+}
+
 .enhe-redesign-preview:lang(en) {
   font-family: var(--enhe-font-en);
 }

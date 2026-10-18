@@ -265,7 +265,7 @@ export function AboutPageShell({ forceLocale }: { forceLocale: Locale }) {
         />
         <section className="enhe-reference-editorial-hero relative overflow-hidden p-0 text-left">
           <div className="relative max-w-4xl">
-            <h1 className="mt-0 text-left text-4xl font-black leading-tight text-[var(--marketing-text)] md:text-6xl">
+            <h1 className="redesign-bold-copy mt-0 text-left text-4xl font-black leading-tight text-[var(--marketing-text)] md:text-6xl">
               {copy.title}
             </h1>
             <p className="mt-5 max-w-3xl text-base font-semibold leading-8 text-[var(--marketing-muted)] md:text-lg">

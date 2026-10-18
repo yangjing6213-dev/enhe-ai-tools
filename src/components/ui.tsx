@@ -49,18 +49,20 @@ export function SectionTitle({
   eyebrow,
   title,
   intro,
+  titleClassName,
   as = "h2"
 }: {
   eyebrow?: string;
   title: string;
   intro?: string;
+  titleClassName?: string;
   as?: "h1" | "h2";
 }) {
   const TitleTag = as;
   return (
     <div className="mb-8 max-w-3xl">
       {eyebrow ? <p className="mb-3 text-sm font-bold tracking-[0.08em] text-[var(--marketing-accent)]">{eyebrow}</p> : null}
-      <TitleTag className="text-3xl font-black tracking-normal text-[var(--marketing-text)] md:text-4xl">{title}</TitleTag>
+      <TitleTag className={`text-3xl font-black tracking-normal text-[var(--marketing-text)] md:text-4xl ${titleClassName ?? ""}`.trim()}>{title}</TitleTag>
       {intro ? <p className="mt-4 text-base font-medium leading-7 text-[var(--marketing-muted)]">{intro}</p> : null}
     </div>
   );

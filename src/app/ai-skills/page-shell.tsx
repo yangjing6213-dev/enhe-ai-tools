@@ -129,7 +129,7 @@ export async function AiSkillsPageShell({
     <main>
       <Container className="py-14">
         <StructuredData data={[breadcrumbSchema, collectionSchema]} />
-        <SectionTitle as="h1" title={copy.title} intro={copy.intro} />
+        <SectionTitle as="h1" title={copy.title} titleClassName="redesign-bold-copy" intro={copy.intro} />
 
         <section className="surface-panel-soft mt-6 p-5" aria-label={copy.answerTitle}>
           <h2 className="text-base font-semibold text-[var(--marketing-text)]">{copy.answerTitle}</h2>

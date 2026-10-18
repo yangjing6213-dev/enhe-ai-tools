@@ -12,6 +12,14 @@ function read(path: string) {
 const hero = read("src/components/redesign/home/EnheRedesignHero.tsx");
 const showcase = read("src/components/redesign/home/EnheRedesignProductShowcase.tsx");
 const reviews = read("src/components/redesign/home/EnheRedesignExperienceReviews.tsx");
+const brandValue = read("src/components/redesign/home/EnheRedesignBrandValue.tsx");
+const softwareCatalog = read("src/components/redesign/software/EnheRedesignSoftwareCatalog.tsx");
+const forumUi = read("src/components/forum/forum-ui.tsx");
+const sectionTitle = read("src/components/ui.tsx");
+const aiSkillsPage = read("src/app/ai-skills/page-shell.tsx");
+const aiNewsPage = read("src/app/ai-news/page-shell.tsx");
+const aiTrendsPage = read("src/app/ai-trends/page-shell.tsx");
+const aboutPage = read("src/app/about/page-shell.tsx");
 const header = read("src/components/redesign/enhe-redesign-header.tsx");
 const footer = read("src/components/redesign/enhe-redesign-footer.tsx");
 const homeStyles = read("src/styles/redesign/home.css");
@@ -22,6 +30,21 @@ const tokens = read("src/styles/redesign/tokens.css");
 const globalStyles = read("src/app/globals.css");
 
 describe("homepage UI polish", () => {
+  it("allows the selected copy to render synthesized bold with the rounded body font", () => {
+    expect(shellStyles).toMatch(/\.redesign-bold-copy\s*\{[^}]*font-synthesis:\s*weight/);
+    expect(showcase).toContain('className="redesign-home-products-eyebrow redesign-bold-copy"');
+    expect(reviews).toContain('id="redesign-home-reviews-heading" className="redesign-bold-copy"');
+    expect(brandValue).toContain('className="redesign-bold-copy"');
+    expect(hero).toContain('cta.href.endsWith("/forum") ? "redesign-home-cta redesign-bold-copy"');
+    expect(softwareCatalog.match(/<h1 className="redesign-bold-copy">/g)).toHaveLength(2);
+    expect(forumUi).toContain('<h1 className="redesign-bold-copy">{t.title}</h1>');
+    expect(sectionTitle).toContain("titleClassName?: string");
+    expect(aiSkillsPage).toContain('titleClassName="redesign-bold-copy"');
+    expect(aiNewsPage).toContain('<h1 className="redesign-bold-copy mt-5');
+    expect(aiTrendsPage).toContain('<h1 className="redesign-bold-copy mt-6');
+    expect(aboutPage).toContain('<h1 className="redesign-bold-copy mt-0');
+  });
+
   it("removes the tagline while keeping the centered light hero", () => {
     expect(HOME_COPY.zh.label).toBe("给你的人生添加AI外挂");
     expect(hero).not.toContain("redesign-home-mobile-label");

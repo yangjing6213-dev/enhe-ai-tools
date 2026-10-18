@@ -83,7 +83,7 @@ describe("software page schema boundary", () => {
       "Software catalog content is not available in this local preview.",
     );
     expect(html).toContain("Return to ENHE AI home");
-    expect(html.match(/<h1>/g)).toHaveLength(1);
+    expect(html.match(/<h1(?:\s[^>]*)?>/g)).toHaveLength(1);
     expect(html.match(/redesign-software-empty-action/g)).toHaveLength(1);
     const statusStart = html.indexOf('role="status"');
     const statusEnd = html.indexOf("</p>", statusStart);

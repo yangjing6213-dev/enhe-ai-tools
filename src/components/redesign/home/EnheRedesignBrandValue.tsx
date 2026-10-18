@@ -11,7 +11,7 @@ export function EnheRedesignBrandValue({ locale }: { locale: RedesignLocale }) {
       aria-labelledby={`redesign-home-brand-value-title-${locale}`}
     >
       <div className="redesign-home-brand-value-inner">
-        <h2 id={`redesign-home-brand-value-title-${locale}`}>{copy.value.heading}</h2>
+        <h2 id={`redesign-home-brand-value-title-${locale}`} className="redesign-bold-copy">{copy.value.heading}</h2>
       </div>
     </section>
   );

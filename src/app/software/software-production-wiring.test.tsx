@@ -123,7 +123,7 @@ describe("production software route wiring", () => {
       }),
     );
 
-    expect(html.match(/<h1>/g)).toHaveLength(1);
+    expect(html.match(/<h1(?:\s[^>]*)?>/g)).toHaveLength(1);
     expect(html).toContain("data-production-catalog");
     expect(html).toContain("Public AI Video Tool");
     expect(html).toContain('href="/en/software/public-ai-video-tool"');

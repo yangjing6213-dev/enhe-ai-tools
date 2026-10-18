@@ -48,7 +48,7 @@ export function EnheRedesignHero({ locale }: { locale: RedesignLocale }) {
             <StarBorder
               key={cta.href}
               as="a"
-              className="redesign-home-cta"
+              className={cta.href.endsWith("/forum") ? "redesign-home-cta redesign-bold-copy" : "redesign-home-cta"}
               href={cta.href}
               color="#ffffff"
               trailColor="#ffffff"

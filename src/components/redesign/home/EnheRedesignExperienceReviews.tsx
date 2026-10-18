@@ -301,7 +301,7 @@ export function EnheRedesignExperienceReviews({
     >
       <div className="redesign-home-reviews-inner">
         <div className="redesign-home-reviews-heading-row">
-          <h2 id="redesign-home-reviews-heading">{copy.heading}</h2>
+          <h2 id="redesign-home-reviews-heading" className="redesign-bold-copy">{copy.heading}</h2>
           <button
             type="button"
             className="redesign-home-reviews-rotation"
