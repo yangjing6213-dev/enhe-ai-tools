@@ -8,7 +8,7 @@ import {
 const AUTOMATION_ACTION = "forum.post.daily_automated";
 const AUDIT_PREFIX = "forum-daily-ai-topic-";
 const SOURCE_LOOKBACK_DAYS = 30;
-const REPEAT_LOOKBACK_DAYS = 14;
+const REPEAT_LOOKBACK_DAYS = SOURCE_LOOKBACK_DAYS;
 
 type AiNewsTopicSource = {
   id: string;

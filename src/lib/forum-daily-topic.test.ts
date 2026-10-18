@@ -104,7 +104,7 @@ describe("daily AI forum topic automation", () => {
     expect(transaction.forumPost.create).toHaveBeenCalledTimes(1);
   });
 
-  it("skips a news article already used by an earlier daily forum topic", async () => {
+  it("skips a news article already used during the full source eligibility window", async () => {
     const clock = getShanghaiForumClock();
     const [year, month, day] = clock.date.split("-").map(Number);
     const lateToday = new Date(Date.UTC(year, month - 1, day, 15, 59));
@@ -125,6 +125,16 @@ describe("daily AI forum topic automation", () => {
     const result = await publishDueDailyAiTipForumTopic(clock.date, lateToday);
 
     expect(result).toEqual({ status: "published", postId: "forum-post-2" });
+    expect(transaction.adminAuditLog.findMany).toHaveBeenCalledWith(
+      expect.objectContaining({
+        where: expect.objectContaining({
+          action: "forum.post.daily_automated",
+          createdAt: {
+            gte: new Date(lateToday.getTime() - 30 * 86_400_000),
+          },
+        }),
+      }),
+    );
     expect(transaction.forumPost.create).toHaveBeenCalledWith({
       data: expect.objectContaining({
         title: "把「新资讯」变成可复用 AI 工作流",
