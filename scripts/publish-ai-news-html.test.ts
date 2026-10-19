@@ -105,8 +105,9 @@ describe("publish-ai-news-html script", () => {
       }
     );
 
+    expect(result.code, `${result.stderr}\n${result.stdout}`).toBe(0);
+    expect(receivedBody, `Import request body was empty.\n${result.stderr}`).not.toBe("");
     const body = JSON.parse(receivedBody) as Record<string, unknown>;
-    expect(result.code).toBe(0);
     expect(authorization).toBe("Bearer secret");
     expect(body).toMatchObject({
       format: "html",
