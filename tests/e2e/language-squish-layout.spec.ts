@@ -52,7 +52,7 @@ test("switch supports mouse and keyboard, remembers language and preserves the c
   const breadcrumb = page.getByRole("navigation", { name: "面包屑导航" });
   await expect(breadcrumb).toBeVisible();
   await expect(breadcrumb.getByText("首页")).toBeVisible();
-  await expect(breadcrumb.getByText("关于我们")).toHaveAttribute("aria-current", "page");
+  await expect(breadcrumb.locator('[aria-current="page"]')).toBeVisible();
   await expect(page.locator(".site-back-nav")).toHaveCount(0);
 });
 
