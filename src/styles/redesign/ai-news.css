@@ -269,3 +269,98 @@
 
 .enhe-redesign-production .ai-news-page .ai-news-card-summary { line-height: 1.65; }
 .enhe-redesign-production .ai-news-page .ai-news-interactive-card .card-like-action { padding: 0 16px 12px; }
+
+.enhe-redesign-production .ai-news-workspace-container.ai-news-page-container {
+  width: min(100% - 96px, 1280px);
+}
+
+.enhe-redesign-production .ai-news-page .ai-news-interactive-card {
+  width: 100%;
+  max-width: none;
+}
+
+.enhe-redesign-production .ai-news-page .ai-news-card-cover {
+  height: clamp(220px, 26vw, 360px);
+}
+
+.enhe-redesign-production .ai-news-detail-page .ai-news-related-tools-grid {
+  grid-template-columns: minmax(0, 1fr);
+}
+
+.enhe-redesign-production .ai-news-detail-page .tool-product-card-compact {
+  display: grid;
+  grid-template-columns: clamp(96px, 18vw, 240px) minmax(0, 1fr);
+  align-items: stretch;
+  width: 100%;
+}
+
+.enhe-redesign-production .ai-news-detail-page .tool-product-card-compact > .tool-product-card-cover {
+  aspect-ratio: auto;
+  border-right: 1px solid var(--enhe-border);
+  border-bottom: 0;
+}
+
+.enhe-redesign-production .ai-news-detail-page .tool-product-card-body-compact {
+  display: flex;
+  min-width: 0;
+  flex-direction: column;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 1rem;
+}
+
+.enhe-redesign-production .ai-news-detail-page .tool-product-card-body-compact > * {
+  margin: 0;
+}
+
+.enhe-redesign-production .ai-news-detail-page .tool-product-card-body-compact .tool-product-card-heading > div {
+  min-width: 0;
+}
+
+.enhe-redesign-production .ai-news-detail-page .tool-product-card-body-compact .tool-product-card-heading h3 {
+  display: -webkit-box;
+  overflow: hidden;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+}
+
+.enhe-redesign-production .ai-news-detail-page .tool-product-card-body-compact .tool-product-card-summary {
+  display: -webkit-box;
+  overflow: hidden;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+}
+
+.enhe-redesign-production .ai-news-detail-page .tool-product-card-highlights {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem 0.85rem;
+}
+
+.enhe-redesign-production .ai-news-detail-page .tool-product-card-supported-agents {
+  margin-top: 0.4rem;
+}
+
+.enhe-redesign-production .ai-news-detail-page .tool-product-card-body-compact .tool-product-card-footer {
+  margin-top: 0.25rem;
+}
+
+@media (width <= 1023px) {
+  .enhe-redesign-production .ai-news-workspace-container.ai-news-page-container {
+    width: min(100% - 64px, 1280px);
+  }
+}
+
+@media (width <= 767px) {
+  .enhe-redesign-production .ai-news-workspace-container.ai-news-page-container {
+    width: min(100% - 40px, 1280px);
+  }
+
+  .enhe-redesign-production .ai-news-page .ai-news-card-cover {
+    height: clamp(160px, 56vw, 220px);
+  }
+
+  .enhe-redesign-production .ai-news-detail-page .tool-product-card-body-compact {
+    padding: 0.75rem;
+  }
+}

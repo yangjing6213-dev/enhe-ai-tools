@@ -227,7 +227,7 @@ export async function AiNewsDetailPageShell({
     : buildFaqSchema({ items: articleFaqItems });
 
   return (
-    <Container className="ai-news-workspace-container py-14">
+    <Container className="ai-news-workspace-container ai-news-page-container py-14">
       <StructuredData
         data={[
           breadcrumbSchema,
@@ -335,7 +335,7 @@ export async function AiNewsDetailPageShell({
             {relatedTools.length && !embeddedSections.relatedTools ? (
               <section>
                 <SectionTitle title={t.aiNews.relatedTools} />
-                <div className="grid gap-5 md:grid-cols-3">
+                <div className="ai-news-related-tools-grid grid gap-4">
                   {relatedTools.map((tool) => (
                     <div
                       key={tool.id}
@@ -345,7 +345,7 @@ export async function AiNewsDetailPageShell({
                       data-analytics-entity-id={tool.id}
                       data-analytics-meta-source="ai-news"
                     >
-                      <ToolCard tool={tool} locale={forceLocale} />
+                      <ToolCard tool={tool} locale={forceLocale} variant="compact" />
                     </div>
                   ))}
                 </div>

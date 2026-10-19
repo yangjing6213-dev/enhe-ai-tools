@@ -18,7 +18,7 @@ import { getPrimaryToolPrice, type ToolPriceSpecStatus } from "@/lib/tool-price-
 type ToolCardProps = {
   headingLevel?: 2 | 3;
   locale?: Locale;
-  variant?: "default" | "homeFeatured";
+  variant?: "default" | "homeFeatured" | "compact";
   tool: {
     name: string;
     englishName?: string | null;
@@ -48,6 +48,7 @@ export function ToolCard({
   const coverImage = resolveToolImageSrc(tool.coverImage);
   const localizedTool = resolveLocalizedToolIdentity(tool, locale);
   const localizedCategory = resolveLocalizedToolCategoryName(tool.category?.name, tool.type, locale);
+  const isCompact = variant === "compact";
   const showMarketingMeta = variant !== "homeFeatured";
   const shouldShowSecondaryName = locale === "zh" && Boolean(localizedTool.secondaryName);
   const summary = buildValueSentence(
@@ -92,8 +93,8 @@ export function ToolCard({
 
   return (
     <PrefetchLink href={buildCanonicalToolPath(tool, locale)} className="group block rounded-2xl focus-visible:outline-none">
-      <Card className="surface-panel tool-product-card group overflow-hidden rounded-2xl border border-border bg-card p-0 text-card-foreground shadow-sm transition-[border-color,box-shadow,transform] duration-200 hover:-translate-y-1 hover:border-primary/45 hover:shadow-lg">
-      <div className="relative aspect-[16/9] overflow-hidden border-b border-border bg-muted">
+      <Card className={`surface-panel tool-product-card group overflow-hidden rounded-2xl border border-border bg-card p-0 text-card-foreground shadow-sm transition-[border-color,box-shadow,transform] duration-200 hover:-translate-y-1 hover:border-primary/45 hover:shadow-lg${isCompact ? " tool-product-card-compact" : ""}`}>
+      <div className="tool-product-card-cover relative aspect-[16/9] overflow-hidden border-b border-border bg-muted">
         {coverImage ? (
           <Image
             src={coverImage}
@@ -109,11 +110,11 @@ export function ToolCard({
         <div className="absolute inset-0 bg-gradient-to-t from-foreground/70 via-transparent to-transparent" />
       </div>
 
-      <div className="p-5">
-        <div className="mb-5 flex items-start justify-between gap-4">
+      <div className={`tool-product-card-body ${isCompact ? "tool-product-card-body-compact" : "p-5"}`}>
+        <div className={`tool-product-card-heading flex items-start justify-between ${isCompact ? "mb-2 gap-3" : "mb-5 gap-4"}`}>
           <div>
             {showMarketingMeta ? (
-              <div className="mb-3 flex flex-wrap gap-2">
+              <div className={`flex flex-wrap gap-2 ${isCompact ? "mb-2" : "mb-3"}`}>
                 <Badge>{localizedCategory || t.toolCard.uncategorized}</Badge>
                 {showPrice ? (
                   <Badge className="border-[var(--marketing-accent)]/35 text-[var(--marketing-accent)]">
@@ -124,10 +125,10 @@ export function ToolCard({
                 )}
               </div>
             ) : null}
-            <Heading className="text-xl font-bold text-[var(--marketing-text)]">{localizedTool.primaryName}</Heading>
-            {shouldShowSecondaryName ? <p className="mt-1 text-sm font-medium text-[var(--marketing-accent)]">{localizedTool.secondaryName}</p> : null}
+            <Heading className={`${isCompact ? "text-lg leading-snug" : "text-xl"} font-bold text-[var(--marketing-text)]`}>{localizedTool.primaryName}</Heading>
+            {shouldShowSecondaryName ? <p className={`mt-1 text-sm font-medium text-[var(--marketing-accent)]${isCompact ? " line-clamp-1" : ""}`}>{localizedTool.secondaryName}</p> : null}
             {tool.type === "ai_skill" && tool.supportedAgents?.length ? (
-              <div className="mt-3 flex flex-wrap gap-2" aria-label={t.toolDetail.supportedAgents}>
+              <div className={`mt-3 flex flex-wrap gap-2${isCompact ? " tool-product-card-supported-agents" : ""}`} aria-label={t.toolDetail.supportedAgents}>
                 {tool.supportedAgents.map((agent) => (
                   <Badge key={agent}>{agent}</Badge>
                 ))}
@@ -136,29 +137,29 @@ export function ToolCard({
           </div>
           <ArrowUpRight className="text-[var(--marketing-muted)] transition-colors group-hover:text-[var(--marketing-accent)]" />
         </div>
-        <p className="min-h-14 text-sm leading-6 text-[var(--marketing-soft-text)]">
+        <p className={`text-sm text-[var(--marketing-soft-text)]${isCompact ? " tool-product-card-summary leading-5" : " min-h-14 leading-6"}`}>
           <span className="font-semibold text-[var(--marketing-accent)]">{t.toolCard.valuePrefix}:</span>
           {summary}
         </p>
         {showMarketingMeta ? (
           <>
-            <div className="mt-5 grid gap-2">
-              {highlights.map((item) => (
+            <div className={`grid gap-2${isCompact ? " tool-product-card-highlights mt-2" : " mt-5"}`}>
+              {highlights.slice(0, isCompact ? 2 : highlights.length).map((item) => (
                 <span key={item} className="inline-flex items-center gap-2 text-sm text-[var(--marketing-muted)]">
                   <Check size={14} className="shrink-0 text-[var(--marketing-accent)]" />
                   {item}
                 </span>
               ))}
             </div>
-            <div className="mt-5 flex items-center gap-2 rounded-xl border border-border bg-muted px-3 py-2 text-xs text-muted-foreground">
+            {!isCompact ? <div className="mt-5 flex items-center gap-2 rounded-xl border border-border bg-muted px-3 py-2 text-xs text-muted-foreground">
               <UserRound size={14} className="shrink-0 text-[var(--marketing-accent)]" />
               <span>
                 {t.toolCard.audienceLabel}: {audience}
               </span>
-            </div>
+            </div> : null}
           </>
         ) : null}
-        {showMarketingMeta ? (
+        {showMarketingMeta && !isCompact ? (
           <div className="tool-card-commerce" aria-label={`${t.toolCard.priceLabel}: ${commerceLabel}`}>
             <div>
               <span>{t.toolCard.priceLabel}</span>
@@ -170,7 +171,7 @@ export function ToolCard({
             </div>
           </div>
         ) : null}
-        <div className="mt-6 flex items-center justify-between gap-4 text-xs text-[var(--marketing-muted)]">
+        <div className={`tool-product-card-footer flex items-center justify-between gap-4 text-xs text-[var(--marketing-muted)]${isCompact ? " mt-3" : " mt-6"}`}>
           {visibleMetrics.length ? (
             <span className="inline-flex items-center gap-3">
               {visibleMetrics.map((metric) => (

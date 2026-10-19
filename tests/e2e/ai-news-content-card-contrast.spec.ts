@@ -13,6 +13,7 @@ for (const route of ["/ai-news", "/en/ai-news"] as const) {
       const response = await page.goto(route, { waitUntil: "load" });
       expect(response?.status()).toBe(200);
 
+      await page.addScriptTag({ content: axe.source });
       await page.locator("main.ai-news-page").evaluate((main) => {
         const card = document.createElement("article");
         card.className = "ai-news-interactive-card glass rounded-2xl p-5";
@@ -47,7 +48,6 @@ for (const route of ["/ai-news", "/en/ai-news"] as const) {
         }
       });
 
-      await page.addScriptTag({ content: axe.source });
       const result = await page.evaluate(async () => {
         const report = await (window as unknown as { axe: typeof axe }).axe.run(document, {
           runOnly: { type: "rule", values: ["color-contrast"] },

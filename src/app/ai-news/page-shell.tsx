@@ -390,7 +390,7 @@ export async function AiNewsPageShell({
 
   return (
     <main className="ai-news-page ai-news-workspace enhe-reference-workspace">
-      <Container className="ai-news-workspace-container py-14">
+      <Container className="ai-news-workspace-container ai-news-page-container py-14">
         <StructuredData data={[breadcrumbSchema, collectionSchema, webPageSchema, faqSchema]} />
         <PageCover
           src="/images/ai-news-cover.png"
