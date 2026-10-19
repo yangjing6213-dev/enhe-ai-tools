@@ -235,7 +235,7 @@ describe("isolated launch deployment contract", () => {
 
     expect(wrapper).toContain("ReleaseRef");
     expect(wrapper).toContain("git status --porcelain");
-    expect(wrapper).toContain('npm -Arguments @("test")');
+    expect(wrapper).toContain('npm -Arguments @("test", "--", "--maxWorkers=8")');
     expect(wrapper).toContain('npm -Arguments @("run", "typecheck")');
     expect(wrapper).toContain('npm -Arguments @("run", "lint")');
     expect(wrapper).toContain('npm -Arguments @("run", "build")');

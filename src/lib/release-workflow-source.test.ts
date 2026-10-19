@@ -47,7 +47,9 @@ describe("production release workflow", () => {
 
   it("generates the local Prisma client before the clean-install test suite", () => {
     const wrapper = read("scripts/push-and-deploy.ps1");
-    const testPhase = wrapper.indexOf('Invoke-Native -FilePath npm -Arguments @("test")');
+    const testPhase = wrapper.indexOf(
+      'Invoke-Native -FilePath npm -Arguments @("test", "--", "--maxWorkers=8")',
+    );
     const generatedClient = wrapper.indexOf(
       'Invoke-Native -FilePath npm -Arguments @("run", "prisma:client")',
     );
@@ -92,7 +94,9 @@ describe("production release workflow", () => {
   it("keeps PostgreSQL-backed Vitest suites behind a separate explicit opt-in", () => {
     const wrapper = read("scripts/push-and-deploy.ps1");
     const runbook = read("docs/tencent-cloud-push-deploy-workflow.md");
-    const testCommand = wrapper.indexOf('Invoke-Native -FilePath npm -Arguments @("test")');
+    const testCommand = wrapper.indexOf(
+      'Invoke-Native -FilePath npm -Arguments @("test", "--", "--maxWorkers=8")',
+    );
     const vitestGate = wrapper.lastIndexOf("if ($AllowDatabaseMutatingVitest) {", testCommand);
     const testDatabaseReset = wrapper.lastIndexOf("$env:DATABASE_URL = $null", testCommand);
     const testAuditDatabaseReset = wrapper.lastIndexOf("$env:SEO_AUDIT_TEST_DATABASE_URL = $null", testCommand);
