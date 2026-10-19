@@ -44,6 +44,16 @@ describe("public navigation current-page state", () => {
     expect(headerSource).not.toContain("查看全部");
   });
 
+  it("adds the AI Workflows destination under the plural AI Skills menu in both locales", () => {
+    expect(REDESIGN_NAV_ITEMS.zh.find((item) => item.href === "/ai-skills")).toMatchObject({
+      label: "AI Skills",
+    });
+    expect(REDESIGN_NAV_ITEMS.zh.find((item) => item.href === "/ai-skills")?.children)
+      .toContainEqual({ label: "AI 工作流", href: "/ai-workflows" });
+    expect(REDESIGN_NAV_ITEMS.en.find((item) => item.href === "/en/ai-skills")?.children)
+      .toContainEqual({ label: "AI Workflows", href: "/en/ai-workflows" });
+  });
+
   it("allows desktop dropdown content to float without expanding the header", () => {
     const dropdownRule = globalStyles.match(/\.site-nav-menu-content\s*\{[^}]*\}/)?.[0] ?? "";
 

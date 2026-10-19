@@ -10,11 +10,12 @@ export const REDESIGN_NAV_ITEMS = {
     { label: "AI工具", href: "/software" },
     { label: "共创AI", href: "/forum" },
     {
-      label: "AI Skill",
+      label: "AI Skills",
       href: "/ai-skills",
       children: [
         { label: "AI 提示词", href: "/skill-learning/ai-prompt-management" },
-        { label: "AI Skill", href: "/ai-skills" },
+        { label: "AI Skills", href: "/ai-skills" },
+        { label: "AI 工作流", href: "/ai-workflows" },
       ],
     },
     { label: "AI资讯", href: "/ai-news" },
@@ -31,6 +32,7 @@ export const REDESIGN_NAV_ITEMS = {
       children: [
         { label: "AI Prompts", href: "/en/skill-learning/ai-prompt-management" },
         { label: "AI Skills", href: "/en/ai-skills" },
+        { label: "AI Workflows", href: "/en/ai-workflows" },
       ],
     },
     { label: "AI News", href: "/en/ai-news" },

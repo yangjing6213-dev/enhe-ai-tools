@@ -46,7 +46,7 @@ describe("ENHE Phase 2C.1.2 production copy compliance", () => {
       "首页",
       "AI工具",
       "共创AI",
-      "AI Skill",
+      "AI Skills",
       "AI资讯",
       "AI趋势",
       "关于我们",
@@ -65,11 +65,13 @@ describe("ENHE Phase 2C.1.2 production copy compliance", () => {
   it("uses the exact localized AI Skills dropdown labels", () => {
     expect(REDESIGN_ZH_NAV_ITEMS[3].children?.map(({ label }) => label)).toEqual([
       "AI 提示词",
-      "AI Skill",
+      "AI Skills",
+      "AI 工作流",
     ]);
     expect(REDESIGN_EN_NAV_ITEMS[3].children?.map(({ label }) => label)).toEqual([
       "AI Prompts",
       "AI Skills",
+      "AI Workflows",
     ]);
   });
 
