@@ -191,7 +191,7 @@
 .redesign-home-products-eyebrow {
   margin: 0 0 16px;
   color: var(--enhe-action-text, #0462C2);
-  font-size: clamp(2.25rem, 3vw, 3rem);
+  font-size: 2rem;
   font-weight: 700;
   letter-spacing: 0.01em;
   text-transform: uppercase;
@@ -201,7 +201,7 @@
   max-width: 100%;
   margin: 0;
   color: var(--enhe-text, #080808);
-  font-size: clamp(1.125rem, 1.6vw, 1.75rem);
+  font-size: clamp(1rem, 1.3vw, 1.2rem);
   letter-spacing: -0.02em;
   line-height: 1.65;
   white-space: normal;
@@ -437,11 +437,11 @@
 
   .redesign-home-products-eyebrow {
     margin-bottom: 12px;
-    font-size: clamp(1.75rem, 8vw, 2.25rem);
+    font-size: 2rem;
   }
 
   .redesign-home-products-heading h2 {
-    font-size: clamp(1rem, 4.5vw, 1.25rem);
+    font-size: clamp(1rem, 1.3vw, 1.2rem);
   }
 
   .redesign-home-product-stage {

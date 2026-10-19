@@ -113,6 +113,21 @@ test("homepage polish stays readable, responsive, and interactive without extern
 
     const productHeading = page.locator(".redesign-home-products-heading h2");
     await expect(productHeading).toHaveCSS("text-align", "center");
+    const matchedHomeFontSizes = await page.evaluate(() => {
+      const fontSize = (selector: string) => {
+        const element = document.querySelector<HTMLElement>(selector);
+        if (!element) throw new Error(`Missing homepage typography element: ${selector}`);
+        return getComputedStyle(element).fontSize;
+      };
+      return {
+        productEyebrow: fontSize(".redesign-home-products-eyebrow"),
+        reviewsHeading: fontSize(".redesign-home-reviews-inner h2"),
+        productHeading: fontSize(".redesign-home-products-heading h2"),
+        heroSubtitle: fontSize(".redesign-home-subtitle"),
+      };
+    });
+    expect(matchedHomeFontSizes.productEyebrow).toBe(matchedHomeFontSizes.reviewsHeading);
+    expect(matchedHomeFontSizes.productHeading).toBe(matchedHomeFontSizes.heroSubtitle);
     const headingDoesNotOverflow = await productHeading.evaluate((element) =>
       element.scrollWidth <= element.clientWidth,
     );
@@ -156,13 +171,10 @@ test("homepage polish stays readable, responsive, and interactive without extern
       };
       return [typography(productHeading), typography(reviewHeading)];
     });
-    const expectedProductHeadingSize = width < 768
-      ? Math.min(36, Math.max(28, width * 0.08))
-      : Math.min(48, Math.max(36, width * 0.03));
     expect(
-      Number.parseFloat(reviewHeadingSize[0].size),
-      `product showcase heading size at ${width}px`,
-    ).toBeCloseTo(expectedProductHeadingSize, 1);
+      reviewHeadingSize[0].size,
+      `product eyebrow matches the review heading at ${width}px`,
+    ).toBe("32px");
     expect(reviewHeadingSize[1].size, `review heading remains 32px at ${width}px`).toBe("32px");
     await expect(reviews.locator(".redesign-home-reviews-disclosure")).toHaveText("AI 生成示例（非真实用户反馈）");
     await expect(reviews.locator(".redesign-home-reviews-control, .redesign-home-review-triangle")).toHaveCount(0);
