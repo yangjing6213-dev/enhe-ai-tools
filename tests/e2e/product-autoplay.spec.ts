@@ -14,7 +14,7 @@ test("featured products autoplay, pause for reading and focus, and resume automa
     await section.locator(".redesign-home-products-eyebrow").evaluate((element) =>
       Number.parseFloat(getComputedStyle(element).fontSize),
     ),
-  ).toBeGreaterThanOrEqual(40);
+  ).toBe(32);
   await expect(section.locator(".redesign-home-product-indicators")).toHaveCSS(
     "background-color",
     "rgb(255, 255, 255)",
