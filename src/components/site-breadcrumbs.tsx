@@ -41,7 +41,7 @@ export function SiteBreadcrumbs({ locale }: SiteBreadcrumbsProps) {
             {item.current ? (
               <span aria-current="page">{item.label}</span>
             ) : (
-              <Link href={item.href}>{item.label}</Link>
+              <Link href={item.href} prefetch={false}>{item.label}</Link>
             )}
           </li>
         ))}
