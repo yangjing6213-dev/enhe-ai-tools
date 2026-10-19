@@ -19,7 +19,7 @@
 
 - `verified`: isolated clean worktree from production release commit `8a1f709abf855a077ed7e46623dc572c6d6ce8a5`.
 - `verified`: public Chinese and English directory routes, 10 task directions, localized search, and explicit unverified-workflow empty state.
-- `verified`: focused tests (20/20), typecheck, targeted lint, desktop/mobile browser checks, search interaction, and no horizontal overflow.
+- `verified`: focused tests (27/27, including the mobile navigation order regression), typecheck, targeted lint, desktop/mobile browser checks, search interaction, and no horizontal overflow.
 - `pending`: guarded push/deploy to the existing release branch.
 - `pending`: continue backend/admin/delivery/collection/scheduler scope after deployment.
 
