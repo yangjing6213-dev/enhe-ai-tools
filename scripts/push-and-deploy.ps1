@@ -248,7 +248,7 @@ try {
     $env:SEO_AUDIT_TEST_DATABASE_URL = $TestDatabaseUrl
     $env:DATABASE_URL = $TestDatabaseUrl
   }
-  Invoke-Native -FilePath npm -Arguments @("test")
+  Invoke-Native -FilePath npm -Arguments @("test", "--", "--maxWorkers=8")
   $env:SEO_AUDIT_TEST_DATABASE_URL = $null
   $env:DATABASE_URL = $null
   $env:DIRECT_URL = $null
