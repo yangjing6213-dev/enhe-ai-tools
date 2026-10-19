@@ -14,7 +14,7 @@ test.beforeEach(async ({ page }) => {
 });
 
 for (const route of [
-  { path: "/ai-skills", menu: "菜单", href: "/ai-skills", label: "AI Skill" },
+  { path: "/ai-skills", menu: "菜单", href: "/ai-skills", label: "AI Skills" },
   { path: "/en/ai-skills", menu: "Menu", href: "/en/ai-skills", label: "AI Skills" },
 ] as const) {
   test(`${route.path} marks only one current page in desktop and mobile navigation`, async ({

@@ -790,7 +790,7 @@ test("navigation and language links remain immediate after search moves into the
     "首页",
     "AI工具",
     "共创AI",
-    "AI SkillAI 提示词AI Skill",
+    "AI SkillsAI 提示词AI SkillsAI 工作流",
     "AI资讯",
     "AI趋势",
     "关于我们",
