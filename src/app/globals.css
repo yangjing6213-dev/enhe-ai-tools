@@ -1033,39 +1033,70 @@ select option:disabled {
   height: 72px;
 }
 
-.site-back-nav {
+.site-breadcrumbs {
   position: relative;
   z-index: 2;
   width: 100%;
   max-width: 1280px;
   margin: 0 auto;
-  padding: calc(72px + 1rem) 1rem 0;
+  padding: 12px 1rem 0;
 }
 
-.site-back-nav-button {
-  display: inline-flex;
+.site-breadcrumbs ol {
+  display: flex;
   align-items: center;
-  gap: 0.4rem;
-  border: 0;
-  background: transparent;
-  color: var(--marketing-muted);
-  font: inherit;
+  gap: 10px;
+  min-width: 0;
+  margin: 0;
+  padding: 0;
+  overflow-x: auto;
+  list-style: none;
+  scrollbar-width: none;
+  white-space: nowrap;
+}
+
+.site-breadcrumbs ol::-webkit-scrollbar {
+  display: none;
+}
+
+.site-breadcrumbs li {
+  display: inline-flex;
+  flex: 0 0 auto;
+  align-items: center;
+  gap: 10px;
+  color: #101828;
   font-size: 0.95rem;
-  font-weight: 600;
-  line-height: 1.25;
-  letter-spacing: 0;
-  cursor: pointer;
-  transition: color 180ms ease, transform 180ms ease;
+  line-height: 1.5;
 }
 
-.site-back-nav-button:hover {
-  color: var(--marketing-text);
-  transform: translateX(-2px);
+.site-breadcrumbs a {
+  color: #667085;
+  text-decoration: none;
+  transition: color 180ms ease;
 }
 
-.site-back-nav-button:focus-visible {
+.site-breadcrumbs a:hover {
+  color: #101828;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.site-breadcrumbs a:focus-visible {
   outline: 2px solid rgba(65, 197, 219, 0.72);
   outline-offset: 4px;
+}
+
+.site-breadcrumbs li:last-child {
+  color: #101828;
+  font-weight: 500;
+}
+
+.site-breadcrumbs-separator {
+  width: 14px;
+  height: 14px;
+  flex: 0 0 auto;
+  color: #667085;
+  stroke-width: 1.7;
 }
 
 .site-brand {
@@ -2005,7 +2036,7 @@ select option:disabled {
 }
 
 .fade-in:has(.home-page-shell),
-.site-back-nav + .fade-in {
+.site-breadcrumbs + .fade-in {
   padding-top: 0;
 }
 
@@ -4218,7 +4249,6 @@ select option:disabled {
   .site-footer-social-link,
   .site-footer-link,
   .site-footer-filing-link,
-  .site-back-nav-button,
   .tool-detail-video-play {
     min-width: 44px;
     min-height: 44px;
@@ -4386,8 +4416,17 @@ select option:disabled {
     padding-left: 1rem;
   }
 
-  .site-back-nav {
-    padding-top: calc(68px + 0.75rem);
+  .site-breadcrumbs {
+    padding-top: 10px;
+  }
+
+  .site-breadcrumbs ol {
+    gap: 8px;
+  }
+
+  .site-breadcrumbs li {
+    gap: 8px;
+    font-size: 0.875rem;
   }
 
   .site-header-actions {

@@ -110,7 +110,7 @@ describe("product demo feature source contract", () => {
     expect(detail).not.toContain("const faqItems = parseProductDemoFaq(demo.faq)");
   });
 
-  it("keeps product demo cards localized and avoids back-navigation overlap", () => {
+  it("keeps product demo cards localized and avoids breadcrumb overlap", () => {
     const productDemos = readFileSync(new URL("./product-demos.ts", import.meta.url), "utf8");
     const card = readFileSync(new URL("../components/product-demo-card.tsx", import.meta.url), "utf8");
     const css = readFileSync(new URL("../app/globals.css", import.meta.url), "utf8");
@@ -125,9 +125,9 @@ describe("product demo feature source contract", () => {
     expect(card).toContain("getLocalizedProductDemoTags");
     expect(card).not.toContain("alt={demo.coverAlt}");
     expect(css).not.toContain(".product-demo-card-media video");
-    expect(css).toContain(".site-back-nav");
+    expect(css).toContain(".site-breadcrumbs");
     expect(css).toContain("position: relative");
-    expect(css).toContain("padding: calc(72px + 1rem) 1rem 0");
+    expect(css).toContain("padding: 12px 1rem 0");
     expect(css).toContain(".product-demo-card p");
     expect(css).toContain("font-weight: 400");
   });

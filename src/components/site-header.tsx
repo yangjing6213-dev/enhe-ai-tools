@@ -4,7 +4,7 @@ import { Suspense } from "react";
 import { HeaderAdminNavLink } from "@/components/header-admin-nav-link";
 import { HeaderAccountControls } from "@/components/header-account-controls";
 import { HeaderSessionGate } from "@/components/header-session-gate";
-import { BackNavigationBar } from "@/components/back-navigation-bar";
+import { SiteBreadcrumbs } from "@/components/site-breadcrumbs";
 import { LanguageSwitcher } from "@/components/language-switcher";
 import { PrefetchLink } from "@/components/prefetch-link";
 import { PublicNavLink } from "@/components/public-nav-link";
@@ -232,7 +232,7 @@ async function SiteHeaderContent({ forceLocale }: { forceLocale?: Locale }) {
           </div>
         </Container>
       </header>
-      <BackNavigationBar locale={locale} />
+      <SiteBreadcrumbs locale={locale === "en" ? "en" : "zh"} />
     </>
   );
 }

@@ -204,7 +204,8 @@ for (const [locale, width] of [["zh", 320], ["en", 1440]] as const) {
     const content = `本地评分保存测试 ${locale} ${suffix}`;
     await page.locator("#tool-comment-content").fill(content);
     const submit = page.locator(".comment-submit-button");
-    await expect(page.locator('.site-back-nav-button')).toHaveCount(1);
+    await expect(page.getByRole("navigation", { name: locale === "en" ? "Breadcrumb" : "面包屑导航" })).toHaveCount(1);
+    await expect(page.locator(".site-back-nav-button")).toHaveCount(0);
     await expect(page.locator('.tool-detail-page').getByRole('link', {name: locale === 'en' ? 'Back' : '返回', exact: true})).toHaveCount(0);
     for (const primary of await page.locator('.tool-detail-page [data-slot="button"][data-variant="default"]').all()) {
       await expect(primary).toHaveCSS("-webkit-text-fill-color", "rgb(255, 255, 255)");

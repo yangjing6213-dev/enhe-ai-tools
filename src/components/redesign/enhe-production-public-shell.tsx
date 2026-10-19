@@ -6,7 +6,7 @@ import { PRODUCTION_FILING } from "@/lib/production-filing";
 import { getPublicSearchRecommendations } from "@/lib/public-search-recommendations";
 import { EnheRedesignFooter } from "./enhe-redesign-footer";
 import { EnheRedesignHeader } from "./enhe-redesign-header";
-import { BackNavigationBar } from "@/components/back-navigation-bar";
+import { SiteBreadcrumbs } from "@/components/site-breadcrumbs";
 import { REDESIGN_NAV_ITEMS } from "./navigation";
 import type { RedesignAccount, RedesignLanguageHrefs } from "./types";
 
@@ -65,7 +65,7 @@ export async function EnheRedesignPublicHeader({
         menuTriggerLabel={t.nav.menu}
         menuCloseLabel={t.nav.closeMenu}
       />
-      <BackNavigationBar locale={locale} />
+      <SiteBreadcrumbs locale={toRedesignLocale(locale)} />
     </>
   );
 }

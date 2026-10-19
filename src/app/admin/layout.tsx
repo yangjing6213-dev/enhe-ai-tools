@@ -11,6 +11,7 @@ import { getAdminDictionary } from "@/lib/admin-i18n";
 import { getDictionary } from "@/lib/dictionaries";
 import { getCurrentLocale } from "@/lib/i18n";
 import { AdminNav } from "@/app/admin/admin-nav";
+import { SiteBreadcrumbs } from "@/components/site-breadcrumbs";
 
 const adminNav = [
   ["dashboard", "/admin"],
@@ -86,6 +87,7 @@ export default async function AdminLayout({ children }: { children: React.ReactN
             </div>
           </div>
         </header>
+        <SiteBreadcrumbs locale={locale === "en" ? "en" : "zh"} />
         <div className="fade-in">
           <Container className="enhe-admin-container grid gap-6 py-10">
             <aside className="admin-shell-card admin-sidebar h-fit p-4">

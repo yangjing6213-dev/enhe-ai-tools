@@ -6,6 +6,10 @@ for (const width of [320, 768, 1366, 1920]) {
     const positions: number[][] = [];
     for (const path of ["/", "/en"]) {
       await page.goto(path);
+      const breadcrumb = page.getByRole("navigation", { name: path === "/en" ? "Breadcrumb" : "面包屑导航" });
+      await expect(breadcrumb).toBeVisible();
+      await expect(breadcrumb.getByText(path === "/en" ? "Home" : "首页")).toBeVisible();
+      await expect(page.locator(".site-back-nav")).toHaveCount(0);
       const toggle = page.locator('.redesign-header .enhe-language-toggle:visible');
       await expect(toggle.getByRole("switch")).toHaveAttribute("aria-checked", path === "/en" ? "true" : "false");
       const rect = (await toggle.boundingBox())!;
@@ -45,7 +49,11 @@ test("switch supports mouse and keyboard, remembers language and preserves the c
   await toggle.focus();
   await page.keyboard.press("Space");
   await expect(page).toHaveURL(/\/about$/);
-  await expect(page.locator('.site-back-nav [data-rounded-back-icon]')).toBeVisible();
+  const breadcrumb = page.getByRole("navigation", { name: "面包屑导航" });
+  await expect(breadcrumb).toBeVisible();
+  await expect(breadcrumb.getByText("首页")).toBeVisible();
+  await expect(breadcrumb.getByText("关于我们")).toHaveAttribute("aria-current", "page");
+  await expect(page.locator(".site-back-nav")).toHaveCount(0);
 });
 
 test("touch switch works with reduced motion", async ({ browser }) => {

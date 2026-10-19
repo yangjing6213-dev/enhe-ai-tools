@@ -971,7 +971,7 @@ body .redesign-footer nav {
   transform: translateY(10%);
 }
 
-.enhe-redesign-production > .site-back-nav {
+.enhe-redesign-production > .site-breadcrumbs {
   width: min(100% - 64px, var(--enhe-content-max));
   padding: 12px 0 0;
 }
@@ -1096,7 +1096,7 @@ body .redesign-footer nav {
 }
 
 @media (width < 768px) {
-  .enhe-redesign-production > .site-back-nav {
+  .enhe-redesign-production > .site-breadcrumbs {
     width: calc(100% - 40px);
   }
 
