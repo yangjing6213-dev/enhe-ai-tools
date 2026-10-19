@@ -40,7 +40,7 @@ type ToolMetaDescriptionInput = {
   description?: string | null;
   brand?: string;
   locale?: Locale;
-  type?: "software" | "online" | "skill_learning" | "ai_skill";
+  type?: "software" | "online" | "skill_learning" | "ai_skill" | "ai_workflow";
   maxLength?: number;
 };
 

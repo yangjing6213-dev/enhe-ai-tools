@@ -53,6 +53,15 @@ const typeLabels = {
     sceneTitle: "Skill 工作台",
     scenario: ["任务增强", "流程复用", "智能体协作"],
     specTitle: "Skill 参数"
+  },
+  ai_workflow: {
+    label: "AI WORKFLOW",
+    zh: "AI 工作流",
+    coverMetric: "可复用",
+    coverMetricLabel: "任务流程",
+    sceneTitle: "工作流工作台",
+    scenario: ["明确输入", "分步执行", "检查结果"],
+    specTitle: "工作流参数"
   }
 } as const;
 

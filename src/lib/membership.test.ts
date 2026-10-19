@@ -198,11 +198,11 @@ describe("membership service", () => {
 
       expect(db.tx.order.findUnique).toHaveBeenNthCalledWith(1, {
         where: { id: "order-vip-race" },
-        select: { id: true, userId: true, orderType: true, toolId: true }
+        select: { id: true, userId: true, orderType: true, toolId: true, toolFileId: true }
       });
       expect(db.tx.order.findUnique).toHaveBeenNthCalledWith(2, {
         where: { id: "order-vip-race" },
-        include: { plan: true, paymentProof: true }
+        include: { plan: true, paymentProof: true, tool: { select: { type: true } } }
       });
       expect(db.tx.$queryRaw).toHaveBeenCalledTimes(2);
       expect(String(db.tx.$queryRaw.mock.calls[0]?.[0]?.sql)).toContain("FROM users");
@@ -248,11 +248,11 @@ describe("membership service", () => {
 
       expect(db.tx.order.findUnique).toHaveBeenNthCalledWith(1, {
         where: { id: "order-software-race" },
-        select: { id: true, userId: true, orderType: true, toolId: true }
+        select: { id: true, userId: true, orderType: true, toolId: true, toolFileId: true }
       });
       expect(db.tx.order.findUnique).toHaveBeenNthCalledWith(2, {
         where: { id: "order-software-race" },
-        include: { plan: true, paymentProof: true }
+        include: { plan: true, paymentProof: true, tool: { select: { type: true } } }
       });
       expect(db.tx.$queryRaw).toHaveBeenCalledTimes(2);
       expect(String(db.tx.$queryRaw.mock.calls[0]?.[0]?.sql)).toContain("FROM orders");
@@ -545,7 +545,8 @@ describe("membership service", () => {
       id: "order-a",
       amount: 19,
       toolPriceSpecId: "spec-a",
-      toolPriceSpecName: "Single machine"
+      toolPriceSpecName: "Single machine",
+      toolFileId: "file-a"
     });
 
     await revokeEntitlementsForRefundedOrder(db.tx, {
@@ -570,7 +571,8 @@ describe("membership service", () => {
         id: true,
         amount: true,
         toolPriceSpecId: true,
-        toolPriceSpecName: true
+        toolPriceSpecName: true,
+        toolFileId: true
       }
     });
     expect(db.tx.toolPurchase.update).toHaveBeenCalledWith({
@@ -579,7 +581,8 @@ describe("membership service", () => {
         orderId: "order-a",
         amount: 19,
         toolPriceSpecId: "spec-a",
-        toolPriceSpecName: "Single machine"
+        toolPriceSpecName: "Single machine",
+        fileId: "file-a"
       }
     });
     expect(db.tx.toolPurchase.delete).not.toHaveBeenCalled();

@@ -55,7 +55,7 @@ export function filterPublicNewsTags<
   return result;
 }
 
-type PublicToolType = "software" | "online" | "skill_learning" | "ai_skill";
+type PublicToolType = "software" | "online" | "skill_learning" | "ai_skill" | "ai_workflow";
 
 const publicSoftwareCatalogWhere = {
   status: "published",
@@ -156,9 +156,9 @@ const getCachedPublicToolListing = unstable_cache(
             ? { tutorials: { some: { status: "active" } } }
             : {}),
           ...buildToolCategoryWhere(categoryId),
-          ...((type === "software" || type === "ai_skill") && paid === "paid"
+          ...((type === "software" || type === "ai_skill" || type === "ai_workflow") && paid === "paid"
             ? { isDownloadPaid: true }
-            : (type === "software" || type === "ai_skill") && paid === "free"
+            : (type === "software" || type === "ai_skill" || type === "ai_workflow") && paid === "free"
               ? { isDownloadPaid: false }
               : {}),
           ...(keyword
@@ -184,7 +184,7 @@ const getCachedPublicToolListing = unstable_cache(
           },
         },
         orderBy:
-          type === "software" || type === "ai_skill"
+          type === "software" || type === "ai_skill" || type === "ai_workflow"
             ? sort === "hot"
               ? { downloadCount: "desc" }
               : { createdAt: "desc" }

@@ -67,7 +67,7 @@ describe("AI Skill module source contracts", () => {
     expect(downloadRoute).toContain('"Content-Disposition"');
 
     const detailPage = source("src/app/tools/[slug]/page-shell.tsx");
-    expect(detailPage).toMatch(/isAiSkill\s*\?\s*hasDownloadLink/);
+    expect(detailPage).toMatch(/isAiSkill\s*\|\|\s*isAiWorkflow\s*\?\s*hasDownloadLink/);
     expect(detailPage).toMatch(/isAiSkill\s*\?\s*forceLocale === "en"/);
   });
 

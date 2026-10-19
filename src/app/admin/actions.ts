@@ -241,9 +241,10 @@ function parseDownloadFileUrl(value: FormDataEntryValue | null) {
   return parseOptionalMultilineText(value);
 }
 
-function getToolListingPath(type: "software" | "online" | "skill_learning" | "ai_skill") {
+function getToolListingPath(type: "software" | "online" | "skill_learning" | "ai_skill" | "ai_workflow") {
   if (type === "skill_learning") return "/skill-learning";
   if (type === "ai_skill") return "/ai-skills";
+  if (type === "ai_workflow") return "/ai-workflows";
   if (type === "software") return "/software";
   return "/account-services";
 }
@@ -1257,7 +1258,7 @@ export async function deleteFileAdminAction(formData: FormData) {
 
 export async function upsertToolAction(formData: FormData) {
   const admin = await requireAdmin();
-  const type = z.enum(["software", "online", "skill_learning", "ai_skill"]).parse(formData.get("type"));
+  const type = z.enum(["software", "online", "skill_learning", "ai_skill", "ai_workflow"]).parse(formData.get("type"));
   const adminPath = getAdminToolBasePath(type);
   let savedToolId = parseOptionalString(formData.get("id"));
 
@@ -1291,8 +1292,28 @@ export async function upsertToolAction(formData: FormData) {
       : parseOptionalString(formData.get("downloadFileId"));
     const priceSpecs = parseToolPriceSpecsFromFormData(formData);
     const primaryPriceSpec = getPrimaryToolPriceSpec(priceSpecs);
-    const isDownloadProduct = type === "software" || type === "ai_skill";
+    const isDownloadProduct = type === "software" || type === "ai_skill" || type === "ai_workflow";
     const resolvedPurchasePrice = primaryPriceSpec?.price ?? (isDownloadProduct ? parseNumberField(formData.get("downloadPrice"), 0) : 0);
+    const requestedStatus = z.enum(["draft", "published", "offline"]).parse(formData.get("status") ?? "draft");
+    if (type === "ai_workflow") {
+      if (priceSpecs.some((spec) => spec.status === "active")) throw new Error("AI 工作流价格只能在待确认价格区域审核，不能通过商品方案绕过确认记录。");
+      if (resolvedPurchasePrice > 0 && (resolvedPurchasePrice < 10 || resolvedPurchasePrice > 50 || Math.round(resolvedPurchasePrice * 100) !== resolvedPurchasePrice * 100)) {
+        throw new Error("AI 工作流收费价格必须为 10 到 50 元，最多两位小数。");
+      }
+      const candidate = id ? await prisma.aiWorkflowCandidate.findUnique({ where: { toolId: id } }) : null;
+      if (resolvedPurchasePrice > 0 && (candidate?.priceDecision !== "paid" || Number(candidate.confirmedPrice) !== resolvedPurchasePrice)) {
+        throw new Error("付费 AI 工作流必须先在待确认价格区域记录价格确认。");
+      }
+      if (candidate?.priceDecision && Number(candidate.confirmedPrice ?? 0) !== resolvedPurchasePrice) {
+        throw new Error("商品价格与已确认价格不一致，请先按价格审核流程重新确认。");
+      }
+      if (requestedStatus === "published" && (
+        !candidate || candidate.status !== "published" || !candidate.priceDecision ||
+        !candidate.fileId || candidate.fileId !== selectedDownloadFileId ||
+        !candidate.packageVersion || !candidate.packageSha256 || !/^[a-f0-9]{64}$/i.test(candidate.packageSha256) ||
+        !candidate.commitSha || !candidate.licenseSpdx || !candidate.validationReport
+      )) throw new Error("该 AI 工作流的价格、许可证、固定版本、验证或交付文件尚未完成审核，不能发布。");
+    }
     const existingProductImages = formData
       .getAll("existingScreenshots")
       .map((value) => String(value ?? ""))
@@ -1319,7 +1340,7 @@ export async function upsertToolAction(formData: FormData) {
       videoDescription3: parseOptionalMultilineText(formData.get("videoDescription3")),
       version: parseOptionalString(formData.get("version")),
       systemRequirement: parseOptionalMultilineText(formData.get("systemRequirement")),
-      supportedAgents: type === "ai_skill" ? normalizeSupportedAgents(formData.getAll("supportedAgents").map(String)) : [],
+      supportedAgents: type === "ai_skill" || type === "ai_workflow" ? normalizeSupportedAgents(formData.getAll("supportedAgents").map(String)) : [],
       isVipRequired: parseBooleanField(formData.get("isVipRequired")),
       isDownloadPaid: isDownloadProduct && resolvedPurchasePrice > 0,
       isDownloadLinkVipOnly: isDownloadProduct && resolvedPurchasePrice > 0,
@@ -1327,7 +1348,7 @@ export async function upsertToolAction(formData: FormData) {
       downloadPrice: resolvedPurchasePrice,
       onlineUrl: parseOptionalString(formData.get("onlineUrl")),
       downloadFileId: selectedDownloadFileId,
-      status: z.enum(["draft", "published", "offline"]).parse(formData.get("status") ?? "draft"),
+      status: requestedStatus,
       sortOrder: parseNumberField(formData.get("sortOrder"), 0)
     };
 
@@ -1453,7 +1474,7 @@ export async function updateToolTagsAction(formData: FormData) {
 export async function deleteToolAction(formData: FormData) {
   const admin = await requireAdmin();
   const id = idSchema.parse(formData.get("id"));
-  const type = z.enum(["software", "online", "skill_learning", "ai_skill"]).parse(formData.get("type"));
+  const type = z.enum(["software", "online", "skill_learning", "ai_skill", "ai_workflow"]).parse(formData.get("type"));
   const adminPath = getAdminToolBasePath(type);
   const result = await deleteToolForAdmin({
     db: prisma,

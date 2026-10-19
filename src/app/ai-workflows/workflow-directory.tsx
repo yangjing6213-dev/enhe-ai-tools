@@ -1,129 +1,196 @@
 "use client";
 
 import { useMemo, useState } from "react";
+import Image from "next/image";
 import Link from "next/link";
 import {
-  BriefcaseBusiness,
-  ChartNoAxesColumnIncreasing,
-  Code2,
-  GraduationCap,
-  HeartHandshake,
-  PanelsTopLeft,
-  Scale,
-  Search,
-  Sparkles,
-  Video,
-  type LucideIcon,
+  BriefcaseBusiness, ChartNoAxesColumnIncreasing, Code2, GraduationCap, HeartHandshake,
+  PanelsTopLeft, Scale, Search, Sparkles, Video, Workflow, type LucideIcon,
 } from "lucide-react";
 
 import type { RedesignLocale } from "@/components/redesign/types";
 import { EmptyState } from "@/components/ui";
+import { resolveToolImageSrc } from "@/lib/tool-image";
 import { AI_WORKFLOW_CATEGORIES, filterAiWorkflowCategories, type AiWorkflowCategory } from "./workflow-catalog";
+import { AiWorkflowFavoriteButton } from "./workflow-interactions";
+import type { AiWorkflowCatalogFilters } from "@/lib/ai-workflows/catalog";
 
 const categoryIcons: Record<AiWorkflowCategory["icon"], LucideIcon> = {
-  briefcase: BriefcaseBusiness,
-  video: Video,
-  sparkles: Sparkles,
-  code: Code2,
-  graduation: GraduationCap,
-  search: Search,
-  chart: ChartNoAxesColumnIncreasing,
-  panels: PanelsTopLeft,
-  heart: HeartHandshake,
-  scale: Scale,
+  briefcase: BriefcaseBusiness, video: Video, sparkles: Sparkles, code: Code2,
+  graduation: GraduationCap, search: Search, chart: ChartNoAxesColumnIncreasing,
+  panels: PanelsTopLeft, heart: HeartHandshake, scale: Scale,
+};
+
+type TopicOption = { id: string; name: string; englishName: string | null };
+export type AiWorkflowCatalogCard = {
+  id: string;
+  slug: string;
+  name: string;
+  englishName: string | null;
+  shortDescription: string;
+  coverImage: string | null;
+  isDownloadPaid: boolean;
+  price: number;
+  favoriteCount: number;
+  isFavorite: boolean;
+  downloadCount: number;
+  ratingAverage: number | null;
+  reviewCount: number;
+  projectType: string;
+  verifiedEnvironments: string[];
+  topic: { name: string; englishName: string | null } | null;
+  tags: string[];
+  systemRequirement: string | null;
 };
 
 const copy = {
   zh: {
-    search: "搜索应用方向或任务",
-    directions: "按应用方向浏览",
-    resultSuffix: "个方向",
-    emptyTitle: "没有找到相关方向",
-    emptyText: "换一个任务关键词试试。",
-    comingTitle: "首批 AI 工作流尚未完成发布核验",
-    comingText: "项目来源、许可证、运行条件和实际交付内容核验完成并正式发布后，这里才会展示具体项目、价格和评价。",
-    browseSkills: "浏览 AI Skills",
-    browseTools: "浏览 AI 工具",
+    search: "搜索中文名、仓库名、用途、主题或标签", directions: "AI 应用方向参考", resultSuffix: "个方向",
+    emptyTitle: "没有找到相关方向", emptyText: "换一个任务关键词试试。", products: "已发布工作流",
+    noProducts: "目前还没有完成核验并发布的工作流。项目通过来源、许可、运行条件和交付检查后，才会显示在这里。",
+    topic: "全部主题", paid: "全部价格", free: "免费", paidOnly: "付费", environment: "全部环境",
+    windows: "已验证 Windows", macos: "已验证 macOS", linux: "已验证 Linux", type: "全部类型",
+    workflow: "工作流", automation: "自动化工具", agent: "智能体项目", template: "模板", companion: "配套工具",
+    sort: "推荐排序", latest: "最新发布", downloads: "网站下载发起", rating: "用户评分", price: "价格从低到高",
+    count: "个项目", details: "查看详情", freeTag: "免费", noRating: "暂无评分", reviews: "条评价",
+    downloadsLabel: "次网站下载发起", environments: "已验证", page: "页", previous: "上一页", next: "下一页",
+    browseSkills: "浏览 AI Skills", browseTools: "浏览 AI 工具", unconfigured: "采集主题尚未配置",
   },
   en: {
-    search: "Search directions or tasks",
-    directions: "Browse by application area",
-    resultSuffix: "directions",
-    emptyTitle: "No matching direction found",
-    emptyText: "Try another task keyword.",
-    comingTitle: "The first AI workflows are not yet verified for publication",
-    comingText: "Specific projects, prices, and reviews will appear here only after their source, license, runtime requirements, and deliverables have been checked and the items are published.",
-    browseSkills: "Browse AI Skills",
-    browseTools: "Browse AI tools",
+    search: "Search Chinese name, repository, use case, topic, or tag", directions: "AI application directions",
+    resultSuffix: "directions", emptyTitle: "No matching direction found", emptyText: "Try another task keyword.",
+    products: "Published workflows", noProducts: "No workflow has completed source, license, runtime, and delivery checks yet. Verified and published items will appear here.",
+    topic: "All topics", paid: "All prices", free: "Free", paidOnly: "Paid", environment: "All environments",
+    windows: "Verified Windows", macos: "Verified macOS", linux: "Verified Linux", type: "All types",
+    workflow: "Workflow", automation: "Automation tool", agent: "Agent project", template: "Template", companion: "Companion tool",
+    sort: "Recommended", latest: "Newest", downloads: "Website download starts", rating: "User rating", price: "Price: low to high",
+    count: "items", details: "View details", freeTag: "Free", noRating: "No ratings yet", reviews: "reviews",
+    downloadsLabel: "website download starts", environments: "Verified", page: "Page", previous: "Previous", next: "Next",
+    browseSkills: "Browse AI Skills", browseTools: "Browse AI tools", unconfigured: "Collection topics are not configured",
   },
 } as const;
 
-export function AiWorkflowDirectory({ locale }: { locale: RedesignLocale }) {
-  const [query, setQuery] = useState("");
+function queryString(filters: AiWorkflowCatalogFilters, page: number) {
+  const params = new URLSearchParams();
+  if (filters.q) params.set("q", filters.q);
+  if (filters.topic) params.set("topic", filters.topic);
+  if (filters.paid !== "all") params.set("paid", filters.paid);
+  if (filters.environment !== "all") params.set("environment", filters.environment);
+  if (filters.type !== "all") params.set("type", filters.type);
+  if (filters.sort !== "recommended") params.set("sort", filters.sort);
+  if (page > 1) params.set("page", String(page));
+  const value = params.toString();
+  return value ? `?${value}` : "";
+}
+
+export function AiWorkflowDirectory({
+  locale, filters, items, topics, total, pageCount,
+}: {
+  locale: RedesignLocale;
+  filters: AiWorkflowCatalogFilters;
+  items: AiWorkflowCatalogCard[];
+  topics: TopicOption[];
+  total: number;
+  pageCount: number;
+}) {
+  const [query, setQuery] = useState(filters.q);
   const text = copy[locale];
-  const categories = useMemo(
-    () => filterAiWorkflowCategories(AI_WORKFLOW_CATEGORIES, query, locale),
-    [query, locale],
-  );
+  const directions = useMemo(() => filterAiWorkflowCategories(AI_WORKFLOW_CATEGORIES, query, locale), [query, locale]);
+  const basePath = locale === "en" ? "/en/ai-workflows" : "/ai-workflows";
 
   return (
     <>
-      <section className="filter-surface mt-7 p-5" aria-label={text.directions}>
-        <label className="sr-only" htmlFor="ai-workflow-direction-search">{text.search}</label>
-        <div className="relative">
+      <form action={basePath} method="get" className="filter-surface mt-7 grid gap-3 p-4 sm:grid-cols-2 lg:grid-cols-4" aria-label={locale === "en" ? "Workflow filters" : "工作流筛选"}>
+        <label className="relative sm:col-span-2">
+          <span className="sr-only">{text.search}</span>
           <Search aria-hidden="true" className="pointer-events-none absolute left-4 top-1/2 size-5 -translate-y-1/2 text-[var(--marketing-muted)]" />
-          <input
-            id="ai-workflow-direction-search"
-            type="search"
-            value={query}
-            placeholder={text.search}
-            className="w-full rounded-xl border border-border bg-background py-3 pl-12 pr-4 text-sm text-foreground placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
-            onChange={(event) => setQuery(event.currentTarget.value)}
-          />
-        </div>
-      </section>
+          <input name="q" type="search" value={query} placeholder={text.search} className="w-full rounded-xl border border-border bg-background py-3 pl-12 pr-4 text-sm text-foreground placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring" onChange={(event) => setQuery(event.currentTarget.value)} />
+        </label>
+        <label>
+          <span className="sr-only">{text.topic}</span>
+          <select name="topic" defaultValue={filters.topic} className="w-full rounded-xl border border-border bg-background px-3 py-3 text-sm text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring">
+            <option value="">{text.topic}</option>
+            {topics.map((topic) => <option key={topic.id} value={topic.id}>{locale === "en" ? topic.englishName || topic.name : topic.name}</option>)}
+          </select>
+        </label>
+        <label>
+          <span className="sr-only">{text.paid}</span>
+          <select name="paid" defaultValue={filters.paid} className="w-full rounded-xl border border-border bg-background px-3 py-3 text-sm text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring">
+            <option value="all">{text.paid}</option><option value="free">{text.free}</option><option value="paid">{text.paidOnly}</option>
+          </select>
+        </label>
+        <label>
+          <span className="sr-only">{text.environment}</span>
+          <select name="environment" defaultValue={filters.environment} className="w-full rounded-xl border border-border bg-background px-3 py-3 text-sm text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring">
+            <option value="all">{text.environment}</option><option value="windows">{text.windows}</option><option value="macos">{text.macos}</option><option value="linux">{text.linux}</option>
+          </select>
+        </label>
+        <label>
+          <span className="sr-only">{text.type}</span>
+          <select name="type" defaultValue={filters.type} className="w-full rounded-xl border border-border bg-background px-3 py-3 text-sm text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring">
+            <option value="all">{text.type}</option><option value="workflow">{text.workflow}</option><option value="automation">{text.automation}</option><option value="agent">{text.agent}</option><option value="template">{text.template}</option><option value="companion">{text.companion}</option>
+          </select>
+        </label>
+        <label>
+          <span className="sr-only">{text.sort}</span>
+          <select name="sort" defaultValue={filters.sort} className="w-full rounded-xl border border-border bg-background px-3 py-3 text-sm text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring">
+            <option value="recommended">{text.sort}</option><option value="latest">{text.latest}</option><option value="downloads">{text.downloads}</option><option value="rating">{text.rating}</option><option value="price">{text.price}</option>
+          </select>
+        </label>
+        <button type="submit" className="rounded-xl bg-[var(--marketing-accent)] px-4 py-3 text-sm font-semibold text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring">{locale === "en" ? "Apply filters" : "应用筛选"}</button>
+      </form>
 
       <div className="mt-6 flex items-center justify-between gap-4">
         <h2 className="text-lg font-semibold text-[var(--marketing-text)]">{text.directions}</h2>
-        <p className="text-sm text-[var(--marketing-muted)]" role="status" aria-live="polite">
-          {categories.length} {text.resultSuffix}
-        </p>
+        <p className="text-sm text-[var(--marketing-muted)]" role="status" aria-live="polite">{directions.length} {text.resultSuffix}</p>
       </div>
-
-      {categories.length ? (
+      {directions.length ? (
         <div className="mt-4 grid gap-4 sm:grid-cols-2" role="list" aria-label={text.directions}>
-          {categories.map((category) => {
+          {directions.map((category) => {
             const Icon = categoryIcons[category.icon];
-            return (
-              <article
-                key={category.slug}
-                className="flex min-h-28 items-start gap-4 rounded-2xl border border-[var(--marketing-border)] bg-white p-5 shadow-[0_12px_34px_rgba(29,78,126,0.06)]"
-                role="listitem"
-              >
-                <span className="mt-0.5 inline-flex size-12 shrink-0 items-center justify-center rounded-full bg-[rgba(0,102,204,0.12)] text-[var(--marketing-accent)]">
-                  <Icon aria-hidden="true" className="size-5" strokeWidth={1.8} />
-                </span>
-                <div>
-                  <h3 className="text-lg font-semibold leading-7 text-[var(--marketing-text)]">{category.label[locale]}</h3>
-                  <p className="mt-1 text-sm leading-6 text-[var(--marketing-muted)]">{category.examples[locale]}</p>
-                </div>
-              </article>
-            );
+            return <article key={category.slug} className="flex min-h-28 items-start gap-4 rounded-2xl border border-[var(--marketing-border)] bg-white p-5 shadow-[0_12px_34px_rgba(29,78,126,0.06)]" role="listitem">
+              <span className="mt-0.5 inline-flex size-12 shrink-0 items-center justify-center rounded-full bg-[rgba(0,102,204,0.12)] text-[var(--marketing-accent)]"><Icon aria-hidden="true" className="size-5" strokeWidth={1.8} /></span>
+              <div><h3 className="text-lg font-semibold leading-7 text-[var(--marketing-text)]">{category.label[locale]}</h3><p className="mt-1 text-sm leading-6 text-[var(--marketing-muted)]">{category.examples[locale]}</p></div>
+            </article>;
           })}
         </div>
-      ) : (
-        <div className="mt-4">
-          <EmptyState title={text.emptyTitle} text={text.emptyText} />
-        </div>
-      )}
+      ) : <div className="mt-4"><EmptyState title={text.emptyTitle} text={text.emptyText} /></div>}
 
-      <section className="mt-8 rounded-2xl border border-[var(--marketing-border)] bg-[var(--marketing-bg-soft)] p-6 sm:p-8" aria-labelledby="ai-workflows-coming-title">
-        <h2 id="ai-workflows-coming-title" className="text-lg font-semibold text-[var(--marketing-text)]">{text.comingTitle}</h2>
-        <p className="mt-2 max-w-3xl text-sm leading-7 text-[var(--marketing-muted)]">{text.comingText}</p>
-        <div className="mt-5 flex flex-wrap gap-3">
-          <Link className="text-sm font-medium text-[var(--marketing-accent)] underline-offset-4 hover:underline" href={locale === "en" ? "/en/ai-skills" : "/ai-skills"}>{text.browseSkills}</Link>
-          <Link className="text-sm font-medium text-[var(--marketing-accent)] underline-offset-4 hover:underline" href={locale === "en" ? "/en/software" : "/software"}>{text.browseTools}</Link>
-        </div>
+      <section className="mt-10" aria-labelledby="ai-workflow-products-title">
+        <div className="flex items-end justify-between gap-4"><h2 id="ai-workflow-products-title" className="text-xl font-semibold text-[var(--marketing-text)]">{text.products}</h2><p className="text-sm text-[var(--marketing-muted)]">{total} {text.count}</p></div>
+        {items.length ? <div className="mt-4 grid gap-4 md:grid-cols-2 xl:grid-cols-3">
+          {items.map((item) => {
+            const href = `${basePath}/${item.slug}`;
+            const image = resolveToolImageSrc(item.coverImage);
+            return <article key={item.id} className="flex min-h-[270px] flex-col rounded-2xl border border-[var(--marketing-border)] bg-white p-5 shadow-[0_12px_34px_rgba(29,78,126,0.06)]">
+              <div className="flex items-start gap-3">
+                <div className="flex size-14 shrink-0 items-center justify-center overflow-hidden rounded-xl bg-[#e8f3ff] text-[var(--marketing-accent)]">
+                  {image ? <Image src={image} alt="" width={56} height={56} unoptimized className="size-14 object-cover" /> : <Workflow aria-hidden="true" className="size-7" />}
+                </div>
+                <div className="min-w-0 flex-1"><Link href={href} className="font-semibold text-[var(--marketing-text)] hover:text-[var(--marketing-accent)]">{locale === "en" ? item.englishName || item.name : item.name}</Link><p className="mt-1 truncate text-xs text-[var(--marketing-muted)]">{item.englishName || item.name}</p></div>
+                <span className="shrink-0 rounded-full bg-[#e8f3ff] px-2.5 py-1 text-xs font-semibold text-[var(--marketing-accent)]">{item.isDownloadPaid ? `¥${item.price.toFixed(2)}` : text.freeTag}</span>
+              </div>
+              <p className="mt-4 line-clamp-3 text-sm leading-6 text-[var(--marketing-muted)]">{item.shortDescription}</p>
+              <div className="mt-3 flex flex-wrap gap-2">{item.topic ? <span className="rounded-full border border-[var(--marketing-border)] px-2.5 py-1 text-xs">{locale === "en" ? item.topic.englishName || item.topic.name : item.topic.name}</span> : null}{item.tags.slice(0, 3).map((tag) => <span key={tag} className="rounded-full border border-[var(--marketing-border)] px-2.5 py-1 text-xs">{tag}</span>)}</div>
+              <div className="mt-auto pt-4">
+                <div className="flex flex-wrap items-center gap-x-3 gap-y-2 text-xs text-[var(--marketing-muted)]">
+                  <span aria-label={item.ratingAverage === null ? text.noRating : `${item.ratingAverage.toFixed(1)} / 5`}>{item.ratingAverage === null ? text.noRating : `★ ${item.ratingAverage.toFixed(1)} (${item.reviewCount} ${text.reviews})`}</span>
+                  <span>{item.downloadCount} {text.downloadsLabel}</span>
+                  {item.verifiedEnvironments.length ? <span>{text.environments}: {item.verifiedEnvironments.join(" / ")}</span> : null}
+                </div>
+                <div className="mt-4 flex items-center justify-between gap-3 border-t border-[var(--marketing-border)] pt-3">
+                  <AiWorkflowFavoriteButton slug={item.slug} initialCount={item.favoriteCount} initialFavorite={item.isFavorite} locale={locale} loginHref={`${locale === "en" ? "/en" : ""}/login?returnTo=${encodeURIComponent(href)}`} />
+                  <Link href={href} className="rounded-lg bg-[var(--marketing-accent)] px-3 py-2 text-sm font-semibold text-white hover:opacity-90">{text.details}</Link>
+                </div>
+              </div>
+            </article>;
+          })}
+        </div> : <div className="mt-4 rounded-2xl border border-[var(--marketing-border)] bg-white p-6"><h3 className="font-semibold text-[var(--marketing-text)]">{text.unconfigured}</h3><p className="mt-2 text-sm leading-6 text-[var(--marketing-muted)]">{text.noProducts}</p><div className="mt-4 flex flex-wrap gap-4"><Link className="text-sm font-medium text-[var(--marketing-accent)] underline-offset-4 hover:underline" href={locale === "en" ? "/en/ai-skills" : "/ai-skills"}>{text.browseSkills}</Link><Link className="text-sm font-medium text-[var(--marketing-accent)] underline-offset-4 hover:underline" href={locale === "en" ? "/en/software" : "/software"}>{text.browseTools}</Link></div></div>}
+        {pageCount > 1 ? <nav className="mt-6 flex items-center justify-center gap-3" aria-label={locale === "en" ? "Workflow pages" : "工作流分页"}>
+          {filters.page > 1 ? <Link href={`${basePath}${queryString(filters, filters.page - 1)}`} className="rounded-lg border px-3 py-2 text-sm">{text.previous}</Link> : null}
+          <span className="text-sm text-[var(--marketing-muted)]">{text.page} {filters.page} / {pageCount}</span>
+          {filters.page < pageCount ? <Link href={`${basePath}${queryString(filters, filters.page + 1)}`} className="rounded-lg border px-3 py-2 text-sm">{text.next}</Link> : null}
+        </nav> : null}
       </section>
     </>
   );

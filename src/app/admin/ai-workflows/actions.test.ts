@@ -1,0 +1,103 @@
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+
+const mocks = vi.hoisted(() => ({
+  audit: vi.fn(),
+  batches: {
+    count: vi.fn(),
+    create: vi.fn(),
+    findFirst: vi.fn(),
+    findUnique: vi.fn(),
+  },
+  collectionSetting: {
+    findUnique: vi.fn(),
+    upsert: vi.fn(),
+  },
+  redirect: vi.fn((path: string) => { throw new Error(`NEXT_REDIRECT:${path}`); }),
+  revalidatePath: vi.fn(),
+  requireAdmin: vi.fn(),
+  topics: {
+    count: vi.fn(),
+    findMany: vi.fn(),
+  },
+  tx: {
+    aiWorkflowBatch: { updateMany: vi.fn() },
+    aiWorkflowCollectionSetting: { findUnique: vi.fn(), upsert: vi.fn() },
+    aiWorkflowTopic: { updateMany: vi.fn(), upsert: vi.fn() },
+  },
+  transaction: vi.fn(),
+}));
+
+vi.mock("next/cache", () => ({ revalidatePath: mocks.revalidatePath }));
+vi.mock("next/navigation", () => ({ redirect: mocks.redirect }));
+vi.mock("@/lib/auth", () => ({ requireAdmin: mocks.requireAdmin }));
+vi.mock("@/lib/admin-audit", () => ({ writeAdminAuditLog: mocks.audit }));
+vi.mock("@/lib/db", () => ({
+  prisma: {
+    $transaction: mocks.transaction,
+    aiWorkflowBatch: mocks.batches,
+    aiWorkflowCollectionSetting: mocks.collectionSetting,
+    aiWorkflowTopic: mocks.topics,
+  },
+}));
+
+import {
+  requestAiWorkflowBatchAction,
+  saveAiWorkflowScheduleAction,
+  saveAiWorkflowTopicsAction,
+} from "@/app/admin/ai-workflows/actions";
+
+beforeEach(() => {
+  vi.clearAllMocks();
+  vi.stubEnv("AI_WORKFLOW_WORKER_TOKEN", "test-worker-token-only");
+  vi.stubEnv("COS_SECRET_ID", "test-secret-id-only");
+  vi.stubEnv("COS_SECRET_KEY", "test-secret-key-only");
+  vi.stubEnv("COS_REGION", "ap-shanghai");
+  vi.stubEnv("COS_STATIC_BUCKET", "enhe-static-1303691623");
+  vi.stubEnv("COS_DOWNLOAD_BUCKET", "enhe-downloads-1303691623");
+  mocks.requireAdmin.mockResolvedValue({ id: "admin-1" });
+  mocks.transaction.mockImplementation(async (callback: (tx: typeof mocks.tx) => Promise<unknown>) => callback(mocks.tx));
+  mocks.tx.aiWorkflowCollectionSetting.findUnique.mockResolvedValue({ topicListVersion: 3 });
+  mocks.collectionSetting.findUnique.mockResolvedValue({
+    scheduledTaskRegisteredAt: new Date("2026-10-19T00:00:00.000Z"),
+    scheduledTaskEnabledAt: new Date("2026-10-19T00:00:00.000Z"),
+    topicListConfirmedAt: null,
+  });
+  mocks.topics.count.mockResolvedValue(1);
+  mocks.topics.findMany.mockResolvedValue([{ id: "topic-1", name: "Workflows", sortOrder: 0 }]);
+});
+
+afterEach(() => vi.unstubAllEnvs());
+
+describe("AI Workflow admin collection safeguards", () => {
+  it("saves topic changes as unconfirmed and invalidates active batches", async () => {
+    const form = new FormData();
+    form.set("topics", "工作流自动化 | Workflow automation");
+
+    await expect(saveAiWorkflowTopicsAction(form)).rejects.toThrow("NEXT_REDIRECT:/admin/ai-workflows?topicsSaved=1");
+
+    expect(mocks.tx.aiWorkflowCollectionSetting.upsert).toHaveBeenCalledWith(expect.objectContaining({
+      update: expect.objectContaining({ topicListVersion: 4, topicListConfirmedAt: null, isEnabled: false }),
+    }));
+    expect(mocks.tx.aiWorkflowBatch.updateMany).toHaveBeenCalledWith(expect.objectContaining({
+      where: { status: { in: ["queued", "paused", "running"] } },
+      data: expect.objectContaining({ status: "failed", failureReason: "topic_list_changed", leaseTokenHash: null }),
+    }));
+  });
+
+  it("cannot enable the daily schedule without a confirmed topic list", async () => {
+    const form = new FormData();
+    form.set("scheduleTime", "09:00");
+    form.set("isEnabled", "on");
+
+    await expect(saveAiWorkflowScheduleAction(form)).rejects.toThrow("NEXT_REDIRECT:/admin/ai-workflows?scheduleNotReady=1");
+
+    expect(mocks.collectionSetting.upsert).toHaveBeenCalledWith(expect.objectContaining({
+      update: expect.objectContaining({ isEnabled: false }),
+    }));
+  });
+
+  it("does not queue manual work until the topic list is confirmed", async () => {
+    await expect(requestAiWorkflowBatchAction()).rejects.toThrow("NEXT_REDIRECT:/admin/ai-workflows?error=请先导入并核对附件2中的有序主题清单。");
+    expect(mocks.batches.create).not.toHaveBeenCalled();
+  });
+});

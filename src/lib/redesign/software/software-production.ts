@@ -22,7 +22,7 @@ export type PublicSoftwareCatalogRow = {
   slug: string;
   name: string;
   englishName: string | null;
-  type: "software" | "online" | "skill_learning" | "ai_skill";
+  type: "software" | "online" | "skill_learning" | "ai_skill" | "ai_workflow";
   shortDescription: string;
   content: string;
   coverImage: string | null;
@@ -281,7 +281,7 @@ function isVisibleInLocale(
 function resolveSoftwareCatalogCategory(
   row: PublicSoftwareCatalogRow,
 ): SoftwareLeafCategoryId {
-  if (row.type === "ai_skill" || row.type === "skill_learning") {
+  if (row.type === "ai_skill" || row.type === "ai_workflow" || row.type === "skill_learning") {
     return "skill";
   }
 
@@ -368,13 +368,13 @@ function buildCatalogItem(
   );
   const primaryPrice = getPrimaryToolPrice(
     row.priceSpecs,
-    row.type === "software" || row.type === "ai_skill"
+    row.type === "software" || row.type === "ai_skill" || row.type === "ai_workflow"
       ? row.downloadPrice
       : 0,
   );
   const isPaid =
     primaryPrice > 0 &&
-    (row.type === "software" || row.type === "ai_skill"
+    (row.type === "software" || row.type === "ai_skill" || row.type === "ai_workflow"
       ? row.isDownloadPaid
       : true);
   const mediaSrc = resolvePublicToolImageSrc(row.id, row.coverImage, row.updatedAt);

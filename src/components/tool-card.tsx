@@ -23,7 +23,7 @@ type ToolCardProps = {
     name: string;
     englishName?: string | null;
     slug: string;
-    type: "software" | "online" | "skill_learning" | "ai_skill";
+    type: "software" | "online" | "skill_learning" | "ai_skill" | "ai_workflow";
     shortDescription: string;
     coverImage?: string | null;
     isVipRequired: boolean;
@@ -67,7 +67,7 @@ export function ToolCard({
   );
   const highlights = showMarketingMeta ? buildCardHighlights(tool, locale) : [];
   const audience = showMarketingMeta ? localizedCategory || t.toolCard.defaultAudience : "";
-  const isDownloadProduct = tool.type === "software" || tool.type === "ai_skill";
+  const isDownloadProduct = tool.type === "software" || tool.type === "ai_skill" || tool.type === "ai_workflow";
   const priceFallback = isDownloadProduct ? tool.downloadPrice : 0;
   const servicePrice = getPrimaryToolPrice(tool.priceSpecs ?? [], priceFallback);
   const isPositivePrice = Number.isFinite(servicePrice) && servicePrice > 0;

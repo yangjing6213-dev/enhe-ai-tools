@@ -2,7 +2,7 @@ export type UserEntitlementTool = {
   id: string;
   name: string;
   slug: string;
-  type: "software" | "online" | "skill_learning" | "ai_skill";
+  type: "software" | "online" | "skill_learning" | "ai_skill" | "ai_workflow";
   isVipRequired: boolean;
   isDownloadPaid: boolean;
   downloadFileId: string | null;
@@ -19,7 +19,7 @@ export function buildUserToolEntitlements<TTool extends UserEntitlementTool>({
   tools
 }: BuildUserToolEntitlementsInput<TTool>) {
   const purchased = new Set(purchasedToolIds);
-  const software = tools.filter((tool) => tool.type === "software" || tool.type === "ai_skill");
+  const software = tools.filter((tool) => tool.type === "software" || tool.type === "ai_skill" || tool.type === "ai_workflow");
 
   return {
     downloadableSoftware: software.filter((tool) => canDownloadToolFromUserCenter(tool, purchased)),

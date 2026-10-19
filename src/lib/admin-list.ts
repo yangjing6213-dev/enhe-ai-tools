@@ -105,7 +105,7 @@ export function parseAdminToolListParams(params: Record<string, string | undefin
 }
 
 export function buildAdminToolWhere(
-  type: "software" | "online" | "skill_learning" | "ai_skill",
+  type: "software" | "online" | "skill_learning" | "ai_skill" | "ai_workflow",
   filters: Pick<AdminToolListParams, "q" | "status" | "categoryId">
 ): Prisma.ToolWhereInput {
   const where: Prisma.ToolWhereInput = { type };

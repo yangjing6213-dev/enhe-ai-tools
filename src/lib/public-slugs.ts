@@ -37,17 +37,18 @@ export function buildCanonicalToolPath(
     slug: string;
     name: string;
     englishName?: string | null;
-    type?: "software" | "online" | "skill_learning" | "ai_skill";
+    type?: "software" | "online" | "skill_learning" | "ai_skill" | "ai_workflow";
   },
   locale: Locale
 ) {
   return buildLocalePath(`${getCanonicalToolBasePath(tool)}/${getCanonicalToolSlug(tool)}`, locale);
 }
 
-export function getCanonicalToolBasePath(tool: { type?: "software" | "online" | "skill_learning" | "ai_skill" }) {
+export function getCanonicalToolBasePath(tool: { type?: "software" | "online" | "skill_learning" | "ai_skill" | "ai_workflow" }) {
   if (tool.type === "online") return "/account-services";
   if (tool.type === "skill_learning") return "/skill-learning";
   if (tool.type === "ai_skill") return "/ai-skills";
+  if (tool.type === "ai_workflow") return "/ai-workflows";
   return "/software";
 }
 

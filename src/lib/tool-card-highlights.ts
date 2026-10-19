@@ -8,7 +8,7 @@ export function buildValueSentence(description: string, locale: Locale) {
 }
 
 type ToolHighlightInput = {
-  type: "software" | "online" | "skill_learning" | "ai_skill";
+  type: "software" | "online" | "skill_learning" | "ai_skill" | "ai_workflow";
   isDownloadPaid?: boolean;
   downloadPrice?: unknown;
   priceSpecs?: { price: unknown; status: ToolPriceSpecStatus }[];
@@ -16,7 +16,7 @@ type ToolHighlightInput = {
 
 export function buildToolCardHighlights(tool: ToolHighlightInput, locale: Locale) {
   const t = getDictionary(locale);
-  const isDownloadProduct = tool.type === "software" || tool.type === "ai_skill";
+  const isDownloadProduct = tool.type === "software" || tool.type === "ai_skill" || tool.type === "ai_workflow";
   const priceFallback = isDownloadProduct ? tool.downloadPrice : 0;
   const servicePrice = getPrimaryToolPrice(tool.priceSpecs ?? [], priceFallback);
   const isPaid =

@@ -20,7 +20,7 @@ export type PricingCatalogTool = {
   slug: string;
   name: string;
   englishName: string | null;
-  type: "software" | "online" | "skill_learning" | "ai_skill";
+  type: "software" | "online" | "skill_learning" | "ai_skill" | "ai_workflow";
   status: "draft" | "published" | "offline";
   shortDescription: string;
   content: string;
@@ -48,7 +48,7 @@ export type PricingOfferItem = {
   path: string;
   price: number;
   offers: PricingOffer[];
-  type: "software" | "account_service" | "course" | "ai_skill";
+  type: "software" | "account_service" | "course" | "ai_skill" | "ai_workflow";
   localized: PricingOfferCopy;
 };
 
@@ -63,6 +63,7 @@ function getCatalogType(type: PricingCatalogTool["type"]): PricingOfferItem["typ
   if (type === "online") return "account_service";
   if (type === "skill_learning") return "course";
   if (type === "ai_skill") return "ai_skill";
+  if (type === "ai_workflow") return "ai_workflow";
   return "software";
 }
 
@@ -70,6 +71,7 @@ function getCatalogPath(type: PricingCatalogTool["type"], slug: string) {
   if (type === "online") return `/account-services/${slug}`;
   if (type === "skill_learning") return `/skill-learning/${slug}`;
   if (type === "ai_skill") return `/ai-skills/${slug}`;
+  if (type === "ai_workflow") return `/ai-workflows/${slug}`;
   return `/software/${slug}`;
 }
 
@@ -96,7 +98,7 @@ function buildOffers(tool: PricingCatalogTool, locale: Locale): PricingOffer[] {
     .filter((spec) => spec.status === "active" && toFinitePrice(spec.price) > 0)
     .sort((left, right) => left.sortOrder - right.sortOrder);
 
-  const isDownloadProduct = tool.type === "software" || tool.type === "ai_skill";
+  const isDownloadProduct = tool.type === "software" || tool.type === "ai_skill" || tool.type === "ai_workflow";
   const usesPaidAccess = !isDownloadProduct || tool.isDownloadPaid;
   if (usesPaidAccess && activeSpecs.length) {
     return activeSpecs.map((spec, index) => ({
@@ -259,7 +261,7 @@ export async function loadPublicPricingCatalogTools(): Promise<
   return prisma.tool.findMany({
     where: {
       status: "published",
-      type: { in: ["software", "online", "skill_learning", "ai_skill"] },
+      type: { in: ["software", "online", "skill_learning", "ai_skill", "ai_workflow"] },
     },
     select: {
       slug: true,

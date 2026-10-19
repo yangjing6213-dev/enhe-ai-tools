@@ -1,6 +1,7 @@
 import { expect, test, type Browser, type Locator, type Page } from "@playwright/test";
 
 import { HOME_PRODUCTS } from "@/lib/redesign/home/home-products";
+import { SOFTWARE_FILTER_CATEGORIES } from "@/lib/redesign/software/software-categories";
 
 const hasProductCatalogTestDatabase = Boolean(process.env.DATABASE_URL?.trim());
 const isProductionServer = process.env.PLAYWRIGHT_USE_PRODUCTION_SERVER === "1";
@@ -158,6 +159,15 @@ async function openFormalRoute(page: Page, route: string) {
   await page.route("**/api/analytics", (request) =>
     request.fulfill({ status: 204 }),
   );
+  if (!hasProductCatalogTestDatabase) {
+    await page.route("**/api/card-likes**", (request) =>
+      request.fulfill({
+        status: 200,
+        contentType: "application/json",
+        body: JSON.stringify({ counts: {}, liked: {} }),
+      }),
+    );
+  }
   const response = await page.goto(route, { waitUntil: "domcontentloaded" });
   expect(response?.status(), `${route} response status`).toBe(200);
 }
@@ -424,7 +434,9 @@ async function openCategory(
         : "translateY(4px) scale(0.98)"
       : "none",
   );
-  await expect(panel.locator(".redesign-software-category-button")).toHaveCount(7);
+  await expect(panel.locator(".redesign-software-category-button")).toHaveCount(
+    SOFTWARE_FILTER_CATEGORIES.length,
+  );
   return { panel, trigger };
 }
 

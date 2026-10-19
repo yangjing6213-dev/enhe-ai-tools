@@ -4,7 +4,7 @@ import {
   sanitizeAccountServiceCopy,
 } from "@/lib/seo";
 
-type ToolType = "software" | "online" | "skill_learning" | "ai_skill";
+type ToolType = "software" | "online" | "skill_learning" | "ai_skill" | "ai_workflow";
 
 type LocalizedToolInput = {
   slug: string;
@@ -264,12 +264,14 @@ function getDefaultToolLabel(type: ToolType, locale: Locale) {
     if (type === "online") return "AI Account Service";
     if (type === "skill_learning") return "AI Skill Course";
     if (type === "ai_skill") return "AI Skill";
+    if (type === "ai_workflow") return "AI Workflow";
     return "AI Software App";
   }
 
   if (type === "online") return "AI账号服务";
   if (type === "skill_learning") return "AI技能课程";
   if (type === "ai_skill") return "AI Skill";
+  if (type === "ai_workflow") return "AI 工作流";
   return "AI软件应用";
 }
 
@@ -277,6 +279,7 @@ function getEnglishSentenceToolLabel(type: ToolType) {
   if (type === "online") return "AI account service";
   if (type === "skill_learning") return "AI skill course";
   if (type === "ai_skill") return "AI Skill";
+  if (type === "ai_workflow") return "AI workflow";
   return "AI software app";
 }
 

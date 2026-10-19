@@ -324,6 +324,61 @@ describe("activateOrderFromZpayNotify", () => {
     );
   });
 
+  it("activates an AI Workflow ZPAY order for the exact purchased package version", async () => {
+    const workflowOrder = {
+      id: order.id,
+      orderNo: order.orderNo,
+      userId: "user-1",
+      toolId: "workflow-tool-1",
+      toolFileId: "workflow-file-v7",
+      tool: { type: "ai_workflow" },
+      toolPriceSpecId: null,
+      toolPriceSpecName: null,
+      orderType: "software_download",
+      orderStatus: "pending_payment",
+      paymentMethod: "wechat",
+      amount: order.amount,
+      paidAt: null,
+      activatedAt: null,
+      paymentTransaction: null,
+      refundRecords: [],
+    };
+    const tx = {
+      $queryRaw: vi.fn().mockResolvedValue([{ id: order.id }]),
+      order: {
+        findUnique: vi.fn().mockResolvedValue(workflowOrder),
+        update: vi.fn(),
+      },
+      paymentTransaction: { upsert: vi.fn() },
+      orderRefundRecord: { create: vi.fn(), update: vi.fn() },
+      toolPurchase: { upsert: vi.fn() },
+      aiWorkflowVersionPurchase: { upsert: vi.fn() },
+      adminAuditLog: { create: vi.fn() },
+    };
+    const db = {
+      order: { findUnique: vi.fn().mockResolvedValue(workflowOrder) },
+      $transaction: vi.fn((callback: (transaction: typeof tx) => unknown) => callback(tx)),
+    };
+
+    await expect(activateOrderFromZpayNotify(successfulPayload("workflow-version-payment"), {
+      db: db as never,
+      config,
+      now: () => new Date("2026-10-20T00:00:00.000Z"),
+    })).resolves.toEqual({ ok: true, response: "success", status: 200 });
+
+    expect(tx.aiWorkflowVersionPurchase.upsert).toHaveBeenCalledWith({
+      where: { orderId: order.id },
+      update: {},
+      create: {
+        userId: "user-1",
+        toolId: "workflow-tool-1",
+        fileId: "workflow-file-v7",
+        orderId: order.id,
+        amount: order.amount,
+      },
+    });
+  });
+
   it("records a verified late payment on a cancelled order without activating it", async () => {
     const fixture = seoAuditFixture({ orderStatus: "cancelled" });
     const trackEvent = vi.fn();

@@ -1,5 +1,5 @@
 export type ToolPublishCheckInput = {
-  type: "software" | "online" | "skill_learning" | "ai_skill";
+  type: "software" | "online" | "skill_learning" | "ai_skill" | "ai_workflow";
   categoryId: string | null;
   shortDescription: string | null;
   content: string | null;
@@ -27,11 +27,11 @@ export function getToolPublishIssues(tool: ToolPublishCheckInput) {
     if (!hasTutorials) issues.push("缺少教程内容");
     return issues;
   }
-  if (tool.type === "ai_skill" && !directDownloadContent.trim()) {
+  if ((tool.type === "ai_skill" || tool.type === "ai_workflow") && !directDownloadContent.trim()) {
     issues.push("未上传 Skill ZIP 包");
   }
   if (tool.type === "software" && !directDownloadContent.trim() && !tool.downloadFileUrl?.trim()) issues.push("未填写下载链接");
-  if ((tool.type === "software" || tool.type === "ai_skill") && tool.isDownloadPaid && Number(tool.downloadPrice) <= 0) {
+  if ((tool.type === "software" || tool.type === "ai_skill" || tool.type === "ai_workflow") && tool.isDownloadPaid && Number(tool.downloadPrice) <= 0) {
     issues.push("付费下载价格需大于 0");
   }
 

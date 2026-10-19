@@ -17,6 +17,7 @@ import { ToolCard } from "@/components/tool-card";
 import { ToolRichContent } from "@/components/tool-rich-content";
 import { UserAvatar } from "@/components/user-avatar";
 import { EmojiText } from "@/components/emoji-text";
+import { AiWorkflowFavoriteButton, AiWorkflowInstallPanel, AiWorkflowReviewForm } from "@/app/ai-workflows/workflow-interactions";
 import { getCurrentUser } from "@/lib/auth";
 import { enheOrganizationReference } from "@/lib/brand-entity";
 import { prisma } from "@/lib/db";
@@ -58,6 +59,7 @@ import {
   shouldIndexEnglishToolPage,
 } from "@/lib/tool-localization";
 import { getPrimaryToolPrice } from "@/lib/tool-price-specs";
+import { canReviewAiWorkflow, normalizeGitHubRepositoryUrl } from "@/lib/ai-workflows/rules";
 import {
   canOpenPublicDownloadEntry,
   canOpenProtectedDownloadEntry,
@@ -76,7 +78,7 @@ export function resolveToolDetailSchemaPrice({
   isDownloadPaid,
   servicePrice,
 }: {
-  toolType: "software" | "online" | "skill_learning" | "ai_skill";
+  toolType: "software" | "online" | "skill_learning" | "ai_skill" | "ai_workflow";
   isDownloadPaid: boolean;
   servicePrice: number;
 }) {
@@ -216,7 +218,7 @@ export async function ToolDetailPageShell({
 }: {
   slug: string;
   forceLocale: Locale;
-  expectedType?: "software" | "online" | "skill_learning" | "ai_skill";
+  expectedType?: "software" | "online" | "skill_learning" | "ai_skill" | "ai_workflow";
 }) {
   if (!process.env.DATABASE_URL?.trim()) notFound();
 
@@ -251,6 +253,14 @@ export async function ToolDetailPageShell({
         include: { user: true },
         orderBy: [{ isPinned: "desc" }, { createdAt: "desc" }],
       },
+      aiWorkflowCandidate: { include: { topic: true } },
+      aiWorkflowReviews: {
+        where: { status: "approved" },
+        include: { user: { select: { nickname: true } } },
+        orderBy: { createdAt: "desc" },
+        take: 10,
+      },
+      _count: { select: { aiWorkflowFavorites: true } },
     },
   });
   if (!tool || tool.status !== "published") notFound();
@@ -322,7 +332,8 @@ export async function ToolDetailPageShell({
   const isAccountService = tool.type === "online";
   const isSkillLearning = tool.type === "skill_learning";
   const isAiSkill = tool.type === "ai_skill";
-  const isDownloadProduct = tool.type === "software" || isAiSkill;
+  const isAiWorkflow = tool.type === "ai_workflow";
+  const isDownloadProduct = tool.type === "software" || isAiSkill || isAiWorkflow;
   const activePriceSpecs = tool.priceSpecs.filter(
     (spec) => Number(spec.price) > 0,
   );
@@ -354,7 +365,30 @@ export async function ToolDetailPageShell({
   const paidSoftware =
     tool.type === "software" && tool.isDownloadPaid && servicePrice > 0;
   const paidAiSkill = isAiSkill && tool.isDownloadPaid && servicePrice > 0;
-  const paidDownloadProduct = paidSoftware || paidAiSkill;
+  const paidAiWorkflow = isAiWorkflow && tool.isDownloadPaid && servicePrice > 0;
+  const paidDownloadProduct = paidSoftware || paidAiSkill || paidAiWorkflow;
+  const workflowVersionPurchase = user && paidAiWorkflow
+    ? await prisma.aiWorkflowVersionPurchase.findFirst({
+        where: {
+          userId: user.id,
+          toolId: tool.id,
+          order: { is: {
+            orderStatus: "activated",
+            refundRecords: { none: { status: "pending" } },
+            OR: [
+              { paymentTransaction: { is: null } },
+              { paymentTransaction: { is: { refundState: null } } },
+              { paymentTransaction: { is: { refundState: "provider_rejected" } } },
+            ],
+          } },
+        },
+        include: { file: true },
+        orderBy: { createdAt: "desc" },
+      })
+    : null;
+  const effectiveDownloadFile = isAiWorkflow && paidAiWorkflow
+    ? workflowVersionPurchase?.file ?? null
+    : tool.downloadFile;
   const isPurchasableAccountService = isAccountService && servicePrice > 0;
   const paidSkillCourse = isSkillLearning && servicePrice > 0;
   const isFreeSkillCourse = isSkillLearning && servicePrice <= 0;
@@ -384,7 +418,9 @@ export async function ToolDetailPageShell({
     ),
   }));
   const hasDownloadPurchase = user
-    ? await prisma.toolPurchase
+    ? isAiWorkflow
+      ? Boolean(workflowVersionPurchase)
+      : await prisma.toolPurchase
         .findUnique({
           where: { userId_toolId: { userId: user.id, toolId: tool.id } },
         })
@@ -400,27 +436,31 @@ export async function ToolDetailPageShell({
     buildLocalePath("/software", forceLocale),
   );
   const purchaseLoginHref = `${buildLocalePath("/login", forceLocale)}?returnTo=${encodeURIComponent(purchaseReturnPath)}`;
-  const downloadLinkContent = getDownloadLinkContent(tool.downloadFile);
+  const downloadLinkContent = isAiWorkflow ? "" : getDownloadLinkContent(effectiveDownloadFile);
   const visibleDownloadLinkContent =
-    isAiSkill
+    isAiWorkflow
+      ? forceLocale === "en"
+        ? "The protected download button checks your access and creates a short-lived download link."
+        : "下方下载按钮会先检查权限，再生成短时有效的下载链接。"
+      : isAiSkill
       ? forceLocale === "en"
         ? "Use the protected download button below to get the current Skill package."
         : "请使用下方受保护的下载按钮获取当前 Skill 压缩包。"
       : buildLocalizedToolOptionalText(downloadLinkContent, forceLocale, { allowUntranslated: true });
   const visibleDownloadFileName =
     buildLocalizedToolOptionalText(
-      tool.downloadFile?.fileName,
+      effectiveDownloadFile?.fileName,
       forceLocale,
     ) || td.noDownloadFileName;
-  const hasDownloadLink = Boolean(
-    tool.downloadFileId && tool.downloadFile && downloadLinkContent,
-  );
+  const hasDownloadLink = isAiWorkflow
+    ? Boolean(effectiveDownloadFile?.id)
+    : Boolean(tool.downloadFileId && effectiveDownloadFile && downloadLinkContent);
   const showDownloadLinkArea = canShowDownloadLinkArea({
     hasDownloadLink,
     isDownloadPaid: paidDownloadProduct,
     hasDownloadPurchase,
   });
-  const canOpenDownloadEntry = isAiSkill
+  const canOpenDownloadEntry = isAiSkill || isAiWorkflow
     ? hasDownloadLink
     : canOpenProtectedDownloadEntry(downloadLinkContent);
   const publicDownloadHref = canOpenPublicDownloadEntry({
@@ -454,6 +494,35 @@ export async function ToolDetailPageShell({
     },
     take: 3,
   });
+  const workflowRepository = isAiWorkflow && tool.aiWorkflowCandidate
+    ? normalizeGitHubRepositoryUrl(tool.aiWorkflowCandidate.repositoryUrl)
+    : null;
+  const workflowRating = isAiWorkflow
+    ? await prisma.aiWorkflowReview.aggregate({
+        where: { toolId: tool.id, status: "approved" },
+        _avg: { rating: true },
+        _count: { id: true },
+      })
+    : null;
+  const workflowIsFavorite = user && isAiWorkflow
+    ? Boolean(await prisma.aiWorkflowFavorite.findUnique({
+        where: { userId_toolId: { userId: user.id, toolId: tool.id } },
+        select: { id: true },
+      }))
+    : false;
+  const workflowHasDownloaded = user && isAiWorkflow && !paidAiWorkflow
+    ? Boolean(await prisma.aiWorkflowDownloadEvent.findFirst({
+        where: { userId: user.id, toolId: tool.id },
+        select: { id: true },
+      }))
+    : false;
+  const workflowCanReview = isAiWorkflow && user
+    ? canReviewAiWorkflow({
+        isPaid: paidAiWorkflow,
+        hasActivePurchase: Boolean(workflowVersionPurchase),
+        hasDownloaded: workflowHasDownloaded,
+      })
+    : false;
   const tutorialVideos = visibleTutorials.filter(
     (tutorial) => tutorial.videoUrl,
   );
@@ -503,6 +572,8 @@ export async function ToolDetailPageShell({
   const baseListingPath =
     tool.type === "software"
       ? buildLocalePath("/software", forceLocale)
+      : tool.type === "ai_workflow"
+        ? buildLocalePath("/ai-workflows", forceLocale)
       : tool.type === "ai_skill"
         ? buildLocalePath("/ai-skills", forceLocale)
       : tool.type === "online"
@@ -516,6 +587,8 @@ export async function ToolDetailPageShell({
         name:
           tool.type === "software"
             ? t.listing.softwareTitle
+            : tool.type === "ai_workflow"
+              ? (forceLocale === "en" ? "AI Workflows" : "AI 工作流")
             : tool.type === "ai_skill"
               ? t.listing.aiSkillTitle
             : tool.type === "online"
@@ -604,6 +677,9 @@ export async function ToolDetailPageShell({
   // Service schemas can emit hasOfferCatalog, and course schemas can emit CourseInstance when the tool data supports them.
   const detailNavItems = [
     { href: "#tool-purchase", label: purchaseButtonLabel },
+    ...(isAiWorkflow
+      ? [{ href: "#workflow-source", label: forceLocale === "en" ? "Source & version" : "来源与版本" }]
+      : []),
     { href: "#tool-intro", label: introTitle },
     ...(hasTutorialSection
       ? [
@@ -1035,6 +1111,78 @@ export async function ToolDetailPageShell({
         </nav>
 
         <div className="mt-10 space-y-10">
+          {isAiWorkflow && tool.aiWorkflowCandidate ? (
+            <>
+              <section id="workflow-source" className="glass scroll-mt-24 rounded-2xl p-7">
+                <SectionTitle
+                  title={forceLocale === "en" ? "Source, license & verified version" : "来源、许可证与已核验版本"}
+                  intro={forceLocale === "en"
+                    ? "Review the exact upstream project and package version before downloading. Verification details describe the tested environment, not a guarantee for every setup."
+                    : "下载前可核对上游项目、交付版本与许可信息。验证结果仅适用于页面列出的环境，不代表所有设备都能直接运行。"}
+                />
+                <div className="mt-6 grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
+                  <Info label={forceLocale === "en" ? "Application area" : "应用方向"} value={forceLocale === "en" ? (tool.aiWorkflowCandidate.topic?.englishName || tool.aiWorkflowCandidate.topic?.name || "-") : (tool.aiWorkflowCandidate.topic?.name || "-")} />
+                  <Info label={forceLocale === "en" ? "Project type" : "项目类型"} value={tool.aiWorkflowCandidate.projectType} />
+                  <Info label={forceLocale === "en" ? "License" : "开源许可证"} value={tool.aiWorkflowCandidate.licenseSpdx || (forceLocale === "en" ? "Not provided" : "未提供")} />
+                  <Info label={forceLocale === "en" ? "Package version" : "交付版本"} value={tool.aiWorkflowCandidate.packageVersion || tool.version || "-"} />
+                  <Info label={forceLocale === "en" ? "Package size" : "压缩包大小"} value={tool.aiWorkflowCandidate.packageSize ? `${(Number(tool.aiWorkflowCandidate.packageSize) / 1024 / 1024).toFixed(1)} MB` : "-"} />
+                  <Info label={forceLocale === "en" ? "Verified environments" : "实际验证环境"} value={tool.aiWorkflowCandidate.verifiedEnvironments.length ? tool.aiWorkflowCandidate.verifiedEnvironments.join(" · ") : tool.systemRequirement || (forceLocale === "en" ? "Not recorded" : "暂无记录")} />
+                </div>
+                <div className="mt-3 grid gap-3 md:grid-cols-[minmax(0,1fr)_auto]">
+                  <div className="rounded-xl border border-white/10 bg-white/8 p-4">
+                    <p className="text-xs text-[#8F9DB2]">{forceLocale === "en" ? "Fixed source commit" : "固定来源版本"}</p>
+                    {workflowRepository && tool.aiWorkflowCandidate.commitSha ? (
+                      <a href={`${workflowRepository.url}/commit/${encodeURIComponent(tool.aiWorkflowCandidate.commitSha)}`} target="_blank" rel="nofollow noopener noreferrer" className="mt-2 inline-block break-all font-mono text-sm text-[var(--marketing-accent)] underline">
+                        {tool.aiWorkflowCandidate.commitSha}
+                      </a>
+                    ) : <p className="mt-2 text-sm text-[#C5D0E2]">{forceLocale === "en" ? "Not recorded" : "暂无记录"}</p>}
+                    {workflowRepository ? <a href={workflowRepository.url} target="_blank" rel="nofollow noopener noreferrer" className="mt-2 block break-all text-sm text-[var(--marketing-accent)] underline">{tool.aiWorkflowCandidate.repositoryOwner}/{tool.aiWorkflowCandidate.repositoryName}</a> : null}
+                    {tool.aiWorkflowCandidate.packageSha256 ? <p className="mt-2 break-all font-mono text-xs text-[#8F9DB2]">SHA-256: {tool.aiWorkflowCandidate.packageSha256}</p> : null}
+                  </div>
+                  <div className="flex min-w-48 flex-col justify-center rounded-xl border border-white/10 bg-white/8 p-4">
+                    <p className="text-xs text-[#8F9DB2]">{forceLocale === "en" ? "Verified user feedback" : "已审核的用户评价"}</p>
+                    <p className="mt-2 text-xl font-semibold text-[#F6FAFF]">
+                      {workflowRating?._count.id ? `${Number(workflowRating._avg.rating ?? 0).toFixed(1)} / 5` : (forceLocale === "en" ? "No reviews yet" : "暂无评价")}
+                    </p>
+                    <p className="mt-1 text-xs text-[#8F9DB2]">{workflowRating?._count.id ?? 0} {forceLocale === "en" ? "approved reviews" : "条已审核评价"}</p>
+                    <AiWorkflowFavoriteButton
+                      slug={tool.slug}
+                      initialCount={tool._count.aiWorkflowFavorites}
+                      initialFavorite={workflowIsFavorite}
+                      locale={forceLocale}
+                      loginHref={`${buildLocalePath("/login", forceLocale)}?returnTo=${encodeURIComponent(buildCanonicalToolPath(tool, forceLocale))}`}
+                    />
+                  </div>
+                </div>
+              </section>
+
+              <AiWorkflowInstallPanel
+                slug={tool.slug}
+                locale={forceLocale}
+                canGenerate={!paidAiWorkflow || Boolean(workflowVersionPurchase)}
+                verifiedEnvironments={tool.aiWorkflowCandidate.verifiedEnvironments}
+              />
+
+              <section id="workflow-reviews" className="glass scroll-mt-24 rounded-2xl p-7">
+                <SectionTitle title={forceLocale === "en" ? "User reviews" : "用户评价"} intro={forceLocale === "en" ? "Only approved reviews from users with a recorded purchase or download are shown." : "仅展示通过审核、且对应真实购买或下载记录的评价。"} />
+                {tool.aiWorkflowReviews.length ? (
+                  <div className="mt-5 grid gap-3">
+                    {tool.aiWorkflowReviews.map((review) => (
+                      <article key={review.id} className="rounded-xl border border-white/10 bg-white/8 p-4">
+                        <div className="flex flex-wrap items-center justify-between gap-2">
+                          <p className="text-sm font-semibold text-[#F6FAFF]">{review.user.nickname?.trim() || (forceLocale === "en" ? "Verified user" : "已验证用户")}</p>
+                          <p className="text-sm text-amber-400" aria-label={`${review.rating} / 5`}>{"★".repeat(review.rating)}{"☆".repeat(5 - review.rating)} <span className="text-[#8F9DB2]">{review.rating}/5</span></p>
+                        </div>
+                        {review.content ? <p className="mt-3 whitespace-pre-wrap break-words text-sm leading-6 text-[#C5D0E2]">{review.content}</p> : null}
+                        <p className="mt-2 text-xs text-[#8F9DB2]">{review.createdAt.toLocaleDateString(forceLocale === "en" ? "en-US" : "zh-CN")}</p>
+                      </article>
+                    ))}
+                  </div>
+                ) : <p className="mt-5 rounded-xl border border-white/10 bg-white/5 p-4 text-sm text-[#8F9DB2]">{forceLocale === "en" ? "There are no approved reviews yet." : "目前还没有通过审核的用户评价。"}</p>}
+                <AiWorkflowReviewForm slug={tool.slug} canReview={workflowCanReview} locale={forceLocale} />
+              </section>
+            </>
+          ) : null}
           <section
             id="tool-intro"
             className="glass scroll-mt-24 rounded-2xl p-7"

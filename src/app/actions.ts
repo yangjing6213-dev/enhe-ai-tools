@@ -55,6 +55,7 @@ import { resolveSafeReturnPath } from "@/lib/safe-return-path";
 import { isValidAvatarFile, MAX_AVATAR_FILE_BYTES } from "@/lib/avatar-file";
 import { getDefaultAvatar } from "@/lib/default-avatar";
 import { saveUploadedFile } from "@/lib/storage";
+import { isAiWorkflowPurchaseReady } from "@/lib/ai-workflows/rules";
 
 export async function registerAction(formData: FormData) {
   const locale = await getCurrentLocale();
@@ -214,25 +215,59 @@ export async function createSoftwareDownloadOrderAction(formData: FormData) {
   const requestedPriceSpecId = String(formData.get("priceSpecId") ?? "").trim() || null;
   const paymentMethod = z.enum(["alipay", "wechat"]).parse(formData.get("paymentMethod") ?? "alipay");
   const tool = await prisma.tool.findFirst({
-    where: { id: toolId, type: { in: ["software", "online", "skill_learning", "ai_skill"] }, status: "published" },
-    include: { priceSpecs: { where: { status: "active" }, orderBy: [{ sortOrder: "asc" }, { createdAt: "asc" }] } }
+    where: { id: toolId, type: { in: ["software", "online", "skill_learning", "ai_skill", "ai_workflow"] }, status: "published" },
+    include: {
+      priceSpecs: { where: { status: "active" }, orderBy: [{ sortOrder: "asc" }, { createdAt: "asc" }] },
+      aiWorkflowCandidate: true
+    }
   });
   if (!tool) throw new Error("工具或服务不存在，或尚未发布");
   const selectedPriceSpec = resolveToolOrderPriceSpec(tool.priceSpecs, requestedPriceSpecId);
-  const fallbackOrderAmount = tool.type === "software" || tool.type === "ai_skill" ? tool.downloadPrice : 0;
+  if (tool.type === "ai_workflow" && (tool.priceSpecs.length > 0 || selectedPriceSpec)) {
+    throw new Error("AI 工作流不能通过额外购买方案绕过已确认价格。");
+  }
+  const fallbackOrderAmount = tool.type === "software" || tool.type === "ai_skill" || tool.type === "ai_workflow" ? tool.downloadPrice : 0;
   const orderAmount = selectedPriceSpec?.price ?? fallbackOrderAmount;
+  if (tool.type === "ai_workflow" && !isAiWorkflowPurchaseReady({
+    candidateStatus: tool.aiWorkflowCandidate?.status ?? "",
+    candidateFileId: tool.aiWorkflowCandidate?.fileId ?? null,
+    toolFileId: tool.downloadFileId,
+    isDownloadPaid: tool.isDownloadPaid,
+    downloadPrice: Number(tool.downloadPrice),
+    priceDecision: tool.aiWorkflowCandidate?.priceDecision ?? null,
+    confirmedPrice: Number(tool.aiWorkflowCandidate?.confirmedPrice ?? 0),
+  })) throw new Error("该 AI 工作流尚未完成价格确认或交付版本归档。");
   const redirectTarget = `/api/tools/${tool.id}/download`;
   const isPaidSoftware = tool.type === "software" && tool.isDownloadPaid && Number(orderAmount) > 0;
   const isPaidAiSkill = tool.type === "ai_skill" && tool.isDownloadPaid && Number(orderAmount) > 0;
+  const isPaidAiWorkflow = tool.type === "ai_workflow" && tool.isDownloadPaid && Number(orderAmount) > 0;
   const isPaidAccountService = tool.type === "online" && Number(orderAmount) > 0;
   const isPaidCourse = tool.type === "skill_learning" && Number(orderAmount) > 0;
-  if (!isPaidSoftware && !isPaidAiSkill && !isPaidAccountService && !isPaidCourse) {
+  if (!isPaidSoftware && !isPaidAiSkill && !isPaidAiWorkflow && !isPaidAccountService && !isPaidCourse) {
     redirect(redirectTarget);
   }
 
-  const existingPurchase = await prisma.toolPurchase.findUnique({
-    where: { userId_toolId: { userId: user.id, toolId: tool.id } }
-  });
+  const existingPurchase = tool.type === "ai_workflow"
+    ? await prisma.aiWorkflowVersionPurchase.findFirst({
+        where: {
+          userId: user.id,
+          toolId: tool.id,
+          fileId: tool.downloadFileId ?? "",
+          order: { is: {
+            orderStatus: "activated",
+            refundRecords: { none: { status: "pending" } },
+            OR: [
+              { paymentTransaction: { is: null } },
+              { paymentTransaction: { is: { refundState: null } } },
+              { paymentTransaction: { is: { refundState: "provider_rejected" } } },
+            ],
+          } },
+        },
+        select: { id: true },
+      })
+    : await prisma.toolPurchase.findUnique({
+        where: { userId_toolId: { userId: user.id, toolId: tool.id } }
+      });
   if (existingPurchase) redirect(redirectTarget);
 
   const order = await prisma.order.create({
@@ -240,6 +275,7 @@ export async function createSoftwareDownloadOrderAction(formData: FormData) {
       orderNo: createOrderNo(),
       userId: user.id,
       toolId: tool.id,
+      toolFileId: tool.downloadFileId,
       toolPriceSpecId: selectedPriceSpec?.id ?? null,
       toolPriceSpecName: selectedPriceSpec?.name ?? null,
       orderType: "software_download",

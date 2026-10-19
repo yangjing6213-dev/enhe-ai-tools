@@ -85,7 +85,7 @@ export async function UserCenterPageShell({
     prisma.tool.findMany({
       where: {
         status: "published",
-        OR: [{ type: "software" }, { type: "online" }, { type: "skill_learning" }]
+        OR: [{ type: "software" }, { type: "online" }, { type: "skill_learning" }, { type: "ai_workflow" }]
       },
       orderBy: [{ sortOrder: "asc" }, { createdAt: "desc" }]
     })

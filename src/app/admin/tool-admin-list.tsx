@@ -16,7 +16,7 @@ import { resolveToolImageSrc } from "@/lib/tool-image";
 import { getPrimaryToolPrice, type ToolPriceSpecStatus } from "@/lib/tool-price-specs";
 import { getToolPublishIssues } from "@/lib/tool-publish-check";
 
-type AdminToolType = "software" | "online" | "skill_learning" | "ai_skill";
+type AdminToolType = "software" | "online" | "skill_learning" | "ai_skill" | "ai_workflow";
 
 type ToolItem = {
   id: string;
@@ -326,6 +326,7 @@ export function ToolEditor({
   const isAccountService = type === "online";
   const isSkillLearning = type === "skill_learning";
   const isAiSkill = type === "ai_skill";
+  const isAiWorkflow = type === "ai_workflow";
   const priceSpecRows = buildEditorPriceSpecRows(tool);
   const priceSpecProtectedCounts = (tool?.priceSpecs ?? []).reduce(
     (counts, priceSpec) => ({
@@ -363,7 +364,7 @@ export function ToolEditor({
         <input type="hidden" name="returnTo" value={editorPath} />
         <input type="hidden" name="coverImage" value={tool?.coverImage ?? ""} />
         {!isAiSkill ? <input type="hidden" name="downloadFileId" value={tool?.downloadFileId ?? ""} /> : null}
-        <input type="hidden" name="downloadPrice" value="0" />
+        <input type="hidden" name="downloadPrice" value={isAiWorkflow ? String(tool?.downloadPrice ?? 0) : "0"} />
 
         <EditorSection title={copy.basicSection} intro={isAccountService ? copy.basicServiceIntro : isSkillLearning ? copy.basicCourseIntro : copy.basicToolIntro}>
           <div className="grid gap-4 md:grid-cols-2">

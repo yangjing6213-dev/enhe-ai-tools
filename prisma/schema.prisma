@@ -33,6 +33,32 @@ enum ToolType {
   online
   skill_learning
   ai_skill
+  ai_workflow
+}
+
+enum AiWorkflowBatchStatus {
+  queued
+  running
+  completed
+  partial
+  failed
+  paused
+}
+
+enum AiWorkflowCandidateStatus {
+  discovered
+  downloading
+  reviewing
+  validated
+  rejected
+  failed
+  pending_pricing
+  published
+}
+
+enum AiWorkflowPriceDecision {
+  paid
+  free
 }
 
 enum PublishStatus {
@@ -263,6 +289,11 @@ model User {
   toolUsageLogs         ToolUsageLog[]
   analyticsEvents       AnalyticsEvent[]
   toolPurchases         ToolPurchase[]
+  aiWorkflowFavorites   AiWorkflowFavorite[]
+  aiWorkflowReviews     AiWorkflowReview[]
+  aiWorkflowDownloadEvents AiWorkflowDownloadEvent[]
+  aiWorkflowVersionPurchases AiWorkflowVersionPurchase[]
+  aiWorkflowPriceApprovals AiWorkflowCandidate[] @relation("AiWorkflowPriceApprover")
   vipAdjustments        VipAdjustmentLog[]     @relation("VipAdjustmentTarget")
   vipOperations         VipAdjustmentLog[]     @relation("VipAdjustmentAdmin")
   refundRecords         OrderRefundRecord[]    @relation("RefundAdmin")
@@ -391,6 +422,11 @@ model Tool {
   faqs                  ToolFaq[]
   changelogs            ToolChangelog[]
   productDemos          ProductDemo[]
+  aiWorkflowCandidate   AiWorkflowCandidate?
+  aiWorkflowFavorites   AiWorkflowFavorite[]
+  aiWorkflowReviews     AiWorkflowReview[]
+  aiWorkflowDownloadEvents AiWorkflowDownloadEvent[]
+  aiWorkflowVersionPurchases AiWorkflowVersionPurchase[]
 
   @@index([type, status])
   @@index([isHomeRecommended, status, sortOrder])
@@ -529,6 +565,10 @@ model File {
   filePath      String        @map("file_path")
   fileUrl       String?       @map("file_url")
   fileSize      BigInt?       @map("file_size")
+  storageBucket String?       @map("storage_bucket")
+  storageRegion String?       @map("storage_region")
+  objectKey     String?       @map("object_key")
+  sha256        String?
   version       String?
   mimeType      String?       @map("mime_type")
   downloadCount Int           @default(0) @map("download_count")
@@ -537,6 +577,11 @@ model File {
   tool          Tool?         @relation("ToolFiles", fields: [toolId], references: [id])
   primaryFor    Tool?         @relation("PrimaryDownload")
   downloadLogs  DownloadLog[]
+  orderVersions Order[]       @relation("OrderToolFile")
+  toolPurchases ToolPurchase[] @relation("ToolPurchaseFile")
+  workflowCandidate AiWorkflowCandidate?
+  aiWorkflowDownloadEvents AiWorkflowDownloadEvent[]
+  workflowVersionPurchases AiWorkflowVersionPurchase[]
 
   @@map("files")
 }
@@ -566,6 +611,7 @@ model Order {
   userId                    String                     @map("user_id")
   planId                    String?                    @map("plan_id")
   toolId                    String?                    @map("tool_id")
+  toolFileId                String?                    @map("tool_file_id")
   toolPriceSpecId           String?                    @map("tool_price_spec_id")
   toolPriceSpecName         String?                    @map("tool_price_spec_name")
   seoAuditOfferId           String?                    @map("seo_audit_offer_id")
@@ -583,12 +629,14 @@ model Order {
   user                      User                       @relation(fields: [userId], references: [id])
   plan                      VipPlan?                   @relation(fields: [planId], references: [id])
   tool                      Tool?                      @relation(fields: [toolId], references: [id], onDelete: Restrict)
+  toolFile                  File?                      @relation("OrderToolFile", fields: [toolFileId], references: [id], onDelete: Restrict)
   toolPriceSpec             ToolPriceSpec?             @relation(fields: [toolPriceSpecId], references: [id], onDelete: Restrict)
   seoAuditOffer             SeoAuditOffer?             @relation(fields: [seoAuditOfferId], references: [id], onDelete: SetNull)
   seoAuditSourceRun         SeoAuditRun?               @relation("SeoAuditUpgradeSourceRun", fields: [seoAuditSourceRunId], references: [id], onDelete: SetNull)
   paymentProof              PaymentProof?
   paymentTransaction        PaymentTransaction?
   toolPurchase              ToolPurchase?
+  aiWorkflowVersionPurchase AiWorkflowVersionPurchase?
   seoAuditCredit            SeoAuditCredit?
   seoAuditSubscriptionOrder SeoAuditSubscriptionOrder?
   seoAuditRuns              SeoAuditRun[]              @relation("SeoAuditFundedRuns")
@@ -671,6 +719,7 @@ model ToolPurchase {
   toolId            String         @map("tool_id")
   toolPriceSpecId   String?        @map("tool_price_spec_id")
   toolPriceSpecName String?        @map("tool_price_spec_name")
+  fileId            String?        @map("file_id")
   orderId           String         @unique @map("order_id")
   amount            Decimal        @db.Decimal(10, 2)
   createdAt         DateTime       @default(now()) @map("created_at")
@@ -679,9 +728,180 @@ model ToolPurchase {
   tool              Tool           @relation(fields: [toolId], references: [id])
   toolPriceSpec     ToolPriceSpec? @relation(fields: [toolPriceSpecId], references: [id], onDelete: Restrict)
   order             Order          @relation(fields: [orderId], references: [id])
+  file              File?          @relation("ToolPurchaseFile", fields: [fileId], references: [id], onDelete: Restrict)
 
   @@unique([userId, toolId])
   @@map("tool_purchases")
+}
+
+model AiWorkflowTopic {
+  id          String               @id @default(cuid())
+  slug        String               @unique
+  name        String
+  englishName String?              @map("english_name")
+  sortOrder   Int                  @default(0) @map("sort_order")
+  isEnabled   Boolean              @default(true) @map("is_enabled")
+  createdAt   DateTime             @default(now()) @map("created_at")
+  updatedAt   DateTime             @updatedAt @map("updated_at")
+  batches     AiWorkflowBatch[]
+  candidates  AiWorkflowCandidate[]
+
+  @@index([isEnabled, sortOrder])
+  @@map("ai_workflow_topics")
+}
+
+model AiWorkflowCollectionSetting {
+  id                       String    @id @default("default")
+  isEnabled                Boolean   @default(false) @map("is_enabled")
+  isPaused                 Boolean   @default(false) @map("is_paused")
+  scheduleTime             String    @default("09:00") @map("schedule_time")
+  timeZone                 String    @default("Asia/Shanghai") @map("time_zone")
+  topicListVersion         Int       @default(0) @map("topic_list_version")
+  topicListConfirmedAt     DateTime? @map("topic_list_confirmed_at")
+  scheduledTaskRegisteredAt DateTime? @map("scheduled_task_registered_at")
+  scheduledTaskEnabledAt   DateTime? @map("scheduled_task_enabled_at")
+  firstUnattendedSuccessAt DateTime? @map("first_unattended_success_at")
+  lastWorkerSeenAt         DateTime? @map("last_worker_seen_at")
+  lastSuccessfulRunAt      DateTime? @map("last_successful_run_at")
+  updatedAt                DateTime  @updatedAt @map("updated_at")
+
+  @@map("ai_workflow_collection_settings")
+}
+
+model AiWorkflowBatch {
+  id                  String                @id @default(cuid())
+  batchDate           DateTime              @unique @map("batch_date") @db.Date
+  topicId             String?               @map("topic_id")
+  topicNameSnapshot   String                @map("topic_name_snapshot")
+  topicOrderVersion   Int                   @map("topic_order_version")
+  triggerType         String                @default("scheduled") @map("trigger_type")
+  status              AiWorkflowBatchStatus @default(queued)
+  checkpoint          Json                  @default("{}")
+  attemptCount        Int                   @default(0) @map("attempt_count")
+  failureReason       String?               @map("failure_reason")
+  startedAt           DateTime?             @map("started_at")
+  completedAt         DateTime?             @map("completed_at")
+  lastRunDate         DateTime?             @map("last_run_date") @db.Date
+  leaseOwnerId        String?               @map("lease_owner_id")
+  leaseTokenHash      String?               @map("lease_token_hash")
+  leaseExpiresAt      DateTime?             @map("lease_expires_at")
+  lastHeartbeatAt     DateTime?             @map("last_heartbeat_at")
+  lastWorkerStage     String?               @map("last_worker_stage")
+  createdAt           DateTime              @default(now()) @map("created_at")
+  updatedAt           DateTime              @updatedAt @map("updated_at")
+  topic               AiWorkflowTopic?      @relation(fields: [topicId], references: [id], onDelete: SetNull)
+  candidates          AiWorkflowCandidate[]
+
+  @@index([status, batchDate])
+  @@index([leaseExpiresAt])
+  @@map("ai_workflow_batches")
+}
+
+model AiWorkflowCandidate {
+  id                   String                    @id @default(cuid())
+  batchId              String                    @map("batch_id")
+  topicId              String?                   @map("topic_id")
+  repositoryId         String                    @unique @map("repository_id")
+  sourceFingerprint    String                    @unique @map("source_fingerprint")
+  repositoryUrl        String                    @map("repository_url")
+  repositoryOwner      String                    @map("repository_owner")
+  repositoryName       String                    @map("repository_name")
+  commitSha            String?                   @map("commit_sha")
+  licenseSpdx          String?                   @map("license_spdx")
+  licenseUrl           String?                   @map("license_url")
+  projectType          String                    @default("workflow") @map("project_type")
+  verifiedEnvironments String[]                  @default([]) @map("verified_environments")
+  githubStars          Int?                      @map("github_stars")
+  starsUpdatedAt       DateTime?                 @map("stars_updated_at")
+  validationReport     Json?                     @map("validation_report")
+  modificationSummary  String?                   @map("modification_summary")
+  fileId               String?                   @unique @map("file_id")
+  packageVersion       String?                   @map("package_version")
+  packageSize          BigInt?                   @map("package_size")
+  packageSha256        String?                   @map("package_sha256")
+  priceSuggestion      Decimal?                  @map("price_suggestion") @db.Decimal(10, 2)
+  priceRationale       Json?                     @map("price_rationale")
+  priceDecision        AiWorkflowPriceDecision?  @map("price_decision")
+  confirmedPrice       Decimal?                  @map("confirmed_price") @db.Decimal(10, 2)
+  pricingApproverId    String?                   @map("pricing_approver_id")
+  pricingApprovedAt    DateTime?                 @map("pricing_approved_at")
+  status               AiWorkflowCandidateStatus @default(discovered)
+  failureReason        String?                   @map("failure_reason")
+  toolId               String?                   @unique @map("tool_id")
+  createdAt            DateTime                  @default(now()) @map("created_at")
+  updatedAt            DateTime                  @updatedAt @map("updated_at")
+  batch                AiWorkflowBatch           @relation(fields: [batchId], references: [id], onDelete: Cascade)
+  topic                AiWorkflowTopic?          @relation(fields: [topicId], references: [id], onDelete: SetNull)
+  file                 File?                     @relation(fields: [fileId], references: [id], onDelete: Restrict)
+  tool                 Tool?                     @relation(fields: [toolId], references: [id], onDelete: SetNull)
+  pricingApprover      User?                     @relation("AiWorkflowPriceApprover", fields: [pricingApproverId], references: [id], onDelete: SetNull)
+
+  @@index([batchId, status])
+  @@index([topicId, status])
+  @@map("ai_workflow_candidates")
+}
+
+model AiWorkflowFavorite {
+  id        String   @id @default(cuid())
+  userId    String   @map("user_id")
+  toolId    String   @map("tool_id")
+  createdAt DateTime @default(now()) @map("created_at")
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  tool      Tool     @relation(fields: [toolId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, toolId])
+  @@index([toolId, createdAt])
+  @@map("ai_workflow_favorites")
+}
+
+model AiWorkflowReview {
+  id        String        @id @default(cuid())
+  userId    String        @map("user_id")
+  toolId    String        @map("tool_id")
+  rating    Int
+  content   String?
+  status    CommentStatus @default(pending)
+  createdAt DateTime      @default(now()) @map("created_at")
+  updatedAt DateTime      @updatedAt @map("updated_at")
+  user      User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  tool      Tool          @relation(fields: [toolId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, toolId])
+  @@index([toolId, status, createdAt])
+  @@map("ai_workflow_reviews")
+}
+
+model AiWorkflowDownloadEvent {
+  id          String   @id @default(cuid())
+  userId      String?  @map("user_id")
+  toolId      String   @map("tool_id")
+  fileId      String   @map("file_id")
+  visitorKey  String   @map("visitor_key")
+  createdAt   DateTime @default(now()) @map("created_at")
+  user        User?    @relation(fields: [userId], references: [id], onDelete: SetNull)
+  tool        Tool     @relation(fields: [toolId], references: [id], onDelete: Restrict)
+  file        File     @relation(fields: [fileId], references: [id], onDelete: Restrict)
+
+  @@unique([toolId, fileId, visitorKey])
+  @@index([toolId, createdAt])
+  @@map("ai_workflow_download_events")
+}
+
+model AiWorkflowVersionPurchase {
+  id        String   @id @default(cuid())
+  userId    String   @map("user_id")
+  toolId    String   @map("tool_id")
+  fileId    String   @map("file_id")
+  orderId   String   @unique @map("order_id")
+  amount    Decimal  @db.Decimal(10, 2)
+  createdAt DateTime @default(now()) @map("created_at")
+  user      User     @relation(fields: [userId], references: [id], onDelete: Restrict)
+  tool      Tool     @relation(fields: [toolId], references: [id], onDelete: Restrict)
+  file      File     @relation(fields: [fileId], references: [id], onDelete: Restrict)
+  order     Order    @relation(fields: [orderId], references: [id], onDelete: Restrict)
+
+  @@index([userId, toolId, createdAt])
+  @@map("ai_workflow_version_purchases")
 }
 
 model SeoAuditOffer {

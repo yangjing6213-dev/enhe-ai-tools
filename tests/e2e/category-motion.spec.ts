@@ -35,6 +35,7 @@ async function openCategoryRoute(
   }
 
   await page.route("**/api/analytics", (request) => request.fulfill({ status: 204 }));
+  await page.route("**/api/card-likes**", (request) => request.fulfill({ status: 200, contentType: "application/json", body: JSON.stringify({ counts: {}, liked: {} }) }));
   const response = await page.goto(route, { waitUntil: "domcontentloaded" });
   expect(response?.status(), `${route} response status`).toBe(200);
 }

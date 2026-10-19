@@ -693,6 +693,7 @@ export async function activateOrderFromZpayNotify(
       where: { id: order.id },
       include: {
         paymentTransaction: true,
+        tool: { select: { type: true } },
         refundRecords: {
           orderBy: { createdAt: "desc" },
           select: { id: true, status: true },
@@ -870,6 +871,20 @@ export async function activateOrderFromZpayNotify(
           amount: current.amount
         }
       });
+      if (current.tool?.type === "ai_workflow") {
+        if (!current.toolFileId) throw new Error("AI_WORKFLOW_ORDER_MISSING_FILE_VERSION");
+        await tx.aiWorkflowVersionPurchase.upsert({
+          where: { orderId: current.id },
+          update: {},
+          create: {
+            userId: current.userId,
+            toolId: current.toolId!,
+            fileId: current.toolFileId,
+            orderId: current.id,
+            amount: current.amount,
+          },
+        });
+      }
     } else {
       await grantSeoAuditEntitlementsForPaidOrderInTransaction(tx, current.id, now);
     }

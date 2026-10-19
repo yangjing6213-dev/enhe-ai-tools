@@ -215,6 +215,11 @@
   border-top: 1px solid var(--enhe-border);
 }
 
+.redesign-preview-section > .redesign-header {
+  width: 100vw;
+  margin-inline: calc(50% - 50vw);
+}
+
 .redesign-preview-section h2 {
   margin: 0 0 var(--enhe-space-4);
   font-size: var(--enhe-font-size-xl);

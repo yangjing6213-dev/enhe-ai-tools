@@ -24,7 +24,7 @@ type RelatedToolIdentityInput = {
   slug: string;
   name: string;
   englishName?: string | null;
-  type: "software" | "online" | "skill_learning" | "ai_skill";
+  type: "software" | "online" | "skill_learning" | "ai_skill" | "ai_workflow";
 };
 
 const cjkPattern = /[\u3400-\u9fff]/;

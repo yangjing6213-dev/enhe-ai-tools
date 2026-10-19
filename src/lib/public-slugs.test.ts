@@ -45,6 +45,18 @@ describe("public slug helpers", () => {
     expect(buildCanonicalToolPath(tool, "en")).toBe("/en/ai-skills/codex-review-skill");
   });
 
+  it("uses ai-workflows for AI Workflow canonical paths", () => {
+    const tool = {
+      slug: "meeting-follow-up-flow",
+      name: "会议跟进工作流",
+      englishName: "Meeting Follow-up Workflow",
+      type: "ai_workflow" as const
+    };
+
+    expect(buildCanonicalToolPath(tool, "zh")).toBe("/ai-workflows/meeting-follow-up-flow");
+    expect(buildCanonicalToolPath(tool, "en")).toBe("/en/ai-workflows/meeting-follow-up-flow");
+  });
+
   it("builds canonical AI news slugs and localized paths", () => {
     const article = {
       slug: "ai-news-trend-insights-launch",

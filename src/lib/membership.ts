@@ -10,6 +10,7 @@ type RefundOrder = {
   userId: string;
   orderType: OrderType;
   toolId?: string | null;
+  toolFileId?: string | null;
   activatedAt?: Date | null;
   paidAt?: Date | null;
   createdAt?: Date | null;
@@ -295,6 +296,7 @@ export async function revokeEntitlementsForRefundedOrder(
           amount: true,
           toolPriceSpecId: true,
           toolPriceSpecName: true,
+          toolFileId: true,
         },
       });
       if (!survivingOrder) {
@@ -309,6 +311,7 @@ export async function revokeEntitlementsForRefundedOrder(
           amount: survivingOrder.amount,
           toolPriceSpecId: survivingOrder.toolPriceSpecId,
           toolPriceSpecName: survivingOrder.toolPriceSpecName,
+          fileId: survivingOrder.toolFileId,
         },
       });
       return;
@@ -503,7 +506,7 @@ export async function activateVipForOrder(orderId: string, reviewerId?: string, 
   return prisma.$transaction(async (tx) => {
     const orderReference = await tx.order.findUnique({
       where: { id: orderId },
-      select: { id: true, userId: true, orderType: true, toolId: true }
+      select: { id: true, userId: true, orderType: true, toolId: true, toolFileId: true }
     });
     if (!orderReference) throw new Error("Order not found.");
 
@@ -542,13 +545,14 @@ export async function activateVipForOrder(orderId: string, reviewerId?: string, 
 
     const order = await tx.order.findUnique({
       where: { id: orderId },
-      include: { plan: true, paymentProof: true }
+      include: { plan: true, paymentProof: true, tool: { select: { type: true } } }
     });
     if (!order) throw new Error("Order not found.");
     if (
       order.userId !== orderReference.userId ||
       order.orderType !== orderReference.orderType ||
-      order.toolId !== orderReference.toolId
+      order.toolId !== orderReference.toolId ||
+      order.toolFileId !== orderReference.toolFileId
     ) {
       throw new Error("Order binding changed during activation.");
     }
@@ -572,7 +576,8 @@ export async function activateVipForOrder(orderId: string, reviewerId?: string, 
             amount: order.amount,
             orderId: order.id,
             toolPriceSpecId: order.toolPriceSpecId,
-            toolPriceSpecName: order.toolPriceSpecName
+            toolPriceSpecName: order.toolPriceSpecName,
+            fileId: order.toolFileId
           },
           create: {
             userId: order.userId,
@@ -580,9 +585,24 @@ export async function activateVipForOrder(orderId: string, reviewerId?: string, 
             orderId: order.id,
             toolPriceSpecId: order.toolPriceSpecId,
             toolPriceSpecName: order.toolPriceSpecName,
+            fileId: order.toolFileId,
             amount: order.amount
           }
         });
+        if (order.tool?.type === "ai_workflow") {
+          if (!order.toolFileId || !order.toolId) throw new Error("AI workflow order is missing its purchased file version.");
+          await tx.aiWorkflowVersionPurchase.upsert({
+            where: { orderId: order.id },
+            update: {},
+            create: {
+              userId: order.userId,
+              toolId: order.toolId,
+              fileId: order.toolFileId,
+              orderId: order.id,
+              amount: order.amount
+            }
+          });
+        }
       } else {
         if (!order.planId || !order.plan) throw new Error("VIP order is missing plan binding.");
         const currentMembership = await findCurrentMembership(tx, order.userId);
@@ -620,7 +640,8 @@ export async function activateVipForOrder(orderId: string, reviewerId?: string, 
           amount: order.amount,
           orderId: order.id,
           toolPriceSpecId: order.toolPriceSpecId,
-          toolPriceSpecName: order.toolPriceSpecName
+          toolPriceSpecName: order.toolPriceSpecName,
+          fileId: order.toolFileId
         },
         create: {
           userId: order.userId,
@@ -628,9 +649,24 @@ export async function activateVipForOrder(orderId: string, reviewerId?: string, 
           orderId: order.id,
           toolPriceSpecId: order.toolPriceSpecId,
           toolPriceSpecName: order.toolPriceSpecName,
+          fileId: order.toolFileId,
           amount: order.amount
         }
       });
+      if (order.tool?.type === "ai_workflow") {
+        if (!order.toolFileId || !order.toolId) throw new Error("AI workflow order is missing its purchased file version.");
+        await tx.aiWorkflowVersionPurchase.upsert({
+          where: { orderId: order.id },
+          update: {},
+          create: {
+            userId: order.userId,
+            toolId: order.toolId,
+            fileId: order.toolFileId,
+            orderId: order.id,
+            amount: order.amount
+          }
+        });
+      }
 
       await tx.paymentProof.updateMany({
         where: { orderId },

@@ -128,8 +128,8 @@ describe("site audit regression coverage", () => {
     const adminActions = read("src/app/admin/actions.ts");
     const access = read("src/lib/access.ts");
 
-    expect(publicActions).toContain('const fallbackOrderAmount = tool.type === "software" || tool.type === "ai_skill" ? tool.downloadPrice : 0;');
-    expect(adminActions).toContain('const isDownloadProduct = type === "software" || type === "ai_skill";');
+    expect(publicActions).toContain('const fallbackOrderAmount = tool.type === "software" || tool.type === "ai_skill" || tool.type === "ai_workflow" ? tool.downloadPrice : 0;');
+    expect(adminActions).toContain('const isDownloadProduct = type === "software" || type === "ai_skill" || type === "ai_workflow";');
     expect(adminActions).toContain('primaryPriceSpec?.price ?? (isDownloadProduct ? parseNumberField(formData.get("downloadPrice"), 0) : 0)');
     expect(access).toContain("getPrimaryToolPrice(tool.priceSpecs, 0)");
   });
@@ -160,7 +160,7 @@ describe("site audit regression coverage", () => {
     expect(pricingOffers).toContain("loadPublicPricingCatalogTools");
     expect(pricingOffers).toContain('status: "published"');
     expect(pricingOffers).toContain(
-      'type: { in: ["software", "online", "skill_learning", "ai_skill"] }',
+      'type: { in: ["software", "online", "skill_learning", "ai_skill", "ai_workflow"] }',
     );
     expect(pricingOffers).toContain("renderPricingMarkdown");
     expect(pricingMarkdownRoute).toContain('getPricingOfferItems("en")');
