@@ -123,6 +123,7 @@ function run(file: string, args: string[], input: string, maxOutput = 4000) {
       env: {
         SystemRoot: process.env.SystemRoot,
         WINDIR: process.env.WINDIR,
+        ProgramData: process.env.ProgramData,
         NODE_ENV: "production",
         PATH: `${process.env.SystemRoot ?? "C:\\Windows"}\\System32`,
         USERPROFILE: process.env.USERPROFILE,
@@ -179,7 +180,7 @@ async function updateServer(values: Record<string, string>) {
     server,
     remoteCommand,
   ], JSON.stringify({ values, backupName: serverBackupName }), 2500);
-  if (result.code !== 0) throw new Error("SERVER_ENV_UPDATE_FAILED");
+  if (result.code !== 0) throw new Error(`SERVER_ENV_UPDATE_FAILED_${result.code}`);
   let response: { ok?: boolean; backup?: string };
   try { response = JSON.parse(result.stdout.trim()) as typeof response; } catch { throw new Error("SERVER_ENV_UPDATE_UNCONFIRMED"); }
   if (!response.ok || !response.backup) throw new Error("SERVER_ENV_UPDATE_UNCONFIRMED");
@@ -235,18 +236,21 @@ async function main() {
     await rename(temporaryTokenPath, protectedTokenPath);
     localActivated = true;
     process.stdout.write(`SERVER_ENV_UPDATED=true\nSERVER_ENV_BACKUP=${backupPath}\nLOCAL_WORKER_TOKEN_PROTECTED=true\nCOS_CREDENTIALS_SET=true\nHOST=${hostname()}\n`);
-  } catch {
-    if (serverUpdateAttempted) {
+  } catch (error) {
+    const updateFailure = error instanceof Error ? error.message : "";
+    const rejectedBeforeBackup = /^SERVER_ENV_UPDATE_FAILED_1[0-4]$/.test(updateFailure);
+    if (serverUpdateAttempted && !rejectedBeforeBackup) {
       const remotePath = backupPath || `/opt/enhe-ai-tools/deploy/enhe-ai-tools/${serverBackupName}`;
       const restored = await restoreServer(remotePath).catch(() => false);
-      if (!restored) process.stderr.write("The server environment may have changed, but its previous backup could not be restored automatically. Keep the scheduled task disabled and use the saved server backup before proceeding.\n");
+      if (!restored) process.stderr.write(`SERVER_ENV_RESTORE=UNCONFIRMED\nSERVER_ENV_BACKUP_REMAINS=${remotePath}\n`);
     }
     if (localActivated) await rm(protectedTokenPath, { force: true }).catch(() => undefined);
     const activeExists = await stat(protectedTokenPath).then(() => true).catch(() => false);
     if (previousTokenPath && !activeExists) await rename(previousTokenPath, protectedTokenPath).catch(() => undefined);
     await rm(temporaryTokenPath, { force: true }).catch(() => undefined);
-    process.stderr.write("AI Workflow production credential setup did not complete. No secret values were displayed.\n");
-    if (backupPath) process.stderr.write("The server .env was updated; keep the saved backup and do not enable the Windows task until local token protection is verified.\n");
+    const safeFailureCode = /^[A-Z0-9_]+$/.test(updateFailure) ? updateFailure : "CONFIGURATION_FAILED";
+    process.stderr.write(`AI Workflow production credential setup did not complete (${safeFailureCode}). No secret values were displayed.\n`);
+    if (backupPath) process.stderr.write(`SERVER_ENV_BACKUP_REMAINS=${backupPath}\n`);
     process.exitCode = 1;
   }
 }

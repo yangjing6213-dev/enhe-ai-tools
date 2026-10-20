@@ -210,6 +210,7 @@ function minimalWindowsEnv(): NodeJS.ProcessEnv {
   return {
     SystemRoot: systemRoot,
     WINDIR: process.env.WINDIR ?? systemRoot,
+    ProgramData: process.env.ProgramData,
     NODE_ENV: "production",
     PATH: `${join(systemRoot, "System32")};${systemRoot}`,
     TEMP: process.env.TEMP,
