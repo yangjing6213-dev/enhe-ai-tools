@@ -48,7 +48,7 @@ describe("production release workflow", () => {
   it("generates the local Prisma client before the clean-install test suite", () => {
     const wrapper = read("scripts/push-and-deploy.ps1");
     const testPhase = wrapper.indexOf(
-      'Invoke-Native -FilePath npm -Arguments @("test", "--", "--maxWorkers=8")',
+      'Invoke-Native -FilePath npm -Arguments @("test", "--", "--maxWorkers=2")',
     );
     const generatedClient = wrapper.indexOf(
       'Invoke-Native -FilePath npm -Arguments @("run", "prisma:client")',
@@ -95,7 +95,7 @@ describe("production release workflow", () => {
     const wrapper = read("scripts/push-and-deploy.ps1");
     const runbook = read("docs/tencent-cloud-push-deploy-workflow.md");
     const testCommand = wrapper.indexOf(
-      'Invoke-Native -FilePath npm -Arguments @("test", "--", "--maxWorkers=8")',
+      'Invoke-Native -FilePath npm -Arguments @("test", "--", "--maxWorkers=2")',
     );
     const vitestGate = wrapper.lastIndexOf("if ($AllowDatabaseMutatingVitest) {", testCommand);
     const testDatabaseReset = wrapper.lastIndexOf("$env:DATABASE_URL = $null", testCommand);
