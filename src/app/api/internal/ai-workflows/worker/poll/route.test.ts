@@ -70,13 +70,14 @@ beforeEach(() => {
       updateMany: mocks.batchesUpdateMany,
     },
   }));
-  mocks.topicsFindMany.mockResolvedValue([{ id: "topic-1", name: "Workflow automation", englishName: "Workflow automation" }]);
+  mocks.topicsFindMany.mockResolvedValue([{ id: "topic-1", name: "工作效率", englishName: null, searchDirections: "搜索趋势 / SaaS 产品发布 / 企业预算" }]);
   mocks.batchesFindFirst.mockResolvedValue(null);
   mocks.batchesFindUnique.mockImplementation(({ where }: { where: { batchDate?: Date; id?: string } }) =>
     where.id ? {
       id: where.id,
       batchDate: new Date("2026-10-20T00:00:00.000Z"),
-      topicNameSnapshot: "Workflow automation",
+      topicNameSnapshot: "工作效率",
+      topicSearchDirectionsSnapshot: "搜索趋势 / SaaS 产品发布 / 企业预算",
       topicOrderVersion: 4,
       attemptCount: 1,
       checkpoint: {},
@@ -211,7 +212,7 @@ describe("POST /api/internal/ai-workflows/worker/poll", () => {
     expect(result).toMatchObject({
       ok: true,
       state: "claimed",
-      batch: { id: "batch-1", topicNameSnapshot: "Workflow automation", topicOrderVersion: 4 },
+      batch: { id: "batch-1", topicNameSnapshot: "工作效率", topicSearchDirectionsSnapshot: "搜索趋势 / SaaS 产品发布 / 企业预算", topicOrderVersion: 4 },
     });
     expect(typeof result.leaseToken).toBe("string");
     const claim = mocks.batchesUpdateMany.mock.calls[0]?.[0] as { data: Record<string, unknown> };
@@ -221,7 +222,8 @@ describe("POST /api/internal/ai-workflows/worker/poll", () => {
       data: expect.objectContaining({
         batchDate: new Date("2026-10-20T00:00:00.000Z"),
         topicId: "topic-1",
-        topicNameSnapshot: "Workflow automation",
+        topicNameSnapshot: "工作效率",
+        topicSearchDirectionsSnapshot: "搜索趋势 / SaaS 产品发布 / 企业预算",
         topicOrderVersion: 4,
       }),
     }));

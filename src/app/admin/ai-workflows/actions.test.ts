@@ -69,14 +69,49 @@ beforeEach(() => {
 afterEach(() => vi.unstubAllEnvs());
 
 describe("AI Workflow admin collection safeguards", () => {
+  it("stores the supplied ordered themes and search directions as confirmed topics", async () => {
+    const rows = [
+      ["工作效率", "搜索趋势 / SaaS 产品发布 / 企业预算"],
+      ["视频生成", "创作者社区 / 模型更新 / 工具榜单"],
+      ["内容创作", "社媒讨论 / 模板市场 / 自媒体需求"],
+      ["编程开发", "开发者工具 / GitHub 生态 / IDE 集成"],
+      ["学习教育", "课程产品 / 家庭学习 / 语言学习"],
+      ["搜索研究", "AI 搜索 / 知识库 / 研究助手"],
+      ["营销销售", "CRM / 广告素材 / 客户触达"],
+      ["办公自动化", "文档表格 / 会议纪要 / 流程编排"],
+      ["情感陪伴", "消费应用 / 社区反馈 / 长时互动"],
+      ["财务法律辅助", "高风险咨询 / 合同审阅 / 合规工具"],
+    ];
+    const form = new FormData();
+    form.set("topics", rows.map(([name, directions]) => `${name} | ${directions}`).join("\n"));
+    form.set("topicListConfirmed", "on");
+
+    await expect(saveAiWorkflowTopicsAction(form)).rejects.toThrow("NEXT_REDIRECT:/admin/ai-workflows?topicsSaved=1");
+
+    expect(mocks.tx.aiWorkflowTopic.upsert).toHaveBeenCalledTimes(rows.length);
+    expect(mocks.tx.aiWorkflowTopic.upsert.mock.calls.map(([input]) => input.create)).toEqual(rows.map(([name, searchDirections], sortOrder) => expect.objectContaining({
+      name,
+      englishName: null,
+      searchDirections,
+      sortOrder,
+      isEnabled: true,
+    })));
+    expect(mocks.tx.aiWorkflowCollectionSetting.upsert).toHaveBeenCalledWith(expect.objectContaining({
+      update: expect.objectContaining({ topicListConfirmedAt: expect.any(Date), isEnabled: false }),
+    }));
+  });
+
   it("saves topic changes as unconfirmed and invalidates active batches", async () => {
     const form = new FormData();
-    form.set("topics", "工作流自动化 | Workflow automation");
+    form.set("topics", "工作流自动化 | Workflow automation | GitHub releases / IDE integrations");
 
     await expect(saveAiWorkflowTopicsAction(form)).rejects.toThrow("NEXT_REDIRECT:/admin/ai-workflows?topicsSaved=1");
 
     expect(mocks.tx.aiWorkflowCollectionSetting.upsert).toHaveBeenCalledWith(expect.objectContaining({
       update: expect.objectContaining({ topicListVersion: 4, topicListConfirmedAt: null, isEnabled: false }),
+    }));
+    expect(mocks.tx.aiWorkflowTopic.upsert).toHaveBeenCalledWith(expect.objectContaining({
+      create: expect.objectContaining({ englishName: "Workflow automation", searchDirections: "GitHub releases / IDE integrations" }),
     }));
     expect(mocks.tx.aiWorkflowBatch.updateMany).toHaveBeenCalledWith(expect.objectContaining({
       where: { status: { in: ["queued", "paused", "running"] } },
@@ -97,7 +132,36 @@ describe("AI Workflow admin collection safeguards", () => {
   });
 
   it("does not queue manual work until the topic list is confirmed", async () => {
-    await expect(requestAiWorkflowBatchAction()).rejects.toThrow("NEXT_REDIRECT:/admin/ai-workflows?error=请先导入并核对附件2中的有序主题清单。");
+    await expect(requestAiWorkflowBatchAction()).rejects.toThrow("NEXT_REDIRECT:/admin/ai-workflows?error=请先导入并核对已提供的有序主题清单。");
     expect(mocks.batches.create).not.toHaveBeenCalled();
+  });
+
+  it("locks the selected search directions into an explicitly requested batch", async () => {
+    mocks.collectionSetting.findUnique.mockResolvedValue({
+      topicListVersion: 7,
+      topicListConfirmedAt: new Date("2026-10-20T00:00:00.000Z"),
+      isPaused: false,
+    });
+    mocks.topics.findMany.mockResolvedValue([{
+      id: "topic-1",
+      name: "工作效率",
+      searchDirections: "搜索趋势 / SaaS 产品发布 / 企业预算",
+      sortOrder: 0,
+    }]);
+    mocks.batches.findUnique.mockResolvedValue(null);
+    mocks.batches.findFirst.mockResolvedValue(null);
+    mocks.batches.count.mockResolvedValue(0);
+    mocks.batches.create.mockResolvedValue({ id: "batch-1" });
+
+    await expect(requestAiWorkflowBatchAction()).rejects.toThrow("NEXT_REDIRECT:/admin/ai-workflows?batchQueued=1");
+
+    expect(mocks.batches.create).toHaveBeenCalledWith(expect.objectContaining({
+      data: expect.objectContaining({
+        topicId: "topic-1",
+        topicNameSnapshot: "工作效率",
+        topicSearchDirectionsSnapshot: "搜索趋势 / SaaS 产品发布 / 企业预算",
+        topicOrderVersion: 7,
+      }),
+    }));
   });
 });

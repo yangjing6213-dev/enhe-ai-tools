@@ -739,6 +739,7 @@ model AiWorkflowTopic {
   slug        String               @unique
   name        String
   englishName String?              @map("english_name")
+  searchDirections String          @default("") @map("search_directions")
   sortOrder   Int                  @default(0) @map("sort_order")
   isEnabled   Boolean              @default(true) @map("is_enabled")
   createdAt   DateTime             @default(now()) @map("created_at")
@@ -773,6 +774,7 @@ model AiWorkflowBatch {
   batchDate           DateTime              @unique @map("batch_date") @db.Date
   topicId             String?               @map("topic_id")
   topicNameSnapshot   String                @map("topic_name_snapshot")
+  topicSearchDirectionsSnapshot String     @default("") @map("topic_search_directions_snapshot")
   topicOrderVersion   Int                   @map("topic_order_version")
   triggerType         String                @default("scheduled") @map("trigger_type")
   status              AiWorkflowBatchStatus @default(queued)

@@ -63,7 +63,7 @@ export async function POST(request: Request) {
     const topics = await tx.aiWorkflowTopic.findMany({
       where: { isEnabled: true },
       orderBy: [{ sortOrder: "asc" }, { name: "asc" }],
-      select: { id: true, name: true, englishName: true },
+      select: { id: true, name: true, englishName: true, searchDirections: true },
     });
     if (!topics.length) return { kind: "idle" as const, reason: "topic_list_missing" };
     const activeTopicIds = topics.map((topic) => topic.id);
@@ -123,6 +123,7 @@ export async function POST(request: Request) {
           batchDate,
           topicId: topic.id,
           topicNameSnapshot: topic.name,
+          topicSearchDirectionsSnapshot: topic.searchDirections,
           topicOrderVersion: setting.topicListVersion,
           triggerType: "scheduled",
           status: "queued",
@@ -169,6 +170,7 @@ export async function POST(request: Request) {
         id: true,
         batchDate: true,
         topicNameSnapshot: true,
+        topicSearchDirectionsSnapshot: true,
         topicOrderVersion: true,
         attemptCount: true,
         checkpoint: true,

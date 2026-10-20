@@ -12,9 +12,16 @@ import { getAiWorkflowCosConfig } from "@/lib/ai-workflows/cos";
 
 function parseTopicRows(value: FormDataEntryValue | null) {
   const rows = String(value ?? "").split(/\r?\n/).map((line) => line.trim()).filter(Boolean).map((line) => {
-    const [name = "", englishName = ""] = line.split("|").map((part) => part.trim());
-    if (!name || name.length > 120 || englishName.length > 120) throw new Error("主题每行最多填写一个中文名称，可用 | 分隔英文名称；单项不超过 120 个字符。");
-    return { name, englishName: englishName || null };
+    const parts = line.split("|").map((part) => part.trim());
+    const [name = "", second = "", third = ""] = parts;
+    if (parts.length > 3) throw new Error("每行最多填写主题名称、英文名称和搜索方向三项。");
+    const hasEnglishAndDirections = parts.length === 3;
+    const englishName = hasEnglishAndDirections ? second : "";
+    const searchDirections = hasEnglishAndDirections ? third : second;
+    if (!name || name.length > 120 || englishName.length > 120 || searchDirections.length > 500) {
+      throw new Error("每行主题名称和英文名称最多 120 个字符，搜索方向最多 500 个字符。");
+    }
+    return { name, englishName: englishName || null, searchDirections };
   });
   if (rows.length > 100) throw new Error("主题列表最多支持 100 项。");
   if (rows.length && new Set(rows.map((row) => row.name.toLocaleLowerCase())).size !== rows.length) throw new Error("主题名称不能重复。");
@@ -49,8 +56,8 @@ export async function saveAiWorkflowTopicsAction(formData: FormData) {
       const slug = `topic-${createHash("sha256").update(row.name).digest("hex").slice(0, 20)}`;
       await tx.aiWorkflowTopic.upsert({
         where: { slug },
-        update: { name: row.name, englishName: row.englishName, sortOrder: index, isEnabled: true },
-        create: { slug, name: row.name, englishName: row.englishName, sortOrder: index, isEnabled: true },
+        update: { name: row.name, englishName: row.englishName, searchDirections: row.searchDirections, sortOrder: index, isEnabled: true },
+        create: { slug, name: row.name, englishName: row.englishName, searchDirections: row.searchDirections, sortOrder: index, isEnabled: true },
       });
     }
     await tx.aiWorkflowCollectionSetting.upsert({
@@ -107,7 +114,7 @@ export async function requestAiWorkflowBatchAction() {
     prisma.aiWorkflowTopic.findMany({ where: { isEnabled: true }, orderBy: [{ sortOrder: "asc" }, { name: "asc" }] }),
   ]);
   if (setting?.isPaused) redirect("/admin/ai-workflows?error=采集已暂停，恢复后才能请求批次。");
-  if (!setting?.topicListConfirmedAt) redirect("/admin/ai-workflows?error=请先导入并核对附件2中的有序主题清单。");
+  if (!setting?.topicListConfirmedAt) redirect("/admin/ai-workflows?error=请先导入并核对已提供的有序主题清单。");
   if (!topics.length) redirect("/admin/ai-workflows?error=尚未导入有序主题清单。");
   const cosConfig = getAiWorkflowCosConfig();
   const cosServerConfigured = Boolean(cosConfig && cosConfig.region === "ap-shanghai" && cosConfig.staticBucket === "enhe-static-1303691623" && cosConfig.downloadBucket === "enhe-downloads-1303691623");
@@ -130,6 +137,7 @@ export async function requestAiWorkflowBatchAction() {
       batchDate,
       topicId: topic.id,
       topicNameSnapshot: topic.name,
+      topicSearchDirectionsSnapshot: topic.searchDirections,
       topicOrderVersion,
       triggerType: "manual",
       status: "queued",
