@@ -33,8 +33,11 @@
 - `verified locally`: the first full release check at 8 test workers hit timeouts in unrelated suites; rerunning the 8 affected files with 1 worker passed all 54 tests. The release check now uses 2 workers; the complete release check is pending.
 - `verified`: first public release was deployed to `codex/forum-topic-dedup-20261019` at `794e4052b1b33e03418bf9a53e9214ac91f99263`; the full test, typecheck, lint, build, E2E, and live route checks were completed before deployment.
 - `verified`: the existing local COS credential file and authorized two-bucket operations were tested earlier; the current upload helper supports private immutable objects, integrity checks, anonymous-denial checks, and optional full signed-read verification. Both custom-domain roots returned 403, so their COS bindings remain unverified.
-- `pending`: configure the production app's separate COS bucket/domain settings without committing secrets; use the existing backup-and-deploy process for additive migrations.
-- `pending`: implement and validate the independent Windows execution program and one fixed 5-minute task. No local runner or scheduled task has been registered, and no unattended collection is claimed.
+- `verified`: production COS and worker settings were added without exposing credentials; the pre-change server `.env` backup remains preserved with root ownership and mode `0600`.
+- `verified`: the new worker collector and license-safe archive pipeline passed focused tests, full unit tests, typecheck, lint, build, release migration checks, and E2E. It searches only the supplied ten topics, limits support to Node projects with lockfiles and allowlisted licenses, and runs upstream tests in a constrained container.
+- `verified`: release `bec285e20be2108b9d57de88d23aa8332a6df59c` was pushed to `codex/forum-topic-dedup-20261019` and deployed. Production reported the database schema up to date and the app, database, SEO worker, and SEO scheduler healthy; live `/ai-workflows` and `/en/ai-workflows` both returned HTTP 200.
+- `verified`: the Windows task `ENHE AI Workflow Collector` is enabled on a five-minute cadence under the signed-in HU account. Its first completed run exited `0` and logged `collection_disabled`; this confirms the daily collection switch remains off and no batch was started. The computer must remain awake and HU signed in for future polling.
+- `verified`: no GitHub batch was started and no workflow product was created by this release. When collection is later enabled, generated entries remain pending administrator review; the collector runs upstream tests but does not independently validate every workflow's core behavior.
 
 ## Known dependencies for later phases
 
