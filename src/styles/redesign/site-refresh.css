@@ -39,7 +39,8 @@
   color: #fff !important;
 }
 
-.enhe-redesign-production .ai-workflows-apply-filters {
+.enhe-redesign-production .ai-workflows-apply-filters,
+.enhe-redesign-production .ai-workflows-detail-link {
   color: #fff !important;
   -webkit-text-fill-color: #fff !important;
 }

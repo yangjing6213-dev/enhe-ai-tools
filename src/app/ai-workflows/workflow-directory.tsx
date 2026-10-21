@@ -1,25 +1,14 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import {
-  BriefcaseBusiness, ChartNoAxesColumnIncreasing, Code2, GraduationCap, HeartHandshake,
-  PanelsTopLeft, Scale, Search, Sparkles, Video, Workflow, type LucideIcon,
-} from "lucide-react";
+import { Search, Workflow } from "lucide-react";
 
 import type { RedesignLocale } from "@/components/redesign/types";
-import { EmptyState } from "@/components/ui";
 import { resolveToolImageSrc } from "@/lib/tool-image";
-import { AI_WORKFLOW_CATEGORIES, filterAiWorkflowCategories, type AiWorkflowCategory } from "./workflow-catalog";
 import { AiWorkflowFavoriteButton } from "./workflow-interactions";
 import type { AiWorkflowCatalogFilters } from "@/lib/ai-workflows/catalog";
-
-const categoryIcons: Record<AiWorkflowCategory["icon"], LucideIcon> = {
-  briefcase: BriefcaseBusiness, video: Video, sparkles: Sparkles, code: Code2,
-  graduation: GraduationCap, search: Search, chart: ChartNoAxesColumnIncreasing,
-  panels: PanelsTopLeft, heart: HeartHandshake, scale: Scale,
-};
 
 type TopicOption = { id: string; name: string; englishName: string | null };
 export type AiWorkflowCatalogCard = {
@@ -47,8 +36,7 @@ export type AiWorkflowCatalogCard = {
 
 const copy = {
   zh: {
-    search: "搜索中文名、仓库名、用途、主题或标签", directions: "AI 应用方向参考", resultSuffix: "个方向",
-    emptyTitle: "没有找到相关方向", emptyText: "换一个任务关键词试试。", products: "已发布工作流",
+    search: "搜索中文名、仓库名、用途、主题或标签", products: "全部工作流",
     noProducts: "目前还没有已发布工作流。符合主题且许可清晰的项目会以可下载包或 GitHub 原仓库链接展示。",
     topic: "全部主题", paid: "全部价格", free: "免费", paidOnly: "付费", environment: "全部环境",
     windows: "已验证 Windows", macos: "已验证 macOS", linux: "已验证 Linux", type: "全部类型",
@@ -59,9 +47,8 @@ const copy = {
     browseSkills: "浏览 AI Skills", browseTools: "浏览 AI 工具", unconfigured: "采集主题尚未配置",
   },
   en: {
-    search: "Search Chinese name, repository, use case, topic, or tag", directions: "AI application directions",
-    resultSuffix: "directions", emptyTitle: "No matching direction found", emptyText: "Try another task keyword.",
-    products: "Published workflows", noProducts: "No workflow is published yet. Relevant projects with a clear license will appear as a downloadable package or a GitHub repository link.",
+    search: "Search Chinese name, repository, use case, topic, or tag", products: "All workflows",
+    noProducts: "No workflow is published yet. Relevant projects with a clear license will appear as a downloadable package or a GitHub repository link.",
     topic: "All topics", paid: "All prices", free: "Free", paidOnly: "Paid", environment: "All environments",
     windows: "Verified Windows", macos: "Verified macOS", linux: "Verified Linux", type: "All types",
     workflow: "Workflow", automation: "Automation tool", agent: "Agent project", template: "Template", companion: "Companion tool",
@@ -97,7 +84,6 @@ export function AiWorkflowDirectory({
 }) {
   const [query, setQuery] = useState(filters.q);
   const text = copy[locale];
-  const directions = useMemo(() => filterAiWorkflowCategories(AI_WORKFLOW_CATEGORIES, query, locale), [query, locale]);
   const basePath = locale === "en" ? "/en/ai-workflows" : "/ai-workflows";
 
   return (
@@ -142,24 +128,8 @@ export function AiWorkflowDirectory({
         <button type="submit" className="ai-workflows-apply-filters rounded-xl bg-[var(--marketing-accent)] px-4 py-3 text-sm font-semibold text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring">{locale === "en" ? "Apply filters" : "应用筛选"}</button>
       </form>
 
-      <div className="mt-6 flex items-center justify-between gap-4">
-        <h2 className="text-lg font-semibold text-[var(--marketing-text)]">{text.directions}</h2>
-        <p className="text-sm text-[var(--marketing-muted)]" role="status" aria-live="polite">{directions.length} {text.resultSuffix}</p>
-      </div>
-      {directions.length ? (
-        <div className="mt-4 grid gap-4 sm:grid-cols-2" role="list" aria-label={text.directions}>
-          {directions.map((category) => {
-            const Icon = categoryIcons[category.icon];
-            return <article key={category.slug} className="flex min-h-28 items-start gap-4 rounded-2xl border border-[var(--marketing-border)] bg-white p-5 shadow-[0_12px_34px_rgba(29,78,126,0.06)]" role="listitem">
-              <span className="mt-0.5 inline-flex size-12 shrink-0 items-center justify-center rounded-full bg-[rgba(0,102,204,0.12)] text-[var(--marketing-accent)]"><Icon aria-hidden="true" className="size-5" strokeWidth={1.8} /></span>
-              <div><h3 className="text-lg font-semibold leading-7 text-[var(--marketing-text)]">{category.label[locale]}</h3><p className="mt-1 text-sm leading-6 text-[var(--marketing-muted)]">{category.examples[locale]}</p></div>
-            </article>;
-          })}
-        </div>
-      ) : <div className="mt-4"><EmptyState title={text.emptyTitle} text={text.emptyText} /></div>}
-
-      <section className="mt-10" aria-labelledby="ai-workflow-products-title">
-        <div className="flex items-end justify-between gap-4"><h2 id="ai-workflow-products-title" className="text-xl font-semibold text-[var(--marketing-text)]">{text.products}</h2><p className="text-sm text-[var(--marketing-muted)]">{total} {text.count}</p></div>
+      <section className="mt-6" aria-labelledby="ai-workflow-products-title">
+        <div className="flex items-end justify-between gap-4"><h2 id="ai-workflow-products-title" className="text-lg font-semibold text-[var(--marketing-text)]">{text.products}</h2><p className="text-sm text-[var(--marketing-muted)]">{total} {text.count}</p></div>
         {items.length ? <div className="mt-4 grid gap-4 md:grid-cols-2 xl:grid-cols-3">
           {items.map((item) => {
             const href = `${basePath}/${item.slug}`;
@@ -183,7 +153,7 @@ export function AiWorkflowDirectory({
                 </div>
                 <div className="mt-4 flex items-center justify-between gap-3 border-t border-[var(--marketing-border)] pt-3">
                   <AiWorkflowFavoriteButton slug={item.slug} initialCount={item.favoriteCount} initialFavorite={item.isFavorite} locale={locale} loginHref={`${locale === "en" ? "/en" : ""}/login?returnTo=${encodeURIComponent(href)}`} />
-                  <Link href={href} className="rounded-lg bg-[var(--marketing-accent)] px-3 py-2 text-sm font-semibold text-white hover:opacity-90">{text.details}</Link>
+                  <Link href={href} className="ai-workflows-detail-link rounded-lg bg-[var(--marketing-accent)] px-3 py-2 text-sm font-semibold text-white hover:opacity-90">{text.details}</Link>
                 </div>
               </div>
             </article>;
