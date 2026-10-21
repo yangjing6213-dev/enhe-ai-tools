@@ -25,7 +25,14 @@ describe("POST /api/internal/ai-workflows/worker/known-repositories", () => {
     expect(response.status).toBe(200);
     expect(await response.json()).toEqual({ ok: true, knownRepositoryIds: ["20"] });
     expect(findMany).toHaveBeenCalledWith({
-      where: { repositoryId: { in: ["10", "20"] } },
+      where: {
+        repositoryId: { in: ["10", "20"] },
+        OR: [
+          { status: { not: "published" } },
+          { fileId: { not: null } },
+          { updatedAt: { lte: expect.any(Date) } },
+        ],
+      },
       select: { repositoryId: true },
     });
   });

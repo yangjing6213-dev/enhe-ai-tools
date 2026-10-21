@@ -77,6 +77,14 @@ describe("POST /api/internal/ai-workflows/worker/[batchId]/complete", () => {
     expect(response.status).toBe(200);
     expect(response.headers.get("cache-control")).toContain("no-store");
     expect(await response.json()).toMatchObject({ ok: true, state: "completed", readyCandidateCount: 3 });
+    expect(mocks.candidatesCount).toHaveBeenCalledWith({
+      where: {
+        batchId: "batch-1",
+        status: { in: ["pending_pricing", "published"] },
+        toolId: { not: null },
+        OR: [{ fileId: { not: null } }, { status: "published", fileId: null }],
+      },
+    });
     expect(mocks.batchesUpdateMany).toHaveBeenCalledWith(expect.objectContaining({
       where: expect.objectContaining({ id: "batch-1", status: "running", leaseOwnerId: "runner-1" }),
       data: expect.objectContaining({

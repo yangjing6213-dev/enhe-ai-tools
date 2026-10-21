@@ -6,6 +6,7 @@ const mocks = vi.hoisted(() => ({
   settingsFindUnique: vi.fn(),
   batchesFindUnique: vi.fn(),
   candidatesFindUnique: vi.fn(),
+  candidatesUpdate: vi.fn(),
   toolsCreate: vi.fn(),
   filesCreate: vi.fn(),
   toolsUpdate: vi.fn(),
@@ -74,6 +75,24 @@ function candidateResult(overrides: Record<string, unknown> = {}) {
   };
 }
 
+function repositoryLinkResult(overrides: Record<string, unknown> = {}) {
+  return {
+    deliveryMode: "repository_link",
+    repositoryId: "123456",
+    repositoryUrl: "https://github.com/example/agent-flow",
+    commitSha: commit,
+    licenseSpdx: "MIT",
+    licenseFilePath: "LICENSE",
+    projectType: "workflow",
+    stars: 125,
+    updatedAt: "2026-10-20T01:00:00.000Z",
+    language: "Python",
+    description: "Reusable AI agent workflow for research tasks.",
+    failureReason: "PACKAGE_LANGUAGE_UNSUPPORTED",
+    ...overrides,
+  };
+}
+
 function request(body: unknown, authorization = "Bearer " + workerToken) {
   return new Request("https://www.enhe-tech.com.cn/api/internal/ai-workflows/worker/batch-1/result", {
     method: "POST",
@@ -100,11 +119,12 @@ beforeEach(() => {
   mocks.transaction.mockImplementation(async (callback: (tx: unknown) => unknown) => callback({
     aiWorkflowCollectionSetting: { findUnique: mocks.settingsFindUnique },
     aiWorkflowBatch: { findUnique: mocks.batchesFindUnique, updateMany: mocks.batchesUpdateMany },
-    aiWorkflowCandidate: { findUnique: mocks.candidatesFindUnique, create: mocks.candidatesCreate },
+    aiWorkflowCandidate: { findUnique: mocks.candidatesFindUnique, create: mocks.candidatesCreate, update: mocks.candidatesUpdate },
     tool: { create: mocks.toolsCreate, update: mocks.toolsUpdate },
     file: { create: mocks.filesCreate },
   }));
   mocks.candidatesFindUnique.mockResolvedValue(null);
+  mocks.candidatesUpdate.mockResolvedValue({ id: "candidate-1" });
   mocks.toolsCreate.mockResolvedValue({ id: "tool-1" });
   mocks.filesCreate.mockResolvedValue({ id: "file-1" });
   mocks.toolsUpdate.mockResolvedValue({ id: "tool-1" });
@@ -148,6 +168,47 @@ describe("POST /api/internal/ai-workflows/worker/[batchId]/result", () => {
     expect(mocks.toolsUpdate).toHaveBeenCalledWith(expect.objectContaining({ data: { downloadFileId: "file-1" } }));
     expect(mocks.candidatesCreate).toHaveBeenCalledWith(expect.objectContaining({ data: expect.objectContaining({ status: "pending_pricing", priceSuggestion: 19 }) }));
     expect(mocks.batchesUpdateMany).toHaveBeenCalledWith(expect.objectContaining({ data: expect.objectContaining({ lastWorkerStage: "register" }) }));
+  });
+
+  it("publishes a factual repository-link listing without requiring COS or a package", async () => {
+    vi.stubEnv("COS_SECRET_KEY", "");
+    const response = await POST(request({ workerId: "runner-1", leaseToken, result: repositoryLinkResult() }), context);
+
+    expect(response.status).toBe(201);
+    expect(await response.json()).toMatchObject({ ok: true, candidateId: "candidate-1", state: "published", deliveryMode: "repository_link" });
+    expect(mocks.toolsCreate).toHaveBeenCalledWith(expect.objectContaining({
+      data: expect.objectContaining({
+        status: "published",
+        onlineUrl: "https://github.com/example/agent-flow",
+        isDownloadPaid: false,
+        downloadPrice: 0,
+      }),
+    }));
+    expect(mocks.filesCreate).not.toHaveBeenCalled();
+    expect(mocks.candidatesCreate).toHaveBeenCalledWith(expect.objectContaining({
+      data: expect.objectContaining({ status: "published", failureReason: "PACKAGE_LANGUAGE_UNSUPPORTED" }),
+    }));
+    expect(mocks.candidatesCreate.mock.calls[0]?.[0].data).not.toHaveProperty("fileId");
+    expect(mocks.toolsCreate.mock.calls[0]?.[0].data.content).toContain("获取方式和核验状态");
+    const publication = mocks.candidatesCreate.mock.calls[0]?.[0].data.validationReport.publication;
+    expect(publication).toMatchObject({ mode: "repository_link", enheDownloadPackageAvailable: false });
+    expect(publication).not.toHaveProperty("sourceCodeExecuted");
+  });
+
+  it("upgrades an existing link listing into a package awaiting price review without creating a duplicate", async () => {
+    mocks.candidatesFindUnique.mockResolvedValue({
+      id: "candidate-link", batchId: "batch-1", commitSha: commit, status: "published", fileId: null, toolId: "tool-link",
+    });
+    const response = await POST(request({ workerId: "runner-1", leaseToken, result: candidateResult() }), context);
+
+    expect(response.status).toBe(200);
+    expect(await response.json()).toMatchObject({ ok: true, candidateId: "candidate-link", state: "pending_pricing", deliveryMode: "package" });
+    expect(mocks.toolsCreate).not.toHaveBeenCalled();
+    expect(mocks.filesCreate).toHaveBeenCalledWith(expect.objectContaining({ data: expect.objectContaining({ toolId: "tool-link" }) }));
+    expect(mocks.candidatesUpdate).toHaveBeenCalledWith(expect.objectContaining({
+      where: { id: "candidate-link" },
+      data: expect.objectContaining({ status: "pending_pricing", fileId: "file-1", batchId: "batch-1" }),
+    }));
   });
 
   it("does not write a candidate when the uploaded object or license does not pass", async () => {

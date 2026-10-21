@@ -33,6 +33,16 @@ export function isAiWorkflowPurchaseReady(input: {
   return input.priceDecision === "free" && input.downloadPrice === 0;
 }
 
+export function resolveAiWorkflowDeliveryMode(input: {
+  candidateStatus: string;
+  candidateFileId: string | null;
+  toolFileId: string | null;
+}): "package" | "repository_link" {
+  return input.candidateStatus === "published" && input.candidateFileId && input.candidateFileId === input.toolFileId
+    ? "package"
+    : "repository_link";
+}
+
 export function isAiWorkflowArchiveReady(input: {
   repositoryId: string;
   commitSha: string | null;

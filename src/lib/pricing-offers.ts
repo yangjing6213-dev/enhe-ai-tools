@@ -27,6 +27,8 @@ export type PricingCatalogTool = {
   category: { name: string } | null;
   isDownloadPaid: boolean;
   downloadPrice: unknown;
+  downloadFileId?: string | null;
+  aiWorkflowCandidate?: { status: string; fileId: string | null } | null;
   tutorials: Array<{ status: "active" | "disabled" }>;
   priceSpecs: Array<{
     id: string;
@@ -209,6 +211,11 @@ export function buildPricingOfferItems(
     .filter(
       (tool) =>
         tool.status === "published" &&
+        (tool.type !== "ai_workflow" || (
+          tool.aiWorkflowCandidate?.status === "published" &&
+          Boolean(tool.aiWorkflowCandidate.fileId) &&
+          tool.aiWorkflowCandidate.fileId === tool.downloadFileId
+        )) &&
         (tool.type !== "skill_learning" ||
           tool.tutorials.some((tutorial) => tutorial.status === "active")),
     )
@@ -274,6 +281,8 @@ export async function loadPublicPricingCatalogTools(): Promise<
       category: { select: { name: true } },
       isDownloadPaid: true,
       downloadPrice: true,
+      downloadFileId: true,
+      aiWorkflowCandidate: { select: { status: true, fileId: true } },
       tutorials: {
         where: { status: "active" },
         select: { status: true },

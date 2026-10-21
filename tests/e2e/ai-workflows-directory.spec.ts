@@ -15,8 +15,8 @@ for (const route of [
     await expect(directions).toHaveCount(10);
     await expect(page.getByRole("heading", { name: route.locale === "en" ? "Published workflows" : "已发布工作流" })).toBeVisible();
     await expect(page.getByText(route.locale === "en"
-      ? "No workflow has completed source, license, runtime, and delivery checks yet. Verified and published items will appear here."
-      : "目前还没有完成核验并发布的工作流。项目通过来源、许可、运行条件和交付检查后，才会显示在这里。",
+      ? "No workflow is published yet. Relevant projects with a clear license will appear as a downloadable package or a GitHub repository link."
+      : "目前还没有已发布工作流。符合主题且许可清晰的项目会以可下载包或 GitHub 原仓库链接展示。",
     )).toBeVisible();
   });
 }

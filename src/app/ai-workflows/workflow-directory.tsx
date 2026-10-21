@@ -37,6 +37,8 @@ export type AiWorkflowCatalogCard = {
   ratingAverage: number | null;
   reviewCount: number;
   projectType: string;
+  deliveryMode: "package" | "repository_link";
+  githubStars: number | null;
   verifiedEnvironments: string[];
   topic: { name: string; englishName: string | null } | null;
   tags: string[];
@@ -47,25 +49,25 @@ const copy = {
   zh: {
     search: "搜索中文名、仓库名、用途、主题或标签", directions: "AI 应用方向参考", resultSuffix: "个方向",
     emptyTitle: "没有找到相关方向", emptyText: "换一个任务关键词试试。", products: "已发布工作流",
-    noProducts: "目前还没有完成核验并发布的工作流。项目通过来源、许可、运行条件和交付检查后，才会显示在这里。",
+    noProducts: "目前还没有已发布工作流。符合主题且许可清晰的项目会以可下载包或 GitHub 原仓库链接展示。",
     topic: "全部主题", paid: "全部价格", free: "免费", paidOnly: "付费", environment: "全部环境",
     windows: "已验证 Windows", macos: "已验证 macOS", linux: "已验证 Linux", type: "全部类型",
     workflow: "工作流", automation: "自动化工具", agent: "智能体项目", template: "模板", companion: "配套工具",
     sort: "推荐排序", latest: "最新发布", downloads: "网站下载发起", rating: "用户评分", price: "价格从低到高",
-    count: "个项目", details: "查看详情", freeTag: "免费", noRating: "暂无评分", reviews: "条评价",
-    downloadsLabel: "次网站下载发起", environments: "已验证", page: "页", previous: "上一页", next: "下一页",
+    count: "个项目", details: "查看详情", freeTag: "免费", repositoryLink: "原仓库链接", noRating: "暂无评分", reviews: "条评价",
+    downloadsLabel: "次网站下载发起", repositoryOnly: "仅提供 GitHub 原仓库", stars: "GitHub 星标", environments: "已验证", page: "页", previous: "上一页", next: "下一页",
     browseSkills: "浏览 AI Skills", browseTools: "浏览 AI 工具", unconfigured: "采集主题尚未配置",
   },
   en: {
     search: "Search Chinese name, repository, use case, topic, or tag", directions: "AI application directions",
     resultSuffix: "directions", emptyTitle: "No matching direction found", emptyText: "Try another task keyword.",
-    products: "Published workflows", noProducts: "No workflow has completed source, license, runtime, and delivery checks yet. Verified and published items will appear here.",
+    products: "Published workflows", noProducts: "No workflow is published yet. Relevant projects with a clear license will appear as a downloadable package or a GitHub repository link.",
     topic: "All topics", paid: "All prices", free: "Free", paidOnly: "Paid", environment: "All environments",
     windows: "Verified Windows", macos: "Verified macOS", linux: "Verified Linux", type: "All types",
     workflow: "Workflow", automation: "Automation tool", agent: "Agent project", template: "Template", companion: "Companion tool",
     sort: "Recommended", latest: "Newest", downloads: "Website download starts", rating: "User rating", price: "Price: low to high",
-    count: "items", details: "View details", freeTag: "Free", noRating: "No ratings yet", reviews: "reviews",
-    downloadsLabel: "website download starts", environments: "Verified", page: "Page", previous: "Previous", next: "Next",
+    count: "items", details: "View details", freeTag: "Free", repositoryLink: "GitHub repository", noRating: "No ratings yet", reviews: "reviews",
+    downloadsLabel: "website download starts", repositoryOnly: "GitHub source link only", stars: "GitHub stars", environments: "Verified", page: "Page", previous: "Previous", next: "Next",
     browseSkills: "Browse AI Skills", browseTools: "Browse AI tools", unconfigured: "Collection topics are not configured",
   },
 } as const;
@@ -168,14 +170,15 @@ export function AiWorkflowDirectory({
                   {image ? <Image src={image} alt="" width={56} height={56} unoptimized className="size-14 object-cover" /> : <Workflow aria-hidden="true" className="size-7" />}
                 </div>
                 <div className="min-w-0 flex-1"><Link href={href} className="font-semibold text-[var(--marketing-text)] hover:text-[var(--marketing-accent)]">{locale === "en" ? item.englishName || item.name : item.name}</Link><p className="mt-1 truncate text-xs text-[var(--marketing-muted)]">{item.englishName || item.name}</p></div>
-                <span className="shrink-0 rounded-full bg-[#e8f3ff] px-2.5 py-1 text-xs font-semibold text-[var(--marketing-accent)]">{item.isDownloadPaid ? `¥${item.price.toFixed(2)}` : text.freeTag}</span>
+                <span className="shrink-0 rounded-full bg-[#e8f3ff] px-2.5 py-1 text-xs font-semibold text-[var(--marketing-accent)]">{item.deliveryMode === "repository_link" ? text.repositoryLink : item.isDownloadPaid ? `¥${item.price.toFixed(2)}` : text.freeTag}</span>
               </div>
               <p className="mt-4 line-clamp-3 text-sm leading-6 text-[var(--marketing-muted)]">{item.shortDescription}</p>
               <div className="mt-3 flex flex-wrap gap-2">{item.topic ? <span className="rounded-full border border-[var(--marketing-border)] px-2.5 py-1 text-xs">{locale === "en" ? item.topic.englishName || item.topic.name : item.topic.name}</span> : null}{item.tags.slice(0, 3).map((tag) => <span key={tag} className="rounded-full border border-[var(--marketing-border)] px-2.5 py-1 text-xs">{tag}</span>)}</div>
               <div className="mt-auto pt-4">
                 <div className="flex flex-wrap items-center gap-x-3 gap-y-2 text-xs text-[var(--marketing-muted)]">
                   <span aria-label={item.ratingAverage === null ? text.noRating : `${item.ratingAverage.toFixed(1)} / 5`}>{item.ratingAverage === null ? text.noRating : `★ ${item.ratingAverage.toFixed(1)} (${item.reviewCount} ${text.reviews})`}</span>
-                  <span>{item.downloadCount} {text.downloadsLabel}</span>
+                  {item.deliveryMode === "package" ? <span>{item.downloadCount} {text.downloadsLabel}</span> : <span>{text.repositoryOnly}</span>}
+                  {item.githubStars !== null ? <span>★ {item.githubStars.toLocaleString()} {text.stars}</span> : null}
                   {item.verifiedEnvironments.length ? <span>{text.environments}: {item.verifiedEnvironments.join(" / ")}</span> : null}
                 </div>
                 <div className="mt-4 flex items-center justify-between gap-3 border-t border-[var(--marketing-border)] pt-3">
