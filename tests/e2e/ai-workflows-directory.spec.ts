@@ -11,6 +11,7 @@ for (const route of [
     expect(response?.status()).toBe(200);
     await expect(page.getByRole("heading", { level: 1, name: route.title })).toBeVisible();
     await expect(page.getByRole("searchbox", { name: route.searchLabel })).toBeVisible();
+    await expect(page.getByRole("button", { name: route.locale === "en" ? "Apply filters" : "应用筛选" })).toHaveCSS("color", "rgb(255, 255, 255)");
     const directions = page.getByRole("list", { name: route.locale === "en" ? "AI application directions" : "AI 应用方向参考" }).getByRole("listitem");
     await expect(directions).toHaveCount(10);
     await expect(page.getByRole("heading", { name: route.locale === "en" ? "Published workflows" : "已发布工作流" })).toBeVisible();

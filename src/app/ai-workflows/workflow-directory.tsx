@@ -139,7 +139,7 @@ export function AiWorkflowDirectory({
             <option value="recommended">{text.sort}</option><option value="latest">{text.latest}</option><option value="downloads">{text.downloads}</option><option value="rating">{text.rating}</option><option value="price">{text.price}</option>
           </select>
         </label>
-        <button type="submit" className="rounded-xl bg-[var(--marketing-accent)] px-4 py-3 text-sm font-semibold text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring">{locale === "en" ? "Apply filters" : "应用筛选"}</button>
+        <button type="submit" className="ai-workflows-apply-filters rounded-xl bg-[var(--marketing-accent)] px-4 py-3 text-sm font-semibold text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring">{locale === "en" ? "Apply filters" : "应用筛选"}</button>
       </form>
 
       <div className="mt-6 flex items-center justify-between gap-4">

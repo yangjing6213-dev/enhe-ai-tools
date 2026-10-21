@@ -49,7 +49,8 @@ test("public header replaces the search link, opens recommendations, and submits
         if (width === 1920) expect(Math.abs(layout.logoLeft - ((width - 1200) / 2 - 240))).toBeLessThan(1);
       }
       await expect(page.locator(".redesign-home-reviews-rotation")).toBeHidden();
-      await expect(page.locator(".redesign-home-brand-value-inner h2")).toHaveCSS("font-weight", "700");
+      const heroTitleWeight = await page.locator(".redesign-home-hero .masked-heading").first().evaluate((element) => getComputedStyle(element).fontWeight);
+      await expect(page.locator(".redesign-home-brand-value-inner h2")).toHaveCSS("font-weight", heroTitleWeight);
       if ([1920, 1440, 390].includes(width)) {
         await footer.scrollIntoViewIfNeeded();
         await page.screenshot({ path: `output/ui-followup/footer-center-${locale}-${width}.png` });

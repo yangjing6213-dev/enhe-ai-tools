@@ -23,18 +23,19 @@ test("account shortcuts have their own named landmark", async ({ page }) => {
   await expect(page.getByRole("region", { name: "个人中心快捷入口", exact: true })).toBeVisible();
 });
 
-test("homepage headline stays readable before JavaScript starts", async ({ browser, baseURL }) => {
+test("homepage headline stays accessible before JavaScript without a black fallback", async ({ browser, baseURL }) => {
   const context = await browser.newContext({ javaScriptEnabled: false, viewport: { width: 1440, height: 900 } });
   const page = await context.newPage();
   try {
     await page.goto(`${baseURL}/`, { waitUntil: "domcontentloaded" });
+    await expect(page.locator(".redesign-home-hero h1")).toHaveAttribute("aria-label", /AI一站式平台/);
     const words = page.locator(".redesign-home-hero .masked-heading__word");
     expect(await words.count()).toBeGreaterThan(0);
     for (const word of await words.all()) {
       await expect(word).toBeVisible();
-      expect(await word.evaluate((element) => getComputedStyle(element).webkitTextFillColor)).toBe("rgb(0, 0, 0)");
+      expect(await word.evaluate((element) => getComputedStyle(element).webkitTextFillColor)).toBe("rgba(0, 0, 0, 0)");
     }
-    expect(await page.locator(".redesign-home-hero .masked-heading__reveal").first().evaluate((element) => getComputedStyle(element).visibility)).toBe("hidden");
+    expect(await page.locator(".redesign-home-hero .masked-heading__reveal").first().evaluate((element) => getComputedStyle(element).visibility)).toBe("visible");
   } finally {
     await context.close();
   }

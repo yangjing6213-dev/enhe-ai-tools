@@ -28,7 +28,8 @@ export const HOME_FEATURES: ReadonlyArray<{
 
 const SKILL_ITEMS = [
   { zh: "AI 提示词", en: "AI prompts", path: "/skill-learning/ai-prompt-management" },
-  { zh: "AI Skill", en: "AI Skill", path: "/ai-skills" },
+  { zh: "AI Skills", en: "AI Skills", path: "/ai-skills" },
+  { zh: "AI 工作流", en: "AI workflows", path: "/ai-workflows" },
 ];
 const NEWS_ITEMS = [
   { zh: "AI 智能体", en: "AI agents", path: "/ai-news/topics/ai-agent" },

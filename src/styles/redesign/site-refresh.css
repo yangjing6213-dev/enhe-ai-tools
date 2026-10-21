@@ -39,6 +39,11 @@
   color: #fff !important;
 }
 
+.enhe-redesign-production .ai-workflows-apply-filters {
+  color: #fff !important;
+  -webkit-text-fill-color: #fff !important;
+}
+
 .enhe-redesign-production :is(button, a, [role="button"], [data-slot="button"]):is(
   [class*="bg-[var(--marketing-accent)]"],
   [class*="bg-[var(--marketing-button)]"],
