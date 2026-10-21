@@ -326,13 +326,18 @@ test("homepage polish stays readable, responsive, and interactive without extern
   await page.setViewportSize({ width: 1440, height: 900 });
   await page.emulateMedia({ colorScheme: "dark" });
   await page.goto("/", { waitUntil: "load" });
+  await expect(page.locator("html")).toHaveClass(/dark/);
+  await expect(page.locator(".enhe-redesign-production")).toHaveCSS("background-color", "rgb(11, 18, 32)");
+  await expect(page.locator(".enhe-redesign-production")).toHaveCSS("color", "rgb(246, 250, 255)");
+  await page.locator(".redesign-desktop-nav .redesign-theme-switch").click();
+  await page.getByRole("menuitemradio", { name: "Light", exact: true }).click();
   await expect(page.locator("html")).not.toHaveClass(/dark/);
-  const darkPalette = await page.locator(".enhe-redesign-production").evaluate((element) => {
+  const lightPalette = await page.locator(".enhe-redesign-production").evaluate((element) => {
     const style = getComputedStyle(element);
     return { background: style.backgroundColor, foreground: style.color };
   });
-  expect(darkPalette.background).toBe("rgb(255, 255, 255)");
-  expect(darkPalette.foreground).toBe("rgb(0, 0, 0)");
+  expect(lightPalette.background).toBe("rgb(255, 255, 255)");
+  expect(lightPalette.foreground).toBe("rgb(0, 0, 0)");
   await expect(page.locator(".theme-toggle")).toHaveCount(0);
   if (process.env.ENHE_CAPTURE_HOME_UI === "1") {
     await page.locator(".redesign-home-products").scrollIntoViewIfNeeded();

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Monitor, Moon, Sun } from "lucide-react";
 import { useTheme } from "next-themes";
 import {
@@ -19,7 +19,11 @@ const themeOptions = [
 export function EnheRedesignThemeSwitch({ locale }: { locale: RedesignLocale }) {
   const { setTheme, theme } = useTheme();
   const [open, setOpen] = useState(false);
-  const selected = themeOptions.find((option) => option.value === theme) ?? themeOptions[2];
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => setMounted(true), []);
+  // The server cannot read localStorage. Keep its icon for the first client render.
+  const currentTheme = mounted ? theme : "system";
+  const selected = themeOptions.find((option) => option.value === currentTheme) ?? themeOptions[2];
   const SelectedIcon = selected.icon;
 
   return (
@@ -45,7 +49,7 @@ export function EnheRedesignThemeSwitch({ locale }: { locale: RedesignLocale }) 
             key={value}
             type="button"
             role="menuitemradio"
-            aria-checked={theme === value}
+            aria-checked={currentTheme === value}
             className="redesign-theme-option"
             onClick={() => {
               setTheme(value);
@@ -53,7 +57,7 @@ export function EnheRedesignThemeSwitch({ locale }: { locale: RedesignLocale }) 
             }}
           >
             <span className="redesign-theme-option-selected" aria-hidden="true">
-              {theme === value ? "•" : ""}
+              {currentTheme === value ? "•" : ""}
             </span>
             <Icon size={18} aria-hidden="true" />
             <span>{label}</span>
