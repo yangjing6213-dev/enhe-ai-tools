@@ -1,6 +1,9 @@
+import "@/styles/redesign/software.css";
+
 import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
+import { ShieldCheck, Star } from "lucide-react";
 import { notFound, permanentRedirect } from "next/navigation";
 import {
   createCommentAction,
@@ -9,6 +12,7 @@ import {
 } from "@/app/actions";
 import { FormSubmitButton } from "@/components/form-submit-button";
 import { HoldDeleteForm } from "@/components/hold-delete-form";
+import { CreatorContactForm } from "@/components/creator-contact-form";
 import { StarRatingInput, CommentRatingDisplay } from "@/components/star-rating-input";
 import { ProductVideoPlayer } from "@/components/product-video-player";
 import { StructuredData } from "@/components/structured-data";
@@ -233,6 +237,7 @@ export async function ToolDetailPageShell({
     where: { id: slugMatch.id },
     include: {
       category: true,
+      creator: { select: { id: true, nickname: true, avatar: true, creatorBio: true } },
       downloadFile: true,
       tagLinks: {
         include: { tag: true },
@@ -269,6 +274,34 @@ export async function ToolDetailPageShell({
   if (slug !== canonicalSlug || (expectedType && tool.type !== expectedType)) {
     permanentRedirect(buildCanonicalToolPath(tool, forceLocale));
   }
+
+  const productCreator = tool.type === "software" ? tool.creator : null;
+  const creatorProfile = productCreator
+    ? await (async () => {
+        const [productCount, rating, avatarSrc] = await Promise.all([
+          prisma.tool.count({
+            where: { creatorId: productCreator.id, type: "software", status: "published" },
+          }),
+          prisma.comment.aggregate({
+            where: {
+              status: "approved",
+              rating: { not: null },
+              tool: { is: { creatorId: productCreator.id, type: "software", status: "published" } },
+            },
+            _avg: { rating: true },
+            _count: { _all: true },
+          }),
+          resolveUserAvatarSrc(productCreator.avatar),
+        ]);
+        return {
+          creator: productCreator,
+          productCount,
+          ratingAverage: rating._avg.rating == null ? null : Number(rating._avg.rating),
+          ratingCount: rating._count._all,
+          avatarSrc,
+        };
+      })()
+    : null;
 
   const localizedTool = resolveLocalizedToolIdentity(tool, forceLocale);
   const localizedCategoryName = resolveLocalizedToolCategoryName(
@@ -824,6 +857,23 @@ export async function ToolDetailPageShell({
                         label={td.systemRequirement}
                         value={tool.systemRequirement ?? td.browser}
                       />
+                      {tool.type === "software" && tool.securityReviewedAt ? (
+                        <div className="product-safety-info-card">
+                          <p className="text-xs text-[#8F9DB2]">{forceLocale === "en" ? "TRUST & SAFETY" : "信任与安全"}</p>
+                          <div className="product-safety-info-heading">
+                            <ShieldCheck size={20} aria-hidden="true" />
+                            <strong>{forceLocale === "en" ? "Manual safety review complete" : "安全审核已完成"}</strong>
+                          </div>
+                          <p className="product-safety-info-date">
+                            {forceLocale === "en" ? "Confirmed by an ENHE AI admin on " : "由 ENHE AI 管理员于"}
+                            {tool.securityReviewedAt.toLocaleDateString(forceLocale === "en" ? "en-US" : "zh-CN", { year: "numeric", month: "2-digit", day: "2-digit", timeZone: "Asia/Shanghai" })}
+                            {forceLocale === "en" ? "." : "确认。"}
+                          </p>
+                          <p className="product-safety-info-note">
+                            {forceLocale === "en" ? "Please verify the source and system requirements before installing." : "安装前请核对来源和系统要求。"}
+                          </p>
+                        </div>
+                      ) : null}
                       {isAiSkill ? (
                         <Info
                           label={td.supportedAgents}
@@ -848,6 +898,8 @@ export async function ToolDetailPageShell({
                   )}
                 </div>
 
+                <div className={`tool-detail-offer-creator-grid${creatorProfile ? " has-creator" : ""}`}>
+                <div className="tool-detail-offer-creator-main">
                 {localizedPriceSpecs.length &&
                 !shouldShowPurchaseForm &&
                 (isAccountService ||
@@ -1047,6 +1099,47 @@ export async function ToolDetailPageShell({
                       : "该账号服务为付费服务，支付成功后系统会自动解锁该服务的使用权限。"}
                   </p>
                 ) : null}
+              </div>
+              {creatorProfile ? (
+                <aside className="creator-profile-card" aria-label={forceLocale === "en" ? "Creator information" : "创作者信息"}>
+                  <p className="creator-profile-eyebrow">CREATOR</p>
+                  <div className="creator-profile-identity">
+                    <UserAvatar
+                      src={creatorProfile.avatarSrc}
+                      alt={creatorProfile.creator.nickname?.trim() || (forceLocale === "en" ? "ENHE creator" : "ENHE 创作者")}
+                      fallbackSeed={creatorProfile.creator.id}
+                      size={48}
+                      className="creator-profile-avatar"
+                    />
+                    <div className="min-w-0">
+                      <p className="creator-profile-name">{creatorProfile.creator.nickname?.trim() || (forceLocale === "en" ? "ENHE creator" : "ENHE 创作者")}</p>
+                      {creatorProfile.ratingAverage !== null && creatorProfile.ratingCount > 0 ? (
+                        <p className="creator-profile-rating" aria-label={`${creatorProfile.ratingAverage.toFixed(1)} / 5`}>
+                          <Star size={16} fill="currentColor" aria-hidden="true" />
+                          <span>{creatorProfile.ratingAverage.toFixed(1)}</span>
+                          <span className="creator-profile-rating-count">({creatorProfile.ratingCount})</span>
+                        </p>
+                      ) : (
+                        <p className="creator-profile-rating-empty">{forceLocale === "en" ? "No ratings yet" : "暂无评分"}</p>
+                      )}
+                    </div>
+                  </div>
+                  <p className="creator-profile-bio">
+                    {creatorProfile.creator.creatorBio?.trim() || (forceLocale === "en" ? "The creator has not added a bio yet." : "创作者暂未填写个人简介。")}
+                  </p>
+                  <p className="creator-profile-products">
+                    {creatorProfile.productCount} {forceLocale === "en" ? "published products" : "个已发布产品"}
+                  </p>
+                  <CreatorContactForm
+                    creatorId={creatorProfile.creator.id}
+                    currentUserId={user?.id ?? null}
+                    toolId={tool.id}
+                    returnTo={buildCanonicalToolPath(tool, forceLocale)}
+                    locale={forceLocale}
+                  />
+                </aside>
+              ) : null}
+              </div>
               </div>
 
               <div

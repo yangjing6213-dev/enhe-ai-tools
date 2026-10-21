@@ -69,6 +69,60 @@
   color: var(--enhe-text);
 }
 
+.redesign-theme-switch {
+  display: inline-grid;
+  width: 44px;
+  min-width: 44px;
+  height: 44px;
+  place-items: center;
+  border: 1px solid var(--enhe-border);
+  border-radius: 999px;
+  background: var(--enhe-page-bg);
+  color: var(--enhe-text);
+  cursor: pointer;
+}
+
+.redesign-theme-switch:hover {
+  border-color: var(--enhe-action);
+  color: var(--enhe-action);
+}
+
+.redesign-theme-menu {
+  width: 200px;
+  padding: 8px;
+  border: 1px solid var(--enhe-border);
+  border-radius: 18px;
+  background: var(--enhe-surface-elevated);
+  color: var(--enhe-text);
+  box-shadow: 0 12px 32px rgb(15 23 42 / 16%);
+}
+
+.redesign-theme-option {
+  display: grid;
+  grid-template-columns: 12px 20px 1fr;
+  min-height: 42px;
+  align-items: center;
+  gap: 10px;
+  padding: 0 8px;
+  border: 0;
+  border-radius: 10px;
+  background: transparent;
+  color: var(--enhe-text);
+  text-align: left;
+  cursor: pointer;
+}
+
+.redesign-theme-option:hover,
+.redesign-theme-option[aria-checked="true"] {
+  background: color-mix(in srgb, var(--enhe-action) 10%, transparent);
+}
+
+.redesign-theme-option-selected {
+  color: var(--enhe-text);
+  font-size: 18px;
+  line-height: 1;
+}
+
 .redesign-header[data-home="true"] .redesign-login-link,
 .redesign-header[data-home="true"] .redesign-avatar-trigger,
 .redesign-header[data-home="true"] .redesign-menu-trigger {

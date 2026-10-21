@@ -14,6 +14,7 @@ const port = String(numericPort);
 const useProductionServer = process.env.PLAYWRIGHT_USE_PRODUCTION_SERVER === "1";
 const useAdminVisualFixture = process.env.ENHE_ADMIN_VISUAL_FIXTURE === "1";
 const allowDatabaseMutation = process.env.ENHE_E2E_ALLOW_DATABASE_MUTATION === "1";
+const chromiumExecutablePath = process.env.ENHE_PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH?.trim();
 const fixtureHost = "127.0.0.1";
 const explicitBaseURL = process.env.PLAYWRIGHT_BASE_URL?.trim();
 const baseURL = explicitBaseURL ?? `http://${fixtureHost}:${port}`;
@@ -133,7 +134,12 @@ export default defineConfig({
   projects: [
     {
       name: "chromium",
-      use: { ...devices["Desktop Chrome"] }
+      use: {
+        ...devices["Desktop Chrome"],
+        ...(chromiumExecutablePath
+          ? { launchOptions: { executablePath: chromiumExecutablePath } }
+          : {}),
+      },
     }
   ]
 });

@@ -2,7 +2,7 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 
 const mocks = vi.hoisted(() => {
   const record = () => ({ findUnique: vi.fn(), findFirst: vi.fn(), findMany: vi.fn().mockResolvedValue([]), create: vi.fn(), update: vi.fn(), updateMany: vi.fn(), deleteMany: vi.fn() });
-  return { admin: vi.fn(), audit: vi.fn(), storage: vi.fn(), db: { tool: record(), file: record(), toolPriceSpec: record(), tutorial: record(), toolFaq: record(), toolChangelog: record(), toolTag: { ...record(), upsert: vi.fn() }, toolTagLink: record(), $transaction: vi.fn() } };
+  return { admin: vi.fn(), audit: vi.fn(), storage: vi.fn(), db: { tool: record(), user: record(), file: record(), toolPriceSpec: record(), tutorial: record(), toolFaq: record(), toolChangelog: record(), toolTag: { ...record(), upsert: vi.fn() }, toolTagLink: record(), $transaction: vi.fn() } };
 });
 vi.mock("@/lib/auth", () => ({ requireAdmin: mocks.admin, hashPassword: vi.fn() }));
 vi.mock("@/lib/db", () => ({ prisma: mocks.db }));
@@ -23,6 +23,9 @@ beforeEach(() => {
   mocks.admin.mockResolvedValue({ id: "local-admin" });
   mocks.db.$transaction.mockImplementation(async operation => typeof operation === "function" ? operation(mocks.db) : Promise.all(operation));
   mocks.db.tool.update.mockResolvedValue({ id: "local-tool", type: "software", slug: "local-product", name: "Local product" });
+  mocks.db.tool.findUnique.mockResolvedValue(null);
+  mocks.db.tool.create.mockResolvedValue({ id: "new-tool", type: "software", slug: "new-product", name: "New product" });
+  mocks.db.user.update.mockResolvedValue({ id: "local-admin" });
   mocks.db.file.findUnique.mockResolvedValue({ id: "local-file", toolId: "local-tool", filePath: "old", fileUrl: "old" });
   mocks.db.file.update.mockResolvedValue({ id: "local-file" });
   mocks.db.toolPriceSpec.updateMany.mockResolvedValue({ count: 0 });
@@ -48,6 +51,28 @@ describe("product editor isolated save path", () => {
     await expect(upsertToolAction(data)).rejects.toThrow("?saved=1");
     expect(mocks.db.tool.update.mock.calls[0][0].data.downloadFileId).toBeNull();
     expect(mocks.db.file.update).not.toHaveBeenCalled();
+  });
+  it("defaults a new software product to the logged-in creator and records a manual review date", async () => {
+    const data = form({
+      type: "software",
+      name: "New product",
+      slug: "new-product",
+      shortDescription: "Summary",
+      content: "Detail",
+      status: "draft",
+      creatorId: "local-admin",
+      creatorBio: "A creator bio",
+      securityReviewed: "on",
+    });
+
+    await expect(upsertToolAction(data)).rejects.toThrow("?saved=1");
+
+    expect(mocks.db.tool.create.mock.calls[0][0].data).toMatchObject({ creatorId: "local-admin" });
+    expect(mocks.db.tool.create.mock.calls[0][0].data.securityReviewedAt).toBeInstanceOf(Date);
+    expect(mocks.db.user.update).toHaveBeenCalledWith({
+      where: { id: "local-admin" },
+      data: { creatorBio: "A creator bio" },
+    });
   });
   it("requires admin authorization before saving product data", async () => {
     mocks.admin.mockRejectedValue(new Error("FORBIDDEN"));

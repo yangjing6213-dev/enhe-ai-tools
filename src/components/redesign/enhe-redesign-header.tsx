@@ -6,6 +6,7 @@ import { EnheBrandLockup } from "./enhe-brand-lockup";
 import { EnheHeaderSearch } from "./enhe-header-search";
 import type { SearchRecommendation } from "@/lib/public-search-recommendations";
 import { EnheRedesignLanguageSwitch } from "./enhe-redesign-language-switch";
+import { EnheRedesignThemeSwitch } from "./enhe-redesign-theme-switch";
 import { EnheRedesignMobileMenu } from "./enhe-redesign-mobile-menu";
 import { PrefetchLink } from "@/components/prefetch-link";
 import {
@@ -154,6 +155,9 @@ export function EnheRedesignHeader({
                 ariaLabel={languageAriaLabel}
               />
             </NavigationMenuItem>
+            <NavigationMenuItem>
+              <EnheRedesignThemeSwitch locale={locale} />
+            </NavigationMenuItem>
           </NavigationMenuList>
         </NavigationMenu>
         <div className="redesign-mobile-actions">
@@ -171,6 +175,7 @@ export function EnheRedesignHeader({
             currentLocale={locale}
             ariaLabel={languageAriaLabel}
           />
+          <EnheRedesignThemeSwitch locale={locale} />
         </div>
       </div>
     </header>

@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 import {
   buildManualVipNotification,
+  buildCreatorMessageNotification,
   buildPaymentReviewNotification,
   buildRefundProcessedNotification,
   buildRefundRequestNotification
@@ -66,6 +67,22 @@ describe("notification messages", () => {
       title: "VIP 权益已调整",
       content: "管理员已为你开通/延长 1个月VIP。原因：线下补偿",
       linkUrl: "/user"
+    });
+  });
+
+  it("builds a creator message notification with sender identity and product link", () => {
+    expect(buildCreatorMessageNotification({
+      senderId: "user-1",
+      senderName: "小李",
+      productName: "ENHE Writer",
+      message: "请问支持哪些系统？",
+      linkUrl: "/software/enhe-writer",
+    })).toEqual({
+      type: "creator_message",
+      title: "收到新的创作者联系消息",
+      content: "发送者：小李\n产品：ENHE Writer\n留言：\n请问支持哪些系统？",
+      linkUrl: "/software/enhe-writer",
+      senderId: "user-1",
     });
   });
 });

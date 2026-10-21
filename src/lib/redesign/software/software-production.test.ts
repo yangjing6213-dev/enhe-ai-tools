@@ -35,6 +35,14 @@ function buildRows(count: number) {
 }
 
 describe("production software catalog adapter", () => {
+  it("carries the administrator's manual safety review date to product cards", () => {
+    const reviewedAt = new Date("2026-10-20T08:00:00.000Z");
+    const rows = buildRows(1);
+    Object.assign(rows[0], { securityReviewedAt: reviewedAt });
+
+    expect(buildSoftwareCatalogPage({ rows, locale: "zh", page: 1 })?.items[0]?.securityReviewedAt).toEqual(reviewedAt);
+  });
+
   it("searches all published rows before pagination and combines category filters", () => {
     const rows = buildRows(25);
     rows[24].name = "独有语音助手";

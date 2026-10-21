@@ -9,6 +9,7 @@ test("site pages keep white surfaces and black neutral text, including interacti
   }
 
   await page.emulateMedia({ colorScheme: "dark", reducedMotion: "reduce" });
+  await page.addInitScript(() => localStorage.setItem("theme", "light"));
   const response = await page.goto("/", { waitUntil: "load" });
   expect(response?.status()).toBe(200);
 

@@ -275,6 +275,7 @@ model User {
   googleSubject         String?                @unique @map("google_subject")
   nickname              String?
   avatar                String?
+  creatorBio            String?                @map("creator_bio") @db.Text
   role                  UserRole               @default(user)
   status                UserStatus             @default(active)
   isTestData            Boolean                @default(false) @map("is_test_data")
@@ -301,6 +302,8 @@ model User {
   adminAuditLogs        AdminAuditLog[]        @relation("AdminAuditLogs")
   sessions              Session[]
   notifications         Notification[]
+  sentNotifications     Notification[]         @relation("NotificationSender")
+  createdTools          Tool[]                 @relation("ToolCreator")
   newsletterEmail       String?                @map("newsletter_email")
   acceptEmailUpdates    Boolean                @default(true) @map("accept_email_updates")
   newsFavorites         NewsArticleFavorite[]
@@ -404,10 +407,13 @@ model Tool {
   downloadCount         Int             @default(0) @map("download_count")
   usageCount            Int             @default(0) @map("usage_count")
   status                PublishStatus   @default(draft)
+  creatorId             String?         @map("creator_id")
+  securityReviewedAt    DateTime?       @map("security_reviewed_at")
   sortOrder             Int             @default(0) @map("sort_order")
   createdAt             DateTime        @default(now()) @map("created_at")
   updatedAt             DateTime        @updatedAt @map("updated_at")
   category              ToolCategory?   @relation(fields: [categoryId], references: [id])
+  creator               User?           @relation("ToolCreator", fields: [creatorId], references: [id], onDelete: SetNull)
   files                 File[]          @relation("ToolFiles")
   downloadFile          File?           @relation("PrimaryDownload", fields: [downloadFileId], references: [id])
   tutorials             Tutorial[]
@@ -429,6 +435,7 @@ model Tool {
   aiWorkflowVersionPurchases AiWorkflowVersionPurchase[]
 
   @@index([type, status])
+  @@index([creatorId, type, status])
   @@index([isHomeRecommended, status, sortOrder])
   @@map("tools")
 }
@@ -1456,6 +1463,7 @@ model AdminAuditLog {
 model Notification {
   id          String               @id @default(cuid())
   userId      String               @map("user_id")
+  senderId    String?              @map("sender_id")
   type        String
   title       String
   content     String
@@ -1463,9 +1471,11 @@ model Notification {
   readAt      DateTime?            @map("read_at")
   createdAt   DateTime             @default(now()) @map("created_at")
   user        User                 @relation(fields: [userId], references: [id], onDelete: Cascade)
+  sender      User?                @relation("NotificationSender", fields: [senderId], references: [id], onDelete: SetNull)
   emailOutbox SeoAuditEmailOutbox?
 
   @@index([userId, readAt, createdAt])
+  @@index([senderId, type, createdAt])
   @@map("notifications")
 }
 

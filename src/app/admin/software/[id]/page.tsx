@@ -1,6 +1,7 @@
 import { notFound } from "next/navigation";
 import { prisma } from "@/lib/db";
 import { getCurrentLocale } from "@/lib/i18n";
+import { requireAdmin } from "@/lib/auth";
 import { ToolEditor } from "../../tool-admin-list";
 
 export default async function AdminSoftwareToolEditorPage({
@@ -11,9 +12,25 @@ export default async function AdminSoftwareToolEditorPage({
   searchParams: Promise<Record<string, string | undefined>>;
 }) {
   const [{ id }, notice, locale] = await Promise.all([params, searchParams, getCurrentLocale()]);
-  const [tool, categories] = await Promise.all([
-    id === "new" ? Promise.resolve(null) : prisma.tool.findFirst({ where: { id, type: "software" }, include: { category: true, downloadFile: true, priceSpecs: { orderBy: [{ sortOrder: "asc" }, { createdAt: "asc" }], include: { _count: { select: { orders: true, purchases: true } } } }, _count: { select: { orders: true, purchases: true } } } }),
-    prisma.toolCategory.findMany({ orderBy: { sortOrder: "asc" } })
+  const admin = await requireAdmin(locale);
+  const [tool, categories, creator] = await Promise.all([
+    id === "new"
+      ? Promise.resolve(null)
+      : prisma.tool.findFirst({
+          where: { id, type: "software" },
+          include: {
+            category: true,
+            downloadFile: true,
+            creator: { select: { id: true, nickname: true, avatar: true, creatorBio: true } },
+            priceSpecs: {
+              orderBy: [{ sortOrder: "asc" }, { createdAt: "asc" }],
+              include: { _count: { select: { orders: true, purchases: true } } },
+            },
+            _count: { select: { orders: true, purchases: true } },
+          },
+        }),
+    prisma.toolCategory.findMany({ orderBy: { sortOrder: "asc" } }),
+    prisma.user.findUnique({ where: { id: admin.id }, select: { id: true, nickname: true, creatorBio: true } }),
   ]);
 
   if (id !== "new" && !tool) notFound();
@@ -28,6 +45,7 @@ export default async function AdminSoftwareToolEditorPage({
       tool={tool ?? undefined}
       categories={categories}
       notice={notice}
+      currentUser={{ id: admin.id, nickname: creator?.nickname ?? admin.nickname ?? null, creatorBio: creator?.creatorBio ?? null }}
     />
   );
 }

@@ -32,6 +32,8 @@ export function SiteBreadcrumbs({ locale }: SiteBreadcrumbsProps) {
     });
   }, [locale, pathname]);
 
+  if (pathname === "/" || pathname === "/en" || pathname === "/en/") return null;
+
   return (
     <nav className="site-breadcrumbs" aria-label={locale === "en" ? "Breadcrumb" : "面包屑导航"}>
       <ol>

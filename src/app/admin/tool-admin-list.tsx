@@ -41,6 +41,9 @@ type ToolItem = {
   videoDescription3: string | null;
   version: string | null;
   systemRequirement: string | null;
+  creatorId?: string | null;
+  creator?: { id: string; nickname: string | null; avatar: string | null; creatorBio: string | null } | null;
+  securityReviewedAt?: Date | string | null;
   supportedAgents: string[];
   isVipRequired: boolean;
   isDownloadPaid: boolean;
@@ -308,7 +311,8 @@ export function ToolEditor({
   locale = "zh",
   tool,
   categories,
-  notice
+  notice,
+  currentUser
 }: {
   title: string;
   type: AdminToolType;
@@ -316,6 +320,7 @@ export function ToolEditor({
   tool?: ToolItem;
   categories: ToolCategoryItem[];
   notice?: Notice;
+  currentUser?: { id: string; nickname: string | null; creatorBio: string | null };
 }) {
   const copy = toolAdminCopy[locale];
   const statusText = locale === "en" ? statusTextEn : statusTextZh;
@@ -419,6 +424,41 @@ export function ToolEditor({
                   <input name="systemRequirement" defaultValue={tool?.systemRequirement ?? ""} className={inputClass} />
                 </Field>
               </>
+            ) : null}
+            {type === "software" ? (
+              <div className="grid gap-4 md:col-span-2 md:grid-cols-2">
+                <div>
+                  <label className="flex min-h-14 items-center gap-3 rounded-xl border border-white/10 bg-white/6 px-4 py-3 text-sm text-[#F6FAFF]">
+                    <input name="securityReviewed" type="checkbox" defaultChecked={Boolean(tool?.securityReviewedAt)} />
+                    {copy.securityReviewed}
+                  </label>
+                  <p className="mt-2 text-xs leading-5 text-[#8B95A7]">{copy.securityReviewedHint}</p>
+                </div>
+                {currentUser ? (
+                  <Field label={copy.creator}>
+                    <select name="creatorId" defaultValue={tool ? (tool.creatorId ?? "") : currentUser.id} className={selectClass}>
+                      <option value="">{copy.noCreator}</option>
+                      <option value={currentUser.id}>{currentUser.nickname?.trim() || currentUser.id} ({copy.currentUser})</option>
+                      {tool?.creator && tool.creator.id !== currentUser.id ? (
+                        <option value={tool.creator.id}>{tool.creator.nickname?.trim() || tool.creator.id}</option>
+                      ) : null}
+                    </select>
+                  </Field>
+                ) : null}
+                <div className="md:col-span-2">
+                  <Field label={copy.creatorBio}>
+                    <textarea
+                      name="creatorBio"
+                      rows={3}
+                      maxLength={1000}
+                      defaultValue={tool?.creator?.creatorBio ?? (tool?.creatorId ? "" : currentUser?.creatorBio ?? "")}
+                      placeholder={copy.creatorBioPlaceholder}
+                      className={textareaClass}
+                    />
+                  </Field>
+                  <p className="mt-2 text-xs leading-5 text-[#8B95A7]">{copy.creatorBioHint}</p>
+                </div>
+              </div>
             ) : null}
             {isAiSkill ? (
               <fieldset className="md:col-span-2 rounded-2xl border border-white/10 bg-white/6 p-4">
@@ -718,6 +758,14 @@ const toolAdminCopy = {
     coverHint: "建议尺寸 1200x675 或 16:9，JPG/PNG/WebP，8MB 以内。上传后会自动覆盖封面图地址。",
     version: "版本",
     systemRequirement: "系统要求",
+    securityReviewed: "标记为人工审核通过的安全产品",
+    securityReviewedHint: "勾选后会在产品卡片和详情页显示安全审核状态与确认日期；这是人工审核记录，不代表自动扫描或安全保证。",
+    creator: "创作者账号",
+    noCreator: "暂不显示创作者",
+    currentUser: "当前登录账号",
+    creatorBio: "创作者个人简介",
+    creatorBioPlaceholder: "介绍创作者背景、经验或产品方向",
+    creatorBioHint: "新产品默认归属当前登录账号。已有产品不会自动补填创作者；可以选择当前账号或保留原创作者。简介保存在创作者账号中。",
     supportedAgents: "支持智能体",
     supportedAgentsHint: "选择该 Skill 已适配并经过验证的智能体。",
     aiSkillPackage: "Skill ZIP 交付包",
@@ -847,6 +895,14 @@ const toolAdminCopy = {
     coverHint: "Recommended size: 1200x675 or 16:9, JPG/PNG/WebP, under 8MB. Uploading will replace the cover image URL.",
     version: "Version",
     systemRequirement: "System requirement",
+    securityReviewed: "Mark as manually reviewed for safety",
+    securityReviewedHint: "When selected, the product card and detail page show the review status and confirmation date. This records a human review; it does not claim an automated scan or guarantee safety.",
+    creator: "Creator account",
+    noCreator: "Do not show a creator",
+    currentUser: "Current account",
+    creatorBio: "Creator bio",
+    creatorBioPlaceholder: "Describe the creator’s background, experience, or product focus",
+    creatorBioHint: "New products default to the signed-in account. Existing products are not assigned automatically; choose the current account or keep the existing creator. The bio is saved on the creator account.",
     supportedAgents: "Supported agents",
     supportedAgentsHint: "Select the agents this Skill has been adapted and tested for.",
     aiSkillPackage: "Skill ZIP package",

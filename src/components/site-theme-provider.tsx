@@ -7,9 +7,8 @@ export function SiteThemeProvider({ children, nonce }: { children: React.ReactNo
     <ThemeProvider
       nonce={nonce}
       attribute="class"
-      defaultTheme="light"
-      forcedTheme="light"
-      enableSystem={false}
+      defaultTheme="system"
+      enableSystem
       disableTransitionOnChange
     >
       {children}

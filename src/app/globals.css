@@ -109,6 +109,63 @@
   --chart-5: var(--blue-12);
 }
 
+.dark {
+  color-scheme: dark;
+  --marketing-bg: #0b1220;
+  --marketing-bg-soft: #111c2b;
+  --marketing-bg-warm: #111c2b;
+  --marketing-text: #f6faff;
+  --marketing-muted: #bdc8d8;
+  --marketing-soft-text: #8f9db2;
+  --marketing-card: #111c2b;
+  --marketing-card-soft: #162236;
+  --marketing-border: #26364a;
+  --marketing-shadow: 0 16px 42px rgb(0 0 0 / 24%);
+  --background: #0b1220;
+  --background-deep: #070d16;
+  --background-soft: #111c2b;
+  --card: #111c2b;
+  --card-foreground: #f6faff;
+  --card-strong: #162236;
+  --card-soft: #172438;
+  --border: #26364a;
+  --border-strong: #3b4d65;
+  --border-focus: #56a8ff;
+  --foreground: #f6faff;
+  --foreground-soft: #bdc8d8;
+  --muted: #172438;
+  --muted-foreground: #bdc8d8;
+  --dim: #8f9db2;
+  --primary: #1476d4;
+  --primary-foreground: #ffffff;
+  --secondary: #22334a;
+  --secondary-foreground: #f6faff;
+  --popover: #111c2b;
+  --popover-foreground: #f6faff;
+  --accent: #22334a;
+  --accent-foreground: #f6faff;
+  --destructive: #d24b4b;
+  --input: #34445a;
+  --ring: #56a8ff;
+  --sidebar: #0b1220;
+  --sidebar-foreground: #f6faff;
+  --sidebar-primary: #1476d4;
+  --sidebar-primary-foreground: #ffffff;
+  --sidebar-accent: #22334a;
+  --sidebar-accent-foreground: #f6faff;
+  --sidebar-border: #26364a;
+  --sidebar-ring: #56a8ff;
+  --price: #f6faff;
+  --alert: #ff8c8c;
+  --warning: #f3cc71;
+}
+
+.dark .home-page-shell,
+.dark .home-hero-shell {
+  background-color: var(--background);
+  color: var(--foreground);
+}
+
 * {
   box-sizing: border-box;
 }
@@ -5725,29 +5782,25 @@ select option:disabled {
   }
 }
 
-/* Sitewide fixed-light color contract */
-:root {
-  color-scheme: light;
-}
-
-body {
+/* Preserve the established light appearance without overriding dark mode. */
+html:not(.dark) body {
   background: #ffffff !important;
   color: #000000 !important;
 }
 
-.enhe-redesign-production,
-.enhe-admin-shell,
-.enhe-account-shell,
-.enhe-auth-page,
-.user-center-page,
-.enhe-editorial-page,
-.public-search-page {
+html:not(.dark) .enhe-redesign-production,
+html:not(.dark) .enhe-admin-shell,
+html:not(.dark) .enhe-account-shell,
+html:not(.dark) .enhe-auth-page,
+html:not(.dark) .user-center-page,
+html:not(.dark) .enhe-editorial-page,
+html:not(.dark) .public-search-page {
   background-color: #ffffff !important;
   background-image: none !important;
   color: #000000 !important;
 }
 
-body :is(
+html:not(.dark) body :is(
   main,
   section,
   article,
@@ -5783,25 +5836,25 @@ body :is(
   .filter-surface,
   .admin-shell-card
 ),
-  body :is([role="dialog"], [role="menu"], [role="listbox"]) {
+  html:not(.dark) body :is([role="dialog"], [role="menu"], [role="listbox"]) {
   border-color: var(--border) !important;
   background-color: #ffffff !important;
   background-image: none !important;
 }
 
-body [class*="border-white/"] {
+html:not(.dark) body [class*="border-white/"] {
   border-color: var(--border) !important;
 }
 
-.enhe-redesign-production :is(main, section, article, [class*="card"], [class*="panel"], [class*="surface"], .glass, .evidence-card, .dossier-card, .filter-surface, .admin-shell-card),
-.enhe-admin-shell :is(article, [class*="card"], [class*="panel"], [class*="surface"], .glass, .evidence-card, .dossier-card, .filter-surface, .admin-shell-card, table),
-.enhe-account-shell :is(main, section, article, [class*="card"], [class*="panel"], [class*="surface"], .glass, .evidence-card, .dossier-card, .filter-surface, .admin-shell-card),
-:is(.glass, .evidence-card, .dossier-card, .surface-panel, .surface-panel-soft, .filter-surface, .admin-shell-card) {
+html:not(.dark) .enhe-redesign-production :is(main, section, article, [class*="card"], [class*="panel"], [class*="surface"], .glass, .evidence-card, .dossier-card, .filter-surface, .admin-shell-card),
+html:not(.dark) .enhe-admin-shell :is(article, [class*="card"], [class*="panel"], [class*="surface"], .glass, .evidence-card, .dossier-card, .filter-surface, .admin-shell-card, table),
+html:not(.dark) .enhe-account-shell :is(main, section, article, [class*="card"], [class*="panel"], [class*="surface"], .glass, .evidence-card, .dossier-card, .filter-surface, .admin-shell-card),
+html:not(.dark) :is(.glass, .evidence-card, .dossier-card, .surface-panel, .surface-panel-soft, .filter-surface, .admin-shell-card) {
   background: #ffffff !important;
   background-image: none !important;
 }
 
-body :is(
+html:not(.dark) body :is(
   [class*="text-white"],
   [class*="text-gray-"],
   [class*="text-slate-"],
@@ -5837,12 +5890,12 @@ body :is(
   -webkit-text-fill-color: #000000 !important;
 }
 
-body [class*="bg-white/"] {
+html:not(.dark) body [class*="bg-white/"] {
   background-color: #ffffff !important;
   background-image: none !important;
 }
 
-body :is(
+html:not(.dark) body :is(
   [class*="bg-[#030A14]"],
   [class*="bg-[#050505]"],
   [class*="bg-[#05070B]"],
@@ -5860,7 +5913,7 @@ body :is(
   color: #000000 !important;
 }
 
-body :is(
+html:not(.dark) body :is(
   [class*="bg-gray-"],
   [class*="bg-slate-"],
   [class*="bg-zinc-"],
@@ -5872,43 +5925,43 @@ body :is(
 }
 
 /* Older account/order layouts share the same public brand colors. */
-body .site-footer,
-body .site-footer :is(nav, address, .site-footer-disclosure, .site-footer-social-link) {
+html:not(.dark) body .site-footer,
+html:not(.dark) body .site-footer :is(nav, address, .site-footer-disclosure, .site-footer-social-link) {
   background-color: #0D3A6D !important;
   color: #fff;
 }
 
-body .site-footer :is(a, p, span, dt, dd, summary, svg) {
+html:not(.dark) body .site-footer :is(a, p, span, dt, dd, summary, svg) {
   color: #fff !important;
 }
 
-body .site-footer :is(a:hover, summary:hover) {
+html:not(.dark) body .site-footer :is(a:hover, summary:hover) {
   background-color: transparent !important;
 }
 
-body .site-footer .site-footer-logo {
+html:not(.dark) body .site-footer .site-footer-logo {
   filter: brightness(0) invert(1);
 }
 
-body .site-footer :is(.site-footer-bottom, .site-footer-filings) {
+html:not(.dark) body .site-footer :is(.site-footer-bottom, .site-footer-filings) {
   justify-content: center;
   text-align: center;
 }
 
-body .site-footer a:focus-visible,
-body .site-footer summary:focus-visible {
+html:not(.dark) body .site-footer a:focus-visible,
+html:not(.dark) body .site-footer summary:focus-visible {
   outline-color: #fff;
 }
 
-body :is(.site-user-chip, .site-login-link, .site-language-switcher),
-body .site-language-switcher a,
-body .site-language-switcher a.is-active {
+html:not(.dark) body :is(.site-user-chip, .site-login-link, .site-language-switcher),
+html:not(.dark) body .site-language-switcher a,
+html:not(.dark) body .site-language-switcher a.is-active {
   border: 0 !important;
   background: var(--brand-blue) !important;
   color: #fff !important;
 }
 
-body .site-user-chip.site-user-chip {
+html:not(.dark) body .site-user-chip.site-user-chip {
   background: transparent !important;
   color: var(--enhe-text, #000) !important;
   -webkit-text-fill-color: currentColor !important;

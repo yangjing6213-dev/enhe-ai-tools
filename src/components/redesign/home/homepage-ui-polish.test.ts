@@ -35,7 +35,8 @@ describe("homepage UI polish", () => {
     expect(showcase).toContain('className="redesign-home-products-eyebrow redesign-bold-copy"');
     expect(reviews).toContain('id="redesign-home-reviews-heading" className="redesign-bold-copy"');
     expect(brandValue).toContain('className="redesign-bold-copy"');
-    expect(hero).toContain('cta.href.endsWith("/forum") ? "redesign-home-cta redesign-bold-copy"');
+    expect(hero).toContain('className="redesign-home-cta"');
+    expect(hero).not.toContain("redesign-home-cta redesign-bold-copy");
     expect(softwareCatalog.match(/<h1 className="redesign-bold-copy">/g)).toHaveLength(2);
     expect(forumUi).toContain('<h1 className="redesign-bold-copy">{t.title}</h1>');
     expect(sectionTitle).toContain("titleClassName?: string");

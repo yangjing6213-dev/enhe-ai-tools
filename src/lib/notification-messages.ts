@@ -1,11 +1,28 @@
 import { reviewCompletionNotice } from "@/lib/review-copy";
 
 export type NotificationMessage = {
-  type: "payment_review" | "refund_request" | "refund_processed" | "vip_adjustment";
+  type: "payment_review" | "refund_request" | "refund_processed" | "vip_adjustment" | "creator_message";
   title: string;
   content: string;
   linkUrl: string;
+  senderId?: string;
 };
+
+export function buildCreatorMessageNotification(input: {
+  senderId: string;
+  senderName: string;
+  productName: string;
+  message: string;
+  linkUrl: string;
+}): NotificationMessage {
+  return {
+    type: "creator_message",
+    title: "收到新的创作者联系消息",
+    content: `发送者：${input.senderName}\n产品：${input.productName}\n留言：\n${input.message}`,
+    linkUrl: input.linkUrl,
+    senderId: input.senderId,
+  };
+}
 
 export function buildPaymentReviewNotification(input: {
   orderId: string;

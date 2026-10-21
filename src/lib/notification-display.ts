@@ -18,6 +18,16 @@ export function getNotificationDisplay(notification: NotificationLike, locale: L
   const orderNo = extractOrderNo(notification.content) ?? extractOrderNo(notification.title) ?? "this order";
   const note = extractTrailingNote(notification.content);
 
+  if (notification.type === "creator_message") {
+    const sender = notification.content.match(/^发送者：(.+)$/m)?.[1]?.trim();
+    const product = notification.content.match(/^产品：(.+)$/m)?.[1]?.trim();
+    const message = notification.content.match(/^留言：\n([\s\S]*)$/m)?.[1]?.trim();
+    return {
+      title: "New creator message",
+      content: `From ${sender || "a website user"}${product ? ` about ${product}` : ""}${message ? `:\n${message}` : "."}`
+    };
+  }
+
   if (notification.type === "payment_review") {
     if (notification.title.includes("未通过") || notification.content.includes("未通过")) {
       return {

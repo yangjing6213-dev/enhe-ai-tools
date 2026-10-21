@@ -29,6 +29,7 @@ export type PublicSoftwareCatalogRow = {
   isDownloadPaid: boolean;
   downloadPrice: unknown;
   isHomeRecommended: boolean;
+  securityReviewedAt?: Date | string | null;
   downloadCount?: number;
   usageCount?: number;
   sortOrder: number;
@@ -47,6 +48,7 @@ export type SoftwareCatalogItem = {
   type: PublicSoftwareCatalogRow["type"];
   secondaryName: string | null;
   isPaid: boolean;
+  securityReviewedAt?: Date | string | null;
   highlights: string[];
   downloadCount: number;
   usageCount: number;
@@ -382,6 +384,7 @@ function buildCatalogItem(
   return {
     id: row.id,
     type: row.type,
+    securityReviewedAt: row.securityReviewedAt ?? null,
     secondaryName: locale === "zh" ? localizedIdentity.secondaryName : null,
     isPaid,
     highlights: buildToolCardHighlights({ ...row, isDownloadPaid: isPaid }, locale),

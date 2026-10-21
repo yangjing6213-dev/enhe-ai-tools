@@ -15,7 +15,8 @@ export async function createUserNotification(
       type: message.type,
       title: message.title,
       content: message.content,
-      linkUrl: message.linkUrl
+      linkUrl: message.linkUrl,
+      ...(message.senderId ? { senderId: message.senderId } : {})
     }
   });
 }

@@ -67,6 +67,7 @@ describe("production software public query", () => {
       isDownloadPaid: true,
       downloadPrice: true,
       isHomeRecommended: true,
+      securityReviewedAt: true,
       sortOrder: true,
       createdAt: true,
       category: { select: { name: true } },

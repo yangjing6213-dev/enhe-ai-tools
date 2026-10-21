@@ -12,13 +12,14 @@ describe("ENHE shared design tokens", () => {
     expect(css).toContain('@import "@radix-ui/colors/gray.css"');
     expect(css).not.toContain('@import "@radix-ui/colors/blue-dark.css"');
     expect(css).not.toContain('@import "@radix-ui/colors/gray-dark.css"');
-    expect(css).not.toMatch(/\.dark\s*\{/);
+    expect(css).toMatch(/\.dark\s*\{/);
     expect(css).toContain("--background: #ffffff");
     expect(css).toContain("--foreground: #000000");
     expect(css).toContain("--marketing-accent: var(--blue-11)");
     expect(css).toContain("--primary: var(--blue-9)");
     expect(css).toContain("--primary-foreground: #ffffff");
     expect(css).toContain("color-scheme: light");
+    expect(css).toContain("color-scheme: dark");
   });
 
   it("keeps the shared site font on the approved OFL rounded font family", () => {

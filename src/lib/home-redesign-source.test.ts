@@ -113,7 +113,7 @@ describe("homepage SaaS redesign source", () => {
     expect(css).toContain("--marketing-bg: #ffffff");
     expect(css).not.toContain(".site-brand-logo-light");
     expect(css).toContain("--marketing-accent: var(--blue-11)");
-    expect(css).not.toContain(".dark {");
+    expect(css).toContain(".dark {");
     expect(css).toContain("--font-sans: 'ENHE Rounded', 'Microsoft YaHei', Arial, sans-serif");
     expect(css).toContain("--font-heading-zh: 'ENHE Rounded', 'Microsoft YaHei', Arial, sans-serif");
     expect(css).toContain(".home-page-shell {\n  position: relative;\n  background: #ffffff;");

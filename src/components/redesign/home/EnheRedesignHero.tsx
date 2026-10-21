@@ -19,7 +19,7 @@ export function EnheRedesignHero({ locale }: { locale: RedesignLocale }) {
               key={`${index}-${line}`}
               tag="span"
               className="redesign-home-animated-line"
-              style={locale === "zh" ? { fontFamily: '"Microsoft YaHei", Arial, sans-serif' } : undefined}
+              style={{ fontFamily: '"Microsoft YaHei", Arial, sans-serif' }}
               text={line}
               src="/redesign/home/blue-energy-city.webp"
               priority
@@ -48,7 +48,7 @@ export function EnheRedesignHero({ locale }: { locale: RedesignLocale }) {
             <StarBorder
               key={cta.href}
               as="a"
-              className={cta.href.endsWith("/forum") ? "redesign-home-cta redesign-bold-copy" : "redesign-home-cta"}
+              className="redesign-home-cta"
               href={cta.href}
               color="#ffffff"
               trailColor="#ffffff"

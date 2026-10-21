@@ -35,6 +35,7 @@ import {
 import { sendUserFlowAdminEmail } from "@/lib/user-flow-admin-email";
 import { activateVipForOrder } from "@/lib/membership";
 import {
+  buildCreatorMessageNotification,
   buildPaymentReviewNotification,
   buildRefundRequestNotification
 } from "@/lib/notification-messages";
@@ -52,6 +53,7 @@ import { buildCanonicalToolPath } from "@/lib/public-slugs";
 import { buildLocalePath } from "@/lib/seo";
 import { resolveToolOrderPriceSpec } from "@/lib/tool-price-specs";
 import { resolveSafeReturnPath } from "@/lib/safe-return-path";
+import { hasReachedCreatorMessageLimit, normalizeCreatorMessage } from "@/lib/creator-contact";
 import { isValidAvatarFile, MAX_AVATAR_FILE_BYTES } from "@/lib/avatar-file";
 import { getDefaultAvatar } from "@/lib/default-avatar";
 import { saveUploadedFile } from "@/lib/storage";
@@ -498,6 +500,67 @@ export async function createCommentAction(formData: FormData) {
   if (tool) {
     revalidatePath(buildCanonicalToolPath(tool, locale));
   }
+}
+
+export async function sendCreatorMessageAction(
+  _previousState: { status: "idle" | "success" | "error"; message: string },
+  formData: FormData,
+): Promise<{ status: "idle" | "success" | "error"; message: string }> {
+  const locale = await getCurrentLocale();
+  const user = await requireUser(locale);
+  const toolId = z.string().min(1).parse(formData.get("toolId"));
+  const message = normalizeCreatorMessage(formData.get("content"));
+  if (!message) {
+    return {
+      status: "error",
+      message: locale === "en" ? "Enter a message between 2 and 1,000 characters." : "请输入 2 到 1000 个字的留言。",
+    };
+  }
+
+  const tool = await prisma.tool.findUnique({
+    where: { id: toolId },
+    select: {
+      id: true,
+      slug: true,
+      name: true,
+      englishName: true,
+      type: true,
+      status: true,
+      creatorId: true,
+      creator: { select: { nickname: true } },
+    },
+  });
+  if (!tool || tool.type !== "software" || tool.status !== "published" || !tool.creatorId) {
+    return { status: "error", message: locale === "en" ? "This creator cannot be contacted for this product." : "该产品暂未开放创作者联系。" };
+  }
+  if (tool.creatorId === user.id) {
+    return { status: "error", message: locale === "en" ? "You cannot contact yourself." : "不能向自己发送联系消息。" };
+  }
+
+  const sentToday = await prisma.notification.count({
+    where: {
+      senderId: user.id,
+      type: "creator_message",
+      createdAt: { gte: new Date(Date.now() - 24 * 60 * 60 * 1000) },
+    },
+  });
+  if (hasReachedCreatorMessageLimit(sentToday)) {
+    return { status: "error", message: locale === "en" ? "You have reached the daily contact-message limit." : "今天发送的创作者联系消息已达到上限。" };
+  }
+
+  const senderName = user.nickname?.trim() || (locale === "en" ? "ENHE user" : "ENHE 用户");
+  await createUserNotification(
+    tool.creatorId,
+    buildCreatorMessageNotification({
+      senderId: user.id,
+      senderName,
+      productName: locale === "en" ? (tool.englishName?.trim() || tool.name) : tool.name,
+      message,
+      linkUrl: buildCanonicalToolPath(tool, locale),
+    }),
+  );
+  revalidatePath(buildLocalePath("/user", locale));
+  return { status: "success", message: locale === "en" ? "Your message was sent to the creator." : "留言已发送给创作者。" };
 }
 
 export async function updateUserProfileAction(formData: FormData) {

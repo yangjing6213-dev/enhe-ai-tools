@@ -9,20 +9,17 @@ function readSource(path: string) {
 }
 
 describe("shared shadcn site components", () => {
-  it("keeps every route in the requested fixed light theme", () => {
+  it("supports system, light, and dark themes across all routes", () => {
     const provider = readSource("src/components/site-theme-provider.tsx");
-    expect(provider).toContain('defaultTheme="light"');
-    expect(provider).toContain('forcedTheme="light"');
-    expect(provider).toContain("enableSystem={false}");
+    expect(provider).toContain('defaultTheme="system"');
+    expect(provider).not.toContain("forcedTheme=");
+    expect(provider).toContain("enableSystem");
 
-    for (const path of [
-      "src/components/site-header.tsx",
-      "src/components/redesign/enhe-redesign-header.tsx",
-      "src/components/redesign/enhe-redesign-mobile-menu.tsx",
-      "src/app/admin/layout.tsx",
-    ]) {
-      expect(readSource(path), path).not.toContain("ThemeToggle");
-    }
+    const header = readSource("src/components/redesign/enhe-redesign-header.tsx");
+    expect(header).toContain("EnheRedesignThemeSwitch");
+    expect(header.indexOf("<EnheRedesignLanguageSwitch")).toBeLessThan(
+      header.indexOf("<EnheRedesignThemeSwitch"),
+    );
   });
 
   it("builds product surfaces and primary links from official shared components", () => {

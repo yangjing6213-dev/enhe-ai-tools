@@ -1,5 +1,39 @@
 import { expect, test } from "@playwright/test";
 
+for (const prefix of ["", "/en"]) {
+  test(`${prefix || "zh"} homepage keeps matching action typography and omits only its own breadcrumb`, async ({ page }) => {
+    await page.goto(prefix || "/");
+    await expect(page.locator(".site-breadcrumbs")).toHaveCount(0);
+    const actions = page.locator(".redesign-home-cta");
+    await expect(actions).toHaveCount(2);
+    const typography = await actions.evaluateAll(elements => elements.map(element => {
+      const style = getComputedStyle(element);
+      return { font: style.fontFamily, size: style.fontSize, weight: style.fontWeight, synthesis: style.fontSynthesis, lineHeight: style.lineHeight };
+    }));
+    expect(typography[1]).toEqual(typography[0]);
+
+    await actions.first().click();
+    await expect(page).toHaveURL(`${prefix}/software`);
+    await expect(page.locator(".site-breadcrumbs")).toBeVisible();
+    await expect(page.locator(".site-breadcrumbs a").first()).toHaveAttribute("href", prefix || "/");
+  });
+}
+
+test("English hero uses the same bold typeface as the Chinese hero", async ({ page }) => {
+  const typography = [];
+  for (const path of ["/", "/en"]) {
+    await page.goto(path);
+    const heading = page.locator(".redesign-home-animated-line").first();
+    await expect(heading).toHaveAttribute("data-mask-ready", "true");
+    typography.push(await heading.evaluate(element => {
+      const style = getComputedStyle(element);
+      return { font: style.fontFamily, weight: style.fontWeight, synthesis: style.fontSynthesis };
+    }));
+  }
+  expect(typography[1]).toEqual(typography[0]);
+  expect(Number(typography[1].weight)).toBeGreaterThanOrEqual(700);
+});
+
 test("homepage language switch keeps smaller text within the capsule", async ({ page }) => {
   await page.goto("/");
   const toggle = page.locator(".redesign-desktop-nav .enhe-language-toggle");

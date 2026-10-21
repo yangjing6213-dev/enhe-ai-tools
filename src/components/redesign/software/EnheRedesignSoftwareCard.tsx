@@ -3,7 +3,7 @@
 import Image from "next/image";
 import { CardLikeAction } from "@/components/card-like-action";
 import { useState } from "react";
-import { ArrowUpRight, Check, Download, MousePointer2, UserRound } from "lucide-react";
+import { ArrowUpRight, Check, Download, MousePointer2, ShieldCheck, UserRound } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import { getDictionary, type Locale } from "@/lib/dictionaries";
 import { buildValueSentence } from "@/lib/tool-card-highlights";
@@ -36,6 +36,14 @@ export function EnheRedesignSoftwareCard({
   const catalogImageSrc = product.media?.src.startsWith("/api/tool-images?")
     ? `${product.media.src}&mode=optimizer-source`
     : product.media?.src;
+  const reviewDate = product.securityReviewedAt
+    ? new Intl.DateTimeFormat(locale === "en" ? "en-US" : "zh-CN", {
+        year: "numeric",
+        month: "2-digit",
+        day: "2-digit",
+        timeZone: "Asia/Shanghai",
+      }).format(new Date(product.securityReviewedAt))
+    : null;
 
   return (
     <Card
@@ -97,6 +105,15 @@ export function EnheRedesignSoftwareCard({
               ))}
             </ul>
             <p className="redesign-software-card-audience"><UserRound size={14} aria-hidden="true" />{t.audienceLabel}: {categoryLabel}</p>
+            {reviewDate ? (
+              <div className="redesign-software-card-trust" data-trust-safety>
+                <ShieldCheck size={18} aria-hidden="true" />
+                <span>
+                  <strong>{locale === "en" ? "Manual safety review" : "安全审核已完成"}</strong>
+                  <small>{locale === "en" ? `Confirmed by ENHE AI admin · ${reviewDate}` : `ENHE AI 管理员人工确认 · ${reviewDate}`}</small>
+                </span>
+              </div>
+            ) : null}
             {metrics.length ? <div className="redesign-software-card-bottom">
               <span className="redesign-software-card-metrics">
                 {metrics.map((metric) => <span key={metric.type}>

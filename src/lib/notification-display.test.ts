@@ -58,4 +58,19 @@ describe("getNotificationDisplay", () => {
     expect(display.title).toBe("VIP benefits adjusted");
     expect(display.content).toBe("Your VIP benefits were cancelled by an admin. Reason: 售后退款");
   });
+
+  it("shows creator messages in English while preserving the user's message", () => {
+    const display = getNotificationDisplay(
+      {
+        type: "creator_message",
+        title: "收到新的创作者联系消息",
+        content: "发送者：Alice\n产品：Writer\n留言：\nCould you share the supported systems?"
+      },
+      "en"
+    );
+
+    expect(display.title).toBe("New creator message");
+    expect(display.content).toContain("From Alice about Writer");
+    expect(display.content).toContain("Could you share the supported systems?");
+  });
 });
