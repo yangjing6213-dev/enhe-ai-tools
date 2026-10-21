@@ -2,8 +2,10 @@ export type AiWorkflowGitHubRepositoryCandidate = {
   id: string;
   fullName: string;
   url: string;
+  description: string;
+  language: string | null;
   stars: number;
-  updatedAt: string | null;
+  updatedAt: string;
   defaultBranch: string;
   licenseSpdx: string | null;
 };
@@ -97,6 +99,10 @@ export function selectAiWorkflowRepositoryCandidates(
     const fullName = typeof value.full_name === "string" ? value.full_name : "";
     const url = typeof value.html_url === "string" ? value.html_url : "";
     const defaultBranch = typeof value.default_branch === "string" ? value.default_branch : "";
+    const language = typeof value.language === "string" ? value.language : null;
+    const description = typeof value.description === "string"
+      ? value.description.replace(/[\u0000-\u001f\u007f]/g, " ").trim().slice(0, 500)
+      : "";
     const licenseValue = isRecord(value.license) ? value.license.spdx_id : null;
     const licenseSpdx = typeof licenseValue === "string" && redistributableLicenses.has(licenseValue) ? licenseValue : null;
     let parsedUrl: URL;
@@ -120,12 +126,37 @@ export function selectAiWorkflowRepositoryCandidates(
     const updatedAt = typeof value.updated_at === "string" && Number.isFinite(Date.parse(value.updated_at))
       ? value.updated_at
       : null;
+    if (stars < 1 || !updatedAt || Date.parse(updatedAt) < Date.now() - 730 * 24 * 60 * 60 * 1000) continue;
     seen.add(id);
-    output.push({ id, fullName, url: parsedUrl.origin + parsedUrl.pathname.replace(/\/$/, ""), stars, updatedAt, defaultBranch, licenseSpdx });
-    if (output.length >= limit) break;
+    output.push({ id, fullName, url: parsedUrl.origin + parsedUrl.pathname.replace(/\/$/, ""), description, language, stars, updatedAt, defaultBranch, licenseSpdx });
   }
 
-  return output;
+  return output
+    .sort((left, right) => right.stars - left.stars || Date.parse(right.updatedAt ?? "") - Date.parse(left.updatedAt ?? "") || left.fullName.localeCompare(right.fullName))
+    .slice(0, limit);
+}
+
+const linkOnlyFailureReasons = new Set([
+  "PACKAGE_LANGUAGE_UNSUPPORTED",
+  "NODE_MANIFEST_MISSING",
+  "NODE_MANIFEST_INVALID",
+  "NO_LOCKED_NODE_TEST_SUITE",
+  "ARCHIVE_SIZE_LIMIT",
+  "ARCHIVE_FILE_LIMIT",
+  "ARCHIVE_FILE_TOO_LARGE",
+  "ARCHIVE_EXPANSION_LIMIT",
+  "UNSUPPORTED_GIT_LFS",
+  "UNSUPPORTED_SUBMODULES",
+  "CANDIDATE_TEST_FAILED",
+  "PACKAGE_SIZE_LIMIT",
+  "PACKAGE_FILE_TOO_LARGE",
+  "CODEX_DRAFT_UNAVAILABLE",
+  "CODEX_DRAFT_INVALID",
+]);
+
+export function getAiWorkflowLinkOnlyFailureReason(error: unknown) {
+  const reason = error instanceof Error ? error.message : typeof error === "string" ? error : "";
+  return linkOnlyFailureReasons.has(reason) ? reason : null;
 }
 
 export function getAiWorkflowFailureCode(error: unknown): "GITHUB_RATE_LIMIT" | "NETWORK_UNAVAILABLE" | "SANDBOX_UNAVAILABLE" | "ARCHIVE_UPLOAD_FAILED" | "UNKNOWN" {

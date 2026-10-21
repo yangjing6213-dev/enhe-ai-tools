@@ -32,8 +32,16 @@ export async function POST(request: Request) {
     return workerJsonResponse({ ok: false, code: "INVALID_REQUEST" }, 400);
   }
 
+  const recheckBefore = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000);
   const registered = await prisma.aiWorkflowCandidate.findMany({
-    where: { repositoryId: { in: input.repositoryIds } },
+    where: {
+      repositoryId: { in: input.repositoryIds },
+      OR: [
+        { status: { not: "published" } },
+        { fileId: { not: null } },
+        { updatedAt: { lte: recheckBefore } },
+      ],
+    },
     select: { repositoryId: true },
   });
   return workerJsonResponse({

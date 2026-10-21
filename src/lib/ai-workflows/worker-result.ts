@@ -14,6 +14,23 @@ const redistributableLicenses = new Set([
 
 const environmentNames = ["windows", "wsl2", "macos", "linux", "docker"] as const;
 const projectTypes = ["workflow", "automation", "agent", "template", "companion"] as const;
+const repositoryLinkFailureReasons = [
+  "PACKAGE_LANGUAGE_UNSUPPORTED",
+  "NODE_MANIFEST_MISSING",
+  "NODE_MANIFEST_INVALID",
+  "NO_LOCKED_NODE_TEST_SUITE",
+  "ARCHIVE_SIZE_LIMIT",
+  "ARCHIVE_FILE_LIMIT",
+  "ARCHIVE_FILE_TOO_LARGE",
+  "ARCHIVE_EXPANSION_LIMIT",
+  "UNSUPPORTED_GIT_LFS",
+  "UNSUPPORTED_SUBMODULES",
+  "CANDIDATE_TEST_FAILED",
+  "PACKAGE_SIZE_LIMIT",
+  "PACKAGE_FILE_TOO_LARGE",
+  "CODEX_DRAFT_UNAVAILABLE",
+  "CODEX_DRAFT_INVALID",
+] as const;
 const text = (max: number) => z.string().trim().min(1).max(max);
 
 const rationaleSchema = z.object({
@@ -82,8 +99,31 @@ const workerResultSchema = z.object({
   product: productSchema,
 }).strict();
 
+const repositoryLinkResultSchema = z.object({
+  deliveryMode: z.literal("repository_link"),
+  repositoryId: z.string().regex(/^\d{1,32}$/),
+  repositoryUrl: z.string().url().max(500),
+  commitSha: z.string().regex(/^[a-f0-9]{40,64}$/i),
+  licenseSpdx: text(80),
+  licenseFilePath: text(300),
+  projectType: z.enum(projectTypes),
+  stars: z.number().int().min(1).max(2_000_000_000),
+  updatedAt: z.string().datetime({ offset: true }),
+  language: z.string().max(120).nullable(),
+  description: z.string().max(500),
+  failureReason: z.enum(repositoryLinkFailureReasons),
+}).strict();
+
 export type AiWorkflowWorkerProduct = z.infer<typeof productSchema>;
 export type AiWorkflowWorkerResult = z.infer<typeof workerResultSchema>;
+export type ParsedAiWorkflowRepositoryLinkResult = z.infer<typeof repositoryLinkResultSchema> & {
+  repositoryOwner: string;
+  repositoryName: string;
+  repositoryUrl: string;
+  commitSha: string;
+  licenseSpdx: string;
+  sourceFingerprint: string;
+};
 
 export type ParsedAiWorkflowWorkerResult = AiWorkflowWorkerResult & {
   repositoryOwner: string;
@@ -156,6 +196,43 @@ export function parseAiWorkflowWorkerResult(value: unknown, expectedDownloadBuck
         reason: rationale.reason,
       },
     } satisfies ParsedAiWorkflowWorkerResult,
+  };
+}
+
+export function parseAiWorkflowRepositoryLinkResult(value: unknown) {
+  const parsed = repositoryLinkResultSchema.safeParse(value);
+  if (!parsed.success) return { success: false as const, error: "INVALID_LINK_RESULT" as const };
+
+  const data = parsed.data;
+  const repository = normalizeGitHubRepositoryUrl(data.repositoryUrl);
+  const licenseSpdx = data.licenseSpdx.trim();
+  const licensePath = data.licenseFilePath.replaceAll("\\", "/");
+  const description = data.description
+    .replace(/[\u0000-\u001f\u007f]/g, " ")
+    .replace(/-----BEGIN [A-Z ]*PRIVATE KEY-----[\s\S]*?-----END [A-Z ]*PRIVATE KEY-----/gi, "[已隐藏疑似密钥]")
+    .replace(/\b(?:gh[pousr]_[A-Za-z0-9]{30,}|AKIA[0-9A-Z]{16}|sk-[A-Za-z0-9_-]{32,})\b/g, "[已隐藏疑似密钥]")
+    .replace(/((?:api[_-]?key|secret|password|token|authorization)\s*[:=]\s*)[^\s,;]+/gi, "$1[已隐藏]")
+    .trim();
+
+  if (
+    !repository ||
+    !redistributableLicenses.has(licenseSpdx) ||
+    !licensePath || licensePath.startsWith("/") || licensePath.split("/").some((part) => part === "..") || /^[a-z]:/i.test(licensePath)
+  ) return { success: false as const, error: "LINK_RESULT_EVIDENCE_MISMATCH" as const };
+
+  return {
+    success: true as const,
+    data: {
+      ...data,
+      description,
+      repositoryUrl: repository.url,
+      repositoryOwner: repository.owner,
+      repositoryName: repository.name,
+      commitSha: data.commitSha.toLowerCase(),
+      licenseSpdx,
+      licenseFilePath: licensePath,
+      sourceFingerprint: `${data.repositoryId}:${data.commitSha.toLowerCase()}`,
+    } satisfies ParsedAiWorkflowRepositoryLinkResult,
   };
 }
 

@@ -14,11 +14,12 @@ import {
   getAiWorkflowDownloadUrl,
   uploadAiWorkflowArchive,
 } from "../src/lib/ai-workflows/cos";
-import { parseAiWorkflowWorkerResult } from "../src/lib/ai-workflows/worker-result";
+import { parseAiWorkflowRepositoryLinkResult, parseAiWorkflowWorkerResult } from "../src/lib/ai-workflows/worker-result";
 import { readAiWorkflowCosCredentialsCsv } from "./lib/ai-workflow-cos-credentials";
 import {
   buildAiWorkflowSearchTerms,
   getAiWorkflowFailureCode,
+  getAiWorkflowLinkOnlyFailureReason,
   redactAiWorkflowCollectorText,
   selectAiWorkflowRepositoryCandidates,
   type AiWorkflowGitHubRepositoryCandidate,
@@ -320,7 +321,7 @@ async function searchRepositories(topic: string, directions: string) {
   const terms = buildAiWorkflowSearchTerms(topic, directions);
   const found: unknown[] = [];
   for (const term of terms.slice(0, 3)) {
-    const query = new URLSearchParams({ q: `${term} in:name,description,readme`, sort: "updated", order: "desc", per_page: "100" });
+    const query = new URLSearchParams({ q: `${term} in:name,description,readme`, sort: "stars", order: "desc", per_page: "100" });
     const result = await githubJson<{ items?: unknown[]; incomplete_results?: boolean }>(`/search/repositories?${query}`);
     if (Array.isArray(result.items)) found.push(...result.items);
     await new Promise((resolvePromise) => setTimeout(resolvePromise, 1200));
@@ -345,7 +346,8 @@ async function readRunState(path: string, batch: WorkerBatch): Promise<RunState 
       if (
         typeof data.pendingRegistration.repositoryId !== "string" ||
         typeof data.pendingRegistration.repository !== "string" ||
-        !parseAiWorkflowWorkerResult(data.pendingRegistration.result).success
+        !parseAiWorkflowWorkerResult(data.pendingRegistration.result).success &&
+        !parseAiWorkflowRepositoryLinkResult(data.pendingRegistration.result).success
       ) return null;
     }
     return data;
@@ -383,7 +385,7 @@ async function downloadRepositoryArchive(candidate: AiWorkflowGitHubRepositoryCa
 
 async function prepareArchive(action: "extract" | "package", config: Record<string, unknown>) {
   const helper = join(process.cwd(), "scripts", "lib", "prepare-ai-workflow-archive.py");
-  const result = await runProcess(runnerConfig.pythonPath, [helper], {
+  const result = await runProcess(runnerConfig.pythonPath, ["-X", "utf8", helper], {
     cwd: runnerRoot,
     input: JSON.stringify({ action, ...config }),
     timeoutMs: 120000,
@@ -412,7 +414,13 @@ async function findReadme(sourceDir: string) {
 
 async function detectNodeTest(sourceDir: string) {
   const manifestPath = join(sourceDir, "package.json");
-  const manifest = JSON.parse(await readFile(manifestPath, "utf8")) as { scripts?: Record<string, string>; name?: string; packageManager?: string };
+  let manifest: { scripts?: Record<string, string>; name?: string; packageManager?: string };
+  try { manifest = JSON.parse(await readFile(manifestPath, "utf8")) as typeof manifest; }
+  catch (error) {
+    if (error instanceof SyntaxError) throw new Error("NODE_MANIFEST_INVALID");
+    if (error && typeof error === "object" && "code" in error && error.code === "ENOENT") throw new Error("NODE_MANIFEST_MISSING");
+    throw error;
+  }
   const hasPackageLock = await stat(join(sourceDir, "package-lock.json")).then((value) => value.isFile()).catch(() => false);
   if (!hasPackageLock || !manifest.scripts?.test) throw new Error("NO_LOCKED_NODE_TEST_SUITE");
   const testScript = manifest.scripts.test;
@@ -474,6 +482,12 @@ async function generateProductDraft(input: {
   ].join("\n\n");
   const result = await runProcess(runnerConfig.codexPath, [
     "exec", "-c", 'approval_policy="never"', "-c", 'web_search="disabled"',
+    // Use HTTPS/SSE because the local network times out on the WebSocket transport.
+    "-c", 'model_provider="openai-https"',
+    "-c", 'model_providers.openai-https.name="OpenAI HTTPS"',
+    "-c", 'model_providers.openai-https.requires_openai_auth=true',
+    "-c", 'model_providers.openai-https.wire_api="responses"',
+    "-c", 'model_providers.openai-https.supports_websockets=false',
     "--disable", "shell_tool", "--disable", "apps",
     "--sandbox", "read-only", "--ephemeral", "--ignore-user-config",
     "--skip-git-repo-check", "--cd", input.codexDir, "-",
@@ -557,6 +571,61 @@ async function removeOwnedCandidateDirectory(path: string, root: string, batchId
   return true;
 }
 
+async function registerRepositoryLinkOnly(input: {
+  candidate: AiWorkflowGitHubRepositoryCandidate;
+  batch: WorkerBatch;
+  lease: WorkerLease;
+  token: string;
+  state: RunState;
+  statePath: string;
+  index: number;
+  failureReason: string;
+  signal: AbortSignal;
+  setStage: (stage: "search" | "fetch" | "license_review" | "sandbox_test" | "package" | "upload" | "register") => void;
+}) {
+  const { candidate, batch, lease, token, state, statePath, index, failureReason, signal, setStage } = input;
+  const commitSha = await getRepositoryCommit(candidate);
+  const license = await getLicenseFile(candidate, commitSha);
+  const payload = {
+    deliveryMode: "repository_link",
+    repositoryId: candidate.id,
+    repositoryUrl: candidate.url,
+    commitSha,
+    licenseSpdx: license.spdx,
+    licenseFilePath: license.path,
+    projectType: "workflow",
+    stars: candidate.stars,
+    updatedAt: candidate.updatedAt,
+    language: candidate.language,
+    description: redactAiWorkflowCollectorText(candidate.description).slice(0, 500),
+    failureReason,
+  };
+  if (!parseAiWorkflowRepositoryLinkResult(payload).success) throw new Error("LINK_RESULT_EVIDENCE_MISMATCH");
+
+  if (signal.aborted) throw new Error("BATCH_PAUSED_OR_LEASE_LOST");
+  state.candidateIndex = index;
+  state.pendingRegistration = { repositoryId: candidate.id, repository: candidate.fullName, result: payload };
+  await persistRunState(statePath, state);
+  setStage("register");
+  await postWorker(`/${batch.id}/heartbeat`, {
+    workerId: workerId(), leaseToken: lease.leaseToken, stage: "register",
+    checkpoint: { candidateIndex: index, completedRepositoryIds: state.completedRepositoryIds.slice(-20) },
+  }, token);
+  await postWorker(`/${batch.id}/result`, { workerId: workerId(), leaseToken: lease.leaseToken, result: payload }, token);
+  if (!state.completedRepositoryIds.includes(candidate.id)) state.completedRepositoryIds.push(candidate.id);
+  if (!state.outcomes.some((outcome) => outcome.repositoryId === candidate.id && outcome.state === "registered")) {
+    state.outcomes.push({ repositoryId: candidate.id, repository: candidate.fullName, state: "registered" });
+  }
+  state.pendingRegistration = undefined;
+  await persistRunState(statePath, state);
+  const rootReal = await realpath(runsRoot);
+  const candidateDir = join(runsRoot, batch.id, candidate.id);
+  const cleaned = await removeOwnedCandidateDirectory(candidateDir, rootReal, batch.id, candidate.id);
+  if (!cleaned && await stat(candidateDir).then(() => true).catch(() => false)) {
+    await logEvent("candidate_temp_retained", { batchId: batch.id, repositoryId: candidate.id, reason: "OWNERSHIP_OR_PATH_CHECK_FAILED" });
+  }
+}
+
 async function processCandidate(input: {
   candidate: AiWorkflowGitHubRepositoryCandidate;
   batch: WorkerBatch;
@@ -620,6 +689,9 @@ async function processCandidate(input: {
   const licenseHash = await sha256File(licensePath);
   await stateUpdate("license_review");
   const readme = await findReadme(sourceDir);
+  if (!candidate.language || !["JavaScript", "TypeScript"].includes(candidate.language)) {
+    throw new Error("PACKAGE_LANGUAGE_UNSUPPORTED");
+  }
   const plan = await detectNodeTest(sourceDir);
   await stateUpdate("sandbox_test");
   const validation = await runIsolatedNodeTest(sourceDir, plan);
@@ -842,6 +914,36 @@ async function runBatch(lease: WorkerLease, token: string, credentials: { secret
           return;
         }
         const reason = error instanceof Error && /^[A-Z0-9_]{2,80}$/.test(error.message) ? error.message : getAiWorkflowFailureCode(error);
+        const linkOnlyReason = getAiWorkflowLinkOnlyFailureReason(reason);
+        if (linkOnlyReason) {
+          try {
+            await registerRepositoryLinkOnly({
+              candidate, batch, lease, token, state, statePath, index,
+              failureReason: linkOnlyReason,
+              signal: controller.signal,
+              setStage: (value) => { stage = value; },
+            });
+            successes += 1;
+            await logEvent("candidate_registered_link_only", { batchId: batch.id, repositoryId: candidate.id, reason: linkOnlyReason });
+            continue;
+          } catch (linkError) {
+            if (hasPendingRegistrationFor(state, candidate.id)) {
+              await logEvent("registration_pending_retry", { batchId: batch.id, repositoryId: candidate.id });
+              return;
+            }
+            const linkErrorReason = linkError instanceof Error && /^[A-Z0-9_]{2,80}$/.test(linkError.message)
+              ? linkError.message
+              : getAiWorkflowFailureCode(linkError);
+            state.outcomes.push({ repositoryId: candidate.id, repository: candidate.fullName, state: "rejected", reason: linkErrorReason });
+            await persistRunState(statePath, state);
+            await logEvent("candidate_link_only_registration_failed", { batchId: batch.id, repositoryId: candidate.id, reason: linkOnlyReason, failure: linkErrorReason });
+            if (["GITHUB_RATE_LIMIT", "NETWORK_UNAVAILABLE", "SANDBOX_UNAVAILABLE", "ARCHIVE_UPLOAD_FAILED", "LOCAL_CONFIGURATION_MISSING", "BUDGET_EXCEEDED"].includes(linkErrorReason)) {
+              failureCode = linkErrorReason;
+              if (["GITHUB_RATE_LIMIT", "NETWORK_UNAVAILABLE", "SANDBOX_UNAVAILABLE", "LOCAL_CONFIGURATION_MISSING", "BUDGET_EXCEEDED"].includes(linkErrorReason)) break;
+            }
+            continue;
+          }
+        }
         state.outcomes.push({ repositoryId: candidate.id, repository: candidate.fullName, state: "rejected", reason });
         await persistRunState(statePath, state);
         const cosFailure = reason === "ARCHIVE_UPLOAD_FAILED"

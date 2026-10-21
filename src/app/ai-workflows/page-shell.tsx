@@ -13,6 +13,7 @@ import {
   parseAiWorkflowCatalogFilters,
 } from "@/lib/ai-workflows/catalog";
 import type { AiWorkflowCatalogCard } from "@/app/ai-workflows/workflow-directory";
+import { resolveAiWorkflowDeliveryMode } from "@/lib/ai-workflows/rules";
 
 const pageCopy = {
   zh: {
@@ -99,6 +100,14 @@ export async function AiWorkflowsPageShell({
         ratingAverage: rating?.average ?? null,
         reviewCount: rating?.count ?? 0,
         projectType: row.aiWorkflowCandidate?.projectType ?? "workflow",
+        deliveryMode: row.aiWorkflowCandidate
+          ? resolveAiWorkflowDeliveryMode({
+              candidateStatus: row.aiWorkflowCandidate.status,
+              candidateFileId: row.aiWorkflowCandidate.fileId,
+              toolFileId: row.downloadFileId,
+            })
+          : "package",
+        githubStars: row.aiWorkflowCandidate?.githubStars ?? null,
         verifiedEnvironments: row.aiWorkflowCandidate?.verifiedEnvironments ?? [],
         topic: row.aiWorkflowCandidate?.topic ?? null,
         tags: row.tagLinks.map((link) => link.tag.name),
@@ -109,6 +118,7 @@ export async function AiWorkflowsPageShell({
     if (filters.sort === "downloads") cards.sort((left, right) => right.downloadCount - left.downloadCount || right.createdAt.getTime() - left.createdAt.getTime());
     if (filters.sort === "rating") cards.sort((left, right) => (right.ratingAverage ?? -1) - (left.ratingAverage ?? -1) || right.reviewCount - left.reviewCount || right.createdAt.getTime() - left.createdAt.getTime());
     if (filters.sort === "price") cards.sort((left, right) => left.price - right.price || right.createdAt.getTime() - left.createdAt.getTime());
+    if (filters.sort === "recommended") cards.sort((left, right) => (right.githubStars ?? -1) - (left.githubStars ?? -1) || right.createdAt.getTime() - left.createdAt.getTime());
     total = cards.length;
     pageCount = Math.max(1, Math.ceil(total / filters.pageSize));
     const page = Math.min(filters.page, pageCount);

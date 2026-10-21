@@ -3,6 +3,7 @@ import {
   canReviewAiWorkflow,
   isAiWorkflowArchiveReady,
   isAiWorkflowPurchaseReady,
+  resolveAiWorkflowDeliveryMode,
   normalizeGitHubRepositoryUrl,
   resolveAiWorkflowDownloadFileId,
 } from "@/lib/ai-workflows/rules";
@@ -65,6 +66,15 @@ describe("AI Workflow published purchase configuration", () => {
     expect(isAiWorkflowPurchaseReady({ ...base, isDownloadPaid: true, downloadPrice: 9, priceDecision: "paid", confirmedPrice: 9 })).toBe(false);
     expect(isAiWorkflowPurchaseReady({ ...base, candidateFileId: "file-2", isDownloadPaid: false, downloadPrice: 0, priceDecision: "free", confirmedPrice: 0 })).toBe(false);
     expect(isAiWorkflowPurchaseReady({ ...base, candidateStatus: "pending_pricing", isDownloadPaid: false, downloadPrice: 0, priceDecision: "free", confirmedPrice: 0 })).toBe(false);
+  });
+});
+
+describe("AI Workflow delivery mode", () => {
+  it("uses the repository link until a matching package is approved and published", () => {
+    expect(resolveAiWorkflowDeliveryMode({ candidateStatus: "published", candidateFileId: null, toolFileId: null })).toBe("repository_link");
+    expect(resolveAiWorkflowDeliveryMode({ candidateStatus: "pending_pricing", candidateFileId: "file-1", toolFileId: "file-1" })).toBe("repository_link");
+    expect(resolveAiWorkflowDeliveryMode({ candidateStatus: "published", candidateFileId: "file-1", toolFileId: "file-2" })).toBe("repository_link");
+    expect(resolveAiWorkflowDeliveryMode({ candidateStatus: "published", candidateFileId: "file-1", toolFileId: "file-1" })).toBe("package");
   });
 });
 

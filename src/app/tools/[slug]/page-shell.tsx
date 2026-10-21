@@ -63,7 +63,7 @@ import {
   shouldIndexEnglishToolPage,
 } from "@/lib/tool-localization";
 import { getPrimaryToolPrice } from "@/lib/tool-price-specs";
-import { canReviewAiWorkflow, normalizeGitHubRepositoryUrl } from "@/lib/ai-workflows/rules";
+import { canReviewAiWorkflow, normalizeGitHubRepositoryUrl, resolveAiWorkflowDeliveryMode } from "@/lib/ai-workflows/rules";
 import {
   canOpenPublicDownloadEntry,
   canOpenProtectedDownloadEntry,
@@ -366,6 +366,15 @@ export async function ToolDetailPageShell({
   const isSkillLearning = tool.type === "skill_learning";
   const isAiSkill = tool.type === "ai_skill";
   const isAiWorkflow = tool.type === "ai_workflow";
+  const workflowDeliveryMode = isAiWorkflow && tool.aiWorkflowCandidate
+    ? resolveAiWorkflowDeliveryMode({
+        candidateStatus: tool.aiWorkflowCandidate.status,
+        candidateFileId: tool.aiWorkflowCandidate.fileId,
+        toolFileId: tool.downloadFileId,
+      })
+    : "package";
+  const workflowLinkOnly = isAiWorkflow && Boolean(tool.aiWorkflowCandidate) && workflowDeliveryMode === "repository_link";
+  const workflowPackageAwaitingReview = isAiWorkflow && tool.aiWorkflowCandidate?.status === "pending_pricing" && Boolean(tool.aiWorkflowCandidate.fileId) && tool.aiWorkflowCandidate.fileId === tool.downloadFileId;
   const isDownloadProduct = tool.type === "software" || isAiSkill || isAiWorkflow;
   const activePriceSpecs = tool.priceSpecs.filter(
     (spec) => Number(spec.price) > 0,
@@ -530,6 +539,29 @@ export async function ToolDetailPageShell({
   const workflowRepository = isAiWorkflow && tool.aiWorkflowCandidate
     ? normalizeGitHubRepositoryUrl(tool.aiWorkflowCandidate.repositoryUrl)
     : null;
+  const workflowLinkOnlyReason = workflowLinkOnly
+    ? workflowPackageAwaitingReview
+      ? (forceLocale === "en" ? "The package is waiting for price review before downloads can be enabled." : "软件包正在等待价格审核，审核完成后才能开放下载。")
+      : tool.aiWorkflowCandidate?.failureReason
+      ? ({
+        PACKAGE_LANGUAGE_UNSUPPORTED: forceLocale === "en" ? "This project language is outside the current package test flow." : "项目语言不在当前打包测试范围内。",
+        NODE_MANIFEST_MISSING: forceLocale === "en" ? "A Node.js package manifest was not found." : "项目中没有找到 Node.js 配置文件。",
+        NODE_MANIFEST_INVALID: forceLocale === "en" ? "The Node.js package manifest could not be read." : "项目中的 Node.js 配置文件格式无法读取。",
+        NO_LOCKED_NODE_TEST_SUITE: forceLocale === "en" ? "A locked Node.js test suite was not available." : "项目没有可验证的 Node.js 测试流程。",
+        ARCHIVE_SIZE_LIMIT: forceLocale === "en" ? "The source archive exceeds the package size limit." : "项目源码压缩包超过本站打包大小限制。",
+        ARCHIVE_FILE_LIMIT: forceLocale === "en" ? "The source archive contains too many files to package." : "项目文件数量超过本站打包限制。",
+        ARCHIVE_FILE_TOO_LARGE: forceLocale === "en" ? "A source file exceeds the package file size limit." : "项目中的单个文件超过本站打包限制。",
+        ARCHIVE_EXPANSION_LIMIT: forceLocale === "en" ? "The expanded source exceeds the package size limit." : "项目解压后的体积超过本站打包限制。",
+        UNSUPPORTED_GIT_LFS: forceLocale === "en" ? "The source uses Git LFS, which this package flow cannot deliver." : "项目使用 Git LFS，当前打包流程无法交付。",
+        UNSUPPORTED_SUBMODULES: forceLocale === "en" ? "The source uses submodules, which this package flow cannot deliver." : "项目使用子模块，当前打包流程无法交付。",
+        CANDIDATE_TEST_FAILED: forceLocale === "en" ? "The project's automated test did not pass in the isolated run." : "项目未通过本站隔离环境中的自动测试。",
+        PACKAGE_SIZE_LIMIT: forceLocale === "en" ? "The prepared package exceeds the package size limit." : "整理后的压缩包超过本站限制。",
+        PACKAGE_FILE_TOO_LARGE: forceLocale === "en" ? "A packaged file exceeds the file size limit." : "压缩包中有文件超过大小限制。",
+        CODEX_DRAFT_UNAVAILABLE: forceLocale === "en" ? "A download product description could not be prepared." : "下载版的整理说明暂未生成。",
+        CODEX_DRAFT_INVALID: forceLocale === "en" ? "The download product description could not be verified." : "下载版的整理说明未能通过格式核验。",
+      } as Record<string, string>)[tool.aiWorkflowCandidate.failureReason] ?? (forceLocale === "en" ? "This item is available as an upstream repository link only." : "该项目目前仅提供原仓库链接。")
+      : (forceLocale === "en" ? "No ENHE download package is currently available." : "本站目前没有可下载的软件包。")
+    : null;
   const workflowRating = isAiWorkflow
     ? await prisma.aiWorkflowReview.aggregate({
         where: { toolId: tool.id, status: "approved" },
@@ -578,7 +610,9 @@ export async function ToolDetailPageShell({
   const paymentMethodLabelId = "tool-purchase-payment-method-label";
   const paymentMethodHelpId = "tool-purchase-payment-method-help";
   const commentHelpId = "tool-comment-help";
-  const purchaseButtonLabel = isAccountService
+  const purchaseButtonLabel = workflowLinkOnly
+    ? forceLocale === "en" ? "Open GitHub repository" : "前往 GitHub 原仓库"
+    : isAccountService
     ? td.buyService
     : paidSkillCourse
       ? td.buyCourse.replace("{price}", Number(servicePrice).toFixed(2))
@@ -646,7 +680,7 @@ export async function ToolDetailPageShell({
   const faqSchema = schemaContent.faq.length
     ? buildFaqSchema({ items: schemaContent.faq })
     : null;
-  const rawToolStructuredData = buildToolStructuredData({
+  const rawToolStructuredData = workflowLinkOnly ? null : buildToolStructuredData({
     schemaType,
     name: localizedTool.primaryName,
     description: buildToolMetaDescription({
@@ -678,14 +712,16 @@ export async function ToolDetailPageShell({
     aggregateRating: schemaContent.aggregateRating,
   });
   const toolStructuredData =
-    schemaType === "SoftwareApplication"
+    !rawToolStructuredData
+      ? null
+      : schemaType === "SoftwareApplication"
       ? rawToolStructuredData
       : {
           ...rawToolStructuredData,
           provider: enheOrganizationReference,
         };
   const rawProductStructuredData =
-    isDownloadProduct
+    isDownloadProduct && !workflowLinkOnly
       ? buildProductStructuredData({
           name: localizedTool.primaryName,
           description: localizedSummary,
@@ -731,7 +767,7 @@ export async function ToolDetailPageShell({
       <StructuredData
         data={[
           breadcrumbSchema,
-          toolStructuredData,
+          ...(toolStructuredData ? [toolStructuredData] : []),
           ...(productStructuredData ? [productStructuredData] : []),
           ...(faqSchema ? [faqSchema] : []),
         ]}
@@ -769,6 +805,8 @@ export async function ToolDetailPageShell({
                         ? td.aiSkill
                       : tool.type === "skill_learning"
                         ? td.skillLearning
+                        : isAiWorkflow
+                          ? forceLocale === "en" ? "AI workflow" : "AI 工作流"
                         : td.online}
                   </Badge>
                   <Badge
@@ -780,7 +818,9 @@ export async function ToolDetailPageShell({
                         : "text-[#5EF1C7]"
                     }
                   >
-                    {paidSkillCourse
+                    {workflowLinkOnly
+                      ? forceLocale === "en" ? "GitHub repository" : "原仓库链接"
+                      : paidSkillCourse
                       ? forceLocale === "en"
                         ? "Paid course"
                         : "付费课程"
@@ -850,12 +890,12 @@ export async function ToolDetailPageShell({
                   ) : (
                     <>
                       <Info
-                        label={td.version}
-                        value={tool.version ?? td.onlineVersion}
+                        label={workflowLinkOnly ? (forceLocale === "en" ? "Delivery" : "获取方式") : td.version}
+                        value={workflowLinkOnly ? (forceLocale === "en" ? "GitHub repository only" : "仅提供原仓库链接") : tool.version ?? td.onlineVersion}
                       />
                       <Info
-                        label={td.systemRequirement}
-                        value={tool.systemRequirement ?? td.browser}
+                        label={workflowLinkOnly ? (forceLocale === "en" ? "Project language" : "项目语言") : td.systemRequirement}
+                        value={workflowLinkOnly ? (tool.systemRequirement || (forceLocale === "en" ? "Not recorded" : "未记录")) : (tool.systemRequirement ?? td.browser)}
                       />
                       {tool.type === "software" && tool.securityReviewedAt ? (
                         <div className="product-safety-info-card">
@@ -891,7 +931,7 @@ export async function ToolDetailPageShell({
                       {tool.supportedAgents.length ? (
                         <SupportedAgentsCard agents={tool.supportedAgents} locale={forceLocale} />
                       ) : null}
-                      {visibleDownloadMetric ? (
+                      {visibleDownloadMetric && !workflowLinkOnly ? (
                         <Info
                           label={td.downloadCount}
                           value={String(visibleDownloadMetric.count)}
@@ -937,7 +977,22 @@ export async function ToolDetailPageShell({
                   id="tool-purchase"
                   className="tool-detail-purchase-panel scroll-mt-24 mt-7 flex flex-wrap gap-3"
                 >
-                  {shouldShowPurchaseForm ? (
+                  {workflowLinkOnly ? workflowRepository ? (
+                    <ButtonLink
+                      href={workflowRepository.url}
+                      target="_blank"
+                      rel="nofollow noopener noreferrer"
+                      data-analytics-event="product_use_cta_click"
+                      data-analytics-entity-type="tool"
+                      data-analytics-entity-id={tool.id}
+                    >
+                      {purchaseButtonLabel}
+                    </ButtonLink>
+                  ) : (
+                    <p role="status" className="text-sm text-[#FFB86B]">
+                      {forceLocale === "en" ? "The GitHub repository link is unavailable." : "原仓库链接暂时不可用。"}
+                    </p>
+                  ) : shouldShowPurchaseForm ? (
                     <PurchaseFormTag
                       id={
                         isAccountService
@@ -1170,19 +1225,26 @@ export async function ToolDetailPageShell({
             <>
               <section id="workflow-source" className="glass scroll-mt-24 rounded-2xl p-7">
                 <SectionTitle
-                  title={forceLocale === "en" ? "Source, license & verified version" : "来源、许可证与已核验版本"}
-                  intro={forceLocale === "en"
-                    ? "Review the exact upstream project and package version before downloading. Verification details describe the tested environment, not a guarantee for every setup."
-                    : "下载前可核对上游项目、交付版本与许可信息。验证结果仅适用于页面列出的环境，不代表所有设备都能直接运行。"}
+                  title={workflowLinkOnly
+                    ? (forceLocale === "en" ? "Original repository & license" : "原仓库与许可证")
+                    : (forceLocale === "en" ? "Source, license & verified version" : "来源、许可证与已核验版本")}
+                  intro={workflowLinkOnly
+                    ? (forceLocale === "en"
+                      ? "This listing points to the original GitHub repository. Check the delivery and verification status below before using it."
+                      : "本条目来源于 GitHub 原仓库；使用前请查看下方的获取方式和核验状态。")
+                    : forceLocale === "en"
+                      ? "Review the exact upstream project and package version before downloading. Verification details describe the tested environment, not a guarantee for every setup."
+                      : "下载前可核对上游项目、交付版本与许可信息。验证结果仅适用于页面列出的环境，不代表所有设备都能直接运行。"}
                 />
                 <div className="mt-6 grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
                   <Info label={forceLocale === "en" ? "Application area" : "应用方向"} value={forceLocale === "en" ? (tool.aiWorkflowCandidate.topic?.englishName || tool.aiWorkflowCandidate.topic?.name || "-") : (tool.aiWorkflowCandidate.topic?.name || "-")} />
                   <Info label={forceLocale === "en" ? "Project type" : "项目类型"} value={tool.aiWorkflowCandidate.projectType} />
                   <Info label={forceLocale === "en" ? "License" : "开源许可证"} value={tool.aiWorkflowCandidate.licenseSpdx || (forceLocale === "en" ? "Not provided" : "未提供")} />
-                  <Info label={forceLocale === "en" ? "Package version" : "交付版本"} value={tool.aiWorkflowCandidate.packageVersion || tool.version || "-"} />
-                  <Info label={forceLocale === "en" ? "Package size" : "压缩包大小"} value={tool.aiWorkflowCandidate.packageSize ? `${(Number(tool.aiWorkflowCandidate.packageSize) / 1024 / 1024).toFixed(1)} MB` : "-"} />
-                  <Info label={forceLocale === "en" ? "Verified environments" : "实际验证环境"} value={tool.aiWorkflowCandidate.verifiedEnvironments.length ? tool.aiWorkflowCandidate.verifiedEnvironments.join(" · ") : tool.systemRequirement || (forceLocale === "en" ? "Not recorded" : "暂无记录")} />
+                  <Info label={workflowLinkOnly ? (forceLocale === "en" ? "Delivery" : "获取方式") : (forceLocale === "en" ? "Package version" : "交付版本")} value={workflowLinkOnly ? (forceLocale === "en" ? "Repository link only" : "仅原仓库链接") : tool.aiWorkflowCandidate.packageVersion || tool.version || "-"} />
+                  <Info label={workflowLinkOnly ? (forceLocale === "en" ? "GitHub stars" : "GitHub 星标") : (forceLocale === "en" ? "Package size" : "压缩包大小")} value={workflowLinkOnly ? `${(tool.aiWorkflowCandidate.githubStars ?? 0).toLocaleString()} · ${tool.aiWorkflowCandidate.starsUpdatedAt?.toLocaleDateString(forceLocale === "en" ? "en-US" : "zh-CN") ?? "-"}` : tool.aiWorkflowCandidate.packageSize ? `${(Number(tool.aiWorkflowCandidate.packageSize) / 1024 / 1024).toFixed(1)} MB` : "-"} />
+                  <Info label={workflowLinkOnly ? (forceLocale === "en" ? "Package verification" : "打包核验") : (forceLocale === "en" ? "Verified environments" : "实际验证环境")} value={workflowLinkOnly ? workflowPackageAwaitingReview ? (forceLocale === "en" ? "Awaiting price review" : "等待价格审核") : tool.aiWorkflowCandidate.failureReason === "CANDIDATE_TEST_FAILED" ? (forceLocale === "en" ? "Automated test did not pass" : "自动测试未通过") : (forceLocale === "en" ? "No ENHE package available" : "本站暂无可下载包") : tool.aiWorkflowCandidate.verifiedEnvironments.length ? tool.aiWorkflowCandidate.verifiedEnvironments.join(" · ") : tool.systemRequirement || (forceLocale === "en" ? "Not recorded" : "暂无记录")} />
                 </div>
+                {workflowLinkOnly ? <p className="mt-4 rounded-xl border border-white/10 bg-white/8 p-4 text-sm leading-6 text-[#C5D0E2]">{forceLocale === "en" ? "Link-only reason: " : "仅提供链接的原因："}{workflowLinkOnlyReason}</p> : null}
                 <div className="mt-3 grid gap-3 md:grid-cols-[minmax(0,1fr)_auto]">
                   <div className="rounded-xl border border-white/10 bg-white/8 p-4">
                     <p className="text-xs text-[#8F9DB2]">{forceLocale === "en" ? "Fixed source commit" : "固定来源版本"}</p>
@@ -1211,12 +1273,12 @@ export async function ToolDetailPageShell({
                 </div>
               </section>
 
-              <AiWorkflowInstallPanel
+              {!workflowLinkOnly ? <AiWorkflowInstallPanel
                 slug={tool.slug}
                 locale={forceLocale}
                 canGenerate={!paidAiWorkflow || Boolean(workflowVersionPurchase)}
                 verifiedEnvironments={tool.aiWorkflowCandidate.verifiedEnvironments}
-              />
+              /> : null}
 
               <section id="workflow-reviews" className="glass scroll-mt-24 rounded-2xl p-7">
                 <SectionTitle title={forceLocale === "en" ? "User reviews" : "用户评价"} intro={forceLocale === "en" ? "Only approved reviews from users with a recorded purchase or download are shown." : "仅展示通过审核、且对应真实购买或下载记录的评价。"} />

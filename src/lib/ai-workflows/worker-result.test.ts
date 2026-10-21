@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 import {
   buildAiWorkflowProductContent,
+  parseAiWorkflowRepositoryLinkResult,
   parseAiWorkflowWorkerResult,
 } from "@/lib/ai-workflows/worker-result";
 
@@ -73,6 +74,53 @@ function result(overrides: Record<string, unknown> = {}) {
 }
 
 describe("AI Workflow worker result intake", () => {
+  it("accepts a link-only listing for a licensed repository that could not be packaged", () => {
+    const parsed = parseAiWorkflowRepositoryLinkResult({
+      deliveryMode: "repository_link",
+      repositoryId,
+      repositoryUrl: "https://github.com/example/agent-flow",
+      commitSha: commit,
+      licenseSpdx: "MIT",
+      licenseFilePath: "LICENSE",
+      projectType: "workflow",
+      stars: 125,
+      updatedAt: "2026-10-20T01:00:00.000Z",
+      language: "Python",
+      description: "Reusable AI agent workflow for research tasks.",
+      failureReason: "PACKAGE_LANGUAGE_UNSUPPORTED",
+    });
+
+    expect(parsed.success).toBe(true);
+    if (parsed.success) {
+      expect(parsed.data).toMatchObject({
+        repositoryOwner: "example",
+        repositoryName: "agent-flow",
+        sourceFingerprint: `${repositoryId}:${commit}`,
+        language: "Python",
+      });
+    }
+  });
+
+  it("rejects repository links without a recognized open-source license or with a hard-stop failure", () => {
+    const link = {
+      deliveryMode: "repository_link",
+      repositoryId,
+      repositoryUrl: "https://github.com/example/agent-flow",
+      commitSha: commit,
+      licenseSpdx: "MIT",
+      licenseFilePath: "LICENSE",
+      projectType: "workflow",
+      stars: 125,
+      updatedAt: "2026-10-20T01:00:00.000Z",
+      language: "Python",
+      description: "Reusable AI agent workflow for research tasks.",
+      failureReason: "PACKAGE_LANGUAGE_UNSUPPORTED",
+    };
+    expect(parseAiWorkflowRepositoryLinkResult({ ...link, licenseSpdx: "NOASSERTION" }).success).toBe(false);
+    expect(parseAiWorkflowRepositoryLinkResult({ ...link, failureReason: "POSSIBLE_SECRET_IN_SOURCE" }).success).toBe(false);
+    expect(parseAiWorkflowRepositoryLinkResult({ ...link, repositoryUrl: "https://example.com/agent-flow" }).success).toBe(false);
+  });
+
   it("accepts a fixed, checksummed package only when the redistributable license and remote checks match", () => {
     const parsed = parseAiWorkflowWorkerResult(result());
     expect(parsed.success).toBe(true);

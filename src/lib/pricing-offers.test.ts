@@ -148,6 +148,37 @@ describe("pricing offers", () => {
     expect(promptProduct?.localized.description).not.toMatch(/\bfree\b/i);
   });
 
+  it("keeps repository-only and unreviewed workflows out of download offers", () => {
+    const linkOnly = makeTool({
+      slug: "workflow-link-only",
+      type: "ai_workflow",
+      isDownloadPaid: false,
+      downloadPrice: 0,
+      downloadFileId: null,
+      aiWorkflowCandidate: { status: "published", fileId: null },
+    });
+    const awaitingReview = makeTool({
+      slug: "workflow-awaiting-review",
+      type: "ai_workflow",
+      isDownloadPaid: false,
+      downloadPrice: 0,
+      downloadFileId: "file-1",
+      aiWorkflowCandidate: { status: "pending_pricing", fileId: "file-1" },
+    });
+    const publishedPackage = makeTool({
+      slug: "workflow-published-package",
+      type: "ai_workflow",
+      isDownloadPaid: false,
+      downloadPrice: 0,
+      downloadFileId: "file-2",
+      aiWorkflowCandidate: { status: "published", fileId: "file-2" },
+    });
+
+    expect(buildPricingOfferItems([linkOnly, awaitingReview, publishedPackage], "en").map(({ slug }) => slug)).toEqual([
+      "workflow-published-package",
+    ]);
+  });
+
   it("emits every active offer from the shared catalog in OfferCatalog schema", () => {
     const items = buildPricingOfferItems(currentPublicTools, "en");
     const schema = buildPricingOfferCatalogSchema("en", items);

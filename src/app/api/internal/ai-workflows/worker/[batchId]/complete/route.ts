@@ -78,8 +78,11 @@ export async function POST(
     where: {
       batchId,
       status: { in: ["pending_pricing", "published"] },
-      fileId: { not: null },
       toolId: { not: null },
+      OR: [
+        { fileId: { not: null } },
+        { status: "published", fileId: null },
+      ],
     },
   });
   if (
