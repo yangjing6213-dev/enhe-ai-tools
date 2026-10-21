@@ -24,8 +24,20 @@ async function installLoopbackOnlyGuard(page: Page) {
 
 test("Chinese and English homepage titles do not show a black fallback while their texture is unavailable", async ({ page }) => {
   await installLoopbackOnlyGuard(page);
-  await page.route("**/_next/image**", (route) => route.abort());
-  await page.route("**/*blue-energy-city.webp*", (route) => route.abort());
+  await page.route("**/*", async (route) => {
+    const requestUrl = route.request().url();
+    let decodedUrl = requestUrl;
+    try {
+      decodedUrl = decodeURIComponent(requestUrl);
+    } catch {
+      // Keep the original URL available for the filename check.
+    }
+    if (requestUrl.includes("blue-energy-city.webp") || decodedUrl.includes("blue-energy-city.webp")) {
+      await route.abort();
+      return;
+    }
+    await route.fallback();
+  });
 
   for (const path of ["/", "/en"]) {
     const response = await page.goto(path, { waitUntil: "domcontentloaded" });
