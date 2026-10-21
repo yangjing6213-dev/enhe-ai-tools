@@ -260,6 +260,79 @@
   padding-top: 0;
 }
 
+.site-announcement {
+  position: relative;
+  background: #2563eb;
+  color: #fff;
+}
+
+.site-announcement-inner {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: min(100% - 24px, 1440px);
+  min-height: 44px;
+  margin-inline: auto;
+}
+
+.site-announcement-message {
+  flex: 1;
+  min-width: 0;
+  padding: 10px 0 10px 44px;
+  text-align: center;
+  font-size: 14px;
+  font-weight: 600;
+  line-height: 1.5;
+  overflow-wrap: anywhere;
+}
+
+.site-announcement a {
+  color: #fff;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.site-announcement button {
+  display: grid;
+  place-items: center;
+  flex: 0 0 44px;
+  width: 44px;
+  height: 44px;
+  border: 0;
+  background: transparent;
+  color: #fff;
+  cursor: pointer;
+}
+
+.site-announcement :is(a, button):focus-visible {
+  outline: 2px solid #fff;
+  outline-offset: 2px;
+}
+
+@media (width < 768px) {
+  .site-announcement-message {
+    padding-left: 0;
+    text-align: left;
+  }
+}
+
+.enhe-admin-announcement-form {
+  display: grid;
+  gap: 16px;
+  margin-top: 20px;
+}
+
+.enhe-admin-announcement-enabled {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.enhe-admin-announcement-enabled input {
+  width: 20px;
+  height: 20px;
+}
+
 .redesign-header[data-sticky="true"] {
   position: sticky;
   top: 0;

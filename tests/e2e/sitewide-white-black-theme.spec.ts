@@ -165,14 +165,15 @@ test("site pages keep white surfaces and black neutral text, including interacti
 
   const byoxResponse = await page.goto("/build-your-own-x", { waitUntil: "load" });
   expect(byoxResponse?.status()).toBe(200);
-  const codeSample = await page.locator(".byox-prompt-card").evaluate((card) => {
+  await expect.poll(() => page.locator(".byox-prompt-card").evaluate((card) => {
     const sample = document.createElement("pre");
     sample.textContent = "const readable = true;";
     card.append(sample);
-    return {
+    const colors = {
       background: getComputedStyle(sample).backgroundColor,
       color: getComputedStyle(sample).color,
     };
-  });
-  expect(codeSample).toEqual({ background: "rgb(255, 255, 255)", color: "rgb(0, 0, 0)" });
+    sample.remove();
+    return colors;
+  })).toEqual({ background: "rgb(255, 255, 255)", color: "rgb(0, 0, 0)" });
 });

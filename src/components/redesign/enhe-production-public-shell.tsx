@@ -7,6 +7,9 @@ import { getPublicSearchRecommendations } from "@/lib/public-search-recommendati
 import { EnheRedesignFooter } from "./enhe-redesign-footer";
 import { EnheRedesignHeader } from "./enhe-redesign-header";
 import { SiteBreadcrumbs } from "@/components/site-breadcrumbs";
+import { SiteAnnouncement } from "@/components/site-announcement";
+import { getSettingsMap } from "@/lib/settings";
+import { parseSiteAnnouncement, SITE_ANNOUNCEMENT_KEY } from "@/lib/site-announcement";
 import { REDESIGN_NAV_ITEMS } from "./navigation";
 import type { RedesignAccount, RedesignLanguageHrefs } from "./types";
 
@@ -21,8 +24,8 @@ export async function EnheRedesignPublicHeader({
   locale: Locale;
   languageHrefs?: RedesignLanguageHrefs;
 }) {
-  const [requestHeaders, user, searchRecommendations] = await Promise.all([
-    headers(), getHeaderUserSnapshot(), getPublicSearchRecommendations(locale),
+  const [requestHeaders, user, searchRecommendations, settings] = await Promise.all([
+    headers(), getHeaderUserSnapshot(), getPublicSearchRecommendations(locale), getSettingsMap(),
   ]);
   const redesignLocale = toRedesignLocale(locale);
   const pathname = requestHeaders.get("x-enhe-pathname") ?? buildLocalePath("/", locale);
@@ -65,6 +68,7 @@ export async function EnheRedesignPublicHeader({
         menuTriggerLabel={t.nav.menu}
         menuCloseLabel={t.nav.closeMenu}
       />
+      <SiteAnnouncement notice={parseSiteAnnouncement(settings[SITE_ANNOUNCEMENT_KEY])} locale={redesignLocale} />
       <SiteBreadcrumbs locale={toRedesignLocale(locale)} />
     </>
   );

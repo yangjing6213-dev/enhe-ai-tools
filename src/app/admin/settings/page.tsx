@@ -1,12 +1,17 @@
 import { prisma } from "@/lib/db";
 import { updateSiteSettingAction } from "@/app/admin/actions";
 import { AdminSection, Field, inputClass, SubmitButton, textareaClass } from "@/app/admin/admin-ui";
+import { parseSiteAnnouncement, SITE_ANNOUNCEMENT_KEY } from "@/lib/site-announcement";
+import { AnnouncementForm } from "./announcement-form";
 
 export default async function AdminSettingsPage() {
   const settings = await prisma.siteSetting.findMany({ where: { NOT: { key: { startsWith: "card-like:" } } }, orderBy: { key: "asc" } });
+  const announcement = parseSiteAnnouncement(settings.find((setting) => setting.key === SITE_ANNOUNCEMENT_KEY)?.value);
+  const generalSettings = settings.filter((setting) => setting.key !== SITE_ANNOUNCEMENT_KEY);
   return (
     <AdminSection title="网站设置" intro="支付宝/微信收款码、网站名称、Logo、首页文案、用户协议、隐私政策、退款规则均存储在 site_settings。">
       <div className="enhe-admin-content-management enhe-admin-settings">
+        <AnnouncementForm initial={announcement} />
         <section className="enhe-admin-settings-create-card">
           <div className="enhe-admin-settings-section-heading">
             <div>
@@ -25,14 +30,14 @@ export default async function AdminSettingsPage() {
         <section className="enhe-admin-settings-list-section" aria-labelledby="enhe-admin-settings-list-title">
           <div className="enhe-admin-settings-section-heading">
             <h2 id="enhe-admin-settings-list-title">已保存设置</h2>
-            <span className="enhe-admin-settings-count">{settings.length} 项</span>
+            <span className="enhe-admin-settings-count">{generalSettings.length} 项</span>
           </div>
 
-          {settings.length === 0 ? (
+          {generalSettings.length === 0 ? (
             <p className="enhe-admin-settings-empty">还没有已保存的设置。</p>
           ) : (
             <div className="enhe-admin-settings-list">
-              {settings.map((setting) => (
+              {generalSettings.map((setting) => (
                 <article key={setting.id} className="enhe-admin-setting-card">
                   <form action={updateSiteSettingAction} className="enhe-admin-setting-form">
                     <input type="hidden" name="key" value={setting.key} />
