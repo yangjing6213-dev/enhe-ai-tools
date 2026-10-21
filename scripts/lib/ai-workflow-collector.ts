@@ -10,6 +10,16 @@ export type AiWorkflowGitHubRepositoryCandidate = {
   licenseSpdx: string | null;
 };
 
+export function restoreAiWorkflowCandidateMetadata(
+  candidate: Omit<AiWorkflowGitHubRepositoryCandidate, "description" | "language"> & { description?: unknown; language?: unknown },
+): AiWorkflowGitHubRepositoryCandidate {
+  return {
+    ...candidate,
+    description: typeof candidate.description === "string" ? candidate.description : "",
+    language: typeof candidate.language === "string" ? candidate.language : null,
+  };
+}
+
 const redistributableLicenses = new Set([
   "0BSD",
   "Apache-2.0",
