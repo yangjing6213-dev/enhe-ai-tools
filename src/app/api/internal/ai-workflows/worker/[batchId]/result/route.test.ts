@@ -13,7 +13,10 @@ const mocks = vi.hoisted(() => ({
   candidatesCreate: vi.fn(),
   batchesUpdateMany: vi.fn(),
   transaction: vi.fn(),
+  revalidateTag: vi.fn(),
 }));
+
+vi.mock("next/cache", () => ({ revalidateTag: mocks.revalidateTag }));
 
 vi.mock("@/lib/db", () => ({
   prisma: {
@@ -27,6 +30,11 @@ const workerToken = "workflow-worker-token-1234567890";
 const leaseToken = "batch-lease-token-1234567890";
 const commit = "a".repeat(40);
 const sha256 = "b".repeat(64);
+const presentation = {
+  zh: { name: "研究工作流", shortDescription: "整理公开研究资料。", content: "项目说明\n整理资料并保留来源。" },
+  en: { name: "Research workflow", shortDescription: "Organize public research.", content: "Project overview\nOrganize research and retain its sources." },
+  cover: { url: `https://raw.githubusercontent.com/example/agent-flow/${commit}/banner.png`, source: "repository", sourceUrl: `https://github.com/example/agent-flow/blob/${commit}/README.md` },
+};
 
 function candidateResult(overrides: Record<string, unknown> = {}) {
   return {
@@ -141,6 +149,7 @@ describe("POST /api/internal/ai-workflows/worker/[batchId]/result", () => {
     vi.stubEnv("COS_SECRET_KEY", "");
     expect((await POST(request({ workerId: "runner-1", leaseToken, result: candidateResult() }), context)).status).toBe(503);
     expect(mocks.transaction).not.toHaveBeenCalled();
+    expect(mocks.revalidateTag).not.toHaveBeenCalled();
   });
 
   it("rejects results without the active lease or while collection is paused", async () => {
@@ -163,7 +172,7 @@ describe("POST /api/internal/ai-workflows/worker/[batchId]/result", () => {
 
     expect(response.status).toBe(201);
     expect(await response.json()).toMatchObject({ ok: true, candidateId: "candidate-1", state: "pending_pricing" });
-    expect(mocks.toolsCreate).toHaveBeenCalledWith(expect.objectContaining({ data: expect.objectContaining({ status: "draft", type: "ai_workflow", downloadPrice: 0 }) }));
+    expect(mocks.toolsCreate).toHaveBeenCalledWith(expect.objectContaining({ data: expect.objectContaining({ status: "draft", type: "ai_workflow", downloadPrice: 0, coverImage: "/api/ai-workflows/covers/ai-workflow-123456-agent-flow" }) }));
     expect(mocks.filesCreate).toHaveBeenCalledWith(expect.objectContaining({ data: expect.objectContaining({ storageBucket: "enhe-downloads-1303691623", objectKey: `ai-workflows/123456/${commit}/${sha256}.zip` }) }));
     expect(mocks.toolsUpdate).toHaveBeenCalledWith(expect.objectContaining({ data: { downloadFileId: "file-1" } }));
     expect(mocks.candidatesCreate).toHaveBeenCalledWith(expect.objectContaining({ data: expect.objectContaining({ status: "pending_pricing", priceSuggestion: 19 }) }));
@@ -193,6 +202,50 @@ describe("POST /api/internal/ai-workflows/worker/[batchId]/result", () => {
     const publication = mocks.candidatesCreate.mock.calls[0]?.[0].data.validationReport.publication;
     expect(publication).toMatchObject({ mode: "repository_link", enheDownloadPackageAvailable: false });
     expect(publication).not.toHaveProperty("sourceCodeExecuted");
+    expect(mocks.toolsCreate.mock.calls[0]?.[0].data.coverImage).toBe("/api/ai-workflows/covers/ai-workflow-123456-agent-flow");
+    expect(mocks.revalidateTag).toHaveBeenCalledWith("public-tools");
+  });
+
+  it.each(["repository_link", "package"])("persists bilingual fields and image evidence for %s results", async (mode) => {
+    const result = mode === "package" ? candidateResult({ presentation }) : repositoryLinkResult({ presentation });
+    const response = await POST(request({ workerId: "runner-1", leaseToken, result }), context);
+
+    expect(response.status).toBe(201);
+    expect(mocks.toolsCreate.mock.calls[0]?.[0].data).toMatchObject({
+      name: presentation.zh.name,
+      englishName: presentation.en.name,
+      shortDescription: `[[zh]]${presentation.zh.shortDescription}[[/zh]]\n[[en]]${presentation.en.shortDescription}[[/en]]`,
+      content: `[[zh]]${presentation.zh.content}[[/zh]]\n[[en]]${presentation.en.content}[[/en]]`,
+      coverImage: presentation.cover.url,
+      status: mode === "package" ? "draft" : "published",
+    });
+    expect(mocks.candidatesCreate.mock.calls[0]?.[0].data.validationReport.presentation).toEqual(presentation);
+    expect(mocks.revalidateTag).toHaveBeenCalledWith("public-tools");
+  });
+
+  it("refreshes presentation on a link-to-package upgrade without skipping price review", async () => {
+    mocks.candidatesFindUnique.mockResolvedValue({
+      id: "candidate-link", batchId: "batch-1", commitSha: commit, status: "published", fileId: null, toolId: "tool-link",
+    });
+    const response = await POST(request({ workerId: "runner-1", leaseToken, result: candidateResult({ presentation }) }), context);
+
+    expect(response.status).toBe(200);
+    expect(mocks.toolsCreate).not.toHaveBeenCalled();
+    expect(mocks.toolsUpdate.mock.calls[0]?.[0].data).toMatchObject({ name: presentation.zh.name, englishName: presentation.en.name, coverImage: presentation.cover.url });
+    expect(mocks.toolsUpdate.mock.calls[0]?.[0].data.systemRequirement).toContain("[[en]]See the project description");
+    expect(mocks.candidatesUpdate.mock.calls[0]?.[0].data).toMatchObject({ status: "pending_pricing", validationReport: { presentation } });
+  });
+
+  it("rejects incomplete languages and untrusted image locations before any write", async () => {
+    for (const invalid of [
+      { ...presentation, en: undefined },
+      { ...presentation, cover: { ...presentation.cover, url: "https://attacker.example/private.png" } },
+    ]) {
+      const response = await POST(request({ workerId: "runner-1", leaseToken, result: repositoryLinkResult({ presentation: invalid }) }), context);
+      expect(response.status).toBe(400);
+    }
+    expect(mocks.transaction).not.toHaveBeenCalled();
+    expect(mocks.revalidateTag).not.toHaveBeenCalled();
   });
 
   it("upgrades an existing link listing into a package awaiting price review without creating a duplicate", async () => {

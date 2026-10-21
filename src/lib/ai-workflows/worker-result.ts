@@ -1,6 +1,7 @@
 import { z } from "zod";
 import { normalizeGitHubRepositoryUrl } from "@/lib/ai-workflows/rules";
 import { buildAiWorkflowArchiveObjectKey } from "@/lib/ai-workflows/cos";
+import { aiWorkflowPresentationSchema } from "@/lib/ai-workflows/presentation";
 
 const redistributableLicenses = new Set([
   "0BSD",
@@ -97,6 +98,7 @@ const workerResultSchema = z.object({
     contentType: z.literal("application/zip"),
   }).strict(),
   product: productSchema,
+  presentation: aiWorkflowPresentationSchema.optional(),
 }).strict();
 
 const repositoryLinkResultSchema = z.object({
@@ -112,6 +114,7 @@ const repositoryLinkResultSchema = z.object({
   language: z.string().max(120).nullable(),
   description: z.string().max(500),
   failureReason: z.enum(repositoryLinkFailureReasons),
+  presentation: aiWorkflowPresentationSchema.optional(),
 }).strict();
 
 export type AiWorkflowWorkerProduct = z.infer<typeof productSchema>;

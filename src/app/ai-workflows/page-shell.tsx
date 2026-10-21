@@ -19,12 +19,12 @@ const pageCopy = {
   zh: {
     title: "AI 工作流",
     intro: "按真实任务发现可复用的 AI 工作流，先看适用场景，再核对运行要求与交付内容。",
-    description: "ENHE AI 工作流按应用方向整理，首批项目尚未完成来源、授权、运行条件和交付内容的发布核验。",
+    description: "发现按应用方向整理的热门开源工作流，查看项目用途、原仓库、开源许可证与可用的下载内容。",
   },
   en: {
     title: "AI Workflows",
     intro: "Find reusable AI workflows by real tasks. Start with the use case, then review runtime requirements and deliverables.",
-    description: "ENHE AI workflows are organized by application area. The first items are not yet verified for publication.",
+    description: "Discover popular open-source workflows by application area, with project descriptions, original repositories, licenses, and available downloads.",
   },
 } as const;
 

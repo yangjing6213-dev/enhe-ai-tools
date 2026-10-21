@@ -1,12 +1,12 @@
 "use client";
 
 import { useState } from "react";
-import Image from "next/image";
 import Link from "next/link";
-import { Search, Workflow } from "lucide-react";
+import { Search } from "lucide-react";
 
 import type { RedesignLocale } from "@/components/redesign/types";
-import { resolveToolImageSrc } from "@/lib/tool-image";
+import { buildLocalizedToolOptionalText, resolveLocalizedToolIdentity, resolveLocalizedToolTagName } from "@/lib/tool-localization";
+import { AiWorkflowCoverImage } from "./workflow-cover-image";
 import { AiWorkflowFavoriteButton } from "./workflow-interactions";
 import type { AiWorkflowCatalogFilters } from "@/lib/ai-workflows/catalog";
 
@@ -133,17 +133,19 @@ export function AiWorkflowDirectory({
         {items.length ? <div className="mt-4 grid gap-4 md:grid-cols-2 xl:grid-cols-3">
           {items.map((item) => {
             const href = `${basePath}/${item.slug}`;
-            const image = resolveToolImageSrc(item.coverImage);
+            const identity = resolveLocalizedToolIdentity({ ...item, type: "ai_workflow" }, locale);
+            const description = buildLocalizedToolOptionalText(item.shortDescription, locale, { allowUntranslated: true });
+            const tags = item.tags.map((tag) => resolveLocalizedToolTagName(tag, locale)).filter(Boolean);
             return <article key={item.id} className="flex min-h-[270px] flex-col rounded-2xl border border-[var(--marketing-border)] bg-white p-5 shadow-[0_12px_34px_rgba(29,78,126,0.06)]">
               <div className="flex items-start gap-3">
                 <div className="flex size-14 shrink-0 items-center justify-center overflow-hidden rounded-xl bg-[#e8f3ff] text-[var(--marketing-accent)]">
-                  {image ? <Image src={image} alt="" width={56} height={56} unoptimized className="size-14 object-cover" /> : <Workflow aria-hidden="true" className="size-7" />}
+                  <AiWorkflowCoverImage coverImage={item.coverImage} slug={item.slug} alt="" width={56} height={56} unoptimized className="size-14 object-cover" />
                 </div>
-                <div className="min-w-0 flex-1"><Link href={href} className="font-semibold text-[var(--marketing-text)] hover:text-[var(--marketing-accent)]">{locale === "en" ? item.englishName || item.name : item.name}</Link><p className="mt-1 truncate text-xs text-[var(--marketing-muted)]">{item.englishName || item.name}</p></div>
+                <div className="min-w-0 flex-1"><Link href={href} className="font-semibold text-[var(--marketing-text)] hover:text-[var(--marketing-accent)]">{identity.primaryName}</Link>{locale === "zh" && identity.secondaryName ? <p className="mt-1 truncate text-xs text-[var(--marketing-muted)]">{identity.secondaryName}</p> : null}</div>
                 <span className="shrink-0 rounded-full bg-[#e8f3ff] px-2.5 py-1 text-xs font-semibold text-[var(--marketing-accent)]">{item.deliveryMode === "repository_link" ? text.repositoryLink : item.isDownloadPaid ? `¥${item.price.toFixed(2)}` : text.freeTag}</span>
               </div>
-              <p className="mt-4 line-clamp-3 text-sm leading-6 text-[var(--marketing-muted)]">{item.shortDescription}</p>
-              <div className="mt-3 flex flex-wrap gap-2">{item.topic ? <span className="rounded-full border border-[var(--marketing-border)] px-2.5 py-1 text-xs">{locale === "en" ? item.topic.englishName || item.topic.name : item.topic.name}</span> : null}{item.tags.slice(0, 3).map((tag) => <span key={tag} className="rounded-full border border-[var(--marketing-border)] px-2.5 py-1 text-xs">{tag}</span>)}</div>
+              <p className="mt-4 line-clamp-3 text-sm leading-6 text-[var(--marketing-muted)]">{description}</p>
+              <div className="mt-3 flex flex-wrap gap-2">{item.topic ? <span className="rounded-full border border-[var(--marketing-border)] px-2.5 py-1 text-xs">{locale === "en" ? item.topic.englishName || item.topic.name : item.topic.name}</span> : null}{tags.slice(0, 3).map((tag) => <span key={tag} className="rounded-full border border-[var(--marketing-border)] px-2.5 py-1 text-xs">{tag}</span>)}</div>
               <div className="mt-auto pt-4">
                 <div className="flex flex-wrap items-center gap-x-3 gap-y-2 text-xs text-[var(--marketing-muted)]">
                   <span aria-label={item.ratingAverage === null ? text.noRating : `${item.ratingAverage.toFixed(1)} / 5`}>{item.ratingAverage === null ? text.noRating : `★ ${item.ratingAverage.toFixed(1)} (${item.reviewCount} ${text.reviews})`}</span>

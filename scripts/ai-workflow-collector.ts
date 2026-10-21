@@ -16,6 +16,7 @@ import {
 } from "../src/lib/ai-workflows/cos";
 import { parseAiWorkflowRepositoryLinkResult, parseAiWorkflowWorkerResult } from "../src/lib/ai-workflows/worker-result";
 import { readAiWorkflowCosCredentialsCsv } from "./lib/ai-workflow-cos-credentials";
+import { generateAiWorkflowPresentation } from "./lib/ai-workflow-presentation";
 import {
   buildAiWorkflowSearchTerms,
   getAiWorkflowFailureCode,
@@ -411,7 +412,7 @@ async function findReadme(sourceDir: string) {
   if (!/\b(?:workflow|automation|agent|skill|template)\b|工作流|自动化|智能体|技能|模板/i.test(content)) {
     throw new Error("WORKFLOW_RELEVANCE_NOT_PROVEN");
   }
-  return { path: readme.name, text: content.slice(0, 14000) };
+  return { path: readme.name, text: content.slice(0, 64 * 1024) };
 }
 
 async function detectNodeTest(sourceDir: string) {
@@ -479,9 +480,24 @@ async function generateProductDraft(input: {
       topic: input.topic,
       actualValidation: input.testSummary,
       dependencySummary: input.dependencySummary,
-      readme: input.readme.slice(0, 12000),
+      readme: input.readme.slice(0, 64 * 1024),
     }),
   ].join("\n\n");
+  const output = await generateRestrictedDraftText(prompt, input.codexDir);
+  let parsed: unknown;
+  try { parsed = JSON.parse(output.trim()); } catch { throw new Error("CODEX_DRAFT_INVALID"); }
+  const product = productSchema.safeParse(parsed);
+  if (!product.success) throw new Error("CODEX_DRAFT_INVALID");
+  // A client is only listed after a separate install/use check exists; this first runner has none.
+  const validationNotice = " ENHE 本次仅运行了上游测试套件，尚未独立验证完整核心业务流程；管理员复核前不得发布。";
+  return {
+    ...product.data,
+    limitations: `${product.data.limitations.slice(0, 1000)}${validationNotice}`,
+    supportedAgents: [] as [],
+  };
+}
+
+async function generateRestrictedDraftText(prompt: string, codexDir: string, maxOutput = 18000) {
   const result = await runProcess(runnerConfig.codexPath, [
     "exec", "-c", 'approval_policy="never"', "-c", 'web_search="disabled"',
     // Use HTTPS/SSE because the local network times out on the WebSocket transport.
@@ -492,12 +508,12 @@ async function generateProductDraft(input: {
     "-c", 'model_providers.openai-https.supports_websockets=false',
     "--disable", "shell_tool", "--disable", "apps",
     "--sandbox", "read-only", "--ephemeral", "--ignore-user-config",
-    "--skip-git-repo-check", "--cd", input.codexDir, "-",
+    "--skip-git-repo-check", "--cd", codexDir, "-",
   ], {
-    cwd: input.codexDir,
+    cwd: codexDir,
     input: prompt,
     timeoutMs: 5 * 60 * 1000,
-    maxOutput: 18000,
+    maxOutput,
     env: {
       ...minimalWindowsEnv(),
       USERPROFILE: process.env.USERPROFILE,
@@ -509,17 +525,7 @@ async function generateProductDraft(input: {
     },
   });
   if (result.code !== 0) throw new Error("CODEX_DRAFT_UNAVAILABLE");
-  let parsed: unknown;
-  try { parsed = JSON.parse(result.stdout.trim()); } catch { throw new Error("CODEX_DRAFT_INVALID"); }
-  const product = productSchema.safeParse(parsed);
-  if (!product.success) throw new Error("CODEX_DRAFT_INVALID");
-  // A client is only listed after a separate install/use check exists; this first runner has none.
-  const validationNotice = " ENHE 本次仅运行了上游测试套件，尚未独立验证完整核心业务流程；管理员复核前不得发布。";
-  return {
-    ...product.data,
-    limitations: `${product.data.limitations.slice(0, 1000)}${validationNotice}`,
-    supportedAgents: [] as [],
-  };
+  return result.stdout;
 }
 
 async function verifyAnonymousReadIsDenied(bucket: string, region: string, objectKey: string) {
@@ -588,6 +594,11 @@ async function registerRepositoryLinkOnly(input: {
   const { candidate, batch, lease, token, state, statePath, index, failureReason, signal, setStage } = input;
   const commitSha = await getRepositoryCommit(candidate);
   const license = await getLicenseFile(candidate, commitSha);
+  const codexDir = join(runnerRoot, "codex");
+  await mkdir(codexDir, { recursive: true });
+  const presentation = await generateAiWorkflowPresentation({
+    candidate, commitSha, topic: batch.topicNameSnapshot, deliveryMode: "repository_link",
+  }, { generateText: (prompt) => generateRestrictedDraftText(prompt, codexDir, 40000) });
   const payload = {
     deliveryMode: "repository_link",
     repositoryId: candidate.id,
@@ -601,6 +612,7 @@ async function registerRepositoryLinkOnly(input: {
     language: candidate.language,
     description: redactAiWorkflowCollectorText(candidate.description).slice(0, 500),
     failureReason,
+    presentation,
   };
   if (!parseAiWorkflowRepositoryLinkResult(payload).success) throw new Error("LINK_RESULT_EVIDENCE_MISMATCH");
 
@@ -707,6 +719,10 @@ async function processCandidate(input: {
     dependencySummary: plan.installCommand,
     codexDir,
   });
+  const presentation = await generateAiWorkflowPresentation({
+    candidate, commitSha, topic: batch.topicNameSnapshot, deliveryMode: "package", readme,
+    validationSummary: validation.summary,
+  }, { generateText: (prompt) => generateRestrictedDraftText(prompt, codexDir, 40000) });
   const validationAt = new Date().toISOString();
   const fileName = `${candidate.fullName.split("/")[1]}-${commitSha.slice(0, 8)}.zip`;
   const usageGuide = [
@@ -786,6 +802,7 @@ async function processCandidate(input: {
       contentType: "application/zip",
     },
     product,
+    presentation,
   };
   if (!parseAiWorkflowWorkerResult(payload).success) throw new Error("RESULT_EVIDENCE_MISMATCH");
   state.pendingRegistration = { repositoryId: candidate.id, repository: candidate.fullName, result: payload };

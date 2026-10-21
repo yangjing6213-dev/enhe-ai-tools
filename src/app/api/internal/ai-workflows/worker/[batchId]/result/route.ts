@@ -1,8 +1,10 @@
 import { Prisma } from "@prisma/client";
+import { revalidateTag } from "next/cache";
 import { z } from "zod";
 import { prisma } from "@/lib/db";
 import { getAiWorkflowCosConfig } from "@/lib/ai-workflows/cos";
 import { buildAiWorkflowProductContent, parseAiWorkflowRepositoryLinkResult, parseAiWorkflowWorkerResult } from "@/lib/ai-workflows/worker-result";
+import { buildAiWorkflowGeneratedCoverUrl, buildAiWorkflowPresentationFields } from "@/lib/ai-workflows/presentation";
 import { verifyAiWorkflowLeaseToken } from "@/lib/ai-workflows/worker";
 import {
   readBoundedJsonBody,
@@ -56,7 +58,7 @@ export async function POST(
   let input: z.infer<typeof requestSchema>;
   try {
     batchId = batchIdSchema.parse((await params).batchId);
-    input = requestSchema.parse(await readBoundedJsonBody(request, 96 * 1024));
+    input = requestSchema.parse(await readBoundedJsonBody(request, 192 * 1024));
   } catch {
     return workerJsonResponse({ ok: false, code: "INVALID_REQUEST" }, 400);
   }
@@ -81,6 +83,7 @@ export async function POST(
   if (parsedLink.success) {
     const item = parsedLink.data;
     const now = new Date();
+    const generatedCoverUrl = buildAiWorkflowGeneratedCoverUrl(item.repositoryId, item.repositoryName);
     const licenseUrl = `${item.repositoryUrl}/blob/${item.commitSha}/${item.licenseFilePath.split("/").map(encodeURIComponent).join("/")}`;
     const description = item.description || "GitHub 未提供项目简介。";
     const linkOnlyContent = [
@@ -104,6 +107,8 @@ export async function POST(
         enheDownloadPackageAvailable: false,
         descriptionSource: "GitHub repository metadata",
       },
+      presentation: item.presentation ?? { cover: { url: generatedCoverUrl, source: "generated" }, localization: "legacy" },
+      localizationSource: item.presentation ? "AI-assisted translation of GitHub repository metadata and README" : "legacy",
     };
     const toolData = {
       name: item.repositoryName,
@@ -119,6 +124,7 @@ export async function POST(
       isDownloadLinkVipOnly: false,
       downloadPrice: 0,
       status: "published" as const,
+      ...(item.presentation ? buildAiWorkflowPresentationFields(item.presentation) : {}),
     };
 
     try {
@@ -167,6 +173,7 @@ export async function POST(
         } else {
           const tool = await tx.tool.create({
             data: {
+              coverImage: generatedCoverUrl,
               ...toolData,
               slug: `ai-workflow-${item.repositoryId}-${normalizeSlugPart(item.repositoryName)}`,
               type: "ai_workflow",
@@ -217,6 +224,7 @@ export async function POST(
         return { candidateId, created };
       });
 
+      revalidateTag("public-tools");
       return workerJsonResponse({ ok: true, candidateId: result.candidateId, state: "published", deliveryMode: "repository_link", idempotentReplay: !result.created }, result.created ? 201 : 200);
     } catch (error) {
       if (error instanceof IntakeError) return workerJsonResponse({ ok: false, code: error.code }, error.status);
@@ -232,6 +240,11 @@ export async function POST(
 
   const item = parsedPackage.data;
   const objectKey = item.objectKey;
+  const generatedCoverUrl = buildAiWorkflowGeneratedCoverUrl(item.repositoryId, item.repositoryName);
+  const presentationFields = item.presentation ? {
+    ...buildAiWorkflowPresentationFields(item.presentation),
+    systemRequirement: "[[zh]]请查看下方项目说明及原仓库的运行要求。[[/zh]]\n[[en]]See the project description below and upstream setup requirements.[[/en]]",
+  } : {};
   const validationReport: Prisma.InputJsonObject = {
     source: {
       repositoryId: item.repositoryId,
@@ -262,6 +275,8 @@ export async function POST(
       anonymousReadDenied: item.archive.anonymousReadDenied,
       contentType: item.archive.contentType,
     },
+    presentation: item.presentation ?? { cover: { url: generatedCoverUrl, source: "generated" }, localization: "legacy" },
+    localizationSource: item.presentation ? "AI-assisted translation of GitHub repository metadata and README" : "legacy",
   };
   const content = buildAiWorkflowProductContent(item.product);
   const slug = `ai-workflow-${normalizeSlugPart(item.repositoryName)}-${item.repositoryId}-${item.commitSha.slice(0, 12)}`;
@@ -304,7 +319,7 @@ export async function POST(
           });
           await tx.tool.update({
             where: { id: existing.toolId },
-            data: { downloadFileId: file.id, version: item.packageVersion, isDownloadPaid: false, isDownloadLinkVipOnly: true, downloadPrice: 0, status: "published" },
+            data: { ...presentationFields, downloadFileId: file.id, version: item.packageVersion, isDownloadPaid: false, isDownloadLinkVipOnly: true, downloadPrice: 0, status: "published" },
           });
           await tx.aiWorkflowCandidate.update({
             where: { id: existing.id },
@@ -362,6 +377,7 @@ export async function POST(
           type: "ai_workflow",
           shortDescription: item.product.shortDescription,
           content,
+          coverImage: generatedCoverUrl,
           version: item.packageVersion,
           systemRequirement: item.product.dependencies,
           supportedAgents: item.product.supportedAgents,
@@ -371,6 +387,7 @@ export async function POST(
           downloadPrice: 0,
           downloadCount: 0,
           status: "draft",
+          ...presentationFields,
         },
         select: { id: true },
       });
@@ -435,6 +452,7 @@ export async function POST(
       return { candidateId: candidate.id, created: true, state: "pending_pricing" };
     });
 
+    revalidateTag("public-tools");
     return workerJsonResponse({
       ok: true,
       candidateId: result.candidateId,

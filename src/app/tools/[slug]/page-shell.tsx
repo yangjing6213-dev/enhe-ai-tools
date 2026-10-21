@@ -22,6 +22,8 @@ import { ToolRichContent } from "@/components/tool-rich-content";
 import { UserAvatar } from "@/components/user-avatar";
 import { EmojiText } from "@/components/emoji-text";
 import { AiWorkflowFavoriteButton, AiWorkflowInstallPanel, AiWorkflowReviewForm } from "@/app/ai-workflows/workflow-interactions";
+import { AiWorkflowCoverImage } from "@/app/ai-workflows/workflow-cover-image";
+import { AiWorkflowContent } from "@/app/ai-workflows/workflow-content";
 import { getCurrentUser } from "@/lib/auth";
 import { enheOrganizationReference } from "@/lib/brand-entity";
 import { prisma } from "@/lib/db";
@@ -183,7 +185,9 @@ export async function generateToolDetailPageMetadata(
     description: buildToolMetaDescription({
       name: buildLocalizedToolMetaHeading(tool, forceLocale),
       englishName: forceLocale === "en" ? null : tool.englishName,
-      description: buildLocalizedToolMetaDescription(tool, forceLocale),
+      description: tool.type === "ai_workflow"
+        ? buildLocalizedToolOptionalText(tool.shortDescription, forceLocale, { allowUntranslated: true })
+        : buildLocalizedToolMetaDescription(tool, forceLocale),
       brand: t.brand,
       locale: forceLocale,
       type:
@@ -196,7 +200,7 @@ export async function generateToolDetailPageMetadata(
             : "software",
     }),
     path: canonical,
-    image: resolveToolImageSrc(tool.coverImage),
+    image: resolveToolImageSrc(tool.coverImage) || (tool.type === "ai_workflow" ? `/api/ai-workflows/covers/${encodeURIComponent(tool.slug)}` : null),
     locale: forceLocale === "en" ? "en_US" : "zh_CN",
     localeKey: forceLocale,
     languageAlternates: buildAvailableLanguageAlternates(
@@ -304,6 +308,7 @@ export async function ToolDetailPageShell({
     : null;
 
   const localizedTool = resolveLocalizedToolIdentity(tool, forceLocale);
+  const isAiWorkflow = tool.type === "ai_workflow";
   const localizedCategoryName = resolveLocalizedToolCategoryName(
     tool.category?.name,
     tool.type,
@@ -320,16 +325,15 @@ export async function ToolDetailPageShell({
     type: tool.type,
     categoryName: tool.category?.name,
   };
-  const localizedSummary = buildLocalizedToolSummary(
-    toolLocalizationInput,
-    forceLocale,
-    { preferAuthored: true },
-  );
-  const localizedLongContent = buildLocalizedToolLongContent(
-    toolLocalizationInput,
-    forceLocale,
-    { preferAuthored: true },
-  );
+  const localizedSummary = isAiWorkflow
+    ? buildLocalizedToolOptionalText(tool.shortDescription, forceLocale, { allowUntranslated: true })
+    : buildLocalizedToolSummary(toolLocalizationInput, forceLocale, { preferAuthored: true });
+  const localizedLongContent = isAiWorkflow
+    ? buildLocalizedToolOptionalText(tool.content, forceLocale, { allowUntranslated: true }) || localizedSummary
+    : buildLocalizedToolLongContent(toolLocalizationInput, forceLocale, { preferAuthored: true });
+  const localizedSystemRequirement = isAiWorkflow
+    ? buildLocalizedToolOptionalText(tool.systemRequirement, forceLocale, { allowUntranslated: true }) || (forceLocale === "en" ? "See upstream setup requirements." : "请查看原仓库的运行要求。")
+    : tool.systemRequirement;
   const visibleTutorials = buildLocalizedToolTutorialItems(
     tool.tutorials,
     toolLocalizationInput,
@@ -365,7 +369,6 @@ export async function ToolDetailPageShell({
   const isAccountService = tool.type === "online";
   const isSkillLearning = tool.type === "skill_learning";
   const isAiSkill = tool.type === "ai_skill";
-  const isAiWorkflow = tool.type === "ai_workflow";
   const workflowDeliveryMode = isAiWorkflow && tool.aiWorkflowCandidate
     ? resolveAiWorkflowDeliveryMode({
         candidateStatus: tool.aiWorkflowCandidate.status,
@@ -434,7 +437,7 @@ export async function ToolDetailPageShell({
   const isPurchasableAccountService = isAccountService && servicePrice > 0;
   const paidSkillCourse = isSkillLearning && servicePrice > 0;
   const isFreeSkillCourse = isSkillLearning && servicePrice <= 0;
-  const coverImage = resolveToolImageSrc(tool.coverImage);
+  const coverImage = resolveToolImageSrc(tool.coverImage) || (isAiWorkflow ? `/api/ai-workflows/covers/${encodeURIComponent(tool.slug)}` : null);
   const productVideos = resolveProductVideos([
     {
       url: tool.videoUrl,
@@ -539,6 +542,13 @@ export async function ToolDetailPageShell({
   const workflowRepository = isAiWorkflow && tool.aiWorkflowCandidate
     ? normalizeGitHubRepositoryUrl(tool.aiWorkflowCandidate.repositoryUrl)
     : null;
+  const workflowProjectType = ({
+    workflow: forceLocale === "en" ? "Workflow" : "工作流",
+    automation: forceLocale === "en" ? "Automation tool" : "自动化工具",
+    agent: forceLocale === "en" ? "Agent project" : "智能体项目",
+    template: forceLocale === "en" ? "Template" : "模板",
+    companion: forceLocale === "en" ? "Companion tool" : "配套工具",
+  } as Record<string, string>)[tool.aiWorkflowCandidate?.projectType ?? "workflow"] || (forceLocale === "en" ? "Workflow" : "工作流");
   const workflowLinkOnlyReason = workflowLinkOnly
     ? workflowPackageAwaitingReview
       ? (forceLocale === "en" ? "The package is waiting for price review before downloads can be enabled." : "软件包正在等待价格审核，审核完成后才能开放下载。")
@@ -701,7 +711,7 @@ export async function ToolDetailPageShell({
     url: buildCanonicalToolPath(tool, forceLocale),
     image: coverImage,
     category: localizedCategoryName,
-    operatingSystem: tool.systemRequirement ?? null,
+    operatingSystem: localizedSystemRequirement ?? null,
     locale: forceLocale === "en" ? "en-US" : "zh-CN",
     price: schemaPrice,
     softwareVersion: tool.version ?? null,
@@ -777,7 +787,19 @@ export async function ToolDetailPageShell({
           <div className="tool-detail-hero-stack flex flex-col gap-8">
             <div className="tool-detail-cover-frame relative overflow-hidden rounded-[1.75rem] border border-[rgba(210,230,255,0.16)] bg-[#07101E]">
               <div className="relative aspect-[16/9]">
-                {coverImage ? (
+                {isAiWorkflow ? (
+                  <AiWorkflowCoverImage
+                    coverImage={tool.coverImage}
+                    slug={tool.slug}
+                    alt={localizedTool.primaryName}
+                    fill
+                    className="content-thumbnail-outline object-contain"
+                    sizes="(min-width: 1024px) 1120px, 100vw"
+                    priority
+                    fetchPriority="high"
+                    unoptimized
+                  />
+                ) : coverImage ? (
                   <Image
                     src={coverImage}
                     alt={localizedTool.primaryName}
@@ -848,9 +870,9 @@ export async function ToolDetailPageShell({
                   ))}
                 </div>
 
-                <p className="mt-5 text-xs font-semibold uppercase tracking-[0.18em] text-[var(--marketing-accent)]">
+                {!isAiWorkflow ? <p className="mt-5 text-xs font-semibold uppercase tracking-[0.18em] text-[var(--marketing-accent)]">
                   {td.coverLabel}
-                </p>
+                </p> : null}
                 <h1 className="mt-5 text-4xl font-semibold leading-tight text-[#F6FAFF] md:text-5xl">
                   {localizedTool.primaryName}
                 </h1>
@@ -895,7 +917,7 @@ export async function ToolDetailPageShell({
                       />
                       <Info
                         label={workflowLinkOnly ? (forceLocale === "en" ? "Project language" : "项目语言") : td.systemRequirement}
-                        value={workflowLinkOnly ? (tool.systemRequirement || (forceLocale === "en" ? "Not recorded" : "未记录")) : (tool.systemRequirement ?? td.browser)}
+                        value={workflowLinkOnly ? (localizedSystemRequirement || (forceLocale === "en" ? "Not recorded" : "未记录")) : (localizedSystemRequirement ?? td.browser)}
                       />
                       {tool.type === "software" && tool.securityReviewedAt ? (
                         <div className="product-safety-info-card">
@@ -1238,11 +1260,11 @@ export async function ToolDetailPageShell({
                 />
                 <div className="mt-6 grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
                   <Info label={forceLocale === "en" ? "Application area" : "应用方向"} value={forceLocale === "en" ? (tool.aiWorkflowCandidate.topic?.englishName || tool.aiWorkflowCandidate.topic?.name || "-") : (tool.aiWorkflowCandidate.topic?.name || "-")} />
-                  <Info label={forceLocale === "en" ? "Project type" : "项目类型"} value={tool.aiWorkflowCandidate.projectType} />
+                  <Info label={forceLocale === "en" ? "Project type" : "项目类型"} value={workflowProjectType} />
                   <Info label={forceLocale === "en" ? "License" : "开源许可证"} value={tool.aiWorkflowCandidate.licenseSpdx || (forceLocale === "en" ? "Not provided" : "未提供")} />
                   <Info label={workflowLinkOnly ? (forceLocale === "en" ? "Delivery" : "获取方式") : (forceLocale === "en" ? "Package version" : "交付版本")} value={workflowLinkOnly ? (forceLocale === "en" ? "Repository link only" : "仅原仓库链接") : tool.aiWorkflowCandidate.packageVersion || tool.version || "-"} />
                   <Info label={workflowLinkOnly ? (forceLocale === "en" ? "GitHub stars" : "GitHub 星标") : (forceLocale === "en" ? "Package size" : "压缩包大小")} value={workflowLinkOnly ? `${(tool.aiWorkflowCandidate.githubStars ?? 0).toLocaleString()} · ${tool.aiWorkflowCandidate.starsUpdatedAt?.toLocaleDateString(forceLocale === "en" ? "en-US" : "zh-CN") ?? "-"}` : tool.aiWorkflowCandidate.packageSize ? `${(Number(tool.aiWorkflowCandidate.packageSize) / 1024 / 1024).toFixed(1)} MB` : "-"} />
-                  <Info label={workflowLinkOnly ? (forceLocale === "en" ? "Package verification" : "打包核验") : (forceLocale === "en" ? "Verified environments" : "实际验证环境")} value={workflowLinkOnly ? workflowPackageAwaitingReview ? (forceLocale === "en" ? "Awaiting price review" : "等待价格审核") : tool.aiWorkflowCandidate.failureReason === "CANDIDATE_TEST_FAILED" ? (forceLocale === "en" ? "Automated test did not pass" : "自动测试未通过") : (forceLocale === "en" ? "No ENHE package available" : "本站暂无可下载包") : tool.aiWorkflowCandidate.verifiedEnvironments.length ? tool.aiWorkflowCandidate.verifiedEnvironments.join(" · ") : tool.systemRequirement || (forceLocale === "en" ? "Not recorded" : "暂无记录")} />
+                  <Info label={workflowLinkOnly ? (forceLocale === "en" ? "Package verification" : "打包核验") : (forceLocale === "en" ? "Verified environments" : "实际验证环境")} value={workflowLinkOnly ? workflowPackageAwaitingReview ? (forceLocale === "en" ? "Awaiting price review" : "等待价格审核") : tool.aiWorkflowCandidate.failureReason === "CANDIDATE_TEST_FAILED" ? (forceLocale === "en" ? "Automated test did not pass" : "自动测试未通过") : (forceLocale === "en" ? "No ENHE package available" : "本站暂无可下载包") : tool.aiWorkflowCandidate.verifiedEnvironments.length ? tool.aiWorkflowCandidate.verifiedEnvironments.join(" · ") : localizedSystemRequirement || (forceLocale === "en" ? "Not recorded" : "暂无记录")} />
                 </div>
                 {workflowLinkOnly ? <p className="mt-4 rounded-xl border border-white/10 bg-white/8 p-4 text-sm leading-6 text-[#C5D0E2]">{forceLocale === "en" ? "Link-only reason: " : "仅提供链接的原因："}{workflowLinkOnlyReason}</p> : null}
                 <div className="mt-3 grid gap-3 md:grid-cols-[minmax(0,1fr)_auto]">
@@ -1337,7 +1359,7 @@ export async function ToolDetailPageShell({
                 ) : (
                   <>
                     <p className="enhe-authored-text whitespace-pre-wrap break-words text-sm leading-6 text-[#C5D0E2]">
-                      {tool.systemRequirement ?? td.browser}
+                      {localizedSystemRequirement ?? td.browser}
                     </p>
                     <p className="mt-2 text-xs text-[#8F9DB2]">
                       {td.version}: {tool.version ?? td.onlineVersion}
@@ -1448,7 +1470,7 @@ export async function ToolDetailPageShell({
                 </div>
               ) : null}
               <div className="tool-detail-copy-card rounded-2xl border border-white/10 bg-white/8 p-5">
-                <ToolRichContent content={localizedLongContent} />
+                {isAiWorkflow ? <AiWorkflowContent content={localizedLongContent} /> : <ToolRichContent content={localizedLongContent} />}
               </div>
               </div>
             </div>
