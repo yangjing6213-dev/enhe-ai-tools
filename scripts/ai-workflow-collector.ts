@@ -21,6 +21,7 @@ import {
   getAiWorkflowFailureCode,
   getAiWorkflowLinkOnlyFailureReason,
   redactAiWorkflowCollectorText,
+  restoreAiWorkflowCandidateMetadata,
   selectAiWorkflowRepositoryCandidates,
   type AiWorkflowGitHubRepositoryCandidate,
 } from "./lib/ai-workflow-collector";
@@ -350,6 +351,7 @@ async function readRunState(path: string, batch: WorkerBatch): Promise<RunState 
         !parseAiWorkflowRepositoryLinkResult(data.pendingRegistration.result).success
       ) return null;
     }
+    data.candidateIds = data.candidateIds.map(restoreAiWorkflowCandidateMetadata);
     return data;
   } catch {
     return null;

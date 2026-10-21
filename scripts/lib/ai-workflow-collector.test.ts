@@ -1,5 +1,48 @@
 import { describe, expect, it } from "vitest";
-import { buildAiWorkflowSearchTerms, getAiWorkflowFailureCode, getAiWorkflowLinkOnlyFailureReason, redactAiWorkflowCollectorText, selectAiWorkflowRepositoryCandidates } from "./ai-workflow-collector";
+import { parseAiWorkflowRepositoryLinkResult } from "../../src/lib/ai-workflows/worker-result";
+import { buildAiWorkflowSearchTerms, getAiWorkflowFailureCode, getAiWorkflowLinkOnlyFailureReason, redactAiWorkflowCollectorText, restoreAiWorkflowCandidateMetadata, selectAiWorkflowRepositoryCandidates } from "./ai-workflow-collector";
+
+describe("AI Workflow cached candidate compatibility", () => {
+  const legacyCandidate = {
+    id: "1204165322",
+    fullName: "team/workflow",
+    url: "https://github.com/team/workflow",
+    stars: 100,
+    updatedAt: "2026-10-21T12:00:00Z",
+    defaultBranch: "main",
+    licenseSpdx: "MIT",
+  };
+
+  it("restores missing metadata so a legacy candidate can register its repository link", () => {
+    const candidate = restoreAiWorkflowCandidateMetadata(legacyCandidate);
+    expect(candidate).toEqual({ ...legacyCandidate, description: "", language: null });
+    expect(legacyCandidate).not.toHaveProperty("description");
+    expect(legacyCandidate).not.toHaveProperty("language");
+
+    const result = parseAiWorkflowRepositoryLinkResult({
+      deliveryMode: "repository_link",
+      repositoryId: candidate.id,
+      repositoryUrl: candidate.url,
+      commitSha: "a".repeat(40),
+      licenseSpdx: candidate.licenseSpdx,
+      licenseFilePath: "LICENSE",
+      projectType: "workflow",
+      stars: candidate.stars,
+      updatedAt: candidate.updatedAt,
+      language: candidate.language,
+      description: redactAiWorkflowCollectorText(candidate.description).slice(0, 500),
+      failureReason: "PACKAGE_LANGUAGE_UNSUPPORTED",
+    });
+    expect(result.success).toBe(true);
+  });
+
+  it("preserves current metadata and defaults invalid cached values", () => {
+    const candidate = { ...legacyCandidate, description: "AI workflow automation", language: "Python" };
+    expect(restoreAiWorkflowCandidateMetadata(candidate)).toEqual(candidate);
+    expect(restoreAiWorkflowCandidateMetadata({ ...legacyCandidate, description: null, language: 42 }))
+      .toEqual({ ...legacyCandidate, description: "", language: null });
+  });
+});
 
 describe("AI Workflow GitHub candidate selection", () => {
   it("keeps relevant-language candidates and ranks active repositories by stars", () => {
