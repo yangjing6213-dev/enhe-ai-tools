@@ -22,6 +22,31 @@ async function installLoopbackOnlyGuard(page: Page) {
   return rejectedOrigins;
 }
 
+test("Chinese and English homepage titles do not show a black fallback while their texture is unavailable", async ({ page }) => {
+  await installLoopbackOnlyGuard(page);
+  await page.route("**/_next/image**", (route) => route.abort());
+
+  for (const path of ["/", "/en"]) {
+    const response = await page.goto(path, { waitUntil: "domcontentloaded" });
+    expect(response?.status(), `${path} homepage status`).toBe(200);
+    const titleLines = page.locator(".redesign-home-hero h1 > span.masked-heading");
+    await expect(titleLines).toHaveCount(2);
+
+    const earlyPaint = await titleLines.evaluateAll((elements) => elements.map((element) => {
+      const measure = element.querySelector<HTMLElement>(".masked-heading__measure");
+      return {
+        fallbackEnabled: element.hasAttribute("data-initial-fallback"),
+        textureReady: element.hasAttribute("data-mask-ready"),
+        measureColor: measure ? getComputedStyle(measure).color : null,
+      };
+    }));
+
+    expect(earlyPaint.every((item) =>
+      !item.fallbackEnabled && !item.textureReady && item.measureColor === "rgba(0, 0, 0, 0)"
+    ), `${path} has no visible black fallback before its title texture loads`).toBe(true);
+  }
+});
+
 test("homepage polish stays readable, responsive, and interactive without external services", async ({ page }) => {
   test.setTimeout(90_000);
 

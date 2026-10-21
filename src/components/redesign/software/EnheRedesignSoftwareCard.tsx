@@ -32,19 +32,11 @@ export function EnheRedesignSoftwareCard({
   const t = getDictionary(locale).toolCard;
   const summary = buildValueSentence(product.description, locale);
   const metrics = getVisibleToolMetrics(product);
+  const hasSafetyReview = Boolean(product.securityReviewedAt);
   const CardElement = listItem ? "div" : "article";
   const catalogImageSrc = product.media?.src.startsWith("/api/tool-images?")
     ? `${product.media.src}&mode=optimizer-source`
     : product.media?.src;
-  const reviewDate = product.securityReviewedAt
-    ? new Intl.DateTimeFormat(locale === "en" ? "en-US" : "zh-CN", {
-        year: "numeric",
-        month: "2-digit",
-        day: "2-digit",
-        timeZone: "Asia/Shanghai",
-      }).format(new Date(product.securityReviewedAt))
-    : null;
-
   return (
     <Card
       asChild
@@ -83,7 +75,7 @@ export function EnheRedesignSoftwareCard({
               </div>
             ) : null}
           </div>
-          <div className={`redesign-software-card-body${reviewDate ? " has-trust" : ""}`}>
+          <div className={`redesign-software-card-body${hasSafetyReview ? " has-trust" : ""}`}>
             <div className="redesign-software-card-badges">
               <p className="redesign-software-card-category">{categoryLabel}</p>
               <span
@@ -105,12 +97,11 @@ export function EnheRedesignSoftwareCard({
               ))}
             </ul>
             <p className="redesign-software-card-audience"><UserRound size={14} aria-hidden="true" />{t.audienceLabel}: {categoryLabel}</p>
-            {reviewDate ? (
+            {hasSafetyReview ? (
               <div className="redesign-software-card-trust" data-trust-safety>
                 <ShieldCheck size={18} aria-hidden="true" />
                 <span>
                   <strong>{locale === "en" ? "Manual safety review" : "安全审核已完成"}</strong>
-                  <small>{locale === "en" ? `Confirmed by ENHE AI admin · ${reviewDate}` : `ENHE AI 管理员人工确认 · ${reviewDate}`}</small>
                 </span>
               </div>
             ) : null}

@@ -61,4 +61,23 @@ describe("tool detail layout source", () => {
     expect(styles).toContain("grid-template-columns: minmax(0, 1fr) minmax(280px, 1fr);");
     expect(styles).toContain(".tool-detail-payment-method-control");
   });
+
+  it("places the refund guarantee beside trust details and the changelog immediately above FAQs", () => {
+    const source = readFileSync(resolve(root, "src/app/tools/[slug]/page-shell.tsx"), "utf8");
+    const changelogStart = source.indexOf('id="tool-changelog"');
+    const changelogEnd = source.indexOf("</section>", changelogStart);
+    const faqStart = source.indexOf('id="tool-faq"');
+    const faqSectionStart = source.lastIndexOf("<section", faqStart);
+    const betweenCards = source.slice(changelogEnd, faqSectionStart);
+
+    expect(source).toContain('forceLocale === "en" ? "Refund guarantee" : "退款保障"');
+    expect(source.indexOf("product-refund-policy-card")).toBeLessThan(source.indexOf("tool-detail-offer-creator-grid"));
+    expect(source.indexOf("product-refund-policy-card")).toBeLessThan(source.indexOf("tool-detail-payment-method-control"));
+    expect(changelogStart).toBeGreaterThan(-1);
+    expect(changelogEnd).toBeGreaterThan(changelogStart);
+    expect(faqStart).toBeGreaterThan(changelogEnd);
+    expect(betweenCards).not.toContain("<section");
+    expect(source.slice(changelogStart, changelogEnd)).toContain("tool-detail-changelog-card");
+    expect(source.slice(changelogStart, changelogEnd)).toContain("w-full");
+  });
 });

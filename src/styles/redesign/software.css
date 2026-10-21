@@ -199,7 +199,7 @@
   box-sizing: border-box;
   display: flex;
   flex-direction: column;
-  height: 658px;
+  height: 600px;
   min-height: 0;
   align-self: start;
   padding: 0;
@@ -232,7 +232,7 @@
 .redesign-software-card-frame {
   position: relative;
   aspect-ratio: 16 / 9;
-  max-height: 240px;
+  max-height: 220px;
   flex: 0 0 auto;
   background: #fff;
 }
@@ -269,15 +269,15 @@
 
 .redesign-software-card-body {
   display: grid;
-  grid-template-rows: 40px 72px 60px 60px 28px minmax(20px, 1fr);
-  gap: 3px;
+  grid-template-rows: 36px 72px 54px 54px 24px minmax(16px, 1fr);
+  gap: 2px;
   flex: 1;
   min-height: auto;
-  padding: 12px;
+  padding: 10px 12px;
 }
 
 .redesign-software-card-body.has-trust {
-  grid-template-rows: 40px 72px 60px 60px 28px auto minmax(16px, 1fr);
+  grid-template-rows: 36px 72px 54px 54px 24px auto minmax(12px, 1fr);
 }
 
 .redesign-software-card-category,
@@ -657,12 +657,6 @@
   line-height: 1.2;
 }
 
-.redesign-software-card-trust small {
-  color: var(--enhe-text-muted);
-  font-size: 11px;
-  line-height: 1.2;
-}
-
 .tool-detail-offer-creator-grid {
   display: grid;
   gap: 24px;
@@ -732,7 +726,7 @@
   display: flex;
   align-items: flex-start;
   gap: 10px;
-  margin-top: 12px;
+  margin-top: 0;
   padding: 12px;
   border: 1px solid color-mix(in srgb, #00a875 22%, var(--enhe-border));
   border-radius: 12px;
@@ -980,6 +974,10 @@
 @media (min-width: 1100px) {
   .tool-detail-facts-grid {
     grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+
+  .tool-detail-facts-grid.has-refund {
+    grid-template-columns: repeat(5, minmax(0, 1fr));
   }
 }
 

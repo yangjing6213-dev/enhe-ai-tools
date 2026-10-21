@@ -309,6 +309,7 @@ for (const locale of locales) {
         const style = getComputedStyle(card);
         const frame = card.querySelector(".redesign-software-card-frame")!.getBoundingClientRect();
         const action = card.querySelector(".redesign-software-card-link")!.getBoundingClientRect();
+        const engagement = card.querySelector(".card-like-action")!.getBoundingClientRect();
         const body = card.querySelector(".redesign-software-card-body")!;
         return {
           section: card.getAttribute("data-section"),
@@ -326,7 +327,9 @@ for (const locale of locales) {
           topGap: frame.top - bounds.top - parseFloat(style.borderTopWidth),
           radius: style.borderRadius,
           height: bounds.height,
+          engagementTop: engagement.top - bounds.top,
           actionFits: action.bottom <= bounds.bottom && action.right <= bounds.right && action.left >= bounds.left,
+          engagementFits: engagement.bottom <= bounds.bottom && engagement.left >= bounds.left && engagement.right <= bounds.right,
           bodyFits: body.scrollHeight <= body.clientHeight + 1,
         };
       }));
@@ -334,9 +337,11 @@ for (const locale of locales) {
       for (const card of layout) {
         expect(card.topGap, `${width}px cover flush`).toBeLessThanOrEqual(1);
         expect(card.radius).toBe("0px");
-        expect(card.height).toBeLessThan(751);
+        expect(card.height).toBe(600);
         expect(card.height).toBeGreaterThan(300);
+        expect(card.engagementTop, `${width}px engagement row moved up with the compact card`).toBeLessThan(570);
         expect(card.actionFits, `${width}px action: ${JSON.stringify(card)}`).toBe(true);
+        expect(card.engagementFits, `${width}px engagement: ${JSON.stringify(card)}`).toBe(true);
         expect(card.bodyFits, `${width}px content: ${JSON.stringify(card)}`).toBe(true);
       }
       for (const section of new Set(layout.map((card) => card.section))) {

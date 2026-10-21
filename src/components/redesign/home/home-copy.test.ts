@@ -9,6 +9,8 @@ const heroSource = readFileSync(
   "utf8",
 );
 const heroStyles = readFileSync(join(process.cwd(), "src/styles/redesign/home.css"), "utf8");
+const footerStyles = readFileSync(join(process.cwd(), "src/styles/redesign/site-refresh.css"), "utf8");
+const footerValueHeading = footerStyles.match(/\.redesign-footer \.redesign-home-brand-value-inner h2\s*\{([^}]*)\}/)?.[1] ?? "";
 
 describe("homepage approved copy", () => {
   it("keeps the exact bilingual hero and value contract", () => {
@@ -52,8 +54,18 @@ describe("homepage approved copy", () => {
     expect(heroSource).not.toMatch(/prisma|database|fetch\(|\/api\//i);
   });
 
-  it("does not paint the oversized English fallback text before the title mask is ready", () => {
-    expect(heroSource).toContain("initialFallback={locale === \"zh\"}");
+  it("does not paint a black fallback headline for either locale", () => {
+    expect(heroSource).toContain("initialFallback={false}");
+    expect(heroSource).not.toContain("initialFallback={locale === \"zh\"}");
     expect(heroStyles).toMatch(/\.redesign-home-hero\[data-locale=\"en\"\] \.redesign-home-animated-line\s*\{[^}]*font-size:\s*clamp\(20px,\s*6\.5vw,\s*56px\)/);
+  });
+
+  it("matches the homepage title type treatment in the footer without changing size or adding motion", () => {
+    expect(valueSource).toContain('className="redesign-bold-copy"');
+    expect(footerValueHeading).toMatch(/font-family:\s*\"Microsoft YaHei\",\s*Arial,\s*sans-serif;/);
+    expect(footerValueHeading).toMatch(/font-weight:\s*800;/);
+    expect(footerValueHeading).toMatch(/letter-spacing:\s*-0\.03em;/);
+    expect(footerValueHeading).toContain("font-size: clamp(2.25rem, 3.2vw, 3rem);");
+    expect(footerValueHeading).not.toMatch(/animation\s*:/i);
   });
 });

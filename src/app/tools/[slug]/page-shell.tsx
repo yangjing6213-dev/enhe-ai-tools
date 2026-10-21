@@ -823,7 +823,7 @@ export async function ToolDetailPageShell({
                   {localizedSummary}
                 </p>
 
-                <div className="tool-detail-facts-grid mt-6">
+                <div className={`tool-detail-facts-grid mt-6${tool.type === "software" && shouldShowPurchaseForm ? " has-refund" : ""}`}>
                   {isAccountService ? (
                     <>
                       <Info
@@ -872,6 +872,20 @@ export async function ToolDetailPageShell({
                           <p className="product-safety-info-note">
                             {forceLocale === "en" ? "Please verify the source and system requirements before installing." : "安装前请核对来源和系统要求。"}
                           </p>
+                        </div>
+                      ) : null}
+                      {tool.type === "software" && shouldShowPurchaseForm ? (
+                        <div className="product-refund-policy-card" data-refund-guarantee>
+                          <RotateCcw size={19} aria-hidden="true" />
+                          <div>
+                            <strong>{forceLocale === "en" ? "Refund guarantee" : "退款保障"}</strong>
+                            <p>{forceLocale === "en"
+                              ? "Refund requests are handled under the published rules. Activated, downloaded, or used digital services are generally not eligible for no-reason refunds."
+                              : "符合退款条件时可提交申请；已开通、下载或使用的数字服务通常不支持无理由退款。"}</p>
+                            <Link href={forceLocale === "en" ? "/en/legal/membership-refund" : "/legal/membership-refund"}>
+                              {forceLocale === "en" ? "Read the refund rules" : "查看完整退款规则"}
+                            </Link>
+                          </div>
                         </div>
                       ) : null}
                       {tool.supportedAgents.length ? (
@@ -1013,18 +1027,6 @@ export async function ToolDetailPageShell({
                             <option value="alipay">{td.alipay}</option>
                             <option value="wechat">{td.wechat}</option>
                           </select>
-                          <div className="product-refund-policy-card">
-                            <RotateCcw size={19} aria-hidden="true" />
-                            <div>
-                              <strong>{forceLocale === "en" ? "Refund policy" : "退款规则说明"}</strong>
-                              <p>{forceLocale === "en"
-                                ? "Refund requests are handled under the published rules. Activated, downloaded, or used digital services are generally not eligible for no-reason refunds."
-                                : "符合退款条件时可提交申请；已开通、下载或使用的数字服务通常不支持无理由退款。"}</p>
-                              <Link href={forceLocale === "en" ? "/en/legal/membership-refund" : "/legal/membership-refund"}>
-                                {forceLocale === "en" ? "Read the refund rules" : "查看完整退款规则"}
-                              </Link>
-                            </div>
-                          </div>
                           <p
                             id={paymentMethodHelpId}
                             className="tool-detail-payment-help mt-2 text-xs leading-5 text-[#8F9DB2]"
@@ -1151,55 +1153,6 @@ export async function ToolDetailPageShell({
               </div>
               </div>
 
-              <div
-                id="tool-changelog"
-                className="scroll-mt-24 rounded-2xl border border-[rgba(210,230,255,0.14)] bg-[rgba(238,246,255,0.06)] p-5"
-              >
-                <div className="flex items-center justify-between gap-4">
-                  <h2 className="text-xl font-semibold text-[#F6FAFF]">
-                    {td.changelogTitle}
-                  </h2>
-                  <span className="rounded-full border border-white/10 px-3 py-1 text-xs text-[#8F9DB2]">
-                    {td.changelogCount.replace(
-                      "{count}",
-                      String(visibleChangelogs.length),
-                    )}
-                  </span>
-                </div>
-                <div className="mt-4 grid gap-3">
-                  {visibleChangelogs.length ? (
-                    visibleChangelogs.slice(0, 3).map((item) => (
-                      <div
-                        key={item.id}
-                        className="rounded-2xl border border-white/10 bg-white/8 p-4"
-                      >
-                        <div className="flex flex-wrap items-center gap-2">
-                          <p className="text-sm font-semibold text-[var(--marketing-accent)]">
-                            {item.version}
-                          </p>
-                          {item.releaseDate ? (
-                            <p className="text-xs text-[#8F9DB2]">
-                              {item.releaseDate.toLocaleDateString(
-                                forceLocale === "en" ? "en-US" : "zh-CN",
-                              )}
-                            </p>
-                          ) : null}
-                        </div>
-                        <h3 className="mt-2 font-semibold text-[#F6FAFF]">
-                          {item.title}
-                        </h3>
-                        <p className="enhe-authored-text mt-2 whitespace-pre-wrap break-words text-sm leading-6 text-[#8F9DB2]">
-                          {item.content}
-                        </p>
-                      </div>
-                    ))
-                  ) : (
-                    <p className="rounded-2xl border border-white/10 bg-white/8 p-4 text-sm leading-6 text-[#8F9DB2]">
-                      {publicChangelogFallback}
-                    </p>
-                  )}
-                </div>
-              </div>
             </div>
           </div>
         </section>
@@ -1518,6 +1471,56 @@ export async function ToolDetailPageShell({
             </div>
           </details>
           ) : null}
+
+          <section
+            id="tool-changelog"
+            className="tool-detail-changelog-card glass w-full scroll-mt-24 rounded-2xl p-7"
+          >
+            <div className="flex items-center justify-between gap-4">
+              <h2 className="text-xl font-semibold text-[#F6FAFF]">
+                {td.changelogTitle}
+              </h2>
+              <span className="rounded-full border border-white/10 px-3 py-1 text-xs text-[#8F9DB2]">
+                {td.changelogCount.replace(
+                  "{count}",
+                  String(visibleChangelogs.length),
+                )}
+              </span>
+            </div>
+            <div className="mt-4 grid gap-3">
+              {visibleChangelogs.length ? (
+                visibleChangelogs.slice(0, 3).map((item) => (
+                  <div
+                    key={item.id}
+                    className="rounded-2xl border border-white/10 bg-white/8 p-4"
+                  >
+                    <div className="flex flex-wrap items-center gap-2">
+                      <p className="text-sm font-semibold text-[var(--marketing-accent)]">
+                        {item.version}
+                      </p>
+                      {item.releaseDate ? (
+                        <p className="text-xs text-[#8F9DB2]">
+                          {item.releaseDate.toLocaleDateString(
+                            forceLocale === "en" ? "en-US" : "zh-CN",
+                          )}
+                        </p>
+                      ) : null}
+                    </div>
+                    <h3 className="mt-2 font-semibold text-[#F6FAFF]">
+                      {item.title}
+                    </h3>
+                    <p className="enhe-authored-text mt-2 whitespace-pre-wrap break-words text-sm leading-6 text-[#8F9DB2]">
+                      {item.content}
+                    </p>
+                  </div>
+                ))
+              ) : (
+                <p className="rounded-2xl border border-white/10 bg-white/8 p-4 text-sm leading-6 text-[#8F9DB2]">
+                  {publicChangelogFallback}
+                </p>
+              )}
+            </div>
+          </section>
 
           <section
             id="tool-faq"
