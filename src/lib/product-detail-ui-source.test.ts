@@ -22,7 +22,7 @@ describe("product detail UI source", () => {
     expect(pageSource).not.toContain(
       'id="tool-faq"\n            className="tool-detail-mobile-disclosure glass scroll-mt-24 rounded-2xl p-7"',
     );
-    expect(pageSource.indexOf('id="tool-faq"')).toBeLessThan(
+    expect(pageSource.indexOf("{!isAiWorkflow ? faqSection : null}")).toBeLessThan(
       pageSource.indexOf("td.commentsTitle"),
     );
   });
