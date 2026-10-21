@@ -294,6 +294,7 @@ describe("SEO audit runtime heartbeat identity", () => {
       expect(engineEnvironment[secretName]).toBeUndefined();
     }
     await stopChild(child);
-  });
+    // Allow the engine's 10-second startup window plus process cleanup on Windows.
+  }, 15_000);
 
 });
