@@ -7,8 +7,7 @@ for (const width of [320, 768, 1366, 1920]) {
     for (const path of ["/", "/en"]) {
       await page.goto(path);
       const breadcrumb = page.getByRole("navigation", { name: path === "/en" ? "Breadcrumb" : "面包屑导航" });
-      await expect(breadcrumb).toBeVisible();
-      await expect(breadcrumb.getByText(path === "/en" ? "Home" : "首页")).toBeVisible();
+      await expect(breadcrumb).toHaveCount(0);
       await expect(page.locator(".site-back-nav")).toHaveCount(0);
       const toggle = page.locator('.redesign-header .enhe-language-toggle:visible');
       await expect(toggle.getByRole("switch")).toHaveAttribute("aria-checked", path === "/en" ? "true" : "false");

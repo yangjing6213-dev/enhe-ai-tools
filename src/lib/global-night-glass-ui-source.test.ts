@@ -32,7 +32,7 @@ describe("global blue and white UI source contract", () => {
     expect(css).toContain(".dark .site-brand-logo-dark");
     expect(css).toContain("color-scheme: light");
     expect(css).toContain("color-scheme: dark");
-    expect(css).toContain("html:not(.dark) body");
+    expect(css).toContain(":where(html:not(.dark)) body");
   });
 
   it("updates shared public components away from the old cyan primary language", () => {

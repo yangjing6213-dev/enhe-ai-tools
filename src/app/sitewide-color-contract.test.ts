@@ -17,8 +17,8 @@ describe("sitewide color mode contract", () => {
     expect(darkTokens).toContain("--background: #0b1220;");
     expect(darkTokens).toContain("--foreground: #f6faff;");
     expect(css).toContain("/* Preserve the established light appearance without overriding dark mode. */");
-    expect(css).toContain("html:not(.dark) body");
-    expect(css).toContain("html:not(.dark) body :is(");
+    expect(css).toContain(":where(html:not(.dark)) body");
+    expect(css).toContain(":where(html:not(.dark)) body :is(");
     expect(css).not.toContain("\nbody {\n  background: #ffffff !important;");
     expect(css).toContain('[class*="Card"]');
     expect(css).toContain('[class*="text-white"]');

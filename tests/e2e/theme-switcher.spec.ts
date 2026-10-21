@@ -7,6 +7,7 @@ test("follows the system by default and remembers a chosen theme", async ({ page
   const response = await page.goto("/", { waitUntil: "load" });
   expect(response?.status()).toBe(200);
   await expect(page.locator("html")).toHaveClass(/dark/);
+  await expect(page.locator("body")).toHaveCSS("background-color", "rgb(11, 18, 32)");
 
   const trigger = page.getByRole("button", { name: "Change theme" });
   await expect(trigger).toBeVisible();
@@ -24,4 +25,7 @@ test("follows the system by default and remembers a chosen theme", async ({ page
 
   await page.reload({ waitUntil: "load" });
   await expect(page.locator("html")).not.toHaveClass(/dark/);
+  await expect(page.locator("body")).toHaveCSS("background-color", "rgb(255, 255, 255)");
+  await expect(page.locator(".redesign-footer")).toHaveCSS("background-color", "rgb(13, 58, 109)");
+  await expect(page.locator(".redesign-footer h3").first()).toHaveCSS("color", "rgb(255, 255, 255)");
 });

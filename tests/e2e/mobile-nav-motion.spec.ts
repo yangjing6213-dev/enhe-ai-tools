@@ -624,24 +624,22 @@ test("mixed keyboard and pointer interruptions preserve the rendered drawer posi
     return {
       after: new DOMMatrixReadOnly(getComputedStyle(element).transform).m41,
       atEvent: captureWindow.__enheEscapeTranslateX,
+      // Capture the animation with its position before the 100ms close removes the drawer.
+      animations: element.getAnimations()
+        .filter((animation) => animation.playState === "running")
+        .map((animation) => ({
+          duration: Number(animation.effect?.getTiming().duration ?? 0),
+          keyframes: animation.effect instanceof KeyframeEffect
+            ? animation.effect.getKeyframes()
+            : [],
+        })),
     };
   });
   expect(escapeHandoff.atEvent).toBeDefined();
   expect(
     Math.abs(escapeHandoff.after - (escapeHandoff.atEvent ?? Number.NaN)),
   ).toBeLessThanOrEqual(1);
-  const keyboardCloseAnimations = await drawer.evaluate((element) =>
-    element
-      .getAnimations()
-      .filter((animation) => animation.playState === "running")
-      .map((animation) => ({
-        duration: Number(animation.effect?.getTiming().duration ?? 0),
-        keyframes:
-          animation.effect instanceof KeyframeEffect
-            ? animation.effect.getKeyframes()
-            : [],
-      })),
-  );
+  const keyboardCloseAnimations = escapeHandoff.animations;
   expect(keyboardCloseAnimations).toHaveLength(1);
   expect(keyboardCloseAnimations[0]?.duration).toBe(100);
   expect(keyboardCloseAnimations[0]?.keyframes.some((frame) => frame.transform)).toBe(false);

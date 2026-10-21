@@ -98,11 +98,9 @@ test("site pages keep white surfaces and black neutral text, including interacti
 
   const newsResponse = await page.goto("/ai-news", { waitUntil: "load" });
   expect(newsResponse?.status()).toBe(200);
-  const newsColors = await page.locator("main.ai-news-page").evaluate((main) => ({
-    background: getComputedStyle(main).backgroundColor,
-    color: getComputedStyle(main).color,
-  }));
-  expect(newsColors).toEqual({ background: "rgb(255, 255, 255)", color: "rgb(0, 0, 0)" });
+  const newsPage = page.locator("main.ai-news-page");
+  await expect(newsPage).toHaveCSS("background-color", "rgb(255, 255, 255)");
+  await expect(newsPage).toHaveCSS("color", "rgb(0, 0, 0)");
 
   const useProductionServer = process.env.PLAYWRIGHT_USE_PRODUCTION_SERVER === "1";
   const softwareResponse = await page.goto(

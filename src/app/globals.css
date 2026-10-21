@@ -5783,24 +5783,25 @@ select option:disabled {
 }
 
 /* Preserve the established light appearance without overriding dark mode. */
-html:not(.dark) body {
+/* The theme condition must not outrank existing component color exceptions. */
+:where(html:not(.dark)) body {
   background: #ffffff !important;
   color: #000000 !important;
 }
 
-html:not(.dark) .enhe-redesign-production,
-html:not(.dark) .enhe-admin-shell,
-html:not(.dark) .enhe-account-shell,
-html:not(.dark) .enhe-auth-page,
-html:not(.dark) .user-center-page,
-html:not(.dark) .enhe-editorial-page,
-html:not(.dark) .public-search-page {
+:where(html:not(.dark)) .enhe-redesign-production,
+:where(html:not(.dark)) .enhe-admin-shell,
+:where(html:not(.dark)) .enhe-account-shell,
+:where(html:not(.dark)) .enhe-auth-page,
+:where(html:not(.dark)) .user-center-page,
+:where(html:not(.dark)) .enhe-editorial-page,
+:where(html:not(.dark)) .public-search-page {
   background-color: #ffffff !important;
   background-image: none !important;
   color: #000000 !important;
 }
 
-html:not(.dark) body :is(
+:where(html:not(.dark)) body :is(
   main,
   section,
   article,
@@ -5836,25 +5837,25 @@ html:not(.dark) body :is(
   .filter-surface,
   .admin-shell-card
 ),
-  html:not(.dark) body :is([role="dialog"], [role="menu"], [role="listbox"]) {
+  :where(html:not(.dark)) body :is([role="dialog"], [role="menu"], [role="listbox"]) {
   border-color: var(--border) !important;
   background-color: #ffffff !important;
   background-image: none !important;
 }
 
-html:not(.dark) body [class*="border-white/"] {
+:where(html:not(.dark)) body [class*="border-white/"] {
   border-color: var(--border) !important;
 }
 
-html:not(.dark) .enhe-redesign-production :is(main, section, article, [class*="card"], [class*="panel"], [class*="surface"], .glass, .evidence-card, .dossier-card, .filter-surface, .admin-shell-card),
-html:not(.dark) .enhe-admin-shell :is(article, [class*="card"], [class*="panel"], [class*="surface"], .glass, .evidence-card, .dossier-card, .filter-surface, .admin-shell-card, table),
-html:not(.dark) .enhe-account-shell :is(main, section, article, [class*="card"], [class*="panel"], [class*="surface"], .glass, .evidence-card, .dossier-card, .filter-surface, .admin-shell-card),
-html:not(.dark) :is(.glass, .evidence-card, .dossier-card, .surface-panel, .surface-panel-soft, .filter-surface, .admin-shell-card) {
+:where(html:not(.dark)) .enhe-redesign-production :is(main, section, article, [class*="card"], [class*="panel"], [class*="surface"], .glass, .evidence-card, .dossier-card, .filter-surface, .admin-shell-card),
+:where(html:not(.dark)) .enhe-admin-shell :is(article, [class*="card"], [class*="panel"], [class*="surface"], .glass, .evidence-card, .dossier-card, .filter-surface, .admin-shell-card, table),
+:where(html:not(.dark)) .enhe-account-shell :is(main, section, article, [class*="card"], [class*="panel"], [class*="surface"], .glass, .evidence-card, .dossier-card, .filter-surface, .admin-shell-card),
+:where(html:not(.dark)) :is(.glass, .evidence-card, .dossier-card, .surface-panel, .surface-panel-soft, .filter-surface, .admin-shell-card) {
   background: #ffffff !important;
   background-image: none !important;
 }
 
-html:not(.dark) body :is(
+:where(html:not(.dark)) body :is(
   [class*="text-white"],
   [class*="text-gray-"],
   [class*="text-slate-"],
@@ -5890,12 +5891,12 @@ html:not(.dark) body :is(
   -webkit-text-fill-color: #000000 !important;
 }
 
-html:not(.dark) body [class*="bg-white/"] {
+:where(html:not(.dark)) body [class*="bg-white/"] {
   background-color: #ffffff !important;
   background-image: none !important;
 }
 
-html:not(.dark) body :is(
+:where(html:not(.dark)) body :is(
   [class*="bg-[#030A14]"],
   [class*="bg-[#050505]"],
   [class*="bg-[#05070B]"],
@@ -5913,7 +5914,7 @@ html:not(.dark) body :is(
   color: #000000 !important;
 }
 
-html:not(.dark) body :is(
+:where(html:not(.dark)) body :is(
   [class*="bg-gray-"],
   [class*="bg-slate-"],
   [class*="bg-zinc-"],
@@ -5925,43 +5926,43 @@ html:not(.dark) body :is(
 }
 
 /* Older account/order layouts share the same public brand colors. */
-html:not(.dark) body .site-footer,
-html:not(.dark) body .site-footer :is(nav, address, .site-footer-disclosure, .site-footer-social-link) {
+:where(html:not(.dark)) body .site-footer,
+:where(html:not(.dark)) body .site-footer :is(nav, address, .site-footer-disclosure, .site-footer-social-link) {
   background-color: #0D3A6D !important;
   color: #fff;
 }
 
-html:not(.dark) body .site-footer :is(a, p, span, dt, dd, summary, svg) {
+:where(html:not(.dark)) body .site-footer :is(a, p, span, dt, dd, summary, svg) {
   color: #fff !important;
 }
 
-html:not(.dark) body .site-footer :is(a:hover, summary:hover) {
+:where(html:not(.dark)) body .site-footer :is(a:hover, summary:hover) {
   background-color: transparent !important;
 }
 
-html:not(.dark) body .site-footer .site-footer-logo {
+:where(html:not(.dark)) body .site-footer .site-footer-logo {
   filter: brightness(0) invert(1);
 }
 
-html:not(.dark) body .site-footer :is(.site-footer-bottom, .site-footer-filings) {
+:where(html:not(.dark)) body .site-footer :is(.site-footer-bottom, .site-footer-filings) {
   justify-content: center;
   text-align: center;
 }
 
-html:not(.dark) body .site-footer a:focus-visible,
-html:not(.dark) body .site-footer summary:focus-visible {
+:where(html:not(.dark)) body .site-footer a:focus-visible,
+:where(html:not(.dark)) body .site-footer summary:focus-visible {
   outline-color: #fff;
 }
 
-html:not(.dark) body :is(.site-user-chip, .site-login-link, .site-language-switcher),
-html:not(.dark) body .site-language-switcher a,
-html:not(.dark) body .site-language-switcher a.is-active {
+:where(html:not(.dark)) body :is(.site-user-chip, .site-login-link, .site-language-switcher),
+:where(html:not(.dark)) body .site-language-switcher a,
+:where(html:not(.dark)) body .site-language-switcher a.is-active {
   border: 0 !important;
   background: var(--brand-blue) !important;
   color: #fff !important;
 }
 
-html:not(.dark) body .site-user-chip.site-user-chip {
+:where(html:not(.dark)) body .site-user-chip.site-user-chip {
   background: transparent !important;
   color: var(--enhe-text, #000) !important;
   -webkit-text-fill-color: currentColor !important;

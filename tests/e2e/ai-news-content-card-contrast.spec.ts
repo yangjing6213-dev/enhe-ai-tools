@@ -94,7 +94,11 @@ for (const route of ["/ai-news", "/en/ai-news"] as const) {
         .not.toBe("none");
       await action.hover();
       await expect
-        .poll(() => action.evaluate((element) => getComputedStyle(element).transform))
+        .poll(async () => {
+          // Smooth scrolling can move this fixture after the first pointer move.
+          await action.hover();
+          return action.evaluate((element) => getComputedStyle(element).transform);
+        })
         .not.toBe("none");
 
       await page.emulateMedia({ reducedMotion: "reduce" });
