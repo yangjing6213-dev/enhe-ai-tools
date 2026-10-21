@@ -1,4 +1,5 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+import { Prisma } from "@prisma/client";
 import { hashAiWorkflowLeaseToken } from "@/lib/ai-workflows/worker";
 import { POST } from "./route";
 
@@ -193,6 +194,26 @@ describe("POST /api/internal/ai-workflows/worker/[batchId]/result", () => {
     const publication = mocks.candidatesCreate.mock.calls[0]?.[0].data.validationReport.publication;
     expect(publication).toMatchObject({ mode: "repository_link", enheDownloadPackageAvailable: false });
     expect(publication).not.toHaveProperty("sourceCodeExecuted");
+  });
+
+  it("returns a safe database error code for failed repository-link writes", async () => {
+    mocks.transaction.mockRejectedValue(new Prisma.PrismaClientKnownRequestError("details must not be returned", {
+      code: "P2003",
+      clientVersion: "test",
+    }));
+    const errorLog = vi.spyOn(console, "error").mockImplementation(() => undefined);
+
+    const response = await POST(request({ workerId: "runner-1", leaseToken, result: repositoryLinkResult() }), context);
+
+    expect(response.status).toBe(500);
+    expect(await response.json()).toMatchObject({ ok: false, code: "DATABASE_P2003" });
+    expect(errorLog).toHaveBeenCalledWith("[ai-workflow-link-intake] registration failed", {
+      batchId: "batch-1",
+      errorType: "PrismaClientKnownRequestError",
+      prismaCode: "P2003",
+    });
+    expect(errorLog.mock.calls.flat().join(" ")).not.toContain("details must not be returned");
+    errorLog.mockRestore();
   });
 
   it("upgrades an existing link listing into a package awaiting price review without creating a duplicate", async () => {

@@ -223,7 +223,16 @@ export async function POST(
       if (error instanceof Prisma.PrismaClientKnownRequestError && error.code === "P2002") {
         return workerJsonResponse({ ok: false, code: "REPOSITORY_ALREADY_REGISTERED" }, 409);
       }
-      throw error;
+      if (error instanceof Prisma.PrismaClientKnownRequestError) {
+        console.error("[ai-workflow-link-intake] registration failed", { batchId, errorType: error.name, prismaCode: error.code });
+        return workerJsonResponse({ ok: false, code: `DATABASE_${error.code}` }, 500);
+      }
+      if (error instanceof Prisma.PrismaClientValidationError) {
+        console.error("[ai-workflow-link-intake] registration failed", { batchId, errorType: error.name });
+        return workerJsonResponse({ ok: false, code: "DATABASE_VALIDATION_ERROR" }, 500);
+      }
+      console.error("[ai-workflow-link-intake] registration failed", { batchId, errorType: error instanceof Error ? error.name : typeof error });
+      return workerJsonResponse({ ok: false, code: "LINK_REGISTRATION_FAILED" }, 500);
     }
   }
 
