@@ -46,6 +46,7 @@ deploy/enhe-ai-tools/forum-media
 !src/app/api/uploads/**
 secrets
 **/secrets
+deploy/enhe-ai-tools/.worker-credential-rotations
 tmp
 temp
 *.tmp

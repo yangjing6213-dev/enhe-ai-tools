@@ -217,6 +217,8 @@ describe("isolated launch deployment contract", () => {
     expect(patterns).toContain("**/.env.*");
     expect(patterns).toContain("!.env.example");
     expect(patterns).toContain("!**/.env.example");
+    expect(patterns).toContain("deploy/enhe-ai-tools/.worker-credential-rotations");
+    expect(read(".gitignore").split(/\r?\n/)).toContain("/deploy/enhe-ai-tools/.worker-credential-rotations/");
   });
 
   it("validates launch configuration inside the app image and waits for the full runtime", () => {

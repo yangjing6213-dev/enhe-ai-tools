@@ -16,6 +16,7 @@ coverage
 /deploy/enhe-ai-tools/runtime/
 /deploy/enhe-ai-tools/uploads/
 /deploy/enhe-ai-tools/secrets/
+/deploy/enhe-ai-tools/.worker-credential-rotations/
 public/uploads
 /private-uploads
 /deploy/enhe-ai-tools/forum-media/
