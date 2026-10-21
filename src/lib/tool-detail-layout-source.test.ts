@@ -66,9 +66,8 @@ describe("tool detail layout source", () => {
     const source = readFileSync(resolve(root, "src/app/tools/[slug]/page-shell.tsx"), "utf8");
     const changelogStart = source.indexOf('id="tool-changelog"');
     const changelogEnd = source.indexOf("</section>", changelogStart);
-    const faqStart = source.indexOf('id="tool-faq"');
-    const faqSectionStart = source.lastIndexOf("<section", faqStart);
-    const betweenCards = source.slice(changelogEnd, faqSectionStart);
+    const faqStart = source.indexOf("{!isAiWorkflow ? faqSection : null}");
+    const betweenCards = source.slice(changelogEnd, faqStart);
 
     expect(source).toContain('forceLocale === "en" ? "Refund guarantee" : "退款保障"');
     expect(source.indexOf("product-refund-policy-card")).toBeLessThan(source.indexOf("tool-detail-offer-creator-grid"));

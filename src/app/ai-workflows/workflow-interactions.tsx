@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { Heart, Star } from "lucide-react";
+import { Heart } from "lucide-react";
 import type { RedesignLocale } from "@/components/redesign/types";
 import { AI_WORKFLOW_AGENTS, AI_WORKFLOW_RUNTIMES, resolveAiWorkflowRuntime, type AiWorkflowAgent, type AiWorkflowRuntime } from "@/lib/ai-workflows/install";
 
@@ -38,41 +38,6 @@ export function AiWorkflowFavoriteButton({
     {loginRequired ? <Link href={loginHref} className="text-[var(--marketing-accent)] underline">{locale === "en" ? "Sign in to save" : "登录后收藏"}</Link> : <button type="button" onClick={toggle} disabled={busy} aria-label={label} aria-pressed={favorite} className="inline-flex items-center gap-1 rounded-md px-1 py-1 text-[var(--marketing-text)] hover:text-[#d62749] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring disabled:opacity-60"><Heart aria-hidden="true" className={`size-4 ${favorite ? "fill-[#e43355] text-[#e43355]" : ""}`} />{label}</button>}
     <span aria-live="polite" className="text-xs text-[var(--marketing-muted)]">{count}</span>
   </div>;
-}
-
-export function AiWorkflowReviewForm({
-  slug, canReview, locale,
-}: { slug: string; canReview: boolean; locale: RedesignLocale }) {
-  const [rating, setRating] = useState("5");
-  const [content, setContent] = useState("");
-  const [message, setMessage] = useState("");
-  const [busy, setBusy] = useState(false);
-
-  async function submit(event: React.FormEvent<HTMLFormElement>) {
-    event.preventDefault();
-    setBusy(true);
-    setMessage("");
-    try {
-      const response = await fetch(`/api/ai-workflows/${encodeURIComponent(slug)}/review`, {
-        method: "POST", headers: { "Content-Type": "application/json", Accept: "application/json" },
-        body: JSON.stringify({ rating: Number(rating), content }),
-      });
-      const body = await response.json() as { error?: string };
-      if (!response.ok) throw new Error(body.error === "LOGIN_REQUIRED" ? "LOGIN_REQUIRED" : "REVIEW_FAILED");
-      setMessage(locale === "en" ? "Review submitted for moderation." : "评价已提交，审核通过后显示。");
-      setContent("");
-    } catch (error) {
-      const code = error instanceof Error ? error.message : "";
-      setMessage(code === "LOGIN_REQUIRED" ? (locale === "en" ? "Sign in before reviewing." : "请先登录后再评价。") : (locale === "en" ? "Could not submit the review. Check your download or purchase access and try again." : "提交失败。请确认已下载或购买该工作流后重试。"));
-    } finally { setBusy(false); }
-  }
-
-  return <form onSubmit={submit} className="mt-5 grid gap-3 rounded-xl border border-[var(--marketing-border)] bg-white p-4">
-    <label className="grid max-w-40 gap-1 text-sm"><span>{locale === "en" ? "Your rating" : "你的评分"}</span><span className="flex items-center gap-2"><Star aria-hidden="true" className="size-4 text-amber-500" /><select value={rating} onChange={(event) => setRating(event.currentTarget.value)} className="rounded-lg border px-3 py-2" disabled={!canReview || busy}>{[5, 4, 3, 2, 1].map((value) => <option key={value} value={value}>{value} / 5</option>)}</select></span></label>
-    <label className="grid gap-1 text-sm"><span>{locale === "en" ? "Comment (optional)" : "评价内容（选填）"}</span><textarea value={content} onChange={(event) => setContent(event.currentTarget.value)} maxLength={2000} rows={3} className="rounded-lg border px-3 py-2" disabled={!canReview || busy} /></label>
-    <div className="flex flex-wrap items-center gap-3"><button type="submit" disabled={!canReview || busy} className="rounded-lg bg-[var(--marketing-accent)] px-4 py-2 text-sm font-semibold text-white disabled:cursor-not-allowed disabled:opacity-50">{busy ? (locale === "en" ? "Submitting…" : "提交中…") : (locale === "en" ? "Submit review" : "提交评价")}</button>{message ? <p role="status" className="text-sm text-[var(--marketing-muted)]">{message}</p> : null}</div>
-    {!canReview ? <p className="text-xs leading-5 text-[var(--marketing-muted)]">{locale === "en" ? "Sign in and download a free item or purchase a paid item before reviewing." : "登录并下载免费工作流，或购买付费工作流后即可评价。"}</p> : null}
-  </form>;
 }
 
 const installAgentNames: Record<AiWorkflowAgent, { zh: string; en: string }> = {

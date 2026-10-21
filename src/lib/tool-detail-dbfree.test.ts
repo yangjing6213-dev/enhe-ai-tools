@@ -1,6 +1,10 @@
 import { existsSync, readFileSync } from "node:fs";
 import { join } from "node:path";
+import React from "react";
+import { renderToStaticMarkup } from "react-dom/server";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+
+Object.assign(globalThis, { React });
 
 const db = vi.hoisted(() => ({
   toolFindMany: vi.fn(),
@@ -13,6 +17,7 @@ const navigation = vi.hoisted(() => ({
   }),
   permanentRedirect: vi.fn(),
   redirect: vi.fn(),
+  useRouter: vi.fn(() => ({ prefetch: vi.fn() })),
 }));
 
 vi.mock("next/cache", () => ({
@@ -171,5 +176,54 @@ describe("public tool detail DB-free boundary", () => {
     const page = read("app/tools/[slug]/page-shell.tsx");
 
     expect(page).toContain("if (!process.env.DATABASE_URL?.trim()) notFound();");
+  });
+
+  async function renderFixtureDetail(type: "ai_workflow" | "software", locale: "zh" | "en") {
+    vi.stubEnv("DATABASE_URL", "postgresql://configured.invalid/enhe");
+    const tool = {
+      id: "detail-layout-fixture", slug: "detail-layout-fixture", name: "Detail layout fixture", englishName: "Detail layout fixture",
+      type, status: "published", shortDescription: "A workflow fixture for checking detail page layout.",
+      content: "Workflow fixture instructions and use cases.", version: "1.0", systemRequirement: "Browser",
+      isDownloadPaid: false, downloadPrice: 0, downloadCount: 0, viewCount: 0, usageCount: 0,
+      coverImage: null, creator: null, category: null, downloadFile: null, downloadFileId: null,
+      supportedAgents: [], screenshots: [], tagLinks: [], tutorials: [], changelogs: [], comments: [], priceSpecs: [],
+      faqs: [{ id: "fixture-faq", question: "How do I get started?", answer: "Read the workflow guide.", englishQuestion: null, englishAnswer: null }],
+      aiWorkflowCandidate: type === "ai_workflow" ? {
+        status: "link_only_published", repositoryUrl: "https://github.com/example/workflow", repositoryOwner: "example", repositoryName: "workflow",
+        projectType: "workflow", licenseSpdx: "MIT", topic: null, fileId: null, packageVersion: null, packageSize: null,
+        packageSha256: null, commitSha: "1234567890123456789012345678901234567890", githubStars: 1, starsUpdatedAt: new Date("2026-10-21T00:00:00Z"),
+        verifiedEnvironments: [], failureReason: "PACKAGE_LANGUAGE_UNSUPPORTED",
+      } : null,
+    };
+    db.toolFindMany.mockResolvedValueOnce([{ id: tool.id, slug: tool.slug, name: tool.name, englishName: tool.englishName }]);
+    db.toolFindUnique.mockResolvedValueOnce(tool);
+    const { ToolDetailPageShell } = await import("@/app/tools/[slug]/page-shell");
+    return renderToStaticMarkup(await ToolDetailPageShell({ slug: tool.slug, forceLocale: locale, expectedType: type }));
+  }
+
+  it.each(["zh", "en"] as const)("renders simplified workflow details with FAQs last (%s)", async (locale) => {
+    const html = await renderFixtureDetail("ai_workflow", locale);
+    expect(html).toContain(locale === "en" ? "Get workflow" : "获取工作流");
+    expect(html).toContain(locale === "en" ? "AI workflow details" : "AI 工作流详情");
+    expect(html).toContain(locale === "en" ? "Workflow introduction" : "工作流介绍");
+    expect(html).toContain(locale === "en"
+      ? "This workflow comes from a GitHub repository. Review the delivery and verification status below before using it."
+      : "工作流来源于 GitHub仓库；使用前请查看下方的获取方式和核验状态。");
+    expect(html).toContain('href="https://github.com/example/workflow"');
+    expect(html).not.toContain('id="workflow-reviews"');
+    expect(html).not.toContain("固定来源版本");
+    expect(html).not.toContain("Fixed source commit");
+    expect(html).not.toContain("已审核的用户评价");
+    expect(html).not.toContain("Verified user feedback");
+    expect(html).not.toContain("1234567890123456789012345678901234567890");
+    expect(html.indexOf('id="tool-faq"')).toBeGreaterThan(html.indexOf('id="tool-related"'));
+  });
+
+  it("keeps the software introduction and FAQ order on ordinary product details", async () => {
+    const html = await renderFixtureDetail("software", "zh");
+    expect(html).toContain("产品介绍");
+    expect(html).not.toContain("工作流介绍");
+    expect(html.indexOf('id="tool-faq"')).toBeGreaterThan(-1);
+    expect(html.indexOf('id="tool-faq"')).toBeLessThan(html.indexOf('id="tool-related"'));
   });
 });

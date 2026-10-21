@@ -21,7 +21,7 @@ import { ToolCard } from "@/components/tool-card";
 import { ToolRichContent } from "@/components/tool-rich-content";
 import { UserAvatar } from "@/components/user-avatar";
 import { EmojiText } from "@/components/emoji-text";
-import { AiWorkflowFavoriteButton, AiWorkflowInstallPanel, AiWorkflowReviewForm } from "@/app/ai-workflows/workflow-interactions";
+import { AiWorkflowInstallPanel } from "@/app/ai-workflows/workflow-interactions";
 import { AiWorkflowCoverImage } from "@/app/ai-workflows/workflow-cover-image";
 import { AiWorkflowContent } from "@/app/ai-workflows/workflow-content";
 import { getCurrentUser } from "@/lib/auth";
@@ -65,7 +65,7 @@ import {
   shouldIndexEnglishToolPage,
 } from "@/lib/tool-localization";
 import { getPrimaryToolPrice } from "@/lib/tool-price-specs";
-import { canReviewAiWorkflow, normalizeGitHubRepositoryUrl, resolveAiWorkflowDeliveryMode } from "@/lib/ai-workflows/rules";
+import { normalizeGitHubRepositoryUrl, resolveAiWorkflowDeliveryMode } from "@/lib/ai-workflows/rules";
 import {
   canOpenPublicDownloadEntry,
   canOpenProtectedDownloadEntry,
@@ -263,13 +263,6 @@ export async function ToolDetailPageShell({
         orderBy: [{ isPinned: "desc" }, { createdAt: "desc" }],
       },
       aiWorkflowCandidate: { include: { topic: true } },
-      aiWorkflowReviews: {
-        where: { status: "approved" },
-        include: { user: { select: { nickname: true } } },
-        orderBy: { createdAt: "desc" },
-        take: 10,
-      },
-      _count: { select: { aiWorkflowFavorites: true } },
     },
   });
   if (!tool || tool.status !== "published") notFound();
@@ -572,32 +565,6 @@ export async function ToolDetailPageShell({
       } as Record<string, string>)[tool.aiWorkflowCandidate.failureReason] ?? (forceLocale === "en" ? "This item is available as an upstream repository link only." : "该项目目前仅提供原仓库链接。")
       : (forceLocale === "en" ? "No ENHE download package is currently available." : "本站目前没有可下载的软件包。")
     : null;
-  const workflowRating = isAiWorkflow
-    ? await prisma.aiWorkflowReview.aggregate({
-        where: { toolId: tool.id, status: "approved" },
-        _avg: { rating: true },
-        _count: { id: true },
-      })
-    : null;
-  const workflowIsFavorite = user && isAiWorkflow
-    ? Boolean(await prisma.aiWorkflowFavorite.findUnique({
-        where: { userId_toolId: { userId: user.id, toolId: tool.id } },
-        select: { id: true },
-      }))
-    : false;
-  const workflowHasDownloaded = user && isAiWorkflow && !paidAiWorkflow
-    ? Boolean(await prisma.aiWorkflowDownloadEvent.findFirst({
-        where: { userId: user.id, toolId: tool.id },
-        select: { id: true },
-      }))
-    : false;
-  const workflowCanReview = isAiWorkflow && user
-    ? canReviewAiWorkflow({
-        isPaid: paidAiWorkflow,
-        hasActivePurchase: Boolean(workflowVersionPurchase),
-        hasDownloaded: workflowHasDownloaded,
-      })
-    : false;
   const tutorialVideos = visibleTutorials.filter(
     (tutorial) => tutorial.videoUrl,
   );
@@ -621,7 +588,7 @@ export async function ToolDetailPageShell({
   const paymentMethodHelpId = "tool-purchase-payment-method-help";
   const commentHelpId = "tool-comment-help";
   const purchaseButtonLabel = workflowLinkOnly
-    ? forceLocale === "en" ? "Open GitHub repository" : "前往 GitHub 原仓库"
+    ? forceLocale === "en" ? "Get workflow" : "获取工作流"
     : isAccountService
     ? td.buyService
     : paidSkillCourse
@@ -631,7 +598,10 @@ export async function ToolDetailPageShell({
         : servicePrice > 0
           ? td.buyDownload.replace("{price}", Number(servicePrice).toFixed(2))
           : freeDownloadButtonLabel;
-  const introTitle = isAccountService ? td.serviceIntroTitle : td.introTitle;
+  const workflowDetailsTitle = forceLocale === "en" ? "AI workflow details" : "AI 工作流详情";
+  const introTitle = isAiWorkflow
+    ? forceLocale === "en" ? "Workflow introduction" : "工作流介绍"
+    : isAccountService ? td.serviceIntroTitle : td.introTitle;
   const productImagesIntro = isAccountService
     ? td.serviceProductImagesIntro
     : td.productImagesIntro;
@@ -754,10 +724,39 @@ export async function ToolDetailPageShell({
         }
       : rawProductStructuredData;
   // Service schemas can emit hasOfferCatalog, and course schemas can emit CourseInstance when the tool data supports them.
+  const faqSection = (
+    <section
+      id="tool-faq"
+      className="tool-detail-faq-card glass scroll-mt-24 rounded-2xl p-7"
+    >
+      <SectionTitle title={td.faqTitle} />
+      <div className="mt-5 grid gap-3">
+        {visibleFaqPreview.length ? (
+          visibleFaqPreview.map((faq) => (
+            <details
+              key={faq.id}
+              className="rounded-2xl border border-white/10 bg-white/8 p-5"
+            >
+              <summary className="cursor-pointer list-none font-semibold text-[#F6FAFF] [&::-webkit-details-marker]:hidden">
+                {faq.question}
+              </summary>
+              <p className="mt-3 enhe-authored-text whitespace-pre-wrap text-sm leading-7 text-[#8F9DB2]">
+                {faq.answer}
+              </p>
+            </details>
+          ))
+        ) : (
+          <p className="rounded-2xl border border-white/10 bg-white/8 p-5 text-sm leading-6 text-[#8F9DB2]">
+            {publicFaqFallback}
+          </p>
+        )}
+      </div>
+    </section>
+  );
   const detailNavItems = [
     { href: "#tool-purchase", label: purchaseButtonLabel },
     ...(isAiWorkflow
-      ? [{ href: "#workflow-source", label: forceLocale === "en" ? "Source & version" : "来源与版本" }]
+      ? [{ href: "#workflow-source", label: workflowDetailsTitle }]
       : []),
     { href: "#tool-intro", label: introTitle },
     ...(hasTutorialSection
@@ -768,8 +767,9 @@ export async function ToolDetailPageShell({
           },
         ]
       : []),
-    { href: "#tool-faq", label: td.faqTitle },
+    ...(!isAiWorkflow ? [{ href: "#tool-faq", label: td.faqTitle }] : []),
     { href: "#tool-related", label: td.relatedTitle },
+    ...(isAiWorkflow ? [{ href: "#tool-faq", label: td.faqTitle }] : []),
   ];
 
   return (
@@ -1247,16 +1247,10 @@ export async function ToolDetailPageShell({
             <>
               <section id="workflow-source" className="glass scroll-mt-24 rounded-2xl p-7">
                 <SectionTitle
-                  title={workflowLinkOnly
-                    ? (forceLocale === "en" ? "Original repository & license" : "原仓库与许可证")
-                    : (forceLocale === "en" ? "Source, license & verified version" : "来源、许可证与已核验版本")}
-                  intro={workflowLinkOnly
-                    ? (forceLocale === "en"
-                      ? "This listing points to the original GitHub repository. Check the delivery and verification status below before using it."
-                      : "本条目来源于 GitHub 原仓库；使用前请查看下方的获取方式和核验状态。")
-                    : forceLocale === "en"
-                      ? "Review the exact upstream project and package version before downloading. Verification details describe the tested environment, not a guarantee for every setup."
-                      : "下载前可核对上游项目、交付版本与许可信息。验证结果仅适用于页面列出的环境，不代表所有设备都能直接运行。"}
+                  title={workflowDetailsTitle}
+                  intro={forceLocale === "en"
+                    ? "This workflow comes from a GitHub repository. Review the delivery and verification status below before using it."
+                    : "工作流来源于 GitHub仓库；使用前请查看下方的获取方式和核验状态。"}
                 />
                 <div className="mt-6 grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
                   <Info label={forceLocale === "en" ? "Application area" : "应用方向"} value={forceLocale === "en" ? (tool.aiWorkflowCandidate.topic?.englishName || tool.aiWorkflowCandidate.topic?.name || "-") : (tool.aiWorkflowCandidate.topic?.name || "-")} />
@@ -1267,32 +1261,6 @@ export async function ToolDetailPageShell({
                   <Info label={workflowLinkOnly ? (forceLocale === "en" ? "Package verification" : "打包核验") : (forceLocale === "en" ? "Verified environments" : "实际验证环境")} value={workflowLinkOnly ? workflowPackageAwaitingReview ? (forceLocale === "en" ? "Awaiting price review" : "等待价格审核") : tool.aiWorkflowCandidate.failureReason === "CANDIDATE_TEST_FAILED" ? (forceLocale === "en" ? "Automated test did not pass" : "自动测试未通过") : (forceLocale === "en" ? "No ENHE package available" : "本站暂无可下载包") : tool.aiWorkflowCandidate.verifiedEnvironments.length ? tool.aiWorkflowCandidate.verifiedEnvironments.join(" · ") : localizedSystemRequirement || (forceLocale === "en" ? "Not recorded" : "暂无记录")} />
                 </div>
                 {workflowLinkOnly ? <p className="mt-4 rounded-xl border border-white/10 bg-white/8 p-4 text-sm leading-6 text-[#C5D0E2]">{forceLocale === "en" ? "Link-only reason: " : "仅提供链接的原因："}{workflowLinkOnlyReason}</p> : null}
-                <div className="mt-3 grid gap-3 md:grid-cols-[minmax(0,1fr)_auto]">
-                  <div className="rounded-xl border border-white/10 bg-white/8 p-4">
-                    <p className="text-xs text-[#8F9DB2]">{forceLocale === "en" ? "Fixed source commit" : "固定来源版本"}</p>
-                    {workflowRepository && tool.aiWorkflowCandidate.commitSha ? (
-                      <a href={`${workflowRepository.url}/commit/${encodeURIComponent(tool.aiWorkflowCandidate.commitSha)}`} target="_blank" rel="nofollow noopener noreferrer" className="mt-2 inline-block break-all font-mono text-sm text-[var(--marketing-accent)] underline">
-                        {tool.aiWorkflowCandidate.commitSha}
-                      </a>
-                    ) : <p className="mt-2 text-sm text-[#C5D0E2]">{forceLocale === "en" ? "Not recorded" : "暂无记录"}</p>}
-                    {workflowRepository ? <a href={workflowRepository.url} target="_blank" rel="nofollow noopener noreferrer" className="mt-2 block break-all text-sm text-[var(--marketing-accent)] underline">{tool.aiWorkflowCandidate.repositoryOwner}/{tool.aiWorkflowCandidate.repositoryName}</a> : null}
-                    {tool.aiWorkflowCandidate.packageSha256 ? <p className="mt-2 break-all font-mono text-xs text-[#8F9DB2]">SHA-256: {tool.aiWorkflowCandidate.packageSha256}</p> : null}
-                  </div>
-                  <div className="flex min-w-48 flex-col justify-center rounded-xl border border-white/10 bg-white/8 p-4">
-                    <p className="text-xs text-[#8F9DB2]">{forceLocale === "en" ? "Verified user feedback" : "已审核的用户评价"}</p>
-                    <p className="mt-2 text-xl font-semibold text-[#F6FAFF]">
-                      {workflowRating?._count.id ? `${Number(workflowRating._avg.rating ?? 0).toFixed(1)} / 5` : (forceLocale === "en" ? "No reviews yet" : "暂无评价")}
-                    </p>
-                    <p className="mt-1 text-xs text-[#8F9DB2]">{workflowRating?._count.id ?? 0} {forceLocale === "en" ? "approved reviews" : "条已审核评价"}</p>
-                    <AiWorkflowFavoriteButton
-                      slug={tool.slug}
-                      initialCount={tool._count.aiWorkflowFavorites}
-                      initialFavorite={workflowIsFavorite}
-                      locale={forceLocale}
-                      loginHref={`${buildLocalePath("/login", forceLocale)}?returnTo=${encodeURIComponent(buildCanonicalToolPath(tool, forceLocale))}`}
-                    />
-                  </div>
-                </div>
               </section>
 
               {!workflowLinkOnly ? <AiWorkflowInstallPanel
@@ -1302,24 +1270,6 @@ export async function ToolDetailPageShell({
                 verifiedEnvironments={tool.aiWorkflowCandidate.verifiedEnvironments}
               /> : null}
 
-              <section id="workflow-reviews" className="glass scroll-mt-24 rounded-2xl p-7">
-                <SectionTitle title={forceLocale === "en" ? "User reviews" : "用户评价"} intro={forceLocale === "en" ? "Only approved reviews from users with a recorded purchase or download are shown." : "仅展示通过审核、且对应真实购买或下载记录的评价。"} />
-                {tool.aiWorkflowReviews.length ? (
-                  <div className="mt-5 grid gap-3">
-                    {tool.aiWorkflowReviews.map((review) => (
-                      <article key={review.id} className="rounded-xl border border-white/10 bg-white/8 p-4">
-                        <div className="flex flex-wrap items-center justify-between gap-2">
-                          <p className="text-sm font-semibold text-[#F6FAFF]">{review.user.nickname?.trim() || (forceLocale === "en" ? "Verified user" : "已验证用户")}</p>
-                          <p className="text-sm text-amber-400" aria-label={`${review.rating} / 5`}>{"★".repeat(review.rating)}{"☆".repeat(5 - review.rating)} <span className="text-[#8F9DB2]">{review.rating}/5</span></p>
-                        </div>
-                        {review.content ? <p className="mt-3 whitespace-pre-wrap break-words text-sm leading-6 text-[#C5D0E2]">{review.content}</p> : null}
-                        <p className="mt-2 text-xs text-[#8F9DB2]">{review.createdAt.toLocaleDateString(forceLocale === "en" ? "en-US" : "zh-CN")}</p>
-                      </article>
-                    ))}
-                  </div>
-                ) : <p className="mt-5 rounded-xl border border-white/10 bg-white/5 p-4 text-sm text-[#8F9DB2]">{forceLocale === "en" ? "There are no approved reviews yet." : "目前还没有通过审核的用户评价。"}</p>}
-                <AiWorkflowReviewForm slug={tool.slug} canReview={workflowCanReview} locale={forceLocale} />
-              </section>
             </>
           ) : null}
           <section
@@ -1606,33 +1556,7 @@ export async function ToolDetailPageShell({
             </div>
           </section>
 
-          <section
-            id="tool-faq"
-            className="tool-detail-faq-card glass scroll-mt-24 rounded-2xl p-7"
-          >
-            <SectionTitle title={td.faqTitle} />
-            <div className="mt-5 grid gap-3">
-              {visibleFaqPreview.length ? (
-                visibleFaqPreview.map((faq) => (
-                  <details
-                    key={faq.id}
-                    className="rounded-2xl border border-white/10 bg-white/8 p-5"
-                  >
-                    <summary className="cursor-pointer list-none font-semibold text-[#F6FAFF] [&::-webkit-details-marker]:hidden">
-                      {faq.question}
-                    </summary>
-                    <p className="mt-3 enhe-authored-text whitespace-pre-wrap text-sm leading-7 text-[#8F9DB2]">
-                      {faq.answer}
-                    </p>
-                  </details>
-                ))
-              ) : (
-                <p className="rounded-2xl border border-white/10 bg-white/8 p-5 text-sm leading-6 text-[#8F9DB2]">
-                  {publicFaqFallback}
-                </p>
-              )}
-            </div>
-          </section>
+          {!isAiWorkflow ? faqSection : null}
 
           <section className="glass rounded-2xl p-7">
             <SectionTitle title={td.commentsTitle} />
@@ -1781,6 +1705,7 @@ export async function ToolDetailPageShell({
             </div>
           </div>
         </details>
+        {isAiWorkflow ? <div className="mt-10">{faqSection}</div> : null}
       </main>
     </Container>
   );
