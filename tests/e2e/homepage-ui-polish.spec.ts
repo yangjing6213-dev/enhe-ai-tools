@@ -22,24 +22,9 @@ async function installLoopbackOnlyGuard(page: Page) {
   return rejectedOrigins;
 }
 
-test("Chinese and English homepage titles do not show a black fallback while their texture is unavailable", async ({ page }) => {
-  await installLoopbackOnlyGuard(page);
-  await page.route("**/*", async (route) => {
-    const requestUrl = route.request().url();
-    let decodedUrl = requestUrl;
-    try {
-      decodedUrl = decodeURIComponent(requestUrl);
-    } catch {
-      // Keep the original URL available for the filename check.
-    }
-    if (requestUrl.includes("blue-energy-city.webp") || decodedUrl.includes("blue-energy-city.webp")) {
-      await route.abort();
-      return;
-    }
-    await route.fallback();
-  });
-
-  for (const path of ["/", "/en"]) {
+for (const path of ["/", "/en"]) {
+  test(`${path} homepage title never shows a black fallback`, async ({ page }) => {
+    await installLoopbackOnlyGuard(page);
     const response = await page.goto(path, { waitUntil: "domcontentloaded" });
     expect(response?.status(), `${path} homepage status`).toBe(200);
     const titleLines = page.locator(".redesign-home-hero h1 > span.masked-heading");
@@ -55,10 +40,10 @@ test("Chinese and English homepage titles do not show a black fallback while the
     }));
 
     expect(earlyPaint.every((item) =>
-      !item.fallbackEnabled && !item.textureReady && item.measureColor === "rgba(0, 0, 0, 0)"
-    ), `${path} has no visible black fallback before its title texture loads: ${JSON.stringify(earlyPaint)}`).toBe(true);
-  }
-});
+      !item.fallbackEnabled && item.measureColor === "rgba(0, 0, 0, 0)"
+    ), `${path} has no visible black fallback: ${JSON.stringify(earlyPaint)}`).toBe(true);
+  });
+}
 
 test("homepage polish stays readable, responsive, and interactive without external services", async ({ page }) => {
   test.setTimeout(90_000);
