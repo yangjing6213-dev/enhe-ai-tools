@@ -23,7 +23,7 @@ export function EnheRedesignHero({ locale }: { locale: RedesignLocale }) {
               text={line}
               src="/redesign/home/blue-energy-city.webp"
               priority
-              initialFallback
+              initialFallback={locale === "zh"}
               fillScale={1.25}
               parallax={26}
               drift={18}

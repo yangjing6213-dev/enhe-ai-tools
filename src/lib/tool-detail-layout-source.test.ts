@@ -48,4 +48,17 @@ describe("tool detail layout source", () => {
     expect(i18nSource).not.toContain("该工具设置为下载链接仅 VIP 可见。");
     expect(i18nSource).not.toContain("当前下载链接仅对 VIP 用户显示");
   });
+
+  it("shows only configured AI agents and links to the published refund rules", () => {
+    const source = readFileSync(resolve(root, "src/app/tools/[slug]/page-shell.tsx"), "utf8");
+    const styles = readFileSync(resolve(root, "src/styles/redesign/software.css"), "utf8");
+
+    expect(source).toContain("{tool.supportedAgents.length ? (");
+    expect(source).toContain("<SupportedAgentsCard agents={tool.supportedAgents} locale={forceLocale} />");
+    expect(source).toContain("/legal/membership-refund");
+    expect(source).toContain("product-refund-policy-card");
+    expect(styles).toContain(".product-supported-agents-card");
+    expect(styles).toContain("grid-template-columns: minmax(0, 1fr) minmax(280px, 1fr);");
+    expect(styles).toContain(".tool-detail-payment-method-control");
+  });
 });

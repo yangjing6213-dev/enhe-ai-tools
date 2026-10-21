@@ -460,10 +460,10 @@ export function ToolEditor({
                 </div>
               </div>
             ) : null}
-            {isAiSkill ? (
+            {isAiSkill || type === "software" ? (
               <fieldset className="md:col-span-2 rounded-2xl border border-white/10 bg-white/6 p-4">
-                <legend className="px-1 text-sm font-semibold text-[#F6FAFF]">{copy.supportedAgents}</legend>
-                <p className="mt-1 text-xs leading-5 text-[#8B95A7]">{copy.supportedAgentsHint}</p>
+                <legend className="px-1 text-sm font-semibold text-[#F6FAFF]">{type === "software" ? (locale === "en" ? "Compatible AI agents" : "适用 AI 代理") : copy.supportedAgents}</legend>
+                <p className="mt-1 text-xs leading-5 text-[#8B95A7]">{type === "software" ? (locale === "en" ? "Select the AI agents supported by this product. Selected agents appear on its detail page." : "勾选此产品支持的 AI 代理，选中后会在产品详情页显示对应图标。") : copy.supportedAgentsHint}</p>
                 <div className="mt-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-5">
                   {supportedAiAgentOptions.map((agent) => (
                     <label key={agent} className="flex min-h-12 items-center gap-3 rounded-xl border border-white/10 bg-white/6 px-4 py-3 text-sm text-[#F6FAFF]">

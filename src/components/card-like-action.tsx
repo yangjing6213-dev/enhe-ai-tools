@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { Download } from "lucide-react";
 import PulseHeart from "@/components/PulseHeart";
 import "./card-like-action.css";
 
@@ -40,7 +41,7 @@ async function loadQueued() {
   }
 }
 
-export function CardLikeAction({ kind, id, locale }: { kind: "tool" | "news"; id: string; locale: "zh" | "en" }) {
+export function CardLikeAction({ kind, id, locale, downloadCount }: { kind: "tool" | "news"; id: string; locale: "zh" | "en"; downloadCount?: number }) {
   const key = `${kind}:${id}`;
   const [state, setState] = useState<LikeState>(empty);
   const [error, setError] = useState(false);
@@ -80,6 +81,12 @@ export function CardLikeAction({ kind, id, locale }: { kind: "tool" | "news"; id
   return <div className="card-like-action" data-card-like={`${kind}:${id}`}>
     <PulseHeart count={state.count} liked={state.liked} deferChange onChange={next => { void save(next); }}
       disabled={state.pending} size={24} pillColor="#ffffff" textColor="#18181b" label={locale === "en" ? "Like" : "喜欢"} />
+    {typeof downloadCount === "number" ? (
+      <span className="card-download-count" aria-label={locale === "en" ? `${downloadCount.toLocaleString("en-US")} downloads` : `已下载 ${downloadCount.toLocaleString("zh-CN")} 次`}>
+        <Download size={16} aria-hidden="true" />
+        <span>{downloadCount.toLocaleString(locale === "en" ? "en-US" : "zh-CN")}</span>
+      </span>
+    ) : null}
     <span className="card-like-status" role="status">{error ? (locale === "en" ? "Not saved. Try again." : "未保存，请重试") : ""}</span>
   </div>;
 }

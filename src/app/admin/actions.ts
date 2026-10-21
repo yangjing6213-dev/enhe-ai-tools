@@ -1358,7 +1358,7 @@ export async function upsertToolAction(formData: FormData) {
       videoDescription3: parseOptionalMultilineText(formData.get("videoDescription3")),
       version: parseOptionalString(formData.get("version")),
       systemRequirement: parseOptionalMultilineText(formData.get("systemRequirement")),
-      supportedAgents: type === "ai_skill" || type === "ai_workflow" ? normalizeSupportedAgents(formData.getAll("supportedAgents").map(String)) : [],
+      supportedAgents: type === "software" || type === "ai_skill" || type === "ai_workflow" ? normalizeSupportedAgents(formData.getAll("supportedAgents").map(String)) : [],
       isVipRequired: parseBooleanField(formData.get("isVipRequired")),
       isDownloadPaid: isDownloadProduct && resolvedPurchasePrice > 0,
       isDownloadLinkVipOnly: isDownloadProduct && resolvedPurchasePrice > 0,

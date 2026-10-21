@@ -115,4 +115,14 @@ describe("admin tool editor source", () => {
     expect(source).toContain('type="hidden" name="coverImage"');
     expect(source).toContain('type="hidden" name="downloadFileId"');
   });
+
+  it("lets admins select AI agents for software products and stores those selections", () => {
+    const editor = readFileSync(join(process.cwd(), "src/app/admin/tool-admin-list.tsx"), "utf8");
+    const actions = readFileSync(join(process.cwd(), "src/app/admin/actions.ts"), "utf8");
+
+    expect(editor).toContain("{isAiSkill || type === \"software\" ? (");
+    expect(editor).toContain('name="supportedAgents" type="checkbox"');
+    expect(editor).toContain("选中后会在产品详情页显示对应图标");
+    expect(actions).toContain('type === "software" || type === "ai_skill" || type === "ai_workflow" ? normalizeSupportedAgents');
+  });
 });

@@ -222,7 +222,7 @@
 
 .redesign-software-card-full-link {
   display: flex;
-  min-height: 0;
+  min-height: auto;
   flex: 1;
   flex-direction: column;
   color: inherit;
@@ -269,11 +269,15 @@
 
 .redesign-software-card-body {
   display: grid;
-  grid-template-rows: 48px 84px 72px 62px 34px minmax(20px, 1fr);
-  gap: 5px;
+  grid-template-rows: 40px 72px 60px 60px 28px minmax(20px, 1fr);
+  gap: 3px;
   flex: 1;
-  min-height: 0;
-  padding: 16px;
+  min-height: auto;
+  padding: 12px;
+}
+
+.redesign-software-card-body.has-trust {
+  grid-template-rows: 40px 72px 60px 60px 28px auto minmax(16px, 1fr);
 }
 
 .redesign-software-card-category,
@@ -302,10 +306,10 @@
 
 .redesign-software-card-identity {
   display: grid;
-  grid-template-rows: 45px 35px;
+  grid-template-rows: 45px 25px;
   gap: 2px;
   min-width: 0;
-  min-height: 84px;
+  min-height: 72px;
   overflow: hidden;
 }
 
@@ -371,10 +375,10 @@
 .redesign-software-card-secondary {
   display: -webkit-box;
   -webkit-box-orient: vertical;
-  -webkit-line-clamp: 2;
+  -webkit-line-clamp: 1;
   overflow: hidden;
   overflow-wrap: anywhere;
-  height: 35px;
+  height: 25px;
   margin: 0;
   color: var(--enhe-action-text, #0462C2);
   font-size: 0.8125rem;
@@ -382,8 +386,8 @@
 }
 
 .redesign-software-card-description {
-  height: 72px;
-  line-height: 1.7;
+  height: 60px;
+  line-height: 1.4;
 }
 
 .redesign-software-card-description strong,
@@ -625,10 +629,11 @@
 }
 .redesign-software-card-trust {
   display: flex;
-  align-items: flex-start;
+  align-items: center;
   gap: 9px;
-  margin-top: 16px;
-  padding: 11px 12px;
+  min-width: 0;
+  margin-top: 0;
+  padding: 5px 8px;
   border: 1px solid color-mix(in srgb, #00a875 24%, var(--enhe-border));
   border-radius: 12px;
   background: color-mix(in srgb, #00a875 5%, var(--enhe-page-bg));
@@ -643,19 +648,19 @@
 
 .redesign-software-card-trust span {
   display: grid;
-  gap: 3px;
+  gap: 2px;
   min-width: 0;
 }
 
 .redesign-software-card-trust strong {
   font-size: 12px;
-  line-height: 1.4;
+  line-height: 1.2;
 }
 
 .redesign-software-card-trust small {
   color: var(--enhe-text-muted);
   font-size: 11px;
-  line-height: 1.4;
+  line-height: 1.2;
 }
 
 .tool-detail-offer-creator-grid {
@@ -666,6 +671,109 @@
 
 .tool-detail-offer-creator-grid.has-creator {
   grid-template-columns: minmax(0, 1fr);
+}
+
+.tool-detail-facts-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.tool-detail-facts-grid > * {
+  min-width: 0;
+}
+
+.product-supported-agents-card {
+  min-width: 0;
+  padding: 16px;
+  border: 1px solid var(--enhe-border);
+  border-radius: 12px;
+  background: var(--enhe-surface);
+  color: var(--enhe-text);
+}
+
+.product-supported-agents-title {
+  color: var(--enhe-text-muted);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  line-height: 1.4;
+}
+
+.product-supported-agents-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px 14px;
+  margin-top: 14px;
+}
+
+.product-supported-agent {
+  display: inline-flex;
+  min-width: 0;
+  align-items: center;
+  gap: 6px;
+  color: var(--enhe-text);
+  font-size: 11px;
+  line-height: 1.3;
+}
+
+.product-supported-agent-icon {
+  display: grid;
+  width: 28px;
+  height: 28px;
+  flex: 0 0 auto;
+  place-items: center;
+  border-radius: 8px;
+  background: color-mix(in srgb, var(--enhe-action) 10%, var(--enhe-surface));
+  color: var(--enhe-action-text, var(--enhe-action));
+}
+
+.product-refund-policy-card {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  margin-top: 12px;
+  padding: 12px;
+  border: 1px solid color-mix(in srgb, #00a875 22%, var(--enhe-border));
+  border-radius: 12px;
+  background: color-mix(in srgb, #00a875 5%, var(--enhe-surface));
+  color: var(--enhe-text);
+}
+
+.product-refund-policy-card > svg {
+  flex: 0 0 auto;
+  margin-top: 1px;
+  color: #009c70;
+}
+
+.product-refund-policy-card strong {
+  font-size: 13px;
+}
+
+.product-refund-policy-card p {
+  margin-top: 4px;
+  color: var(--enhe-text-muted);
+  font-size: 11px;
+  line-height: 1.45;
+}
+
+.product-refund-policy-card a {
+  display: inline-block;
+  margin-top: 5px;
+  color: var(--enhe-action-text, #0462C2);
+  font-size: 11px;
+  font-weight: 600;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+.tool-detail-payment-method-control {
+  width: 100%;
+  min-width: 0;
+}
+
+.tool-detail-payment-method-control select {
+  width: 100%;
 }
 
 .tool-detail-offer-creator-main {
@@ -857,6 +965,26 @@
 
 @media (min-width: 1280px) {
   .tool-detail-offer-creator-grid.has-creator {
-    grid-template-columns: minmax(0, 1.4fr) minmax(280px, 0.8fr);
+    grid-template-columns: minmax(0, 1fr) minmax(280px, 1fr);
+  }
+
+  .creator-profile-card { margin-top: 12px; }
+}
+
+@media (min-width: 640px) {
+  .tool-detail-payment-method-control {
+    width: calc(50% - 6px);
+  }
+}
+
+@media (min-width: 1100px) {
+  .tool-detail-facts-grid {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 600px) {
+  .tool-detail-facts-grid {
+    grid-template-columns: minmax(0, 1fr);
   }
 }

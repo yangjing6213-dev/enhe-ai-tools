@@ -3,7 +3,7 @@ import "@/styles/redesign/software.css";
 import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
-import { ShieldCheck, Star } from "lucide-react";
+import { Bot, Code2, MousePointer2, RotateCcw, ShieldCheck, Sparkles, Star, Terminal, type LucideIcon } from "lucide-react";
 import { notFound, permanentRedirect } from "next/navigation";
 import {
   createCommentAction,
@@ -823,7 +823,7 @@ export async function ToolDetailPageShell({
                   {localizedSummary}
                 </p>
 
-                <div className="mt-6 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+                <div className="tool-detail-facts-grid mt-6">
                   {isAccountService ? (
                     <>
                       <Info
@@ -874,11 +874,8 @@ export async function ToolDetailPageShell({
                           </p>
                         </div>
                       ) : null}
-                      {isAiSkill ? (
-                        <Info
-                          label={td.supportedAgents}
-                          value={tool.supportedAgents.length ? tool.supportedAgents.join(" / ") : "-"}
-                        />
+                      {tool.supportedAgents.length ? (
+                        <SupportedAgentsCard agents={tool.supportedAgents} locale={forceLocale} />
                       ) : null}
                       {visibleDownloadMetric ? (
                         <Info
@@ -956,7 +953,7 @@ export async function ToolDetailPageShell({
                               ? "Select one offer before generating the payment QR code. The selected offer controls the order amount."
                               : "生成支付二维码前请选择一个方案，订单金额以所选方案为准。"}
                           </p>
-                          <div className="grid gap-3 sm:grid-cols-2">
+                          <div className="tool-detail-price-options grid gap-3 sm:grid-cols-2">
                             {localizedPriceSpecs.map((spec, index) => (
                               <label
                                 key={spec.id}
@@ -991,7 +988,7 @@ export async function ToolDetailPageShell({
                         </fieldset>
                       ) : null}
                       <div className="tool-detail-payment-method-grid grid gap-3">
-                        <div className="max-w-[560px]">
+                        <div className="tool-detail-payment-method-control">
                           <label
                             id={paymentMethodLabelId}
                             htmlFor="tool-purchase-payment-method"
@@ -1016,6 +1013,18 @@ export async function ToolDetailPageShell({
                             <option value="alipay">{td.alipay}</option>
                             <option value="wechat">{td.wechat}</option>
                           </select>
+                          <div className="product-refund-policy-card">
+                            <RotateCcw size={19} aria-hidden="true" />
+                            <div>
+                              <strong>{forceLocale === "en" ? "Refund policy" : "退款规则说明"}</strong>
+                              <p>{forceLocale === "en"
+                                ? "Refund requests are handled under the published rules. Activated, downloaded, or used digital services are generally not eligible for no-reason refunds."
+                                : "符合退款条件时可提交申请；已开通、下载或使用的数字服务通常不支持无理由退款。"}</p>
+                              <Link href={forceLocale === "en" ? "/en/legal/membership-refund" : "/legal/membership-refund"}>
+                                {forceLocale === "en" ? "Read the refund rules" : "查看完整退款规则"}
+                              </Link>
+                            </div>
+                          </div>
                           <p
                             id={paymentMethodHelpId}
                             className="tool-detail-payment-help mt-2 text-xs leading-5 text-[#8F9DB2]"
@@ -1696,6 +1705,33 @@ function Info({ label, value, numeric = false }: { label: string; value: string;
       <p className="text-xs text-[#8F9DB2]">{label}</p>
       <p className={`enhe-authored-text whitespace-pre-wrap break-words mt-2 font-semibold text-[#F6FAFF]${numeric ? " tabular-nums" : ""}`}>{value}</p>
     </div>
+  );
+}
+
+const supportedAgentIcons: Record<string, LucideIcon> = {
+  Codex: Code2,
+  OpenClaw: Bot,
+  "Claude Code": Sparkles,
+  Cursor: MousePointer2,
+  Cline: Terminal,
+};
+
+function SupportedAgentsCard({ agents, locale }: { agents: string[]; locale: Locale }) {
+  return (
+    <section className="product-supported-agents-card" aria-label={locale === "en" ? "Supported AI agents" : "适用 AI 代理"}>
+      <p className="product-supported-agents-title">{locale === "en" ? "WORKS WITH THESE AI AGENTS" : "适用 AI 代理"}</p>
+      <div className="product-supported-agents-list">
+        {agents.map((agent) => {
+          const Icon = supportedAgentIcons[agent] ?? Bot;
+          return (
+            <span className="product-supported-agent" key={agent}>
+              <span className="product-supported-agent-icon"><Icon size={18} aria-hidden="true" /></span>
+              <span>{agent}</span>
+            </span>
+          );
+        })}
+      </div>
+    </section>
   );
 }
 

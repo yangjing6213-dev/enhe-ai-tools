@@ -18,7 +18,7 @@ describe("AI tools candidate responsive browsing", () => {
     expect(css).toMatch(/\.redesign-software-grid\s*\{[^}]*grid-template-columns:\s*repeat\(3,\s*minmax\(0,\s*1fr\)\)/);
     expect(css).toMatch(/@media\s*\(max-width:\s*768px\)[\s\S]*\.redesign-software-grid\s*\{[^}]*grid-template-columns:\s*minmax\(0,\s*1fr\)/);
     expect(css).not.toContain(":nth-child(");
-    expect(css).toContain("grid-template-rows: 48px 84px 72px 62px 34px minmax(20px, 1fr)");
+    expect(css).toContain("grid-template-rows: 40px 72px 60px 60px 28px minmax(20px, 1fr)");
     expect(css).toMatch(/\.redesign-software-card-badges\s*\{[^}]*justify-content:\s*space-between;/);
     expect(css).toMatch(/\.redesign-software-card-full-link\s*\{[^}]*display:\s*flex;/);
     expect(css).toMatch(/width\s*<\s*768px/);
@@ -45,6 +45,7 @@ describe("AI tools candidate responsive browsing", () => {
     expect(css).toContain("padding: 144px 24px 120px");
     expect(css).toContain("font-size: clamp(0.9rem, 2vw, 1.5rem)");
     expect(css).toContain("height: 658px;");
+    expect(css).toContain("min-height: 0;");
     expect(css).toContain("font-weight: 900;");
     expect(catalog).not.toContain("按公开发布时间展示最新上架的工具入口。");
     expect(catalog).not.toContain("通过已跟踪的编辑推荐字段筛选公开产品。");
@@ -135,6 +136,18 @@ describe("AI tools candidate responsive browsing", () => {
     const css = readCandidate("styles/redesign/software.css");
 
     expect(css).not.toMatch(/overflow-x:\s*hidden/);
+  });
+
+  it("gives reviewed product cards room for trust details and keeps likes borderless beside downloads", () => {
+    const css = readCandidate("styles/redesign/software.css");
+    const card = readCandidate("components/redesign/software/EnheRedesignSoftwareCard.tsx");
+    const actions = readCandidate("components/card-like-action.tsx");
+    const actionCss = readCandidate("components/card-like-action.css");
+
+    expect(css).toContain(".redesign-software-card-body.has-trust");
+    expect(card).toContain('downloadCount={product.downloadCount}');
+    expect(actions).toContain('className="card-download-count"');
+    expect(actionCss).toContain(".redesign-software-card .card-like-action .pulse-heart__pill { background: transparent; box-shadow: none; }");
   });
 
   it("keeps the mobile sheet viewport-anchored outside transformed fade animation", () => {

@@ -8,6 +8,7 @@ const heroSource = readFileSync(
   join(process.cwd(), "src/components/redesign/home/EnheRedesignHero.tsx"),
   "utf8",
 );
+const heroStyles = readFileSync(join(process.cwd(), "src/styles/redesign/home.css"), "utf8");
 
 describe("homepage approved copy", () => {
   it("keeps the exact bilingual hero and value contract", () => {
@@ -49,5 +50,10 @@ describe("homepage approved copy", () => {
     expect(heroSource).toContain("[copy.cta, copy.forumCta]");
     expect(heroSource).not.toContain('"use client"');
     expect(heroSource).not.toMatch(/prisma|database|fetch\(|\/api\//i);
+  });
+
+  it("does not paint the oversized English fallback text before the title mask is ready", () => {
+    expect(heroSource).toContain("initialFallback={locale === \"zh\"}");
+    expect(heroStyles).toMatch(/\.redesign-home-hero\[data-locale=\"en\"\] \.redesign-home-animated-line\s*\{[^}]*font-size:\s*clamp\(20px,\s*6\.5vw,\s*56px\)/);
   });
 });

@@ -83,7 +83,7 @@ export function EnheRedesignSoftwareCard({
               </div>
             ) : null}
           </div>
-          <div className="redesign-software-card-body">
+          <div className={`redesign-software-card-body${reviewDate ? " has-trust" : ""}`}>
             <div className="redesign-software-card-badges">
               <p className="redesign-software-card-category">{categoryLabel}</p>
               <span
@@ -124,7 +124,7 @@ export function EnheRedesignSoftwareCard({
             </div> : null}
           </div>
         </a>
-        <CardLikeAction kind="tool" id={product.id} locale={locale} />
+        <CardLikeAction kind="tool" id={product.id} locale={locale} downloadCount={product.downloadCount} />
       </CardElement>
     </Card>
   );
