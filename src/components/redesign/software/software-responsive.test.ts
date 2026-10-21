@@ -146,7 +146,7 @@ describe("AI tools candidate responsive browsing", () => {
 
     expect(css).toContain(".redesign-software-card-body.has-trust");
     expect(card).toContain('downloadCount={product.downloadCount}');
-    expect(card).toContain('"安全审核已完成"');
+    expect(card).toContain('"安全审核通过"');
     expect(card).not.toContain("reviewDate");
     expect(card).not.toContain("管理员人工确认");
     expect(actions).toContain('className="card-download-count"');

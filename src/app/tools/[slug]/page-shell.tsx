@@ -902,7 +902,7 @@ export async function ToolDetailPageShell({
                           <p className="text-xs text-[#8F9DB2]">{forceLocale === "en" ? "TRUST & SAFETY" : "信任与安全"}</p>
                           <div className="product-safety-info-heading">
                             <ShieldCheck size={20} aria-hidden="true" />
-                            <strong>{forceLocale === "en" ? "Manual safety review complete" : "安全审核已完成"}</strong>
+                            <strong>{forceLocale === "en" ? "Manual safety review passed" : "安全审核通过"}</strong>
                           </div>
                           <p className="product-safety-info-date">
                             {forceLocale === "en" ? "Confirmed by an ENHE AI admin on " : "由 ENHE AI 管理员于"}

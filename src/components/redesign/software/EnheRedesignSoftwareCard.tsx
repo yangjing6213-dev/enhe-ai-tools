@@ -101,7 +101,7 @@ export function EnheRedesignSoftwareCard({
               <div className="redesign-software-card-trust" data-trust-safety>
                 <ShieldCheck size={18} aria-hidden="true" />
                 <span>
-                  <strong>{locale === "en" ? "Manual safety review" : "安全审核已完成"}</strong>
+                  <strong>{locale === "en" ? "Manual safety review passed" : "安全审核通过"}</strong>
                 </span>
               </div>
             ) : null}
