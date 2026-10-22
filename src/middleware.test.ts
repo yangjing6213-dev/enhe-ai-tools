@@ -3,6 +3,26 @@ import { describe, expect, it } from "vitest";
 import { middleware } from "@/middleware";
 
 describe("locale switch redirects", () => {
+  it("keeps AI workflow paths when following a saved language choice", () => {
+    for (const path of ["/ai-workflows", "/ai-workflows/demo-workflow"]) {
+      const response = middleware(new NextRequest(`https://www.enhe-tech.com.cn${path}`, {
+        headers: { cookie: "enhe_locale=en", "cf-ipcountry": "CN" },
+      }));
+
+      expect(response.status).toBe(307);
+      expect(response.headers.get("location")).toBe(`https://www.enhe-tech.com.cn/en${path}`);
+    }
+  });
+
+  it("preserves an explicit English AI workflow URL with a saved Chinese choice", () => {
+    const response = middleware(new NextRequest("https://www.enhe-tech.com.cn/en/ai-workflows", {
+      headers: { cookie: "enhe_locale=zh", "cf-ipcountry": "CN" },
+    }));
+
+    expect(response.status).toBe(200);
+    expect(response.headers.get("location")).toBeNull();
+  });
+
   it("automatically follows country language without saving it as a manual choice", () => {
     const response = middleware(
       new NextRequest("https://www.enhe-tech.com.cn/software", {

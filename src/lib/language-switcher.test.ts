@@ -3,6 +3,13 @@ import { describe, expect, it } from "vitest";
 import { buildLanguageSwitcherHref, buildLocalePath } from "@/lib/seo";
 
 describe("buildLanguageSwitcherHref", () => {
+  it("keeps AI workflow directory and detail pages when switching languages", () => {
+    for (const path of ["/ai-workflows", "/ai-workflows/demo-workflow"]) {
+      expect(buildLanguageSwitcherHref(path, "en")).toBe(`/en${path}`);
+      expect(buildLanguageSwitcherHref(`/en${path}`, "zh")).toBe(path);
+    }
+  });
+
   it("keeps localized public routes on the matching page", () => {
     expect(buildLanguageSwitcherHref("/", "en")).toBe("/en");
     expect(buildLanguageSwitcherHref("/en", "zh")).toBe("/");

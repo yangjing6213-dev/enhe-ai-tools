@@ -212,6 +212,8 @@ const localizedPublicRoutePatterns = [
   /^\/ai-topics\/.+$/,
   /^\/software$/,
   /^\/software\/.+$/,
+  /^\/ai-workflows$/,
+  /^\/ai-workflows\/.+$/,
   /^\/account-services$/,
   /^\/account-services\/.+$/,
   /^\/skill-learning$/,
