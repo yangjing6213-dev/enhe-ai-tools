@@ -2,7 +2,7 @@ FROM node:24-alpine AS deps
 WORKDIR /app
 COPY package.json package-lock.json* ./
 COPY vendor/braces-3.0.4-enhe.0.tgz ./vendor/
-RUN npm ci
+RUN NODE_OPTIONS=--network-family-autoselection-attempt-timeout=5000 npm ci
 
 FROM deps AS production-deps
 RUN npm prune --omit=dev --ignore-scripts
