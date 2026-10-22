@@ -4,6 +4,10 @@ export const supportedAiAgentOptions = [
   "Claude Code",
   "Cursor",
   "Cline",
+  "Manus",
+  "Grok",
+  "Muse",
+  "Dots",
 ] as const;
 
 export const aiSkillPackageMaxBytes = 100 * 1024 * 1024;

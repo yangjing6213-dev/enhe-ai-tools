@@ -3,7 +3,7 @@ import "@/styles/redesign/software.css";
 import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
-import { Bot, Code2, MousePointer2, RotateCcw, ShieldCheck, Sparkles, Star, Terminal, type LucideIcon } from "lucide-react";
+import { Bot, RotateCcw, ShieldCheck, Star, Terminal, type LucideIcon } from "lucide-react";
 import { notFound, permanentRedirect } from "next/navigation";
 import {
   createCommentAction,
@@ -915,14 +915,18 @@ export async function ToolDetailPageShell({
                     </>
                   ) : (
                     <>
-                      <Info
-                        label={workflowLinkOnly ? (forceLocale === "en" ? "Delivery" : "获取方式") : td.version}
-                        value={workflowLinkOnly ? (forceLocale === "en" ? "GitHub repository only" : "仅提供原仓库链接") : tool.version ?? td.onlineVersion}
-                      />
-                      <Info
-                        label={workflowLinkOnly ? (forceLocale === "en" ? "Project language" : "项目语言") : td.systemRequirement}
-                        value={workflowLinkOnly ? (localizedSystemRequirement || (forceLocale === "en" ? "Not recorded" : "未记录")) : (localizedSystemRequirement ?? td.browser)}
-                      />
+                      {workflowLinkOnly ? (
+                        <>
+                          <Info
+                            label={forceLocale === "en" ? "Delivery" : "获取方式"}
+                            value={forceLocale === "en" ? "GitHub repository only" : "仅提供原仓库链接"}
+                          />
+                          <Info
+                            label={forceLocale === "en" ? "Project language" : "项目语言"}
+                            value={localizedSystemRequirement || (forceLocale === "en" ? "Not recorded" : "未记录")}
+                          />
+                        </>
+                      ) : null}
                       {tool.type === "software" && tool.securityReviewedAt ? (
                         <div className="product-safety-info-card">
                           <p className="text-xs text-[#8F9DB2]">{forceLocale === "en" ? "TRUST & SAFETY" : "信任与安全"}</p>
@@ -1724,11 +1728,31 @@ function Info({ label, value, numeric = false }: { label: string; value: string;
   );
 }
 
-const supportedAgentIcons: Record<string, LucideIcon> = {
-  Codex: Code2,
-  OpenClaw: Bot,
-  "Claude Code": Sparkles,
-  Cursor: MousePointer2,
+const supportedAgentIconSources: Record<string, string> = {
+  Codex: "/images/ai-agents/openai.svg",
+  OpenClaw: "/images/ai-agents/openclaw.png",
+  "Claude Code": "/images/ai-agents/claude.svg",
+  Cursor: "/images/ai-agents/cursor.svg",
+  Manus: "/images/ai-agents/manus.svg",
+  Grok: "/images/ai-agents/grok.svg",
+  Muse: "/images/ai-agents/muse.png",
+  Dots: "/images/ai-agents/dots.png",
+};
+
+const supportedAgentLabels: Record<string, string> = {
+  codex: "Codex",
+  openclaw: "OpenClaw",
+  "claude code": "Claude Code",
+  claude_code: "Claude Code",
+  cursor: "Cursor",
+  cline: "Cline",
+  manus: "Manus",
+  grok: "Grok",
+  muse: "Muse",
+  dots: "Dots",
+};
+
+const supportedAgentFallbackIcons: Record<string, LucideIcon> = {
   Cline: Terminal,
 };
 
@@ -1737,11 +1761,27 @@ function SupportedAgentsCard({ agents, locale }: { agents: string[]; locale: Loc
     <section className="product-supported-agents-card" aria-label={locale === "en" ? "Supported AI agents" : "适用 AI 代理"}>
       <p className="product-supported-agents-title">{locale === "en" ? "WORKS WITH THESE AI AGENTS" : "适用 AI 代理"}</p>
       <div className="product-supported-agents-list">
-        {agents.map((agent) => {
-          const Icon = supportedAgentIcons[agent] ?? Bot;
+        {agents.map((agentValue) => {
+          const normalizedAgent = agentValue.trim().toLowerCase();
+          const agent = supportedAgentLabels[normalizedAgent] ?? agentValue;
+          const iconSrc = supportedAgentIconSources[agent];
+          const Icon = supportedAgentFallbackIcons[agent] ?? Bot;
           return (
             <span className="product-supported-agent" key={agent}>
-              <span className="product-supported-agent-icon"><Icon size={18} aria-hidden="true" /></span>
+              <span className="product-supported-agent-icon">
+                {iconSrc ? (
+                  <Image
+                    src={iconSrc}
+                    width={22}
+                    height={22}
+                    alt=""
+                    aria-hidden="true"
+                    className="object-contain"
+                  />
+                ) : (
+                  <Icon size={18} aria-hidden="true" />
+                )}
+              </span>
               <span>{agent}</span>
             </span>
           );
