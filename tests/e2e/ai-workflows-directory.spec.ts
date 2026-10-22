@@ -18,10 +18,11 @@ for (const route of [
     const heading = page.getByRole("heading", { name: route.locale === "en" ? "All workflows" : "全部工作流", exact: true });
     await expect(heading).toBeVisible();
     await expect(heading).toHaveCSS("font-size", "18px");
-    await expect(page.getByText(route.locale === "en"
-      ? "No workflow is published yet. Relevant projects with a clear license will appear as a downloadable package or a GitHub repository link."
-      : "目前还没有已发布工作流。符合主题且许可清晰的项目会以可下载包或 GitHub 原仓库链接展示。",
-    )).toBeVisible();
+    await expect(page.getByRole("heading", {
+      level: 3,
+      name: route.locale === "en" ? "Local preview is not connected to a content source" : "本地预览尚未连接内容源",
+      exact: true,
+    })).toBeVisible();
   });
 }
 
