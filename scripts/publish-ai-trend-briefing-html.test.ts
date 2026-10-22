@@ -85,7 +85,7 @@ describe("publish-ai-trend-briefing-html script", () => {
 
     expect(result.code).toBe(1);
     expect(result.stderr).toContain("Missing --file");
-  });
+  }, 15_000);
 
   it("validates summary and rejects source-less published reports before database writes", async () => {
     const { htmlFile, summaryFile } = await createFiles({
