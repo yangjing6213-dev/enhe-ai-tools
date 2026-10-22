@@ -25,6 +25,7 @@ import {
   redactAiWorkflowCollectorText,
   restoreAiWorkflowCandidateMetadata,
   selectAiWorkflowRepositoryCandidates,
+  skipAlreadyRegisteredRepository,
   type AiWorkflowGitHubRepositoryCandidate,
 } from "./lib/ai-workflow-collector";
 
@@ -896,24 +897,31 @@ async function runBatch(lease: WorkerLease, token: string, credentials: { secret
       const pending = state.pendingRegistration;
       try {
         await postWorker(`/${batch.id}/result`, { workerId: workerId(), leaseToken: lease.leaseToken, result: pending.result }, token);
-      } catch {
-        await logEvent("registration_pending_retry", { batchId: batch.id, repositoryId: pending.repositoryId });
-        return;
+      } catch (error) {
+        if (error instanceof Error && error.message === "REPOSITORY_ALREADY_REGISTERED" && skipAlreadyRegisteredRepository(state, pending.repositoryId)) {
+          await persistRunState(statePath, state);
+          await logEvent("candidate_skipped_duplicate", { batchId: batch.id, repositoryId: pending.repositoryId });
+        } else {
+          await logEvent("registration_pending_retry", { batchId: batch.id, repositoryId: pending.repositoryId });
+          return;
+        }
       }
-      const wasAlreadyRegistered = state.completedRepositoryIds.includes(pending.repositoryId);
-      if (!wasAlreadyRegistered) state.completedRepositoryIds.push(pending.repositoryId);
-      if (!state.outcomes.some((outcome) => outcome.repositoryId === pending.repositoryId && outcome.state === "registered")) {
-        state.outcomes.push({ repositoryId: pending.repositoryId, repository: pending.repository, state: "registered" });
+      if (state.pendingRegistration) {
+        const wasAlreadyRegistered = state.completedRepositoryIds.includes(pending.repositoryId);
+        if (!wasAlreadyRegistered) state.completedRepositoryIds.push(pending.repositoryId);
+        if (!state.outcomes.some((outcome) => outcome.repositoryId === pending.repositoryId && outcome.state === "registered")) {
+          state.outcomes.push({ repositoryId: pending.repositoryId, repository: pending.repository, state: "registered" });
+        }
+        const pendingDir = join(runsRoot, batch.id, pending.repositoryId);
+        const removed = await removeOwnedCandidateDirectory(pendingDir, runsRoot, batch.id, pending.repositoryId);
+        const pendingDirExists = await stat(pendingDir).then(() => true).catch(() => false);
+        if (pendingDirExists && !removed) {
+          await logEvent("candidate_temp_retained", { batchId: batch.id, repositoryId: pending.repositoryId, reason: "OWNERSHIP_OR_PATH_CHECK_FAILED" });
+        }
+        state.pendingRegistration = undefined;
+        await persistRunState(statePath, state);
+        if (!wasAlreadyRegistered) successes += 1;
       }
-      const pendingDir = join(runsRoot, batch.id, pending.repositoryId);
-      const removed = await removeOwnedCandidateDirectory(pendingDir, runsRoot, batch.id, pending.repositoryId);
-      const pendingDirExists = await stat(pendingDir).then(() => true).catch(() => false);
-      if (pendingDirExists && !removed) {
-        await logEvent("candidate_temp_retained", { batchId: batch.id, repositoryId: pending.repositoryId, reason: "OWNERSHIP_OR_PATH_CHECK_FAILED" });
-      }
-      state.pendingRegistration = undefined;
-      await persistRunState(statePath, state);
-      if (!wasAlreadyRegistered) successes += 1;
     }
     const endAt = started + maximumBatchMs;
     for (let index = 0; index < Math.min(maximumCandidates, state.candidateIds.length) && successes < 3; index += 1) {
@@ -947,6 +955,11 @@ async function runBatch(lease: WorkerLease, token: string, credentials: { secret
             await logEvent("candidate_registered_link_only", { batchId: batch.id, repositoryId: candidate.id, reason: linkOnlyReason });
             continue;
           } catch (linkError) {
+            if (linkError instanceof Error && linkError.message === "REPOSITORY_ALREADY_REGISTERED" && skipAlreadyRegisteredRepository(state, candidate.id)) {
+              await persistRunState(statePath, state);
+              await logEvent("candidate_skipped_duplicate", { batchId: batch.id, repositoryId: candidate.id });
+              continue;
+            }
             if (hasPendingRegistrationFor(state, candidate.id)) {
               await logEvent("registration_pending_retry", { batchId: batch.id, repositoryId: candidate.id });
               return;

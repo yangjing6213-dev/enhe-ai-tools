@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { parseAiWorkflowRepositoryLinkResult } from "../../src/lib/ai-workflows/worker-result";
-import { buildAiWorkflowSearchTerms, getAiWorkflowFailureCode, getAiWorkflowLinkOnlyFailureReason, getAiWorkflowRegisteredRepositoryIds, redactAiWorkflowCollectorText, restoreAiWorkflowCandidateMetadata, selectAiWorkflowRepositoryCandidates } from "./ai-workflow-collector";
+import { buildAiWorkflowSearchTerms, getAiWorkflowFailureCode, getAiWorkflowLinkOnlyFailureReason, getAiWorkflowRegisteredRepositoryIds, redactAiWorkflowCollectorText, restoreAiWorkflowCandidateMetadata, selectAiWorkflowRepositoryCandidates, skipAlreadyRegisteredRepository } from "./ai-workflow-collector";
 
 describe("AI Workflow registered draft recovery", () => {
   it("counts three saved review drafts as a completed collection quota without requiring publication", () => {
@@ -25,6 +25,29 @@ describe("AI Workflow registered draft recovery", () => {
       { repositoryId: "16", status: "packaging" },
       { repositoryId: "17", status: "failed" },
     ])).toEqual(["11", "12", "13"]);
+  });
+});
+
+describe("AI Workflow duplicate registration recovery", () => {
+  it("clears a permanently duplicated pending registration so collection can continue", () => {
+    const state = {
+      completedRepositoryIds: [],
+      outcomes: [] as Array<{ repositoryId: string; repository: string; state: "registered" | "rejected"; reason?: string }>,
+      pendingRegistration: { repositoryId: "896335270", repository: "punkpeye/awesome-mcp-servers", result: { deliveryMode: "repository_link" } },
+    };
+
+    expect(skipAlreadyRegisteredRepository(state, "896335270")).toBe(true);
+    expect(state.completedRepositoryIds).toEqual(["896335270"]);
+    expect(state.outcomes).toEqual([{ repositoryId: "896335270", repository: "punkpeye/awesome-mcp-servers", state: "rejected", reason: "REPOSITORY_ALREADY_REGISTERED" }]);
+    expect(state.pendingRegistration).toBeUndefined();
+    expect(skipAlreadyRegisteredRepository(state, "896335270")).toBe(false);
+  });
+
+  it("leaves a pending result untouched when the duplicate ID does not match", () => {
+    const pendingRegistration = { repositoryId: "896335270", repository: "punkpeye/awesome-mcp-servers", result: {} };
+    const state = { completedRepositoryIds: [] as string[], outcomes: [] as Array<{ repositoryId: string; repository: string; state: "registered" | "rejected"; reason?: string }>, pendingRegistration };
+    expect(skipAlreadyRegisteredRepository(state, "1035029907")).toBe(false);
+    expect(state).toEqual({ completedRepositoryIds: [], outcomes: [], pendingRegistration });
   });
 });
 

@@ -28,6 +28,30 @@ export function getAiWorkflowRegisteredRepositoryIds(
     .map(({ repositoryId }) => repositoryId))];
 }
 
+type PendingRepositoryRegistration = {
+  repositoryId: string;
+  repository: string;
+  result: unknown;
+};
+
+export function skipAlreadyRegisteredRepository(
+  state: {
+    completedRepositoryIds: string[];
+    outcomes: Array<{ repositoryId: string; repository: string; state: "registered" | "rejected"; reason?: string }>;
+    pendingRegistration?: PendingRepositoryRegistration;
+  },
+  repositoryId: string,
+) {
+  const pending = state.pendingRegistration;
+  if (!pending || pending.repositoryId !== repositoryId) return false;
+  if (!state.completedRepositoryIds.includes(repositoryId)) state.completedRepositoryIds.push(repositoryId);
+  if (!state.outcomes.some((outcome) => outcome.repositoryId === repositoryId)) {
+    state.outcomes.push({ repositoryId, repository: pending.repository, state: "rejected", reason: "REPOSITORY_ALREADY_REGISTERED" });
+  }
+  state.pendingRegistration = undefined;
+  return true;
+}
+
 const redistributableLicenses = new Set([
   "0BSD",
   "Apache-2.0",
