@@ -32,6 +32,7 @@
 
 .folder-float__folder {
   position: relative;
+  display: block;
   width: var(--ff-w);
   height: var(--ff-h);
 }

@@ -9,6 +9,12 @@ for (const route of ["/", "/en"]) {
       const folders = page.locator(".redesign-home-features .folder-float");
       await expect(folders).toHaveCount(4);
       for (const folder of await folders.all()) {
+        const folderShape = folder.locator(".folder-float__folder");
+        const front = folder.locator(".folder-float__front");
+        await expect(folderShape).toBeVisible();
+        const frontBounds = (await front.boundingBox())!;
+        expect(frontBounds.width).toBeGreaterThan(180);
+        expect(frontBounds.height).toBeGreaterThan(90);
         const bounds = (await folder.boundingBox())!;
         expect(bounds.y).toBeGreaterThan(0);
         expect(await folder.evaluate(node => node.style.getPropertyValue("--ff-back"))).toBe("#f5f5f5");
