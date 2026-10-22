@@ -4,10 +4,33 @@ import {
   parseAiWorkflowRepositoryLinkResult,
   parseAiWorkflowWorkerResult,
 } from "@/lib/ai-workflows/worker-result";
+import { buildAiWorkflowSourceArchiveObjectKey } from "@/lib/ai-workflows/cos";
 
 const sha256 = "b".repeat(64);
 const commit = "a".repeat(40);
 const repositoryId = "123456";
+const sourceSha256 = "c".repeat(64);
+const sourceObjectKey = buildAiWorkflowSourceArchiveObjectKey(repositoryId, commit, sourceSha256);
+
+function sourceArchive() {
+  return {
+    deliveryMode: "cos",
+    upstreamUrl: `https://github.com/example/agent-flow/archive/${commit}.zip`,
+    archive: {
+      sha256: sourceSha256,
+      size: 2048,
+      crc64: "1234567890123",
+      remoteSize: 2048,
+      remoteCrc64: "1234567890123",
+      anonymousReadDenied: true,
+      bucket: "enhe-downloads-1303691623",
+      region: "ap-shanghai",
+      objectKey: sourceObjectKey,
+      filePath: `cos://enhe-downloads-1303691623/${sourceObjectKey}`,
+      contentType: "application/zip",
+    },
+  };
+}
 
 function result(overrides: Record<string, unknown> = {}) {
   return {
@@ -101,6 +124,30 @@ describe("AI Workflow worker result intake", () => {
     }
   });
 
+  it("records a COS source ZIP only for a matching fixed commit and redistributable license", () => {
+    const link = {
+      deliveryMode: "repository_link",
+      repositoryId,
+      repositoryUrl: "https://github.com/example/agent-flow",
+      commitSha: commit,
+      licenseSpdx: "MIT",
+      licenseFilePath: "LICENSE",
+      projectType: "workflow",
+      stars: 125,
+      updatedAt: "2026-10-20T01:00:00.000Z",
+      language: "Python",
+      description: "Reusable AI agent workflow for research tasks.",
+      failureReason: "PACKAGE_LANGUAGE_UNSUPPORTED",
+      sourceArchive: sourceArchive(),
+    };
+    expect(parseAiWorkflowRepositoryLinkResult(link).success).toBe(true);
+    expect(parseAiWorkflowRepositoryLinkResult({ ...link, licenseSpdx: "GPL-3.0-only" }).success).toBe(false);
+    expect(parseAiWorkflowRepositoryLinkResult({
+      ...link,
+      sourceArchive: { ...sourceArchive(), upstreamUrl: "https://github.com/example/agent-flow/archive/main.zip" },
+    }).success).toBe(false);
+  });
+
   it("rejects repository links without a recognized open-source license or with a hard-stop failure", () => {
     const link = {
       deliveryMode: "repository_link",
@@ -133,6 +180,14 @@ describe("AI Workflow worker result intake", () => {
         problem: "减少重复整理公开资料的手工步骤。",
       });
     }
+  });
+
+  it("accepts package metadata with a separately verified upstream source ZIP", () => {
+    const parsed = parseAiWorkflowWorkerResult(result({ sourceArchive: sourceArchive() }));
+    expect(parsed.success).toBe(true);
+    expect(parseAiWorkflowWorkerResult(result({
+      sourceArchive: { ...sourceArchive(), archive: { ...sourceArchive().archive, remoteCrc64: "1" } },
+    })).success).toBe(false);
   });
 
   it("rejects unknown licenses, mismatched remote checks, and incomplete core validation", () => {

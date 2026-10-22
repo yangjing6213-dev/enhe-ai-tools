@@ -51,7 +51,7 @@ async function rect(locator: Locator): Promise<Rect> {
 async function openFormalRoute(page: Page, path: string) {
   await page.context().clearCookies({ name: "enhe_locale" });
   await page.route("**/api/analytics", (route) => route.fulfill({ status: 204 }));
-  await page.goto(path, { waitUntil: "networkidle" });
+  await page.goto(path, { waitUntil: "load" });
 }
 
 async function scrollIntoView(locator: Locator, block: ScrollLogicalPosition = "center") {

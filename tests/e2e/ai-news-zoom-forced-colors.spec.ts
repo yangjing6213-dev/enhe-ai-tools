@@ -20,7 +20,7 @@ for (const route of routes) {
 
 
     await page.setViewportSize({ width: 390, height: 844 });
-    const response = await page.goto(route.path, { waitUntil: "networkidle" });
+    const response = await page.goto(route.path, { waitUntil: "load" });
     expect(response?.status()).toBe(200);
 
     await page.addStyleTag({
@@ -67,7 +67,7 @@ for (const route of routes) {
 
     await page.emulateMedia({ forcedColors: "active" });
     await page.setViewportSize({ width: 390, height: 844 });
-    const response = await page.goto(route.path, { waitUntil: "networkidle" });
+    const response = await page.goto(route.path, { waitUntil: "load" });
     expect(response?.status()).toBe(200);
     await expect(page.locator("main.ai-news-page")).toBeVisible();
     const statePanel = page.locator(

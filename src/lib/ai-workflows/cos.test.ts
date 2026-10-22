@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { buildAiWorkflowArchiveObjectKey, calculateCosCrc64Ecma, getAiWorkflowCosConfig, getAiWorkflowCosOperationFailure, getAiWorkflowDownloadUrl } from "@/lib/ai-workflows/cos";
+import { buildAiWorkflowArchiveObjectKey, buildAiWorkflowSourceArchiveObjectKey, calculateCosCrc64Ecma, getAiWorkflowCosConfig, getAiWorkflowCosOperationFailure, getAiWorkflowDownloadUrl } from "@/lib/ai-workflows/cos";
 
 describe("AI Workflow COS configuration", () => {
   it("uses only the dedicated workflow buckets and defaults to the Shanghai region", () => {
@@ -28,6 +28,9 @@ describe("AI Workflow archive identity and transfer verification", () => {
   it("uses a repository, fixed commit, and archive hash for an immutable object key", () => {
     expect(buildAiWorkflowArchiveObjectKey("123456", "a".repeat(40), "b".repeat(64))).toBe(
       `ai-workflows/123456/${"a".repeat(40)}/${"b".repeat(64)}.zip`,
+    );
+    expect(buildAiWorkflowSourceArchiveObjectKey("123456", "a".repeat(40), "b".repeat(64))).toBe(
+      `ai-workflows/source/123456/${"a".repeat(40)}/${"b".repeat(64)}.zip`,
     );
   });
 

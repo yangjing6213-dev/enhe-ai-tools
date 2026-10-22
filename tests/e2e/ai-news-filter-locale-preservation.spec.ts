@@ -56,7 +56,7 @@ for (const route of routes) {
     });
 
     await page.setViewportSize({ width: 1440, height: 900 });
-    const response = await page.goto(route.path, { waitUntil: "networkidle" });
+    const response = await page.goto(route.path, { waitUntil: "load" });
 
     expect(response?.status()).toBe(200);
     await expect(page.locator("main.ai-news-page")).toBeVisible();

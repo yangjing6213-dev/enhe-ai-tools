@@ -11,6 +11,7 @@ export const clientWritableAnalyticsEventNames = [
   "product_use_cta_click",
   "begin_checkout",
   "product_download_click",
+  "workflow_source_archive_download",
   "view_pricing",
   "view_user_center",
   "search_ai_news",

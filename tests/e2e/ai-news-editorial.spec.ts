@@ -41,7 +41,7 @@ for (const route of routes) {
     await page.setViewportSize(viewports[0]);
     const response = await page.goto(route, { waitUntil: "domcontentloaded" });
     expect(response?.status()).toBe(200);
-    await page.waitForLoadState("networkidle");
+    await page.waitForLoadState("load");
 
     for (const viewport of viewports) {
       await page.setViewportSize(viewport);

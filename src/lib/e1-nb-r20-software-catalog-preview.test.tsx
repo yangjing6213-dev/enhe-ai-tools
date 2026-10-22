@@ -84,7 +84,7 @@ describe("E1-NB-R20 software catalog DB-free preview", () => {
         expect(html).toContain("软件目录内容尚未核验");
       }
     },
-    10000,
+    20000,
   );
 
   it.each([

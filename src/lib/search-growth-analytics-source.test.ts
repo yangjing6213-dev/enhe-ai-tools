@@ -1,5 +1,6 @@
 import { readFileSync } from "node:fs";
 import { describe, expect, it } from "vitest";
+import { getAnalyticsProductRoute } from "@/lib/analytics-public-routes";
 import { isClientAnalyticsEventName } from "@/lib/analytics";
 
 function read(relativePath: string) {
@@ -18,8 +19,10 @@ describe("search growth analytics triggers", () => {
     expect(source).toMatch(/<FormSubmitButton[\s\S]*?data-analytics-event="product_purchase_cta_click"/);
     expect(source).toMatch(/<ButtonLink[\s\S]*?data-analytics-event=\{softwareDownloadCtaEvent\}/);
     expect(tracker).toContain("getPageViewEventName");
+    expect(analyticsClient).toContain("getAnalyticsProductRoute");
     expect(analyticsClient).toContain("getAnalyticsProductRoute(normalized)?.eventName");
     expect(read("./analytics-public-routes.ts")).toContain('"view_tool" as const');
+    expect(getAnalyticsProductRoute("/tools/example")?.eventName).toBe("view_tool");
   });
 
   it("tracks content links into product detail pages", () => {

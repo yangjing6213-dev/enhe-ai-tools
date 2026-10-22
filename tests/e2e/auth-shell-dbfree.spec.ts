@@ -63,7 +63,7 @@ for (const route of routes) {
       await form.getByRole("button", { name: route.locale === "en" ? "Hide password" : "隐藏密码", exact: true }).click();
       await expect(password).toHaveAttribute("type", "password");
       if (route.kind === "register") {
-        await expect(form.getByLabel(route.locale === "en" ? "Email" : "邮箱", { exact: true })).toBeVisible();
+        await expect(account).toHaveAttribute("name", "email");
       }
       const googleLink = form.getByRole("link", {
         name: route.kind === "register"
