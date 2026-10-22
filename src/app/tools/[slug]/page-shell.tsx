@@ -845,7 +845,7 @@ export async function ToolDetailPageShell({
                     }
                   >
                     {workflowLinkOnly
-                      ? forceLocale === "en" ? "GitHub repository" : "原仓库链接"
+                      ? forceLocale === "en" ? "GitHub source ZIP and repository" : "GitHub 源码 ZIP 与原仓库"
                       : paidSkillCourse
                       ? forceLocale === "en"
                         ? "Paid course"
@@ -919,7 +919,7 @@ export async function ToolDetailPageShell({
                         <>
                           <Info
                             label={forceLocale === "en" ? "Delivery" : "获取方式"}
-                            value={forceLocale === "en" ? "GitHub repository only" : "仅提供原仓库链接"}
+                            value={forceLocale === "en" ? "GitHub source ZIP and repository link" : "GitHub 源码 ZIP 与原仓库链接"}
                           />
                           <Info
                             label={forceLocale === "en" ? "Project language" : "项目语言"}
@@ -977,7 +977,26 @@ export async function ToolDetailPageShell({
                       ) : null}
                     </>
                   )}
+                  {isAiWorkflow && tool.aiWorkflowCandidate?.status === "published" ? (
+                    <ButtonLink
+                      href={`/api/ai-workflows/${encodeURIComponent(tool.slug)}/source-archive`}
+                      className="tool-download-button"
+                      data-analytics-event="workflow_source_archive_download"
+                      data-analytics-entity-type="tool"
+                      data-analytics-entity-id={tool.id}
+                    >
+                      {forceLocale === "en" ? "Download GitHub source ZIP" : "下载 GitHub 源码 ZIP"}
+                    </ButtonLink>
+                  ) : null}
                 </div>
+
+                {isAiWorkflow && tool.aiWorkflowCandidate?.status === "published" ? (
+                  <p className="mt-3 text-xs leading-5 text-[#8F9DB2]">
+                    {forceLocale === "en"
+                      ? "This is an upstream source snapshot at a fixed commit, separate from any ENHE package."
+                      : "这是固定提交的上游源码快照，与 ENHE 交付包分开提供。"}
+                  </p>
+                ) : null}
 
                 <div className={`tool-detail-offer-creator-grid${creatorProfile ? " has-creator" : ""}`}>
                 <div className="tool-detail-offer-creator-main">
@@ -1264,7 +1283,7 @@ export async function ToolDetailPageShell({
                   <Info label={forceLocale === "en" ? "Application area" : "应用方向"} value={forceLocale === "en" ? (tool.aiWorkflowCandidate.topic?.englishName || tool.aiWorkflowCandidate.topic?.name || "-") : (tool.aiWorkflowCandidate.topic?.name || "-")} />
                   <Info label={forceLocale === "en" ? "Project type" : "项目类型"} value={workflowProjectType} />
                   <Info label={forceLocale === "en" ? "License" : "开源许可证"} value={tool.aiWorkflowCandidate.licenseSpdx || (forceLocale === "en" ? "Not provided" : "未提供")} />
-                  <Info label={workflowLinkOnly ? (forceLocale === "en" ? "Delivery" : "获取方式") : (forceLocale === "en" ? "Package version" : "交付版本")} value={workflowLinkOnly ? (forceLocale === "en" ? "Repository link only" : "仅原仓库链接") : tool.aiWorkflowCandidate.packageVersion || tool.version || "-"} />
+                  <Info label={workflowLinkOnly ? (forceLocale === "en" ? "Delivery" : "获取方式") : (forceLocale === "en" ? "Package version" : "交付版本")} value={workflowLinkOnly ? (forceLocale === "en" ? "GitHub source ZIP and repository link" : "GitHub 源码 ZIP 与原仓库链接") : tool.aiWorkflowCandidate.packageVersion || tool.version || "-"} />
                   <Info label={workflowLinkOnly ? (forceLocale === "en" ? "GitHub stars" : "GitHub 星标") : (forceLocale === "en" ? "Package size" : "压缩包大小")} value={workflowLinkOnly ? `${(tool.aiWorkflowCandidate.githubStars ?? 0).toLocaleString()} · ${tool.aiWorkflowCandidate.starsUpdatedAt?.toLocaleDateString(forceLocale === "en" ? "en-US" : "zh-CN") ?? "-"}` : tool.aiWorkflowCandidate.packageSize ? `${(Number(tool.aiWorkflowCandidate.packageSize) / 1024 / 1024).toFixed(1)} MB` : "-"} />
                   <Info label={workflowLinkOnly ? (forceLocale === "en" ? "Package verification" : "打包核验") : (forceLocale === "en" ? "Verified environments" : "实际验证环境")} value={workflowLinkOnly ? workflowPackageAwaitingReview ? (forceLocale === "en" ? "Awaiting price review" : "等待价格审核") : tool.aiWorkflowCandidate.failureReason === "CANDIDATE_TEST_FAILED" ? (forceLocale === "en" ? "Automated test did not pass" : "自动测试未通过") : (forceLocale === "en" ? "No ENHE package available" : "本站暂无可下载包") : tool.aiWorkflowCandidate.verifiedEnvironments.length ? tool.aiWorkflowCandidate.verifiedEnvironments.join(" · ") : localizedSystemRequirement || (forceLocale === "en" ? "Not recorded" : "暂无记录")} />
                 </div>

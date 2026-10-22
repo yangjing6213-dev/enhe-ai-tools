@@ -74,6 +74,12 @@ export function buildAiWorkflowArchiveObjectKey(repositoryId: string, commitSha:
   return `ai-workflows/${safeRepositoryId}/${safeCommit}/${safeSha}.zip`;
 }
 
+export function buildAiWorkflowSourceArchiveObjectKey(repositoryId: string, commitSha: string, archiveSha256: string) {
+  const packageObjectKey = buildAiWorkflowArchiveObjectKey(repositoryId, commitSha, archiveSha256);
+  const [, safeRepositoryId, safeCommit, safeArchiveName] = packageObjectKey.split("/");
+  return `ai-workflows/source/${safeRepositoryId}/${safeCommit}/${safeArchiveName}`;
+}
+
 function updateCosCrc64(crc: bigint, bytes: Uint8Array) {
   for (const byte of bytes) {
     crc ^= BigInt(byte);
@@ -209,6 +215,7 @@ export async function uploadAiWorkflowArchive(input: {
   archivePath: string;
   repositoryId: string;
   commitSha: string;
+  archiveKind?: "package" | "source";
   env?: Env;
 }) {
   const env = input.env ?? process.env;
@@ -226,7 +233,9 @@ export async function uploadAiWorkflowArchive(input: {
     stream.on("end", () => resolve(hash.digest("hex")));
   }));
   const crc64 = await calculateCosCrc64EcmaFile(input.archivePath);
-  const objectKey = buildAiWorkflowArchiveObjectKey(input.repositoryId, input.commitSha, packageSha256);
+  const objectKey = input.archiveKind === "source"
+    ? buildAiWorkflowSourceArchiveObjectKey(input.repositoryId, input.commitSha, packageSha256)
+    : buildAiWorkflowArchiveObjectKey(input.repositoryId, input.commitSha, packageSha256);
   const client = createCosClient(config);
   const reused = await withCosStage("inspect_existing_object", () => withCosRetry(() => inspectExistingObject(client, config, objectKey, archiveStat.size, crc64)));
 

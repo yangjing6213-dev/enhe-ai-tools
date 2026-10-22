@@ -106,8 +106,11 @@ export async function POST(
         mode: "repository_link",
         reason: item.failureReason,
         enheDownloadPackageAvailable: false,
+        upstreamSourceArchiveAvailable: true,
+        sourceArchiveDeliveryMode: item.sourceArchive?.deliveryMode ?? "github",
         descriptionSource: "GitHub repository metadata",
       },
+      ...(item.sourceArchive ? { sourceArchive: item.sourceArchive } : {}),
       presentation: item.presentation ?? { cover: { url: generatedCoverUrl, source: "generated" }, localization: "legacy" },
       localizationSource: item.presentation ? "AI-assisted translation of GitHub repository metadata and README" : "legacy",
     };
@@ -191,7 +194,7 @@ export async function POST(
               githubStars: item.stars,
               starsUpdatedAt: now,
               validationReport,
-              modificationSummary: "仅收录 GitHub 原仓库链接；本站未制作下载包，未通过下载版发布流程。",
+              modificationSummary: "提供 GitHub 固定版本源码 ZIP 和原仓库链接；本站未制作或验证可运行交付包。",
               failureReason: item.failureReason,
               status: "reviewing",
               toolId: tool.id,
@@ -267,6 +270,7 @@ export async function POST(
       anonymousReadDenied: item.archive.anonymousReadDenied,
       contentType: item.archive.contentType,
     },
+    ...(item.sourceArchive ? { sourceArchive: item.sourceArchive } : {}),
     presentation: item.presentation ?? { cover: { url: generatedCoverUrl, source: "generated" }, localization: "legacy" },
     localizationSource: item.presentation ? "AI-assisted translation of GitHub repository metadata and README" : "legacy",
   };

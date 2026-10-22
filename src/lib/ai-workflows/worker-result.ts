@@ -3,6 +3,7 @@ import { isLinkableOpenSourceLicenseId, isPackageRedistributableLicenseId } from
 import { normalizeGitHubRepositoryUrl } from "@/lib/ai-workflows/rules";
 import { buildAiWorkflowArchiveObjectKey } from "@/lib/ai-workflows/cos";
 import { aiWorkflowPresentationSchema } from "@/lib/ai-workflows/presentation";
+import { aiWorkflowSourceArchiveDeliverySchema, parseAiWorkflowSourceArchiveDelivery } from "@/lib/ai-workflows/source-archive";
 
 const environmentNames = ["windows", "wsl2", "macos", "linux", "docker"] as const;
 const projectTypes = ["workflow", "automation", "agent", "template", "companion"] as const;
@@ -89,6 +90,7 @@ const workerResultSchema = z.object({
     fileName: z.string().min(1).max(240),
     contentType: z.literal("application/zip"),
   }).strict(),
+  sourceArchive: aiWorkflowSourceArchiveDeliverySchema.optional(),
   product: productSchema,
   presentation: aiWorkflowPresentationSchema.optional(),
 }).strict();
@@ -106,6 +108,7 @@ const repositoryLinkResultSchema = z.object({
   language: z.string().max(120).nullable(),
   description: z.string().max(500),
   failureReason: z.enum(repositoryLinkFailureReasons),
+  sourceArchive: aiWorkflowSourceArchiveDeliverySchema.optional(),
   presentation: aiWorkflowPresentationSchema.optional(),
 }).strict();
 
@@ -152,9 +155,20 @@ export function parseAiWorkflowWorkerResult(value: unknown, expectedDownloadBuck
   const archiveSha256 = data.archive.sha256.toLowerCase();
   const expectedObjectKey = buildAiWorkflowArchiveObjectKey(data.repositoryId, commitSha, archiveSha256);
   const licensePath = data.licenseFilePath.replaceAll("\\", "/");
+  const sourceArchive = data.sourceArchive
+    ? parseAiWorkflowSourceArchiveDelivery(data.sourceArchive, {
+      repositoryId: data.repositoryId,
+      repositoryUrl: data.repositoryUrl,
+      commitSha,
+      licenseSpdx,
+      downloadBucket: expectedDownloadBucket,
+      region: process.env.COS_REGION?.trim() || "ap-shanghai",
+    })
+    : undefined;
 
   if (
     !repository ||
+    (data.sourceArchive && !sourceArchive) ||
     !isPackageRedistributableLicenseId(licenseSpdx) ||
     !licensePath || licensePath.startsWith("/") || licensePath.split("/").some((part) => part === "..") || /^[a-z]:/i.test(licensePath) ||
     data.archive.bucket !== expectedDownloadBucket ||
@@ -172,6 +186,7 @@ export function parseAiWorkflowWorkerResult(value: unknown, expectedDownloadBuck
     success: true as const,
     data: {
       ...data,
+      ...(sourceArchive ? { sourceArchive } : {}),
       repositoryUrl: repository.url,
       repositoryOwner: repository.owner,
       repositoryName: repository.name,
@@ -202,6 +217,14 @@ export function parseAiWorkflowRepositoryLinkResult(value: unknown) {
   const repository = normalizeGitHubRepositoryUrl(data.repositoryUrl);
   const licenseSpdx = data.licenseSpdx.trim();
   const licensePath = data.licenseFilePath.replaceAll("\\", "/");
+  const sourceArchive = data.sourceArchive
+    ? parseAiWorkflowSourceArchiveDelivery(data.sourceArchive, {
+      repositoryId: data.repositoryId,
+      repositoryUrl: data.repositoryUrl,
+      commitSha: data.commitSha,
+      licenseSpdx,
+    })
+    : undefined;
   const description = data.description
     .replace(/[\u0000-\u001f\u007f]/g, " ")
     .replace(/-----BEGIN [A-Z ]*PRIVATE KEY-----[\s\S]*?-----END [A-Z ]*PRIVATE KEY-----/gi, "[已隐藏疑似密钥]")
@@ -211,6 +234,7 @@ export function parseAiWorkflowRepositoryLinkResult(value: unknown) {
 
   if (
     !repository ||
+    (data.sourceArchive && !sourceArchive) ||
     !isLinkableOpenSourceLicenseId(licenseSpdx) ||
     !licensePath || licensePath.startsWith("/") || licensePath.split("/").some((part) => part === "..") || /^[a-z]:/i.test(licensePath)
   ) return { success: false as const, error: "LINK_RESULT_EVIDENCE_MISMATCH" as const };
@@ -219,6 +243,7 @@ export function parseAiWorkflowRepositoryLinkResult(value: unknown) {
     success: true as const,
     data: {
       ...data,
+      ...(sourceArchive ? { sourceArchive } : {}),
       description,
       repositoryUrl: repository.url,
       repositoryOwner: repository.owner,

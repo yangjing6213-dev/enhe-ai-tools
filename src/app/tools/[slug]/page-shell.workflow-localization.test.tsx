@@ -65,6 +65,8 @@ describe("workflow detail localized publication", () => {
   it.each(["zh", "en"] as const)("keeps the exact %s text in the hero, body, requirements and metadata", async (locale) => {
     const page = await ToolDetailPageShell({ slug: "ai-workflow-123-design", forceLocale: locale, expectedType: "ai_workflow" });
     const all = elements(page);
+    const sourceArchiveButton = all.find((element) => element.props.href === "/api/ai-workflows/ai-workflow-123-design/source-archive");
+    expect(sourceArchiveButton?.props.children).toBe(locale === "en" ? "Download GitHub source ZIP" : "下载 GitHub 源码 ZIP");
     const hero = all.find((element) => element.type === "section");
     const html = renderToStaticMarkup(hero);
     expect(html).toContain(locale === "en" ? "Create design drafts." : "根据文字创建设计稿。");

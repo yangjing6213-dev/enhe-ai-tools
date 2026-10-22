@@ -14,6 +14,12 @@ import {
   getAiWorkflowDownloadUrl,
   uploadAiWorkflowArchive,
 } from "../src/lib/ai-workflows/cos";
+import {
+  AI_WORKFLOW_SOURCE_ARCHIVE_MAX_BYTES,
+  buildAiWorkflowGitHubSourceArchiveUrl,
+  buildAiWorkflowSourceArchiveFileName,
+  type AiWorkflowSourceArchiveDelivery,
+} from "../src/lib/ai-workflows/source-archive";
 import { parseAiWorkflowRepositoryLinkResult, parseAiWorkflowWorkerResult } from "../src/lib/ai-workflows/worker-result";
 import { isLinkableOpenSourceLicenseId, isPackageRedistributableLicenseId } from "../src/lib/ai-workflows/licenses";
 import { readAiWorkflowCosCredentialsCsv } from "./lib/ai-workflow-cos-credentials";
@@ -597,6 +603,102 @@ async function verifySignedRead(archive: { fileName: string; filePath: string; s
   return { byteCount, sha256: hash.digest("hex") };
 }
 
+function getSourceArchiveFallbackReason(error: unknown): "ARCHIVE_SIZE_LIMIT" | "GITHUB_ARCHIVE_UNAVAILABLE" | "SOURCE_ARCHIVE_INVALID" | "COS_MIRROR_FAILED" {
+  const message = error instanceof Error ? error.message : "";
+  if (message === "ARCHIVE_SIZE_LIMIT") return "ARCHIVE_SIZE_LIMIT";
+  if (message === "GITHUB_ARCHIVE_UNAVAILABLE" || getAiWorkflowFailureCode(error) === "NETWORK_UNAVAILABLE") return "GITHUB_ARCHIVE_UNAVAILABLE";
+  if (message === "SOURCE_ARCHIVE_INVALID") return "SOURCE_ARCHIVE_INVALID";
+  return "COS_MIRROR_FAILED";
+}
+
+async function uploadSourceArchiveToCos(input: {
+  archivePath: string;
+  candidate: AiWorkflowGitHubRepositoryCandidate;
+  commitSha: string;
+  licenseSpdx: string;
+  credentials: { secretId: string; secretKey: string };
+}) {
+  if (!isPackageRedistributableLicenseId(input.licenseSpdx)) throw new Error("LICENSE_NOT_REDISTRIBUTABLE");
+  const archiveInfo = await lstat(input.archivePath);
+  if (!archiveInfo.isFile() || archiveInfo.isSymbolicLink() || archiveInfo.size <= 0) throw new Error("SOURCE_ARCHIVE_INVALID");
+  if (archiveInfo.size > AI_WORKFLOW_SOURCE_ARCHIVE_MAX_BYTES) throw new Error("ARCHIVE_SIZE_LIMIT");
+
+  const handle = await open(input.archivePath, "r");
+  try {
+    const signature = Buffer.alloc(4);
+    const { bytesRead } = await handle.read(signature, 0, signature.length, 0);
+    const validZipSignature = bytesRead === 4 && (
+      signature.equals(Buffer.from([0x50, 0x4b, 0x03, 0x04])) ||
+      signature.equals(Buffer.from([0x50, 0x4b, 0x05, 0x06])) ||
+      signature.equals(Buffer.from([0x50, 0x4b, 0x07, 0x08]))
+    );
+    if (!validZipSignature) throw new Error("SOURCE_ARCHIVE_INVALID");
+  } finally {
+    await handle.close();
+  }
+
+  const uploadEnv: Record<string, string | undefined> = {
+    COS_SECRET_ID: input.credentials.secretId,
+    COS_SECRET_KEY: input.credentials.secretKey,
+    COS_REGION: "ap-shanghai",
+    COS_STATIC_BUCKET: "enhe-static-1303691623",
+    COS_DOWNLOAD_BUCKET: "enhe-downloads-1303691623",
+    COS_STATIC_BASE_URL: "https://static.enhe-tech.com.cn",
+    COS_DOWNLOAD_BASE_URL: "https://download.enhe-tech.com.cn",
+    COS_DOWNLOAD_DOMAIN_VERIFIED: "true",
+    COS_SIGN_EXPIRES_SECONDS: "3600",
+  };
+  const cosConfig = getAiWorkflowCosConfig(uploadEnv);
+  if (!cosConfig) throw new Error("LOCAL_CONFIGURATION_MISSING");
+
+  const upstreamUrl = buildAiWorkflowGitHubSourceArchiveUrl(input.candidate.url, input.commitSha);
+  const fileName = buildAiWorkflowSourceArchiveFileName(input.candidate.url, input.commitSha);
+  if (!upstreamUrl || !fileName) throw new Error("SOURCE_ARCHIVE_INVALID");
+
+  const uploaded = await uploadAiWorkflowArchive({
+    archivePath: input.archivePath,
+    repositoryId: input.candidate.id,
+    commitSha: input.commitSha,
+    archiveKind: "source",
+    env: uploadEnv,
+  });
+  const anonymousStatus = await verifyAnonymousReadIsDenied(uploaded.bucket, uploaded.region, uploaded.objectKey);
+  const signedRead = await verifySignedRead({
+    fileName,
+    filePath: uploaded.filePath,
+    storageBucket: uploaded.bucket,
+    objectKey: uploaded.objectKey,
+  }, uploadEnv);
+  if (
+    uploaded.fileSize !== archiveInfo.size ||
+    signedRead.byteCount !== archiveInfo.size ||
+    signedRead.sha256 !== uploaded.packageSha256 ||
+    anonymousStatus !== 401 && anonymousStatus !== 403
+  ) throw new Error("COS_MIRROR_FAILED");
+
+  return {
+    deliveryMode: "cos" as const,
+    upstreamUrl,
+    archive: {
+      sha256: uploaded.packageSha256,
+      size: uploaded.fileSize,
+      crc64: uploaded.crc64,
+      remoteSize: uploaded.fileSize,
+      remoteCrc64: uploaded.crc64,
+      anonymousReadDenied: true as const,
+      bucket: uploaded.bucket,
+      region: uploaded.region,
+      objectKey: uploaded.objectKey,
+      filePath: uploaded.filePath,
+      contentType: "application/zip" as const,
+    },
+  } satisfies AiWorkflowSourceArchiveDelivery;
+}
+
+function sourceArchiveFallback(upstreamUrl: string, failureReason: "LICENSE_NOT_REDISTRIBUTABLE" | "ARCHIVE_SIZE_LIMIT" | "GITHUB_ARCHIVE_UNAVAILABLE" | "SOURCE_ARCHIVE_INVALID" | "COS_MIRROR_FAILED") {
+  return { deliveryMode: "github", upstreamUrl, failureReason } as const satisfies AiWorkflowSourceArchiveDelivery;
+}
+
 async function getRepositoryCommit(candidate: AiWorkflowGitHubRepositoryCandidate) {
   const data = await githubJson<{ sha?: string }>(`/repos/${candidate.fullName}/commits/${encodeURIComponent(candidate.defaultBranch)}`);
   if (!data.sha || !/^[a-f0-9]{40,64}$/i.test(data.sha)) throw new Error("GITHUB_COMMIT_INVALID");
@@ -641,6 +743,7 @@ async function registerRepositoryLinkOnly(input: {
   batch: WorkerBatch;
   lease: WorkerLease;
   token: string;
+  credentials: { secretId: string; secretKey: string };
   state: RunState;
   statePath: string;
   index: number;
@@ -648,11 +751,48 @@ async function registerRepositoryLinkOnly(input: {
   signal: AbortSignal;
   setStage: (stage: "search" | "fetch" | "license_review" | "sandbox_test" | "package" | "upload" | "register") => void;
 }) {
-  const { candidate, batch, lease, token, state, statePath, index, failureReason, signal, setStage } = input;
+  const { candidate, batch, lease, token, credentials, state, statePath, index, failureReason, signal, setStage } = input;
   const commitSha = await getRepositoryCommit(candidate);
   const license = await getLicenseFile(candidate, commitSha, { linkOnly: true });
   const readme = await getGitHubReadmeText(candidate, commitSha);
   if (!isAiWorkflowCandidateRelevant(candidate.collectionTopicName, candidate, readme)) throw new Error("TOPIC_MISMATCH");
+  const upstreamUrl = buildAiWorkflowGitHubSourceArchiveUrl(candidate.url, commitSha);
+  if (!upstreamUrl) throw new Error("SOURCE_ARCHIVE_INVALID");
+
+  let sourceArchive: AiWorkflowSourceArchiveDelivery;
+  if (!isPackageRedistributableLicenseId(license.spdx)) {
+    sourceArchive = sourceArchiveFallback(upstreamUrl, "LICENSE_NOT_REDISTRIBUTABLE");
+  } else {
+    const updateArchiveStage = async (stage: "fetch" | "upload") => {
+      if (signal.aborted) throw new Error("BATCH_PAUSED_OR_LEASE_LOST");
+      state.candidateIndex = index;
+      await persistRunState(statePath, state);
+      setStage(stage);
+      await postWorker(`/${batch.id}/heartbeat`, {
+        workerId: workerId(), leaseToken: lease.leaseToken, stage,
+        checkpoint: buildWorkerCheckpoint(state),
+      }, token);
+    };
+    let archivePath: string | null = null;
+    try {
+      const rootReal = await realpath(runsRoot);
+      const batchReal = await realpath(join(runsRoot, batch.id));
+      if (!pathIsWithin(rootReal, batchReal)) throw new Error("UNSAFE_RUN_PATH");
+      archivePath = join(batchReal, `${candidate.id}-source-${randomUUID()}.zip`);
+      if (!pathIsWithin(batchReal, archivePath)) throw new Error("UNSAFE_RUN_PATH");
+      await updateArchiveStage("fetch");
+      await downloadRepositoryArchive(candidate, commitSha, archivePath);
+      await updateArchiveStage("upload");
+      sourceArchive = await uploadSourceArchiveToCos({ archivePath, candidate, commitSha, licenseSpdx: license.spdx, credentials });
+    } catch (error) {
+      if (signal.aborted) throw new Error("BATCH_PAUSED_OR_LEASE_LOST");
+      const reason = getSourceArchiveFallbackReason(error);
+      sourceArchive = sourceArchiveFallback(upstreamUrl, reason);
+      await logEvent("source_archive_mirror_fallback", { batchId: batch.id, repositoryId: candidate.id, reason });
+    } finally {
+      if (archivePath) await rm(archivePath, { force: true }).catch(() => undefined);
+    }
+  }
   const codexDir = join(runnerRoot, "codex");
   await mkdir(codexDir, { recursive: true });
   const presentation = await generateAiWorkflowPresentation({
@@ -671,6 +811,7 @@ async function registerRepositoryLinkOnly(input: {
     language: candidate.language,
     description: redactAiWorkflowCollectorText(candidate.description).slice(0, 500),
     failureReason,
+    sourceArchive,
     presentation,
   };
   if (!parseAiWorkflowRepositoryLinkResult(payload).success) throw new Error("LINK_RESULT_EVIDENCE_MISMATCH");
@@ -826,6 +967,25 @@ async function processCandidate(input: {
   const cosConfig = getAiWorkflowCosConfig(uploadEnv);
   if (!cosConfig) throw new Error("LOCAL_CONFIGURATION_MISSING");
   await stateUpdate("upload");
+  const upstreamUrl = buildAiWorkflowGitHubSourceArchiveUrl(candidate.url, commitSha);
+  let sourceArchive: AiWorkflowSourceArchiveDelivery | undefined;
+  if (upstreamUrl) {
+    try {
+      sourceArchive = await uploadSourceArchiveToCos({
+        archivePath: sourceZip,
+        candidate,
+        commitSha,
+        licenseSpdx: license.spdx,
+        credentials,
+      });
+    } catch (error) {
+      if (signal.aborted) throw new Error("BATCH_PAUSED_OR_LEASE_LOST");
+      const reason = getSourceArchiveFallbackReason(error);
+      sourceArchive = sourceArchiveFallback(upstreamUrl, reason);
+      await logEvent("source_archive_mirror_fallback", { batchId: batch.id, repositoryId: candidate.id, reason });
+    }
+  }
+  if (signal.aborted) throw new Error("BATCH_PAUSED_OR_LEASE_LOST");
   const uploaded = await uploadAiWorkflowArchive({ archivePath: packagePath, repositoryId: candidate.id, commitSha, env: uploadEnv });
   const anonymousStatus = await verifyAnonymousReadIsDenied(uploaded.bucket, uploaded.region, uploaded.objectKey);
   const signedRead = await verifySignedRead({ fileName, filePath: uploaded.filePath, storageBucket: uploaded.bucket, objectKey: uploaded.objectKey }, uploadEnv);
@@ -863,6 +1023,7 @@ async function processCandidate(input: {
       fileName,
       contentType: "application/zip",
     },
+    ...(sourceArchive ? { sourceArchive } : {}),
     product,
     presentation,
   };
@@ -1036,7 +1197,7 @@ async function runBatch(lease: WorkerLease, token: string, credentials: { secret
           if (linkOnlyReason) {
             try {
               await registerRepositoryLinkOnly({
-                candidate, batch, lease, token, state, statePath, index,
+                candidate, batch, lease, token, credentials, state, statePath, index,
                 failureReason: linkOnlyReason,
                 signal: controller.signal,
                 setStage: (value) => { stage = value; },
