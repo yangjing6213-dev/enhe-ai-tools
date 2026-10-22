@@ -142,7 +142,7 @@ export function isAiWorkflowCandidateRelevant(
   const terms = topicRelevanceTerms[topic];
   if (!terms) return true;
 
-  const normalize = (value: string) => value.normalize("NFKC").toLocaleLowerCase();
+  const normalize = (value: string) => value.normalize("NFKC").toLowerCase();
   const metadata = normalize(`${candidate.fullName}\n${candidate.description}`);
   if (terms.some((term) => metadata.includes(normalize(term)))) return true;
 
