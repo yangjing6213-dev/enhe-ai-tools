@@ -18,7 +18,8 @@ describe("search growth analytics triggers", () => {
     expect(source).toMatch(/<FormSubmitButton[\s\S]*?data-analytics-event="product_purchase_cta_click"/);
     expect(source).toMatch(/<ButtonLink[\s\S]*?data-analytics-event=\{softwareDownloadCtaEvent\}/);
     expect(tracker).toContain("getPageViewEventName");
-    expect(analyticsClient).toContain('return "view_tool"');
+    expect(analyticsClient).toContain("getAnalyticsProductRoute(normalized)?.eventName");
+    expect(read("./analytics-public-routes.ts")).toContain('"view_tool" as const');
   });
 
   it("tracks content links into product detail pages", () => {

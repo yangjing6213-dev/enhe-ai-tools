@@ -1,10 +1,13 @@
 import { AiWorkflowsPageShell, generateAiWorkflowsPageMetadata } from "@/app/ai-workflows/page-shell";
 import { PublicSiteChrome } from "@/components/public-site-chrome";
+import type { AiWorkflowCatalogSearchParams } from "@/lib/ai-workflows/catalog";
 
 export const dynamic = "force-dynamic";
-export const metadata = generateAiWorkflowsPageMetadata("zh");
+export async function generateMetadata({ searchParams }: { searchParams: Promise<AiWorkflowCatalogSearchParams> }) {
+  return generateAiWorkflowsPageMetadata("zh", await searchParams);
+}
 
-export default async function AiWorkflowsPage({ searchParams }: { searchParams: Promise<Record<string, string | undefined>> }) {
+export default async function AiWorkflowsPage({ searchParams }: { searchParams: Promise<AiWorkflowCatalogSearchParams> }) {
   const params = await searchParams;
   return (
     <PublicSiteChrome forceLocale="zh">

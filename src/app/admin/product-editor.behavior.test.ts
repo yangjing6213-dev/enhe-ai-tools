@@ -79,14 +79,49 @@ describe("product editor isolated save path", () => {
     await expect(upsertToolAction(form({ type: "software" }))).rejects.toThrow("FORBIDDEN");
     expect(mocks.db.tool.update).not.toHaveBeenCalled();
   });
+  it("stores ordered how-to steps and the prompt without including prompt text in the audit event", async () => {
+    const privatePrompt = "private prompt text that must not enter audit metadata";
+    const data = form({
+      id: "local-tool", type: "software", name: "Local product", slug: "local-product",
+      shortDescription: "A short description", content: "Product details", status: "draft",
+      downloadFileId: "existing-file", deliveryMode: "how_to", usageStepCount: "2",
+      usageStepTitle_0: "Connect", usageStepDescription_0: "Open the supported app.",
+      usageStepTitle_1: "Finish setup", usageStepDescription_1: "Paste the copied prompt.",
+      installPrompt: privatePrompt,
+    });
+
+    await expect(upsertToolAction(data)).rejects.toThrow("?saved=1");
+
+    expect(mocks.db.tool.update.mock.calls[0][0].data).toMatchObject({
+      deliveryMode: "how_to",
+      usageSteps: [
+        { title: "Connect", description: "Open the supported app." },
+        { title: "Finish setup", description: "Paste the copied prompt." },
+      ],
+      installPrompt: privatePrompt,
+      downloadFileId: "existing-file",
+    });
+    expect(JSON.stringify(mocks.audit.mock.calls)).not.toContain(privatePrompt);
+  });
+
+  it("rejects a how-to form with more than five steps before saving", async () => {
+    const data = form({
+      type: "software", name: "Local product", shortDescription: "Summary", content: "Details", status: "draft",
+      deliveryMode: "how_to", usageStepCount: "6", installPrompt: "prompt",
+    });
+
+    await expect(upsertToolAction(data)).rejects.toThrow("REDIRECT:/admin/software?error=");
+    expect(mocks.db.tool.create).not.toHaveBeenCalled();
+    expect(mocks.db.tool.update).not.toHaveBeenCalled();
+  });
   it("saves tutorial, FAQ and changelog text and media fields without flattening emoji or lines", async () => {
-    const values = { id: "local-record", toolId: "local-tool", title: "Title ✅", content: copy, imageUrl: "/uploads/tutorial.png", videoUrl: "/uploads/tutorial.mp4", notes: copy, commonErrors: copy, question: "Question ✅", answer: copy, version: "v2", status: "active" };
+    const values = { id: "local-record", toolId: "local-tool", title: "Title ✅", content: copy, imageUrl: "/uploads/tutorial.png", videoUrl: "/uploads/tutorial.mp4", notes: copy, commonErrors: copy, question: "Question ✅", answer: copy, versionMajor: "2", versionMinor: "0", status: "active" };
     await expect(upsertTutorialAction(form(values))).rejects.toThrow("?saved=1");
     expect(mocks.db.tutorial.update.mock.calls[0][0].data).toMatchObject({ content: copy, notes: copy, commonErrors: copy, imageUrl: values.imageUrl, videoUrl: values.videoUrl });
     await expect(upsertToolFaqAction(form(values))).rejects.toThrow("?saved=1");
     expect(mocks.db.toolFaq.update.mock.calls[0][0].data.answer).toBe(copy);
     await expect(upsertToolChangelogAction(form(values))).rejects.toThrow("?saved=1");
-    expect(mocks.db.toolChangelog.update.mock.calls[0][0].data.content).toBe(copy);
+    expect(mocks.db.toolChangelog.update.mock.calls[0][0].data).toMatchObject({ content: copy, version: "V2.0" });
   });
   it("deduplicates and binds emoji tags without losing their text", async () => {
     mocks.db.toolTag.upsert.mockImplementation(async ({ create }) => ({ id: create.name, ...create }));

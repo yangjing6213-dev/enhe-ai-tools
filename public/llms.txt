@@ -28,6 +28,8 @@ Important pages:
 - [About ENHE AI](https://www.enhe-tech.com.cn/about)
 - [AI software apps](https://www.enhe-tech.com.cn/software)
 - [AI Skills for agents](https://www.enhe-tech.com.cn/ai-skills)
+- [AI workflows](https://www.enhe-tech.com.cn/ai-workflows)
+- [English AI workflows](https://www.enhe-tech.com.cn/en/ai-workflows)
 - [Independent-site SEO/GEO Audit](https://www.enhe-tech.com.cn/online-tools/seo-geo-audit)
 - [AI account service guidance](https://www.enhe-tech.com.cn/account-services)
 - [AI skill learning](https://www.enhe-tech.com.cn/skill-learning)

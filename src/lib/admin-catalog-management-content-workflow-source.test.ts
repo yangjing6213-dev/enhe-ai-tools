@@ -47,7 +47,7 @@ describe("FAQ, category, tag, and changelog admin presentation", () => {
     }
     expect(changelogEditor).toContain("action={upsertToolChangelogAction}");
     expect(changelogEditor).toContain("action={deleteToolChangelogAction}");
-    for (const name of ["toolId", "version", "title", "releaseDate", "content", "status"]) {
+    for (const name of ["toolId", "versionMajor", "versionMinor", "title", "releaseDate", "content", "status"]) {
       expect(changelogEditor).toContain(`name="${name}"`);
     }
   });

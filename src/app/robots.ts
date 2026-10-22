@@ -25,6 +25,7 @@ const publicAllow = [
   "/api/uploads/",
   "/api/tool-images$",
   "/api/tool-images?",
+  "/api/ai-workflows/covers/",
 ];
 
 const answerEngineUserAgents = [

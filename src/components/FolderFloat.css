@@ -106,27 +106,39 @@
 }
 
 .folder-float__trigger {
-  position: absolute;
-  right: 0;
-  bottom: 0;
-  left: 0;
+  display: block;
+  position: relative;
   z-index: 3;
-  height: 76%;
+  width: var(--ff-w);
+  height: var(--ff-h);
   margin: 0;
   padding: 0;
   border: 0;
-  border-radius: var(--ff-r);
+  list-style: none;
   background: transparent;
   cursor: pointer;
   outline: none;
+  text-align: left;
   -webkit-tap-highlight-color: transparent;
 }
 
-.folder-float[data-open] .folder-float__front {
+.folder-float__trigger::marker,
+.folder-float__trigger::-webkit-details-marker {
+  display: none;
+  content: "";
+}
+
+.folder-float__trigger:focus-visible {
+  border-radius: var(--ff-r);
+  outline: 2px solid #1d4ed8;
+  outline-offset: 3px;
+}
+
+.folder-float[open] .folder-float__front {
   transform: perspective(600px) rotateX(calc(-1 * var(--ff-angle)));
 }
 
-.folder-float[data-open] .folder-float__paper {
+.folder-float[open] .folder-float__paper {
   opacity: 1;
   transform: translateY(0);
   transition:
@@ -143,7 +155,7 @@
   height: 0;
 }
 
-.folder-float[data-open] .folder-float__items::before {
+.folder-float[open] .folder-float__items::before {
   content: '';
   position: absolute;
   top: calc(-1 * (var(--ff-lift) + 120px));
@@ -180,7 +192,7 @@
     scale 160ms var(--ff-ease-out);
 }
 
-.folder-float[data-open] .folder-float__item {
+.folder-float[open] .folder-float__item {
   opacity: 1;
   transform: translate(calc(-50% + var(--x)), var(--y)) rotate(var(--r)) scale(1);
   pointer-events: auto;
@@ -200,12 +212,12 @@
 }
 
 @media (hover: hover) and (pointer: fine) {
-  .folder-float[data-open] .folder-float__item:hover {
+.folder-float[open] .folder-float__item:hover {
     scale: 1.05;
   }
 }
 
-.folder-float[data-open] .folder-float__item:active {
+.folder-float[open] .folder-float__item:active {
   scale: 0.97;
 }
 
@@ -220,7 +232,7 @@
   animation-play-state: paused;
 }
 
-.folder-float[data-open] .folder-float__drift {
+.folder-float[open] .folder-float__drift {
   animation-play-state: running;
 }
 
@@ -256,7 +268,7 @@
     transition: opacity 200ms ease;
   }
 
-  .folder-float[data-open] .folder-float__front {
+  .folder-float[open] .folder-float__front {
     transform: perspective(600px) rotateX(calc(-1 * var(--ff-rest)));
   }
 
@@ -268,7 +280,7 @@
     transition: opacity 200ms ease;
   }
 
-  .folder-float[data-open] .folder-float__item {
+  .folder-float[open] .folder-float__item {
     transition: opacity 200ms ease calc(var(--i) * var(--ff-stagger));
   }
 

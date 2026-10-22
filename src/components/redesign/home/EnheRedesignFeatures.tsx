@@ -54,10 +54,16 @@ export function EnheRedesignFeatures({ locale }: { locale: RedesignLocale }) {
               label={title[locale]}
               sublabel={locale === "zh" ? "点击或悬停探索" : "Open to explore"}
               items={index === 0
-                ? HOME_SOFTWARE_CATEGORIES.map(category => ({ label: category.label[locale], value: `${href[locale]}?category=${category.id}` }))
+                ? HOME_SOFTWARE_CATEGORIES.map(category => {
+                    const target = `${href[locale]}?category=${category.id}`;
+                    return { label: category.label[locale], value: target, href: target };
+                  })
                 : index === 1 || index === 2
-                ? (index === 1 ? SKILL_ITEMS : NEWS_ITEMS).map(item => ({ label: item[locale], value: `${locale === "en" ? "/en" : ""}${item.path}` }))
-                : [{ label: locale === "zh" ? `查看${title[locale]}` : `Explore ${title[locale]}`, value: href[locale] }]}
+                ? (index === 1 ? SKILL_ITEMS : NEWS_ITEMS).map(item => {
+                    const target = `${locale === "en" ? "/en" : ""}${item.path}`;
+                    return { label: item[locale], value: target, href: target };
+                  })
+                : [{ label: locale === "zh" ? `查看${title[locale]}` : `Explore ${title[locale]}`, value: href[locale], href: href[locale] }]}
               trigger="hover"
               closeOnSelect
               physics
@@ -90,7 +96,6 @@ export function EnheRedesignFeatures({ locale }: { locale: RedesignLocale }) {
                       : value.split(/[?#]/)[0].replace(/^\/en(?=\/)/, "").replaceAll("/", "_"),
                   },
                 });
-                window.location.assign(value);
               }}
             />
           </div>

@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { buildAiWorkflowCatalogWhere, parseAiWorkflowCatalogFilters } from "@/lib/ai-workflows/catalog";
+import { buildAiWorkflowCatalogWhere, normalizeAiWorkflowCatalogSearchParams, parseAiWorkflowCatalogFilters } from "@/lib/ai-workflows/catalog";
 
 describe("AI Workflow catalog filters", () => {
   it("normalizes URL filters and keeps valid pagination", () => {
@@ -26,6 +26,16 @@ describe("AI Workflow catalog filters", () => {
       page: 1,
       pageSize: 12,
     });
+  });
+
+  it("uses the first repeated query value consistently and trims display inputs", () => {
+    const normalized = normalizeAiWorkflowCatalogSearchParams({ q: ["  first  ", "second"], sort: ["invalid", "latest"], page: ["2", "3"] });
+    expect(normalized).toEqual({ q: "  first  ", sort: "invalid", page: "2" });
+    expect(parseAiWorkflowCatalogFilters(normalized)).toMatchObject({ q: "first", sort: "recommended", page: 2 });
+  });
+
+  it.each(["-4", "NaN", "", "0"])("normalizes invalid page value %s to the first page", (page) => {
+    expect(parseAiWorkflowCatalogFilters({ page }).page).toBe(1);
   });
 
   it("searches the English collection topic name as well as the Chinese name", () => {

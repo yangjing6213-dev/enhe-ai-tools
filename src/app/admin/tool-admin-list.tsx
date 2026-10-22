@@ -8,6 +8,7 @@ import { ToolMediaUploadGuard } from "@/app/admin/tool-media-upload-guard";
 import { ToolProductImageManager } from "@/app/admin/tool-product-image-manager";
 import { ToolVideoUploadField } from "@/app/admin/tool-video-upload-field";
 import { AiSkillPackageUploadField } from "@/app/admin/ai-skill-package-upload-field";
+import { ToolUsageEditor } from "@/app/admin/tool-usage-editor";
 import { supportedAiAgentOptions } from "@/lib/ai-skill";
 import { getAdminToolBasePath, getAdminToolEditPath, getAdminToolNewPath } from "@/lib/admin-tool-routes";
 import { ADMIN_TOOL_DELETE_PROTECTED_RECORDS, decideAdminToolHardDelete } from "@/lib/admin-delete-protection";
@@ -15,6 +16,7 @@ import type { Locale } from "@/lib/i18n";
 import { resolveToolImageSrc } from "@/lib/tool-image";
 import { getPrimaryToolPrice, type ToolPriceSpecStatus } from "@/lib/tool-price-specs";
 import { getToolPublishIssues } from "@/lib/tool-publish-check";
+import { normalizeToolUsageSteps } from "@/lib/tool-usage-instructions";
 
 type AdminToolType = "software" | "online" | "skill_learning" | "ai_skill" | "ai_workflow";
 
@@ -52,6 +54,9 @@ type ToolItem = {
   downloadPrice: unknown;
   onlineUrl: string | null;
   downloadFileId: string | null;
+  deliveryMode?: string;
+  usageSteps?: unknown;
+  installPrompt?: string | null;
   downloadFile?: { fileName: string; filePath: string; fileUrl: string | null; fileSize: bigint | null } | null;
   priceSpecs?: ToolPriceSpecItem[];
   categoryId: string | null;
@@ -642,6 +647,15 @@ export function ToolEditor({
                   remove: copy.aiSkillPackageRemove,
                   failed: copy.aiSkillPackageFailed,
                 }}
+              />
+            ) : type === "software" || isAiWorkflow ? (
+              <ToolUsageEditor
+                locale={locale}
+                defaultMode={tool?.deliveryMode ?? "link"}
+                defaultSteps={normalizeToolUsageSteps(tool?.usageSteps)}
+                defaultPrompt={tool?.installPrompt ?? ""}
+                downloadFileUrl={directDownloadUrl}
+                downloadFileUrlHint={copy.downloadFileUrlHint}
               />
             ) : !isAccountService ? (
               <EmojiField label={copy.downloadFileUrl}>

@@ -16,7 +16,7 @@ import './FolderFloat.css';
 
 const { Bodies, Body, Composite, Engine } = Matter;
 
-export type FolderFloatItem = string | { label: string; value: string };
+export type FolderFloatItem = string | { label: string; value?: string; href?: string };
 export type FolderFloatTrigger = 'hover' | 'click';
 
 export interface FolderFloatProps {
@@ -50,7 +50,7 @@ export interface FolderFloatProps {
   className?: string;
 }
 
-type Entry = { label: string; value: string };
+type Entry = { label: string; value: string; href?: string };
 type Size = { w: number; h: number };
 type Zone = { left: number; right: number; top: number; bottom: number };
 type Drag = { i: number; id: number; dx: number; dy: number; sx: number; sy: number; moved: boolean };
@@ -149,13 +149,12 @@ const FolderFloat: React.FC<FolderFloatProps> = ({
   className = ''
 }) => {
   const [open, setOpen] = useState(defaultOpen);
-  const [ready, setReady] = useState(false);
-  useEffect(() => setReady(true), []);
   const [popped, setPopped] = useState(-1);
   const [live, setLive] = useState(false);
   const [sizes, setSizes] = useState<Size[]>([]);
+  const detailsRef = useRef<HTMLDetailsElement>(null);
   const anchorRef = useRef<HTMLDivElement>(null);
-  const pillRefs = useRef<(HTMLButtonElement | null)[]>([]);
+  const pillRefs = useRef<(HTMLAnchorElement | HTMLButtonElement | null)[]>([]);
   const world = useRef<World>({
     engine: null,
     bodies: [],
@@ -172,7 +171,10 @@ const FolderFloat: React.FC<FolderFloatProps> = ({
   const popTimer = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
   const liveTimer = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
   const draggedRef = useRef(false);
-  const list: Entry[] = items.map(item => (typeof item === 'string' ? { label: item, value: item } : item));
+  const list: Entry[] = items.map(item => {
+    if (typeof item === 'string') return { label: item, value: item };
+    return { ...item, value: item.value ?? item.href ?? item.label };
+  });
   const n = list.length;
   const sub = sublabel || `${n} ${n === 1 ? 'note' : 'notes'}`;
   const pos = layout(list, spread, lift, tilt, sizes);
@@ -221,7 +223,7 @@ const FolderFloat: React.FC<FolderFloatProps> = ({
     const engine = Engine.create({ gravity: { x: 0, y: 0 } });
     engine.enableSleeping = false;
     w.engine = engine;
-    w.sizes = (els as HTMLButtonElement[]).map(el => ({ w: el.offsetWidth, h: el.offsetHeight }));
+    w.sizes = (els as Array<HTMLAnchorElement | HTMLButtonElement>).map(el => ({ w: el.offsetWidth, h: el.offsetHeight }));
     const ys = pos.map(p => p.y);
     const zone = {
       left: -spread - ZONE_PAD,
@@ -293,6 +295,7 @@ const FolderFloat: React.FC<FolderFloatProps> = ({
   const set = useCallback(
     (next: boolean) => {
       if (!next) stopPhysics();
+      if (detailsRef.current && detailsRef.current.open !== next) detailsRef.current.open = next;
       setOpen(prev => {
         if (prev === next) return prev;
         latest.current.onOpenChange?.(next);
@@ -338,19 +341,19 @@ const FolderFloat: React.FC<FolderFloatProps> = ({
     [stopPhysics]
   );
 
-  const pick = (item: Entry, i: number) => {
+  const pick = (item: Entry, i: number, shouldClose = closeOnSelect) => {
     latest.current.onSelect?.(item.value, i);
     clearTimeout(popTimer.current);
     setPopped(i);
     popTimer.current = setTimeout(() => setPopped(-1), 320);
-    if (closeOnSelect) set(false);
+    if (shouldClose) set(false);
   };
 
-  const pointerAt = (e: PointerEvent<HTMLButtonElement>) => {
+  const pointerAt = (e: PointerEvent<HTMLElement>) => {
     const r = anchorRef.current?.getBoundingClientRect();
     return r ? { x: e.clientX - r.left, y: e.clientY - r.top } : { x: 0, y: 0 };
   };
-  const down = (e: PointerEvent<HTMLButtonElement>, i: number) => {
+  const down = (e: PointerEvent<HTMLElement>, i: number) => {
     draggedRef.current = false;
     const w = world.current;
     if (!w.live || e.button !== 0) return;
@@ -370,7 +373,7 @@ const FolderFloat: React.FC<FolderFloatProps> = ({
       e.currentTarget.setPointerCapture(e.pointerId);
     } catch {}
   };
-  const move = (e: PointerEvent<HTMLButtonElement>, i: number) => {
+  const move = (e: PointerEvent<HTMLElement>, i: number) => {
     const w = world.current;
     const d = w.drag;
     if (!d || d.i !== i || d.id !== e.pointerId) return;
@@ -389,7 +392,7 @@ const FolderFloat: React.FC<FolderFloatProps> = ({
     Body.setVelocity(b, { x: (x - b.position.x) * 0.6, y: (y - b.position.y) * 0.6 });
     Body.setPosition(b, { x, y });
   };
-  const up = (e: PointerEvent<HTMLButtonElement>, i: number) => {
+  const up = (e: PointerEvent<HTMLElement>, i: number) => {
     const w = world.current;
     const d = w.drag;
     if (!d || d.i !== i || d.id !== e.pointerId) return;
@@ -403,8 +406,10 @@ const FolderFloat: React.FC<FolderFloatProps> = ({
   const hover = trigger === 'hover';
 
   return (
-    <div
+    <details
+      ref={detailsRef}
       className={`folder-float${className ? ` ${className}` : ''}`}
+      open={open}
       data-open={open ? '' : undefined}
       data-live={live ? '' : undefined}
       data-physics={physics ? '' : undefined}
@@ -417,7 +422,7 @@ const FolderFloat: React.FC<FolderFloatProps> = ({
             }
           : undefined
       }
-      onKeyDown={(e: React.KeyboardEvent<HTMLDivElement>) => {
+      onKeyDown={(e: React.KeyboardEvent<HTMLDetailsElement>) => {
         if (e.key === 'Escape' && open) {
           e.stopPropagation();
           set(false);
@@ -445,33 +450,64 @@ const FolderFloat: React.FC<FolderFloatProps> = ({
           '--ff-spring': `cubic-bezier(0.34, ${(1 + bounce * 1.9).toFixed(2)}, 0.64, 1)`
         } as CSSProperties
       }
+      onToggle={event => {
+        if (event.currentTarget.open !== open) set(event.currentTarget.open);
+      }}
     >
+      <summary className="folder-float__trigger" aria-label={`${label}, ${sub}`}>
+        <span className="folder-float__folder" aria-hidden="true">
+          <span className="folder-float__back" />
+          <span className="folder-float__paper" />
+          <span className="folder-float__front">
+            <span className="folder-float__label">{label}</span>
+            <span className="folder-float__sub">{sub}</span>
+          </span>
+        </span>
+        <span className="sr-only">{label}, {sub}</span>
+      </summary>
       <div ref={anchorRef} className="folder-float__items">
         {list.map((item, i) => {
           const p = pos[i];
+          const commonProps = {
+            ref: (el: HTMLAnchorElement | HTMLButtonElement | null) => {
+              pillRefs.current[i] = el;
+            },
+            className: 'folder-float__item',
+            'data-pop': popped === i ? '' : undefined,
+            style: {
+              '--i': i,
+              '--x': `${p.x.toFixed(1)}px`,
+              '--y': `${p.y.toFixed(1)}px`,
+              '--r': `${p.r.toFixed(2)}deg`
+            } as CSSProperties,
+            onPointerDown: (e: PointerEvent<HTMLElement>) => down(e, i),
+            onPointerMove: (e: PointerEvent<HTMLElement>) => move(e, i),
+            onPointerUp: (e: PointerEvent<HTMLElement>) => up(e, i),
+            onPointerCancel: (e: PointerEvent<HTMLElement>) => { draggedRef.current = true; up(e, i); },
+          };
+
+          if (item.href) {
+            return (
+              <a
+                {...commonProps}
+                key={`${item.href}-${i}`}
+                href={item.href}
+                onClick={e => {
+                  if (draggedRef.current && e.detail !== 0) e.preventDefault();
+                  else pick(item, i, false);
+                  draggedRef.current = false;
+                }}
+              >
+                <span className="folder-float__drift">{item.label}</span>
+              </a>
+            );
+          }
+
           return (
             <button
+              {...commonProps}
               key={`${item.value}-${i}`}
-              ref={el => {
-                pillRefs.current[i] = el;
-              }}
               type="button"
-              className="folder-float__item"
-              tabIndex={open ? 0 : -1}
-              aria-hidden={!open}
-              data-pop={popped === i ? '' : undefined}
-              style={
-                {
-                  '--i': i,
-                  '--x': `${p.x.toFixed(1)}px`,
-                  '--y': `${p.y.toFixed(1)}px`,
-                  '--r': `${p.r.toFixed(2)}deg`
-                } as CSSProperties
-              }
-              onPointerDown={e => down(e, i)}
-              onPointerMove={e => move(e, i)}
-              onPointerUp={e => up(e, i)}
-              onPointerCancel={e => { draggedRef.current = true; up(e, i); }}
               onClick={e => {
                 if (!draggedRef.current || e.detail === 0) pick(item, i);
                 draggedRef.current = false;
@@ -482,23 +518,7 @@ const FolderFloat: React.FC<FolderFloatProps> = ({
           );
         })}
       </div>
-      <div className="folder-float__folder">
-        <span className="folder-float__back" aria-hidden="true" />
-        <span className="folder-float__paper" aria-hidden="true" />
-        <span className="folder-float__front" aria-hidden="true">
-          <span className="folder-float__label">{label}</span>
-          <span className="folder-float__sub">{sub}</span>
-        </span>
-        <button
-          type="button"
-          className="folder-float__trigger"
-          disabled={!ready}
-          aria-expanded={open}
-          aria-label={`${label}, ${sub}`}
-          onClick={() => set(!open)}
-        />
-      </div>
-    </div>
+    </details>
   );
 };
 

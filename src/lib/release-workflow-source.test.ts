@@ -29,7 +29,7 @@ describe("production release workflow", () => {
 
     for (const dockerfile of dockerfiles) {
       const archiveCopy = dockerfile.indexOf("COPY vendor/braces-3.0.4-enhe.0.tgz ./vendor/");
-      const dependencyInstall = dockerfile.search(/^RUN npm (?:ci|install)$/m);
+      const dependencyInstall = dockerfile.search(/^RUN (?:[A-Z_][A-Z0-9_]*=\S+ )?npm (?:ci|install)$/m);
 
       expect(archiveCopy).toBeGreaterThan(-1);
       expect(dependencyInstall).toBeGreaterThan(archiveCopy);

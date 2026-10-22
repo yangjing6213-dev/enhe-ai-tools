@@ -29,14 +29,20 @@ const item: AiWorkflowCatalogCard = {
   systemRequirement: null,
 };
 
-function renderDirectory(locale: "zh" | "en", overrides: Partial<AiWorkflowCatalogCard> = {}) {
+function renderDirectory(
+  locale: "zh" | "en",
+  overrides: Partial<AiWorkflowCatalogCard> = {},
+  items: AiWorkflowCatalogCard[] = [{ ...item, ...overrides }],
+  emptyState: "no-matches" | "no-published" | "topics-unconfigured" | "unverified" = "topics-unconfigured",
+) {
   return renderToStaticMarkup(<AiWorkflowDirectory
     locale={locale}
     filters={{ q: "", topic: "", paid: "all", environment: "all", type: "all", sort: "recommended", page: 1, pageSize: 12 }}
-    items={[{ ...item, ...overrides }]}
+    items={items}
     topics={[]}
     total={1}
     pageCount={1}
+    emptyState={emptyState}
   />);
 }
 
@@ -68,5 +74,25 @@ describe("workflow directory localized publication", () => {
   it("prefers the upstream cover when one is available", () => {
     expect(renderDirectory("en", { coverImage: "https://raw.githubusercontent.com/example/design/main/cover.png" }))
       .toContain('src="https://raw.githubusercontent.com/example/design/main/cover.png"');
+  });
+
+  it("clears a no-match search back to the current language directory", () => {
+    const zh = renderDirectory("zh", {}, [], "no-matches");
+    const en = renderDirectory("en", {}, [], "no-matches");
+    expect(zh).toContain("没有匹配的工作流");
+    expect(zh).toContain('href="/ai-workflows"');
+    expect(en).toContain("No matching workflows");
+    expect(en).toContain('href="/en/ai-workflows"');
+    expect(zh).not.toContain("采集主题尚未配置");
+    expect(en).not.toContain("Collection topics are not configured");
+  });
+
+  it.each([
+    ["no-published", "目前还没有已发布工作流", "No workflows have been published yet"],
+    ["topics-unconfigured", "工作流主题尚未配置", "Workflow topics are not configured"],
+    ["unverified", "本地预览尚未连接内容源", "Local preview is not connected to a content source"],
+  ] as const)("shows the %s state without claiming a filtered result", (state, zhText, enText) => {
+    expect(renderDirectory("zh", {}, [], state)).toContain(zhText);
+    expect(renderDirectory("en", {}, [], state)).toContain(enText);
   });
 });

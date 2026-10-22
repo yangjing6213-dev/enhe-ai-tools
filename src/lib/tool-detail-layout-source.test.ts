@@ -15,7 +15,8 @@ describe("tool detail layout source", () => {
     expect(source).toContain("tool-detail-product-image-frame");
     expect(source).toContain("resolveSoftwareDownloadCtaHref");
     expect(source).toContain('id="download-links"');
-    expect(source).toContain("href={softwareDownloadCtaHref}");
+    expect(source).toContain("href={productActionHref}");
+    expect(source).toContain(": softwareDownloadCtaHref");
     expect(source).toContain("object-contain");
     expect(source).not.toContain("lg:grid-cols-[minmax(0,0.95fr)_minmax(0,1.05fr)]");
     expect(source).not.toContain("lg:grid-cols-[minmax(0,0.9fr)_minmax(0,1.1fr)]");
@@ -62,7 +63,7 @@ describe("tool detail layout source", () => {
     expect(styles).toContain(".tool-detail-payment-method-control");
   });
 
-  it("places the refund guarantee beside trust details and the changelog immediately above FAQs", () => {
+  it("keeps the refund guarantee and places the optional how-to card after the changelog", () => {
     const source = readFileSync(resolve(root, "src/app/tools/[slug]/page-shell.tsx"), "utf8");
     const changelogStart = source.indexOf('id="tool-changelog"');
     const changelogEnd = source.indexOf("</section>", changelogStart);
@@ -75,7 +76,10 @@ describe("tool detail layout source", () => {
     expect(changelogStart).toBeGreaterThan(-1);
     expect(changelogEnd).toBeGreaterThan(changelogStart);
     expect(faqStart).toBeGreaterThan(changelogEnd);
-    expect(betweenCards).not.toContain("<section");
+    expect(betweenCards).toContain('id="tool-how-to"');
+    expect(betweenCards).toContain("visibleUsageSteps.map");
+    expect(source).not.toContain('id="tool-intro"');
+    expect(source).toContain('id="tool-product-description"');
     expect(source.slice(changelogStart, changelogEnd)).toContain("tool-detail-changelog-card");
     expect(source.slice(changelogStart, changelogEnd)).toContain("w-full");
   });

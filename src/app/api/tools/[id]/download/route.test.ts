@@ -73,6 +73,18 @@ describe("download response preparation analytics", () => {
     expect(JSON.stringify(mocks.track.mock.calls)).not.toMatch(/signature|private-path|private-name|must-not-log/);
   });
 
+  it("does not serve a stale download when the product is set to how-to delivery", async () => {
+    mocks.tool.mockResolvedValue({ type: "software", deliveryMode: "how_to" });
+
+    const response = await GET(request(), params);
+
+    expect(response.status).toBe(404);
+    expect(response.headers.get("cache-control")).toBe("private, no-store");
+    expect(mocks.access).not.toHaveBeenCalled();
+    expect(names()).toEqual(["product_download_requested", "product_download_request_failed"]);
+    expect(mocks.track.mock.calls[1][0].metadata).toMatchObject({ reason: "delivery_mode_instructions" });
+  });
+
   it("preserves the private local response headers and records only stream preparation", async () => {
     mocks.localPath.mockReturnValue("private-local-path-must-not-log");
     const response = await GET(request(), params);

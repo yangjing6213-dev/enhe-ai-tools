@@ -22,6 +22,7 @@ import { ToolRichContent } from "@/components/tool-rich-content";
 import { UserAvatar } from "@/components/user-avatar";
 import { EmojiText } from "@/components/emoji-text";
 import { AiWorkflowInstallPanel } from "@/app/ai-workflows/workflow-interactions";
+import { InstallPromptButton } from "./install-prompt-button";
 import { AiWorkflowCoverImage } from "@/app/ai-workflows/workflow-cover-image";
 import { AiWorkflowContent } from "@/app/ai-workflows/workflow-content";
 import { getCurrentUser } from "@/lib/auth";
@@ -65,6 +66,7 @@ import {
   shouldIndexEnglishToolPage,
 } from "@/lib/tool-localization";
 import { getPrimaryToolPrice } from "@/lib/tool-price-specs";
+import { normalizeToolUsageSteps, parseToolChangelogVersion } from "@/lib/tool-usage-instructions";
 import { normalizeGitHubRepositoryUrl, resolveAiWorkflowDeliveryMode } from "@/lib/ai-workflows/rules";
 import {
   canOpenPublicDownloadEntry,
@@ -349,6 +351,12 @@ export async function ToolDetailPageShell({
   );
   const visibleFaqPreview = visibleFaqs.slice(0, 3);
   const visibleChangelogs = tool.changelogs;
+  const visibleUsageSteps = normalizeToolUsageSteps(tool.usageSteps);
+  const hasHowToDelivery =
+    (tool.type === "software" || tool.type === "ai_workflow") &&
+    tool.deliveryMode === "how_to" &&
+    visibleUsageSteps.length > 0 &&
+    Boolean(tool.installPrompt?.trim());
   const visibleComments = (await Promise.all(
     tool.comments.map(async (comment) => ({
       ...comment,
@@ -497,7 +505,7 @@ export async function ToolDetailPageShell({
     ? Boolean(effectiveDownloadFile?.id)
     : Boolean(tool.downloadFileId && effectiveDownloadFile && downloadLinkContent);
   const showDownloadLinkArea = canShowDownloadLinkArea({
-    hasDownloadLink,
+    hasDownloadLink: hasDownloadLink && !hasHowToDelivery,
     isDownloadPaid: paidDownloadProduct,
     hasDownloadPurchase,
   });
@@ -520,8 +528,11 @@ export async function ToolDetailPageShell({
     protectedDownloadHref,
     publicDownloadHref,
   });
+  const productActionHref = hasHowToDelivery
+    ? paidDownloadProduct && !hasDownloadPurchase ? "#tool-purchase" : "#tool-how-to"
+    : softwareDownloadCtaHref;
   const softwareDownloadCtaEvent =
-    softwareDownloadCtaHref === "#download-purchase"
+    productActionHref === "#download-purchase" || (hasHowToDelivery && paidDownloadProduct && !hasDownloadPurchase)
       ? "product_purchase_cta_click"
       : "product_download_click";
   const related = await prisma.tool.findMany({
@@ -569,19 +580,12 @@ export async function ToolDetailPageShell({
       } as Record<string, string>)[tool.aiWorkflowCandidate.failureReason] ?? (forceLocale === "en" ? "This item is available as an upstream repository link only." : "该项目目前仅提供原仓库链接。")
       : (forceLocale === "en" ? "No ENHE download package is currently available." : "本站目前没有可下载的软件包。")
     : null;
-  const tutorialVideos = visibleTutorials.filter(
-    (tutorial) => tutorial.videoUrl,
-  );
   const hasTutorialSection = isSkillLearning || visibleTutorials.length > 0;
   const supportEmail = td.supportEmailValue;
   const publicChangelogFallback =
     forceLocale === "en"
       ? "Important version notes will be added when availability, delivery details, or usage guidance changes. Review the current page information before purchase or use."
       : "当版本、交付说明或使用建议发生变化时，ENHE AI 会在这里同步重要更新。使用或购买前，请以当前页面说明为准。";
-  const publicDemoVideoFallback =
-    forceLocale === "en"
-      ? "Start with the written guide below to confirm the suitable scenario, access conditions, and practical usage steps."
-      : "可先阅读下方图文说明，按步骤确认适用场景、使用条件和实际操作方式。";
   const publicFaqFallback =
     forceLocale === "en"
       ? "Before using this page, review the suitable scenario, delivery boundary, platform rules, and support contact. ENHE AI will continue adding common questions as the page evolves."
@@ -762,7 +766,10 @@ export async function ToolDetailPageShell({
     ...(isAiWorkflow
       ? [{ href: "#workflow-source", label: workflowDetailsTitle }]
       : []),
-    { href: "#tool-intro", label: introTitle },
+    { href: "#tool-product-description", label: introTitle },
+    ...(hasHowToDelivery
+      ? [{ href: "#tool-how-to", label: forceLocale === "en" ? "How to use" : "如何使用" }]
+      : []),
     ...(hasTutorialSection
       ? [
           {
@@ -1007,7 +1014,7 @@ export async function ToolDetailPageShell({
                   id="tool-purchase"
                   className="tool-detail-purchase-panel scroll-mt-24 mt-7 flex flex-wrap gap-3"
                 >
-                  {workflowLinkOnly ? workflowRepository ? (
+                  {workflowLinkOnly && !hasHowToDelivery ? workflowRepository ? (
                     <ButtonLink
                       href={workflowRepository.url}
                       target="_blank"
@@ -1150,22 +1157,26 @@ export async function ToolDetailPageShell({
                     </PurchaseFormTag>
                   ) : isDownloadProduct ? (
                     <ButtonLink
-                      href={softwareDownloadCtaHref}
+                      href={productActionHref}
                       className="tool-download-button" data-no-card-glow
                       data-analytics-event={softwareDownloadCtaEvent}
                       data-analytics-entity-type="tool"
                       data-analytics-entity-id={tool.id}
                     >
-                      {paidDownloadProduct && hasDownloadPurchase
-                        ? isAiSkill ? td.downloadSkill : td.downloadSoftware
-                        : freeDownloadButtonLabel}
+                      {hasHowToDelivery
+                        ? forceLocale === "en"
+                          ? paidDownloadProduct && !hasDownloadPurchase ? "Purchase to continue" : "View how to use"
+                          : paidDownloadProduct && !hasDownloadPurchase ? "前往购买" : "查看如何使用"
+                        : paidDownloadProduct && hasDownloadPurchase
+                          ? isAiSkill ? td.downloadSkill : td.downloadSoftware
+                          : freeDownloadButtonLabel}
                     </ButtonLink>
                   ) : (
                     <ButtonLink
                       href={
                         tool.onlineUrl
                           ? `/api/tools/${tool.id}/use`
-                          : "#tool-intro"
+                          : "#tool-product-description"
                       }
                       data-analytics-event="product_use_cta_click"
                       data-analytics-entity-type="tool"
@@ -1280,86 +1291,8 @@ export async function ToolDetailPageShell({
 
             </>
           ) : null}
-          <section
-            id="tool-intro"
-            className="glass scroll-mt-24 rounded-2xl p-7"
-          >
-            <SectionTitle title={td.trustTitle} intro={td.trustIntro} />
-            <div className="mt-6 grid gap-4 md:grid-cols-2 xl:grid-cols-4">
-              <TrustItem label={td.demoVideo}>
-                {tutorialVideos.length ? (
-                  <div className="space-y-2">
-                    {tutorialVideos.slice(0, 2).map((tutorial) => (
-                      <a
-                        key={tutorial.id}
-                        href={tutorial.videoUrl ?? "#"}
-                        target="_blank"
-                        rel="nofollow noopener noreferrer"
-                        className="tool-detail-touch-link break-all text-sm leading-6 text-[var(--marketing-accent)] hover:text-[#8feaff]"
-                      >
-                        {tutorial.title}
-                      </a>
-                    ))}
-                  </div>
-                ) : (
-                  <p className="text-sm leading-6 text-[#8F9DB2]">
-                    {publicDemoVideoFallback}
-                  </p>
-                )}
-              </TrustItem>
-              <TrustItem
-                label={isAccountService ? td.serviceType : td.systemRequirement}
-              >
-                {isAccountService ? (
-                  <p className="text-sm leading-6 text-[#C5D0E2]">
-                    {localizedCategoryName ?? td.uncategorized}
-                  </p>
-                ) : (
-                  <>
-                    <p className="enhe-authored-text whitespace-pre-wrap break-words text-sm leading-6 text-[#C5D0E2]">
-                      {localizedSystemRequirement ?? td.browser}
-                    </p>
-                    <p className="mt-2 text-xs text-[#8F9DB2]">
-                      {td.version}: {tool.version ?? td.onlineVersion}
-                    </p>
-                  </>
-                )}
-              </TrustItem>
-              <TrustItem label={td.updateLog}>
-                <p className="text-sm leading-6 text-[#C5D0E2]">
-                  {td.changelogCount.replace(
-                    "{count}",
-                    String(visibleChangelogs.length),
-                  )}
-                </p>
-                <Link
-                  href="#tool-changelog"
-                  className="tool-detail-touch-link mt-2 text-sm font-semibold text-[var(--marketing-accent)] hover:text-[#8feaff]"
-                >
-                  {td.changelogTitle}
-                </Link>
-              </TrustItem>
-              <TrustItem label={td.supportEmail}>
-                <a
-                  href={`mailto:${supportEmail}`}
-                  className="tool-detail-touch-link break-all text-sm font-semibold text-[var(--marketing-accent)] hover:text-[#8feaff]"
-                >
-                  {supportEmail}
-                </a>
-                <Link
-                  href={buildLocalePath(
-                    "/legal/membership-refund",
-                    forceLocale,
-                  )}
-                  className="tool-detail-touch-link mt-2 text-sm leading-6 text-[#FFB86B] hover:text-[#FFD29B]"
-                >
-                  {td.refundRulesIntro}
-                </Link>
-              </TrustItem>
-            </div>
-          </section>
-
           <details
+            id="tool-product-description"
             className="tool-detail-mobile-disclosure glass rounded-2xl p-7"
             open
           >
@@ -1529,33 +1462,42 @@ export async function ToolDetailPageShell({
                 )}
               </span>
             </div>
-            <div className="mt-4 grid gap-3">
+            <div className="mt-5">
               {visibleChangelogs.length ? (
-                visibleChangelogs.slice(0, 3).map((item) => (
-                  <div
-                    key={item.id}
-                    className="rounded-2xl border border-white/10 bg-white/8 p-4"
-                  >
-                    <div className="flex flex-wrap items-center gap-2">
-                      <p className="text-sm font-semibold text-[var(--marketing-accent)]">
-                        {item.version}
-                      </p>
-                      {item.releaseDate ? (
-                        <p className="text-xs text-[#8F9DB2]">
-                          {item.releaseDate.toLocaleDateString(
-                            forceLocale === "en" ? "en-US" : "zh-CN",
-                          )}
-                        </p>
-                      ) : null}
-                    </div>
-                    <h3 className="mt-2 font-semibold text-[#F6FAFF]">
-                      {item.title}
-                    </h3>
-                    <p className="enhe-authored-text mt-2 whitespace-pre-wrap break-words text-sm leading-6 text-[#8F9DB2]">
-                      {item.content}
-                    </p>
-                  </div>
-                ))
+                <div className="relative ml-2 border-l border-white/12 pl-6">
+                  {(() => {
+                    const item = visibleChangelogs[0];
+                    const version = parseToolChangelogVersion(item.version);
+                    const displayVersion = version ? `V${version.major}.${version.minor}` : item.version;
+                    return (
+                      <article key={item.id} className="relative pb-5">
+                        <span className="absolute -left-[1.9rem] top-1 h-3 w-3 rounded-full bg-[var(--marketing-accent)]" aria-hidden="true" />
+                        <div className="flex flex-wrap items-center gap-2">
+                          <span className="text-sm font-semibold text-[#F6FAFF]">{displayVersion}</span>
+                          <span className="rounded bg-[var(--marketing-accent)]/15 px-2 py-0.5 text-[10px] font-semibold tracking-wide text-[var(--marketing-accent)]">{td.changelogLatest}</span>
+                          {item.releaseDate ? <time dateTime={item.releaseDate.toISOString()} className="text-xs text-[#8F9DB2]">{item.releaseDate.toLocaleDateString(forceLocale === "en" ? "en-US" : "zh-CN")}</time> : null}
+                        </div>
+                        <h3 className="mt-2 font-semibold text-[#F6FAFF]">{item.title}</h3>
+                        <p className="enhe-authored-text mt-2 whitespace-pre-wrap break-words text-sm leading-6 text-[#8F9DB2]">{item.content}</p>
+                      </article>
+                    );
+                  })()}
+                  {visibleChangelogs.length > 1 ? (
+                    <details className="pt-1">
+                      <summary className="cursor-pointer text-sm font-medium text-[var(--marketing-accent)]">{td.changelogOlderReleases} ({visibleChangelogs.length - 1})</summary>
+                      <div className="mt-4 grid gap-4">
+                        {visibleChangelogs.slice(1).map((item) => (
+                          <article key={item.id} className="relative border-t border-white/10 pt-4">
+                            <span className="absolute -left-[1.9rem] top-5 h-3 w-3 rounded-full border-2 border-[var(--marketing-accent)] bg-[#08111F]" aria-hidden="true" />
+                            {item.releaseDate ? <time dateTime={item.releaseDate.toISOString()} className="text-xs text-[#8F9DB2]">{item.releaseDate.toLocaleDateString(forceLocale === "en" ? "en-US" : "zh-CN")}</time> : null}
+                            <h3 className="mt-2 font-semibold text-[#F6FAFF]">{item.title}</h3>
+                            <p className="enhe-authored-text mt-2 whitespace-pre-wrap break-words text-sm leading-6 text-[#8F9DB2]">{item.content}</p>
+                          </article>
+                        ))}
+                      </div>
+                    </details>
+                  ) : null}
+                </div>
               ) : (
                 <p className="rounded-2xl border border-white/10 bg-white/8 p-4 text-sm leading-6 text-[#8F9DB2]">
                   {publicChangelogFallback}
@@ -1563,6 +1505,29 @@ export async function ToolDetailPageShell({
               )}
             </div>
           </section>
+
+          {hasHowToDelivery ? (
+            <section id="tool-how-to" className="glass scroll-mt-24 rounded-2xl p-7">
+              <SectionTitle
+                title={forceLocale === "en" ? "How to use" : "如何使用"}
+                intro={forceLocale === "en" ? "Follow these steps, then copy the prompt to install or configure the product." : "按步骤完成设置后，可一键复制提示词来安装或配置产品。"}
+              />
+              <ol className="mt-5 grid gap-4">
+                {visibleUsageSteps.map((step, index) => (
+                  <li key={`${index}-${step.title}`} className="flex gap-4 rounded-2xl border border-white/10 bg-white/8 p-5">
+                    <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-[var(--marketing-accent)]/15 text-sm font-semibold text-[var(--marketing-accent)]">{index + 1}</span>
+                    <div>
+                      <h3 className="font-semibold text-[#F6FAFF]">{step.title}</h3>
+                      <p className="enhe-authored-text mt-2 whitespace-pre-wrap break-words text-sm leading-6 text-[#8F9DB2]">{step.description}</p>
+                    </div>
+                  </li>
+                ))}
+              </ol>
+              {paidDownloadProduct && !hasDownloadPurchase ? (
+                <ButtonLink href="#tool-purchase" className="mt-5">{forceLocale === "en" ? "Purchase to get the prompt" : "购买后获取提示词"}</ButtonLink>
+              ) : <InstallPromptButton toolId={tool.id} locale={forceLocale} />}
+            </section>
+          ) : null}
 
           {!isAiWorkflow ? faqSection : null}
 
@@ -1658,7 +1623,7 @@ export async function ToolDetailPageShell({
             </div>
           </section>
 
-          {showDownloadLinkArea ? (
+          {showDownloadLinkArea && !hasHowToDelivery ? (
             <section
               id="download-links"
               className="glass scroll-mt-24 rounded-2xl p-7"
@@ -1788,21 +1753,6 @@ function SupportedAgentsCard({ agents, locale }: { agents: string[]; locale: Loc
         })}
       </div>
     </section>
-  );
-}
-
-function TrustItem({
-  label,
-  children,
-}: {
-  label: string;
-  children: React.ReactNode;
-}) {
-  return (
-    <div className="rounded-2xl border border-white/10 bg-white/8 p-5">
-      <p className="text-sm font-semibold text-[#F6FAFF]">{label}</p>
-      <div className="mt-3">{children}</div>
-    </div>
   );
 }
 

@@ -41,6 +41,7 @@ const sitemapExcludedPaths = new Set(
 const dynamicListingPaths = new Set([
   "/software",
   "/ai-skills",
+  "/ai-workflows",
   "/account-services",
   "/skill-learning",
   "/ai-news",

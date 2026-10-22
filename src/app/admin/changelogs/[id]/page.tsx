@@ -5,6 +5,7 @@ import { deleteToolChangelogAction, upsertToolChangelogAction } from "@/app/admi
 import { AdminContentShell, AdminSection, Field, inputClass, selectClass, SubmitButton, textareaClass } from "@/app/admin/admin-ui";
 import { HoldDeleteForm } from "@/components/hold-delete-form";
 import { prisma } from "@/lib/db";
+import { parseToolChangelogVersion } from "@/lib/tool-usage-instructions";
 
 type AdminChangelogDetailPageProps = {
   params: Promise<{ id: string }>;
@@ -19,6 +20,9 @@ export default async function AdminChangelogDetailPage({ params, searchParams }:
     prisma.tool.findMany({ select: { id: true, name: true }, orderBy: { name: "asc" } })
   ]);
   if (!isNew && !changelog) notFound();
+  const parsedVersion = parseToolChangelogVersion(changelog?.version);
+  const selectedMajor = String(parsedVersion?.major ?? 1);
+  const selectedMinor = String(parsedVersion?.minor ?? 0);
 
   return (
     <AdminSection title={isNew ? "新增工具版本记录" : "编辑工具版本记录"} intro="维护单个工具详情页中的版本更新记录。">
@@ -51,7 +55,18 @@ export default async function AdminChangelogDetailPage({ params, searchParams }:
             {tools.map((tool) => <option key={tool.id} value={tool.id}>{tool.name}</option>)}
           </select>
         </Field>
-        <Field label="版本"><input name="version" required defaultValue={changelog?.version ?? ""} className={inputClass} /></Field>
+        <Field label="版本（V主版本.次版本）">
+          <div className="flex min-h-12 items-center gap-2">
+            <span className="text-sm font-semibold text-[#E8EEF8]">V</span>
+            <select name="versionMajor" defaultValue={selectedMajor} className={selectClass} aria-label="主版本号">
+              {Array.from({ length: 100 }, (_, value) => <option key={value} value={value}>{value}</option>)}
+            </select>
+            <span className="text-sm font-semibold text-[#E8EEF8]">.</span>
+            <select name="versionMinor" defaultValue={selectedMinor} className={selectClass} aria-label="次版本号">
+              {Array.from({ length: 100 }, (_, value) => <option key={value} value={value}>{value}</option>)}
+            </select>
+          </div>
+        </Field>
         <Field label="标题"><input name="title" required defaultValue={changelog?.title ?? ""} className={inputClass} /></Field>
         <Field label="发布日期"><input name="releaseDate" type="date" defaultValue={changelog?.releaseDate?.toISOString().slice(0, 10) ?? ""} className={inputClass} /></Field>
         <Field label="排序"><input name="sortOrder" type="number" defaultValue={changelog?.sortOrder ?? 0} className={inputClass} /></Field>

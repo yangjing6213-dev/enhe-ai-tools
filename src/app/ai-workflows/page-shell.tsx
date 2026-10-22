@@ -3,14 +3,17 @@ import type { Metadata } from "next";
 import { AiWorkflowDirectory } from "@/app/ai-workflows/workflow-directory";
 import { Container, SectionTitle } from "@/components/ui";
 import type { Locale } from "@/lib/dictionaries";
-import { absoluteUrl, buildBreadcrumbSchema, buildLocalePath, buildPageMetadata } from "@/lib/seo";
+import { absoluteUrl, applyFilteredListingRobots, buildBreadcrumbSchema, buildLocalePath, buildPageMetadata } from "@/lib/seo";
 import { StructuredData } from "@/components/structured-data";
 import { getCurrentUser } from "@/lib/auth";
 import { prisma } from "@/lib/db";
 import {
+  aiWorkflowFilterParamNames,
   buildAiWorkflowCatalogOrderBy,
   buildAiWorkflowCatalogWhere,
+  normalizeAiWorkflowCatalogSearchParams,
   parseAiWorkflowCatalogFilters,
+  type AiWorkflowCatalogSearchParams,
 } from "@/lib/ai-workflows/catalog";
 import type { AiWorkflowCatalogCard } from "@/app/ai-workflows/workflow-directory";
 import { resolveAiWorkflowDeliveryMode } from "@/lib/ai-workflows/rules";
@@ -28,16 +31,56 @@ const pageCopy = {
   },
 } as const;
 
-export function generateAiWorkflowsPageMetadata(locale: Locale): Metadata {
+export async function generateAiWorkflowsPageMetadata(
+  locale: Locale,
+  searchParams: AiWorkflowCatalogSearchParams = {},
+): Promise<Metadata> {
   const copy = pageCopy[locale];
+  const normalizedParams = normalizeAiWorkflowCatalogSearchParams(searchParams);
+  const filters = parseAiWorkflowCatalogFilters(normalizedParams);
   const path = buildLocalePath("/ai-workflows", locale);
-  return buildPageMetadata({
+  const databaseConnected = Boolean(process.env.DATABASE_URL?.trim());
+  let matchingCount: number | null = null;
+
+  if (databaseConnected) {
+    try {
+      matchingCount = await prisma.tool.count({ where: buildAiWorkflowCatalogWhere(filters) });
+    } catch {
+      matchingCount = null;
+    }
+  }
+
+  const pageCount = matchingCount === null
+    ? null
+    : Math.max(1, Math.ceil(matchingCount / filters.pageSize));
+  const effectivePage = pageCount === null ? 1 : Math.min(filters.page, pageCount);
+  const hasNonDefaultPage = filters.page > 1;
+  const hasSearchOrFilter = aiWorkflowFilterParamNames.some((key) => Boolean(normalizedParams[key]?.trim()));
+  const canonicalPath = !hasSearchOrFilter && effectivePage > 1
+    ? `${path}?page=${effectivePage}`
+    : path;
+  const metadata = buildPageMetadata({
     title: `${copy.title} - ENHE AI`,
     description: copy.description,
-    path,
+    path: canonicalPath,
     locale: locale === "en" ? "en_US" : "zh_CN",
     localeKey: locale,
   });
+
+  if (!databaseConnected || matchingCount === null) {
+    metadata.robots = { index: false, follow: true };
+    return metadata;
+  }
+
+  if (hasSearchOrFilter || hasNonDefaultPage) {
+    return applyFilteredListingRobots(
+      metadata,
+      normalizedParams,
+      [...aiWorkflowFilterParamNames, ...(hasNonDefaultPage ? ["page"] : [])],
+    );
+  }
+
+  return metadata;
 }
 
 export async function AiWorkflowsPageShell({
@@ -45,16 +88,18 @@ export async function AiWorkflowsPageShell({
   searchParams = {},
 }: {
   forceLocale: Locale;
-  searchParams?: Record<string, string | undefined>;
+  searchParams?: AiWorkflowCatalogSearchParams;
 }) {
   const copy = pageCopy[forceLocale];
   const path = buildLocalePath("/ai-workflows", forceLocale);
-  const filters = parseAiWorkflowCatalogFilters(searchParams);
+  const normalizedSearchParams = normalizeAiWorkflowCatalogSearchParams(searchParams);
+  const filters = parseAiWorkflowCatalogFilters(normalizedSearchParams);
   const viewer = process.env.DATABASE_URL?.trim() ? await getCurrentUser() : null;
   let products: AiWorkflowCatalogCard[] = [];
   let topicOptions: { id: string; name: string; englishName: string | null }[] = [];
   let total = 0;
   let pageCount = 1;
+  let publishedWorkflowCount: number | null = null;
 
   if (process.env.DATABASE_URL?.trim()) {
     const [rows, topics] = await Promise.all([
@@ -74,6 +119,13 @@ export async function AiWorkflowsPageShell({
       }),
     ]);
     topicOptions = topics;
+    if (rows.length === 0) {
+      try {
+        publishedWorkflowCount = await prisma.tool.count({ where: { type: "ai_workflow", status: "published" } });
+      } catch {
+        publishedWorkflowCount = null;
+      }
+    }
     const ids = rows.map((row) => row.id);
     const [ratings, downloadEvents, favorites] = ids.length ? await Promise.all([
       prisma.aiWorkflowReview.groupBy({ by: ["toolId"], where: { toolId: { in: ids }, status: "approved" }, _avg: { rating: true }, _count: { id: true } }),
@@ -124,6 +176,14 @@ export async function AiWorkflowsPageShell({
     const page = Math.min(filters.page, pageCount);
     products = cards.slice((page - 1) * filters.pageSize, page * filters.pageSize).map(({ createdAt: _createdAt, ...card }) => card);
   }
+  const displayFilters = { ...filters, page: Math.min(filters.page, pageCount) };
+  const emptyState = !process.env.DATABASE_URL?.trim() || publishedWorkflowCount === null
+    ? "unverified"
+    : publishedWorkflowCount > 0
+      ? "no-matches"
+      : topicOptions.length > 0
+        ? "no-published"
+        : "topics-unconfigured";
   const breadcrumbSchema = buildBreadcrumbSchema({
     schemaType: "BreadcrumbList",
     items: [
@@ -146,7 +206,7 @@ export async function AiWorkflowsPageShell({
       <Container className="pt-12 pb-56 sm:pt-14 sm:pb-56">
         <StructuredData data={[breadcrumbSchema, collectionSchema]} />
         <SectionTitle as="h1" title={copy.title} titleClassName="redesign-bold-copy" intro={copy.intro} />
-        <AiWorkflowDirectory locale={forceLocale} filters={filters} items={products} topics={topicOptions} total={total} pageCount={pageCount} />
+        <AiWorkflowDirectory locale={forceLocale} filters={displayFilters} items={products} topics={topicOptions} total={total} pageCount={pageCount} emptyState={emptyState} />
       </Container>
     </main>
   );

@@ -18,7 +18,7 @@ type DownloadResponseKind = "private_stream" | "signed_redirect";
 type DownloadAnalyticsMetadata = {
   stage: "request" | "access" | "response";
   responseKind?: DownloadResponseKind;
-  reason?: "tool_lookup_failed" | "access_not_granted" | "rate_limited" | "file_unavailable" | "response_preparation_failed";
+  reason?: "tool_lookup_failed" | "access_not_granted" | "rate_limited" | "file_unavailable" | "delivery_mode_instructions" | "response_preparation_failed";
 };
 
 function createDownloadEventRecorder(request: Request, confirmedTool: { id?: string }): (eventName: DownloadAnalyticsEvent, metadata: DownloadAnalyticsMetadata) => void {
@@ -78,13 +78,17 @@ export async function GET(request: Request, { params }: { params: Promise<{ id: 
   const recordDownloadEvent = createDownloadEventRecorder(request, confirmedTool);
   recordDownloadEvent("product_download_requested", { stage: "request" });
   const [tool, savedVisitorKey] = await Promise.all([
-    prisma.tool.findUnique({ where: { id }, select: { type: true } }),
+    prisma.tool.findUnique({ where: { id }, select: { type: true, deliveryMode: true } }),
     Promise.resolve(readWorkflowVisitorCookie(request)),
   ]).catch(error => {
     recordDownloadEvent("product_download_request_failed", { stage: "request", reason: "tool_lookup_failed" });
     throw error;
   });
   if (tool) confirmedTool.id = id;
+  if (tool?.deliveryMode === "how_to" && (tool.type === "software" || tool.type === "ai_workflow")) {
+    recordDownloadEvent("product_download_request_failed", { stage: "access", reason: "delivery_mode_instructions" });
+    return NextResponse.json({ message: "该产品通过使用说明交付。" }, { status: 404, headers: { "Cache-Control": "private, no-store" } });
+  }
   const newVisitorKey = tool?.type === "ai_workflow" && !savedVisitorKey ? randomBytes(32).toString("hex") : null;
   const visitorKey = savedVisitorKey ?? newVisitorKey ?? undefined;
   let file;

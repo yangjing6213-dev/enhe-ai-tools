@@ -103,12 +103,30 @@ describe("sitemap canonical URL contract", () => {
     prismaMock.newsArticle.findMany.mockResolvedValue([]);
     const { default: sitemap } = await import("@/app/sitemap");
     const entries = await sitemap();
-    for (const path of ["/software", "/ai-skills", "/account-services", "/skill-learning", "/ai-news", "/product-demos", "/tutorials"]) {
+    for (const path of ["/software", "/ai-skills", "/ai-workflows", "/account-services", "/skill-learning", "/ai-news", "/product-demos", "/tutorials"]) {
       for (const prefix of ["", "/en"]) {
         const entry = entries.find((entry) => entry.url === `https://www.enhe-tech.com.cn${prefix}${path}`);
         expect(entry).toBeDefined();
         expect(entry).not.toHaveProperty("lastModified");
       }
+    }
+  });
+
+  it("includes both workflow directory routes exactly once with reciprocal language alternates", async () => {
+    prismaMock.tool.findMany.mockResolvedValue([]);
+    prismaMock.newsArticle.findMany.mockResolvedValue([]);
+
+    const { default: sitemap } = await import("@/app/sitemap");
+    const entries = await sitemap();
+    for (const [path, languagePath] of [["/ai-workflows", "/en/ai-workflows"], ["/en/ai-workflows", "/ai-workflows"]]) {
+      const url = `https://www.enhe-tech.com.cn${path}`;
+      const matches = entries.filter((entry) => entry.url === url);
+      expect(matches).toHaveLength(1);
+      expect(matches[0]).not.toHaveProperty("lastModified");
+      expect(matches[0].alternates?.languages?.["zh-CN"]).toBe("https://www.enhe-tech.com.cn/ai-workflows");
+      expect(matches[0].alternates?.languages?.["en-US"]).toBe("https://www.enhe-tech.com.cn/en/ai-workflows");
+      expect(matches[0].alternates?.languages?.["x-default"]).toBe("https://www.enhe-tech.com.cn/ai-workflows");
+      expect(languagePath).toMatch(/^\/(?:en\/)?ai-workflows$/);
     }
   });
 

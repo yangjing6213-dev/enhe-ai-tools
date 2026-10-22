@@ -59,7 +59,8 @@ describe("launch readiness source coverage", () => {
 
     const toolDetail = read("src/app/tools/[slug]/page-shell.tsx");
     expect(toolDetail).toContain("faqs");
-    expect(toolDetail).toContain("trustTitle");
+    expect(toolDetail).toContain("InstallPromptButton");
+    expect(toolDetail).not.toContain('id="tool-intro"');
     expect(toolDetail).toContain("supportEmail");
     expect(toolDetail).toContain("/legal/membership-refund");
   });

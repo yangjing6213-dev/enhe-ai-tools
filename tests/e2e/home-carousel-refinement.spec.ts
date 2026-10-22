@@ -114,11 +114,11 @@ for (const route of ["/", "/en"]) {
       const trigger = folder.locator(".folder-float__trigger");
       await trigger.focus();
       await page.keyboard.press("Enter");
-      await expect(trigger).toHaveAttribute("aria-expanded", "true");
+      await expect(folder).toHaveAttribute("open", "");
       await page.keyboard.press("Escape");
-      await expect(trigger).toHaveAttribute("aria-expanded", "false");
+      await expect(folder).not.toHaveAttribute("open", "");
       await folder.hover();
-      await expect(trigger).toHaveAttribute("aria-expanded", "true");
+      await expect(folder).toHaveAttribute("open", "");
       await expect(folder).toHaveAttribute("data-live", "");
       await folder.locator(".folder-float__item").first().click();
       await expect(page).toHaveURL(route === "/" ? /\/software\?category=video$/ : /\/en\/software\?category=video$/);
@@ -149,7 +149,7 @@ test("folders remain usable on a touch screen with reduced motion", async ({ bro
     const folder = page.locator(".redesign-home-features .folder-float").first();
     const trigger = folder.locator(".folder-float__trigger");
     await trigger.tap();
-    await expect(trigger).toHaveAttribute("aria-expanded", "true");
+    await expect(folder).toHaveAttribute("open", "");
     await page.waitForTimeout(1000);
     await expect(folder).not.toHaveAttribute("data-live");
     await folder.locator(".folder-float__item").first().tap();

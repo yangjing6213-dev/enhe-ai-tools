@@ -34,6 +34,8 @@ export type AiWorkflowCatalogCard = {
   systemRequirement: string | null;
 };
 
+export type AiWorkflowDirectoryEmptyState = "no-matches" | "no-published" | "topics-unconfigured" | "unverified";
+
 const copy = {
   zh: {
     search: "搜索中文名、仓库名、用途、主题或标签", products: "全部工作流",
@@ -44,7 +46,13 @@ const copy = {
     sort: "推荐排序", latest: "最新发布", downloads: "网站下载发起", rating: "用户评分", price: "价格从低到高",
     count: "个项目", details: "查看详情", freeTag: "免费", repositoryLink: "原仓库链接", noRating: "暂无评分", reviews: "条评价",
     downloadsLabel: "次网站下载发起", repositoryOnly: "仅提供 GitHub 原仓库", stars: "GitHub 星标", environments: "已验证", page: "页", previous: "上一页", next: "下一页",
-    browseSkills: "浏览 AI Skills", browseTools: "浏览 AI 工具", unconfigured: "采集主题尚未配置",
+    browseSkills: "浏览 AI Skills", browseTools: "浏览 AI 工具", clearFilters: "清除筛选，查看全部工作流",
+    emptyStates: {
+      "no-matches": { title: "没有匹配的工作流", body: "当前搜索或筛选条件没有匹配项。清除条件即可查看全部工作流。" },
+      "no-published": { title: "目前还没有已发布工作流", body: "有工作流发布后会显示在这里，您也可以先浏览其他 AI 内容。" },
+      "topics-unconfigured": { title: "工作流主题尚未配置", body: "工作流目录正在准备中，您可以先浏览其他 AI 内容。" },
+      unverified: { title: "本地预览尚未连接内容源", body: "当前无法核验已发布工作流数量；这不代表线上目录没有内容。" },
+    },
   },
   en: {
     search: "Search Chinese name, repository, use case, topic, or tag", products: "All workflows",
@@ -55,7 +63,13 @@ const copy = {
     sort: "Recommended", latest: "Newest", downloads: "Website download starts", rating: "User rating", price: "Price: low to high",
     count: "items", details: "View details", freeTag: "Free", repositoryLink: "GitHub repository", noRating: "No ratings yet", reviews: "reviews",
     downloadsLabel: "website download starts", repositoryOnly: "GitHub source link only", stars: "GitHub stars", environments: "Verified", page: "Page", previous: "Previous", next: "Next",
-    browseSkills: "Browse AI Skills", browseTools: "Browse AI tools", unconfigured: "Collection topics are not configured",
+    browseSkills: "Browse AI Skills", browseTools: "Browse AI tools", clearFilters: "Clear filters and view all workflows",
+    emptyStates: {
+      "no-matches": { title: "No matching workflows", body: "Nothing matches the current search or filters. Clear them to view all workflows." },
+      "no-published": { title: "No workflows have been published yet", body: "Published workflows will appear here. You can browse other AI content in the meantime." },
+      "topics-unconfigured": { title: "Workflow topics are not configured", body: "The workflow directory is being prepared. You can browse other AI content in the meantime." },
+      unverified: { title: "Local preview is not connected to a content source", body: "The published workflow count cannot be verified here; this does not mean the live directory is empty." },
+    },
   },
 } as const;
 
@@ -73,7 +87,7 @@ function queryString(filters: AiWorkflowCatalogFilters, page: number) {
 }
 
 export function AiWorkflowDirectory({
-  locale, filters, items, topics, total, pageCount,
+  locale, filters, items, topics, total, pageCount, emptyState,
 }: {
   locale: RedesignLocale;
   filters: AiWorkflowCatalogFilters;
@@ -81,10 +95,12 @@ export function AiWorkflowDirectory({
   topics: TopicOption[];
   total: number;
   pageCount: number;
+  emptyState: AiWorkflowDirectoryEmptyState;
 }) {
   const [query, setQuery] = useState(filters.q);
   const text = copy[locale];
   const basePath = locale === "en" ? "/en/ai-workflows" : "/ai-workflows";
+  const emptyCopy = text.emptyStates[emptyState];
 
   return (
     <>
@@ -160,7 +176,7 @@ export function AiWorkflowDirectory({
               </div>
             </article>;
           })}
-        </div> : <div className="mt-4 rounded-2xl border border-[var(--marketing-border)] bg-white p-6"><h3 className="font-semibold text-[var(--marketing-text)]">{text.unconfigured}</h3><p className="mt-2 text-sm leading-6 text-[var(--marketing-muted)]">{text.noProducts}</p><div className="mt-4 flex flex-wrap gap-4"><Link className="text-sm font-medium text-[var(--marketing-accent)] underline-offset-4 hover:underline" href={locale === "en" ? "/en/ai-skills" : "/ai-skills"}>{text.browseSkills}</Link><Link className="text-sm font-medium text-[var(--marketing-accent)] underline-offset-4 hover:underline" href={locale === "en" ? "/en/software" : "/software"}>{text.browseTools}</Link></div></div>}
+        </div> : <div className="mt-4 rounded-2xl border border-[var(--marketing-border)] bg-white p-6"><h3 className="font-semibold text-[var(--marketing-text)]">{emptyCopy.title}</h3><p className="mt-2 text-sm leading-6 text-[var(--marketing-muted)]">{emptyCopy.body}</p><div className="mt-4 flex flex-wrap gap-4">{emptyState === "no-matches" ? <Link className="text-sm font-medium text-[var(--marketing-accent)] underline-offset-4 hover:underline" href={basePath}>{text.clearFilters}</Link> : null}<Link className="text-sm font-medium text-[var(--marketing-accent)] underline-offset-4 hover:underline" href={locale === "en" ? "/en/ai-skills" : "/ai-skills"}>{text.browseSkills}</Link><Link className="text-sm font-medium text-[var(--marketing-accent)] underline-offset-4 hover:underline" href={locale === "en" ? "/en/software" : "/software"}>{text.browseTools}</Link></div></div>}
         {pageCount > 1 ? <nav className="mt-6 flex items-center justify-center gap-3" aria-label={locale === "en" ? "Workflow pages" : "工作流分页"}>
           {filters.page > 1 ? <Link href={`${basePath}${queryString(filters, filters.page - 1)}`} className="rounded-lg border px-3 py-2 text-sm">{text.previous}</Link> : null}
           <span className="text-sm text-[var(--marketing-muted)]">{text.page} {filters.page} / {pageCount}</span>

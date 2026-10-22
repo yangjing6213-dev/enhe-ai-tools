@@ -51,6 +51,8 @@ export const publicDiscoveryRoutes: readonly PublicDiscoveryRoute[] = [
     llmsLabel: "AI Skills for agents",
   },
   { path: "/en/ai-skills", lastModified: "2026-07-30T00:00:00.000Z" },
+  { path: "/ai-workflows", lastModified: "2026-10-22T00:00:00.000Z", llmsLabel: "AI workflows" },
+  { path: "/en/ai-workflows", lastModified: "2026-10-22T00:00:00.000Z", llmsLabel: "English AI workflows" },
   {
     path: "/online-tools/seo-geo-audit",
     lastModified: "2026-07-26T00:00:00.000Z",

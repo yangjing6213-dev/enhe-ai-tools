@@ -14,8 +14,7 @@ afterEach(() => { mocks.folders.length = 0; mocks.track.mockClear(); vi.unstubAl
 
 describe("homepage folder entry analytics", () => {
   it.each(["zh", "en"] as const)("distinguishes software categories without logging arbitrary query text in %s", locale => {
-    const assign = vi.fn();
-    vi.stubGlobal("window", { location: { pathname: locale === "en" ? "/en" : "/", assign } });
+    vi.stubGlobal("window", { location: { pathname: locale === "en" ? "/en" : "/" } });
     renderToStaticMarkup(<EnheRedesignFeatures locale={locale} />);
     const categories = SOFTWARE_CATEGORIES.filter(item => !["all", "skill"].includes(item.id));
     mocks.folders[0].onSelect?.("/software?category=anything&private=do-not-log", 0);
@@ -23,15 +22,18 @@ describe("homepage folder entry analytics", () => {
     expect(mocks.track.mock.calls.map(call => call[0].metadata.target)).toEqual([`software_${categories[0].id}`, `software_${categories[1].id}`]);
     expect(mocks.track.mock.calls[0][0]).toMatchObject({ eventName: "home_entry_click", metadata: { surface: "category_folder" } });
     expect(JSON.stringify(mocks.track.mock.calls)).not.toContain("do-not-log");
-    expect(assign).toHaveBeenCalledTimes(2);
+    expect(mocks.folders[0].items).toEqual(expect.arrayContaining([
+      expect.objectContaining({ href: `${locale === "en" ? "/en" : ""}/software?category=${categories[0].id}` }),
+    ]));
   });
 
-  it("uses the same workflow target across languages and preserves navigation", () => {
-    const assign = vi.fn();
-    vi.stubGlobal("window", { location: { pathname: "/en", assign } });
+  it("uses real workflow links and the same analytics target across languages", () => {
+    vi.stubGlobal("window", { location: { pathname: "/en" } });
     renderToStaticMarkup(<EnheRedesignFeatures locale="en" />);
     mocks.folders[1].onSelect?.("/en/ai-workflows", 2);
     expect(mocks.track).toHaveBeenCalledWith(expect.objectContaining({ metadata: { surface: "category_folder", target: "_ai-workflows" } }));
-    expect(assign).toHaveBeenCalledWith("/en/ai-workflows");
+    expect(mocks.folders[1].items).toEqual(expect.arrayContaining([
+      expect.objectContaining({ label: "AI workflows", href: "/en/ai-workflows" }),
+    ]));
   });
 });

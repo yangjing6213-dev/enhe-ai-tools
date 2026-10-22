@@ -11,6 +11,16 @@ export type AiWorkflowCatalogFilters = {
   pageSize: 12;
 };
 
+export type AiWorkflowCatalogSearchParams = Record<string, string | string[] | undefined>;
+
+export const aiWorkflowFilterParamNames = ["q", "topic", "paid", "environment", "type", "sort"] as const;
+
+export function normalizeAiWorkflowCatalogSearchParams(params: AiWorkflowCatalogSearchParams): Record<string, string | undefined> {
+  return Object.fromEntries(
+    Object.entries(params).map(([key, value]) => [key, Array.isArray(value) ? value[0] : value]),
+  );
+}
+
 const paidOptions = new Set(["all", "free", "paid"] as const);
 const environmentOptions = new Set(["all", "windows", "macos", "linux"] as const);
 const typeOptions = new Set(["all", "workflow", "automation", "agent", "template", "companion"] as const);
@@ -20,15 +30,16 @@ function parseOption<T extends string>(value: string | undefined, allowed: Set<T
   return value && allowed.has(value as T) ? value as T : fallback;
 }
 
-export function parseAiWorkflowCatalogFilters(params: Record<string, string | undefined>): AiWorkflowCatalogFilters {
-  const pageValue = Number(params.page ?? "1");
+export function parseAiWorkflowCatalogFilters(params: AiWorkflowCatalogSearchParams): AiWorkflowCatalogFilters {
+  const normalized = normalizeAiWorkflowCatalogSearchParams(params);
+  const pageValue = Number(normalized.page ?? "1");
   return {
-    q: (params.q ?? "").trim().slice(0, 120),
-    topic: (params.topic ?? "").trim().slice(0, 120),
-    paid: parseOption(params.paid, paidOptions, "all"),
-    environment: parseOption(params.environment, environmentOptions, "all"),
-    type: parseOption(params.type, typeOptions, "all"),
-    sort: parseOption(params.sort, sortOptions, "recommended"),
+    q: (normalized.q ?? "").trim().slice(0, 120),
+    topic: (normalized.topic ?? "").trim().slice(0, 120),
+    paid: parseOption(normalized.paid, paidOptions, "all"),
+    environment: parseOption(normalized.environment, environmentOptions, "all"),
+    type: parseOption(normalized.type, typeOptions, "all"),
+    sort: parseOption(normalized.sort, sortOptions, "recommended"),
     page: Number.isFinite(pageValue) ? Math.max(1, Math.min(10000, Math.trunc(pageValue))) : 1,
     pageSize: 12,
   };

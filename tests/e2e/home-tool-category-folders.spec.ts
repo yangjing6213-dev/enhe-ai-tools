@@ -12,7 +12,7 @@ for (const locale of ['zh','en']) {
       await trigger.scrollIntoViewIfNeeded();
       await trigger.focus();
       await page.keyboard.press('Enter');
-      await expect(trigger).toHaveAttribute('aria-expanded','true');
+      await expect(folder).toHaveAttribute('open','');
       await expect(folder.locator('.folder-float__item')).toHaveCount(5);
       const option = folder.locator('.folder-float__item').nth(index);
       await option.focus();
@@ -32,7 +32,7 @@ for (const width of [320,768,1440]) {
       await trigger.scrollIntoViewIfNeeded();
       await trigger.focus();
       await page.keyboard.press('Enter');
-      await expect(trigger).toHaveAttribute('aria-expanded','true');
+      await expect(folder).toHaveAttribute('open','');
       await page.waitForTimeout(1000);
       for(const option of await folder.locator('.folder-float__item').all()) {
         const bounds=(await option.boundingBox())!;

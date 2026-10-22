@@ -30,8 +30,8 @@ describe("SEO and GEO follow-up source contracts", () => {
     const detail = read("src/app/tools/[slug]/page-shell.tsx");
 
     expect(detail).toContain("publicChangelogFallback");
-    expect(detail).toContain("publicDemoVideoFallback");
     expect(detail).toContain("publicFaqFallback");
+    expect(detail).not.toContain("publicDemoVideoFallback");
     expect(detail).not.toContain("{td.noChangelogs}");
     expect(detail).not.toContain("{td.demoVideoFallback}");
     expect(detail).not.toContain("{td.noFaqs}");

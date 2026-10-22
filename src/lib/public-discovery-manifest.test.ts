@@ -24,7 +24,7 @@ describe("public discovery manifest", () => {
     const paths = publicDiscoveryRoutes.map((route) => route.path);
 
     expect(new Set(paths).size).toBe(paths.length);
-    for (const required of ["/", "/en", "/ai-news", "/ai-trends", "/software", "/ai-skills", "/en/ai-skills", "/skill-learning", "/online-tools/seo-geo-audit", "/en/online-tools/seo-geo-audit"]) {
+    for (const required of ["/", "/en", "/ai-news", "/ai-trends", "/software", "/ai-skills", "/en/ai-skills", "/ai-workflows", "/en/ai-workflows", "/skill-learning", "/online-tools/seo-geo-audit", "/en/online-tools/seo-geo-audit"]) {
       expect(paths).toContain(required);
     }
     for (const forbidden of ["/admin", "/user", "/checkout", "/orders", "/api"]) {
@@ -75,6 +75,13 @@ describe("public discovery manifest", () => {
     ].join("\n");
 
     expect(renderedSignals).not.toMatch(/build-your-own-x|ai-topics|product-demos/);
+  });
+
+  it("describes the Chinese and English workflow directories in llms.txt", () => {
+    expect(publicDiscoveryRoutes.find((route) => route.path === "/ai-workflows")?.llmsLabel).toBeTruthy();
+    expect(publicDiscoveryRoutes.find((route) => route.path === "/en/ai-workflows")?.llmsLabel).toBeTruthy();
+    expect(renderLlmsImportantPages()).toContain("https://www.enhe-tech.com.cn/ai-workflows");
+    expect(renderLlmsImportantPages()).toContain("https://www.enhe-tech.com.cn/en/ai-workflows");
   });
 
   it("retains code-level contextual inbound links without claiming production crawl state", () => {

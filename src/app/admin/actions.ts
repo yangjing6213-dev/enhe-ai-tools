@@ -61,6 +61,7 @@ import {
 import { normalizeToolContentForStorage, normalizeToolSummaryForStorage, parseTagNames, tagSlug } from "@/lib/tool-content";
 import { canOpenProtectedDownloadEntry } from "@/lib/tool-download-link";
 import { getPrimaryToolPriceSpec, parseToolPriceSpecsFromFormData, type ToolPriceSpecDraft } from "@/lib/tool-price-specs";
+import { composeToolChangelogVersion, MAX_USAGE_PROMPT_LENGTH, parseToolUsageStepsJson } from "@/lib/tool-usage-instructions";
 import { mergeToolProductImages } from "@/lib/tool-product-images";
 import { buildCanonicalAiNewsPath, buildCanonicalToolPath } from "@/lib/public-slugs";
 import { parseTopicDelimitedRows } from "@/lib/ai-news-topic-config";
@@ -1311,6 +1312,23 @@ export async function upsertToolAction(formData: FormData) {
     const priceSpecs = parseToolPriceSpecsFromFormData(formData);
     const primaryPriceSpec = getPrimaryToolPriceSpec(priceSpecs);
     const isDownloadProduct = type === "software" || type === "ai_skill" || type === "ai_workflow";
+    const supportsUsageInstructions = type === "software" || type === "ai_workflow";
+    const deliveryMode = supportsUsageInstructions
+      ? z.enum(["link", "how_to"]).parse(formData.get("deliveryMode") ?? "link")
+      : "link";
+    let usageSteps: Array<{ title: string; description: string }> = [];
+    let installPrompt: string | null = null;
+    if (supportsUsageInstructions && deliveryMode === "how_to") {
+      const stepCount = Number.parseInt(String(formData.get("usageStepCount") ?? "0"), 10);
+      if (!Number.isInteger(stepCount) || stepCount < 1 || stepCount > 5) {
+        throw new Error("如何使用模式需要设置 1 到 5 个步骤。");
+      }
+      usageSteps = parseToolUsageStepsJson(JSON.stringify(Array.from({ length: stepCount }, (_, index) => ({
+        title: formData.get(`usageStepTitle_${index}`),
+        description: formData.get(`usageStepDescription_${index}`),
+      }))));
+      installPrompt = z.string().trim().min(1, "请填写一键安装提示词。").max(MAX_USAGE_PROMPT_LENGTH, "提示词不能超过 30000 个字符。").parse(formData.get("installPrompt"));
+    }
     const resolvedPurchasePrice = primaryPriceSpec?.price ?? (isDownloadProduct ? parseNumberField(formData.get("downloadPrice"), 0) : 0);
     const requestedStatus = z.enum(["draft", "published", "offline"]).parse(formData.get("status") ?? "draft");
     if (type === "ai_workflow") {
@@ -1366,6 +1384,11 @@ export async function upsertToolAction(formData: FormData) {
       downloadPrice: resolvedPurchasePrice,
       onlineUrl: parseOptionalString(formData.get("onlineUrl")),
       downloadFileId: selectedDownloadFileId,
+      ...(supportsUsageInstructions ? {
+        deliveryMode,
+        usageSteps: usageSteps as Prisma.InputJsonValue,
+        installPrompt,
+      } : {}),
       status: requestedStatus,
       sortOrder: parseNumberField(formData.get("sortOrder"), 0),
       ...(type === "software" ? {
@@ -1639,7 +1662,10 @@ export async function upsertToolChangelogAction(formData: FormData) {
   const releaseDate = parseOptionalString(formData.get("releaseDate"));
   const data = {
     toolId: idSchema.parse(formData.get("toolId")),
-    version: z.string().min(1).parse(formData.get("version")),
+    version: composeToolChangelogVersion(
+      z.string().parse(formData.get("versionMajor")),
+      z.string().parse(formData.get("versionMinor")),
+    ),
     title: z.string().min(1).parse(formData.get("title")),
     content: z.string().min(1).parse(formData.get("content")),
     releaseDate: releaseDate ? new Date(releaseDate) : null,

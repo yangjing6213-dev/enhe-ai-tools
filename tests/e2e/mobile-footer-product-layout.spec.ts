@@ -52,7 +52,7 @@ for (const locale of ["zh", "en"] as const) {
   test(`product navigation CSS keeps links in document flow (${locale})`, async ({ page }) => {
     // Exercise the real responsive CSS without a database or network requests.
     await page.route("**/*", (route) => route.abort());
-    const sections = ["tool-purchase", "tool-intro", "tool-faq", "tool-related"];
+    const sections = ["tool-purchase", "tool-product-description", "tool-faq", "tool-related"];
     const labels = locale === "zh"
       ? ["购买", "产品介绍", "FAQ", "相关推荐"]
       : ["Buy", "Product introduction", "FAQ", "Related products"];
@@ -141,7 +141,7 @@ test.describe("product detail navigation on a local test database", () => {
         await page.setViewportSize({ width, height: 900 });
         await expect(navigation).toBeVisible();
         await expect(navigation).toHaveCSS("position", "static");
-        for (const target of ["tool-purchase", "tool-intro", "tool-faq", "tool-related"]) {
+        for (const target of ["tool-purchase", "tool-product-description", "tool-faq", "tool-related"]) {
           const link = navigation.locator(`a[href="#${target}"]`);
           await expect(link).toHaveCSS("color", "rgb(255, 255, 255)");
           await link.click();
@@ -165,7 +165,7 @@ test.describe("product detail navigation on a local test database", () => {
       for (const width of [768, 1440]) {
         await page.setViewportSize({ width, height: 900 });
         await expect(navigation).toBeHidden();
-        await expect(page.locator("#tool-intro")).toBeVisible();
+        await expect(page.locator("#tool-product-description")).toBeVisible();
       }
     });
   }
