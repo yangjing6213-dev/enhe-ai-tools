@@ -14,6 +14,9 @@ type LocalizedToolInput = {
   content?: string | null;
   type: ToolType;
   categoryName?: string | null;
+  workflowDeliveryMode?: "package" | "repository_link";
+  isDownloadPaid?: boolean;
+  workflowPackagePrice?: number;
 };
 
 type LocalizedFaqInput = {
@@ -609,6 +612,10 @@ function buildEnglishToolSentence(tool: LocalizedToolInput) {
   const primaryIsGeneric = localizedTool.primaryName === defaultLabel;
   const categoryIsGeneric = categoryName === defaultLabel;
 
+  if (tool.type === "ai_workflow") {
+    return `${localizedTool.primaryName} is an AI workflow entry. Review its source, delivery method, runtime requirements, and verification status before use.`;
+  }
+
   if (primaryIsGeneric && categoryIsGeneric) {
     if (tool.type === "online") {
       return "Review pricing, delivery notes, and access guidance for this AI account service on ENHE AI.";
@@ -871,10 +878,10 @@ function buildEnglishFaqFallback(
       question: "How do I access it after purchase?",
       answer:
         tool.type === "software" || tool.type === "ai_skill"
-          ? "After payment review, the related download-link content becomes available in your account center."
+          ? "Follow the payment method and access instructions on the order page. Once access is unlocked, the related download-link content is available in your account center."
           : tool.type === "skill_learning"
-            ? "After purchase, the course content and practical learning materials become available in your account center."
-            : "After purchase and review, the service access notes, delivery scope, and compliance reminders become available in your account center.",
+            ? "Follow the payment and access instructions on the order page. Once access is unlocked, the course content and practical learning materials are available in your account center."
+            : "Follow the payment and access instructions on the order page. Once access is unlocked, the service access notes, delivery scope, and compliance reminders are available in your account center.",
     },
   ];
 }
@@ -905,7 +912,7 @@ function buildChineseFaqFallback(
         id: "localized-faq-course-access",
         question: "购买课程后如何学习？",
         answer:
-          "完成购买并通过审核后，可在用户中心查看课程内容、学习资料和相关使用说明。",
+          "请按订单页面显示的支付方式和解锁条件操作。权限解锁后，可在用户中心查看课程内容、学习资料和相关使用说明。",
       },
       {
         id: "localized-faq-course-fit",
@@ -921,7 +928,7 @@ function buildChineseFaqFallback(
       id: "localized-faq-software-access",
       question: "购买软件后如何获取下载内容？",
       answer:
-        "完成购买并通过审核后，可在用户中心查看对应软件的下载链接、版本信息和使用说明。",
+        "请按订单页面显示的支付方式和解锁条件操作。权限解锁后，可在用户中心查看对应软件的下载链接、版本信息和使用说明。",
     },
     {
       id: "localized-faq-software-requirements",
@@ -933,6 +940,54 @@ function buildChineseFaqFallback(
 }
 
 const minimumToolFaqCount = 5;
+
+function buildWorkflowFaqFallback(tool: LocalizedToolInput, locale: Locale): LocalizedFaqInput[] {
+  const isEnglish = locale === "en";
+  let accessAnswer: string;
+  if (!tool.workflowDeliveryMode) {
+    accessAnswer = isEnglish
+      ? "Review the delivery method shown on this page before using Get workflow. Follow the linked source or the package access instructions provided there."
+      : "请先确认本页标注的获取方式，再使用“获取工作流”入口；按对应来源链接或交付包的访问说明操作。";
+  } else if (tool.workflowDeliveryMode === "repository_link") {
+    accessAnswer = isEnglish
+      ? "Use Get workflow to open the GitHub repository. ENHE does not provide a download package for this entry; follow the upstream instructions."
+      : "点击“获取工作流”前往 GitHub 原仓库。本站未为该条目提供下载包，请按原仓库说明获取和使用。";
+  } else if (tool.isDownloadPaid === true && Number.isFinite(tool.workflowPackagePrice) && Number(tool.workflowPackagePrice) > 0) {
+    accessAnswer = isEnglish
+      ? "Review the price and package version before purchase. Successful payment unlocks the protected download entry for the purchased version."
+      : "购买前核对价格和交付版本。支付成功后，系统解锁已购买版本的受保护下载入口。";
+  } else if (tool.isDownloadPaid === false) {
+    accessAnswer = isEnglish
+      ? "Use the free package's protected download entry on this page and follow the sign-in and access instructions shown there."
+      : "请使用本页免费交付包的受保护下载入口，并按页面提示完成登录和访问检查。";
+  } else {
+    accessAnswer = isEnglish
+      ? "Check the price and access method on this page before continuing. Package availability alone does not confirm its price or access conditions."
+      : "请先查看价格与获取方式，再按本页说明操作。存在交付包不代表其价格或访问条件已经确认。";
+  }
+
+  return [
+    {
+      id: "localized-faq-workflow-access",
+      question: isEnglish ? "How do I get this workflow?" : "如何获取该工作流？",
+      answer: accessAnswer,
+    },
+    {
+      id: "localized-faq-workflow-requirements",
+      question: isEnglish ? "What should I check before using it?" : "使用前需要确认什么？",
+      answer: isEnglish
+        ? "Check the upstream setup instructions, runtime requirements, version, and the verification status shown on this page. A repository link does not mean ENHE has verified the complete workflow."
+        : "请核对原仓库的安装说明、运行环境、版本及本页核验状态。提供仓库链接不代表 ENHE 已验证完整运行流程。",
+    },
+    {
+      id: "localized-faq-workflow-costs",
+      question: isEnglish ? "Does access include third-party services and permissions?" : "获取后是否包含第三方服务费用和使用许可？",
+      answer: isEnglish
+        ? "Check the upstream license and each service provider's terms. Model APIs, accounts, hosting, and other dependencies may have separate requirements or charges; follow the stated delivery scope."
+        : "请查看原仓库许可证及各服务方的条款。模型 API、账号、部署资源等依赖可能另有使用条件或费用，请以明确标注的交付范围为准。",
+    },
+  ];
+}
 
 function buildGeneratedFaqQuestion(
   tool: LocalizedToolInput,
@@ -1023,7 +1078,7 @@ function buildGeneratedFaqAnswer(
     if (tool.type === "skill_learning") {
       return [
         summary,
-        `After purchase, ${enName} course content, practical materials, and learning notes become available in your account center after the order is reviewed.`,
+        `Follow the order page's payment and access instructions. Once access is unlocked, ${enName} course content, practical materials, and learning notes are available in your account center.`,
         "It is suitable for users who want to learn AI tools, prompts, automation workflows, and practical methods through a structured learning path.",
         "Most lessons start from practical scenarios and operating steps. If the course involves specific software, accounts, or local deployment, review the preparation notes first.",
         "Use the course to understand the workflow, practice the key steps, and turn the method into a repeatable work, learning, or content-production outcome.",
@@ -1033,7 +1088,7 @@ function buildGeneratedFaqAnswer(
     if (tool.type === "software") {
       return [
         summary,
-        `After payment review, ${enName} download-link content, version notes, and usage guidance become available in your account center.`,
+        `Follow the order page's payment and access instructions. Once access is unlocked, ${enName} download-link content, version notes, and usage guidance are available in your account center.`,
         "Check the system requirements, version notes, price, delivery scope, and whether the tool fits your device environment and current workflow.",
         "Start from a clear task, review the tool detail page and related tutorials, then test the output quality before using it in repeated work.",
         "You can review the current page notes and contact ENHE AI support for access, download, usage, or update-related guidance when needed.",
@@ -1042,7 +1097,7 @@ function buildGeneratedFaqAnswer(
 
     return [
       summary,
-      "After purchase and review, the service access notes, delivery scope, and compliance reminders become available in your account center.",
+      "Follow the payment and access instructions on the order page. Once access is unlocked, the service access notes, delivery scope, and compliance reminders are available in your account center.",
       "Review the service scope, delivery notes, platform rules, official platform policy, and support boundary before purchase or use.",
       "You can contact ENHE AI support for access guidance, usage suggestions, compliance guidance, and service-boundary clarification.",
       "ENHE AI may update page notes when platform policy, access conditions, delivery details, or support guidance changes.",
@@ -1052,7 +1107,7 @@ function buildGeneratedFaqAnswer(
   if (tool.type === "skill_learning") {
     return [
       `${zhName}围绕 AI 工具使用、流程方法和实战落地展开，帮助你把学习内容转化为可执行的工作步骤。`,
-      "完成购买并通过审核后，可在用户中心查看课程内容、学习资料、操作说明和相关补充信息。",
+      "请按订单页面显示的支付方式和解锁条件操作。权限解锁后，可在用户中心查看课程内容、学习资料、操作说明和相关补充信息。",
       "适合希望系统学习 AI 工具、提示词、自动化流程和实战方法的用户。建议先阅读课程介绍和目录，再判断是否符合当前目标。",
       "大多数内容会从实际场景和操作步骤切入。如果课程涉及特定软件、账号或本地部署环境，请先查看详情页中的适用条件和准备说明。",
       "你可以把课程中的方法用于内容创作、运营提效、工具配置或工作流搭建，并形成可复用的实践步骤。",
@@ -1062,7 +1117,7 @@ function buildGeneratedFaqAnswer(
   if (tool.type === "software") {
     return [
       `${zhName}用于辅助完成 AI 工具应用、内容生产、流程处理或效率提升类任务。使用前建议结合详情页说明确认适用场景。`,
-      "完成购买并通过审核后，可在用户中心查看对应软件的下载链接、版本信息和使用说明。",
+      "请按订单页面显示的支付方式和解锁条件操作。权限解锁后，可在用户中心查看对应软件的下载链接、版本信息和使用说明。",
       "请先查看系统要求、版本记录、产品介绍和使用教程，确认软件适合你的设备环境和工作流程。",
       "建议先明确要完成的任务，再按照详情页和教程进行小范围测试，确认输出质量、操作步骤和成本后再用于高频工作。",
       "可以先查看详情页、教程和版本说明；如果仍有问题，可联系 ENHE AI 客服获取下载、安装、使用或更新相关支持。",
@@ -1071,7 +1126,7 @@ function buildGeneratedFaqAnswer(
 
   return [
     "该服务主要提供AI工具订阅与账号使用支持、访问建议、交付说明和售后边界说明。使用前请遵守对应平台规则。",
-    "完成购买并通过审核后，可在用户中心查看对应服务说明、交付范围、使用建议和支持入口。",
+    "请按订单页面显示的支付方式和解锁条件操作。权限解锁后，可在用户中心查看对应服务说明、交付范围、使用建议和支持入口。",
     "适合需要了解AI工具访问、订阅方案、账号使用边界和合规注意事项的用户。涉及第三方平台时，请以对应平台官方政策为准。",
     "请按对应平台规则合规使用，不承诺绕过平台限制，也不保证第三方平台政策长期不变。",
     "可联系ENHE AI客服获取使用建议和服务边界说明。平台能力、订阅规则和访问条件可能变化，请以当前页面说明为准。",
@@ -1119,6 +1174,13 @@ export function buildLocalizedToolFaqItems(
     question: resolveLocalizedInlineCopy(faq.question, locale, normalizeText),
     answer: resolveLocalizedInlineCopy(faq.answer, locale, normalizeRichText),
   }));
+
+  if (tool.type === "ai_workflow") {
+    const workflowFaqs = locale === "zh" ? localizedFaqs : localizedFaqs.filter((faq) =>
+      isVisibleInEnglishContent(faq.question, 2) && isVisibleInEnglishContent(faq.answer, 5),
+    );
+    return workflowFaqs.length ? workflowFaqs : buildWorkflowFaqFallback(tool, locale);
+  }
 
   if (locale === "zh") {
     if (!localizedFaqs.length)
@@ -1210,6 +1272,8 @@ export function buildLocalizedToolTutorialItems(
       isVisibleInEnglishContent(tutorial.title, 2) &&
       isVisibleInEnglishContent(tutorial.content, 6),
   );
+
+  if (tool.type === "ai_workflow") return visibleLocalizedTutorials;
 
   return visibleLocalizedTutorials.length
     ? visibleLocalizedTutorials

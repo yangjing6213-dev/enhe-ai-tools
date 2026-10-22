@@ -1,13 +1,15 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
-const { analyticsEventCreate, headersMock } = vi.hoisted(() => ({
+const { analyticsEventCreate, analyticsEventUpsert, analyticsEventFindMany, headersMock } = vi.hoisted(() => ({
   analyticsEventCreate: vi.fn(),
+  analyticsEventUpsert: vi.fn(),
+  analyticsEventFindMany: vi.fn(),
   headersMock: vi.fn()
 }));
 
 vi.mock("next/headers", () => ({ headers: headersMock }));
 vi.mock("@/lib/db", () => ({
-  prisma: { analyticsEvent: { create: analyticsEventCreate } }
+  prisma: { analyticsEvent: { create: analyticsEventCreate, upsert: analyticsEventUpsert, findMany: analyticsEventFindMany } }
 }));
 
 import {
@@ -75,6 +77,10 @@ describe("analytics funnel helpers", () => {
     expect(isClientAnalyticsEventName("home_account_services_cta_click")).toBe(true);
     expect(isClientAnalyticsEventName("home_task_outcome_click")).toBe(true);
     expect(isClientAnalyticsEventName("payment_review_approved")).toBe(false);
+    expect(isAnalyticsEventName("purchase_completed")).toBe(true);
+    expect(isClientAnalyticsEventName("purchase_completed")).toBe(false);
+    expect(isAnalyticsEventName("registration_completed")).toBe(true);
+    expect(isClientAnalyticsEventName("registration_completed")).toBe(false);
     expect(seoAuditFunnelSteps.every(isAnalyticsEventName)).toBe(true);
     expect(isAnalyticsEventName("unknown_event")).toBe(false);
   });
@@ -87,8 +93,7 @@ describe("analytics funnel helpers", () => {
       "product_purchase_cta_click",
       "begin_checkout",
       "create_order",
-      "payment_proof_submitted",
-      "payment_review_approved",
+      "purchase_completed",
     ]);
     expect(analyticsFunnelSteps).toContain("view_tool");
   });
@@ -133,6 +138,8 @@ describe("analytics funnel helpers", () => {
       "create_order",
       "payment_proof_submitted",
       "payment_review_approved",
+      "purchase_completed",
+      "registration_completed",
       "payment_review_rejected",
       "refund_request_submitted",
       "order_receipt_submitted",
@@ -223,7 +230,78 @@ describe("analytics funnel helpers", () => {
 describe("server analytics tracking", () => {
   beforeEach(() => {
     analyticsEventCreate.mockReset().mockResolvedValue({ id: "event-1" });
+    analyticsEventUpsert.mockReset().mockResolvedValue({ id: "purchase_completed:order-1" });
+    analyticsEventFindMany.mockReset().mockResolvedValue([]);
     headersMock.mockReset();
+  });
+
+  it("deduplicates concurrent authoritative completion events by order without buyer cookies", async () => {
+    const input = {
+      eventName: "purchase_completed" as const,
+      entityType: "order",
+      entityId: "order-1",
+      path: "/orders/order-1",
+      userId: "buyer-1",
+      context: { orderId: "order-1" },
+      metadata: { orderType: "software_download", paymentProvider: "zpay" },
+      networkContext: { ip: null, userAgent: null },
+    };
+
+    await Promise.all([trackAnalyticsEvent(input), trackAnalyticsEvent(input)]);
+
+    expect(analyticsEventCreate).not.toHaveBeenCalled();
+    expect(analyticsEventUpsert).toHaveBeenCalledTimes(2);
+    expect(analyticsEventUpsert).toHaveBeenCalledWith({
+      where: { id: "purchase_completed:order-1" },
+      create: expect.objectContaining({
+        id: "purchase_completed:order-1",
+        eventName: "purchase_completed",
+        metadata: expect.objectContaining({ orderId: "order-1", eventTrust: "server" }),
+      }),
+      update: {},
+    });
+    expect(headersMock).not.toHaveBeenCalled();
+  });
+
+  it("deduplicates registration completion by the created account id", async () => {
+    await trackAnalyticsEvent({
+      eventName: "registration_completed",
+      entityType: "user",
+      entityId: "user-1",
+      userId: "user-1",
+      metadata: { locale: "zh", registrationMethod: "password" },
+      networkContext: { ip: null, userAgent: null },
+    });
+
+    expect(analyticsEventUpsert).toHaveBeenCalledWith({
+      where: { id: "registration_completed:user-1" },
+      create: expect.objectContaining({
+        id: "registration_completed:user-1",
+        metadata: { locale: "zh", registrationMethod: "password", eventTrust: "server" },
+      }),
+      update: {},
+    });
+  });
+
+  it("rejects a purchase completion without an order binding", async () => {
+    const consoleError = vi.spyOn(console, "error").mockImplementation(() => undefined);
+
+    await trackAnalyticsEvent({ eventName: "purchase_completed", networkContext: { ip: null, userAgent: null } });
+
+    expect(analyticsEventCreate).not.toHaveBeenCalled();
+    expect(analyticsEventUpsert).not.toHaveBeenCalled();
+    expect(consoleError).toHaveBeenCalledWith("[analytics] failed to track event", expect.any(Error));
+  });
+
+  it("does not store a completion explicitly marked as a test order", async () => {
+    await trackAnalyticsEvent({
+      eventName: "purchase_completed", entityType: "order", entityId: "test-order-1",
+      metadata: { isTestData: true }, networkContext: { ip: null, userAgent: null },
+    });
+
+    expect(analyticsEventCreate).not.toHaveBeenCalled();
+    expect(analyticsEventUpsert).not.toHaveBeenCalled();
+    expect(analyticsEventFindMany).not.toHaveBeenCalled();
   });
 
   afterEach(() => {

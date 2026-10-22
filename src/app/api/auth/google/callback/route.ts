@@ -4,6 +4,7 @@ import { NextResponse, type NextRequest } from "next/server";
 import { hashPassword, signInUser } from "@/lib/auth";
 import { getDefaultAvatar } from "@/lib/default-avatar";
 import { prisma } from "@/lib/db";
+import { trackAnalyticsEvent } from "@/lib/analytics";
 import { getGoogleRedirectUri, googleOAuthStateCookieName, verifyGoogleIdToken, type GoogleIdentity } from "@/lib/google-oauth";
 import { localeCookieName } from "@/lib/locale-routing";
 import { normalizeLocale } from "@/lib/dictionaries";
@@ -55,7 +56,7 @@ function isUniqueConstraintError(error: unknown) {
   return typeof error === "object" && error !== null && "code" in error && error.code === "P2002";
 }
 
-async function findOrCreateGoogleUser(identity: GoogleIdentity) {
+async function findOrCreateGoogleUser(identity: GoogleIdentity, locale: "zh" | "en") {
   const existingIdentity = await prisma.user.findUnique({
     where: { googleSubject: identity.subject },
     select: { id: true, status: true },
@@ -88,6 +89,18 @@ async function findOrCreateGoogleUser(identity: GoogleIdentity) {
       },
       select: { id: true },
     });
+    try {
+      await trackAnalyticsEvent({
+        eventName: "registration_completed",
+        path: buildLocalePath("/register", locale),
+        entityType: "user",
+        entityId: user.id,
+        userId: user.id,
+        metadata: { locale, registrationMethod: "google" },
+      });
+    } catch {
+      // Account creation has succeeded; analytics must not prevent sign-in.
+    }
     return user.id;
   } catch (error) {
     if (!isUniqueConstraintError(error)) throw error;
@@ -155,7 +168,7 @@ export async function GET(request: NextRequest) {
     if (typeof tokenPayload.id_token !== "string") return fail();
 
     const identity = await verifyGoogleIdToken(tokenPayload.id_token, clientId, oauthState.nonce);
-    const userId = await findOrCreateGoogleUser(identity);
+    const userId = await findOrCreateGoogleUser(identity, locale);
     await signInUser(userId);
     clearStateCookie();
 

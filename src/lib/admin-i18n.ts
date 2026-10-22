@@ -70,7 +70,7 @@ export const adminDictionaries = {
       popularToolStats: "下载 {downloads} / 使用 {usage} / 热度 {score}",
       noPublishedTools: "暂无已发布工具数据。",
       funnelTitle: "7 天运营漏斗",
-      funnelNote: "访问、开通、审核和退款关键节点",
+      funnelNote: "按新完成事件记录访问、开通和退款节点；历史审核记录不等于成交，不与新事件直接合并。",
       funnelConversion: "相邻转化 {rate}%",
       funnelLabels: {
         visit_home: "访问首页",
@@ -79,6 +79,8 @@ export const adminDictionaries = {
         create_order: "创建订单",
         payment_proof_submitted: "提交凭证",
         payment_review_approved: "审核通过",
+        purchase_completed: "支付并开通成功",
+        registration_completed: "注册成功",
         refund_request_submitted: "退款申请"
       }
     },
@@ -176,7 +178,7 @@ export const adminDictionaries = {
       popularToolStats: "Downloads {downloads} / Usage {usage} / Score {score}",
       noPublishedTools: "No published tool data yet.",
       funnelTitle: "7-day operations funnel",
-      funnelNote: "Visit, activation, review, and refund milestones",
+      funnelNote: "New completion events track visits, activation, and refund requests. Historical review events are not purchases and are not combined with completion events.",
       funnelConversion: "Step conversion {rate}%",
       funnelLabels: {
         visit_home: "Visit home",
@@ -185,6 +187,8 @@ export const adminDictionaries = {
         create_order: "Create order",
         payment_proof_submitted: "Submit proof",
         payment_review_approved: "Approved",
+        purchase_completed: "Paid and activated",
+        registration_completed: "Registration completed",
         refund_request_submitted: "Refund request"
       }
     },

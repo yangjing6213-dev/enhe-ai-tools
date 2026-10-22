@@ -3,6 +3,7 @@
 import type { RedesignLocale } from "@/components/redesign/types";
 import FolderFloat from "@/components/FolderFloat";
 import { SOFTWARE_CATEGORIES } from "@/lib/redesign/software/software-categories";
+import { trackClientAnalyticsEvent } from "@/components/analytics-tracker";
 
 export const HOME_FEATURES: ReadonlyArray<{
   title: Record<RedesignLocale, string>;
@@ -38,6 +39,7 @@ const NEWS_ITEMS = [
   { zh: "AI 技能教程", en: "AI tutorials", path: "/ai-news/topics/ai-tutorials" },
   { zh: "AI 监管与安全", en: "AI regulation", path: "/ai-news/topics/ai-regulation" },
 ];
+const HOME_SOFTWARE_CATEGORIES = SOFTWARE_CATEGORIES.filter(category => !["all", "skill"].includes(category.id));
 
 export function EnheRedesignFeatures({ locale }: { locale: RedesignLocale }) {
   return (
@@ -52,7 +54,7 @@ export function EnheRedesignFeatures({ locale }: { locale: RedesignLocale }) {
               label={title[locale]}
               sublabel={locale === "zh" ? "点击或悬停探索" : "Open to explore"}
               items={index === 0
-                ? SOFTWARE_CATEGORIES.filter(category => !["all", "skill"].includes(category.id)).map(category => ({ label: category.label[locale], value: `${href[locale]}?category=${category.id}` }))
+                ? HOME_SOFTWARE_CATEGORIES.map(category => ({ label: category.label[locale], value: `${href[locale]}?category=${category.id}` }))
                 : index === 1 || index === 2
                 ? (index === 1 ? SKILL_ITEMS : NEWS_ITEMS).map(item => ({ label: item[locale], value: `${locale === "en" ? "/en" : ""}${item.path}` }))
                 : [{ label: locale === "zh" ? `查看${title[locale]}` : `Explore ${title[locale]}`, value: href[locale] }]}
@@ -77,7 +79,19 @@ export function EnheRedesignFeatures({ locale }: { locale: RedesignLocale }) {
               openDuration={520}
               stagger={45}
               bounce={0.3}
-              onSelect={value => { window.location.assign(value); }}
+              onSelect={(value, itemIndex) => {
+                trackClientAnalyticsEvent({
+                  eventName: "home_entry_click",
+                  path: window.location.pathname,
+                  metadata: {
+                    surface: "category_folder",
+                    target: index === 0
+                      ? `software_${HOME_SOFTWARE_CATEGORIES[itemIndex]?.id ?? "all"}`
+                      : value.split(/[?#]/)[0].replace(/^\/en(?=\/)/, "").replaceAll("/", "_"),
+                  },
+                });
+                window.location.assign(value);
+              }}
             />
           </div>
         ))}

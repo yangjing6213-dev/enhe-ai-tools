@@ -1,5 +1,6 @@
 import { getDictionary, type Locale } from "@/lib/dictionaries";
 import { getPrimaryToolPrice, type ToolPriceSpecStatus } from "@/lib/tool-price-specs";
+import { resolveAiWorkflowDeliveryMode } from "@/lib/ai-workflows/rules";
 
 export function buildValueSentence(description: string, locale: Locale) {
   const sentence = description.split(/[。?!；，,.!?]/).find(Boolean)?.trim() ?? description.trim();
@@ -12,11 +13,34 @@ type ToolHighlightInput = {
   isDownloadPaid?: boolean;
   downloadPrice?: unknown;
   priceSpecs?: { price: unknown; status: ToolPriceSpecStatus }[];
+  downloadFileId?: string | null;
+  aiWorkflowCandidate?: { status: string; fileId: string | null } | null;
 };
 
 export function buildToolCardHighlights(tool: ToolHighlightInput, locale: Locale) {
   const t = getDictionary(locale);
-  const isDownloadProduct = tool.type === "software" || tool.type === "ai_skill" || tool.type === "ai_workflow";
+  if (tool.type === "ai_workflow") {
+    const mode = tool.aiWorkflowCandidate
+      ? resolveAiWorkflowDeliveryMode({
+          candidateStatus: tool.aiWorkflowCandidate.status,
+          candidateFileId: tool.aiWorkflowCandidate.fileId,
+          toolFileId: tool.downloadFileId ?? null,
+        })
+      : null;
+    const packagePrice = getPrimaryToolPrice(tool.priceSpecs ?? [], tool.downloadPrice);
+    const hasPaidPackage = tool.isDownloadPaid === true && Number.isFinite(packagePrice) && packagePrice > 0;
+    const delivery = mode === "repository_link"
+      ? locale === "en" ? "GitHub repository only" : "仅 GitHub 原仓库"
+      : mode === "package"
+        ? hasPaidPackage
+          ? t.toolCard.capabilityPaidDownload
+          : tool.isDownloadPaid === false
+            ? locale === "en" ? "Free package" : "免费交付包"
+            : locale === "en" ? "Check price and access" : "查看价格与获取方式"
+        : locale === "en" ? "Check delivery details" : "查看获取方式";
+    return [locale === "en" ? "AI workflow" : "AI 工作流", delivery];
+  }
+  const isDownloadProduct = tool.type === "software" || tool.type === "ai_skill";
   const priceFallback = isDownloadProduct ? tool.downloadPrice : 0;
   const servicePrice = getPrimaryToolPrice(tool.priceSpecs ?? [], priceFallback);
   const isPaid =

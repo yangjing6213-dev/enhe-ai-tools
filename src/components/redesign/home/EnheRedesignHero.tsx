@@ -50,6 +50,9 @@ export function EnheRedesignHero({ locale }: { locale: RedesignLocale }) {
               as="a"
               className="redesign-home-cta"
               href={cta.href}
+              data-analytics-event="home_entry_click"
+              data-analytics-meta-surface="hero"
+              data-analytics-meta-target={cta === copy.cta ? "tools" : "forum"}
               color="#ffffff"
               trailColor="#ffffff"
               textColor="#ffffff"

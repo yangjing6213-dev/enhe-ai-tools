@@ -105,20 +105,6 @@ export async function RegisterPageShell({
         <p id="register-password-help" className="mt-2 text-xs leading-5 text-[var(--marketing-muted)]">
           {locale === "en" ? "Required. Use at least 6 characters." : "必填，请输入至少 6 个字符。"}
         </p>
-        <label htmlFor="register-newsletter-email" className="mt-5 block text-sm font-semibold text-[var(--marketing-text)]">{t.auth.newsletterEmailLabel}</label>
-        <input
-          id="register-newsletter-email"
-          name="newsletterEmail"
-          type="email"
-          autoComplete="email"
-          placeholder={locale === "en" ? "Optional notification email" : "可选，接收资讯的邮箱"}
-          title={locale === "en" ? "Optional. Enter a notification email if different from your account email." : "可选，如需使用不同邮箱接收资讯可填写。"}
-          aria-describedby="register-newsletter-email-help"
-          className="form-control-dark mt-2"
-        />
-        <p id="register-newsletter-email-help" className="mt-2 text-xs leading-5 text-[var(--marketing-muted)]">
-          {locale === "en" ? "Optional. Leave blank to use your account email when needed." : "选填，留空时可继续使用账号邮箱。"}
-        </p>
         <FormSubmitButton className="login-submit-button mt-8 w-full text-base" pendingLabel={t.auth.creatingAccount}>
           {t.auth.createAccount}
         </FormSubmitButton>

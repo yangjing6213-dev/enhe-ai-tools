@@ -19,6 +19,7 @@ const mocks = vi.hoisted(() => ({
 }));
 
 vi.mock("@/lib/csrf", () => ({ assertValidCsrfToken: vi.fn() }));
+vi.mock("@/lib/analytics", () => ({ trackAnalyticsEvent: vi.fn() }));
 
 vi.mock("next/cache", () => ({ revalidatePath: mocks.revalidatePath }));
 vi.mock("next/navigation", () => ({ redirect: mocks.redirect }));

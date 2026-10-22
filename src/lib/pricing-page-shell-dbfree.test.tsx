@@ -64,4 +64,13 @@ describe("pricing page DB-free shell", () => {
       }
     },
   );
+
+  it.each(["zh", "en"] as const)("explains automatic and manual payment as separate paths (%s)", async (locale) => {
+    vi.stubEnv("DATABASE_URL", "postgresql://configured.invalid/enhe");
+    db.toolFindMany.mockResolvedValue([]);
+    const { PricingPageShell } = await import("@/app/pricing/page-shell");
+    const html = renderToStaticMarkup(await PricingPageShell({ forceLocale: locale }));
+    expect(html).toContain(locale === "zh" ? "自动支付确认成功后解锁对应权限" : "Automatic payments unlock access after successful confirmation");
+    expect(html).toContain(locale === "zh" ? "仅在所选流程要求人工审核时" : "upload proof only when");
+  });
 });

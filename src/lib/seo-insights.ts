@@ -1,17 +1,13 @@
 import { parseAnalyticsAttribution } from "@/lib/analytics-client-payload";
+import { analyticsProductRouteFamilies, getAnalyticsProductRoute, type AnalyticsProductContentType } from "@/lib/analytics-public-routes";
 
 export type TrafficMedium = "direct" | "internal" | "organic_search" | "ai_answer_engine" | "referral" | "campaign";
 
 export type SeoContentType =
+  | AnalyticsProductContentType
   | "home"
   | "ai_news_listing"
   | "ai_news_article"
-  | "software_listing"
-  | "software_detail"
-  | "account_service_listing"
-  | "account_service_detail"
-  | "skill_learning_listing"
-  | "skill_learning_detail"
   | "tutorial_listing"
   | "pricing"
   | "legal"
@@ -42,8 +38,7 @@ export const seoContentConversionFunnelSteps = [
   "product_purchase_cta_click",
   "begin_checkout",
   "create_order",
-  "payment_proof_submitted",
-  "payment_review_approved"
+  "purchase_completed"
 ] as const;
 
 export const seoDirectConversionFunnelSteps = [
@@ -52,8 +47,7 @@ export const seoDirectConversionFunnelSteps = [
   "product_purchase_cta_click",
   "begin_checkout",
   "create_order",
-  "payment_proof_submitted",
-  "payment_review_approved"
+  "purchase_completed"
 ] as const;
 
 export const seoConversionFunnelSteps = seoContentConversionFunnelSteps;
@@ -204,12 +198,8 @@ export function getSeoContentType(pathname: string | null | undefined): SeoConte
   if (path === "/") return "home";
   if (path === "/ai-news") return "ai_news_listing";
   if (path.startsWith("/ai-news/")) return "ai_news_article";
-  if (path === "/software") return "software_listing";
-  if (path.startsWith("/software/") || path.startsWith("/tools/")) return "software_detail";
-  if (path === "/account-services" || path === "/online-tools") return "account_service_listing";
-  if (path.startsWith("/account-services/") || path.startsWith("/online-tools/")) return "account_service_detail";
-  if (path === "/skill-learning") return "skill_learning_listing";
-  if (path.startsWith("/skill-learning/")) return "skill_learning_detail";
+  const productRoute = getAnalyticsProductRoute(path);
+  if (productRoute) return productRoute.contentType;
   if (path === "/tutorials") return "tutorial_listing";
   if (path === "/pricing") return "pricing";
   if (path.startsWith("/legal/")) return "legal";
@@ -420,7 +410,7 @@ function isContentConversionLandingPath(pathname: string | undefined) {
 
 function isDirectConversionLandingPath(pathname: string | undefined) {
   const contentType = getSeoContentType(pathname);
-  return contentType === "software_detail" || contentType === "account_service_detail" || contentType === "skill_learning_detail";
+  return analyticsProductRouteFamilies.some(route => route.detail === contentType);
 }
 
 function getEventTrafficMedium(value: unknown) {
@@ -599,22 +589,17 @@ function isKeywordCovered(query: string, content: SeoInsightContentItem[]) {
 }
 
 function normalizePublicPath(pathname: string | null | undefined) {
-  const rawPath = String(pathname || "/").split("?")[0].replace(/\/+$/, "") || "/";
+  const rawPath = String(pathname || "/").split(/[?#]/)[0].replace(/\/+$/, "") || "/";
   if (rawPath === "/en") return "/";
   return rawPath.replace(/^\/en(?=\/)/, "") || "/";
 }
 
 function normalizeSeoContentType(value: string | null): SeoContentType | null {
   const types: SeoContentType[] = [
+    ...analyticsProductRouteFamilies.flatMap(route => [route.listing, route.detail]),
     "home",
     "ai_news_listing",
     "ai_news_article",
-    "software_listing",
-    "software_detail",
-    "account_service_listing",
-    "account_service_detail",
-    "skill_learning_listing",
-    "skill_learning_detail",
     "tutorial_listing",
     "pricing",
     "legal",

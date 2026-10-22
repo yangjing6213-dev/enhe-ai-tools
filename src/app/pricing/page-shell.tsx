@@ -133,7 +133,7 @@ export async function PricingPageShell({ forceLocale }: { forceLocale: Locale })
             "Review current prices, delivery notes, and support boundaries before opening the matching product, course, or service page.",
           cardTitle: "Buy from the detail page",
           cardText:
-            "Each paid item has its own price, access scope, and review workflow. The detail page is the final source before purchase.",
+            "Each paid item has its own price, access scope, payment method, and delivery notes. The detail page is the final source before purchase.",
           cta: "Browse all products",
           currentPrice: "Current price",
           viewOffer: "View details",
@@ -141,7 +141,7 @@ export async function PricingPageShell({ forceLocale }: { forceLocale: Locale })
           purchaseGuidance:
             "Open the matching detail page first. Confirm the price, access scope, system or platform requirements, and delivery notes.",
           paymentReview:
-            "After payment, submit the required proof through the page workflow. ENHE AI reviews the order and unlocks the matching access after approval.",
+            "Follow the payment method and delivery notes shown on the order page. Automatic payments unlock access after successful confirmation; upload proof only when the selected workflow requests a manual review.",
           afterSalesBoundary:
             "Paid access follows the description on each detail page. Third-party platform services must follow the official rules of that platform.",
         }
@@ -151,7 +151,7 @@ export async function PricingPageShell({ forceLocale }: { forceLocale: Locale })
             "购买前先看清当前价格、交付方式和服务边界，再进入对应的软件、课程或服务详情页操作。",
           cardTitle: "从详情页确认后购买",
           cardText:
-            "每个付费项目都有独立价格、权益范围和审核流程。下单前以对应详情页说明为准。",
+            "每个付费项目都有独立价格、权益范围、支付方式和交付说明。下单前以对应详情页说明为准。",
           cta: "浏览全部产品",
           currentPrice: "当前价格",
           viewOffer: "查看详情",
@@ -159,7 +159,7 @@ export async function PricingPageShell({ forceLocale }: { forceLocale: Locale })
           purchaseGuidance:
             "请先进入对应详情页，确认价格、权益范围、设备或平台要求、交付方式与相关使用说明。",
           paymentReview:
-            "完成支付后，按页面流程提交相应凭证。ENHE AI 审核通过后，会解锁对应的下载、课程或服务权限。",
+            "请按订单页面显示的支付方式与交付说明操作。自动支付确认成功后解锁对应权限；仅在所选流程要求人工审核时，才需提交付款凭证并等待审核。",
           afterSalesBoundary:
             "付费权益以各详情页说明为准。涉及第三方平台的服务，请以对应平台官方规则为准。",
         };

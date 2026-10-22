@@ -94,6 +94,18 @@ export async function registerAction(formData: FormData) {
       avatar: getDefaultAvatar(input.identifier, gender)
     }
   });
+  try {
+    await trackAnalyticsEvent({
+      eventName: "registration_completed",
+      path: buildLocalePath("/register", locale),
+      entityType: "user",
+      entityId: user.id,
+      userId: user.id,
+      metadata: { locale, registrationMethod: "password" },
+    });
+  } catch {
+    // Account creation has succeeded; analytics must not prevent sign-in.
+  }
   await signInUser(user.id);
   redirect(returnTo);
 }

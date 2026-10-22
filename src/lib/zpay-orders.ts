@@ -918,6 +918,27 @@ export async function activateOrderFromZpayNotify(
     }
 
     const purchaseEvents: Array<Parameters<typeof trackAnalyticsEvent>[0]> = [];
+    if (!wasActivated && !requiresLatePaymentReconciliation && !current.isTestData) {
+      purchaseEvents.push({
+        eventName: "purchase_completed",
+        path: `/orders/${current.id}`,
+        entityType: "order",
+        entityId: current.id,
+        userId: current.userId,
+        metadata: {
+          orderType: current.orderType,
+          paymentProvider: "zpay",
+          toolId: current.toolId,
+          toolType: current.tool?.type,
+          isTestData: current.isTestData,
+        },
+        context: {
+          orderId: current.id,
+          ...(current.seoAuditOfferId ? { offerId: current.seoAuditOfferId } : {}),
+        },
+        networkContext: { ip: null, userAgent: null },
+      });
+    }
     if (
       !wasPaid &&
       !wasActivated &&

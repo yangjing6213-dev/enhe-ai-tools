@@ -182,25 +182,25 @@ function buildDeliveryCopy(
     if (type === "online") {
       return isFree
         ? "Free service access from the detail page"
-        : "Service notes and support entry after payment review";
+        : "Service access follows the payment status and delivery notes on the order page";
     }
     if (type === "skill_learning") {
       return isFree
         ? "Free course access"
-        : "Course access after payment review";
+        : "Course access follows the payment status and delivery notes on the order page";
     }
     return isFree
       ? "Free download or access from the detail page"
-      : "Download and setup notes after payment review";
+      : "Download access follows the payment status and delivery notes on the order page";
   }
 
   if (type === "online") {
-    return isFree ? "从详情页免费获取服务" : "付款审核后开放服务说明与支持入口";
+    return isFree ? "从详情页免费获取服务" : "服务权限以订单付款状态和交付说明为准";
   }
   if (type === "skill_learning") {
-    return isFree ? "免费获取课程内容" : "付款审核后开放课程权限";
+    return isFree ? "免费获取课程内容" : "课程权限以订单付款状态和交付说明为准";
   }
-  return isFree ? "从详情页免费下载或获取" : "付款审核后开放下载与使用说明";
+  return isFree ? "从详情页免费下载或获取" : "下载权限以订单付款状态和交付说明为准";
 }
 
 export function buildPricingOfferItems(
@@ -320,6 +320,8 @@ export async function getPricingOfferItems(locale: Locale) {
 function getMarkdownType(type: PricingOfferItem["type"]) {
   if (type === "account_service") return "AI account service guidance";
   if (type === "course") return "AI skill course";
+  if (type === "ai_skill") return "AI Skill package";
+  if (type === "ai_workflow") return "AI workflow package";
   return "AI software app";
 }
 
@@ -361,7 +363,7 @@ export function renderPricingMarkdown(items: PricingOfferItem[]) {
     "",
     "- Prices are listed in CNY.",
     "- Users should review the matching detail page before purchase or access.",
-    "- Payment proof review is required before paid download, course, or service access is unlocked.",
+    "- Follow the payment method and delivery notes shown on the order page. Automatic payments unlock access after successful confirmation; upload proof only when the selected workflow requests a manual review.",
     "- Third-party platform services must follow the official rules of that platform.",
     "",
     "## Support",

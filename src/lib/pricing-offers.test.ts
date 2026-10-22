@@ -213,6 +213,17 @@ describe("pricing offers", () => {
     expect(markdown).toContain("- Offer: Service option 1 | CNY 195.00");
     expect(markdown).toContain("- Offer: Service option 2 | CNY 200.00");
     expect(markdown).not.toMatch(/free prompt workspace/i);
+    expect(markdown).toContain("Automatic payments unlock access after successful confirmation");
+    expect(markdown).toContain("upload proof only when");
+    expect(markdown).not.toContain("Payment proof review is required before");
+  });
+
+  it.each(["zh", "en"] as const)("does not tell every paid customer to wait for manual review (%s)", (locale) => {
+    const offers = buildPricingOfferItems(currentPublicTools, locale);
+    for (const offer of offers.filter((item) => item.offers.some((price) => price.price > 0))) {
+      expect(offer.localized.delivery).toContain(locale === "zh" ? "订单付款状态和交付说明" : "payment status and delivery notes");
+      expect(offer.localized.delivery).not.toMatch(/付款审核后|after payment review/i);
+    }
   });
 
   it("serves pricing.md from the live shared catalog instead of a drifting build snapshot", () => {

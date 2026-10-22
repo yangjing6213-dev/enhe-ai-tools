@@ -1,6 +1,7 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
 const db = vi.hoisted(() => ({
+  trackEvent: vi.fn(),
   tx: {
     $queryRaw: vi.fn(),
     order: {
@@ -55,9 +56,12 @@ vi.mock("@/lib/db", () => ({
   prisma: db.prisma
 }));
 
+vi.mock("@/lib/analytics", () => ({ trackAnalyticsEvent: db.trackEvent }));
+
 describe("membership service", () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    db.trackEvent.mockReset().mockResolvedValue(undefined);
     db.prisma.$transaction.mockImplementation((callback: (tx: typeof db.tx) => unknown) => callback(db.tx));
     db.tx.order.update.mockImplementation(({ data }) => ({ id: "order-1", ...data }));
     db.tx.membership.findFirst.mockResolvedValue(null);
@@ -82,6 +86,7 @@ describe("membership service", () => {
       orderType: "vip",
       orderStatus: "pending_review",
       paidAt: null,
+      amount: 19,
       plan: { id: "plan-1", name: "7天VIP", durationDays: 7 },
       paymentProof: null
     });
@@ -103,6 +108,14 @@ describe("membership service", () => {
     expect(db.tx.order.update).toHaveBeenCalledWith(
       expect.objectContaining({ data: expect.objectContaining({ orderStatus: "activated" }) })
     );
+    expect(db.trackEvent).toHaveBeenCalledWith(expect.objectContaining({
+      eventName: "purchase_completed",
+      entityType: "order",
+      entityId: "order-1",
+      path: "/orders/order-1",
+      metadata: expect.objectContaining({ orderType: "vip", paymentProvider: "manual" }),
+    }));
+    expect(db.trackEvent.mock.calls[0][0].metadata).not.toHaveProperty("amount");
   });
 
   it("repairs a VIP order that is already activated but has no active membership", async () => {
@@ -135,6 +148,7 @@ describe("membership service", () => {
       })
     );
     expect(db.tx.order.update).not.toHaveBeenCalled();
+    expect(db.trackEvent).not.toHaveBeenCalled();
   });
 
   it("creates software purchase authorization when a paid software order is approved", async () => {
@@ -168,6 +182,11 @@ describe("membership service", () => {
         })
       })
     );
+    expect(db.trackEvent).toHaveBeenCalledWith(expect.objectContaining({
+      eventName: "purchase_completed",
+      entityId: "order-2",
+      metadata: expect.objectContaining({ orderType: "software_download", toolId: "tool-1" }),
+    }));
   });
 
   it.each(["refunded", "cancelled"] as const)(
@@ -214,8 +233,65 @@ describe("membership service", () => {
       expect(db.tx.membership.update).not.toHaveBeenCalled();
       expect(db.tx.paymentProof.updateMany).not.toHaveBeenCalled();
       expect(db.tx.order.update).not.toHaveBeenCalled();
+      expect(db.trackEvent).not.toHaveBeenCalled();
     }
   );
+
+  it("tracks manual completion after commit and keeps activation successful if tracking fails", async () => {
+    const { activateVipForOrder } = await import("@/lib/membership");
+    const calls: string[] = [];
+    db.tx.order.findUnique.mockResolvedValue({
+      id: "order-manual", userId: "user-1", toolId: "tool-1",
+      orderType: "software_download", orderStatus: "pending_review",
+      amount: 19, paidAt: null, activatedAt: null, plan: null,
+    });
+    db.prisma.$transaction.mockImplementation(async (callback: (tx: typeof db.tx) => unknown) => {
+      const result = await callback(db.tx);
+      calls.push("commit");
+      return result;
+    });
+    db.trackEvent.mockImplementation(async () => {
+      calls.push("track");
+      throw new Error("analytics unavailable");
+    });
+
+    await expect(activateVipForOrder("order-manual", "admin-1")).resolves.toMatchObject({ orderStatus: "activated" });
+
+    expect(calls).toEqual(["commit", "track"]);
+    expect(db.trackEvent).toHaveBeenCalledTimes(1);
+    expect(JSON.stringify(db.trackEvent.mock.calls)).not.toContain("admin-1");
+  });
+
+  it("does not track completion if entitlement activation rolls back", async () => {
+    const { activateVipForOrder } = await import("@/lib/membership");
+    db.tx.order.findUnique.mockResolvedValue({
+      id: "order-manual", userId: "user-1", toolId: "tool-1",
+      orderType: "software_download", orderStatus: "pending_review",
+      amount: 19, paidAt: null, activatedAt: null, plan: null,
+    });
+    db.prisma.$transaction.mockImplementationOnce(async (callback: (tx: typeof db.tx) => unknown) => {
+      await callback(db.tx);
+      throw new Error("commit failed");
+    });
+
+    await expect(activateVipForOrder("order-manual", "admin-1")).rejects.toThrow("commit failed");
+
+    expect(db.trackEvent).not.toHaveBeenCalled();
+  });
+
+  it("activates a manual test order without counting an ordinary purchase completion", async () => {
+    const { activateVipForOrder } = await import("@/lib/membership");
+    db.tx.order.findUnique.mockResolvedValue({
+      id: "test-order-1", userId: "user-1", toolId: "tool-1",
+      orderType: "software_download", orderStatus: "pending_review", isTestData: true,
+      amount: 19, paidAt: null, activatedAt: null, plan: null,
+    });
+
+    await expect(activateVipForOrder("test-order-1", "admin-1")).resolves.toMatchObject({ orderStatus: "activated" });
+
+    expect(db.tx.toolPurchase.upsert).toHaveBeenCalledTimes(1);
+    expect(db.trackEvent).not.toHaveBeenCalled();
+  });
 
   it.each(["refunded", "cancelled"] as const)(
     "does not restore software entitlement when the order becomes %s before activation locks it",
@@ -265,6 +341,7 @@ describe("membership service", () => {
       expect(db.tx.toolPurchase.upsert).not.toHaveBeenCalled();
       expect(db.tx.paymentProof.updateMany).not.toHaveBeenCalled();
       expect(db.tx.order.update).not.toHaveBeenCalled();
+      expect(db.trackEvent).not.toHaveBeenCalled();
     }
   );
 

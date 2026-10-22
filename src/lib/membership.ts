@@ -1,5 +1,6 @@
 import { Prisma, type OrderType, type PaymentRefundState } from "@prisma/client";
 import { prisma } from "@/lib/db";
+import { trackAnalyticsEvent } from "@/lib/analytics";
 import { applyVipCancellation, applyVipGrant, type MembershipSnapshot } from "@/lib/membership-rules";
 
 type MembershipDelegate = {
@@ -503,7 +504,8 @@ export async function manuallyAdjustVip(input: {
 }
 
 export async function activateVipForOrder(orderId: string, reviewerId?: string, reviewNote?: string) {
-  return prisma.$transaction(async (tx) => {
+  let completionEvent: Parameters<typeof trackAnalyticsEvent>[0] | null = null;
+  const activatedOrder = await prisma.$transaction(async (tx) => {
     const orderReference = await tx.order.findUnique({
       where: { id: orderId },
       select: { id: true, userId: true, orderType: true, toolId: true, toolFileId: true }
@@ -631,6 +633,23 @@ export async function activateVipForOrder(orderId: string, reviewerId?: string, 
       return order;
     }
 
+    if (!order.isTestData) completionEvent = {
+      eventName: "purchase_completed",
+      path: `/orders/${order.id}`,
+      entityType: "order",
+      entityId: order.id,
+      userId: order.userId,
+      metadata: {
+        orderType: order.orderType,
+        paymentProvider: "manual",
+        toolId: order.toolId,
+        toolType: order.tool?.type,
+        isTestData: order.isTestData,
+      },
+      context: { orderId: order.id },
+      networkContext: { ip: null, userAgent: null },
+    };
+
     if (order.orderType === "software_download") {
       if (!order.toolId) throw new Error("Software order is missing tool binding.");
 
@@ -716,4 +735,12 @@ export async function activateVipForOrder(orderId: string, reviewerId?: string, 
       }
     });
   });
+  if (completionEvent) {
+    try {
+      await trackAnalyticsEvent(completionEvent);
+    } catch {
+      // Entitlement activation has committed; analytics must not undo payment.
+    }
+  }
+  return activatedOrder;
 }

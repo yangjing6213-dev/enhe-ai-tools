@@ -14,6 +14,7 @@ import {
 } from "@/lib/tool-localization";
 import { getVisibleToolMetrics } from "@/lib/tool-metrics";
 import { getPrimaryToolPrice, type ToolPriceSpecStatus } from "@/lib/tool-price-specs";
+import { resolveAiWorkflowDeliveryMode } from "@/lib/ai-workflows/rules";
 
 type ToolCardProps = {
   headingLevel?: 2 | 3;
@@ -33,6 +34,8 @@ type ToolCardProps = {
     downloadPrice?: unknown;
     priceSpecs?: { price: unknown; status: ToolPriceSpecStatus }[];
     supportedAgents?: string[];
+    downloadFileId?: string | null;
+    aiWorkflowCandidate?: { status: string; fileId: string | null } | null;
     category?: { name: string } | null;
   };
 };
@@ -68,24 +71,46 @@ export function ToolCard({
   const highlights = showMarketingMeta ? buildCardHighlights(tool, locale) : [];
   const audience = showMarketingMeta ? localizedCategory || t.toolCard.defaultAudience : "";
   const isDownloadProduct = tool.type === "software" || tool.type === "ai_skill" || tool.type === "ai_workflow";
+  const workflowDeliveryMode = tool.type === "ai_workflow" && tool.aiWorkflowCandidate
+    ? resolveAiWorkflowDeliveryMode({
+        candidateStatus: tool.aiWorkflowCandidate.status,
+        candidateFileId: tool.aiWorkflowCandidate.fileId,
+        toolFileId: tool.downloadFileId ?? null,
+      })
+    : null;
+  const workflowWithoutPackage = tool.type === "ai_workflow" && workflowDeliveryMode !== "package";
   const priceFallback = isDownloadProduct ? tool.downloadPrice : 0;
   const servicePrice = getPrimaryToolPrice(tool.priceSpecs ?? [], priceFallback);
   const isPositivePrice = Number.isFinite(servicePrice) && servicePrice > 0;
+  const workflowPriceUnconfirmed = workflowDeliveryMode === "package" &&
+    tool.isDownloadPaid !== false && !(tool.isDownloadPaid === true && isPositivePrice);
+  const workflowAccessUnconfirmed = workflowWithoutPackage || workflowPriceUnconfirmed;
   const showPrice =
     showMarketingMeta &&
+    !workflowAccessUnconfirmed &&
     ((isDownloadProduct && tool.isDownloadPaid && isPositivePrice) ||
       (tool.type === "online" && isPositivePrice) ||
       (tool.type === "skill_learning" && isPositivePrice));
-  const commerceLabel = showPrice ? `¥${servicePrice.toFixed(2)}` : t.toolCard.free;
+  const commerceLabel = workflowAccessUnconfirmed
+    ? locale === "en" ? "See details" : "查看详情"
+    : showPrice ? `¥${servicePrice.toFixed(2)}` : t.toolCard.free;
   const deliveryLabel =
-    tool.type === "software"
+    tool.type === "ai_workflow"
+      ? workflowDeliveryMode === "repository_link"
+        ? locale === "en" ? "GitHub repository only" : "仅 GitHub 原仓库"
+        : workflowDeliveryMode === "package"
+          ? workflowPriceUnconfirmed
+            ? locale === "en" ? "Check price and access" : "查看价格与获取方式"
+            : t.toolCard.deliveryDownload
+          : locale === "en" ? "Check delivery details" : "查看获取方式"
+    : tool.type === "software"
       ? t.toolCard.deliveryDownload
       : tool.type === "ai_skill"
         ? t.toolCard.deliverySkill
       : tool.type === "online"
         ? t.toolCard.deliveryService
         : t.toolCard.deliveryCourse;
-  const primaryActionLabel = showPrice ? t.toolCard.compareBeforeBuy : t.toolCard.getFreeTool;
+  const primaryActionLabel = workflowAccessUnconfirmed ? t.toolCard.viewDetails : showPrice ? t.toolCard.compareBeforeBuy : t.toolCard.getFreeTool;
   const visibleMetrics = getVisibleToolMetrics({
     downloadCount: tool.downloadCount,
     usageCount: tool.usageCount,
@@ -120,9 +145,9 @@ export function ToolCard({
                   <Badge className="border-[var(--marketing-accent)]/35 text-[var(--marketing-accent)]">
                     {tool.type === "online" ? t.toolCard.servicePrice : tool.type === "skill_learning" ? t.toolCard.capabilityPaidCourse : t.toolCard.paidDownload} ¥{servicePrice.toFixed(2)}
                   </Badge>
-                ) : (
+                ) : !workflowAccessUnconfirmed ? (
                   <Badge>{t.toolCard.free}</Badge>
-                )}
+                ) : null}
               </div>
             ) : null}
             <Heading className={`${isCompact ? "text-lg leading-snug" : "text-xl"} font-bold text-[var(--marketing-text)]`}>{localizedTool.primaryName}</Heading>

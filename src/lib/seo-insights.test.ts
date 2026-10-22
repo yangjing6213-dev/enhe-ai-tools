@@ -146,11 +146,13 @@ describe("SEO insight helpers", () => {
       attributed("create_order", "landing-a"),
        attributed("payment_proof_submitted", "landing-a"),
        attributed("payment_review_approved", "landing-a"),
+       attributed("purchase_completed", "landing-a"),
        attributed("product_purchase_cta_click", "landing-b", "/software/product"),
        attributed("begin_checkout", "landing-b", "/software/product"),
        attributed("create_order", "landing-b", "/software/product"),
        attributed("payment_proof_submitted", "landing-b", "/software/product"),
        attributed("payment_review_approved", "landing-b", "/software/product"),
+       attributed("purchase_completed", "landing-b", "/software/product"),
       attributed("content_to_product_click", "landing-ai", "/ai-news/answer", "ai_answer_engine"),
       attributed("view_tool", "landing-ai", "/ai-news/answer", "ai_answer_engine"),
       attributed("create_order", "landing-campaign", "/pricing", "campaign"),
@@ -165,7 +167,7 @@ describe("SEO insight helpers", () => {
     });
 
     expect(report.conversionFunnels.content.rows.map((step) => step.eventName)).toEqual([...seoConversionFunnelSteps]);
-    expect(report.conversionFunnels.content.rows.map((step) => step.count)).toEqual([1, 1, 1, 1, 1, 1, 1, 1]);
+    expect(report.conversionFunnels.content.rows.map((step) => step.count)).toEqual([1, 1, 1, 1, 1, 1, 1]);
     expect(report.conversionFunnels.content.rows[1]).toMatchObject({
       stepConversionRate: 100,
       landingConversionRate: 100
@@ -176,10 +178,9 @@ describe("SEO insight helpers", () => {
       "product_purchase_cta_click",
       "begin_checkout",
       "create_order",
-      "payment_proof_submitted",
-      "payment_review_approved"
+      "purchase_completed"
     ]);
-    expect(report.conversionFunnels.direct.rows.map((step) => step.count)).toEqual([1, 1, 1, 1, 1, 1, 1]);
+    expect(report.conversionFunnels.direct.rows.map((step) => step.count)).toEqual([1, 1, 1, 1, 1, 1]);
     expect(report.conversionFunnels.direct.rows[1]).toMatchObject({
       stepConversionRate: 100,
       landingConversionRate: 100
@@ -187,7 +188,7 @@ describe("SEO insight helpers", () => {
     expect(report.conversionFunnels.content.rows.concat(report.conversionFunnels.direct.rows).every((step) => step.stepConversionRate <= 100 && step.landingConversionRate <= 100)).toBe(true);
     expect(report.conversionAttribution).toEqual({
       attributedLandings: 2,
-      attributedStageLandings: 15,
+      attributedStageLandings: 13,
       unattributedFunnelEvents: 11
     });
     expect(report.summary).toMatchObject({
@@ -195,7 +196,7 @@ describe("SEO insight helpers", () => {
       aiAnswerLandings: 1,
       campaignLandings: 1,
       directLandings: 1,
-      conversionEvents: 22
+      conversionEvents: 20
     });
   });
 

@@ -11,6 +11,8 @@ import {
 import { updateOrderForAdmin } from "@/lib/admin-order-mutations";
 import { expireUnpaidOrder } from "@/lib/order-expiry";
 
+vi.mock("@/lib/analytics", () => ({ trackAnalyticsEvent: vi.fn() }));
+
 const databaseUrl = process.env.SEO_AUDIT_TEST_DATABASE_URL;
 if (databaseUrl) {
   const parsed = new URL(databaseUrl);

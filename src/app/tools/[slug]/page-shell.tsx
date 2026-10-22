@@ -302,6 +302,13 @@ export async function ToolDetailPageShell({
 
   const localizedTool = resolveLocalizedToolIdentity(tool, forceLocale);
   const isAiWorkflow = tool.type === "ai_workflow";
+  const workflowDeliveryMode = isAiWorkflow && tool.aiWorkflowCandidate
+    ? resolveAiWorkflowDeliveryMode({
+        candidateStatus: tool.aiWorkflowCandidate.status,
+        candidateFileId: tool.aiWorkflowCandidate.fileId,
+        toolFileId: tool.downloadFileId,
+      })
+    : "package";
   const localizedCategoryName = resolveLocalizedToolCategoryName(
     tool.category?.name,
     tool.type,
@@ -317,6 +324,9 @@ export async function ToolDetailPageShell({
     content: tool.content,
     type: tool.type,
     categoryName: tool.category?.name,
+    workflowDeliveryMode: tool.aiWorkflowCandidate ? workflowDeliveryMode : undefined,
+    isDownloadPaid: tool.isDownloadPaid,
+    workflowPackagePrice: getPrimaryToolPrice(tool.priceSpecs, tool.downloadPrice),
   };
   const localizedSummary = isAiWorkflow
     ? buildLocalizedToolOptionalText(tool.shortDescription, forceLocale, { allowUntranslated: true })
@@ -362,13 +372,6 @@ export async function ToolDetailPageShell({
   const isAccountService = tool.type === "online";
   const isSkillLearning = tool.type === "skill_learning";
   const isAiSkill = tool.type === "ai_skill";
-  const workflowDeliveryMode = isAiWorkflow && tool.aiWorkflowCandidate
-    ? resolveAiWorkflowDeliveryMode({
-        candidateStatus: tool.aiWorkflowCandidate.status,
-        candidateFileId: tool.aiWorkflowCandidate.fileId,
-        toolFileId: tool.downloadFileId,
-      })
-    : "package";
   const workflowLinkOnly = isAiWorkflow && Boolean(tool.aiWorkflowCandidate) && workflowDeliveryMode === "repository_link";
   const workflowPackageAwaitingReview = isAiWorkflow && tool.aiWorkflowCandidate?.status === "pending_pricing" && Boolean(tool.aiWorkflowCandidate.fileId) && tool.aiWorkflowCandidate.fileId === tool.downloadFileId;
   const isDownloadProduct = tool.type === "software" || isAiSkill || isAiWorkflow;
@@ -525,6 +528,7 @@ export async function ToolDetailPageShell({
     where: { type: tool.type, status: "published", id: { not: tool.id } },
     include: {
       category: true,
+      aiWorkflowCandidate: { select: { status: true, fileId: true } },
       priceSpecs: {
         where: { status: "active" },
         orderBy: [{ sortOrder: "asc" }, { createdAt: "asc" }],

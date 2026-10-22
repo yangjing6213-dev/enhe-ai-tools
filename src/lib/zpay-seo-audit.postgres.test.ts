@@ -12,6 +12,8 @@ import {
   ensureZpayPaymentForOrder,
 } from "@/lib/zpay-orders";
 
+vi.mock("@/lib/analytics", () => ({ trackAnalyticsEvent: vi.fn() }));
+
 const databaseUrl = process.env.SEO_AUDIT_TEST_DATABASE_URL;
 const describePostgres = databaseUrl ? describe : describe.skip;
 

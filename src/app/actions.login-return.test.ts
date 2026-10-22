@@ -6,6 +6,7 @@ const mocks = vi.hoisted(() => ({
   createUser: vi.fn(),
   findUser: vi.fn(),
   hashPassword: vi.fn(),
+  trackEvent: vi.fn(),
   getCurrentLocale: vi.fn(),
   headers: vi.fn(),
   recordLoginAttempt: vi.fn(),
@@ -37,6 +38,7 @@ vi.mock("@/lib/auth", () => ({
   updatePasswordAndRevokeSessions: mocks.updatePasswordAndRevokeSessions,
 }));
 vi.mock("@/lib/csrf", () => ({ assertValidCsrfToken: mocks.assertValidCsrfToken }));
+vi.mock("@/lib/analytics", () => ({ trackAnalyticsEvent: mocks.trackEvent }));
 vi.mock("@/lib/i18n", () => ({ getCurrentLocale: mocks.getCurrentLocale }));
 vi.mock("@/lib/admin-email-notifications", () => ({
   sendAdminLoginSecurityEmail: mocks.sendAdminLoginSecurityEmail,
@@ -83,6 +85,7 @@ describe("admin login return path", () => {
     mocks.sendAdminLoginSecurityEmail.mockResolvedValue(undefined);
     mocks.verifyPassword.mockResolvedValue(true);
     mocks.hashPassword.mockResolvedValue("hashed-password");
+    mocks.trackEvent.mockReset().mockResolvedValue(undefined);
     mocks.createUser.mockResolvedValue({ id: "new-user-1" });
     mocks.requireUser.mockResolvedValue({ id: "admin-1", googleSubject: null });
   });
@@ -111,6 +114,7 @@ describe("admin login return path", () => {
     await expect(registerAction(registrationForm())).rejects.toThrow("register-limited");
     expect(mocks.findUser).not.toHaveBeenCalled();
     expect(mocks.createUser).not.toHaveBeenCalled();
+    expect(mocks.trackEvent).not.toHaveBeenCalled();
   });
 
   it("revokes previous sessions before issuing a new session after a password change", async () => {
@@ -162,5 +166,27 @@ describe("admin login return path", () => {
         avatar: expect.stringMatching(/^\/images\/user-avatars\/avatar-\d{2}\.webp$/),
       }),
     });
+    expect(mocks.trackEvent).toHaveBeenCalledWith({
+      eventName: "registration_completed",
+      path: "/en/register",
+      entityType: "user",
+      entityId: "new-user-1",
+      userId: "new-user-1",
+      metadata: { locale: "en", registrationMethod: "password" },
+    });
+    expect(JSON.stringify(mocks.trackEvent.mock.calls)).not.toContain("new-user@example.com");
+    expect(JSON.stringify(mocks.trackEvent.mock.calls)).not.toContain("hashed-password");
+  });
+
+  it("does not record another registration when the account already exists", async () => {
+    await expect(registerAction(registrationForm())).rejects.toThrow("account-exists");
+    expect(mocks.trackEvent).not.toHaveBeenCalled();
+  });
+
+  it("does not prevent sign-in after registration if analytics fails", async () => {
+    mocks.findUser.mockResolvedValueOnce(null);
+    mocks.trackEvent.mockRejectedValueOnce(new Error("analytics unavailable"));
+    await expect(registerAction(registrationForm())).rejects.toThrow("NEXT_REDIRECT:/en/user");
+    expect(mocks.signInUser).toHaveBeenCalledWith("new-user-1");
   });
 });

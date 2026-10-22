@@ -453,7 +453,13 @@ export function EnheRedesignProductShowcase({
         <div className="redesign-home-product-detail">
           <h3>{product.name[locale]}</h3>
           <p>{product.description[locale]}</p>
-          <a className="redesign-home-product-detail-link" href={product.detailHref[locale]}>
+          <a
+            className="redesign-home-product-detail-link"
+            href={product.detailHref[locale]}
+            data-analytics-event="home_entry_click"
+            data-analytics-meta-surface="product_showcase"
+            data-analytics-meta-target={product.id}
+          >
             {copy.detail}
             <EnheIconfontIcon
               icon="arrow-right"

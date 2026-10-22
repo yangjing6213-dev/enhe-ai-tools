@@ -1,5 +1,9 @@
+import { getAnalyticsProductRoute } from "@/lib/analytics-public-routes";
+
 export const clientWritableAnalyticsEventNames = [
   "visit_home",
+  "view_catalog",
+  "home_entry_click",
   "view_tool",
   "click_open_vip",
   "content_to_product_click",
@@ -45,7 +49,7 @@ export function isClientWritableAnalyticsEventName(
 export function normalizeAnalyticsPublicPath(path: string) {
   const rawPath =
     String(path || "/")
-      .split("?")[0]
+      .split(/[?#]/)[0]
       .replace(/\/+$/, "") || "/";
   if (rawPath === "/en") return "/";
   return rawPath.replace(/^\/en(?=\/)/, "") || "/";
@@ -58,13 +62,5 @@ export function getPageViewEventName(
   if (normalized === "/") return "visit_home";
   if (normalized === "/pricing") return "view_pricing";
   if (normalized === "/user") return "view_user_center";
-  if (
-    normalized.startsWith("/software/") ||
-    normalized.startsWith("/skill-learning/") ||
-    normalized.startsWith("/account-services/") ||
-    normalized.startsWith("/tools/")
-  ) {
-    return "view_tool";
-  }
-  return null;
+  return getAnalyticsProductRoute(normalized)?.eventName ?? null;
 }

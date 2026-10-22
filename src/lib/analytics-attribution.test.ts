@@ -5,6 +5,7 @@ const { headersMock, prismaMock } = vi.hoisted(() => ({
   prismaMock: {
     analyticsEvent: {
       create: vi.fn(),
+      upsert: vi.fn(),
       findMany: vi.fn()
     }
   }
@@ -38,8 +39,52 @@ describe("server analytics attribution", () => {
   beforeEach(() => {
     headersMock.mockReset();
     prismaMock.analyticsEvent.create.mockReset();
+    prismaMock.analyticsEvent.upsert.mockReset();
     prismaMock.analyticsEvent.findMany.mockReset();
     prismaMock.analyticsEvent.findMany.mockResolvedValue([]);
+  });
+
+  it("inherits completion attribution from the buyer order instead of the admin or provider session", async () => {
+    headersMock.mockResolvedValue(new Headers({
+      cookie: attributionCookie({ ...buyerAttribution, sessionId: "session-admin", source: "direct" }),
+    }));
+    prismaMock.analyticsEvent.findMany.mockResolvedValue([{
+      metadata: { attribution: buyerAttribution },
+    }]);
+
+    await trackAnalyticsEvent({
+      eventName: "purchase_completed",
+      entityType: "order",
+      entityId: "order-1",
+      context: { orderId: "order-1" },
+      networkContext: { ip: null, userAgent: null },
+    });
+
+    expect(prismaMock.analyticsEvent.upsert).toHaveBeenCalledWith(expect.objectContaining({
+      create: expect.objectContaining({
+        metadata: expect.objectContaining({
+          sessionId: "session-buyer", landingId: "landing-buyer", eventTrust: "server",
+        }),
+      }),
+    }));
+    expect(headersMock).not.toHaveBeenCalled();
+  });
+
+  it("leaves completion unattributed when the order has no buyer attribution", async () => {
+    headersMock.mockResolvedValue(new Headers({
+      cookie: attributionCookie({ ...buyerAttribution, sessionId: "session-admin" }),
+    }));
+
+    await trackAnalyticsEvent({
+      eventName: "purchase_completed",
+      entityType: "order",
+      entityId: "order-1",
+      context: { orderId: "order-1" },
+    });
+
+    expect(prismaMock.analyticsEvent.upsert).toHaveBeenCalledWith(expect.objectContaining({
+      create: expect.objectContaining({ metadata: { orderId: "order-1", eventTrust: "server" } }),
+    }));
   });
 
   it("adds the browser attribution cookie to an existing checkout event", async () => {

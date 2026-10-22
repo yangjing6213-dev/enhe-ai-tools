@@ -50,8 +50,7 @@ export const analyticsFunnelSteps = [
   "view_tool",
   "click_open_vip",
   "create_order",
-  "payment_proof_submitted",
-  "payment_review_approved",
+  "purchase_completed",
   "refund_request_submitted",
 ] as const;
 
@@ -62,8 +61,7 @@ export const organicConversionFunnelSteps = [
   "product_purchase_cta_click",
   "begin_checkout",
   "create_order",
-  "payment_proof_submitted",
-  "payment_review_approved",
+  "purchase_completed",
 ] as const;
 
 export const productEngagementEventNames = [
@@ -150,6 +148,10 @@ const clientMetadataRules: Partial<
   },
   home_free_claim_cta_click: actionMetadataRules(),
   home_hot_ai_tools_cta_click: actionMetadataRules(),
+  home_entry_click: {
+    ...actionMetadataRules(),
+    surface: stringRule(80, identifierPattern),
+  },
   validation_ai_prompt_kit_cta_click: {
     surface: stringRule(80, identifierPattern),
   },
@@ -241,6 +243,9 @@ export function buildAnalyticsEventMetadata(input: {
     ...(isSeoAuditAnalyticsEventName(input.eventName)
       ? { product: "seo_geo_audit", eventTrust: input.trust }
       : {}),
+    ...(input.eventName === "purchase_completed" || input.eventName === "registration_completed"
+      ? { eventTrust: input.trust }
+      : {}),
     ...context,
   };
 }
@@ -290,31 +295,45 @@ export async function trackAnalyticsEvent(input: {
   context?: AnalyticsCorrelationContext | null;
   networkContext?: AnalyticsNetworkContext;
 }) {
+  if (input.eventName === "purchase_completed" && input.metadata?.isTestData === true) return;
   const networkContext = await resolveAnalyticsNetworkContext(
     input.networkContext,
   );
   try {
     const attribution = await resolveServerAnalyticsAttribution(input);
     const metadata = mergeAnalyticsAttribution(input.metadata, attribution);
-    await prisma.analyticsEvent.create({
-      data: {
-        eventName: input.eventName,
-        path: input.path,
-        entityType: input.entityType,
-        entityId: input.entityId,
-        userId: input.userId,
-        metadata: toPrismaJson(
-          buildAnalyticsEventMetadata({
-            eventName: input.eventName,
-            trust: "server",
-            metadata,
-            context: input.context,
-          }),
-        ),
-        ip: networkContext.ip,
-        userAgent: networkContext.userAgent,
-      },
-    });
+    const data = {
+      eventName: input.eventName,
+      path: input.path,
+      entityType: input.entityType,
+      entityId: input.entityId,
+      userId: input.userId,
+      metadata: toPrismaJson(
+        buildAnalyticsEventMetadata({
+          eventName: input.eventName,
+          trust: "server",
+          metadata,
+          context: input.context,
+        }),
+      ),
+      ip: networkContext.ip,
+      userAgent: networkContext.userAgent,
+    };
+    if (input.eventName === "purchase_completed" || input.eventName === "registration_completed") {
+      const entityType = input.eventName === "purchase_completed" ? "order" : "user";
+      if (input.entityType !== entityType || !input.entityId) {
+        throw new Error("COMPLETION_EVENT_REQUIRES_ENTITY");
+      }
+      // The primary key makes concurrent/replayed writes for one entity idempotent.
+      const id = `${input.eventName}:${input.entityId}`;
+      await prisma.analyticsEvent.upsert({
+        where: { id },
+        create: { id, ...data },
+        update: {},
+      });
+    } else {
+      await prisma.analyticsEvent.create({ data });
+    }
   } catch (error) {
     if (isMissingAnalyticsStorageError(error)) {
       console.warn(
@@ -331,6 +350,7 @@ const orderAttributionEventNames = [
   "create_order",
   "payment_proof_submitted",
   "payment_review_approved",
+  "purchase_completed",
   "payment_review_rejected",
   "order_receipt_submitted",
   "refund_request_submitted",
@@ -343,7 +363,7 @@ async function resolveServerAnalyticsAttribution(input: {
   networkContext?: AnalyticsNetworkContext;
 }) {
   const previousOrderAttribution = await findPreviousOrderAttribution(input);
-  if (previousOrderAttribution || isPaymentReviewEvent(input.eventName)) {
+  if (previousOrderAttribution || isPaymentReviewEvent(input.eventName) || input.eventName === "purchase_completed") {
     return previousOrderAttribution;
   }
   if (input.networkContext !== undefined) return null;

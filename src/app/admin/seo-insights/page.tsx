@@ -78,6 +78,7 @@ export default async function AdminSeoInsightsPage() {
             <p className="mt-2 text-sm leading-6 text-[var(--marketing-muted)]">
               近 {SEO_ATTRIBUTION_WINDOW_DAYS} 天仅纳入 trafficMedium=organic_search，并按匿名浏览器会话的首次 landing 归因；后续阶段只统计携带同一 landingId 且完成前序阶段的 landing。
               清除浏览器数据、跨浏览器或跨设备时无法合并，因此不是用户身份级归因。
+              购买完成仅采用本轮新增的服务器权益开通记录；历史“付款审核通过”不直接当作成交，也不与新记录相加。新口径开始积累前的数据不能作为完整成交漏斗。
             </p>
           </div>
           <div className="text-right text-xs leading-5 text-[var(--marketing-muted)]">
@@ -93,11 +94,11 @@ export default async function AdminSeoInsightsPage() {
           />
           <ConversionFunnelTable
             title="产品页直达路径"
-            description="产品、服务或课程详情页的搜索直达用户从查看产品开始，不要求经过内容页点击。"
+            description="软件、AI Skills、工作流、服务或课程详情页的搜索直达用户从查看产品开始，不要求经过内容页点击。"
             funnel={report.conversionFunnels.direct}
           />
         </div>
-        <p className="mt-5 text-xs leading-5 text-[var(--marketing-muted)]">本页仅展示实际事件和订单状态，不推算或展示收入金额。</p>
+        <p className="mt-5 text-xs leading-5 text-[var(--marketing-muted)]">本页仅展示实际事件和订单状态，不推算或展示收入金额。统计写入失败或开通后进程中断可能漏记，实际成交须与订单账核对；退款不删除历史开通事件，不能据此计算净成交。</p>
       </section>
 
       <section className="surface-panel mt-8 p-6">
@@ -358,6 +359,10 @@ function contentTypeLabel(type: string) {
     ai_news_article: "AI资讯文章",
     software_listing: "软件列表",
     software_detail: "软件详情",
+    ai_skill_listing: "AI Skills 列表",
+    ai_skill_detail: "AI Skills 详情",
+    ai_workflow_listing: "AI 工作流列表",
+    ai_workflow_detail: "AI 工作流详情",
     account_service_listing: "账号服务列表",
     account_service_detail: "账号服务详情",
     skill_learning_listing: "技能学习",
@@ -377,8 +382,7 @@ function funnelStepLabel(eventName: SeoConversionFunnelRow["eventName"]) {
     product_purchase_cta_click: "点击购买",
     begin_checkout: "开始结算",
     create_order: "创建订单",
-    payment_proof_submitted: "提交付款凭证",
-    payment_review_approved: "付款审核通过"
+    purchase_completed: "购买完成并开通权益"
   };
   return labels[eventName];
 }

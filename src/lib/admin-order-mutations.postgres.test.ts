@@ -13,6 +13,8 @@ import { resolveAmbiguousZpayRefund } from "@/lib/refund-execution";
 import type { ZpayConfig } from "@/lib/zpay-config";
 import { activateOrderFromZpayNotify, ensureZpayPaymentForOrder } from "@/lib/zpay-orders";
 
+vi.mock("@/lib/analytics", () => ({ trackAnalyticsEvent: vi.fn() }));
+
 const databaseUrl = process.env.SEO_AUDIT_TEST_DATABASE_URL;
 if (databaseUrl) {
   const parsed = new URL(databaseUrl);

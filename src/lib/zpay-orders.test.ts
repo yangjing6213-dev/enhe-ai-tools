@@ -9,6 +9,8 @@ vi.mock("@/lib/seo-audit/entitlements", () => ({
   grantSeoAuditEntitlementsForPaidOrderInTransaction,
 }));
 
+vi.mock("@/lib/analytics", () => ({ trackAnalyticsEvent: vi.fn() }));
+
 import {
   activateOrderFromZpayNotify,
   buildZpayPaymentRequest,
@@ -240,6 +242,7 @@ describe("activateOrderFromZpayNotify", () => {
         update: vi.fn()
       },
       paymentTransaction: { upsert: vi.fn() },
+      toolPurchase: { upsert: vi.fn() },
       orderRefundRecord: {
         create: vi.fn().mockResolvedValue({ id: "refund-1" }),
         update: vi.fn()
@@ -287,6 +290,7 @@ describe("activateOrderFromZpayNotify", () => {
       order: { findUnique: vi.fn().mockResolvedValue(softwareOrder) },
       $transaction: vi.fn((callback: (transaction: typeof tx) => unknown) => callback(tx))
     };
+    const trackEvent = vi.fn();
     const payload = buildZpaySignedParams(
       {
         pid: config.pid,
@@ -303,6 +307,7 @@ describe("activateOrderFromZpayNotify", () => {
       activateOrderFromZpayNotify(payload, {
         db: db as never,
         config,
+        trackEvent,
         now: () => new Date("2026-07-26T00:00:00.000Z")
       })
     ).resolves.toEqual({ ok: true, response: "success", status: 200 });
@@ -322,6 +327,14 @@ describe("activateOrderFromZpayNotify", () => {
         update: expect.objectContaining({ orderId: order.id })
       })
     );
+    expect(trackEvent).toHaveBeenCalledWith(expect.objectContaining({
+      eventName: "purchase_completed",
+      path: `/orders/${order.id}`,
+      entityType: "order",
+      entityId: order.id,
+      metadata: expect.objectContaining({ orderType: "software_download", toolId: "tool-1", paymentProvider: "zpay" }),
+    }));
+    expect(trackEvent.mock.calls[0][0].metadata).not.toHaveProperty("amount");
   });
 
   it("activates an AI Workflow ZPAY order for the exact purchased package version", async () => {
@@ -406,8 +419,9 @@ describe("activateOrderFromZpayNotify", () => {
       })
     ).resolves.toEqual({ ok: true, response: "success", status: 200 });
 
-    expect(fixture.calls).toEqual(["commit", "track", "track"]);
+    expect(fixture.calls).toEqual(["commit", "track", "track", "track"]);
     expect(trackEvent.mock.calls.map(([event]) => event.eventName)).toEqual([
+      "purchase_completed",
       "seo_audit_purchased",
       "seo_audit_monitoring_purchased"
     ]);
@@ -418,12 +432,13 @@ describe("activateOrderFromZpayNotify", () => {
         userId: "user-1",
         metadata: {
           orderType: "seo_audit_monitoring",
-          amount: "9.9"
         },
         context: { orderId: order.id, offerId: "offer-1" }
       });
       expect(JSON.stringify(event)).not.toContain("https://");
       expect(JSON.stringify(event)).not.toContain("report=secret");
+      if (event.eventName === "purchase_completed") expect(event.metadata).not.toHaveProperty("amount");
+      else expect(event.metadata).toHaveProperty("amount", "9.9");
     }
   });
 
@@ -442,10 +457,66 @@ describe("activateOrderFromZpayNotify", () => {
       })
     ).resolves.toEqual({ ok: true, response: "success", status: 200 });
 
-    expect(trackEvent).toHaveBeenCalledTimes(1);
+    expect(trackEvent).toHaveBeenCalledTimes(2);
     expect(trackEvent).toHaveBeenCalledWith(
       expect.objectContaining({ eventName: "seo_audit_purchased" })
     );
+  });
+
+  it("does not track completion if the payment activation transaction fails", async () => {
+    const fixture = seoAuditFixture();
+    fixture.db.$transaction.mockImplementationOnce(async (callback: (transaction: typeof fixture.tx) => unknown) => {
+      await callback(fixture.tx);
+      throw new Error("commit failed");
+    });
+    const trackEvent = vi.fn();
+
+    await expect(activateOrderFromZpayNotify(successfulPayload("failed-commit"), {
+      db: fixture.db as never, config, trackEvent,
+    })).rejects.toThrow("commit failed");
+
+    expect(trackEvent).not.toHaveBeenCalled();
+  });
+
+  it("records completion when a paid order receives its first entitlement activation", async () => {
+    const fixture = seoAuditFixture({ orderStatus: "paid", paymentTransaction: {
+      status: "paid", amount: { toString: () => "9.9", equals: () => true },
+    } });
+    const trackEvent = vi.fn();
+
+    await activateOrderFromZpayNotify(successfulPayload("first-activation"), {
+      db: fixture.db as never, config, trackEvent,
+    });
+
+    expect(trackEvent).toHaveBeenCalledTimes(1);
+    expect(trackEvent).toHaveBeenCalledWith(expect.objectContaining({ eventName: "purchase_completed" }));
+  });
+
+  it("activates a verified automatic test order without counting an ordinary purchase completion", async () => {
+    const fixture = seoAuditFixture({ orderType: "software_download", toolId: "tool-1", isTestData: true });
+    const trackEvent = vi.fn();
+
+    await expect(activateOrderFromZpayNotify(successfulPayload("test-order-payment"), {
+      db: fixture.db as never, config, trackEvent,
+    })).resolves.toEqual({ ok: true, response: "success", status: 200 });
+
+    expect(fixture.tx.toolPurchase.upsert).toHaveBeenCalledTimes(1);
+    expect(fixture.tx.order.update).toHaveBeenCalledWith(expect.objectContaining({ data: expect.objectContaining({ orderStatus: "activated" }) }));
+    expect(trackEvent).not.toHaveBeenCalled();
+  });
+
+  it("keeps existing SEO-specific purchase events for a test order without adding an ordinary completion", async () => {
+    const fixture = seoAuditFixture({ orderType: "seo_audit_monitoring", isTestData: true });
+    const trackEvent = vi.fn();
+
+    await activateOrderFromZpayNotify(successfulPayload("test-monitoring-payment"), {
+      db: fixture.db as never, config, trackEvent,
+    });
+
+    expect(trackEvent.mock.calls.map(([event]) => event.eventName)).toEqual([
+      "seo_audit_purchased", "seo_audit_monitoring_purchased",
+    ]);
+    expect(fixture.tx.order.update).toHaveBeenCalledWith(expect.objectContaining({ data: expect.objectContaining({ orderStatus: "activated" }) }));
   });
 
   it("does not track replayed or late-after-refund callbacks", async () => {
