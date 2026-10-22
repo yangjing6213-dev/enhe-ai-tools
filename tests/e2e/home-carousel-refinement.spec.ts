@@ -1,6 +1,48 @@
 import { expect, test } from "@playwright/test";
 
 for (const route of ["/", "/en"]) {
+  test(`homepage folder labels stay centered and inside their card area on ${route}`, async ({ page }) => {
+    for (const viewport of [{ width: 1366, height: 768 }, { width: 390, height: 844 }]) {
+      await page.setViewportSize(viewport);
+      await page.goto(route);
+      const folders = page.locator(".redesign-home-features .folder-float");
+      await expect(folders).toHaveCount(4);
+
+      for (const folder of await folders.all()) {
+        await folder.locator(".folder-float__trigger").hover();
+        await expect(folder).toHaveAttribute("open", "");
+        await expect(folder).toHaveAttribute("data-live", "");
+
+        const geometry = await folder.evaluate(node => {
+          const container = node.parentElement!.getBoundingClientRect();
+          const items = [...node.querySelectorAll<HTMLElement>(".folder-float__item")];
+          const boxes = items.map(item => {
+            const bounds = item.getBoundingClientRect();
+            return {
+              left: bounds.left,
+              right: bounds.right,
+              textAlign: getComputedStyle(item).textAlign,
+            };
+          });
+          return {
+            container: { left: container.left, right: container.right },
+            boxes,
+            groupCenter: (Math.min(...boxes.map(box => box.left)) + Math.max(...boxes.map(box => box.right))) / 2,
+            containerCenter: (container.left + container.right) / 2,
+          };
+        });
+
+        expect(geometry.boxes.length).toBeGreaterThan(0);
+        for (const item of geometry.boxes) {
+          expect(item.left).toBeGreaterThanOrEqual(geometry.container.left - 1);
+          expect(item.right).toBeLessThanOrEqual(geometry.container.right + 1);
+          expect(item.textAlign).toBe("center");
+        }
+        expect(Math.abs(geometry.groupCenter - geometry.containerCenter)).toBeLessThanOrEqual(10);
+      }
+    }
+  });
+
   test(`blue folders keep their design with the requested larger hero spacing on ${route}`, async ({ page }) => {
     for (const viewport of [{ width: 1366, height: 768 }, { width: 1440, height: 900 }]) {
       await page.setViewportSize(viewport);

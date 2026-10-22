@@ -178,6 +178,7 @@
   background: var(--ff-item);
   color: var(--ff-item-ink);
   font: inherit;
+  text-align: center;
   white-space: nowrap;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.14);
   cursor: pointer;

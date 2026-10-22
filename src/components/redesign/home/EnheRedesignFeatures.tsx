@@ -67,6 +67,7 @@ export function EnheRedesignFeatures({ locale }: { locale: RedesignLocale }) {
               trigger="hover"
               closeOnSelect
               physics
+              constrainItemsToParent
               drift={0.5}
               folderColor="#f5f5f5"
               frontColor="#3b82f6"
