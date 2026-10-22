@@ -168,6 +168,7 @@ export async function POST(request: Request) {
       where: { id: batch.id },
       select: {
         id: true,
+        topicId: true,
         batchDate: true,
         topicNameSnapshot: true,
         topicSearchDirectionsSnapshot: true,
@@ -181,7 +182,11 @@ export async function POST(request: Request) {
       },
     });
     if (!claimedBatch) return { kind: "idle" as const, reason: "claim_state_unavailable" };
-    return { kind: "claimed" as const, leaseToken, leaseExpiresAt, batch: claimedBatch };
+    const selectedTopicIndex = topics.findIndex(({ id }) => id === claimedBatch.topicId);
+    const topicFallbacks = selectedTopicIndex < 0
+      ? []
+      : [...topics.slice(selectedTopicIndex), ...topics.slice(0, selectedTopicIndex)].map(({ id, name, searchDirections }) => ({ id, name, searchDirections }));
+    return { kind: "claimed" as const, leaseToken, leaseExpiresAt, batch: { ...claimedBatch, topicFallbacks } };
     });
     if (outcome.kind === "idle") return idle(outcome.reason);
     return workerJsonResponse({

@@ -4,6 +4,7 @@ import { POST } from "./route";
 
 const mocks = vi.hoisted(() => ({
   settingsFindUnique: vi.fn(),
+  topicsFindFirst: vi.fn(),
   batchesFindUnique: vi.fn(),
   candidatesFindUnique: vi.fn(),
   candidatesUpdate: vi.fn(),
@@ -126,6 +127,7 @@ beforeEach(() => {
   });
   mocks.transaction.mockImplementation(async (callback: (tx: unknown) => unknown) => callback({
     aiWorkflowCollectionSetting: { findUnique: mocks.settingsFindUnique },
+    aiWorkflowTopic: { findFirst: mocks.topicsFindFirst },
     aiWorkflowBatch: { findUnique: mocks.batchesFindUnique, updateMany: mocks.batchesUpdateMany },
     aiWorkflowCandidate: { findUnique: mocks.candidatesFindUnique, create: mocks.candidatesCreate, update: mocks.candidatesUpdate },
     tool: { create: mocks.toolsCreate, update: mocks.toolsUpdate },
@@ -204,6 +206,29 @@ describe("POST /api/internal/ai-workflows/worker/[batchId]/result", () => {
     expect(publication).not.toHaveProperty("sourceCodeExecuted");
     expect(mocks.toolsCreate.mock.calls[0]?.[0].data.coverImage).toBe("/api/ai-workflows/covers/ai-workflow-123456-agent-flow");
     expect(mocks.revalidateTag).toHaveBeenCalledWith("public-tools");
+  });
+
+  it("records a fallback result under its own enabled topic", async () => {
+    mocks.topicsFindFirst.mockResolvedValue({ id: "topic-2" });
+    const response = await POST(request({ workerId: "runner-1", leaseToken, topicId: "topic-2", result: repositoryLinkResult() }), context);
+
+    expect(response.status).toBe(201);
+    expect(mocks.topicsFindFirst).toHaveBeenCalledWith({
+      where: { id: "topic-2", isEnabled: true },
+      select: { id: true },
+    });
+    expect(mocks.candidatesCreate).toHaveBeenCalledWith(expect.objectContaining({
+      data: expect.objectContaining({ topicId: "topic-2", status: "reviewing" }),
+    }));
+  });
+
+  it("rejects a fallback result for a topic that is no longer enabled", async () => {
+    mocks.topicsFindFirst.mockResolvedValue(null);
+    const response = await POST(request({ workerId: "runner-1", leaseToken, topicId: "topic-disabled", result: repositoryLinkResult() }), context);
+
+    expect(response.status).toBe(400);
+    expect(await response.json()).toMatchObject({ ok: false, code: "TOPIC_INVALID" });
+    expect(mocks.candidatesCreate).not.toHaveBeenCalled();
   });
 
   it.each(["repository_link", "package"])("persists bilingual fields and image evidence for %s results", async (mode) => {

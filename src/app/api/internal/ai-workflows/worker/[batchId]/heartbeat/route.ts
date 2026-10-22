@@ -18,6 +18,7 @@ const batchIdSchema = z.string().min(1).max(128).regex(/^[A-Za-z0-9_-]+$/);
 const checkpointSchema = z.object({
   candidateIndex: z.number().int().min(0).max(10_000).optional(),
   completedRepositoryIds: z.array(z.string().regex(/^\d{1,32}$/)).max(20).optional(),
+  searchedTopicIds: z.array(z.string().min(1).max(128)).max(10).optional(),
 }).strict();
 const heartbeatSchema = z.object({
   workerId: z.string().min(1).max(80).regex(/^[A-Za-z0-9._:-]+$/),

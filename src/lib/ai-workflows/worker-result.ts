@@ -1,21 +1,13 @@
 import { z } from "zod";
+import { isLinkableOpenSourceLicenseId, isPackageRedistributableLicenseId } from "./licenses";
 import { normalizeGitHubRepositoryUrl } from "@/lib/ai-workflows/rules";
 import { buildAiWorkflowArchiveObjectKey } from "@/lib/ai-workflows/cos";
 import { aiWorkflowPresentationSchema } from "@/lib/ai-workflows/presentation";
 
-const redistributableLicenses = new Set([
-  "0BSD",
-  "Apache-2.0",
-  "BSD-2-Clause",
-  "BSD-3-Clause",
-  "ISC",
-  "MIT",
-  "MPL-2.0",
-]);
-
 const environmentNames = ["windows", "wsl2", "macos", "linux", "docker"] as const;
 const projectTypes = ["workflow", "automation", "agent", "template", "companion"] as const;
 const repositoryLinkFailureReasons = [
+  "LICENSE_NOT_REDISTRIBUTABLE",
   "PACKAGE_LANGUAGE_UNSUPPORTED",
   "NODE_MANIFEST_MISSING",
   "NODE_MANIFEST_INVALID",
@@ -163,7 +155,7 @@ export function parseAiWorkflowWorkerResult(value: unknown, expectedDownloadBuck
 
   if (
     !repository ||
-    !redistributableLicenses.has(licenseSpdx) ||
+    !isPackageRedistributableLicenseId(licenseSpdx) ||
     !licensePath || licensePath.startsWith("/") || licensePath.split("/").some((part) => part === "..") || /^[a-z]:/i.test(licensePath) ||
     data.archive.bucket !== expectedDownloadBucket ||
     data.archive.region !== (process.env.COS_REGION?.trim() || "ap-shanghai") ||
@@ -219,7 +211,7 @@ export function parseAiWorkflowRepositoryLinkResult(value: unknown) {
 
   if (
     !repository ||
-    !redistributableLicenses.has(licenseSpdx) ||
+    !isLinkableOpenSourceLicenseId(licenseSpdx) ||
     !licensePath || licensePath.startsWith("/") || licensePath.split("/").some((part) => part === "..") || /^[a-z]:/i.test(licensePath)
   ) return { success: false as const, error: "LINK_RESULT_EVIDENCE_MISMATCH" as const };
 

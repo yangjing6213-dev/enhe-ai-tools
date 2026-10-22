@@ -83,6 +83,22 @@ describe("AI Workflow cached candidate compatibility", () => {
       failureReason: "PACKAGE_LANGUAGE_UNSUPPORTED",
     });
     expect(result.success).toBe(true);
+
+    const copyleftLink = parseAiWorkflowRepositoryLinkResult({
+      deliveryMode: "repository_link",
+      repositoryId: candidate.id,
+      repositoryUrl: candidate.url,
+      commitSha: "a".repeat(40),
+      licenseSpdx: "GPL-3.0-only",
+      licenseFilePath: "LICENSE",
+      projectType: "workflow",
+      stars: candidate.stars,
+      updatedAt: candidate.updatedAt,
+      language: candidate.language,
+      description: candidate.description,
+      failureReason: "LICENSE_NOT_REDISTRIBUTABLE",
+    });
+    expect(copyleftLink.success).toBe(true);
   });
 
   it("preserves current metadata and defaults invalid cached values", () => {
@@ -95,7 +111,7 @@ describe("AI Workflow cached candidate compatibility", () => {
 
 describe("AI Workflow GitHub candidate selection", () => {
   it("keeps relevant-language candidates and ranks active repositories by stars", () => {
-    const repository = (id: number, language: string | null, stars: number, updatedDaysAgo = 30) => ({
+    const repository = (id: number, language: string | null, stars: number, updatedDaysAgo = 30, description = `AI workflow project ${id}`, topics: string[] = []) => ({
       id,
       full_name: `team/project-${id}`,
       html_url: `https://github.com/team/project-${id}`,
@@ -105,7 +121,8 @@ describe("AI Workflow GitHub candidate selection", () => {
       default_branch: "main",
       license: { spdx_id: "MIT" },
       language,
-      description: `AI workflow project ${id}`,
+      description,
+      topics,
       stargazers_count: stars,
       updated_at: new Date(Date.now() - updatedDaysAgo * 24 * 60 * 60 * 1000).toISOString(),
     });
@@ -135,6 +152,31 @@ describe("AI Workflow GitHub candidate selection", () => {
 
     expect(selected.map(({ id, fullName }) => [id, fullName])).toEqual([["11", "team/first"]]);
   });
+
+  it("ranks topic-specific repositories ahead of higher-star incidental matches", () => {
+    const repository = (id: number, description: string, stars: number, topics: string[], licenseSpdx = "MIT") => ({
+      id,
+      full_name: `team/project-${id}`,
+      html_url: `https://github.com/team/project-${id}`,
+      private: false,
+      archived: false,
+      fork: false,
+      default_branch: "main",
+      license: { spdx_id: licenseSpdx },
+      language: "TypeScript",
+      description,
+      topics,
+      stargazers_count: stars,
+      updated_at: new Date().toISOString(),
+    });
+
+    const selected = selectAiWorkflowRepositoryCandidates([
+      repository(30, "General AI tools", 100_000, ["ai", "tools"]),
+      repository(31, "Developer productivity tools for coding workflows", 1_200, ["developer-productivity"], "GPL-3.0-only"),
+    ], new Set(), 2, "工作效率");
+
+    expect(selected.map(({ id }) => id)).toEqual(["31", "30"]);
+  });
 });
 
 describe("AI Workflow collector diagnostics", () => {
@@ -143,15 +185,31 @@ describe("AI Workflow collector diagnostics", () => {
     expect(getAiWorkflowLinkOnlyFailureReason("NODE_MANIFEST_INVALID")).toBe("NODE_MANIFEST_INVALID");
     expect(getAiWorkflowLinkOnlyFailureReason(new Error("ARCHIVE_SIZE_LIMIT"))).toBe("ARCHIVE_SIZE_LIMIT");
     expect(getAiWorkflowLinkOnlyFailureReason("POSSIBLE_SECRET_IN_SOURCE")).toBeNull();
-    expect(getAiWorkflowLinkOnlyFailureReason("LICENSE_NOT_REDISTRIBUTABLE")).toBeNull();
+    expect(getAiWorkflowLinkOnlyFailureReason("LICENSE_NOT_REDISTRIBUTABLE")).toBe("LICENSE_NOT_REDISTRIBUTABLE");
     expect(getAiWorkflowLinkOnlyFailureReason("NETWORK_UNAVAILABLE")).toBeNull();
   });
 
   it("includes the supplied topic directions in GitHub search terms", () => {
     expect(buildAiWorkflowSearchTerms("工作效率", "搜索趋势 / SaaS 产品发布 / 企业预算")).toEqual([
-      "productivity automation workflow search trends",
-      "productivity automation workflow SaaS product launch",
-      "productivity automation workflow enterprise budget",
+      "work productivity tools search trends",
+      "developer productivity workflow tools",
+      "工作效率工具 工作方法 自动化",
+    ]);
+  });
+
+  it("searches work-efficiency projects across jobs and programming workflows", () => {
+    expect(buildAiWorkflowSearchTerms("工作效率", "")).toEqual([
+      "work productivity tools",
+      "developer productivity workflow tools",
+      "工作效率工具 工作方法 自动化",
+    ]);
+  });
+
+  it("searches video creation, editing, and generation instead of only text-to-video models", () => {
+    expect(buildAiWorkflowSearchTerms("视频生成", "")).toEqual([
+      "video generation",
+      "video editor",
+      "topic:video",
     ]);
   });
 
@@ -185,7 +243,7 @@ describe("AI Workflow topic relevance", () => {
     licenseSpdx: "MIT",
   });
 
-  it("accepts projects whose README clearly describes video generation", () => {
+  it("accepts projects for video generation and adjacent creation workflows", () => {
     expect(isAiWorkflowCandidateRelevant("视频生成", candidate("team/video-model", "Text-to-video generation model"), ""))
       .toBe(true);
     expect(isAiWorkflowCandidateRelevant("视频生成", candidate("team/model", "Open model"), "文生视频与图生视频生成工具"))
@@ -198,7 +256,9 @@ describe("AI Workflow topic relevance", () => {
     expect(isAiWorkflowCandidateRelevant("视频生成", candidate("pbakaus/impeccable", "The design language that makes your AI harness better at design."), "Design systems and UI guidelines for AI coding tools."))
       .toBe(false);
     expect(isAiWorkflowCandidateRelevant("视频生成", candidate("team/video-editor", "AI video editing software"), "Edit and assemble existing video clips."))
-      .toBe(false);
+      .toBe(true);
+    expect(isAiWorkflowCandidateRelevant("视频生成", candidate("team/shotcraft", "Video production workflow and shot-planning skills"), "Tools for planning camera shots and editing short videos."))
+      .toBe(true);
     expect(isAiWorkflowCandidateRelevant("视频生成", candidate("earendil-works/pi", "The 1st collaborative AI design agent workspace. Create motion, prototypes, images, and videos."), "Create websites, apps, presentations, images, and videos with AI agents."))
       .toBe(false);
     const incidentalReadmeMention = `${"General AI toolkit. ".repeat(120)}Includes one video generation example.`;
@@ -210,5 +270,12 @@ describe("AI Workflow topic relevance", () => {
   it("does not apply built-in topic rules to custom topic names", () => {
     expect(isAiWorkflowCandidateRelevant("用户自定义主题", candidate("team/project", "A custom project"), ""))
       .toBe(true);
+  });
+
+  it("treats programming resources and methods as work-efficiency projects", () => {
+    expect(isAiWorkflowCandidateRelevant("工作效率", candidate("team/dev-workflow", "Developer productivity tools for coding workflows"), ""))
+      .toBe(true);
+    expect(isAiWorkflowCandidateRelevant("工作效率", candidate("team/random-project", "A general software library"), ""))
+      .toBe(false);
   });
 });

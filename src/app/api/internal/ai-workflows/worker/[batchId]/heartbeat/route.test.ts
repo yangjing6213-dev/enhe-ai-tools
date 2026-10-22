@@ -66,7 +66,7 @@ describe("POST /api/internal/ai-workflows/worker/[batchId]/heartbeat", () => {
       workerId: "runner-1",
       leaseToken,
       stage: "license_review",
-      checkpoint: { candidateIndex: 2, completedRepositoryIds: ["123456", "789012"] },
+      checkpoint: { candidateIndex: 2, completedRepositoryIds: ["123456", "789012"], searchedTopicIds: ["topic-1", "topic-2"] },
     }), { params: Promise.resolve({ batchId: "batch-1" }) });
 
     expect(response.status).toBe(200);
@@ -75,7 +75,7 @@ describe("POST /api/internal/ai-workflows/worker/[batchId]/heartbeat", () => {
       where: expect.objectContaining({ id: "batch-1", status: "running", leaseOwnerId: "runner-1" }),
       data: expect.objectContaining({
         lastWorkerStage: "license_review",
-        checkpoint: { candidateIndex: 2, completedRepositoryIds: ["123456", "789012"] },
+        checkpoint: { candidateIndex: 2, completedRepositoryIds: ["123456", "789012"], searchedTopicIds: ["topic-1", "topic-2"] },
       }),
     }));
     expect(JSON.stringify(await response.json())).not.toContain(leaseToken);

@@ -2,6 +2,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 const mocks = vi.hoisted(() => ({
   audit: vi.fn(),
+  randomInt: vi.fn(),
   batches: {
     count: vi.fn(),
     create: vi.fn(),
@@ -29,6 +30,10 @@ const mocks = vi.hoisted(() => ({
 
 vi.mock("next/cache", () => ({ revalidatePath: mocks.revalidatePath }));
 vi.mock("next/navigation", () => ({ redirect: mocks.redirect }));
+vi.mock("node:crypto", async (importOriginal) => ({
+  ...(await importOriginal<typeof import("node:crypto")>()),
+  randomInt: mocks.randomInt,
+}));
 vi.mock("@/lib/auth", () => ({ requireAdmin: mocks.requireAdmin }));
 vi.mock("@/lib/admin-audit", () => ({ writeAdminAuditLog: mocks.audit }));
 vi.mock("@/lib/db", () => ({
@@ -55,6 +60,7 @@ beforeEach(() => {
   vi.stubEnv("COS_STATIC_BUCKET", "enhe-static-1303691623");
   vi.stubEnv("COS_DOWNLOAD_BUCKET", "enhe-downloads-1303691623");
   mocks.requireAdmin.mockResolvedValue({ id: "admin-1" });
+  mocks.randomInt.mockReturnValue(0);
   mocks.transaction.mockImplementation(async (callback: (tx: typeof mocks.tx) => Promise<unknown>) => callback(mocks.tx));
   mocks.tx.aiWorkflowCollectionSetting.findUnique.mockResolvedValue({ topicListVersion: 3 });
   mocks.collectionSetting.findUnique.mockResolvedValue({
@@ -136,18 +142,17 @@ describe("AI Workflow admin collection safeguards", () => {
     expect(mocks.batches.create).not.toHaveBeenCalled();
   });
 
-  it("locks the selected search directions into an explicitly requested batch", async () => {
+  it("randomly selects an enabled topic and locks its search directions into the batch", async () => {
     mocks.collectionSetting.findUnique.mockResolvedValue({
       topicListVersion: 7,
       topicListConfirmedAt: new Date("2026-10-20T00:00:00.000Z"),
       isPaused: false,
     });
-    mocks.topics.findMany.mockResolvedValue([{
-      id: "topic-1",
-      name: "工作效率",
-      searchDirections: "搜索趋势 / SaaS 产品发布 / 企业预算",
-      sortOrder: 0,
-    }]);
+    mocks.topics.findMany.mockResolvedValue([
+      { id: "topic-1", name: "工作效率", searchDirections: "工作流与效率方法", sortOrder: 0 },
+      { id: "topic-2", name: "视频生成", searchDirections: "视频生成 / 视频编辑 / 视频生产", sortOrder: 1 },
+    ]);
+    mocks.randomInt.mockReturnValue(1);
     mocks.batches.findUnique.mockResolvedValue(null);
     mocks.batches.findFirst.mockResolvedValue(null);
     mocks.batches.count.mockResolvedValue(0);
@@ -157,11 +162,12 @@ describe("AI Workflow admin collection safeguards", () => {
 
     expect(mocks.batches.create).toHaveBeenCalledWith(expect.objectContaining({
       data: expect.objectContaining({
-        topicId: "topic-1",
-        topicNameSnapshot: "工作效率",
-        topicSearchDirectionsSnapshot: "搜索趋势 / SaaS 产品发布 / 企业预算",
+        topicId: "topic-2",
+        topicNameSnapshot: "视频生成",
+        topicSearchDirectionsSnapshot: "视频生成 / 视频编辑 / 视频生产",
         topicOrderVersion: 7,
       }),
     }));
+    expect(mocks.randomInt).toHaveBeenCalledWith(2);
   });
 });

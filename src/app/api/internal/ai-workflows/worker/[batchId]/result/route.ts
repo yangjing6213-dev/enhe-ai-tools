@@ -20,6 +20,7 @@ const batchIdSchema = z.string().min(1).max(128).regex(/^[A-Za-z0-9_-]+$/);
 const requestSchema = z.object({
   workerId: z.string().min(1).max(80).regex(/^[A-Za-z0-9._:-]+$/),
   leaseToken: z.string().min(24).max(512).regex(/^\S+$/),
+  topicId: z.string().min(1).max(128).optional(),
   result: z.unknown(),
 }).strict();
 
@@ -137,6 +138,15 @@ export async function POST(
           select: { status: true, topicId: true, topicNameSnapshot: true, leaseOwnerId: true, leaseTokenHash: true, leaseExpiresAt: true },
         });
         if (!validLease(currentBatch, input.workerId, input.leaseToken, new Date())) throw new IntakeError(409, "LEASE_INVALID");
+        let candidateTopicId = currentBatch?.topicId ?? null;
+        if (input.topicId) {
+          const requestedTopic = await tx.aiWorkflowTopic.findFirst({
+            where: { id: input.topicId, isEnabled: true },
+            select: { id: true },
+          });
+          if (!requestedTopic) throw new IntakeError(400, "TOPIC_INVALID");
+          candidateTopicId = requestedTopic.id;
+        }
 
         const existing = await tx.aiWorkflowCandidate.findUnique({
           where: { repositoryId: item.repositoryId },
@@ -167,7 +177,7 @@ export async function POST(
           const candidate = await tx.aiWorkflowCandidate.create({
             data: {
               batchId,
-              topicId: currentBatch?.topicId ?? null,
+              topicId: candidateTopicId,
               repositoryId: item.repositoryId,
               sourceFingerprint: item.sourceFingerprint,
               repositoryUrl: item.repositoryUrl,
@@ -274,6 +284,15 @@ export async function POST(
         select: { status: true, topicId: true, topicNameSnapshot: true, leaseOwnerId: true, leaseTokenHash: true, leaseExpiresAt: true },
       });
       if (!validLease(currentBatch, input.workerId, input.leaseToken, new Date())) throw new IntakeError(409, "LEASE_INVALID");
+      let candidateTopicId = currentBatch?.topicId ?? null;
+      if (input.topicId) {
+        const requestedTopic = await tx.aiWorkflowTopic.findFirst({
+          where: { id: input.topicId, isEnabled: true },
+          select: { id: true },
+        });
+        if (!requestedTopic) throw new IntakeError(400, "TOPIC_INVALID");
+        candidateTopicId = requestedTopic.id;
+      }
 
       const existing = await tx.aiWorkflowCandidate.findUnique({
         where: { repositoryId: item.repositoryId },
@@ -307,7 +326,7 @@ export async function POST(
             where: { id: existing.id },
             data: {
               batchId,
-              topicId: currentBatch?.topicId ?? null,
+              topicId: candidateTopicId,
               sourceFingerprint: item.sourceFingerprint,
               repositoryUrl: item.repositoryUrl,
               repositoryOwner: item.repositoryOwner,
@@ -392,7 +411,7 @@ export async function POST(
       const candidate = await tx.aiWorkflowCandidate.create({
         data: {
           batchId,
-          topicId: currentBatch?.topicId ?? null,
+          topicId: candidateTopicId,
           repositoryId: item.repositoryId,
           sourceFingerprint: item.sourceFingerprint,
           repositoryUrl: item.repositoryUrl,

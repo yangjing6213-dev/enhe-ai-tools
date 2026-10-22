@@ -15,6 +15,7 @@ import {
   uploadAiWorkflowArchive,
 } from "../src/lib/ai-workflows/cos";
 import { parseAiWorkflowRepositoryLinkResult, parseAiWorkflowWorkerResult } from "../src/lib/ai-workflows/worker-result";
+import { isLinkableOpenSourceLicenseId, isPackageRedistributableLicenseId } from "../src/lib/ai-workflows/licenses";
 import { readAiWorkflowCosCredentialsCsv } from "./lib/ai-workflow-cos-credentials";
 import { generateAiWorkflowPresentation } from "./lib/ai-workflow-presentation";
 import {
@@ -39,16 +40,23 @@ const minimumFreeBytes = 3 * 1024 * 1024 * 1024;
 const maximumBatchMs = 2 * 60 * 60 * 1000;
 const githubApi = "https://api.github.com";
 const githubZipHost = "codeload.github.com";
-const allowedLicenses = new Set(["0BSD", "Apache-2.0", "BSD-2-Clause", "BSD-3-Clause", "ISC", "MIT", "MPL-2.0"]);
 const completionFailureCodes = new Set([
   "INSUFFICIENT_CANDIDATES", "GITHUB_RATE_LIMIT", "NETWORK_UNAVAILABLE", "BUDGET_EXCEEDED",
   "SANDBOX_UNAVAILABLE", "ARCHIVE_UPLOAD_FAILED", "LOCAL_CONFIGURATION_MISSING", "UNKNOWN",
 ]);
 
+type TopicSearchTarget = { id: string; name: string; searchDirections: string };
+type SourcedCandidate = AiWorkflowGitHubRepositoryCandidate & {
+  collectionTopicId: string;
+  collectionTopicName: string;
+  collectionTopicSearchDirections: string;
+};
 type WorkerBatch = {
   id: string;
+  topicId: string;
   topicNameSnapshot: string;
   topicSearchDirectionsSnapshot: string;
+  topicFallbacks?: TopicSearchTarget[];
   checkpoint: unknown;
   candidates: Array<{ repositoryId: string; commitSha: string | null; status: string }>;
 };
@@ -56,9 +64,10 @@ type WorkerLease = { leaseToken: string; leaseExpiresAt: string; batch: WorkerBa
 type RunState = {
   batchId: string;
   topic: string;
-  candidateIds: AiWorkflowGitHubRepositoryCandidate[];
+  candidateIds: SourcedCandidate[];
+  searchedTopicIds: string[];
   outcomes: Array<{ repositoryId: string; repository: string; state: "registered" | "rejected"; reason?: string }>;
-  pendingRegistration?: { repositoryId: string; repository: string; result: Record<string, unknown> };
+  pendingRegistration?: { repositoryId: string; repository: string; topicId?: string; result: Record<string, unknown> };
   completedRepositoryIds: string[];
   candidateIndex: number;
   updatedAt: string;
@@ -326,17 +335,37 @@ async function searchRepositories(topic: string, directions: string) {
   const terms = buildAiWorkflowSearchTerms(topic, directions);
   const found: unknown[] = [];
   for (const term of terms.slice(0, 3)) {
-    const query = new URLSearchParams({ q: `${term} in:name,description,readme`, sort: "stars", order: "desc", per_page: "100" });
+    const searchQuery = term.startsWith("topic:") ? term : `${term} in:name,description,readme`;
+    const query = new URLSearchParams({ q: searchQuery, sort: "stars", order: "desc", per_page: "100" });
     const result = await githubJson<{ items?: unknown[]; incomplete_results?: boolean }>(`/search/repositories?${query}`);
     if (Array.isArray(result.items)) found.push(...result.items);
     await new Promise((resolvePromise) => setTimeout(resolvePromise, 1200));
   }
-  return selectAiWorkflowRepositoryCandidates(found, new Set(), maximumCandidates * 3);
+  return selectAiWorkflowRepositoryCandidates(found, new Set(), maximumCandidates * 3, topic);
+}
+
+function getTopicSearchPlan(batch: WorkerBatch): TopicSearchTarget[] {
+  const snapshot = Array.isArray(batch.topicFallbacks) ? batch.topicFallbacks : [];
+  const primary = snapshot.find(({ id }) => id === batch.topicId) ?? {
+    id: batch.topicId,
+    name: batch.topicNameSnapshot,
+    searchDirections: batch.topicSearchDirectionsSnapshot,
+  };
+  const fallback = snapshot.filter(({ id }) => id !== primary.id).slice(0, 1);
+  return [primary, ...fallback];
 }
 
 async function persistRunState(path: string, state: RunState) {
   state.updatedAt = new Date().toISOString();
   await writeJsonAtomic(path, state);
+}
+
+function buildWorkerCheckpoint(state: RunState) {
+  return {
+    candidateIndex: state.candidateIndex,
+    completedRepositoryIds: state.completedRepositoryIds.slice(-20),
+    searchedTopicIds: [...new Set(state.searchedTopicIds)].slice(0, 10),
+  };
 }
 
 function hasPendingRegistrationFor(state: RunState, repositoryId: string) {
@@ -354,8 +383,22 @@ async function readRunState(path: string, batch: WorkerBatch): Promise<RunState 
         !parseAiWorkflowWorkerResult(data.pendingRegistration.result).success &&
         !parseAiWorkflowRepositoryLinkResult(data.pendingRegistration.result).success
       ) return null;
+      data.pendingRegistration.topicId ??= batch.topicId;
     }
-    data.candidateIds = data.candidateIds.map(restoreAiWorkflowCandidateMetadata);
+    data.candidateIds = data.candidateIds.map((candidate) => {
+      const restored = restoreAiWorkflowCandidateMetadata(candidate);
+      const saved = candidate as SourcedCandidate;
+      const target = batch.topicFallbacks?.find(({ id }) => id === saved.collectionTopicId);
+      return {
+        ...restored,
+        collectionTopicId: typeof saved.collectionTopicId === "string" ? saved.collectionTopicId : batch.topicId,
+        collectionTopicName: typeof saved.collectionTopicName === "string" ? saved.collectionTopicName : target?.name ?? batch.topicNameSnapshot,
+        collectionTopicSearchDirections: typeof saved.collectionTopicSearchDirections === "string" ? saved.collectionTopicSearchDirections : target?.searchDirections ?? batch.topicSearchDirectionsSnapshot,
+      };
+    });
+    data.searchedTopicIds = Array.isArray(data.searchedTopicIds)
+      ? data.searchedTopicIds.filter((topicId): topicId is string => typeof topicId === "string")
+      : data.candidateIds.length ? [...new Set(data.candidateIds.map(({ collectionTopicId }) => collectionTopicId))] : [];
     return data;
   } catch {
     return null;
@@ -560,12 +603,23 @@ async function getRepositoryCommit(candidate: AiWorkflowGitHubRepositoryCandidat
   return data.sha.toLowerCase();
 }
 
-async function getLicenseFile(candidate: AiWorkflowGitHubRepositoryCandidate, commitSha: string) {
+async function getLicenseFile(candidate: AiWorkflowGitHubRepositoryCandidate, commitSha: string, options: { linkOnly?: boolean } = {}) {
   const license = await githubJson<{ name?: string; path?: string; spdx_id?: string; download_url?: string }>(`/repos/${candidate.fullName}/license?ref=${commitSha}`);
   if (!license.path || !/^[^/].{0,299}$/.test(license.path) || license.path.split(/[\\/]/).includes("..")) throw new Error("LICENSE_FILE_INVALID");
   const spdx = typeof license.spdx_id === "string" ? license.spdx_id : candidate.licenseSpdx;
-  if (!spdx || !allowedLicenses.has(spdx)) throw new Error("LICENSE_NOT_REDISTRIBUTABLE");
+  const allowed = spdx && (options.linkOnly ? isLinkableOpenSourceLicenseId(spdx) : isPackageRedistributableLicenseId(spdx));
+  if (!allowed) throw new Error(options.linkOnly ? "LICENSE_NOT_OPEN_SOURCE" : "LICENSE_NOT_REDISTRIBUTABLE");
   return { path: license.path.replaceAll("\\", "/"), spdx };
+}
+
+async function getGitHubReadmeText(candidate: AiWorkflowGitHubRepositoryCandidate, commitSha: string) {
+  const [owner, repository] = candidate.fullName.split("/");
+  if (!owner || !repository) throw new Error("GITHUB_README_UNAVAILABLE");
+  const readme = await githubJson<{ encoding?: string; content?: string }>(
+    `/repos/${encodeURIComponent(owner)}/${encodeURIComponent(repository)}/readme?ref=${encodeURIComponent(commitSha)}`,
+  );
+  if (readme.encoding !== "base64" || typeof readme.content !== "string") throw new Error("GITHUB_README_UNAVAILABLE");
+  return Buffer.from(readme.content.replace(/\s+/g, ""), "base64").toString("utf8").slice(0, 12_000);
 }
 
 async function removeOwnedCandidateDirectory(path: string, root: string, batchId: string, repositoryId: string) {
@@ -583,7 +637,7 @@ async function removeOwnedCandidateDirectory(path: string, root: string, batchId
 }
 
 async function registerRepositoryLinkOnly(input: {
-  candidate: AiWorkflowGitHubRepositoryCandidate;
+  candidate: SourcedCandidate;
   batch: WorkerBatch;
   lease: WorkerLease;
   token: string;
@@ -596,11 +650,13 @@ async function registerRepositoryLinkOnly(input: {
 }) {
   const { candidate, batch, lease, token, state, statePath, index, failureReason, signal, setStage } = input;
   const commitSha = await getRepositoryCommit(candidate);
-  const license = await getLicenseFile(candidate, commitSha);
+  const license = await getLicenseFile(candidate, commitSha, { linkOnly: true });
+  const readme = await getGitHubReadmeText(candidate, commitSha);
+  if (!isAiWorkflowCandidateRelevant(candidate.collectionTopicName, candidate, readme)) throw new Error("TOPIC_MISMATCH");
   const codexDir = join(runnerRoot, "codex");
   await mkdir(codexDir, { recursive: true });
   const presentation = await generateAiWorkflowPresentation({
-    candidate, commitSha, topic: batch.topicNameSnapshot, deliveryMode: "repository_link",
+    candidate, commitSha, topic: candidate.collectionTopicName, deliveryMode: "repository_link",
   }, { generateText: (prompt) => generateRestrictedDraftText(prompt, codexDir, 40000) });
   const payload = {
     deliveryMode: "repository_link",
@@ -621,14 +677,14 @@ async function registerRepositoryLinkOnly(input: {
 
   if (signal.aborted) throw new Error("BATCH_PAUSED_OR_LEASE_LOST");
   state.candidateIndex = index;
-  state.pendingRegistration = { repositoryId: candidate.id, repository: candidate.fullName, result: payload };
+  state.pendingRegistration = { repositoryId: candidate.id, repository: candidate.fullName, topicId: candidate.collectionTopicId, result: payload };
   await persistRunState(statePath, state);
   setStage("register");
   await postWorker(`/${batch.id}/heartbeat`, {
     workerId: workerId(), leaseToken: lease.leaseToken, stage: "register",
-    checkpoint: { candidateIndex: index, completedRepositoryIds: state.completedRepositoryIds.slice(-20) },
+    checkpoint: buildWorkerCheckpoint(state),
   }, token);
-  await postWorker(`/${batch.id}/result`, { workerId: workerId(), leaseToken: lease.leaseToken, result: payload }, token);
+  await postWorker(`/${batch.id}/result`, { workerId: workerId(), leaseToken: lease.leaseToken, topicId: candidate.collectionTopicId, result: payload }, token);
   if (!state.completedRepositoryIds.includes(candidate.id)) state.completedRepositoryIds.push(candidate.id);
   if (!state.outcomes.some((outcome) => outcome.repositoryId === candidate.id && outcome.state === "registered")) {
     state.outcomes.push({ repositoryId: candidate.id, repository: candidate.fullName, state: "registered" });
@@ -644,7 +700,7 @@ async function registerRepositoryLinkOnly(input: {
 }
 
 async function processCandidate(input: {
-  candidate: AiWorkflowGitHubRepositoryCandidate;
+  candidate: SourcedCandidate;
   batch: WorkerBatch;
   lease: WorkerLease;
   token: string;
@@ -693,7 +749,7 @@ async function processCandidate(input: {
     setStage(stage);
     await postWorker(`/${batch.id}/heartbeat`, {
       workerId: workerId(), leaseToken: lease.leaseToken, stage,
-      checkpoint: { candidateIndex: index, completedRepositoryIds: state.completedRepositoryIds.slice(-20) },
+      checkpoint: buildWorkerCheckpoint(state),
     }, token);
   };
 
@@ -706,7 +762,7 @@ async function processCandidate(input: {
   const licenseHash = await sha256File(licensePath);
   await stateUpdate("license_review");
   const readme = await findReadme(sourceDir);
-  if (!isAiWorkflowCandidateRelevant(batch.topicNameSnapshot, candidate, readme.text)) {
+  if (!isAiWorkflowCandidateRelevant(candidate.collectionTopicName, candidate, readme.text)) {
     throw new Error("TOPIC_MISMATCH");
   }
   if (!candidate.language || !["JavaScript", "TypeScript"].includes(candidate.language)) {
@@ -719,14 +775,14 @@ async function processCandidate(input: {
   await mkdir(codexDir, { recursive: true });
   const product = await generateProductDraft({
     candidate,
-    topic: batch.topicNameSnapshot,
+    topic: candidate.collectionTopicName,
     readme: readme.text,
     testSummary: validation.summary,
     dependencySummary: plan.installCommand,
     codexDir,
   });
   const presentation = await generateAiWorkflowPresentation({
-    candidate, commitSha, topic: batch.topicNameSnapshot, deliveryMode: "package", readme,
+    candidate, commitSha, topic: candidate.collectionTopicName, deliveryMode: "package", readme,
     validationSummary: validation.summary,
   }, { generateText: (prompt) => generateRestrictedDraftText(prompt, codexDir, 40000) });
   const validationAt = new Date().toISOString();
@@ -736,7 +792,7 @@ async function processCandidate(input: {
     "",
     product.shortDescription,
     "",
-    `## 来源与固定版本\n- 仓库：${candidate.url}\n- 提交：${commitSha}\n- 主题：${batch.topicNameSnapshot}`,
+    `## 来源与固定版本\n- 仓库：${candidate.url}\n- 提交：${commitSha}\n- 主题：${candidate.collectionTopicName}`,
     `## 用途\n${product.valueStatement}\n\n## 适用人群\n${product.audience}\n\n## 使用示例\n输入：${product.exampleInput}\n步骤：${product.exampleSteps.map((step, stepIndex) => `${stepIndex + 1}. ${step}`).join("\n")}\n产出：${product.exampleOutput}`,
     `## 安装\n${product.installGuide}\n\n## 依赖与成本\n${product.dependencies}\n\n${product.additionalCosts}`,
     "上游 README 和 LICENSE 原文随包保留；使用前请再次阅读上游许可与说明。",
@@ -811,11 +867,11 @@ async function processCandidate(input: {
     presentation,
   };
   if (!parseAiWorkflowWorkerResult(payload).success) throw new Error("RESULT_EVIDENCE_MISMATCH");
-  state.pendingRegistration = { repositoryId: candidate.id, repository: candidate.fullName, result: payload };
+  state.pendingRegistration = { repositoryId: candidate.id, repository: candidate.fullName, topicId: candidate.collectionTopicId, result: payload };
   await persistRunState(statePath, state);
   await stateUpdate("register");
   const registration = await postWorker<{ candidateId: string; state: string; idempotentReplay: boolean }>(`/${batch.id}/result`, {
-    workerId: workerId(), leaseToken: lease.leaseToken, result: payload,
+    workerId: workerId(), leaseToken: lease.leaseToken, topicId: candidate.collectionTopicId, result: payload,
   }, token);
   if (!state.completedRepositoryIds.includes(candidate.id)) state.completedRepositoryIds.push(candidate.id);
   if (!state.outcomes.some((outcome) => outcome.repositoryId === candidate.id && outcome.state === "registered")) {
@@ -841,6 +897,7 @@ async function runBatch(lease: WorkerLease, token: string, credentials: { secret
       batchId: batch.id,
       topic: batch.topicNameSnapshot,
       candidateIds: [],
+      searchedTopicIds: [],
       outcomes: [],
       completedRepositoryIds: [],
       candidateIndex: 0,
@@ -855,21 +912,40 @@ async function runBatch(lease: WorkerLease, token: string, credentials: { secret
     }
   }
   const existingInBatch = new Set(batch.candidates.map(({ repositoryId }) => repositoryId));
-  if (state.candidateIds.length === 0) {
-    await postWorker(`/${batch.id}/heartbeat`, { workerId: workerId(), leaseToken: lease.leaseToken, stage: "search", checkpoint: { candidateIndex: 0, completedRepositoryIds: state.completedRepositoryIds.slice(-20) } }, token);
-    state.candidateIds = await searchRepositories(batch.topicNameSnapshot, batch.topicSearchDirectionsSnapshot);
-  }
-  if (state.candidateIds.length) {
-    const checkableIds = state.candidateIds.map(({ id }) => id).filter((id) => !existingInBatch.has(id));
+  const topicSearchPlan = getTopicSearchPlan(batch);
+  const appendTopicSearchResults = async (topic: TopicSearchTarget) => {
+    const found = await searchRepositories(topic.name, topic.searchDirections);
+    const alreadyInRun = new Set(state.candidateIds.map(({ id }) => id));
+    const sourced = found
+      .filter(({ id }) => !alreadyInRun.has(id))
+      .map((candidate) => ({
+        ...candidate,
+        collectionTopicId: topic.id,
+        collectionTopicName: topic.name,
+        collectionTopicSearchDirections: topic.searchDirections,
+      }));
+    const checkableIds = sourced.map(({ id }) => id).filter((id) => !existingInBatch.has(id));
     const known = new Set<string>();
     for (let offset = 0; offset < checkableIds.length; offset += 100) {
       const response = await postWorker<{ knownRepositoryIds: string[] }>("/known-repositories", { repositoryIds: checkableIds.slice(offset, offset + 100) }, token);
       response.knownRepositoryIds.forEach((id) => known.add(id));
     }
-    state.candidateIds = state.candidateIds.filter(({ id }) => existingInBatch.has(id) || !known.has(id));
+    state.candidateIds.push(...sourced.filter(({ id }) => existingInBatch.has(id) || !known.has(id)));
+    state.searchedTopicIds.push(topic.id);
+    await persistRunState(statePath, state);
+    const heartbeat = await postWorker<{ state: string }>(`/${batch.id}/heartbeat`, {
+      workerId: workerId(), leaseToken: lease.leaseToken, stage: "search",
+      checkpoint: buildWorkerCheckpoint(state),
+    }, token);
+    if (heartbeat.state === "paused") throw new Error("BATCH_PAUSED_OR_LEASE_LOST");
+    await logEvent("topic_search_completed", { batchId: batch.id, topic: topic.name, candidatesFound: state.candidateIds.filter(({ collectionTopicId }) => collectionTopicId === topic.id).length });
+  };
+  if (state.searchedTopicIds.length === 0 && registeredRepositoryIds.length < 3 && topicSearchPlan[0]) {
+    await postWorker(`/${batch.id}/heartbeat`, { workerId: workerId(), leaseToken: lease.leaseToken, stage: "search", checkpoint: buildWorkerCheckpoint(state) }, token);
+    await appendTopicSearchResults(topicSearchPlan[0]);
   }
   await persistRunState(statePath, state);
-  await logEvent("batch_claimed", { batchId: batch.id, topic: batch.topicNameSnapshot, candidatesFound: state.candidateIds.length });
+  await logEvent("batch_claimed", { batchId: batch.id, topic: batch.topicNameSnapshot, candidatesFound: state.candidateIds.length, topicsSearched: state.searchedTopicIds });
 
   const controller = new AbortController();
   let stage: "search" | "fetch" | "license_review" | "sandbox_test" | "package" | "upload" | "register" = "search";
@@ -881,7 +957,7 @@ async function runBatch(lease: WorkerLease, token: string, credentials: { secret
     try {
       const response = await postWorker<{ state: string }>(`/${batch.id}/heartbeat`, {
         workerId: workerId(), leaseToken: lease.leaseToken, stage,
-        checkpoint: { candidateIndex: state!.candidateIndex, completedRepositoryIds: state!.completedRepositoryIds.slice(-20) },
+        checkpoint: buildWorkerCheckpoint(state!),
       }, token);
       heartbeatFailures = 0;
       if (response.state === "paused") controller.abort();
@@ -900,7 +976,7 @@ async function runBatch(lease: WorkerLease, token: string, credentials: { secret
     if (state.pendingRegistration) {
       const pending = state.pendingRegistration;
       try {
-        await postWorker(`/${batch.id}/result`, { workerId: workerId(), leaseToken: lease.leaseToken, result: pending.result }, token);
+        await postWorker(`/${batch.id}/result`, { workerId: workerId(), leaseToken: lease.leaseToken, topicId: pending.topicId ?? batch.topicId, result: pending.result }, token);
       } catch (error) {
         if (error instanceof Error && error.message === "REPOSITORY_ALREADY_REGISTERED" && skipAlreadyRegisteredRepository(state, pending.repositoryId)) {
           await persistRunState(statePath, state);
@@ -928,68 +1004,79 @@ async function runBatch(lease: WorkerLease, token: string, credentials: { secret
       }
     }
     const endAt = started + maximumBatchMs;
-    for (let index = 0; index < Math.min(maximumCandidates, state.candidateIds.length) && successes < 3; index += 1) {
+    for (const topic of topicSearchPlan) {
+      if (successes >= 3 || failureCode) break;
       if (Date.now() > endAt) { failureCode = "BUDGET_EXCEEDED"; break; }
-      if (controller.signal.aborted) throw new Error("BATCH_PAUSED_OR_LEASE_LOST");
-      const candidate = state.candidateIds[index]!;
-      const space = await statfs(runsRoot);
-      if (space.bavail * space.bsize < minimumFreeBytes) { failureCode = "BUDGET_EXCEEDED"; break; }
-      state.candidateIndex = index;
-      if (existingInBatch.has(candidate.id) || state.completedRepositoryIds.includes(candidate.id)) continue;
-      try {
-        stage = "fetch";
-        await processCandidate({ candidate, batch, lease, token, credentials, state, statePath, index, signal: controller.signal, setStage: (value) => { stage = value; } });
-        successes += 1;
-      } catch (error) {
-        if (hasPendingRegistrationFor(state, candidate.id)) {
-          await logEvent("registration_pending_retry", { batchId: batch.id, repositoryId: candidate.id });
-          return;
-        }
-        const reason = error instanceof Error && /^[A-Z0-9_]{2,80}$/.test(error.message) ? error.message : getAiWorkflowFailureCode(error);
-        const linkOnlyReason = getAiWorkflowLinkOnlyFailureReason(reason);
-        if (linkOnlyReason) {
-          try {
-            await registerRepositoryLinkOnly({
-              candidate, batch, lease, token, state, statePath, index,
-              failureReason: linkOnlyReason,
-              signal: controller.signal,
-              setStage: (value) => { stage = value; },
-            });
-            successes += 1;
-            await logEvent("candidate_registered_link_only", { batchId: batch.id, repositoryId: candidate.id, reason: linkOnlyReason });
-            continue;
-          } catch (linkError) {
-            if (linkError instanceof Error && linkError.message === "REPOSITORY_ALREADY_REGISTERED" && skipAlreadyRegisteredRepository(state, candidate.id)) {
+      if (!state.searchedTopicIds.includes(topic.id)) {
+        stage = "search";
+        await appendTopicSearchResults(topic);
+      }
+      const topicCandidates = state.candidateIds
+        .filter(({ collectionTopicId }) => collectionTopicId === topic.id)
+        .slice(0, maximumCandidates);
+      for (const candidate of topicCandidates) {
+        if (Date.now() > endAt) { failureCode = "BUDGET_EXCEEDED"; break; }
+        if (controller.signal.aborted) throw new Error("BATCH_PAUSED_OR_LEASE_LOST");
+        const index = state.candidateIds.indexOf(candidate);
+        const space = await statfs(runsRoot);
+        if (space.bavail * space.bsize < minimumFreeBytes) { failureCode = "BUDGET_EXCEEDED"; break; }
+        state.candidateIndex = index;
+        if (existingInBatch.has(candidate.id) || state.completedRepositoryIds.includes(candidate.id)) continue;
+        try {
+          stage = "fetch";
+          await processCandidate({ candidate, batch, lease, token, credentials, state, statePath, index, signal: controller.signal, setStage: (value) => { stage = value; } });
+          successes += 1;
+        } catch (error) {
+          if (hasPendingRegistrationFor(state, candidate.id)) {
+            await logEvent("registration_pending_retry", { batchId: batch.id, repositoryId: candidate.id });
+            return;
+          }
+          const reason = error instanceof Error && /^[A-Z0-9_]{2,80}$/.test(error.message) ? error.message : getAiWorkflowFailureCode(error);
+          const linkOnlyReason = getAiWorkflowLinkOnlyFailureReason(reason);
+          if (linkOnlyReason) {
+            try {
+              await registerRepositoryLinkOnly({
+                candidate, batch, lease, token, state, statePath, index,
+                failureReason: linkOnlyReason,
+                signal: controller.signal,
+                setStage: (value) => { stage = value; },
+              });
+              successes += 1;
+              await logEvent("candidate_registered_link_only", { batchId: batch.id, repositoryId: candidate.id, reason: linkOnlyReason });
+              continue;
+            } catch (linkError) {
+              if (linkError instanceof Error && linkError.message === "REPOSITORY_ALREADY_REGISTERED" && skipAlreadyRegisteredRepository(state, candidate.id)) {
+                await persistRunState(statePath, state);
+                await logEvent("candidate_skipped_duplicate", { batchId: batch.id, repositoryId: candidate.id });
+                continue;
+              }
+              if (hasPendingRegistrationFor(state, candidate.id)) {
+                await logEvent("registration_pending_retry", { batchId: batch.id, repositoryId: candidate.id });
+                return;
+              }
+              const linkErrorReason = linkError instanceof Error && /^[A-Z0-9_]{2,80}$/.test(linkError.message)
+                ? linkError.message
+                : getAiWorkflowFailureCode(linkError);
+              state.outcomes.push({ repositoryId: candidate.id, repository: candidate.fullName, state: "rejected", reason: linkErrorReason });
               await persistRunState(statePath, state);
-              await logEvent("candidate_skipped_duplicate", { batchId: batch.id, repositoryId: candidate.id });
+              await logEvent("candidate_link_only_registration_failed", { batchId: batch.id, repositoryId: candidate.id, reason: linkOnlyReason, failure: linkErrorReason });
+              if (["GITHUB_RATE_LIMIT", "NETWORK_UNAVAILABLE", "SANDBOX_UNAVAILABLE", "ARCHIVE_UPLOAD_FAILED", "LOCAL_CONFIGURATION_MISSING", "BUDGET_EXCEEDED"].includes(linkErrorReason)) {
+                failureCode = linkErrorReason;
+                if (["GITHUB_RATE_LIMIT", "NETWORK_UNAVAILABLE", "SANDBOX_UNAVAILABLE", "LOCAL_CONFIGURATION_MISSING", "BUDGET_EXCEEDED"].includes(linkErrorReason)) break;
+              }
               continue;
             }
-            if (hasPendingRegistrationFor(state, candidate.id)) {
-              await logEvent("registration_pending_retry", { batchId: batch.id, repositoryId: candidate.id });
-              return;
-            }
-            const linkErrorReason = linkError instanceof Error && /^[A-Z0-9_]{2,80}$/.test(linkError.message)
-              ? linkError.message
-              : getAiWorkflowFailureCode(linkError);
-            state.outcomes.push({ repositoryId: candidate.id, repository: candidate.fullName, state: "rejected", reason: linkErrorReason });
-            await persistRunState(statePath, state);
-            await logEvent("candidate_link_only_registration_failed", { batchId: batch.id, repositoryId: candidate.id, reason: linkOnlyReason, failure: linkErrorReason });
-            if (["GITHUB_RATE_LIMIT", "NETWORK_UNAVAILABLE", "SANDBOX_UNAVAILABLE", "ARCHIVE_UPLOAD_FAILED", "LOCAL_CONFIGURATION_MISSING", "BUDGET_EXCEEDED"].includes(linkErrorReason)) {
-              failureCode = linkErrorReason;
-              if (["GITHUB_RATE_LIMIT", "NETWORK_UNAVAILABLE", "SANDBOX_UNAVAILABLE", "LOCAL_CONFIGURATION_MISSING", "BUDGET_EXCEEDED"].includes(linkErrorReason)) break;
-            }
-            continue;
           }
-        }
-        state.outcomes.push({ repositoryId: candidate.id, repository: candidate.fullName, state: "rejected", reason });
-        await persistRunState(statePath, state);
-        const cosFailure = reason === "ARCHIVE_UPLOAD_FAILED"
-          ? getAiWorkflowCosOperationFailure(error, "enhe-downloads-1303691623", `ai-workflows/${candidate.id}/<fixed-commit>/<package-sha>.zip`)
-          : undefined;
-        await logEvent("candidate_rejected", { batchId: batch.id, repositoryId: candidate.id, reason, ...(cosFailure ? { cosFailure } : {}) });
-        if (["GITHUB_RATE_LIMIT", "NETWORK_UNAVAILABLE", "SANDBOX_UNAVAILABLE", "ARCHIVE_UPLOAD_FAILED", "LOCAL_CONFIGURATION_MISSING", "BUDGET_EXCEEDED"].includes(reason)) {
-          failureCode = reason;
-          if (["GITHUB_RATE_LIMIT", "NETWORK_UNAVAILABLE", "SANDBOX_UNAVAILABLE", "LOCAL_CONFIGURATION_MISSING", "BUDGET_EXCEEDED"].includes(reason)) break;
+          state.outcomes.push({ repositoryId: candidate.id, repository: candidate.fullName, state: "rejected", reason });
+          await persistRunState(statePath, state);
+          const cosFailure = reason === "ARCHIVE_UPLOAD_FAILED"
+            ? getAiWorkflowCosOperationFailure(error, "enhe-downloads-1303691623", `ai-workflows/${candidate.id}/<fixed-commit>/<package-sha>.zip`)
+            : undefined;
+          await logEvent("candidate_rejected", { batchId: batch.id, repositoryId: candidate.id, reason, ...(cosFailure ? { cosFailure } : {}) });
+          if (["GITHUB_RATE_LIMIT", "NETWORK_UNAVAILABLE", "SANDBOX_UNAVAILABLE", "ARCHIVE_UPLOAD_FAILED", "LOCAL_CONFIGURATION_MISSING", "BUDGET_EXCEEDED"].includes(reason)) {
+            failureCode = reason;
+            if (["GITHUB_RATE_LIMIT", "NETWORK_UNAVAILABLE", "SANDBOX_UNAVAILABLE", "LOCAL_CONFIGURATION_MISSING", "BUDGET_EXCEEDED"].includes(reason)) break;
+          }
         }
       }
     }

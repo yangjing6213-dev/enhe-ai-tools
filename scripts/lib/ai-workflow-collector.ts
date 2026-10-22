@@ -1,8 +1,11 @@
+import { isLinkableOpenSourceLicenseId } from "../../src/lib/ai-workflows/licenses";
+
 export type AiWorkflowGitHubRepositoryCandidate = {
   id: string;
   fullName: string;
   url: string;
   description: string;
+  topics?: string[];
   language: string | null;
   stars: number;
   updatedAt: string;
@@ -52,40 +55,53 @@ export function skipAlreadyRegisteredRepository(
   return true;
 }
 
-const redistributableLicenses = new Set([
-  "0BSD",
-  "Apache-2.0",
-  "BSD-2-Clause",
-  "BSD-3-Clause",
-  "ISC",
-  "MIT",
-  "MPL-2.0",
-]);
-
-const topicSearchTerms: Record<string, string> = {
-  "工作效率": "productivity automation workflow",
-  "视频生成": "AI video generation workflow",
-  "内容创作": "AI content creation workflow",
-  "编程开发": "AI developer workflow tools",
-  "学习教育": "AI education learning workflow",
-  "搜索研究": "AI research search knowledge base",
-  "营销销售": "AI marketing sales automation",
-  "办公自动化": "office document spreadsheet automation",
-  "情感陪伴": "AI companion conversational agent",
-  "财务法律辅助": "AI contract review finance workflow",
+const topicSearchTerms: Record<string, string[]> = {
+  "工作效率": [
+    "work productivity tools",
+    "developer productivity workflow tools",
+    "工作效率工具 工作方法 自动化",
+  ],
+  "视频生成": [
+    "video generation",
+    "video editor",
+    "topic:video",
+  ],
+  "内容创作": ["AI content creation workflow", "open source writing and publishing tools"],
+  "编程开发": ["AI developer workflow tools", "open source coding assistant developer tools"],
+  "学习教育": ["AI education learning workflow", "open source learning and tutoring tools"],
+  "搜索研究": ["AI research search knowledge base", "open source research and information retrieval tools"],
+  "营销销售": ["AI marketing sales automation", "open source CRM and sales tools"],
+  "办公自动化": ["office document spreadsheet automation", "open source office workflow tools"],
+  "情感陪伴": ["AI companion conversational agent", "open source virtual companion chatbot"],
+  "财务法律辅助": ["AI contract review finance workflow", "open source legal accounting tools"],
 };
 
-const topicRelevanceTerms: Record<string, string[]> = {
-  "工作效率": ["productivity", "workflow automation", "task automation", "task management", "time management", "效率工具", "工作流自动化", "任务管理", "时间管理"],
-  "视频生成": ["video generation", "video generator", "text-to-video", "text to video", "image-to-video", "image to video", "video synthesis", "video diffusion", "generative video", "ai video maker", "ai-generated video", "generate video", "视频生成", "生成视频", "文生视频", "图生视频", "视频合成", "视频扩散"],
-  "内容创作": ["content creation", "content generation", "content creator", "writing assistant", "ai writing", "copywriting", "内容创作", "内容生成", "文案生成", "写作助手"],
-  "编程开发": ["code generation", "coding assistant", "developer tool", "software development", "programming", "code editor", "ai coding", "代码生成", "编程助手", "开发者工具"],
-  "学习教育": ["education", "learning platform", "tutoring", "study assistant", "educational tool", "在线课程", "学习平台", "教育工具", "辅导学习"],
-  "搜索研究": ["research assistant", "research tool", "search engine", "knowledge base", "information retrieval", "academic search", "研究助手", "搜索引擎", "知识库", "信息检索"],
-  "营销销售": ["marketing automation", "sales automation", "crm", "lead generation", "ad creative", "营销自动化", "销售自动化", "客户管理", "广告素材"],
-  "办公自动化": ["office automation", "document automation", "spreadsheet", "meeting notes", "document assistant", "办公自动化", "文档自动化", "会议纪要", "表格自动化"],
-  "情感陪伴": ["ai companion", "virtual companion", "companion chatbot", "conversational companion", "情感陪伴", "虚拟伴侣", "陪伴聊天"],
-  "财务法律辅助": ["legal assistant", "contract review", "financial assistant", "accounting", "tax preparation", "finance workflow", "法律助手", "合同审查", "财务助手", "会计软件"],
+const topicRelevanceGroups: Record<string, string[][]> = {
+  "工作效率": [
+    ["productivity tool", "work productivity", "workplace productivity", "employee productivity", "team productivity", "developer productivity", "效率工具", "工作效率", "职场效率", "工作提效", "提升效率", "开发效率", "程序员效率"],
+    ["workflow automation", "task automation", "business process automation", "流程自动化", "工作流自动化", "业务自动化"],
+    ["task management", "project management", "project tracking", "time management", "任务管理", "项目管理", "时间管理", "工作管理"],
+    ["work method", "work methods", "work methodology", "workflow template", "standard operating procedure", "工作方法", "工作流程", "工作法", "效率方法"],
+    ["workflow management", "business workflow", "team workflow", "operations workflow", "workplace automation", "workflow optimization", "工作流程管理", "业务流程", "团队工作流", "运营流程", "流程优化"],
+    ["developer tool", "developer tools", "developer workflow", "software development workflow", "coding workflow", "programming workflow", "ide extension", "cli productivity", "开发者工具", "开发工作流", "编程工作流", "程序员工具", "开发资料"],
+    ["team collaboration", "knowledge management", "personal knowledge management", "note taking", "团队协作", "知识管理", "知识库", "协作工具"],
+    ["crm", "sales automation", "marketing automation", "office automation", "document automation", "customer support workflow", "销售自动化", "营销自动化", "办公自动化", "文档自动化", "客户服务流程"],
+    ["accounting software", "research workflow", "recruitment workflow", "inventory management", "field service management", "education workflow", "healthcare workflow", "会计软件", "研究流程", "招聘流程", "库存管理", "教育工作流", "医疗工作流"],
+  ],
+  "视频生成": [
+    ["video generation", "video generator", "text to video", "image to video", "video synthesis", "video diffusion", "generative video", "ai video maker", "ai generated video", "generate video", "视频生成", "生成视频", "文生视频", "图生视频", "视频合成", "视频扩散"],
+    ["video editor", "video editing", "video剪辑", "video editor software", "clip editor", "视频剪辑", "视频编辑", "开源剪辑", "剪辑工具"],
+    ["video creation", "video production", "video creator", "video workflow", "video automation", "programmatic video", "video rendering", "video skills", "video skill", "short video", "html to video", "video shotcraft", "视频创作", "视频制作", "视频工作流", "视频自动化", "短视频", "视频工具", "视频技能", "视频创作流程"],
+    ["video prompt", "video prompts", "video prompt engineering", "shot planning", "storyboard for video", "seedance skill", "seedance video", "镜头脚本", "镜头规划", "视频分镜", "视频提示词"],
+  ],
+  "内容创作": [["content creation", "content generation", "content creator", "writing assistant", "ai writing", "copywriting", "内容创作", "内容生成", "文案生成", "写作助手"]],
+  "编程开发": [["code generation", "coding assistant", "developer tool", "software development", "programming", "code editor", "ai coding", "代码生成", "编程助手", "开发者工具"]],
+  "学习教育": [["education", "learning platform", "tutoring", "study assistant", "educational tool", "在线课程", "学习平台", "教育工具", "辅导学习"]],
+  "搜索研究": [["research assistant", "research tool", "search engine", "knowledge base", "information retrieval", "academic search", "研究助手", "搜索引擎", "知识库", "信息检索"]],
+  "营销销售": [["marketing automation", "sales automation", "crm", "lead generation", "ad creative", "营销自动化", "销售自动化", "客户管理", "广告素材"]],
+  "办公自动化": [["office automation", "document automation", "spreadsheet", "meeting notes", "document assistant", "办公自动化", "文档自动化", "会议纪要", "表格自动化"]],
+  "情感陪伴": [["ai companion", "virtual companion", "companion chatbot", "conversational companion", "情感陪伴", "虚拟伴侣", "陪伴聊天"]],
+  "财务法律辅助": [["legal assistant", "contract review", "financial assistant", "accounting", "tax preparation", "finance workflow", "法律助手", "合同审查", "财务助手", "会计软件"]],
 };
 
 const directionSearchTerms: Record<string, string> = {
@@ -126,37 +142,49 @@ function isRecord(value: unknown): value is Record<string, unknown> {
 }
 
 export function buildAiWorkflowSearchTerms(topic: string, directions: string) {
-  const base = topicSearchTerms[topic] ?? `AI agent workflow ${topic}`;
+  const baseTerms = topicSearchTerms[topic] ?? [`AI agent workflow ${topic}`];
   const translated = directions.split(/[\/|,，;；]/)
     .map((value) => directionSearchTerms[value.trim().replace(/\s+/g, "").toLowerCase()])
     .filter((value): value is string => Boolean(value))
-    .map((value) => `${base} ${value}`);
-  return translated.length ? [...new Set(translated)].slice(0, 3) : [base];
+    .map((value) => `${baseTerms[0]} ${value}`);
+  const directedSearches = translated.slice(0, 1);
+  const complementaryTerms = directedSearches.length && directedSearches[0]!.startsWith(`${baseTerms[0]} `)
+    ? baseTerms.slice(1)
+    : baseTerms;
+  return [...new Set([...directedSearches, ...complementaryTerms])].slice(0, 3);
+}
+
+function normalizeRelevanceText(value: string) {
+  return value.normalize("NFKC").toLowerCase().replace(/[^\p{L}\p{N}]+/gu, " ").replace(/\s+/g, " ").trim();
+}
+
+function matchedRelevanceGroups(topic: string, value: string) {
+  const groups = topicRelevanceGroups[topic];
+  if (!groups) return 0;
+  const normalized = normalizeRelevanceText(value);
+  return groups.filter((group) => group.some((term) => normalized.includes(normalizeRelevanceText(term)))).length;
+}
+
+function getCandidateMetadataRelevance(topic: string, candidate: Pick<AiWorkflowGitHubRepositoryCandidate, "fullName" | "description"> & { topics?: readonly string[] }) {
+  return matchedRelevanceGroups(topic, `${candidate.fullName}\n${candidate.description}\n${candidate.topics?.join(" ") ?? ""}`);
 }
 
 export function isAiWorkflowCandidateRelevant(
   topic: string,
-  candidate: Pick<AiWorkflowGitHubRepositoryCandidate, "fullName" | "description">,
+  candidate: Pick<AiWorkflowGitHubRepositoryCandidate, "fullName" | "description"> & { topics?: readonly string[] },
   readme: string,
 ) {
-  const terms = topicRelevanceTerms[topic];
-  if (!terms) return true;
-
-  const normalize = (value: string) => value.normalize("NFKC").toLowerCase();
-  const metadata = normalize(`${candidate.fullName}\n${candidate.description}`);
-  if (terms.some((term) => metadata.includes(normalize(term)))) return true;
-
-  const readmeOverview = normalize(readme.slice(0, 2_000));
-  if (terms.some((term) => readmeOverview.includes(normalize(term)))) return true;
-
-  const readmeSummary = normalize(readme.slice(0, 12_000));
-  return terms.filter((term) => readmeSummary.includes(normalize(term))).length >= 2;
+  if (!topicRelevanceGroups[topic]) return true;
+  if (getCandidateMetadataRelevance(topic, candidate) > 0) return true;
+  if (matchedRelevanceGroups(topic, readme.slice(0, 2_000)) > 0) return true;
+  return matchedRelevanceGroups(topic, readme.slice(0, 12_000)) >= 2;
 }
 
 export function selectAiWorkflowRepositoryCandidates(
   values: unknown,
   alreadyRegistered: ReadonlySet<string>,
   limit: number,
+  topic?: string,
 ): AiWorkflowGitHubRepositoryCandidate[] {
   if (!Array.isArray(values) || !Number.isSafeInteger(limit) || limit < 1) return [];
   const output: AiWorkflowGitHubRepositoryCandidate[] = [];
@@ -177,8 +205,11 @@ export function selectAiWorkflowRepositoryCandidates(
     const description = typeof value.description === "string"
       ? value.description.replace(/[\u0000-\u001f\u007f]/g, " ").trim().slice(0, 500)
       : "";
+    const topics = Array.isArray(value.topics)
+      ? value.topics.filter((entry): entry is string => typeof entry === "string").slice(0, 50)
+      : [];
     const licenseValue = isRecord(value.license) ? value.license.spdx_id : null;
-    const licenseSpdx = typeof licenseValue === "string" && redistributableLicenses.has(licenseValue) ? licenseValue : null;
+    const licenseSpdx = typeof licenseValue === "string" && isLinkableOpenSourceLicenseId(licenseValue) ? licenseValue : null;
     let parsedUrl: URL;
     try {
       parsedUrl = new URL(url);
@@ -202,15 +233,18 @@ export function selectAiWorkflowRepositoryCandidates(
       : null;
     if (stars < 1 || !updatedAt || Date.parse(updatedAt) < Date.now() - 730 * 24 * 60 * 60 * 1000) continue;
     seen.add(id);
-    output.push({ id, fullName, url: parsedUrl.origin + parsedUrl.pathname.replace(/\/$/, ""), description, language, stars, updatedAt, defaultBranch, licenseSpdx });
+    output.push({ id, fullName, url: parsedUrl.origin + parsedUrl.pathname.replace(/\/$/, ""), description, language, stars, updatedAt, defaultBranch, licenseSpdx, topics });
   }
 
   return output
-    .sort((left, right) => right.stars - left.stars || Date.parse(right.updatedAt ?? "") - Date.parse(left.updatedAt ?? "") || left.fullName.localeCompare(right.fullName))
+    .sort((left, right) =>
+      (topic ? getCandidateMetadataRelevance(topic, right) - getCandidateMetadataRelevance(topic, left) : 0) ||
+      right.stars - left.stars || Date.parse(right.updatedAt ?? "") - Date.parse(left.updatedAt ?? "") || left.fullName.localeCompare(right.fullName))
     .slice(0, limit);
 }
 
 const linkOnlyFailureReasons = new Set([
+  "LICENSE_NOT_REDISTRIBUTABLE",
   "PACKAGE_LANGUAGE_UNSUPPORTED",
   "NODE_MANIFEST_MISSING",
   "NODE_MANIFEST_INVALID",

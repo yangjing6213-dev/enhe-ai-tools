@@ -76,6 +76,7 @@ beforeEach(() => {
     where.id ? {
       id: where.id,
       batchDate: new Date("2026-10-20T00:00:00.000Z"),
+      topicId: "topic-1",
       topicNameSnapshot: "工作效率",
       topicSearchDirectionsSnapshot: "搜索趋势 / SaaS 产品发布 / 企业预算",
       topicOrderVersion: 4,
@@ -230,6 +231,42 @@ describe("POST /api/internal/ai-workflows/worker/poll", () => {
     expect(mocks.batchesFindFirst).toHaveBeenNthCalledWith(2, expect.objectContaining({
       where: expect.objectContaining({ topicOrderVersion: 4, topicId: { in: ["topic-1"] } }),
     }));
+  });
+
+  it("returns enabled fallback topics in order after the selected daily topic", async () => {
+    mocks.topicsFindMany.mockResolvedValue([
+      { id: "topic-1", name: "工作效率", englishName: null, searchDirections: "开发者工具" },
+      { id: "topic-2", name: "视频生成", englishName: null, searchDirections: "视频创作" },
+      { id: "topic-3", name: "内容创作", englishName: null, searchDirections: "创作工具" },
+    ]);
+    mocks.batchesCount.mockResolvedValue(1);
+    mocks.batchesFindUnique.mockImplementation(({ where }: { where: { batchDate?: Date; id?: string } }) =>
+      where.id ? {
+        id: where.id,
+        batchDate: new Date("2026-10-20T00:00:00.000Z"),
+        topicId: "topic-2",
+        topicNameSnapshot: "视频生成",
+        topicSearchDirectionsSnapshot: "视频创作",
+        topicOrderVersion: 4,
+        attemptCount: 1,
+        checkpoint: {},
+        candidates: [],
+      } : null,
+    );
+
+    const result = await body(await POST(request()));
+
+    expect(result).toMatchObject({
+      state: "claimed",
+      batch: {
+        topicId: "topic-2",
+        topicFallbacks: [
+          { id: "topic-2", name: "视频生成", searchDirections: "视频创作" },
+          { id: "topic-3", name: "内容创作", searchDirections: "创作工具" },
+          { id: "topic-1", name: "工作效率", searchDirections: "开发者工具" },
+        ],
+      },
+    });
   });
 
   it("leaves the date's batch limit intact when today's batch already exists", async () => {

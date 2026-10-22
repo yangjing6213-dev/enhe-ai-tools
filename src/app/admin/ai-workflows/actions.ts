@@ -1,6 +1,6 @@
 "use server";
 
-import { createHash } from "node:crypto";
+import { createHash, randomInt } from "node:crypto";
 import { revalidatePath, revalidateTag } from "next/cache";
 import { redirect } from "next/navigation";
 import { Prisma } from "@prisma/client";
@@ -177,8 +177,7 @@ export async function requestAiWorkflowBatchAction() {
   if (alreadyUsedToday) redirect("/admin/ai-workflows?dailyQuotaUsed=1");
   if (activeBatch) redirect("/admin/ai-workflows?batchInProgress=1");
   const topicOrderVersion = setting?.topicListVersion ?? 0;
-  const previousBatches = await prisma.aiWorkflowBatch.count({ where: { batchDate: { lt: batchDate }, topicOrderVersion } });
-  const topic = topics[previousBatches % topics.length]!;
+  const topic = topics[randomInt(topics.length)]!;
   try {
     const batch = await prisma.aiWorkflowBatch.create({ data: {
       batchDate,
