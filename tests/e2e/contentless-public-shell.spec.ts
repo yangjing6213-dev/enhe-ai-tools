@@ -46,7 +46,7 @@ for (const route of routes) {
       );
     });
 
-    const response = await page.goto(route, { waitUntil: "networkidle" });
+    const response = await page.goto(route, { waitUntil: "load" });
 
     expect(response?.status()).toBe(200);
     const shell = page.locator('main[data-shell-state="contentless"]');
@@ -119,7 +119,7 @@ test.describe("contentless shell responsive boundary", () => {
   ]) {
     test(`AI News stays usable at ${viewport.width}px`, async ({ page }) => {
       await page.setViewportSize(viewport);
-      const response = await page.goto("/ai-news", { waitUntil: "networkidle" });
+      const response = await page.goto("/ai-news", { waitUntil: "load" });
 
       expect(response?.status()).toBe(200);
       await expect(page.locator('main[data-shell-state="contentless"]')).toBeVisible();

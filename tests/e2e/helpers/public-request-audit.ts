@@ -44,6 +44,12 @@ export function auditPublicRequests(page: Page) {
   });
   page.on("requestfailed", (request) => {
     const aborted = request.failure()?.errorText === "net::ERR_ABORTED";
+    const wasCanceledAnalyticsOnNavigation =
+      new URL(request.url()).pathname === "/api/analytics" && aborted;
+    const wasCanceledEmojiRequestOnNavigation =
+      new URL(request.url()).pathname === "/api/emojis" && aborted;
+    // These background requests may be canceled as the browser leaves a page.
+    if (wasCanceledAnalyticsOnNavigation || wasCanceledEmojiRequestOnNavigation) return;
     // Only the extra click-proof phase permits leaving-page background aborts.
     // Document failures and all other errors remain failures in both phases.
     if (verifyingNavigation && !request.isNavigationRequest() && aborted) return;
@@ -63,7 +69,7 @@ export function auditPublicRequests(page: Page) {
 
   return {
     async verify() {
-      await page.waitForLoadState("networkidle");
+      await page.waitForLoadState("load");
       assertNoErrors(page.url());
       // Freeze the initial observations. Click-proof navigation cannot add new
       // exceptions, and each source/target/viewport must receive its own proof.

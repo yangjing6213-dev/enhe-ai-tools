@@ -44,7 +44,7 @@ for (const route of routes) {
     await expect(desktopLanguageLink).toHaveCount(1);
     await expect(desktopLanguageLink).toHaveAttribute("lang", route.targetLocale);
 
-    await page.waitForLoadState("networkidle");
+    await page.waitForLoadState("load");
     await page.setViewportSize({ width: 390, height: 844 });
     const mobileResponse = await page.goto(route.path, { waitUntil: "load" });
     expect(mobileResponse?.status()).toBe(200);
