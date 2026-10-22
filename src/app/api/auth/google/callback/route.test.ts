@@ -62,6 +62,38 @@ describe("Google identity ownership", () => {
     expect(response.headers.get("location")).toBe("https://site.example/user");
     expect(mocks.signIn).toHaveBeenCalledWith("new-google-user");
   });
+  it("uses the configured relay and verifies its returned signing keys locally", async () => {
+    vi.stubEnv("GOOGLE_OAUTH_RELAY_URL", "https://enhe-relay.account.workers.dev/exchange");
+    const relayResponse = { idToken: "relay-token", jwks: { keys: [{ kty: "RSA", kid: "test-key" }] } };
+    const relayFetch = vi.fn(async () => Response.json(relayResponse));
+    vi.stubGlobal("fetch", relayFetch);
+    mocks.find.mockResolvedValueOnce({ id: "linked-user", status: "active" });
+
+    const response = await GET(request());
+
+    expect(relayFetch).toHaveBeenCalledWith(
+      "https://enhe-relay.account.workers.dev/exchange",
+      expect.objectContaining({
+        method: "POST",
+        headers: expect.objectContaining({
+          "Content-Type": "application/json",
+          Authorization: expect.stringMatching(/^HMAC [A-Za-z0-9_-]{43}$/),
+        }),
+        body: JSON.stringify({ code: "fixture", redirectUri: "https://site.example/api/auth/google/callback" }),
+        cache: "no-store",
+      }),
+    );
+    expect(mocks.verify).toHaveBeenCalledWith("relay-token", "fixture-client", "nonce", relayResponse.jwks);
+    expect(response.headers.get("location")).toBe("https://site.example/user");
+  });
+  it("rejects relay URLs outside the Cloudflare workers.dev endpoint", async () => {
+    vi.stubEnv("GOOGLE_OAUTH_RELAY_URL", "https://example.com/exchange");
+
+    const response = await GET(request());
+
+    expect(new URL(response.headers.get("location")!).searchParams.get("message")).toBe("google-not-configured");
+    expect(fetch).not.toHaveBeenCalled();
+  });
   it("does not count a unique-constraint race resolved to an existing account as another registration", async () => {
     mocks.find.mockResolvedValueOnce(null).mockResolvedValueOnce(null).mockResolvedValueOnce({ id: "raced-user", status: "active" });
     mocks.create.mockRejectedValueOnce({ code: "P2002" });

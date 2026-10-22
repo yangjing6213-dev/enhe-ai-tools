@@ -1,4 +1,4 @@
-import { createRemoteJWKSet, jwtVerify, type JWTPayload } from "jose";
+import { createLocalJWKSet, createRemoteJWKSet, jwtVerify, type JWTPayload } from "jose";
 import { timingSafeEqual } from "node:crypto";
 import { z } from "zod";
 import { fallbackSiteBaseUrl } from "@/lib/seo";
@@ -71,8 +71,10 @@ export async function verifyGoogleIdToken(
   idToken: string,
   clientId: string,
   expectedNonce: string,
+  jwks?: Parameters<typeof createLocalJWKSet>[0],
 ) {
-  const { payload } = await jwtVerify(idToken, googleSigningKeys, {
+  const keySet = jwks ? createLocalJWKSet(jwks) : googleSigningKeys;
+  const { payload } = await jwtVerify(idToken, keySet, {
     audience: clientId,
     issuer: ["https://accounts.google.com", "accounts.google.com"],
   });
