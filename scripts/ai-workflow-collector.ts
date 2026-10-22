@@ -21,6 +21,7 @@ import {
   buildAiWorkflowSearchTerms,
   getAiWorkflowFailureCode,
   getAiWorkflowLinkOnlyFailureReason,
+  getAiWorkflowRegisteredRepositoryIds,
   redactAiWorkflowCollectorText,
   restoreAiWorkflowCandidateMetadata,
   selectAiWorkflowRepositoryCandidates,
@@ -841,10 +842,11 @@ async function runBatch(lease: WorkerLease, token: string, credentials: { secret
       updatedAt: new Date().toISOString(),
     };
   }
-  for (const current of batch.candidates) {
-    if (["pending_pricing", "published"].includes(current.status) && !state.completedRepositoryIds.includes(current.repositoryId)) {
-      state.completedRepositoryIds.push(current.repositoryId);
-      state.outcomes.push({ repositoryId: current.repositoryId, repository: current.repositoryId, state: "registered" });
+  const registeredRepositoryIds = getAiWorkflowRegisteredRepositoryIds(batch.candidates);
+  for (const repositoryId of registeredRepositoryIds) {
+    if (!state.completedRepositoryIds.includes(repositoryId)) {
+      state.completedRepositoryIds.push(repositoryId);
+      state.outcomes.push({ repositoryId, repository: repositoryId, state: "registered" });
     }
   }
   const existingInBatch = new Set(batch.candidates.map(({ repositoryId }) => repositoryId));
@@ -889,8 +891,7 @@ async function runBatch(lease: WorkerLease, token: string, credentials: { secret
 
   let failureCode: string | undefined;
   try {
-    const existingReadyCount = batch.candidates.filter(({ status }) => ["pending_pricing", "published"].includes(status)).length;
-    let successes = existingReadyCount;
+    let successes = registeredRepositoryIds.length;
     if (state.pendingRegistration) {
       const pending = state.pendingRegistration;
       try {
@@ -922,7 +923,7 @@ async function runBatch(lease: WorkerLease, token: string, credentials: { secret
       const space = await statfs(runsRoot);
       if (space.bavail * space.bsize < minimumFreeBytes) { failureCode = "BUDGET_EXCEEDED"; break; }
       state.candidateIndex = index;
-      if (existingInBatch.has(candidate.id)) continue;
+      if (existingInBatch.has(candidate.id) || state.completedRepositoryIds.includes(candidate.id)) continue;
       try {
         stage = "fetch";
         await processCandidate({ candidate, batch, lease, token, credentials, state, statePath, index, signal: controller.signal, setStage: (value) => { stage = value; } });

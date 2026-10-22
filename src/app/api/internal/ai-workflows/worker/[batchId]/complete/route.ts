@@ -77,16 +77,15 @@ export async function POST(
   const readyCandidateCount = await prisma.aiWorkflowCandidate.count({
     where: {
       batchId,
-      status: { in: ["pending_pricing", "published"] },
       toolId: { not: null },
       OR: [
-        { fileId: { not: null } },
-        { status: "published", fileId: null },
+        { status: { in: ["pending_pricing", "published"] }, fileId: { not: null } },
+        { status: { in: ["reviewing", "published"] }, fileId: null },
       ],
     },
   });
   if (
-    (input.state === "completed" && readyCandidateCount < 3) ||
+    (input.state === "completed" && readyCandidateCount !== 3) ||
     (input.state === "partial" && (readyCandidateCount === 0 || readyCandidateCount >= 3)) ||
     (input.state === "failed" && readyCandidateCount !== 0)
   ) {

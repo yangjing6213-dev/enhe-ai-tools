@@ -123,7 +123,7 @@ export async function POST(
       isDownloadPaid: false,
       isDownloadLinkVipOnly: false,
       downloadPrice: 0,
-      status: "published" as const,
+      status: "draft" as const,
       ...(item.presentation ? buildAiWorkflowPresentationFields(item.presentation) : {}),
     };
 
@@ -144,32 +144,14 @@ export async function POST(
         });
         let candidateId: string;
         let created = false;
+        let state: "reviewing" | "published" = "reviewing";
         if (existing) {
-          if (existing.status !== "published" || existing.fileId || !existing.toolId) throw new IntakeError(409, "REPOSITORY_ALREADY_REGISTERED");
-          await tx.tool.update({ where: { id: existing.toolId }, data: toolData });
-          await tx.aiWorkflowCandidate.update({
-            where: { id: existing.id },
-            data: {
-              batchId,
-              topicId: currentBatch?.topicId ?? null,
-              sourceFingerprint: item.sourceFingerprint,
-              repositoryUrl: item.repositoryUrl,
-              repositoryOwner: item.repositoryOwner,
-              repositoryName: item.repositoryName,
-              commitSha: item.commitSha,
-              licenseSpdx: item.licenseSpdx,
-              licenseUrl,
-              projectType: item.projectType,
-              verifiedEnvironments: [],
-              githubStars: item.stars,
-              starsUpdatedAt: now,
-              validationReport,
-              modificationSummary: "仅收录 GitHub 原仓库链接；本站未制作下载包，未通过下载版发布流程。",
-              failureReason: item.failureReason,
-              status: "published",
-            },
-          });
+          if (existing.batchId !== batchId || existing.commitSha?.toLowerCase() !== item.commitSha ||
+            (existing.status !== "reviewing" && existing.status !== "published") || existing.fileId || !existing.toolId) {
+            throw new IntakeError(409, "REPOSITORY_ALREADY_REGISTERED");
+          }
           candidateId = existing.id;
+          state = existing.status;
         } else {
           const tool = await tx.tool.create({
             data: {
@@ -201,7 +183,7 @@ export async function POST(
               validationReport,
               modificationSummary: "仅收录 GitHub 原仓库链接；本站未制作下载包，未通过下载版发布流程。",
               failureReason: item.failureReason,
-              status: "published",
+              status: "reviewing",
               toolId: tool.id,
             },
             select: { id: true },
@@ -221,11 +203,11 @@ export async function POST(
           data: { lastWorkerStage: "register", lastHeartbeatAt: new Date() },
         });
         if (heartbeat.count !== 1) throw new IntakeError(409, "LEASE_INVALID");
-        return { candidateId, created };
+        return { candidateId, created, state };
       });
 
       revalidateTag("public-tools");
-      return workerJsonResponse({ ok: true, candidateId: result.candidateId, state: "published", deliveryMode: "repository_link", idempotentReplay: !result.created }, result.created ? 201 : 200);
+      return workerJsonResponse({ ok: true, candidateId: result.candidateId, state: result.state, deliveryMode: "repository_link", idempotentReplay: !result.created }, result.created ? 201 : 200);
     } catch (error) {
       if (error instanceof IntakeError) return workerJsonResponse({ ok: false, code: error.code }, error.status);
       if (error instanceof Prisma.PrismaClientKnownRequestError && error.code === "P2002") {
@@ -319,7 +301,7 @@ export async function POST(
           });
           await tx.tool.update({
             where: { id: existing.toolId },
-            data: { ...presentationFields, downloadFileId: file.id, version: item.packageVersion, isDownloadPaid: false, isDownloadLinkVipOnly: true, downloadPrice: 0, status: "published" },
+            data: { downloadFileId: file.id, version: item.packageVersion, isDownloadPaid: false, isDownloadLinkVipOnly: true, downloadPrice: 0 },
           });
           await tx.aiWorkflowCandidate.update({
             where: { id: existing.id },

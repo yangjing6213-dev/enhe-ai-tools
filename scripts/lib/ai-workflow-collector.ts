@@ -20,6 +20,14 @@ export function restoreAiWorkflowCandidateMetadata(
   };
 }
 
+export function getAiWorkflowRegisteredRepositoryIds(
+  candidates: ReadonlyArray<{ repositoryId: string; status: string }>,
+) {
+  return [...new Set(candidates
+    .filter(({ status }) => ["reviewing", "pending_pricing", "published"].includes(status))
+    .map(({ repositoryId }) => repositoryId))];
+}
+
 const redistributableLicenses = new Set([
   "0BSD",
   "Apache-2.0",

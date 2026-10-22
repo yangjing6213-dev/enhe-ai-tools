@@ -1,6 +1,32 @@
 import { describe, expect, it } from "vitest";
 import { parseAiWorkflowRepositoryLinkResult } from "../../src/lib/ai-workflows/worker-result";
-import { buildAiWorkflowSearchTerms, getAiWorkflowFailureCode, getAiWorkflowLinkOnlyFailureReason, redactAiWorkflowCollectorText, restoreAiWorkflowCandidateMetadata, selectAiWorkflowRepositoryCandidates } from "./ai-workflow-collector";
+import { buildAiWorkflowSearchTerms, getAiWorkflowFailureCode, getAiWorkflowLinkOnlyFailureReason, getAiWorkflowRegisteredRepositoryIds, redactAiWorkflowCollectorText, restoreAiWorkflowCandidateMetadata, selectAiWorkflowRepositoryCandidates } from "./ai-workflow-collector";
+
+describe("AI Workflow registered draft recovery", () => {
+  it("counts three saved review drafts as a completed collection quota without requiring publication", () => {
+    const registered = getAiWorkflowRegisteredRepositoryIds([
+      { repositoryId: "11", status: "reviewing" },
+      { repositoryId: "12", status: "reviewing" },
+      { repositoryId: "13", status: "reviewing" },
+      { repositoryId: "14", status: "rejected" },
+    ]);
+    expect(registered).toEqual(["11", "12", "13"]);
+    expect(registered).toHaveLength(3);
+  });
+
+  it("keeps pending-price and published entries while deduplicating saved drafts and excluding unfinished candidates", () => {
+    expect(getAiWorkflowRegisteredRepositoryIds([
+      { repositoryId: "11", status: "reviewing" },
+      { repositoryId: "11", status: "reviewing" },
+      { repositoryId: "12", status: "pending_pricing" },
+      { repositoryId: "13", status: "published" },
+      { repositoryId: "14", status: "detected" },
+      { repositoryId: "15", status: "testing" },
+      { repositoryId: "16", status: "packaging" },
+      { repositoryId: "17", status: "failed" },
+    ])).toEqual(["11", "12", "13"]);
+  });
+});
 
 describe("AI Workflow cached candidate compatibility", () => {
   const legacyCandidate = {

@@ -30,4 +30,17 @@ describe("workflow cover image recovery", () => {
     const next = AiWorkflowCoverImage({ ...props, coverImage: "https://raw.githubusercontent.com/example/design/main/new-cover.png" });
     expect(next.props.src).toBe("https://raw.githubusercontent.com/example/design/main/new-cover.png");
   });
+
+  it("shows a generated background while the upstream image is still loading", () => {
+    const image = AiWorkflowCoverImage({ slug: "ai-workflow-123-design", coverImage: "https://raw.githubusercontent.com/example/design/main/cover.png", alt: "Design", style: { borderRadius: 12 } });
+    expect(image.props.style).toMatchObject({ backgroundImage: 'url("/api/ai-workflows/covers/ai-workflow-123-design")', backgroundSize: "contain", backgroundPosition: "center", backgroundRepeat: "no-repeat", borderRadius: 12 });
+  });
+
+  it("uses the private admin preview fallback without requesting a public draft cover", () => {
+    const props = { slug: "draft", coverImage: "https://raw.githubusercontent.com/example/design/main/cover.png", fallbackImage: "data:image/svg+xml;base64,PHN2Zy8+", alt: "Draft" };
+    const image = AiWorkflowCoverImage(props);
+    expect(image.props.style.backgroundImage).toContain(props.fallbackImage);
+    image.props.onError();
+    expect(AiWorkflowCoverImage(props).props.src).toBe(props.fallbackImage);
+  });
 });

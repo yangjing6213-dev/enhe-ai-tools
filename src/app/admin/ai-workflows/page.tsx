@@ -3,6 +3,7 @@ import { AdminContentShell } from "@/app/admin/admin-ui";
 import { getCurrentLocale } from "@/lib/i18n";
 import { prisma } from "@/lib/db";
 import { getAiWorkflowCosConfig } from "@/lib/ai-workflows/cos";
+import { AiWorkflowReviewPreview } from "./review-preview";
 import {
   decideAiWorkflowPriceAction,
   requestAiWorkflowBatchAction,
@@ -22,8 +23,8 @@ function rationaleLines(value: unknown) {
 }
 
 function statusText(status: string, english: boolean) {
-  const zh: Record<string, string> = { queued: "等待执行端", running: "执行中", completed: "完成", partial: "部分完成", failed: "失败", paused: "暂停", pending_pricing: "待确认价格", published: "已发布", validated: "验证通过", discovered: "已发现", downloading: "下载中", reviewing: "核验中", rejected: "已拒绝" };
-  const en: Record<string, string> = { queued: "Waiting for worker", running: "Running", completed: "Complete", partial: "Partial", failed: "Failed", paused: "Paused", pending_pricing: "Price approval", published: "Published", validated: "Validated", discovered: "Discovered", downloading: "Downloading", reviewing: "Reviewing", rejected: "Rejected" };
+  const zh: Record<string, string> = { draft: "待审核草稿", offline: "已下架", queued: "等待执行端", running: "执行中", completed: "采集完成", partial: "部分完成", failed: "失败", paused: "暂停", pending_pricing: "待确认内容和价格", published: "已发布", validated: "验证通过", discovered: "已发现", downloading: "下载中", reviewing: "待人工审核", rejected: "已拒绝" };
+  const en: Record<string, string> = { draft: "Draft awaiting review", offline: "Offline", queued: "Waiting for worker", running: "Running", completed: "Collection complete", partial: "Partial", failed: "Failed", paused: "Paused", pending_pricing: "Content and price approval", published: "Published", validated: "Validated", discovered: "Discovered", downloading: "Downloading", reviewing: "Awaiting human review", rejected: "Rejected" };
   return (english ? en : zh)[status] ?? status;
 }
 
@@ -42,10 +43,12 @@ export default async function AdminAiWorkflowsPage({ searchParams }: { searchPar
     prisma.aiWorkflowCollectionSetting.findUnique({ where: { id: "default" } }),
     prisma.aiWorkflowTopic.findMany({ orderBy: [{ sortOrder: "asc" }, { name: "asc" }] }),
     prisma.aiWorkflowBatch.findMany({ take: 10, orderBy: { batchDate: "desc" }, include: { topic: true, _count: { select: { candidates: true } } } }),
-    prisma.aiWorkflowCandidate.findMany({ where: { status: "pending_pricing" }, orderBy: { createdAt: "asc" }, include: { topic: true, file: true, tool: true } }),
+    prisma.aiWorkflowCandidate.findMany({ where: { status: { in: ["reviewing", "pending_pricing"] } }, orderBy: { createdAt: "asc" }, include: { topic: true, file: true, tool: true } }),
     prisma.tool.findMany({ where: { type: "ai_workflow" }, orderBy: [{ updatedAt: "desc" }], take: 100, include: { aiWorkflowCandidate: true } }),
   ]);
   const english = locale === "en";
+  const introductions = candidates.filter((candidate) => candidate.status === "reviewing" && candidate.tool?.status === "draft");
+  const pricingCandidates = candidates.filter((candidate) => candidate.status === "pending_pricing");
   const serverCosConfig = getAiWorkflowCosConfig();
   const serverCosReady = Boolean(serverCosConfig && serverCosConfig.region === "ap-shanghai" && serverCosConfig.staticBucket === "enhe-static-1303691623" && serverCosConfig.downloadBucket === "enhe-downloads-1303691623");
   const activeTopics = topics.filter((topic) => topic.isEnabled);
@@ -72,7 +75,7 @@ export default async function AdminAiWorkflowsPage({ searchParams }: { searchPar
       <div><h1 className="text-3xl font-semibold text-white">{text.title}</h1><p className="mt-3 max-w-3xl text-sm leading-6 text-[#8B95A7]">{text.intro}</p></div>
       <Link href="/admin/ai-workflows/new" className="rounded-lg bg-[#1769C2] px-4 py-2 text-sm font-semibold text-white">{text.newProduct}</Link>
     </div>
-    {params.error ? <p role="alert" className="mt-5 rounded-xl border border-red-400/30 bg-red-400/10 px-4 py-3 text-sm text-red-100">{params.error}</p> : params.topicsSaved || params.scheduleSaved || params.batchQueued || params.priceConfirmed || params.candidateRejected ? <p role="status" className="mt-5 rounded-xl border border-emerald-400/30 bg-emerald-400/10 px-4 py-3 text-sm text-emerald-100">{text.notice}</p> : null}
+    {params.error ? <p role="alert" className="mt-5 rounded-xl border border-red-400/30 bg-red-400/10 px-4 py-3 text-sm text-red-100">{params.error}</p> : params.topicsSaved || params.scheduleSaved || params.batchQueued || params.priceConfirmed || params.introductionPublished || params.candidateRejected ? <p role="status" className="mt-5 rounded-xl border border-emerald-400/30 bg-emerald-400/10 px-4 py-3 text-sm text-emerald-100">{params.introductionPublished ? (english ? "Reviewed introduction published." : "已审核的仓库介绍已发布。") : text.notice}</p> : null}
     {params.dailyQuotaUsed || params.batchInProgress || params.batchExists ? <p role="status" className="mt-5 rounded-xl border border-sky-400/30 bg-sky-400/10 px-4 py-3 text-sm text-sky-100">{params.dailyQuotaUsed ? text.dailyQuotaMessage : params.batchInProgress ? text.batchActiveMessage : text.batchExistsMessage}</p> : null}
     {params.scheduleNotReady ? <p role="status" className="mt-5 rounded-xl border border-amber-400/30 bg-amber-400/10 px-4 py-3 text-sm text-amber-100">{text.scheduleBlocked}</p> : null}
     {params.priceSavedPendingArchive ? <p role="status" className="mt-5 rounded-xl border border-amber-400/30 bg-amber-400/10 px-4 py-3 text-sm text-amber-100">{text.archivePending}</p> : null}
@@ -105,11 +108,20 @@ export default async function AdminAiWorkflowsPage({ searchParams }: { searchPar
       </div>
     </section>
 
-    <section className="mt-9">
+    <section id="review" className="mt-9">
+      <h2 className="text-2xl font-semibold text-white">{english ? "Draft introductions awaiting review" : "待人工审核的介绍草稿"}</h2>
+      <p className="mt-3 text-sm leading-6 text-[#9CAABD]">{english ? "Daily collection saves AI-assisted introductions as drafts. They become public only after you review both languages and the cover, then explicitly publish. Collection completion does not mean publication." : "每日采集的 AI 介绍先保存为草稿。核对中英文内容和封面后，手动点击发布才会展示到网站；采集完成不等于已发布。"}</p>
+      {introductions.length ? <div className="mt-4 grid gap-3">{introductions.map((candidate) => <article key={candidate.id} className="flex flex-wrap items-center justify-between gap-3 rounded-xl border border-white/10 bg-white/[0.04] p-4">
+        <div><h3 className="font-semibold text-white">{candidate.tool!.name}</h3><p className="mt-1 text-sm text-[#9CAABD]">{candidate.repositoryOwner}/{candidate.repositoryName} · {statusText(candidate.status, english)}</p></div>
+        <Link href={`/admin/ai-workflows/${candidate.toolId}`} className="rounded-lg bg-[#1769C2] px-3 py-2 text-sm text-white">{english ? "Review and publish" : "审核并发布"}</Link>
+      </article>)}</div> : <p className="mt-3 text-sm text-[#9CAABD]">{english ? "No introduction is awaiting review." : "当前没有等待审核的介绍草稿。"}</p>}
+    </section>
+
+    <section id="pricing" className="mt-9">
       <h2 className="text-2xl font-semibold text-white">{text.pricing}</h2>
-      {candidates.length ? <div className="mt-4 grid gap-4">{candidates.map((candidate) => <article key={candidate.id} className="rounded-2xl border border-white/10 bg-white/[0.04] p-5">
+      {pricingCandidates.length ? <div className="mt-4 grid gap-4">{pricingCandidates.map((candidate) => <article key={candidate.id} className="rounded-2xl border border-white/10 bg-white/[0.04] p-5">
         <div className="flex flex-wrap items-start justify-between gap-3"><div><h3 className="text-lg font-semibold text-white">{candidate.tool?.name ?? candidate.repositoryName}</h3><p className="mt-1 text-sm text-[#9CAABD]">{text.source}: <a href={candidate.repositoryUrl} target="_blank" rel="noreferrer" className="text-sky-300 underline">{candidate.repositoryOwner}/{candidate.repositoryName}</a></p></div><span className="rounded-full border border-amber-300/30 px-3 py-1 text-xs text-amber-200">{statusText(candidate.status, english)}</span></div>
-        <p className="mt-3 text-sm leading-6 text-[#D7E0EB]">{candidate.tool?.shortDescription ?? "尚无商品简介。"}</p>
+        {candidate.tool ? <details className="mt-4"><summary className="cursor-pointer text-sm text-sky-300">{english ? "Review Chinese and English content and cover" : "展开审核中英文内容与封面"}</summary><AiWorkflowReviewPreview tool={candidate.tool} repository={`${candidate.repositoryOwner}/${candidate.repositoryName}`} pendingReport={candidate.tool.status === "published" ? candidate.validationReport : undefined} /></details> : null}
         <p className="mt-2 text-xs text-[#9CAABD]">{text.license}: {candidate.licenseSpdx ?? "—"} · {text.environments}: {candidate.verifiedEnvironments.length ? candidate.verifiedEnvironments.join("、") : "—"} · {text.fileState}: {candidate.file && candidate.packageSha256 ? text.fileReady : text.fileMissing}</p>
         <p className="mt-1 text-xs leading-5 text-[#9CAABD]">{text.validation}: {validationSummary(candidate.validationReport)}</p>
         <p className="mt-3 text-sm text-[#D7E0EB]">{text.version}: {candidate.packageVersion ?? "-"} · {text.size}: {candidate.packageSize ? `${(Number(candidate.packageSize) / 1024 / 1024).toFixed(1)} MB` : "-"}</p>
@@ -117,10 +129,13 @@ export default async function AdminAiWorkflowsPage({ searchParams }: { searchPar
         <div className="mt-4 rounded-xl bg-[#0b1424] p-4"><h4 className="text-sm font-semibold text-white">{text.rationale}</h4>{rationaleLines(candidate.priceRationale).length ? rationaleLines(candidate.priceRationale).map((line) => <p key={line.label} className="mt-2 text-sm leading-6 text-[#B8C4D4]"><strong>{line.label}：</strong>{line.value}</p>) : <p className="mt-2 text-sm text-[#9CAABD]">尚未生成可审核的定价依据。</p>}</div>
         <form action={decideAiWorkflowPriceAction} className="mt-4 flex flex-wrap items-end gap-3">
           <input type="hidden" name="candidateId" value={candidate.id} />
+          <input type="hidden" name="candidateUpdatedAt" value={candidate.updatedAt.toISOString()} />
+          <input type="hidden" name="toolUpdatedAt" value={candidate.tool?.updatedAt.toISOString() ?? ""} />
+          <label className="flex w-full gap-2 text-sm leading-6 text-[#D7E0EB]"><input required type="checkbox" name="contentReviewed" />{english ? "I reviewed both languages, cover, source and usage limitations." : "我已人工核对中英文介绍、封面、来源和使用限制。"}</label>
           <label className="grid gap-1 text-xs text-[#9CAABD]">{text.suggestion}<input name="confirmedPrice" type="number" min="10" max="50" step="0.01" defaultValue={candidate.priceSuggestion ? Number(candidate.priceSuggestion).toFixed(2) : "19.00"} className="w-32 rounded-lg border border-white/15 bg-[#0b1424] px-3 py-2 text-sm text-white" /></label>
           <button name="decision" value="paid" className="rounded-lg bg-[#1769C2] px-4 py-2 text-sm font-semibold text-white">{text.confirmPaid}</button>
           <button name="decision" value="free" className="rounded-lg border border-white/20 px-4 py-2 text-sm text-white">{text.setFree}</button>
-          <button name="decision" value="reject" className="rounded-lg border border-red-300/40 px-4 py-2 text-sm text-red-200">{text.reject}</button>
+          <button name="decision" value="reject" formNoValidate className="rounded-lg border border-red-300/40 px-4 py-2 text-sm text-red-200">{text.reject}</button>
         </form>
       </article>)}</div> : <p className="mt-3 rounded-xl border border-white/10 bg-white/[0.03] p-5 text-sm text-[#9CAABD]">{text.noCandidates}</p>}
     </section>

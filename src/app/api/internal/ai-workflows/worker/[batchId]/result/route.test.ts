@@ -179,15 +179,15 @@ describe("POST /api/internal/ai-workflows/worker/[batchId]/result", () => {
     expect(mocks.batchesUpdateMany).toHaveBeenCalledWith(expect.objectContaining({ data: expect.objectContaining({ lastWorkerStage: "register" }) }));
   });
 
-  it("publishes a factual repository-link listing without requiring COS or a package", async () => {
+  it("keeps legacy repository-link listings as review drafts without requiring COS or a package", async () => {
     vi.stubEnv("COS_SECRET_KEY", "");
     const response = await POST(request({ workerId: "runner-1", leaseToken, result: repositoryLinkResult() }), context);
 
     expect(response.status).toBe(201);
-    expect(await response.json()).toMatchObject({ ok: true, candidateId: "candidate-1", state: "published", deliveryMode: "repository_link" });
+    expect(await response.json()).toMatchObject({ ok: true, candidateId: "candidate-1", state: "reviewing", deliveryMode: "repository_link" });
     expect(mocks.toolsCreate).toHaveBeenCalledWith(expect.objectContaining({
       data: expect.objectContaining({
-        status: "published",
+        status: "draft",
         onlineUrl: "https://github.com/example/agent-flow",
         isDownloadPaid: false,
         downloadPrice: 0,
@@ -195,7 +195,7 @@ describe("POST /api/internal/ai-workflows/worker/[batchId]/result", () => {
     }));
     expect(mocks.filesCreate).not.toHaveBeenCalled();
     expect(mocks.candidatesCreate).toHaveBeenCalledWith(expect.objectContaining({
-      data: expect.objectContaining({ status: "published", failureReason: "PACKAGE_LANGUAGE_UNSUPPORTED" }),
+      data: expect.objectContaining({ status: "reviewing", failureReason: "PACKAGE_LANGUAGE_UNSUPPORTED" }),
     }));
     expect(mocks.candidatesCreate.mock.calls[0]?.[0].data).not.toHaveProperty("fileId");
     expect(mocks.toolsCreate.mock.calls[0]?.[0].data.content).toContain("获取方式和核验状态");
@@ -217,13 +217,14 @@ describe("POST /api/internal/ai-workflows/worker/[batchId]/result", () => {
       shortDescription: `[[zh]]${presentation.zh.shortDescription}[[/zh]]\n[[en]]${presentation.en.shortDescription}[[/en]]`,
       content: `[[zh]]${presentation.zh.content}[[/zh]]\n[[en]]${presentation.en.content}[[/en]]`,
       coverImage: presentation.cover.url,
-      status: mode === "package" ? "draft" : "published",
+      status: "draft",
     });
     expect(mocks.candidatesCreate.mock.calls[0]?.[0].data.validationReport.presentation).toEqual(presentation);
+    expect(mocks.candidatesCreate.mock.calls[0]?.[0].data.status).toBe(mode === "package" ? "pending_pricing" : "reviewing");
     expect(mocks.revalidateTag).toHaveBeenCalledWith("public-tools");
   });
 
-  it("refreshes presentation on a link-to-package upgrade without skipping price review", async () => {
+  it("stages a package presentation for review without replacing the already published copy", async () => {
     mocks.candidatesFindUnique.mockResolvedValue({
       id: "candidate-link", batchId: "batch-1", commitSha: commit, status: "published", fileId: null, toolId: "tool-link",
     });
@@ -231,9 +232,38 @@ describe("POST /api/internal/ai-workflows/worker/[batchId]/result", () => {
 
     expect(response.status).toBe(200);
     expect(mocks.toolsCreate).not.toHaveBeenCalled();
-    expect(mocks.toolsUpdate.mock.calls[0]?.[0].data).toMatchObject({ name: presentation.zh.name, englishName: presentation.en.name, coverImage: presentation.cover.url });
-    expect(mocks.toolsUpdate.mock.calls[0]?.[0].data.systemRequirement).toContain("[[en]]See the project description");
+    expect(mocks.toolsUpdate.mock.calls[0]?.[0].data).toMatchObject({ downloadFileId: "file-1" });
+    for (const field of ["name", "englishName", "shortDescription", "content", "coverImage", "systemRequirement", "status"]) {
+      expect(mocks.toolsUpdate.mock.calls[0]?.[0].data).not.toHaveProperty(field);
+    }
     expect(mocks.candidatesUpdate.mock.calls[0]?.[0].data).toMatchObject({ status: "pending_pricing", validationReport: { presentation } });
+  });
+
+  it.each(["reviewing", "published"])("does not overwrite %s listings on an idempotent collector replay", async (status) => {
+    mocks.candidatesFindUnique.mockResolvedValue({
+      id: "candidate-existing", batchId: "batch-1", commitSha: commit, status, fileId: null, toolId: "tool-existing",
+    });
+    const response = await POST(request({ workerId: "runner-1", leaseToken, result: repositoryLinkResult({ presentation }) }), context);
+
+    expect(response.status).toBe(200);
+    expect(await response.json()).toMatchObject({ ok: true, candidateId: "candidate-existing", state: status, idempotentReplay: true });
+    expect(mocks.toolsCreate).not.toHaveBeenCalled();
+    expect(mocks.toolsUpdate).not.toHaveBeenCalled();
+    expect(mocks.candidatesUpdate).not.toHaveBeenCalled();
+    expect(mocks.filesCreate).not.toHaveBeenCalled();
+  });
+
+  it.each(["reviewing", "published"])("rejects another batch overwriting an existing %s repository", async (status) => {
+    mocks.candidatesFindUnique.mockResolvedValue({
+      id: "candidate-existing", batchId: "other-batch", commitSha: commit, status, fileId: null, toolId: "tool-existing",
+    });
+    const response = await POST(request({ workerId: "runner-1", leaseToken, result: repositoryLinkResult({ presentation }) }), context);
+
+    expect(response.status).toBe(409);
+    expect(await response.json()).toMatchObject({ ok: false, code: "REPOSITORY_ALREADY_REGISTERED" });
+    expect(mocks.toolsCreate).not.toHaveBeenCalled();
+    expect(mocks.toolsUpdate).not.toHaveBeenCalled();
+    expect(mocks.candidatesUpdate).not.toHaveBeenCalled();
   });
 
   it("rejects incomplete languages and untrusted image locations before any write", async () => {

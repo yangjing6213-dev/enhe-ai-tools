@@ -53,8 +53,8 @@ beforeEach(() => {
 afterEach(() => vi.unstubAllEnvs());
 
 describe("POST /api/internal/ai-workflows/worker/[batchId]/complete", () => {
-  it("does not mark an undersized batch complete", async () => {
-    mocks.candidatesCount.mockResolvedValue(2);
+  it.each([0, 2, 4])("does not mark a batch with %i registered candidates complete", async (count) => {
+    mocks.candidatesCount.mockResolvedValue(count);
 
     const response = await POST(request({
       workerId: "runner-1",
@@ -67,7 +67,7 @@ describe("POST /api/internal/ai-workflows/worker/[batchId]/complete", () => {
     expect(mocks.batchesUpdateMany).not.toHaveBeenCalled();
   });
 
-  it("finishes only a valid leased batch and records unattended success", async () => {
+  it("counts registered review drafts alongside ready packages without publishing them", async () => {
     const response = await POST(request({
       workerId: "runner-1",
       leaseToken,
@@ -80,9 +80,11 @@ describe("POST /api/internal/ai-workflows/worker/[batchId]/complete", () => {
     expect(mocks.candidatesCount).toHaveBeenCalledWith({
       where: {
         batchId: "batch-1",
-        status: { in: ["pending_pricing", "published"] },
         toolId: { not: null },
-        OR: [{ fileId: { not: null } }, { status: "published", fileId: null }],
+        OR: [
+          { status: { in: ["pending_pricing", "published"] }, fileId: { not: null } },
+          { status: { in: ["reviewing", "published"] }, fileId: null },
+        ],
       },
     });
     expect(mocks.batchesUpdateMany).toHaveBeenCalledWith(expect.objectContaining({
@@ -116,5 +118,16 @@ describe("POST /api/internal/ai-workflows/worker/[batchId]/complete", () => {
     expect(mocks.batchesUpdateMany).toHaveBeenCalledWith(expect.objectContaining({
       data: expect.objectContaining({ status: "partial", failureReason: "GITHUB_RATE_LIMIT" }),
     }));
+  });
+
+  it.each([
+    { count: 0, state: "partial" },
+    { count: 3, state: "partial" },
+    { count: 1, state: "failed" },
+  ])("rejects $state when the registered count is $count", async ({ count, state }) => {
+    mocks.candidatesCount.mockResolvedValue(count);
+    const response = await POST(request({ workerId: "runner-1", leaseToken, state, failureCode: "INSUFFICIENT_CANDIDATES" }), context);
+    expect(response.status).toBe(409);
+    expect(mocks.batchesUpdateMany).not.toHaveBeenCalled();
   });
 });
