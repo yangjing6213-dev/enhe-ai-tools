@@ -3864,3 +3864,21 @@ body .enhe-admin-shell .enhe-admin-users :is(.enhe-admin-content-primary-action,
 .enhe-admin-shell .enhe-admin-user-danger-panel button[type="submit"] {
   background: #b42318 !important;
 }
+
+/* Workflow management still contains legacy dark controls on a light surface. */
+.enhe-admin-shell .enhe-admin-ai-workflows [class*="bg-[#0b1424]"] {
+  background: #fff !important;
+  color: var(--enhe-text) !important;
+  -webkit-text-fill-color: var(--enhe-text) !important;
+  color-scheme: light;
+}
+
+.enhe-admin-shell .enhe-admin-ai-workflows [class*="bg-[#0b1424]"] :is(h4, p, strong) {
+  color: var(--enhe-text) !important;
+  -webkit-text-fill-color: var(--enhe-text) !important;
+}
+
+body .enhe-admin-shell .enhe-admin-ai-workflows :is(a, button)[class*="bg-[#1769C2]"] {
+  color: #fff !important;
+  -webkit-text-fill-color: #fff !important;
+}

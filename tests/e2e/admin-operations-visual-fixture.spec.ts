@@ -1,5 +1,50 @@
 import { expect, test } from "@playwright/test";
 
+test("workflow management keeps blue actions readable and legacy fields white in both languages", async ({ page, context, baseURL }) => {
+  if (!baseURL) throw new Error("The local visual fixture requires an explicit base URL.");
+  test.setTimeout(120_000);
+  const writes: string[] = [];
+  await context.addCookies([{ name: "enhe_session", value: "fixture-only", url: baseURL }]);
+  await page.route("**/*", async (route) => {
+    const request = route.request();
+    if (!["GET", "HEAD"].includes(request.method())) {
+      writes.push(request.method());
+      await route.abort();
+    } else if (new URL(request.url()).origin !== baseURL) {
+      await route.abort();
+    } else {
+      await route.continue();
+    }
+  });
+
+  for (const locale of ["zh", "en"]) {
+    await context.addCookies([{ name: "enhe_locale", value: locale, url: baseURL }]);
+    for (const width of [390, 1440]) {
+      await page.setViewportSize({ width, height: 900 });
+      const response = await page.goto("/admin/ai-workflows?introductionPublished=1", { waitUntil: "load" });
+      expect(response?.status()).toBe(200);
+      const panel = page.locator(".enhe-admin-ai-workflows");
+      await expect(panel).toBeVisible();
+      const fields = panel.locator('textarea[name="topics"], input[name="scheduleTime"]');
+      await expect(fields).toHaveCount(2);
+      for (const field of await fields.all()) {
+        await expect(field).toHaveCSS("background-color", "rgb(255, 255, 255)");
+        await expect(field).toHaveCSS("color", "rgb(0, 0, 0)");
+      }
+      const actions = panel.locator('a[class*="bg-[#1769C2]"], button[class*="bg-[#1769C2]"]');
+      expect(await actions.count()).toBeGreaterThanOrEqual(2);
+      for (const action of await actions.all()) {
+        await expect(action).toHaveCSS("color", "rgb(255, 255, 255)");
+        await expect(action).toHaveCSS("-webkit-text-fill-color", "rgb(255, 255, 255)");
+      }
+      await fields.first().fill("工作效率 | Productivity | SaaS");
+      await expect(fields.first()).toHaveValue("工作效率 | Productivity | SaaS");
+      expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBeLessThanOrEqual(width);
+    }
+  }
+  expect(writes).toEqual([]);
+});
+
 const routes = [
   "/admin",
   "/admin/audit",

@@ -70,7 +70,7 @@ export default async function AdminAiWorkflowsPage({ searchParams }: { searchPar
     batches: "最近批次", noBatches: "还没有批次记录。", batchDate: "日期", topicLabel: "主题", candidateCount: "候选数", products: "工作流商品", newProduct: "新增草稿", noProducts: "还没有工作流商品记录。", edit: "编辑", productStatus: "状态", created: "更新时间", notice: "已保存。", dailyQuotaMessage: "今天的批次额度已经使用，最多每天推进一个主题。", batchActiveMessage: "已有等待或正在执行的批次，会先恢复或完成它。", batchExistsMessage: "今天已经有一个批次。",
   };
 
-  return <AdminContentShell>
+  return <AdminContentShell className="enhe-admin-ai-workflows">
     <div className="flex flex-wrap items-start justify-between gap-4">
       <div><h1 className="text-3xl font-semibold text-white">{text.title}</h1><p className="mt-3 max-w-3xl text-sm leading-6 text-[#8B95A7]">{text.intro}</p></div>
       <Link href="/admin/ai-workflows/new" className="rounded-lg bg-[#1769C2] px-4 py-2 text-sm font-semibold text-white">{text.newProduct}</Link>
