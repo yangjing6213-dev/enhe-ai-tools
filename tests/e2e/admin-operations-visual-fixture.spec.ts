@@ -1,6 +1,6 @@
 import { expect, test } from "@playwright/test";
 
-test("workflow management keeps blue actions readable and legacy fields white in both languages", async ({ page, context, baseURL }) => {
+test("workflow management keeps batch notices black, blue actions readable, and legacy fields white in both languages", async ({ page, context, baseURL }, testInfo) => {
   if (!baseURL) throw new Error("The local visual fixture requires an explicit base URL.");
   test.setTimeout(120_000);
   const writes: string[] = [];
@@ -21,10 +21,14 @@ test("workflow management keeps blue actions readable and legacy fields white in
     await context.addCookies([{ name: "enhe_locale", value: locale, url: baseURL }]);
     for (const width of [390, 1440]) {
       await page.setViewportSize({ width, height: 900 });
-      const response = await page.goto("/admin/ai-workflows?introductionPublished=1", { waitUntil: "load" });
+      const response = await page.goto("/admin/ai-workflows?batchExists=1", { waitUntil: "load" });
       expect(response?.status()).toBe(200);
       const panel = page.locator(".enhe-admin-ai-workflows");
       await expect(panel).toBeVisible();
+      const batchNotice = panel.getByRole("status").filter({ hasText: locale === "en" ? "A batch for today already exists." : "今天已经有一个批次。" });
+      await expect(batchNotice).toBeVisible();
+      await expect(batchNotice).toHaveCSS("color", "rgb(0, 0, 0)");
+      await expect(batchNotice).toHaveCSS("-webkit-text-fill-color", "rgb(0, 0, 0)");
       const fields = panel.locator('textarea[name="topics"], input[name="scheduleTime"]');
       await expect(fields).toHaveCount(2);
       for (const field of await fields.all()) {
@@ -40,6 +44,8 @@ test("workflow management keeps blue actions readable and legacy fields white in
       await fields.first().fill("工作效率 | Productivity | SaaS");
       await expect(fields.first()).toHaveValue("工作效率 | Productivity | SaaS");
       expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBeLessThanOrEqual(width);
+      await batchNotice.scrollIntoViewIfNeeded();
+      await page.screenshot({ path: testInfo.outputPath(`workflow-batch-notice-${locale}-${width}.png`) });
     }
   }
   expect(writes).toEqual([]);

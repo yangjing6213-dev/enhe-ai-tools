@@ -3882,3 +3882,8 @@ body .enhe-admin-shell .enhe-admin-ai-workflows :is(a, button)[class*="bg-[#1769
   color: #fff !important;
   -webkit-text-fill-color: #fff !important;
 }
+
+.enhe-admin-shell .enhe-admin-ai-workflows .enhe-admin-ai-workflow-batch-notice {
+  color: #000 !important;
+  -webkit-text-fill-color: #000 !important;
+}
