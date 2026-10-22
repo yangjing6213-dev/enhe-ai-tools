@@ -75,6 +75,19 @@ const topicSearchTerms: Record<string, string> = {
   "财务法律辅助": "AI contract review finance workflow",
 };
 
+const topicRelevanceTerms: Record<string, string[]> = {
+  "工作效率": ["productivity", "workflow automation", "task automation", "task management", "time management", "效率工具", "工作流自动化", "任务管理", "时间管理"],
+  "视频生成": ["video generation", "video generator", "text-to-video", "text to video", "image-to-video", "image to video", "video synthesis", "video diffusion", "generative video", "ai video maker", "ai-generated video", "generate video", "视频生成", "生成视频", "文生视频", "图生视频", "视频合成", "视频扩散"],
+  "内容创作": ["content creation", "content generation", "content creator", "writing assistant", "ai writing", "copywriting", "内容创作", "内容生成", "文案生成", "写作助手"],
+  "编程开发": ["code generation", "coding assistant", "developer tool", "software development", "programming", "code editor", "ai coding", "代码生成", "编程助手", "开发者工具"],
+  "学习教育": ["education", "learning platform", "tutoring", "study assistant", "educational tool", "在线课程", "学习平台", "教育工具", "辅导学习"],
+  "搜索研究": ["research assistant", "research tool", "search engine", "knowledge base", "information retrieval", "academic search", "研究助手", "搜索引擎", "知识库", "信息检索"],
+  "营销销售": ["marketing automation", "sales automation", "crm", "lead generation", "ad creative", "营销自动化", "销售自动化", "客户管理", "广告素材"],
+  "办公自动化": ["office automation", "document automation", "spreadsheet", "meeting notes", "document assistant", "办公自动化", "文档自动化", "会议纪要", "表格自动化"],
+  "情感陪伴": ["ai companion", "virtual companion", "companion chatbot", "conversational companion", "情感陪伴", "虚拟伴侣", "陪伴聊天"],
+  "财务法律辅助": ["legal assistant", "contract review", "financial assistant", "accounting", "tax preparation", "finance workflow", "法律助手", "合同审查", "财务助手", "会计软件"],
+};
+
 const directionSearchTerms: Record<string, string> = {
   "搜索趋势": "search trends",
   "saas产品发布": "SaaS product launch",
@@ -119,6 +132,25 @@ export function buildAiWorkflowSearchTerms(topic: string, directions: string) {
     .filter((value): value is string => Boolean(value))
     .map((value) => `${base} ${value}`);
   return translated.length ? [...new Set(translated)].slice(0, 3) : [base];
+}
+
+export function isAiWorkflowCandidateRelevant(
+  topic: string,
+  candidate: Pick<AiWorkflowGitHubRepositoryCandidate, "fullName" | "description">,
+  readme: string,
+) {
+  const terms = topicRelevanceTerms[topic];
+  if (!terms) return true;
+
+  const normalize = (value: string) => value.normalize("NFKC").toLocaleLowerCase();
+  const metadata = normalize(`${candidate.fullName}\n${candidate.description}`);
+  if (terms.some((term) => metadata.includes(normalize(term)))) return true;
+
+  const readmeOverview = normalize(readme.slice(0, 2_000));
+  if (terms.some((term) => readmeOverview.includes(normalize(term)))) return true;
+
+  const readmeSummary = normalize(readme.slice(0, 12_000));
+  return terms.filter((term) => readmeSummary.includes(normalize(term))).length >= 2;
 }
 
 export function selectAiWorkflowRepositoryCandidates(

@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { parseAiWorkflowRepositoryLinkResult } from "../../src/lib/ai-workflows/worker-result";
-import { buildAiWorkflowSearchTerms, getAiWorkflowFailureCode, getAiWorkflowLinkOnlyFailureReason, getAiWorkflowRegisteredRepositoryIds, redactAiWorkflowCollectorText, restoreAiWorkflowCandidateMetadata, selectAiWorkflowRepositoryCandidates, skipAlreadyRegisteredRepository } from "./ai-workflow-collector";
+import { buildAiWorkflowSearchTerms, getAiWorkflowFailureCode, getAiWorkflowLinkOnlyFailureReason, getAiWorkflowRegisteredRepositoryIds, isAiWorkflowCandidateRelevant, redactAiWorkflowCollectorText, restoreAiWorkflowCandidateMetadata, selectAiWorkflowRepositoryCandidates, skipAlreadyRegisteredRepository } from "./ai-workflow-collector";
 
 describe("AI Workflow registered draft recovery", () => {
   it("counts three saved review drafts as a completed collection quota without requiring publication", () => {
@@ -169,5 +169,46 @@ describe("AI Workflow collector diagnostics", () => {
     expect(safe).not.toContain("worker-secret");
     expect(safe).not.toContain("cos-secret");
     expect(safe).not.toContain("sign=private");
+  });
+});
+
+describe("AI Workflow topic relevance", () => {
+  const candidate = (fullName: string, description: string) => ({
+    id: "1",
+    fullName,
+    url: `https://github.com/${fullName}`,
+    description,
+    language: "Python",
+    stars: 1000,
+    updatedAt: new Date().toISOString(),
+    defaultBranch: "main",
+    licenseSpdx: "MIT",
+  });
+
+  it("accepts projects whose README clearly describes video generation", () => {
+    expect(isAiWorkflowCandidateRelevant("视频生成", candidate("team/video-model", "Text-to-video generation model"), ""))
+      .toBe(true);
+    expect(isAiWorkflowCandidateRelevant("视频生成", candidate("team/model", "Open model"), "文生视频与图生视频生成工具"))
+      .toBe(true);
+  });
+
+  it("rejects unrelated projects before packaging fallback can register a repository link", () => {
+    expect(isAiWorkflowCandidateRelevant("视频生成", candidate("mlabonne/llm-course", "Course to get into Large Language Models"), "A course about language models, agents, and RAG."))
+      .toBe(false);
+    expect(isAiWorkflowCandidateRelevant("视频生成", candidate("pbakaus/impeccable", "The design language that makes your AI harness better at design."), "Design systems and UI guidelines for AI coding tools."))
+      .toBe(false);
+    expect(isAiWorkflowCandidateRelevant("视频生成", candidate("team/video-editor", "AI video editing software"), "Edit and assemble existing video clips."))
+      .toBe(false);
+    expect(isAiWorkflowCandidateRelevant("视频生成", candidate("earendil-works/pi", "The 1st collaborative AI design agent workspace. Create motion, prototypes, images, and videos."), "Create websites, apps, presentations, images, and videos with AI agents."))
+      .toBe(false);
+    const incidentalReadmeMention = `${"General AI toolkit. ".repeat(120)}Includes one video generation example.`;
+    expect(isAiWorkflowCandidateRelevant("视频生成", candidate("team/general-ai", "General AI toolkit"), incidentalReadmeMention))
+      .toBe(false);
+    expect(getAiWorkflowLinkOnlyFailureReason("TOPIC_MISMATCH")).toBeNull();
+  });
+
+  it("does not apply built-in topic rules to custom topic names", () => {
+    expect(isAiWorkflowCandidateRelevant("用户自定义主题", candidate("team/project", "A custom project"), ""))
+      .toBe(true);
   });
 });

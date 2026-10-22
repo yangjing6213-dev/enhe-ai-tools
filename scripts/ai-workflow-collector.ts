@@ -22,6 +22,7 @@ import {
   getAiWorkflowFailureCode,
   getAiWorkflowLinkOnlyFailureReason,
   getAiWorkflowRegisteredRepositoryIds,
+  isAiWorkflowCandidateRelevant,
   redactAiWorkflowCollectorText,
   restoreAiWorkflowCandidateMetadata,
   selectAiWorkflowRepositoryCandidates,
@@ -705,6 +706,9 @@ async function processCandidate(input: {
   const licenseHash = await sha256File(licensePath);
   await stateUpdate("license_review");
   const readme = await findReadme(sourceDir);
+  if (!isAiWorkflowCandidateRelevant(batch.topicNameSnapshot, candidate, readme.text)) {
+    throw new Error("TOPIC_MISMATCH");
+  }
   if (!candidate.language || !["JavaScript", "TypeScript"].includes(candidate.language)) {
     throw new Error("PACKAGE_LANGUAGE_UNSUPPORTED");
   }
