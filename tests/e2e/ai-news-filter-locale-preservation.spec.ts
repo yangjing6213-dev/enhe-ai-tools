@@ -1,4 +1,5 @@
 import { expect, test } from "@playwright/test";
+import { auditPublicRequests } from "./helpers/public-request-audit";
 
 const query =
   "q=agent%20workflow&category=category-a&tag=tag-a&sort=hot&page=2&ignored=drop";
@@ -43,17 +44,7 @@ for (const route of routes) {
   test(`${route.path} preserves filters in the locale switcher`, async ({
     page,
   }) => {
-    const pageErrors: string[] = [];
-    const consoleErrors: string[] = [];
-    const failedRequests: string[] = [];
-
-    page.on("pageerror", (error) => pageErrors.push(error.message));
-    page.on("console", (message) => {
-      if (message.type() === "error") consoleErrors.push(message.text());
-    });
-    page.on("requestfailed", (request) => {
-      failedRequests.push(`${request.method()} ${request.url()}`);
-    });
+    const requestAudit = auditPublicRequests(page);
 
     await page.setViewportSize({ width: 1440, height: 900 });
     const response = await page.goto(route.path, { waitUntil: "load" });
@@ -78,8 +69,6 @@ for (const route of routes) {
     expect(globalSwitcherHrefs).toEqual([route.expectedHref]);
     expect(JSON.stringify(globalSwitcherHrefs)).not.toContain("ignored");
 
-    expect(pageErrors).toEqual([]);
-    expect(consoleErrors).toEqual([]);
-    expect(failedRequests).toEqual([]);
+    await requestAudit.verify();
   });
 }

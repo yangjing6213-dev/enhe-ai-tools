@@ -176,7 +176,7 @@ for (const route of routes) {
   });
 }
 
-test("AI News and About covers match the forum cover frame", async ({ page }) => {
+test("AI News cover matches content while About keeps the forum cover frame", async ({ page }) => {
   for (const width of [320, 390, 700, 701, 768, 1440]) {
     await page.setViewportSize({ width, height: 900 });
     const expectedWidth = width <= 700 ? width - 32 : Math.min(width - 40, 1120);
@@ -190,7 +190,14 @@ test("AI News and About covers match the forum cover frame", async ({ page }) =>
 
       const frame = await cover.boundingBox();
       expect(frame).not.toBeNull();
-      expect(frame!.width).toBeCloseTo(expectedWidth, 0);
+      if (route === "/ai-news") {
+        const content = await page.locator(".ai-news-page .glass").first().boundingBox();
+        expect(content).not.toBeNull();
+        expect(frame!.x).toBeCloseTo(content!.x, 1);
+        expect(frame!.width).toBeCloseTo(content!.width, 1);
+      } else {
+        expect(frame!.width).toBeCloseTo(expectedWidth, 0);
+      }
       expect(frame!.width / frame!.height).toBeCloseTo(1448 / 620, 2);
       expect(await image.evaluate((element: HTMLImageElement) => element.naturalWidth)).toBeGreaterThan(0);
       expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBeLessThanOrEqual(width);
