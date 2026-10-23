@@ -12,7 +12,7 @@ describe("product detail UI source", () => {
     );
 
     expect(pageSource).toContain(
-      "const visibleFaqPreview = visibleFaqs.slice(0, 3)",
+      "const visibleFaqPreview = visibleFaqs.slice(0, 4)",
     );
     expect(pageSource).toContain("const hasTutorialSection =");
     expect(pageSource).toContain("...(hasTutorialSection");

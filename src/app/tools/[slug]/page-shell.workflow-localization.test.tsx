@@ -106,4 +106,29 @@ describe("workflow detail localized publication", () => {
     const hero = elements(page).find((element) => element.type === "section");
     expect(renderToStaticMarkup(hero)).toContain("ENHE 工具封面");
   });
+
+  it("renders all four reviewed English FAQs in the existing product FAQ card", async () => {
+    const questions = [
+      "What can I do with the web library?",
+      "Do I need to sign in to use the web library?",
+      "How many prompts are included?",
+      "Does the free web library include the desktop download?",
+    ];
+    mocks.findTool.mockResolvedValue({
+      ...fixture("software"),
+      faqs: questions.map((question, index) => ({
+        id: `faq-${index + 1}`,
+        question: `[[zh]][[/zh]][[en]]${question}[[/en]]`,
+        answer: `[[zh]][[/zh]][[en]]This reviewed English answer contains enough words for the product FAQ display.[[/en]]`,
+      })),
+    });
+
+    const page = await ToolDetailPageShell({ slug: "ai-workflow-123-design", forceLocale: "en", expectedType: "software" });
+    const faqSection = elements(page).find((element) => element.props.id === "tool-faq");
+    const html = renderToStaticMarkup(faqSection);
+
+    for (const question of questions) expect(html).toContain(question);
+    expect((html.match(/<details\b/g) ?? []).length).toBe(4);
+    expect(faqSection?.props.className).toBe("tool-detail-faq-card glass scroll-mt-24 rounded-2xl p-7");
+  });
 });

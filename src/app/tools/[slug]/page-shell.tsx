@@ -349,7 +349,7 @@ export async function ToolDetailPageShell({
     toolLocalizationInput,
     forceLocale,
   );
-  const visibleFaqPreview = visibleFaqs.slice(0, 3);
+  const visibleFaqPreview = visibleFaqs.slice(0, 4);
   const visibleChangelogs = tool.changelogs;
   const visibleUsageSteps = normalizeToolUsageSteps(tool.usageSteps);
   const hasHowToDelivery =
