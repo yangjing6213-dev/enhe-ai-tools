@@ -1176,6 +1176,7 @@ async function runBatch(lease: WorkerLease, token: string, credentials: { secret
         .filter(({ collectionTopicId }) => collectionTopicId === topic.id)
         .slice(0, maximumCandidates);
       for (const candidate of topicCandidates) {
+        if (successes >= 3) break;
         if (Date.now() > endAt) { failureCode = "BUDGET_EXCEEDED"; break; }
         if (controller.signal.aborted) throw new Error("BATCH_PAUSED_OR_LEASE_LOST");
         const index = state.candidateIds.indexOf(candidate);
