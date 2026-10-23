@@ -27,7 +27,6 @@ export interface FolderFloatProps {
   defaultOpen?: boolean;
   closeOnSelect?: boolean;
   physics?: boolean;
-  constrainItemsToParent?: boolean;
   drift?: number;
   onSelect?: (value: string, index: number) => void;
   onOpenChange?: (open: boolean) => void;
@@ -85,14 +84,13 @@ const GAP = 12;
 const ROW = 52;
 const DRAG_MIN = 4;
 const ZONE_PAD = 8;
-const ITEM_EDGE_GUTTER = 16;
 
 const jitter = (i: number) => {
   const x = Math.sin(i * 12.9898 + 4.1414) * 43758.5453;
   return x - Math.floor(x);
 };
 
-const layout = (list: Entry[], spread: number, lift: number, tilt: number, sizes: (Size | null)[], centerRows = false) => {
+const layout = (list: Entry[], spread: number, lift: number, tilt: number, sizes: (Size | null)[]) => {
   const rows: { items: { i: number; pw: number }[]; width: number }[] = [];
   let row: { i: number; pw: number }[] = [];
   let width = 0;
@@ -110,7 +108,7 @@ const layout = (list: Entry[], spread: number, lift: number, tilt: number, sizes
   const pos: { x: number; y: number; r: number }[] = [];
   rows.forEach((r, ri) => {
     let x = -r.width / 2;
-    const shift = centerRows ? 0 : (ri % 2 ? 1 : -1) * Math.min(16, spread * 0.1);
+    const shift = (ri % 2 ? 1 : -1) * Math.min(16, spread * 0.1);
     r.items.forEach(({ i, pw }) => {
       const j = jitter(i);
       pos[i] = { x: x + pw / 2 + shift + (j - 0.5) * 6, y: -lift - ri * ROW - j * 6, r: tilt * (j * 2 - 1) };
@@ -128,7 +126,6 @@ const FolderFloat: React.FC<FolderFloatProps> = ({
   defaultOpen = false,
   closeOnSelect = true,
   physics = true,
-  constrainItemsToParent = false,
   drift = 0.5,
   onSelect,
   onOpenChange,
@@ -155,7 +152,6 @@ const FolderFloat: React.FC<FolderFloatProps> = ({
   const [popped, setPopped] = useState(-1);
   const [live, setLive] = useState(false);
   const [sizes, setSizes] = useState<Size[]>([]);
-  const [itemContainerWidth, setItemContainerWidth] = useState(0);
   const detailsRef = useRef<HTMLDetailsElement>(null);
   const anchorRef = useRef<HTMLDivElement>(null);
   const pillRefs = useRef<(HTMLAnchorElement | HTMLButtonElement | null)[]>([]);
@@ -181,10 +177,7 @@ const FolderFloat: React.FC<FolderFloatProps> = ({
   });
   const n = list.length;
   const sub = sublabel || `${n} ${n === 1 ? 'note' : 'notes'}`;
-  const itemSpread = constrainItemsToParent && itemContainerWidth > 0
-    ? Math.min(spread, Math.max(0, (itemContainerWidth - ITEM_EDGE_GUTTER * 2) / 2))
-    : spread;
-  const pos = layout(list, itemSpread, lift, tilt, sizes, constrainItemsToParent);
+  const pos = layout(list, spread, lift, tilt, sizes);
 
   const labelsKey = list.map(item => item.label).join('|');
   useLayoutEffect(() => {
@@ -199,20 +192,6 @@ const FolderFloat: React.FC<FolderFloatProps> = ({
     measure();
     document.fonts?.ready.then(measure);
   }, [n, labelsKey]);
-
-  useLayoutEffect(() => {
-    if (!constrainItemsToParent) return undefined;
-    const container = detailsRef.current?.parentElement;
-    if (!container) return undefined;
-    const measure = () => {
-      const width = container.getBoundingClientRect().width;
-      setItemContainerWidth(previous => Math.abs(previous - width) < 0.5 ? previous : width);
-    };
-    measure();
-    const observer = new ResizeObserver(measure);
-    observer.observe(container);
-    return () => observer.disconnect();
-  }, [constrainItemsToParent]);
 
   const stopPhysics = useCallback(() => {
     const w = world.current;
@@ -246,12 +225,9 @@ const FolderFloat: React.FC<FolderFloatProps> = ({
     w.engine = engine;
     w.sizes = (els as Array<HTMLAnchorElement | HTMLButtonElement>).map(el => ({ w: el.offsetWidth, h: el.offsetHeight }));
     const ys = pos.map(p => p.y);
-    const horizontalExtent = constrainItemsToParent && itemContainerWidth > 0
-      ? Math.min(itemSpread + ZONE_PAD, Math.max(0, itemContainerWidth / 2 - ITEM_EDGE_GUTTER / 2))
-      : itemSpread + ZONE_PAD;
     const zone = {
-      left: -horizontalExtent,
-      right: horizontalExtent,
+      left: -spread - ZONE_PAD,
+      right: spread + ZONE_PAD,
       top: Math.min(...ys) - ZONE_PAD,
       bottom: -lift + Math.max(...w.sizes.map(s => s.h))
     };
@@ -314,7 +290,7 @@ const FolderFloat: React.FC<FolderFloatProps> = ({
     };
     w.raf = requestAnimationFrame(tick);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [n, itemSpread, lift, pos.map(p => `${p.x},${p.y}`).join('|'), constrainItemsToParent, itemContainerWidth]);
+  }, [n, spread, lift, pos.map(p => `${p.x},${p.y}`).join('|')]);
 
   const set = useCallback(
     (next: boolean) => {
@@ -336,10 +312,9 @@ const FolderFloat: React.FC<FolderFloatProps> = ({
       else if (!physics) stopPhysics();
       return undefined;
     }
-    if (world.current.engine) stopPhysics();
     liveTimer.current = setTimeout(startPhysics, openDuration + (n - 1) * stagger + 80);
     return () => clearTimeout(liveTimer.current);
-  }, [open, physics, openDuration, stagger, n, startPhysics, stopPhysics, itemSpread, itemContainerWidth]);
+  }, [open, physics, openDuration, stagger, n, startPhysics, stopPhysics]);
 
   useEffect(() => {
     const mq = window.matchMedia('(prefers-reduced-motion: reduce)');
@@ -464,7 +439,7 @@ const FolderFloat: React.FC<FolderFloatProps> = ({
           '--ff-item': itemColor,
           '--ff-item-ink': itemTextColor,
           '--ff-label': labelColor,
-          '--ff-spread': `${itemSpread}px`,
+          '--ff-spread': `${spread}px`,
           '--ff-lift': `${lift}px`,
           '--ff-angle': `${flapAngle}deg`,
           '--ff-rest': `${restAngle}deg`,
