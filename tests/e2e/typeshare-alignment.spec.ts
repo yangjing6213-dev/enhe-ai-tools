@@ -43,6 +43,14 @@ for (const route of routes) {
       const response = await page.goto(route, { waitUntil: "load" });
       expect(response?.status(), `${route} @ ${width}`).toBe(200);
       await expect(page.locator("main").first()).toBeVisible();
+      if (route === "/ai-news" || route === "/en/ai-news") {
+        const cover = await page.locator(".enhe-page-cover").boundingBox();
+        const contentCard = await page.locator(".ai-news-page .glass").first().boundingBox();
+        expect(cover).not.toBeNull();
+        expect(contentCard).not.toBeNull();
+        expect(cover!.x).toBeCloseTo(contentCard!.x, 1);
+        expect(cover!.width).toBeCloseTo(contentCard!.width, 1);
+      }
       const designTokens = await page.evaluate(() => {
         const styles = getComputedStyle(document.documentElement);
         const productionShell = document.querySelector<HTMLElement>(".enhe-redesign-production");

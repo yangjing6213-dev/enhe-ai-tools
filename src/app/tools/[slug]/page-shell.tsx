@@ -984,17 +984,6 @@ export async function ToolDetailPageShell({
                       ) : null}
                     </>
                   )}
-                  {isAiWorkflow && tool.aiWorkflowCandidate?.status === "published" ? (
-                    <ButtonLink
-                      href={`/api/ai-workflows/${encodeURIComponent(tool.slug)}/source-archive`}
-                      className="tool-download-button"
-                      data-analytics-event="workflow_source_archive_download"
-                      data-analytics-entity-type="tool"
-                      data-analytics-entity-id={tool.id}
-                    >
-                      {forceLocale === "en" ? "Download GitHub source ZIP" : "下载 GitHub 源码 ZIP"}
-                    </ButtonLink>
-                  ) : null}
                 </div>
 
                 {isAiWorkflow && tool.aiWorkflowCandidate?.status === "published" ? (
@@ -1206,6 +1195,17 @@ export async function ToolDetailPageShell({
                         : td.useOnline}
                     </ButtonLink>
                   )}
+                  {isAiWorkflow && tool.aiWorkflowCandidate?.status === "published" ? (
+                    <ButtonLink
+                      href={`/api/ai-workflows/${encodeURIComponent(tool.slug)}/source-archive`}
+                      className="tool-download-button w-fit self-start"
+                      data-analytics-event="workflow_source_archive_download"
+                      data-analytics-entity-type="tool"
+                      data-analytics-entity-id={tool.id}
+                    >
+                      {forceLocale === "en" ? "Download GitHub source ZIP" : "下载 GitHub 源码 ZIP"}
+                    </ButtonLink>
+                  ) : null}
                 </div>
 
                 {isDownloadProduct && tool.isDownloadPaid ? (

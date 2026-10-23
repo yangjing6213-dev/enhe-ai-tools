@@ -67,6 +67,15 @@ describe("workflow detail localized publication", () => {
     const all = elements(page);
     const sourceArchiveButton = all.find((element) => element.props.href === "/api/ai-workflows/ai-workflow-123-design/source-archive");
     expect(sourceArchiveButton?.props.children).toBe(locale === "en" ? "Download GitHub source ZIP" : "下载 GitHub 源码 ZIP");
+    const purchase = all.find((element) => element.props.id === "tool-purchase");
+    const actions = elements(purchase?.props.children as React.ReactNode);
+    const repositoryAction = actions.find((element) => element.props.href === "https://github.com/example/design");
+    expect(repositoryAction).toBeDefined();
+    const sourceActionIndex = actions.findIndex((element) => element.props.href === sourceArchiveButton?.props.href);
+    expect(sourceActionIndex).toBe(actions.indexOf(repositoryAction!) + 1);
+    expect(actions[sourceActionIndex].type).toBe(repositoryAction!.type);
+    const facts = all.find((element) => String(element.props.className ?? "").includes("tool-detail-facts-grid"));
+    expect(elements(facts?.props.children as React.ReactNode).some((element) => element.props.href === sourceArchiveButton?.props.href)).toBe(false);
     const hero = all.find((element) => element.type === "section");
     const html = renderToStaticMarkup(hero);
     expect(html).toContain(locale === "en" ? "Create design drafts." : "根据文字创建设计稿。");

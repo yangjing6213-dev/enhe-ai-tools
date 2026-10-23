@@ -274,6 +274,12 @@
   width: min(100% - 96px, 1280px);
 }
 
+.enhe-redesign-production .ai-news-page .enhe-page-cover {
+  left: auto;
+  width: 100%;
+  transform: none;
+}
+
 .enhe-redesign-production .ai-news-page .ai-news-interactive-card {
   width: 100%;
   max-width: none;
