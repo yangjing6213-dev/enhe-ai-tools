@@ -2,7 +2,8 @@
 
 import Link from "next/link";
 import { ChevronLeft, ChevronRight, LoaderCircle, MessageCircle, Send, X } from "lucide-react";
-import { useRef, useState, type FormEvent, type KeyboardEvent } from "react";
+import { useEffect, useRef, useState, type FormEvent, type KeyboardEvent } from "react";
+import { getSupportLauncherOffset } from "@/lib/customer-support-placement";
 import type {
   CustomerSupportFaq,
   CustomerSupportLocale
@@ -61,6 +62,7 @@ export function CustomerSupportWidget({
   faqs: CustomerSupportFaq[];
 }) {
   const copy = widgetCopy[locale];
+  const widgetRef = useRef<HTMLDivElement>(null);
   const honeypotRef = useRef<HTMLInputElement>(null);
   const launcherRef = useRef<HTMLButtonElement>(null);
   const panelRef = useRef<HTMLElement>(null);
@@ -71,6 +73,57 @@ export function CustomerSupportWidget({
   const [email, setEmail] = useState("");
   const [status, setStatus] = useState<SubmitStatus>("idle");
   const selectedFaq = faqs.find((faq) => faq.id === selectedFaqId) ?? null;
+
+  useEffect(() => {
+    const widget = widgetRef.current;
+    const surface = widget?.closest(".enhe-redesign-production");
+    if (!widget || !surface || isOpen) return;
+
+    let frame = 0;
+    let offset = 0;
+    const mobile = window.matchMedia("(width < 768px)");
+    const update = () => {
+      frame = 0;
+      let nextOffset = 0;
+      if (mobile.matches) {
+        const box = widget.getBoundingClientRect();
+        const obstacles = Array.from(surface.querySelectorAll(
+          ".redesign-home-cta, .redesign-home-product-control, .redesign-footer a, .redesign-footer button, .redesign-footer summary, .redesign-software-load-row a, .site-floating-actions button",
+        )).flatMap((element) => {
+          const rect = element.getBoundingClientRect();
+          return rect.width > 0 && rect.height > 0 && getComputedStyle(element).visibility !== "hidden"
+            ? [{ x: rect.x, y: rect.y, width: rect.width, height: rect.height }]
+            : [];
+        });
+        nextOffset = getSupportLauncherOffset(
+          { x: box.x, y: box.y + offset, width: box.width, height: box.height },
+          obstacles,
+          window.innerHeight,
+        );
+      }
+      if (nextOffset === offset) return;
+      offset = nextOffset;
+      if (offset) widget.style.translate = `0 -${offset}px`;
+      else widget.style.removeProperty("translate");
+    };
+    const schedule = () => {
+      if (!frame) frame = requestAnimationFrame(update);
+    };
+    const observer = new ResizeObserver(schedule);
+    observer.observe(surface);
+    window.addEventListener("scroll", schedule, { passive: true, capture: true });
+    window.addEventListener("resize", schedule);
+    document.addEventListener("toggle", schedule, true);
+    update();
+    return () => {
+      cancelAnimationFrame(frame);
+      observer.disconnect();
+      window.removeEventListener("scroll", schedule, true);
+      window.removeEventListener("resize", schedule);
+      document.removeEventListener("toggle", schedule, true);
+      widget.style.removeProperty("translate");
+    };
+  }, [isOpen]);
 
   function closePanel() {
     setIsOpen(false);
@@ -181,6 +234,7 @@ export function CustomerSupportWidget({
 
   return (
     <div
+      ref={widgetRef}
       className="customer-support-widget fixed bottom-4 right-4 z-[70] flex w-[calc(100vw-2rem)] max-w-[360px] flex-col items-end sm:bottom-6 sm:right-6"
       data-support-open={isOpen ? "true" : "false"}
     >

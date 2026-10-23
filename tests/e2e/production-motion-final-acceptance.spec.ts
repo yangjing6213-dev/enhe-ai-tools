@@ -341,7 +341,7 @@ async function expectSupportClearOf(
   const target = page.locator(selector).first();
   await expect(target, label).toBeVisible();
   await target.evaluate((element) =>
-    element.scrollIntoView({ block: "end", inline: "nearest" }),
+    element.scrollIntoView({ behavior: "instant", block: "end", inline: "nearest" }),
   );
   await page.evaluate(
     () =>
@@ -350,19 +350,22 @@ async function expectSupportClearOf(
       ),
   );
 
-  const supportBox = await support.boundingBox();
-  const targetBoxes = await page.locator(selector).evaluateAll((elements) =>
-    elements.flatMap((element) => {
-      const style = getComputedStyle(element);
-      const rect = element.getBoundingClientRect();
-      return style.display !== "none" &&
-        style.visibility !== "hidden" &&
-        rect.width > 0 &&
-        rect.height > 0
-        ? [{ x: rect.x, y: rect.y, width: rect.width, height: rect.height }]
-        : [];
-    }),
-  );
+  const { supportBox, targetBoxes } = await support.evaluate((launcher, targetSelector) => {
+    const supportRect = launcher.getBoundingClientRect();
+    return {
+      supportBox: { x: supportRect.x, y: supportRect.y, width: supportRect.width, height: supportRect.height },
+      targetBoxes: Array.from(document.querySelectorAll(targetSelector)).flatMap((element) => {
+        const style = getComputedStyle(element);
+        const rect = element.getBoundingClientRect();
+        return style.display !== "none" &&
+          style.visibility !== "hidden" &&
+          rect.width > 0 &&
+          rect.height > 0
+          ? [{ x: rect.x, y: rect.y, width: rect.width, height: rect.height }]
+          : [];
+      }),
+    };
+  }, selector);
   expect(supportBox, `${label} support box`).not.toBeNull();
   expect(targetBoxes.length, `${label} visible target count`).toBeGreaterThan(0);
   for (const targetBox of targetBoxes) {
@@ -651,6 +654,35 @@ for (const route of routes.filter(({ kind }) => kind === "software")) {
     ).toHaveCount(0);
   });
 }
+
+test("support avoids mobile controls, stays usable, and returns without moving the page layout", async ({ page }) => {
+  await page.setViewportSize({ width: 483, height: 844 });
+  await openFormalRoute(page, "/");
+  await page.evaluate(() => document.fonts.ready);
+  const support = page.getByRole("button", { name: "客服", exact: true });
+  await expect(support).toBeVisible();
+  const resting = await support.boundingBox();
+  expect(resting).not.toBeNull();
+  const readStage = () => page.locator(".redesign-home-product-stage").evaluate((element) => {
+    const rect = element.getBoundingClientRect();
+    return { x: rect.x, top: rect.y + scrollY, width: rect.width, height: rect.height };
+  });
+  const stageBefore = await readStage();
+
+  await expectSupportClearOf(page, support, ".redesign-home-product-control", "mobile control avoidance");
+  expect((await support.boundingBox())!.y).toBeLessThan(resting!.y);
+  const stageAfter = await readStage();
+  for (const key of ["x", "top", "width", "height"] as const) {
+    expect(stageAfter[key]).toBeCloseTo(stageBefore[key], 1);
+  }
+
+  await support.click();
+  await expect(page.getByRole("dialog", { name: "客服助手" })).toBeVisible();
+  await page.getByRole("button", { name: "关闭客服", exact: true }).click();
+  await expect(support).toBeVisible();
+  await page.evaluate(() => scrollTo({ top: 0, behavior: "instant" }));
+  await expect.poll(async () => (await support.boundingBox())!.y).toBeCloseTo(resting!.y, 1);
+});
 
 for (const supportWidth of [483, 484] as const) {
   test(`support exclusions keep formal controls clear at ${supportWidth}px`, async ({
