@@ -34,12 +34,13 @@ function renderDirectory(
   overrides: Partial<AiWorkflowCatalogCard> = {},
   items: AiWorkflowCatalogCard[] = [{ ...item, ...overrides }],
   emptyState: "no-matches" | "no-published" | "topics-unconfigured" | "unverified" = "topics-unconfigured",
+  topics: { id: string; name: string; englishName: string | null }[] = [],
 ) {
   return renderToStaticMarkup(<AiWorkflowDirectory
     locale={locale}
     filters={{ q: "", topic: "", paid: "all", environment: "all", type: "all", sort: "recommended", page: 1, pageSize: 12 }}
     items={items}
-    topics={[]}
+    topics={topics}
     total={1}
     pageCount={1}
     emptyState={emptyState}
@@ -65,6 +66,59 @@ describe("workflow directory localized publication", () => {
     expect(html).not.toContain("设计助手");
     expect(html).not.toContain("根据文字创建设计稿。");
     expect(html).not.toContain("[[");
+  });
+
+  it("translates English topic fallbacks while preserving configured names and Chinese labels", () => {
+    const topics = [
+      { id: "work-efficiency", name: "工作效率", englishName: null },
+      { id: "video-generation", name: "视频生成", englishName: "Video creation" },
+      { id: "content-creation", name: "内容创作", englishName: null },
+      { id: "programming-development", name: "编程开发", englishName: null },
+      { id: "learning-education", name: "学习教育", englishName: null },
+      { id: "search-research", name: "搜索研究", englishName: null },
+      { id: "marketing-sales", name: "营销销售", englishName: null },
+      { id: "office-automation", name: "办公自动化", englishName: null },
+      { id: "companionship", name: "情感陪伴", englishName: null },
+      { id: "finance-legal", name: "财务法律辅助", englishName: null },
+    ];
+    const en = renderDirectory(
+      "en",
+      { topic: { name: "工作效率", englishName: null } },
+      [{ ...item, topic: { name: "工作效率", englishName: null } }],
+      "topics-unconfigured",
+      topics,
+    );
+    const zh = renderDirectory(
+      "zh",
+      { topic: { name: "工作效率", englishName: null } },
+      [{ ...item, topic: { name: "工作效率", englishName: null } }],
+      "topics-unconfigured",
+      topics,
+    );
+    const normalizedEn = en.replaceAll("&amp;", "&");
+
+    expect(normalizedEn).toContain(">Productivity</option>");
+    expect(normalizedEn).toContain(">Video creation</option>");
+    expect(normalizedEn).toContain(">Productivity</span>");
+    for (const topic of topics) {
+      expect(normalizedEn).not.toContain(topic.name);
+    }
+    for (const label of [
+      "Productivity",
+      "Video creation",
+      "Content creation",
+      "Programming & development",
+      "Learning & education",
+      "Search & research",
+      "Marketing & sales",
+      "Office automation",
+      "Companionship",
+      "Finance & legal support",
+    ]) {
+      expect(normalizedEn).toContain(`>${label}</option>`);
+    }
+    expect(zh).toContain(">工作效率</option>");
+    expect(zh).toContain(">工作效率</span>");
   });
 
   it("uses a project-specific generated cover when no upstream image exists", () => {
