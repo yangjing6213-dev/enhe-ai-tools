@@ -22,7 +22,7 @@ const presentation = {
 function fixture() {
   return { id: "candidate-1", toolId: "tool-1", updatedAt: stamp, status: "reviewing", repositoryId: "123", repositoryUrl: "https://github.com/example/demo", repositoryOwner: "example", repositoryName: "demo", commitSha: sha, sourceFingerprint: `123:${sha}`, licenseSpdx: "MIT", licenseUrl: `https://github.com/example/demo/blob/${sha}/LICENSE`, projectType: "workflow", githubStars: 100, fileId: null as string | null, file: null as object | null, packageVersion: null, packageSha256: null, verifiedEnvironments: [], failureReason: "NO_LOCKED_NODE_TEST_SUITE",
     validationReport: { source: { deliveryMode: "repository_link", repositoryId: "123", repositoryUrl: "https://github.com/example/demo", commitSha: sha, updatedAt: "2026-10-21T00:00:00.000Z", language: "TypeScript" }, license: { spdx: "MIT", filePath: "LICENSE" }, publication: { mode: "repository_link", reason: "NO_LOCKED_NODE_TEST_SUITE", enheDownloadPackageAvailable: false }, presentation },
-    tool: { id: "tool-1", slug: "ai-workflow-123-demo", type: "ai_workflow", status: "draft", name: "人工编辑标题", englishName: "Edited title", shortDescription: "[[zh]]人工编辑简介[[/zh]][[en]]Edited summary[[/en]]", content: "[[zh]]人工编辑正文[[/zh]][[en]]Edited body[[/en]]", coverImage: presentation.cover.url, updatedAt: stamp, downloadFileId: null as string | null, downloadPrice: 0, isDownloadPaid: false, onlineUrl: "https://github.com/example/demo" },
+    tool: { id: "tool-1", slug: "ai-workflow-123-demo", type: "ai_workflow", status: "draft", name: "人工编辑标题", englishName: "Edited title", shortDescription: "[[zh]]人工编辑简介[[/zh]][[en]]Edited summary[[/en]]", content: "[[zh]]人工编辑正文[[/zh]][[en]]Edited body[[/en]]", coverImage: presentation.cover.url, updatedAt: stamp, downloadFileId: null as string | null, downloadPrice: 0, isDownloadPaid: false, onlineUrl: "https://github.com/example/demo" as string | null },
   };
 }
 function form() {
@@ -45,7 +45,24 @@ describe("human approval of workflow introductions", () => {
   });
   it("does not publish without explicit content approval", async () => {
     const data = form(); data.delete("contentReviewed");
-    await expect(publishAiWorkflowIntroductionAction(data)).rejects.toThrow("NEXT_REDIRECT");
+    await expect(publishAiWorkflowIntroductionAction(data)).rejects.toThrow(`NEXT_REDIRECT:/admin/ai-workflows?error=${encodeURIComponent("请先阅读并确认中英文介绍和封面，再发布。")}`);
+    expect(mocks.transaction).not.toHaveBeenCalled();
+  });
+  it("publishes a valid legacy link-only draft with no saved tool URL and records its verified repository URL", async () => {
+    const item = fixture();
+    item.tool.onlineUrl = null;
+    mocks.findUnique.mockResolvedValue(item);
+    await expect(publishAiWorkflowIntroductionAction(form())).rejects.toThrow("introductionPublished=1");
+    expect(mocks.toolUpdate).toHaveBeenCalledWith(expect.objectContaining({
+      where: expect.objectContaining({ id: "tool-1", status: "draft", updatedAt: stamp }),
+      data: { status: "published", onlineUrl: "https://github.com/example/demo" },
+    }));
+  });
+  it("does not accept a saved URL that conflicts with the verified repository", async () => {
+    const item = fixture();
+    item.tool.onlineUrl = "https://github.com/other/repository";
+    mocks.findUnique.mockResolvedValue(item);
+    await expect(publishAiWorkflowIntroductionAction(form())).rejects.toThrow(encodeURIComponent("草稿状态、双语内容、封面、来源或许可证据不完整；请先编辑补齐。下载包请使用价格审核入口。"));
     expect(mocks.transaction).not.toHaveBeenCalled();
   });
   it.each(["package", "license", "stale", "translation", "evidence"])("blocks an ineligible %s draft", async (reason) => {
@@ -61,7 +78,7 @@ describe("human approval of workflow introductions", () => {
   });
   it("publishes only the reviewed current draft and records approval", async () => {
     await expect(publishAiWorkflowIntroductionAction(form())).rejects.toThrow("introductionPublished=1");
-    expect(mocks.toolUpdate).toHaveBeenCalledWith(expect.objectContaining({ where: expect.objectContaining({ id: "tool-1", updatedAt: stamp, status: "draft" }), data: { status: "published" } }));
+    expect(mocks.toolUpdate).toHaveBeenCalledWith(expect.objectContaining({ where: expect.objectContaining({ id: "tool-1", updatedAt: stamp, status: "draft" }), data: { status: "published", onlineUrl: "https://github.com/example/demo" } }));
     expect(mocks.candidateUpdate).toHaveBeenCalledWith(expect.objectContaining({ data: { status: "published" } }));
     expect(mocks.audit).toHaveBeenCalledWith(expect.objectContaining({ data: expect.objectContaining({ adminId: "admin-1", action: "ai_workflow.introduction.publish" }) }));
     expect(mocks.revalidateTag).toHaveBeenCalledWith("public-tools");
@@ -91,7 +108,7 @@ describe("package review preserves delivery gates", () => {
     const item = fixture(); item.status = "pending_pricing"; item.updatedAt = new Date("2026-10-21T11:00:00Z");
     mocks.findUnique.mockResolvedValue(item);
     const data = form(); data.set("decision", "reject");
-    await expect(decideAiWorkflowPriceAction(data)).rejects.toThrow("内容已变化");
+    await expect(decideAiWorkflowPriceAction(data)).rejects.toThrow(encodeURIComponent("内容已变化，请刷新后重新审核。"));
     expect(mocks.transaction).not.toHaveBeenCalled();
   });
   it("preserves manually edited package drafts when approving them", async () => {

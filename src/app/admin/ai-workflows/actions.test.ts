@@ -138,7 +138,7 @@ describe("AI Workflow admin collection safeguards", () => {
   });
 
   it("does not queue manual work until the topic list is confirmed", async () => {
-    await expect(requestAiWorkflowBatchAction()).rejects.toThrow("NEXT_REDIRECT:/admin/ai-workflows?error=请先导入并核对已提供的有序主题清单。");
+    await expect(requestAiWorkflowBatchAction()).rejects.toThrow(`NEXT_REDIRECT:/admin/ai-workflows?error=${encodeURIComponent("请先导入并核对已提供的有序主题清单。")}`);
     expect(mocks.batches.create).not.toHaveBeenCalled();
   });
 
