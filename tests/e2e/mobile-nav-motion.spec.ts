@@ -592,6 +592,26 @@ test("mixed keyboard and pointer interruptions preserve the rendered drawer posi
   const trigger = page.getByRole("button", { name: "菜单", exact: true });
   const drawer = page.locator(".redesign-mobile-drawer");
 
+  // Exercise a known position in the actual native animation. A remote browser
+  // call can otherwise consume the entire 230ms transition before Escape.
+  const holdNextPointerMotion = () => page.evaluate(() => {
+    const originalAnimate = Element.prototype.animate;
+    Element.prototype.animate = function (keyframes, options) {
+      const animation = originalAnimate.call(this, keyframes, options);
+      if (this.classList.contains("redesign-mobile-drawer") &&
+        animation.effect instanceof KeyframeEffect &&
+        animation.effect.getKeyframes().some((frame) => frame.transform)) {
+        Element.prototype.animate = originalAnimate;
+        queueMicrotask(() => {
+          animation.pause();
+          animation.currentTime = Number(animation.effect?.getTiming().duration ?? 0) * 0.35;
+        });
+      }
+      return animation;
+    };
+  });
+
+  await holdNextPointerMotion();
   await trigger.click();
   await expect(drawer).toBeVisible();
   const beforeEscape = await drawerTranslateX(page);
@@ -650,10 +670,10 @@ test("mixed keyboard and pointer interruptions preserve the rendered drawer posi
   await expect(drawer).toHaveCSS("opacity", "1");
   await expect.poll(() => drawerTranslateX(page)).toBeLessThanOrEqual(1);
 
+  await holdNextPointerMotion();
   await page
     .locator(".redesign-menu-overlay")
     .click({ position: { x: 8, y: 100 } });
-  await page.waitForTimeout(40);
   const beforeKeyboardOpen = await drawer.evaluate((element) => ({
     opacity: Number(getComputedStyle(element).opacity),
     translateX: new DOMMatrixReadOnly(getComputedStyle(element).transform).m41,

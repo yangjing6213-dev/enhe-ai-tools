@@ -1,4 +1,5 @@
 import { expect, test } from "@playwright/test";
+import { auditPublicRequests } from "./helpers/public-request-audit";
 
 const routes = [
   { path: "/software", locale: "zh", menu: "菜单", home: "ENHE AI 首页" },
@@ -52,12 +53,7 @@ for (const route of routes) {
   test(`${route.path} moves keyboard focus through the localized skip link`, async ({
     page,
   }) => {
-    const pageErrors: string[] = [];
-    const failedRequests: string[] = [];
-    page.on("pageerror", (error) => pageErrors.push(error.message));
-    page.on("requestfailed", (request) => {
-      failedRequests.push(`${request.method()} ${request.url()}`);
-    });
+    const requestAudit = auditPublicRequests(page);
 
     await page.setViewportSize({ width: 390, height: 844 });
     const response = await page.goto(route.path, { waitUntil: "load" });
@@ -78,8 +74,7 @@ for (const route of routes) {
 
     await page.keyboard.press("Enter");
     await expect(mainContent).toBeFocused();
-    expect(pageErrors).toEqual([]);
-    expect(failedRequests).toEqual([]);
+    await requestAudit.verify();
   });
 
   test(`${route.path} exposes current navigation and a named home link`, async ({
