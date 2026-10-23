@@ -161,7 +161,8 @@ chmod +x /opt/enhe-ai-tools/deploy/enhe-ai-tools/scripts/*.sh
 
 默认策略：
 
-- 每天 03:15 备份 PostgreSQL 到 `/opt/enhe-ai-tools/backups/db`，保留 14 天。
+- 安装上述任务后，每天按服务器时区 03:15 备份 PostgreSQL 到 `/opt/enhe-ai-tools/backups/db`。`enhe-backup-db.sh` 当前默认 `RETENTION_DAYS=36500`，用于保守保留现有恢复点，并非已确认的长期保留方案；实际执行还需核对任务是否安装及环境变量覆盖值。
+- 恢复操作前的独立副本写入 `/opt/enhe-ai-tools/backups/pre-restore`，现有恢复脚本显式使用 `RETENTION_DAYS=90`。运行备份脚本会按生效天数清理对应目录中过期的 `.dump` 及校验文件；缩短保留周期或清理历史副本前，须先确认具体范围。本次文档同步不改变任务、保留参数或已有文件。
 - 每 5 分钟检查 `http://127.0.0.1:3001/api/health`，异常时通过 SMTP 发邮件。
 - 健康告警 30 分钟内只发送一次，恢复后自动清除告警状态。
 

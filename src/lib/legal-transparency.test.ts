@@ -13,8 +13,10 @@ describe("public privacy and service transparency", () => {
     expect(text).toContain(locale === "zh" ? "密码" : "password");
     for (const slug of legalSlugs) {
       const p = getLegalPage(slug, locale)!;
-      expect(p).toHaveProperty("updatedAt", "2026-10-18");
-      expect(p.sections.at(-1)?.paragraphs.join(" ")).toContain("292055066@qq.com");
+      expect(p).toHaveProperty("updatedAt", "2026-10-23");
+      const contacts = p.sections.flatMap((section) => section.paragraphs).join(" ");
+      expect(contacts).toContain("amen.enhe@gmail.com");
+      expect(contacts).not.toMatch(/292055066@qq\.com|ENHEAI\.life@protonmail\.com/);
     }
   });
 });

@@ -4,10 +4,16 @@ title: ENHE AI overview
 description: Overview of ENHE AI user-first positioning, public content areas, and recommended user journeys.
 resource: https://www.enhe-tech.com.cn/
 tags: [ai-productivity, ai-creation, privacy, stable-workflows, ai-skills]
-timestamp: 2026-07-04
+timestamp: 2026-10-23
 ---
 
 # ENHE AI Overview
+
+## Contact
+
+<!-- PUBLIC_CONTACT:START -->
+- Email: amen.enhe@gmail.com
+<!-- PUBLIC_CONTACT:END -->
 
 ENHE AI 帮助用户把 AI 用到真实任务里：更快完成工作、创作内容、整理资料、学习技能、解决工具选择和使用问题。在需要处理敏感素材、长期稳定流程或隐私边界时，提供更可控的AI工具和路径。
 

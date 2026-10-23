@@ -297,7 +297,7 @@ export async function AiNewsPageShell({
         className="ai-news-page ai-news-workspace enhe-reference-workspace"
         topContent={
           <PageCover
-            src="/images/ai-news-cover.png"
+            src="/images/ai-news-cover-fc4bdd9313852b40.webp"
             alt={forceLocale === "en" ? "ENHE AI news and insights" : "ENHE AI 资讯品牌封面"}
           />
         }
@@ -393,7 +393,7 @@ export async function AiNewsPageShell({
       <Container className="ai-news-workspace-container ai-news-page-container py-14">
         <StructuredData data={[breadcrumbSchema, collectionSchema, webPageSchema, faqSchema]} />
         <PageCover
-          src="/images/ai-news-cover.png"
+          src="/images/ai-news-cover-fc4bdd9313852b40.webp"
           alt={forceLocale === "en" ? "ENHE AI news and insights" : "ENHE AI 资讯品牌封面"}
         />
         <section

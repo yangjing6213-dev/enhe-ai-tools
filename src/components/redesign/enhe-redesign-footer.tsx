@@ -1,6 +1,7 @@
 import { Fragment } from "react";
 import Image from "next/image";
 import { ChevronDown, Github } from "lucide-react";
+import { companyProfile } from "@/lib/company-profile";
 import { EnheRedesignBrandValue } from "./home/EnheRedesignBrandValue";
 import type { ProductionFiling } from "@/lib/production-filing";
 import type { RedesignFooterCopy, RedesignLocale } from "./types";
@@ -32,7 +33,7 @@ const FOOTER_COPY: Record<RedesignLocale, RedesignFooterCopy> = {
         title: "公司信息",
         links: [
           { label: "品牌档案", href: "/about" },
-          { label: "联系邮箱", href: "mailto:292055066@qq.com" },
+          { label: "联系邮箱", href: companyProfile.email.href },
         ],
       },
     ],
@@ -64,7 +65,7 @@ const FOOTER_COPY: Record<RedesignLocale, RedesignFooterCopy> = {
         title: "Company",
         links: [
           { label: "Brand Profile", href: "/en/about" },
-          { label: "Contact Email", href: "mailto:292055066@qq.com" },
+          { label: "Contact Email", href: companyProfile.email.href },
         ],
       },
     ],

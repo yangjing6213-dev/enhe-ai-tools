@@ -1,6 +1,7 @@
 "use client";
 
 import ProfileCard from "@/components/ProfileCard";
+import { companyProfile } from "@/lib/company-profile";
 import type { Locale } from "@/lib/dictionaries";
 import "./about-founder.css";
 
@@ -17,7 +18,7 @@ export function AboutFounder({ locale }: { locale: Locale }) {
           handle="Amenenhe_ai"
           status={english ? "Solo Builder" : "一人公司实践者"}
           contactText={english ? "Email" : "联系"}
-          contactHref="mailto:amen.enhe@gmail.com"
+          contactHref={companyProfile.email.href}
           avatarUrl="/images/about/enhe-founder.webp"
           iconUrl="/images/about/enhe-founder-pattern.svg"
           holo={0.8}
@@ -39,7 +40,7 @@ export function AboutFounder({ locale }: { locale: Locale }) {
             <div><dt>X / Twitter</dt><dd><a href="https://x.com/Amenenhe_ai" target="_blank" rel="noopener noreferrer">Amenenhe_ai</a></dd></div>
             <div><dt>{english ? "Website" : "网站"}</dt><dd><a href="https://www.enhe-tech.com.cn/">www.enhe-tech.com.cn</a></dd></div>
             <div><dt>{english ? "WeChat" : "微信"}</dt><dd>ENHE-AI</dd></div>
-            <div><dt>{english ? "Email" : "邮箱"}</dt><dd><a href="mailto:amen.enhe@gmail.com">amen.enhe@gmail.com</a></dd></div>
+            <div><dt>{english ? "Email" : "邮箱"}</dt><dd><a href={companyProfile.email.href}>{companyProfile.email.value}</a></dd></div>
           </dl>
         </div>
       </div>

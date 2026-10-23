@@ -76,7 +76,7 @@ export function buildAiWorkflowCatalogWhere(filters: AiWorkflowCatalogFilters): 
 
   if (filters.topic) and.push({ aiWorkflowCandidate: { is: { topicId: filters.topic } } });
   if (filters.paid === "paid") and.push({ isDownloadPaid: true, downloadPrice: { gt: 0 } });
-  if (filters.paid === "free") and.push({ OR: [{ isDownloadPaid: false }, { downloadPrice: { lte: 0 } }] });
+  if (filters.paid === "free") and.push({ isDownloadPaid: false });
   if (filters.environment !== "all") {
     and.push({ aiWorkflowCandidate: { is: { verifiedEnvironments: { has: filters.environment } } } });
   }

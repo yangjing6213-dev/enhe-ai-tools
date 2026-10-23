@@ -12,7 +12,7 @@ export const companyProfile = {
     href: "tel:15715097597"
   },
   email: {
-    value: "ENHEAI.life@protonmail.com",
-    href: "mailto:ENHEAI.life@protonmail.com"
+    value: "amen.enhe@gmail.com",
+    href: "mailto:amen.enhe@gmail.com"
   }
 } as const;

@@ -105,6 +105,13 @@ describe("public discovery manifest", () => {
     expect(generatedBlock(okf, "PUBLIC_DISCOVERY_OKF_SECTIONS")).toBe(renderOkfCanonicalSections());
   });
 
+  it("publishes the same support contact in llms and the organization knowledge file", () => {
+    for (const path of ["public/llms.txt", "public/okf/enhe-ai-overview.md"]) {
+      expect(generatedBlock(read(path), "PUBLIC_CONTACT")).toBe("- Email: amen.enhe@gmail.com");
+      expect(read(path)).not.toMatch(/292055066@qq\.com|ENHEAI\.life@protonmail\.com/);
+    }
+  });
+
   it("uses the manifest in sitemap and runs discovery generation before builds", () => {
     const sitemap = read("src/app/sitemap.ts");
     const packageJson = read("package.json");

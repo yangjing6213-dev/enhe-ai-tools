@@ -1,6 +1,7 @@
 import { unstable_cache } from "next/cache";
 import type { Locale } from "@/lib/dictionaries";
 import { prisma } from "@/lib/db";
+import { companyProfile } from "@/lib/company-profile";
 import { publicPageCacheSeconds } from "@/lib/public-routes";
 import {
   buildLocalizedToolOfferName,
@@ -369,7 +370,7 @@ export function renderPricingMarkdown(items: PricingOfferItem[]) {
     "## Support",
     "",
     "- Company: ENHE AI",
-    "- Email: ENHEAI.life@protonmail.com",
+    `- Email: ${companyProfile.email.value}`,
     "- Website: https://www.enhe-tech.com.cn/",
     "",
   ].join("\n");

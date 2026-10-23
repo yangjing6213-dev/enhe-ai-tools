@@ -42,7 +42,9 @@ Important pages:
 <!-- PUBLIC_DISCOVERY_PAGES:END -->
 
 Contact:
-- Email: ENHEAI.life@protonmail.com
+<!-- PUBLIC_CONTACT:START -->
+- Email: amen.enhe@gmail.com
+<!-- PUBLIC_CONTACT:END -->
 - Brand profile: https://www.enhe-tech.com.cn/about
 
 Main columns:

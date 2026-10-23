@@ -216,6 +216,8 @@ describe("pricing offers", () => {
     expect(markdown).toContain("Automatic payments unlock access after successful confirmation");
     expect(markdown).toContain("upload proof only when");
     expect(markdown).not.toContain("Payment proof review is required before");
+    expect(markdown).toContain("- Email: amen.enhe@gmail.com");
+    expect(markdown).not.toContain("ENHEAI.life@protonmail.com");
   });
 
   it.each(["zh", "en"] as const)("does not tell every paid customer to wait for manual review (%s)", (locale) => {

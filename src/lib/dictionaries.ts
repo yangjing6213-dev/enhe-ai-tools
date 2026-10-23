@@ -1,4 +1,5 @@
 import { reviewCompletionNotice, reviewCompletionNoticeEn } from "@/lib/review-copy";
+import { companyProfile } from "@/lib/company-profile";
 
 export const supportedLocales = ["zh", "en"] as const;
 export type Locale = (typeof supportedLocales)[number];
@@ -376,7 +377,7 @@ export const dictionaries = {
       refundRules: "退款规则",
       refundRulesIntro: "查看售后与退款规则",
       supportEmail: "客服联系方式",
-      supportEmailValue: "amen.enhe@gmail.com",
+      supportEmailValue: companyProfile.email.value,
       contactSupport: "联系售后",
       commentsTitle: "用户评论",
       commentPlaceholder: "写下你的使用体验",
@@ -772,7 +773,7 @@ export const dictionaries = {
       refundRules: "Refund rules",
       refundRulesIntro: "View membership and refund rules",
       supportEmail: "Support contact",
-      supportEmailValue: "amen.enhe@gmail.com",
+      supportEmailValue: companyProfile.email.value,
       contactSupport: "Contact support",
       commentsTitle: "User comments",
       commentPlaceholder: "Write your experience",

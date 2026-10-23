@@ -1,5 +1,6 @@
 import { readFileSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
+import { companyProfile } from "../src/lib/company-profile";
 import {
   renderLlmsImportantPages,
   renderLlmsMachineReadableResources,
@@ -34,8 +35,13 @@ function updateFile(path: string, blocks: Array<[string, string]>) {
 }
 
 updateFile("public/llms.txt", [
+  ["PUBLIC_CONTACT", `- Email: ${companyProfile.email.value}`],
   ["PUBLIC_DISCOVERY_PAGES", renderLlmsImportantPages()],
   ["PUBLIC_DISCOVERY_RESOURCES", renderLlmsMachineReadableResources()],
+]);
+
+updateFile("public/okf/enhe-ai-overview.md", [
+  ["PUBLIC_CONTACT", `- Email: ${companyProfile.email.value}`],
 ]);
 
 updateFile("public/okf/index.md", [

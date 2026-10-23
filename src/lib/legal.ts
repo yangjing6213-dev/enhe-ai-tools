@@ -1,4 +1,5 @@
 import type { Locale } from "@/lib/i18n";
+import { companyProfile } from "@/lib/company-profile";
 
 export type LegalPage = {
   slug: string;
@@ -19,7 +20,7 @@ export const legalSlugs = [
 
 export type LegalSlug = (typeof legalSlugs)[number];
 
-export const legalPolicyUpdatedAt = "2026-10-18";
+export const legalPolicyUpdatedAt = "2026-10-23";
 
 const zhIntro =
   "欢迎访问恩禾 ENHE AI工具站。为保障用户权益并规范网站服务，请您在注册、浏览、下载、使用AI账号服务或购买会员服务前，仔细阅读本声明及相关用户协议、隐私政策、会员服务规则。您访问、注册或使用本网站服务，即视为您已阅读、理解并同意遵守相关规则。";
@@ -90,7 +91,7 @@ const legalPageMap: Record<Locale, Record<LegalSlug, LegalPage>> = {
           title: "三、信息安全与联系",
           paragraphs: [
             "本网站将尽力采用合理的技术与管理措施保护用户信息安全，但互联网环境并非绝对安全。",
-            "如您对隐私保护、信息更正或删除有疑问，可通过联系邮箱 292055066@qq.com 与我们联系。"
+            `如您对隐私保护、信息更正或删除有疑问，可通过联系邮箱 ${companyProfile.email.value} 与我们联系。`
           ]
         },
         {
@@ -196,7 +197,7 @@ const legalPageMap: Record<Locale, Record<LegalSlug, LegalPage>> = {
           ]
         },
         { title: "十一、规则更新", paragraphs: ["本网站有权根据法律法规变化、业务调整及运营需要更新本声明。更新后的声明将在网站相关页面公示，并自公示之日起生效。用户继续使用本网站服务的，视为接受更新后的声明。"] },
-        { title: "十二、联系方式", paragraphs: ["如您对本声明、用户权益、版权投诉、未成年人付费、隐私保护或服务使用有任何问题，可通过以下方式联系我们：联系邮箱：292055066@qq.com。", "网站名称：恩禾 ENHE AI工具站。网站域名：www.enhe-tech.com.cn。"] }
+        { title: "十二、联系方式", paragraphs: [`如您对本声明、用户权益、版权投诉、未成年人付费、隐私保护或服务使用有任何问题，可通过以下方式联系我们：联系邮箱：${companyProfile.email.value}。`, "网站名称：恩禾 ENHE AI工具站。网站域名：www.enhe-tech.com.cn。"] }
       ]
     },
     "membership-refund": {
@@ -206,7 +207,7 @@ const legalPageMap: Record<Locale, Record<LegalSlug, LegalPage>> = {
       sections: [
         { title: "一、会员服务说明", paragraphs: ["本网站可能提供 VIP 会员服务。会员权益、有效期、价格、开通方式、适用范围、退款规则等，以网站页面公示的会员服务规则为准。", "本网站当前可能采用个人收款码、订单号备注、付款截图上传、后台人工审核等方式完成会员开通。用户付款时应仔细核对订单号、金额、套餐内容及收款信息。"] },
         { title: "二、付款凭证与审核", paragraphs: ["用户付款后，应按照页面提示上传付款凭证。经后台审核确认后，本网站将为对应账号开通相应会员权益。审核目标为2个小时内；需补充材料或人工核验时可能延长，请在订单页查看进度或联系客服。", "因用户未备注订单号、付款账号不一致、截图不清晰、重复付款、错误付款或其他原因导致无法核验的，用户应及时联系本站处理。"] },
-        { title: "三、退款处理", paragraphs: ["会员服务属于数字化服务或虚拟权益服务。已经完成开通、下载或实际使用的服务，除法律法规另有规定或本站明确承诺外，原则上不支持无理由退款。", "如因重复付款、错误付款、未开通且可核验、未成年人未经监护人同意付费等情况需要处理，可通过联系邮箱 292055066@qq.com 提交订单号、支付凭证、账号信息和必要说明，本站将在核实后依法依规处理。"] },
+        { title: "三、退款处理", paragraphs: ["会员服务属于数字化服务或虚拟权益服务。已经完成开通、下载或实际使用的服务，除法律法规另有规定或本站明确承诺外，原则上不支持无理由退款。", `如因重复付款、错误付款、未开通且可核验、未成年人未经监护人同意付费等情况需要处理，可通过联系邮箱 ${companyProfile.email.value} 提交订单号、支付凭证、账号信息和必要说明，本站将在核实后依法依规处理。`] },
         { title: "四、巡检报告交付与退款边界", paragraphs: ["SEO/GEO 巡检属于数字化报告服务。任务完成且报告已在账号内开放查看或下载，视为完成主要交付；用户已消耗的巡检次数或已交付报告，除报告无法访问、服务重大故障、重复付款、法律法规另有规定或页面明确承诺外，原则上不支持无理由退款。", "任务因本站系统原因未开始、长期失败且无法重试，或付款后未获得约定权益的，用户可提交订单号和任务编号申请核验。退款获批后，对应未使用次数、监控权益及报告访问权可被撤销；已发生的支付、退款和审计记录依法保留。"] },
         { title: "五、持续监控续购", paragraphs: ["持续监控是 30 天服务包，绑定一个规范化站点和一个可编辑计划，具体运行次数以购买页面公示权益为准。", "持续监控到期后需用户手动续购，本网站不会自动扣款。未续购时计划停止执行；续购成功后按新服务期恢复相应权益。"] }
       ]
@@ -217,7 +218,7 @@ const legalPageMap: Record<Locale, Record<LegalSlug, LegalPage>> = {
       summary: "说明权利人如何提交侵权投诉、需要提供的材料以及本站处理方式。",
       sections: [
         { title: "一、知识产权声明", paragraphs: ["本网站自研软件、页面设计、文字说明、教程内容、图标、Logo、程序代码、产品名称及相关内容，除另有说明外，其知识产权归本网站开发者或合法权利人所有。", "未经授权，任何用户不得复制、传播、改编、反向工程、破解、转售、出租、分发或以其他方式商业化使用本网站的软件、AI账号服务、教程、页面内容及相关资源。"] },
-        { title: "二、投诉材料", paragraphs: ["若权利人认为相关内容侵犯其合法权益，可通过联系邮箱 292055066@qq.com 提交权利证明、侵权内容链接、身份信息、联系方式及初步证明材料。", "本站收到完整材料后，将根据法律法规和平台规则进行核实，并依法及时采取删除、隐藏、断开链接或其他必要处理措施。"] }
+        { title: "二、投诉材料", paragraphs: [`若权利人认为相关内容侵犯其合法权益，可通过联系邮箱 ${companyProfile.email.value} 提交权利证明、侵权内容链接、身份信息、联系方式及初步证明材料。`, "本站收到完整材料后，将根据法律法规和平台规则进行核实，并依法及时采取删除、隐藏、断开链接或其他必要处理措施。"] }
       ]
     },
     "minor-protection": {
@@ -292,7 +293,7 @@ const legalPageMap: Record<Locale, Record<LegalSlug, LegalPage>> = {
           title: "3. Security and Contact",
           paragraphs: [
             "We will use reasonable technical and administrative measures to protect user information, but the internet environment is not absolutely secure.",
-            "For privacy protection, correction, or deletion requests, please contact us at 292055066@qq.com."
+            `For privacy protection, correction, or deletion requests, please contact us at ${companyProfile.email.value}.`
           ]
         },
         {
@@ -398,7 +399,7 @@ const legalPageMap: Record<Locale, Record<LegalSlug, LegalPage>> = {
           ]
         },
         { title: "11. Updates", paragraphs: ["We may update this statement due to changes in laws and regulations, business adjustments, or operational needs. Updated terms will be displayed on the relevant website pages and take effect from the date of publication. Continued use of the website indicates acceptance of the updated statement."] },
-        { title: "12. Contact", paragraphs: ["For questions about this statement, user rights, copyright complaints, minor payments, privacy protection, or service usage, contact us at 292055066@qq.com.", "Website name: ENHE AI Tools. Domain: www.enhe-tech.com.cn."] }
+        { title: "12. Contact", paragraphs: [`For questions about this statement, user rights, copyright complaints, minor payments, privacy protection, or service usage, contact us at ${companyProfile.email.value}.`, "Website name: ENHE AI Tools. Domain: www.enhe-tech.com.cn."] }
       ]
     },
     "membership-refund": {
@@ -408,7 +409,7 @@ const legalPageMap: Record<Locale, Record<LegalSlug, LegalPage>> = {
       sections: [
         { title: "1. Membership Services", paragraphs: ["The website may provide VIP membership services. Benefits, validity periods, prices, activation methods, scope, and refund rules are subject to the membership rules displayed on the website.", "The current version may use personal payment QR codes, order number remarks, payment screenshot uploads, and manual backend review to activate membership. Users should carefully verify the order number, amount, plan details, and recipient information before paying."] },
         { title: "2. Payment Proof and Review", paragraphs: ["After payment, users should upload payment proof as instructed. After backend approval, the corresponding membership benefits will be activated for the account. We aim to review within 2 hours; requests needing more information or manual verification may take longer. Check your order page or contact support for progress.", "If verification fails due to missing order remarks, inconsistent payer accounts, unclear screenshots, duplicate payments, incorrect payments, or other reasons, users should contact us promptly."] },
-        { title: "3. Refund Handling", paragraphs: ["Membership services are digital services or virtual benefits. Once activated, downloaded, or actually used, they generally do not support no-reason refunds unless otherwise required by law or expressly promised by the website.", "For duplicate payments, incorrect payments, unactivated and verifiable orders, or payments made by minors without guardian consent, please email 292055066@qq.com with the order number, payment proof, account information, and necessary explanation. We will handle the matter after verification according to applicable laws and rules."] },
+        { title: "3. Refund Handling", paragraphs: ["Membership services are digital services or virtual benefits. Once activated, downloaded, or actually used, they generally do not support no-reason refunds unless otherwise required by law or expressly promised by the website.", `For duplicate payments, incorrect payments, unactivated and verifiable orders, or payments made by minors without guardian consent, please email ${companyProfile.email.value} with the order number, payment proof, account information, and necessary explanation. We will handle the matter after verification according to applicable laws and rules.`] },
         { title: "4. Audit Report Delivery and Refund Boundaries", paragraphs: ["An SEO/GEO audit is a digital report service. The primary delivery is complete when a finished report is available to view or download in the user's account. A consumed audit run or delivered digital report generally does not qualify for a no-reason refund unless the report is inaccessible, the service has a material failure, payment was duplicated, applicable law requires otherwise, or the purchase page expressly promises a refund.", "If a task does not start, repeatedly fails for reasons attributable to our system and cannot be retried, or the paid entitlement is not granted, the user may submit the order and task identifiers for review. Once a refund is approved, unused runs, monitoring entitlements, and report access may be revoked; payment, refund, and audit records are retained as required by law."] },
         { title: "5. Continuous Monitoring Renewal", paragraphs: ["Continuous monitoring is a 30-day service package tied to one normalized site and one editable schedule. The included run limits are those displayed on the purchase page.", "Renewal is manual and there is no automatic debit. The schedule stops when the service expires; the corresponding entitlement resumes for a new service period after a successful manual renewal."] }
       ]
@@ -419,7 +420,7 @@ const legalPageMap: Record<Locale, Record<LegalSlug, LegalPage>> = {
       summary: "How rights holders can submit infringement complaints, what materials are required, and how we process them.",
       sections: [
         { title: "1. Intellectual Property Statement", paragraphs: ["Unless otherwise stated, the website's self-developed software, page design, written descriptions, tutorials, icons, Logo, program code, product names, and related content are owned by the website developer or lawful rights holders.", "Without authorization, users may not copy, distribute, adapt, reverse engineer, crack, resell, rent, redistribute, or commercialize the website's software, AI account services, tutorials, page content, or related resources."] },
-        { title: "2. Complaint Materials", paragraphs: ["If a rights holder believes that content infringes their lawful rights, they may email 292055066@qq.com with proof of rights, the infringing content link, identity information, contact information, and preliminary evidence.", "After receiving complete materials, we will verify the complaint according to laws and platform rules and take necessary measures such as deletion, hiding, or link removal in a timely manner."] }
+        { title: "2. Complaint Materials", paragraphs: [`If a rights holder believes that content infringes their lawful rights, they may email ${companyProfile.email.value} with proof of rights, the infringing content link, identity information, contact information, and preliminary evidence.`, "After receiving complete materials, we will verify the complaint according to laws and platform rules and take necessary measures such as deletion, hiding, or link removal in a timely manner."] }
       ]
     },
     "minor-protection": {
@@ -453,7 +454,7 @@ const privacySupplement: Record<Locale, LegalPage["sections"]> = {
     {
       title: "七、注销、资料更正与删除申请",
       paragraphs: [
-        "请向 292055066@qq.com 发送主题为“账号注销/资料删除”的邮件，说明注册账号、希望处理的资料或论坛链接。请勿发送密码、完整付款账号或登录凭据。本站目前通过客服人工受理，网站内没有一键注销入口。",
+        `请向 ${companyProfile.email.value} 发送主题为“账号注销/资料删除”的邮件，说明注册账号、希望处理的资料或论坛链接。请勿发送密码、完整付款账号或登录凭据。本站目前通过客服人工受理，网站内没有一键注销入口。`,
         "客服将通过注册邮箱或其他与账号匹配的方式核验身份，并说明需补齐的材料、不能立即删除的记录及预计完成日期。处理时限以完成身份和范围核验后的书面回复为准；如需延长，客服应说明原因和新的日期，用户可通过同一邮件跟进。涉及未完成订单或争议的，将先告知处理次序，不在未核实归属时删除资料。",
       ],
     },
@@ -476,7 +477,7 @@ const privacySupplement: Record<Locale, LegalPage["sections"]> = {
     {
       title: "7. Correction, Account Closure and Deletion Requests",
       paragraphs: [
-        "Email 292055066@qq.com with the subject Account closure / data deletion, your registered account and the data or forum links to be handled. Do not send passwords, full payment account details or login credentials. Requests are handled manually by support; there is no one-click account deletion page.",
+        `Email ${companyProfile.email.value} with the subject Account closure / data deletion, your registered account and the data or forum links to be handled. Do not send passwords, full payment account details or login credentials. Requests are handled manually by support; there is no one-click account deletion page.`,
         "Support verifies ownership through the registered email or another matching account method, then identifies missing materials, any records that cannot immediately be deleted and an expected completion date. The processing period is confirmed in writing after identity and scope verification; an extension should include a reason and revised date. Follow up in the same email thread. Pending orders or disputes are explained before handling, and data is not erased before ownership is verified.",
       ],
     },
@@ -486,11 +487,11 @@ const privacySupplement: Record<Locale, LegalPage["sections"]> = {
 const supportSections: Record<Locale, LegalPage["sections"][number]> = {
   zh: {
     title: "联系渠道与处理范围",
-    paragraphs: ["账号、订单、退款、隐私与版权请求：292055066@qq.com。软件安装与使用：优先使用产品详情页公示的客服渠道（通用软件支持 amen.enhe@gmail.com；提示词产品支持 ENHEAI.life@protonmail.com）。这些渠道服务同一网站的不同事项，账号资料删除请统一向第一个邮箱提出。"],
+    paragraphs: [`账号、订单、退款、隐私、版权、软件安装与使用、提示词产品支持及账号资料删除请求，请统一联系 ${companyProfile.email.value}。`],
   },
   en: {
     title: "Contact Channels and Responsibilities",
-    paragraphs: ["Accounts, orders, refunds, privacy and copyright: 292055066@qq.com. Installation and product usage: use the support channel published on the product page (general software support amen.enhe@gmail.com; prompt-product support ENHEAI.life@protonmail.com). These channels cover different matters for the same website. Send account-data deletion requests to the first address."],
+    paragraphs: [`For accounts, orders, refunds, privacy, copyright, software installation and usage, prompt-product support, or account-data deletion, contact ${companyProfile.email.value}.`],
   },
 };
 

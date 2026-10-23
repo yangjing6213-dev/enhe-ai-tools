@@ -5,6 +5,7 @@ import { PageCover } from "@/components/page-cover";
 import { StructuredData } from "@/components/structured-data";
 import { Container, SectionTitle } from "@/components/ui";
 import { enheOrganizationReference } from "@/lib/brand-entity";
+import { companyProfile } from "@/lib/company-profile";
 import { getDictionary, type Locale } from "@/lib/dictionaries";
 import {
   absoluteUrl,
@@ -17,7 +18,7 @@ import {
 
 export const aboutPageRevalidate = 300;
 
-const contactEmail = "amen.enhe@gmail.com";
+const contactEmail = companyProfile.email.value;
 
 const aboutCopy = {
   zh: {

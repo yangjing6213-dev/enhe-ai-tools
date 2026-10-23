@@ -8,6 +8,7 @@ import {
 import { getCustomerSupportFaqs } from "@/lib/customer-support";
 import { getHeaderUserSnapshot } from "@/lib/auth";
 import { buildEnheOrganizationSchema } from "@/lib/brand-entity";
+import { companyProfile } from "@/lib/company-profile";
 import { getDictionary, type Locale } from "@/lib/dictionaries";
 import {
   absoluteUrl,
@@ -59,8 +60,8 @@ export async function PublicSiteChrome({
     url: languageAlternates["x-default"],
     returnPolicyPath: buildLocalePath("/legal/membership-refund", forceLocale),
     contactPoint: {
-      email: "292055066@qq.com",
-      contactType: "account, order and privacy support",
+      email: companyProfile.email.value,
+      contactType: "customer support",
       availableLanguage: ["zh-CN", "en-US"]
     }
   });

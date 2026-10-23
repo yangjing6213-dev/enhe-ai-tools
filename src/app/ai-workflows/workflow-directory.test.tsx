@@ -76,6 +76,22 @@ describe("workflow directory localized publication", () => {
       .toContain('src="https://raw.githubusercontent.com/example/design/main/cover.png"');
   });
 
+  it.each(["zh", "en"] as const)("keeps an unconfirmed paid package distinct from free packages in %s", (locale) => {
+    for (const price of [0, -1, Number.NaN, Number.POSITIVE_INFINITY]) {
+      const html = renderDirectory(locale, { deliveryMode: "package", isDownloadPaid: true, price });
+      const badge = html.match(/<span class="shrink-0[^"]*">([^<]*)<\/span>/)?.[1];
+      expect(badge).toBe(locale === "en" ? "Price pending" : "价格待确认");
+    }
+  });
+
+  it.each(["zh", "en"] as const)("retains confirmed free, paid, and repository labels in %s", (locale) => {
+    const badge = (overrides: Partial<AiWorkflowCatalogCard>) => renderDirectory(locale, overrides)
+      .match(/<span class="shrink-0[^"]*">([^<]*)<\/span>/)?.[1];
+    expect(badge({ deliveryMode: "package", isDownloadPaid: false, price: 0 })).toBe(locale === "en" ? "Free" : "免费");
+    expect(badge({ deliveryMode: "package", isDownloadPaid: true, price: 19 })).toBe("¥19.00");
+    expect(badge({ deliveryMode: "repository_link", isDownloadPaid: true, price: 0 })).toBe(locale === "en" ? "GitHub repository" : "原仓库链接");
+  });
+
   it("clears a no-match search back to the current language directory", () => {
     const zh = renderDirectory("zh", {}, [], "no-matches");
     const en = renderDirectory("en", {}, [], "no-matches");

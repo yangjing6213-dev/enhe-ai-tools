@@ -4,6 +4,7 @@ import type { ReactNode } from "react";
 import { StructuredData } from "@/components/structured-data";
 import { Badge, Container, SectionTitle } from "@/components/ui";
 import type { Locale } from "@/lib/dictionaries";
+import { companyProfile } from "@/lib/company-profile";
 import {
   buildBreadcrumbSchema,
   buildFaqSchema,
@@ -11,7 +12,7 @@ import {
   buildPageMetadata
 } from "@/lib/seo";
 
-const supportEmail = "ENHEAI.life@protonmail.com";
+const supportEmail = companyProfile.email.value;
 
 const content = {
   zh: {

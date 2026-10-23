@@ -42,4 +42,18 @@ describe("AI Workflow catalog filters", () => {
     const where = buildAiWorkflowCatalogWhere(parseAiWorkflowCatalogFilters({ q: "research" }));
     expect(JSON.stringify(where)).toContain('"englishName":{"contains":"research","mode":"insensitive"}');
   });
+
+  it("requires the explicit free flag instead of treating an unconfirmed paid price as free", () => {
+    expect(buildAiWorkflowCatalogWhere(parseAiWorkflowCatalogFilters({ paid: "free" }))).toEqual({
+      type: "ai_workflow",
+      status: "published",
+      AND: [{ isDownloadPaid: false }],
+    });
+  });
+
+  it("continues requiring a positive price for paid-only results", () => {
+    expect(buildAiWorkflowCatalogWhere(parseAiWorkflowCatalogFilters({ paid: "paid" }))).toMatchObject({
+      AND: [{ isDownloadPaid: true, downloadPrice: { gt: 0 } }],
+    });
+  });
 });

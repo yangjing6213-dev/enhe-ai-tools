@@ -1,6 +1,6 @@
 export type PublicDiscoveryRoute = {
   path: string;
-  lastModified: string;
+  lastModified?: string;
   indexable?: boolean;
   llmsLabel?: string;
   okfFile?: string;
@@ -15,8 +15,9 @@ export type MachineReadableResource = {
 export const publicSiteBaseUrl = "https://www.enhe-tech.com.cn";
 
 export const publicDiscoveryRoutes: readonly PublicDiscoveryRoute[] = [
-  { path: "/", lastModified: "2026-07-24T00:00:00.000Z", llmsLabel: "ENHE AI home" },
-  { path: "/en", lastModified: "2026-07-24T00:00:00.000Z" },
+  // Home content also depends on live products and comments; no reliable page-wide timestamp exists.
+  { path: "/", llmsLabel: "ENHE AI home" },
+  { path: "/en" },
   {
     path: "/about",
     lastModified: "2026-07-23T00:00:00.000Z",
@@ -118,18 +119,18 @@ export const publicDiscoveryRoutes: readonly PublicDiscoveryRoute[] = [
   { path: "/en/ai-news", lastModified: "2026-06-18T00:00:00.000Z" },
   { path: "/ai-trends", lastModified: "2026-06-19T00:00:00.000Z", llmsLabel: "AI trends", okfLabel: "AI demand trends" },
   { path: "/en/ai-trends", lastModified: "2026-06-19T00:00:00.000Z" },
-  { path: "/legal/user-agreement", lastModified: "2026-06-17T00:00:00.000Z" },
-  { path: "/en/legal/user-agreement", lastModified: "2026-06-17T00:00:00.000Z" },
-  { path: "/legal/privacy-policy", lastModified: "2026-06-17T00:00:00.000Z" },
-  { path: "/en/legal/privacy-policy", lastModified: "2026-06-17T00:00:00.000Z" },
-  { path: "/legal/membership-refund", lastModified: "2026-06-17T00:00:00.000Z" },
-  { path: "/en/legal/membership-refund", lastModified: "2026-06-17T00:00:00.000Z" },
-  { path: "/legal/disclaimer", lastModified: "2026-06-17T00:00:00.000Z" },
-  { path: "/en/legal/disclaimer", lastModified: "2026-06-17T00:00:00.000Z" },
-  { path: "/legal/copyright-complaint", lastModified: "2026-06-17T00:00:00.000Z" },
-  { path: "/en/legal/copyright-complaint", lastModified: "2026-06-17T00:00:00.000Z" },
-  { path: "/legal/minor-protection", lastModified: "2026-06-17T00:00:00.000Z" },
-  { path: "/en/legal/minor-protection", lastModified: "2026-06-17T00:00:00.000Z" },
+  { path: "/legal/user-agreement", lastModified: "2026-10-23T00:00:00.000Z" },
+  { path: "/en/legal/user-agreement", lastModified: "2026-10-23T00:00:00.000Z" },
+  { path: "/legal/privacy-policy", lastModified: "2026-10-23T00:00:00.000Z" },
+  { path: "/en/legal/privacy-policy", lastModified: "2026-10-23T00:00:00.000Z" },
+  { path: "/legal/membership-refund", lastModified: "2026-10-23T00:00:00.000Z" },
+  { path: "/en/legal/membership-refund", lastModified: "2026-10-23T00:00:00.000Z" },
+  { path: "/legal/disclaimer", lastModified: "2026-10-23T00:00:00.000Z" },
+  { path: "/en/legal/disclaimer", lastModified: "2026-10-23T00:00:00.000Z" },
+  { path: "/legal/copyright-complaint", lastModified: "2026-10-23T00:00:00.000Z" },
+  { path: "/en/legal/copyright-complaint", lastModified: "2026-10-23T00:00:00.000Z" },
+  { path: "/legal/minor-protection", lastModified: "2026-10-23T00:00:00.000Z" },
+  { path: "/en/legal/minor-protection", lastModified: "2026-10-23T00:00:00.000Z" },
 ] as const;
 
 export const machineReadableResources: readonly MachineReadableResource[] = [

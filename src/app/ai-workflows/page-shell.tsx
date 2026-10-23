@@ -144,7 +144,7 @@ export async function AiWorkflowsPageShell({
         englishName: row.englishName,
         shortDescription: row.shortDescription,
         coverImage: row.coverImage,
-        isDownloadPaid: row.isDownloadPaid && Number(row.downloadPrice) > 0,
+        isDownloadPaid: row.isDownloadPaid,
         price: Number(row.downloadPrice),
         favoriteCount: row._count.aiWorkflowFavorites,
         isFavorite: favoriteIds.has(row.id),

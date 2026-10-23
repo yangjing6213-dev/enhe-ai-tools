@@ -44,7 +44,7 @@ const copy = {
     windows: "已验证 Windows", macos: "已验证 macOS", linux: "已验证 Linux", type: "全部类型",
     workflow: "工作流", automation: "自动化工具", agent: "智能体项目", template: "模板", companion: "配套工具",
     sort: "推荐排序", latest: "最新发布", downloads: "网站下载发起", rating: "用户评分", price: "价格从低到高",
-    count: "个项目", details: "查看详情", freeTag: "免费", repositoryLink: "原仓库链接", noRating: "暂无评分", reviews: "条评价",
+    count: "个项目", details: "查看详情", freeTag: "免费", pricePending: "价格待确认", repositoryLink: "原仓库链接", noRating: "暂无评分", reviews: "条评价",
     downloadsLabel: "次网站下载发起", repositoryOnly: "仅提供 GitHub 原仓库", stars: "GitHub 星标", environments: "已验证", page: "页", previous: "上一页", next: "下一页",
     browseSkills: "浏览 AI Skills", browseTools: "浏览 AI 工具", clearFilters: "清除筛选，查看全部工作流",
     emptyStates: {
@@ -61,7 +61,7 @@ const copy = {
     windows: "Verified Windows", macos: "Verified macOS", linux: "Verified Linux", type: "All types",
     workflow: "Workflow", automation: "Automation tool", agent: "Agent project", template: "Template", companion: "Companion tool",
     sort: "Recommended", latest: "Newest", downloads: "Website download starts", rating: "User rating", price: "Price: low to high",
-    count: "items", details: "View details", freeTag: "Free", repositoryLink: "GitHub repository", noRating: "No ratings yet", reviews: "reviews",
+    count: "items", details: "View details", freeTag: "Free", pricePending: "Price pending", repositoryLink: "GitHub repository", noRating: "No ratings yet", reviews: "reviews",
     downloadsLabel: "website download starts", repositoryOnly: "GitHub source link only", stars: "GitHub stars", environments: "Verified", page: "Page", previous: "Previous", next: "Next",
     browseSkills: "Browse AI Skills", browseTools: "Browse AI tools", clearFilters: "Clear filters and view all workflows",
     emptyStates: {
@@ -152,13 +152,16 @@ export function AiWorkflowDirectory({
             const identity = resolveLocalizedToolIdentity({ ...item, type: "ai_workflow" }, locale);
             const description = buildLocalizedToolOptionalText(item.shortDescription, locale, { allowUntranslated: true });
             const tags = item.tags.map((tag) => resolveLocalizedToolTagName(tag, locale)).filter(Boolean);
+            const priceLabel = item.isDownloadPaid
+              ? Number.isFinite(item.price) && item.price > 0 ? `¥${item.price.toFixed(2)}` : text.pricePending
+              : text.freeTag;
             return <article key={item.id} className="flex min-h-[270px] flex-col rounded-2xl border border-[var(--marketing-border)] bg-white p-5 shadow-[0_12px_34px_rgba(29,78,126,0.06)]">
               <div className="flex items-start gap-3">
                 <div className="flex size-14 shrink-0 items-center justify-center overflow-hidden rounded-xl bg-[#e8f3ff] text-[var(--marketing-accent)]">
                   <AiWorkflowCoverImage coverImage={item.coverImage} slug={item.slug} alt="" width={56} height={56} unoptimized className="size-14 object-cover" />
                 </div>
                 <div className="min-w-0 flex-1"><Link href={href} className="font-semibold text-[var(--marketing-text)] hover:text-[var(--marketing-accent)]">{identity.primaryName}</Link>{locale === "zh" && identity.secondaryName ? <p className="mt-1 truncate text-xs text-[var(--marketing-muted)]">{identity.secondaryName}</p> : null}</div>
-                <span className="shrink-0 rounded-full bg-[#e8f3ff] px-2.5 py-1 text-xs font-semibold text-[var(--marketing-accent)]">{item.deliveryMode === "repository_link" ? text.repositoryLink : item.isDownloadPaid ? `¥${item.price.toFixed(2)}` : text.freeTag}</span>
+                <span className="shrink-0 rounded-full bg-[#e8f3ff] px-2.5 py-1 text-xs font-semibold text-[var(--marketing-accent)]">{item.deliveryMode === "repository_link" ? text.repositoryLink : priceLabel}</span>
               </div>
               <p className="mt-4 line-clamp-3 text-sm leading-6 text-[var(--marketing-muted)]">{description}</p>
               <div className="mt-3 flex flex-wrap gap-2">{item.topic ? <span className="rounded-full border border-[var(--marketing-border)] px-2.5 py-1 text-xs">{locale === "en" ? item.topic.englishName || item.topic.name : item.topic.name}</span> : null}{tags.slice(0, 3).map((tag) => <span key={tag} className="rounded-full border border-[var(--marketing-border)] px-2.5 py-1 text-xs">{tag}</span>)}</div>

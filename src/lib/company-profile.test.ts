@@ -7,6 +7,7 @@ describe("companyProfile", () => {
     expect(companyProfile.name.en).toBe("Shenzhen Longgang District Enhe Network Technology Studio");
     expect(companyProfile.address.zh).toContain("宸和路51号");
     expect(companyProfile.phone.href).toBe(`tel:${companyProfile.phone.value}`);
+    expect(companyProfile.email.value).toBe("amen.enhe@gmail.com");
     expect(companyProfile.email.href).toBe(`mailto:${companyProfile.email.value}`);
   });
 });

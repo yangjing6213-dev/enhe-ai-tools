@@ -1,4 +1,5 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
+import { legalPolicyUpdatedAt, legalSlugs } from "@/lib/legal";
 
 const prismaMock = {
   tool: {
@@ -108,6 +109,41 @@ describe("sitemap canonical URL contract", () => {
         const entry = entries.find((entry) => entry.url === `https://www.enhe-tech.com.cn${prefix}${path}`);
         expect(entry).toBeDefined();
         expect(entry).not.toHaveProperty("lastModified");
+      }
+    }
+  });
+
+  it("keeps both homepages discoverable without an unverified source-edit timestamp", async () => {
+    prismaMock.tool.findMany.mockResolvedValue([]);
+    prismaMock.newsArticle.findMany.mockResolvedValue([]);
+    const { default: sitemap } = await import("@/app/sitemap");
+    const entries = await sitemap();
+
+    for (const path of ["/", "/en"]) {
+      const matches = entries.filter((entry) => entry.url === `https://www.enhe-tech.com.cn${path}`);
+      expect(matches).toHaveLength(1);
+      expect(matches[0]).not.toHaveProperty("lastModified");
+      expect(matches[0].alternates?.languages).toEqual({
+        "x-default": "https://www.enhe-tech.com.cn/",
+        "zh-CN": "https://www.enhe-tech.com.cn/",
+        "en-US": "https://www.enhe-tech.com.cn/en",
+      });
+    }
+
+    expect(entries.find((entry) => entry.url === "https://www.enhe-tech.com.cn/about")?.lastModified)
+      .toEqual(new Date("2026-07-23T00:00:00.000Z"));
+  });
+
+  it("uses the published policy revision date for both languages of the legal pages", async () => {
+    prismaMock.tool.findMany.mockResolvedValue([]);
+    prismaMock.newsArticle.findMany.mockResolvedValue([]);
+    const { default: sitemap } = await import("@/app/sitemap");
+    const entries = await sitemap();
+
+    for (const slug of legalSlugs) {
+      for (const prefix of ["", "/en"]) {
+        const entry = entries.find((item) => item.url === `https://www.enhe-tech.com.cn${prefix}/legal/${slug}`);
+        expect(entry?.lastModified).toEqual(new Date(`${legalPolicyUpdatedAt}T00:00:00.000Z`));
       }
     }
   });

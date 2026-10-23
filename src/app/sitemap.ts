@@ -171,7 +171,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     })),
     ...publicDiscoveryRoutes.filter((route) => !sitemapExcludedPaths.has(route.path)).map((route) => ({
       url: absoluteSitemapUrl(route.path),
-      ...(dynamicListingPaths.has(stripLocalePrefix(route.path)) ? {} : { lastModified: new Date(route.lastModified) }),
+      ...(route.lastModified && !dynamicListingPaths.has(stripLocalePrefix(route.path)) ? { lastModified: new Date(route.lastModified) } : {}),
       alternates: {
         languages: buildLanguageAlternates(getCanonicalSourcePath(route.path)),
       },
