@@ -85,6 +85,47 @@ describe("tool localization bilingual blocks", () => {
     expect(tutorials[0].commonErrors).toContain("not saved");
   });
 
+  it("keeps English-only tutorials and FAQs off the Chinese page", () => {
+    const tool = {
+      slug: "ai-prompt",
+      name: "AI提示词管理系统",
+      englishName: "AI Prompt Management System",
+      shortDescription: "免费提示词库。",
+      content: "提示词库说明。",
+      type: "software" as const,
+      categoryName: "AI软件",
+    };
+    const tutorials = [
+      {
+        id: "tutorial-en-only",
+        title: "[[zh]][[/zh]][[en]]Access and usage guide[[/en]]",
+        content: "[[zh]][[/zh]][[en]]Open the library and copy a prompt.[[/en]]",
+        notes: null,
+        commonErrors: null,
+      },
+    ];
+    const faqs = [
+      {
+        id: "faq-en-only",
+        question: "[[zh]][[/zh]][[en]]What can I do with the web library?[[/en]]",
+        answer: "[[zh]][[/zh]][[en]]Search, filter, add context, and copy prompts.[[/en]]",
+      },
+    ];
+
+    expect(buildLocalizedToolTutorialItems(tutorials, tool, "en")).toMatchObject([
+      { title: "Access and usage guide", content: "Open the library and copy a prompt." },
+    ]);
+    expect(buildLocalizedToolTutorialItems(tutorials, tool, "zh")).toEqual([]);
+
+    const fallbackFaqs = buildLocalizedToolFaqItems([], tool, "zh");
+    const localizedChineseFaqs = buildLocalizedToolFaqItems(faqs, tool, "zh");
+    expect(localizedChineseFaqs).toEqual(fallbackFaqs);
+    expect(buildLocalizedToolFaqItems(faqs, tool, "en")[0]).toMatchObject({
+      question: "What can I do with the web library?",
+      answer: "Search, filter, add context, and copy prompts.",
+    });
+  });
+
   it("isolates legacy unmarked chinese and english product sections", () => {
     const tool = {
       slug: "legacy-mixed-language-voice-tool",

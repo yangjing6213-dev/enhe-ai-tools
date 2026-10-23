@@ -197,7 +197,6 @@ function extractLocalizedBlocks(value: string | null | undefined) {
   for (const match of source.matchAll(localizedBlockPattern)) {
     const locale = match[1] as Locale;
     const content = match[2]?.trim() ?? "";
-    if (!content) continue;
     blocks[locale] = content;
     hasMatch = true;
   }
@@ -1173,7 +1172,7 @@ export function buildLocalizedToolFaqItems(
     ...faq,
     question: resolveLocalizedInlineCopy(faq.question, locale, normalizeText),
     answer: resolveLocalizedInlineCopy(faq.answer, locale, normalizeRichText),
-  }));
+  })).filter((faq) => faq.question.trim() && faq.answer.trim());
 
   if (tool.type === "ai_workflow") {
     const workflowFaqs = locale === "zh" ? localizedFaqs : localizedFaqs.filter((faq) =>
@@ -1265,7 +1264,12 @@ export function buildLocalizedToolTutorialItems(
     ),
   }));
 
-  if (locale === "zh") return localizedTutorials;
+  if (locale === "zh") {
+    return localizedTutorials.filter((tutorial) =>
+      [tutorial.title, tutorial.content, tutorial.notes, tutorial.commonErrors]
+        .some((value) => Boolean(value?.trim())),
+    );
+  }
 
   const visibleLocalizedTutorials = localizedTutorials.filter(
     (tutorial) =>
