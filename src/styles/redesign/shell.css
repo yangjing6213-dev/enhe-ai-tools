@@ -102,7 +102,14 @@
 
   .enhe-redesign-production .customer-support-widget[data-support-open="false"] {
     right: calc(16px + var(--support-safe-area-inline-end));
-    bottom: calc(16px + var(--support-safe-area-block-end));
+    bottom: calc(
+      72px +
+      var(--support-trigger-icon-size) +
+      var(--support-trigger-icon-size) +
+      var(--support-trigger-gap) +
+      var(--support-trigger-gap) +
+      var(--support-safe-area-block-end)
+    );
   }
 
   .enhe-redesign-production:has(

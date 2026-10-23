@@ -1,4 +1,4 @@
-import { randomBytes, timingSafeEqual } from "node:crypto";
+import { createHmac, randomBytes, timingSafeEqual } from "node:crypto";
 import { cookies } from "next/headers";
 import { NextResponse, type NextRequest } from "next/server";
 import { hashPassword, signInUser } from "@/lib/auth";
@@ -54,6 +54,18 @@ function registerUrl(request: NextRequest, locale: "zh" | "en", message: string,
 
 function isUniqueConstraintError(error: unknown) {
   return typeof error === "object" && error !== null && "code" in error && error.code === "P2002";
+}
+
+function isTrustedGoogleRelayUrl(value: string) {
+  try {
+    const relayUrl = new URL(value);
+    return relayUrl.protocol === "https:" &&
+      /^([a-z0-9-]+\.){2}workers\.dev$/i.test(relayUrl.hostname) &&
+      relayUrl.pathname === "/exchange" &&
+      !relayUrl.search && !relayUrl.hash && !relayUrl.username && !relayUrl.password;
+  } catch {
+    return false;
+  }
 }
 
 async function findOrCreateGoogleUser(identity: GoogleIdentity, locale: "zh" | "en") {
@@ -146,28 +158,59 @@ export async function GET(request: NextRequest) {
 
   const clientId = process.env.GOOGLE_CLIENT_ID?.trim();
   const clientSecret = process.env.GOOGLE_CLIENT_SECRET?.trim();
+  const relayUrl = process.env.GOOGLE_OAUTH_RELAY_URL?.trim();
   if (!clientId || !clientSecret) return fail("google-not-configured");
+  if (relayUrl && !isTrustedGoogleRelayUrl(relayUrl)) return fail("google-not-configured");
 
   try {
-    const tokenResponse = await fetch("https://oauth2.googleapis.com/token", {
-      method: "POST",
-      headers: { "Content-Type": "application/x-www-form-urlencoded" },
-      body: new URLSearchParams({
-        code,
-        client_id: clientId,
-        client_secret: clientSecret,
-        redirect_uri: getGoogleRedirectUri(request.url),
-        grant_type: "authorization_code",
-      }),
-      cache: "no-store",
-      signal: AbortSignal.timeout(10_000),
-    });
-    if (!tokenResponse.ok) return fail();
+    let idToken: string | undefined;
+    let jwks: Parameters<typeof verifyGoogleIdToken>[3];
+    if (relayUrl) {
+      const relayBody = JSON.stringify({ code, redirectUri: getGoogleRedirectUri(request.url) });
+      const relaySignature = createHmac("sha256", clientSecret)
+        .update(`POST\n/exchange\n${relayBody}`)
+        .digest("base64url");
+      const relayResponse = await fetch(relayUrl, {
+        method: "POST",
+        headers: {
+          Authorization: `HMAC ${relaySignature}`,
+          "Content-Type": "application/json",
+        },
+        body: relayBody,
+        cache: "no-store",
+        signal: AbortSignal.timeout(10_000),
+      });
+      if (!relayResponse.ok) return fail();
+      const relayPayload = await relayResponse.json() as { idToken?: unknown; jwks?: unknown };
+      if (
+        typeof relayPayload.idToken !== "string" ||
+        typeof relayPayload.jwks !== "object" || relayPayload.jwks === null ||
+        !("keys" in relayPayload.jwks) || !Array.isArray(relayPayload.jwks.keys)
+      ) return fail();
+      idToken = relayPayload.idToken;
+      jwks = relayPayload.jwks as Parameters<typeof verifyGoogleIdToken>[3];
+    } else if (clientSecret) {
+      const tokenResponse = await fetch("https://oauth2.googleapis.com/token", {
+        method: "POST",
+        headers: { "Content-Type": "application/x-www-form-urlencoded" },
+        body: new URLSearchParams({
+          code,
+          client_id: clientId,
+          client_secret: clientSecret,
+          redirect_uri: getGoogleRedirectUri(request.url),
+          grant_type: "authorization_code",
+        }),
+        cache: "no-store",
+        signal: AbortSignal.timeout(10_000),
+      });
+      if (!tokenResponse.ok) return fail();
+      const tokenPayload = await tokenResponse.json() as { id_token?: unknown };
+      if (typeof tokenPayload.id_token !== "string") return fail();
+      idToken = tokenPayload.id_token;
+    }
 
-    const tokenPayload = await tokenResponse.json() as { id_token?: unknown };
-    if (typeof tokenPayload.id_token !== "string") return fail();
-
-    const identity = await verifyGoogleIdToken(tokenPayload.id_token, clientId, oauthState.nonce);
+    if (!idToken) return fail();
+    const identity = await verifyGoogleIdToken(idToken, clientId, oauthState.nonce, jwks);
     const userId = await findOrCreateGoogleUser(identity, locale);
     await signInUser(userId);
     clearStateCookie();

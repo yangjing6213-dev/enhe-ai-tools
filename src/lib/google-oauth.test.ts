@@ -1,5 +1,6 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
-import { buildGoogleAuthorizationUrl, getGoogleRedirectUri, validateGoogleIdentityClaims } from "@/lib/google-oauth";
+import { exportJWK, generateKeyPair, SignJWT } from "jose";
+import { buildGoogleAuthorizationUrl, getGoogleRedirectUri, validateGoogleIdentityClaims, verifyGoogleIdToken } from "@/lib/google-oauth";
 
 describe("Google registration helpers", () => {
   afterEach(() => vi.unstubAllEnvs());
@@ -54,5 +55,28 @@ describe("Google registration helpers", () => {
       email_verified: true,
       nonce: "other-nonce",
     }, "expected-nonce")).toThrow("GOOGLE_IDENTITY_INVALID");
+  });
+
+  it("verifies a Google identity token with relay-provided public keys", async () => {
+    const { privateKey, publicKey } = await generateKeyPair("RS256");
+    const jwk = await exportJWK(publicKey);
+    jwk.kid = "relay-test-key";
+    jwk.alg = "RS256";
+    const idToken = await new SignJWT({
+      email: "Person@Example.com",
+      email_verified: true,
+      nonce: "expected-nonce",
+      name: "Google Person",
+    })
+      .setProtectedHeader({ alg: "RS256", kid: jwk.kid })
+      .setIssuer("https://accounts.google.com")
+      .setAudience("fixture-client")
+      .setSubject("google-subject")
+      .setIssuedAt()
+      .setExpirationTime("5m")
+      .sign(privateKey);
+
+    await expect(verifyGoogleIdToken(idToken, "fixture-client", "expected-nonce", { keys: [jwk] }))
+      .resolves.toEqual({ subject: "google-subject", email: "person@example.com", name: "Google Person" });
   });
 });
