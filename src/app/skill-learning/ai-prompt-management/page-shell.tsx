@@ -52,14 +52,14 @@ const pageCopy = {
   en: {
     title: "AI Prompt Management System",
     description:
-      "A free bilingual AI prompt library for writing, video, images, learning, workplace, operations, and programming, with search, categories, task context, and one-click copy.",
+      "Browse 418 bilingual prompts across 11 categories for writing, SEO/GEO, video, images, AI agents, and productivity. Search, save favorites, and copy prompts from the free web library; the desktop download is a separate paid offer.",
     eyebrow: "Free AI skill tool",
     heading: "AI Prompt Management System",
     intro:
-      "Stop searching through old chats. Choose a scenario, add your task context, and turn saved prompts into practical instructions you can use immediately.",
-    guideTitle: "How to get better results",
+      "Browse 418 prompts in each language—Chinese and English—across 11 categories, including writing, short-video scripts, product copy, SEO/GEO, image generation, AI agents, and productivity. Search, filter by category, save favorites, and copy prompts with your own task context; the free web library requires no sign-in. The desktop version is a separate paid download intended for offline prompt-library use. Review its current offer, system requirements, included files, and delivery terms before purchasing.",
+    guideTitle: "How to use the prompt library",
     guide:
-      "Choose the closest scenario, then add your goal, audience, platform, tone, and constraints. Copy the result into ChatGPT, Claude, Gemini, DeepSeek, Doubao, Qwen, or another AI tool.",
+      "1. Open the free web library; no sign-in is required. 2. Search for a topic or browse the categories. 3. Open a prompt, review its wording, and add your task context. 4. Save it to favorites if useful, or copy it for your own use.",
     related: "Keep learning",
     relatedLinks: [
       { label: "Build Your Own X Navigator", href: "/build-your-own-x" },
@@ -68,19 +68,29 @@ const pageCopy = {
     ],
     faq: [
       {
-        question: "Who is this prompt manager for?",
+        question: "Is the online prompt library free?",
         answer:
-          "It is for everyday AI users, creators, ecommerce operators, product managers, students, workplace users, and teams building an internal prompt library.",
+          "Yes. The web library is free to use without signing in. The desktop version is a separate paid download and is not included in free web access.",
       },
       {
-        question: "Do I need to sign in?",
+        question: "How many prompts and categories are included?",
         answer:
-          "No. The web version is a free public tool for searching, filtering, and copying prompts.",
+          "There are 418 prompts in each language—Chinese and English—across 11 categories. Check the library for its latest contents.",
       },
       {
-        question: "How is the desktop version different?",
+        question: "What can I do in the web library?",
         answer:
-          "The web version is easier to discover and use anywhere. The desktop version is designed for offline libraries, training, and enterprise delivery.",
+          "You can search prompts, browse categories, save favorites, and copy prompt text.",
+      },
+      {
+        question: "Does the paid desktop version include the free web library?",
+        answer:
+          "No. The desktop download is a separate offer. Review the current purchase page for its price, system requirements, included files, and delivery terms.",
+      },
+      {
+        question: "How do I get the desktop download after purchase?",
+        answer:
+          "Follow the payment and access instructions on the order page. After access is unlocked, check your account center for the delivered version and usage instructions.",
       },
     ],
   },
