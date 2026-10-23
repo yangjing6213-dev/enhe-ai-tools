@@ -188,6 +188,21 @@ describe("tool localization helpers", () => {
     ).toBe(true);
   });
 
+  it("keeps SearchScope non-indexable while its English copy is being reviewed", () => {
+    expect(
+      shouldIndexEnglishToolPage({
+        slug: "searchscope-seo-geo",
+        name: "SearchScope SEO/GEO",
+        englishName: "SearchScope SEO/GEO",
+        shortDescription:
+          "Review basic SEO and GEO signals on publicly accessible websites.",
+        content:
+          "Inspect public page titles, content structure, multilingual relations, structured data, and crawler rules. Review evidence, priorities, and suggested next steps before applying changes.",
+        type: "software",
+      }),
+    ).toBe(false);
+  });
+
   it("does not index English details when only generated English copy would exist", () => {
     expect(
       shouldIndexEnglishToolPage({

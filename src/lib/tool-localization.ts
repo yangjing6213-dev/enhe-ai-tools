@@ -92,6 +92,8 @@ const reviewedEnglishIndexableToolSlugs = new Set([
   "high-frequency-ai-prompts-for-work-learning-and-teaching",
 ]);
 
+const englishIndexingHoldToolSlugs = new Set(["searchscope-seo-geo"]);
+
 const cjkPattern = /[\u3400-\u9fff]/;
 const latinWordPattern = /[A-Za-z][A-Za-z0-9'+-]*/g;
 const sentenceBreakPattern = /[。！？!?；;\n]+/;
@@ -734,6 +736,8 @@ export function shouldIndexEnglishToolPage(
     "slug" | "name" | "englishName" | "shortDescription" | "content" | "type"
   >,
 ) {
+  if (englishIndexingHoldToolSlugs.has(tool.slug)) return false;
+
   const localizedIdentity = resolveLocalizedToolIdentity(tool, "en");
   const localizedSummary = buildLocalizedToolSummary(tool, "en");
   const localizedContent = buildLocalizedToolLongContent(tool, "en");
