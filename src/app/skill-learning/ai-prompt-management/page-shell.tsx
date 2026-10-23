@@ -52,14 +52,14 @@ const pageCopy = {
   en: {
     title: "AI Prompt Management System",
     description:
-      "Browse 418 bilingual prompts across 11 categories for writing, SEO/GEO, video, images, AI agents, and productivity. Search, save favorites, and copy prompts from the free web library; the desktop download is a separate paid offer.",
+      "Search 418 Chinese prompts and 418 English prompts across 11 categories in a free library. Filter by category, add task context, and copy prompts into your AI assistant.",
     eyebrow: "Free AI skill tool",
     heading: "AI Prompt Management System",
     intro:
-      "Browse 418 prompts in each language—Chinese and English—across 11 categories, including writing, short-video scripts, product copy, SEO/GEO, image generation, AI agents, and productivity. Search, filter by category, save favorites, and copy prompts with your own task context; the free web library requires no sign-in. The desktop version is a separate paid download intended for offline prompt-library use. Review its current offer, system requirements, included files, and delivery terms before purchasing.",
+      "Browse 418 Chinese prompts and 418 English prompts across 11 categories in the free public web library. Search by task, filter by category, add your own context, and copy a prompt into the AI assistant you use. No sign-in is required. The desktop download is a separate paid product; check the current offer for its price, included files, and delivery details.",
     guideTitle: "How to use the prompt library",
     guide:
-      "1. Open the free web library; no sign-in is required. 2. Search for a topic or browse the categories. 3. Open a prompt, review its wording, and add your task context. 4. Save it to favorites if useful, or copy it for your own use.",
+      "1. Open the free web library; no sign-in is required. 2. Search by task or choose a category. 3. Select a prompt and add context that matters to you, such as your goal, audience, platform, tone, or constraints. 4. Copy it into your AI assistant and review the result before using it.",
     related: "Keep learning",
     relatedLinks: [
       { label: "Build Your Own X Navigator", href: "/build-your-own-x" },
@@ -68,29 +68,23 @@ const pageCopy = {
     ],
     faq: [
       {
-        question: "Is the online prompt library free?",
+        question: "What can I do with the web library?",
         answer:
-          "Yes. The web library is free to use without signing in. The desktop version is a separate paid download and is not included in free web access.",
+          "Search prompt entries by keyword, filter by category, add task context, and copy a prompt for use in an AI assistant.",
       },
       {
-        question: "How many prompts and categories are included?",
-        answer:
-          "There are 418 prompts in each language—Chinese and English—across 11 categories. Check the library for its latest contents.",
+        question: "Do I need to sign in to use the web library?",
+        answer: "No. The web library is free to use without signing in.",
       },
       {
-        question: "What can I do in the web library?",
+        question: "How many prompts are available?",
         answer:
-          "You can search prompts, browse categories, save favorites, and copy prompt text.",
+          "The Chinese dataset and English dataset each contain 418 prompt entries across 11 categories.",
       },
       {
-        question: "Does the paid desktop version include the free web library?",
+        question: "Does the free web library include the desktop download?",
         answer:
-          "No. The desktop download is a separate offer. Review the current purchase page for its price, system requirements, included files, and delivery terms.",
-      },
-      {
-        question: "How do I get the desktop download after purchase?",
-        answer:
-          "Follow the payment and access instructions on the order page. After access is unlocked, check your account center for the delivered version and usage instructions.",
+          "No. The desktop download is a separate paid product. Check the current offer for its price, included files, and delivery details.",
       },
     ],
   },

@@ -146,4 +146,20 @@ describe("AI prompt management website source contract", () => {
       ).toBe(false);
     }
   });
+
+  it("describes only verified features on the English prompt library page", () => {
+    const pageShell = read(
+      "src/app/skill-learning/ai-prompt-management/page-shell.tsx",
+    );
+    const englishCopy =
+      pageShell.split("  en: {")[1]?.split("\n  },\n} as const")[0] ?? "";
+
+    expect(englishCopy).toContain("Search by task");
+    expect(englishCopy).toContain("filter by category");
+    expect(englishCopy).toContain("add your own context");
+    expect(englishCopy).toContain("copy a prompt");
+    expect(englishCopy).not.toMatch(/favorite/i);
+    expect(englishCopy).not.toMatch(/offline prompt-library use/i);
+    expect(englishCopy).not.toMatch(/system requirements|account center/i);
+  });
 });
