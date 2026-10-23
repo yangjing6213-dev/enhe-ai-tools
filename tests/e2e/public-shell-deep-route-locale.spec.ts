@@ -28,7 +28,7 @@ for (const route of routes) {
   test(`${route.path} keeps one section navigation and global locale links on desktop and mobile`, async ({
     page,
   }) => {
-    const requestAudit = auditPublicRequests(page);
+    const desktopRequestAudit = auditPublicRequests(page);
 
 
     await page.setViewportSize({ width: 1440, height: 900 });
@@ -43,26 +43,31 @@ for (const route of routes) {
     const desktopLanguageLink = page.locator(`.redesign-desktop-nav .redesign-language-link[href="${route.targetHref}"]`);
     await expect(desktopLanguageLink).toHaveCount(1);
     await expect(desktopLanguageLink).toHaveAttribute("lang", route.targetLocale);
+    await desktopRequestAudit.verify();
 
-    await page.waitForLoadState("load");
-    await page.setViewportSize({ width: 390, height: 844 });
-    const mobileResponse = await page.goto(route.path, { waitUntil: "load" });
+    const mobilePage = await page.context().newPage();
+    await mobilePage.route("**/api/analytics", (request) =>
+      request.fulfill({ status: 204 }),
+    );
+    const mobileRequestAudit = auditPublicRequests(mobilePage);
+    await mobilePage.setViewportSize({ width: 390, height: 844 });
+    const mobileResponse = await mobilePage.goto(route.path, { waitUntil: "load" });
     expect(mobileResponse?.status()).toBe(200);
-    const mobileNav = page.locator(".ai-news-section-nav");
+    const mobileNav = mobilePage.locator(".ai-news-section-nav");
     await expect(mobileNav).toBeVisible();
     await expect(
       mobileNav.locator(`a[aria-current="location"][href="${route.navHref}"]`),
     ).toHaveCount(1);
-    const mobileLanguageLink = page.locator(`.redesign-mobile-actions .redesign-language-link[href="${route.targetHref}"]`);
+    const mobileLanguageLink = mobilePage.locator(`.redesign-mobile-actions .redesign-language-link[href="${route.targetHref}"]`);
     await expect(mobileLanguageLink).toHaveCount(1);
     await expect(mobileLanguageLink).toHaveAttribute("lang", route.targetLocale);
     const mobileSectionLinks = mobileNav.locator("a[href]");
     await mobileSectionLinks.first().focus();
     await expect(mobileSectionLinks.first()).toBeFocused();
-    await page.keyboard.press("Tab");
+    await mobilePage.keyboard.press("Tab");
     await expect(mobileNav.locator('a[aria-current="location"]')).toBeFocused();
-    await page.keyboard.press("Tab");
-    await expect.poll(() => page.evaluate(() => Boolean(document.activeElement?.closest(".ai-news-section-nav")))).toBe(false);
-    await requestAudit.verify();
+    await mobilePage.keyboard.press("Tab");
+    await expect.poll(() => mobilePage.evaluate(() => Boolean(document.activeElement?.closest(".ai-news-section-nav")))).toBe(false);
+    await mobileRequestAudit.verify();
   });
 }

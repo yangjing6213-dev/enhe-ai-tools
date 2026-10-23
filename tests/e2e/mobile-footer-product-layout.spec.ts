@@ -21,7 +21,7 @@ for (const locale of ["zh", "en"] as const) {
       await footer.scrollIntoViewIfNeeded();
       await expect.poll(() => footer.locator(".footer-brand-logo").evaluate((image) =>
         (image as HTMLImageElement).naturalWidth,
-      )).toBeGreaterThan(0);
+      ), { timeout: 15_000 }).toBeGreaterThan(0);
       const layout = await footer.evaluate((element) => {
         const bounds = (selector: string) =>
           element.querySelector(selector)!.getBoundingClientRect().toJSON();

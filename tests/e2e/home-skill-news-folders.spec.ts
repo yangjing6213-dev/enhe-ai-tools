@@ -52,7 +52,7 @@ for (const prefix of ['', '/en']) {
     try {
       const page = await context.newPage();
       const home = prefix || '/';
-      await page.goto(home);
+      await page.goto(home, { waitUntil: 'domcontentloaded' });
       const folder = page.locator('.redesign-home-features .folder-float').nth(1);
       const summary = folder.locator('.folder-float__trigger');
       await expect(summary).toBeVisible();
