@@ -40,6 +40,10 @@ function setNotice(key: string) {
   redirect(`/admin/ai-workflows?${key}=1`);
 }
 
+function redirectWorkflowError(message: string): never {
+  redirect(`/admin/ai-workflows?error=${encodeURIComponent(message)}`);
+}
+
 function revalidateWorkflowPublication(slug: string) {
   revalidateTag("public-tools");
   for (const prefix of ["", "/en"]) {
@@ -52,12 +56,12 @@ function revalidateWorkflowPublication(slug: string) {
 
 function assertCurrentReviewVersion(formData: FormData, candidate: { updatedAt: Date; tool: { updatedAt: Date } }) {
   if (formData.get("candidateUpdatedAt") !== candidate.updatedAt.toISOString() || formData.get("toolUpdatedAt") !== candidate.tool.updatedAt.toISOString()) {
-    redirect("/admin/ai-workflows?error=内容已变化，请刷新后重新审核。");
+    redirectWorkflowError("内容已变化，请刷新后重新审核。");
   }
 }
 
 function assertReviewedVersion(formData: FormData, candidate: { updatedAt: Date; tool: { updatedAt: Date } }) {
-  if (formData.get("contentReviewed") !== "on") redirect("/admin/ai-workflows?error=请先阅读并确认中英文介绍和封面，再发布。");
+  if (formData.get("contentReviewed") !== "on") redirectWorkflowError("请先阅读并确认中英文介绍和封面，再发布。");
   assertCurrentReviewVersion(formData, candidate);
 }
 
@@ -67,19 +71,19 @@ export async function publishAiWorkflowIntroductionAction(formData: FormData) {
   const admin = await requireAdmin();
   const candidateId = String(formData.get("candidateId") ?? "").trim();
   const candidate = await prisma.aiWorkflowCandidate.findUnique({ where: { id: candidateId }, include: { tool: true } });
-  if (!candidate?.tool || !canReviewRepositoryIntroduction(candidate, candidate.tool)) redirect("/admin/ai-workflows?error=草稿状态、双语内容、封面、来源或许可证据不完整；请先编辑补齐。下载包请使用价格审核入口。");
+  if (!candidate?.tool || !canReviewRepositoryIntroduction(candidate, candidate.tool)) redirectWorkflowError("草稿状态、双语内容、封面、来源或许可证据不完整；请先编辑补齐。下载包请使用价格审核入口。");
   const tool = candidate.tool;
   assertReviewedVersion(formData, { ...candidate, tool });
   const auditData = createAdminAuditCreateData({ adminId: admin.id, action: "ai_workflow.introduction.publish", targetType: "ai_workflow_candidate", targetId: candidate.id, summary: "Manually reviewed and published the bilingual repository introduction and cover.", metadata: { repositoryId: candidate.repositoryId, toolId: tool.id, contentReviewed: true, reviewedToolUpdatedAt: tool.updatedAt.toISOString() } }, await getAdminAuditRequestContext());
   try {
     await prisma.$transaction(async (tx) => {
       const updatedCandidate = await tx.aiWorkflowCandidate.updateMany({ where: { id: candidate.id, status: "reviewing", updatedAt: candidate.updatedAt, fileId: null }, data: { status: "published" } });
-      const updatedTool = await tx.tool.updateMany({ where: { id: tool.id, type: "ai_workflow", status: "draft", updatedAt: tool.updatedAt, downloadFileId: null }, data: { status: "published" } });
+      const updatedTool = await tx.tool.updateMany({ where: { id: tool.id, type: "ai_workflow", status: "draft", updatedAt: tool.updatedAt, downloadFileId: null }, data: { status: "published", onlineUrl: candidate.repositoryUrl } });
       if (updatedCandidate.count !== 1 || updatedTool.count !== 1) throw new ReviewChangedError();
       await tx.adminAuditLog.create({ data: auditData });
     });
   } catch (error) {
-    if (error instanceof ReviewChangedError) redirect("/admin/ai-workflows?error=内容已变化，请刷新后重新审核。");
+    if (error instanceof ReviewChangedError) redirectWorkflowError("内容已变化，请刷新后重新审核。");
     throw error;
   }
   revalidateWorkflowPublication(tool.slug);
@@ -91,8 +95,8 @@ export async function saveAiWorkflowTopicsAction(formData: FormData) {
   const topicListConfirmed = formData.get("topicListConfirmed") === "on";
   let rows: ReturnType<typeof parseTopicRows>;
   try { rows = parseTopicRows(formData.get("topics")); }
-  catch (error) { redirect(`/admin/ai-workflows?error=${encodeURIComponent(error instanceof Error ? error.message : "主题格式有误。")}`); }
-  if (topicListConfirmed && rows.length === 0) redirect("/admin/ai-workflows?error=不能确认空主题清单。");
+  catch (error) { redirectWorkflowError(error instanceof Error ? error.message : "主题格式有误。"); }
+  if (topicListConfirmed && rows.length === 0) redirectWorkflowError("不能确认空主题清单。");
 
   await prisma.$transaction(async (tx) => {
     const currentSetting = await tx.aiWorkflowCollectionSetting.findUnique({ where: { id: "default" }, select: { topicListVersion: true } });
@@ -132,7 +136,7 @@ export async function saveAiWorkflowTopicsAction(formData: FormData) {
 export async function saveAiWorkflowScheduleAction(formData: FormData) {
   const admin = await requireAdmin();
   const scheduleTime = String(formData.get("scheduleTime") ?? "09:00").trim();
-  if (!/^([01]\d|2[0-3]):[0-5]\d$/.test(scheduleTime)) redirect("/admin/ai-workflows?error=时间格式应为%20HH:mm");
+  if (!/^([01]\d|2[0-3]):[0-5]\d$/.test(scheduleTime)) redirectWorkflowError("时间格式应为 HH:mm");
   const isPaused = formData.get("isPaused") === "on";
   const requestedEnabled = formData.get("isEnabled") === "on";
   const [topicCount, setting] = await Promise.all([
@@ -160,12 +164,12 @@ export async function requestAiWorkflowBatchAction() {
     prisma.aiWorkflowCollectionSetting.findUnique({ where: { id: "default" } }),
     prisma.aiWorkflowTopic.findMany({ where: { isEnabled: true }, orderBy: [{ sortOrder: "asc" }, { name: "asc" }] }),
   ]);
-  if (setting?.isPaused) redirect("/admin/ai-workflows?error=采集已暂停，恢复后才能请求批次。");
-  if (!setting?.topicListConfirmedAt) redirect("/admin/ai-workflows?error=请先导入并核对已提供的有序主题清单。");
-  if (!topics.length) redirect("/admin/ai-workflows?error=尚未导入有序主题清单。");
+  if (setting?.isPaused) redirectWorkflowError("采集已暂停，恢复后才能请求批次。");
+  if (!setting?.topicListConfirmedAt) redirectWorkflowError("请先导入并核对已提供的有序主题清单。");
+  if (!topics.length) redirectWorkflowError("尚未导入有序主题清单。");
   const cosConfig = getAiWorkflowCosConfig();
   const cosServerConfigured = Boolean(cosConfig && cosConfig.region === "ap-shanghai" && cosConfig.staticBucket === "enhe-static-1303691623" && cosConfig.downloadBucket === "enhe-downloads-1303691623");
-  if (!process.env.AI_WORKFLOW_WORKER_TOKEN?.trim() || !cosServerConfigured) redirect("/admin/ai-workflows?error=执行凭据或服务器文件存储未就绪，暂不能请求批次。");
+  if (!process.env.AI_WORKFLOW_WORKER_TOKEN?.trim() || !cosServerConfigured) redirectWorkflowError("执行凭据或服务器文件存储未就绪，暂不能请求批次。");
 
   const batchDate = getShanghaiDate();
   const [existing, alreadyUsedToday, activeBatch] = await Promise.all([
@@ -200,7 +204,7 @@ export async function decideAiWorkflowPriceAction(formData: FormData) {
   const candidateId = String(formData.get("candidateId") ?? "").trim();
   const decision = String(formData.get("decision") ?? "").trim();
   const candidate = await prisma.aiWorkflowCandidate.findUnique({ where: { id: candidateId }, include: { tool: true, file: true } });
-  if (!candidate || !candidate.toolId || !candidate.tool || candidate.status !== "pending_pricing") redirect("/admin/ai-workflows?error=候选项目状态已变化，请刷新后重试。");
+  if (!candidate || !candidate.toolId || !candidate.tool || candidate.status !== "pending_pricing") redirectWorkflowError("候选项目状态已变化，请刷新后重试。");
   if (decision === "reject") {
     assertCurrentReviewVersion(formData, { ...candidate, tool: candidate.tool });
     const auditData = createAdminAuditCreateData({ adminId: admin.id, action: "ai_workflow.candidate.reject", targetType: "ai_workflow_candidate", targetId: candidate.id, summary: "Rejected an AI Workflow package proposal; any previously published introduction remains available.", metadata: { repositoryId: candidate.repositoryId } }, await getAdminAuditRequestContext());
@@ -212,7 +216,7 @@ export async function decideAiWorkflowPriceAction(formData: FormData) {
         await tx.adminAuditLog.create({ data: auditData });
       });
     } catch (error) {
-      if (error instanceof ReviewChangedError) redirect("/admin/ai-workflows?error=内容已变化，请刷新后重新审核。");
+      if (error instanceof ReviewChangedError) redirectWorkflowError("内容已变化，请刷新后重新审核。");
       throw error;
     }
     revalidateWorkflowPublication(candidate.tool.slug);
@@ -220,13 +224,13 @@ export async function decideAiWorkflowPriceAction(formData: FormData) {
   }
 
   const priceDecision = decision === "paid" ? "paid" : decision === "free" ? "free" : null;
-  if (!priceDecision) redirect("/admin/ai-workflows?error=价格选择无效。");
+  if (!priceDecision) redirectWorkflowError("价格选择无效。");
   assertReviewedVersion(formData, { ...candidate, tool: candidate.tool });
   const presentationFields = candidate.tool.status === "published" ? pendingWorkflowPresentation(candidate.validationReport) : null;
   const reviewedTool = { ...candidate.tool, ...presentationFields };
-  if (!hasReviewableWorkflowPresentation(reviewedTool)) redirect("/admin/ai-workflows?error=请先补齐可审核的中英文介绍和封面。");
+  if (!hasReviewableWorkflowPresentation(reviewedTool)) redirectWorkflowError("请先补齐可审核的中英文介绍和封面。");
   const price = priceDecision === "paid" ? Number(formData.get("confirmedPrice")) : 0;
-  if (priceDecision === "paid" && (!Number.isFinite(price) || price < 10 || price > 50 || Math.round(price * 100) !== price * 100)) redirect("/admin/ai-workflows?error=收费价格必须为 10 到 50 元，最多两位小数。");
+  if (priceDecision === "paid" && (!Number.isFinite(price) || price < 10 || price > 50 || Math.round(price * 100) !== price * 100)) redirectWorkflowError("收费价格必须为 10 到 50 元，最多两位小数。");
   const downloadBucket = process.env.COS_DOWNLOAD_BUCKET?.trim() || "enhe-downloads-1303691623";
   const canPublish = Boolean(candidate.file && isAiWorkflowArchiveReady({
     repositoryId: candidate.repositoryId,
@@ -279,7 +283,7 @@ export async function decideAiWorkflowPriceAction(formData: FormData) {
       await tx.adminAuditLog.create({ data: auditData });
     });
   } catch (error) {
-    if (error instanceof ReviewChangedError) redirect("/admin/ai-workflows?error=内容已变化，请刷新后重新审核。");
+    if (error instanceof ReviewChangedError) redirectWorkflowError("内容已变化，请刷新后重新审核。");
     throw error;
   }
   if (canPublish) revalidateWorkflowPublication(candidate.tool.slug);

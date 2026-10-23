@@ -50,5 +50,5 @@ export function canReviewRepositoryIntroduction(candidate: AiWorkflowCandidate, 
     candidate.repositoryOwner === item.repositoryOwner && candidate.repositoryName === item.repositoryName &&
     candidate.commitSha === item.commitSha && candidate.sourceFingerprint === item.sourceFingerprint &&
     candidate.licenseSpdx === item.licenseSpdx && candidate.licenseUrl === expectedLicenseUrl &&
-    candidate.failureReason === item.failureReason && tool.onlineUrl === item.repositoryUrl;
+    candidate.failureReason === item.failureReason && (tool.onlineUrl === null || tool.onlineUrl === item.repositoryUrl);
 }
