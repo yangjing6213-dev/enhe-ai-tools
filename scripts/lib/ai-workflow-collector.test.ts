@@ -1,6 +1,26 @@
 import { describe, expect, it } from "vitest";
 import { parseAiWorkflowRepositoryLinkResult } from "../../src/lib/ai-workflows/worker-result";
-import { buildAiWorkflowSearchTerms, getAiWorkflowFailureCode, getAiWorkflowLinkOnlyFailureReason, getAiWorkflowRegisteredRepositoryIds, isAiWorkflowCandidateRelevant, redactAiWorkflowCollectorText, restoreAiWorkflowCandidateMetadata, selectAiWorkflowRepositoryCandidates, skipAlreadyRegisteredRepository } from "./ai-workflow-collector";
+import { buildAiWorkflowSearchTerms, getAiWorkflowFailureCode, getAiWorkflowGitHubApiHeaders, getAiWorkflowLinkOnlyFailureReason, getAiWorkflowRateLimitRetryAfterSeconds, getAiWorkflowRegisteredRepositoryIds, isAiWorkflowCandidateRelevant, isAiWorkflowCandidateRetryableOutcome, redactAiWorkflowCollectorText, restoreAiWorkflowCandidateMetadata, selectAiWorkflowRepositoryCandidates, skipAlreadyRegisteredRepository } from "./ai-workflow-collector";
+
+describe("AI Workflow collection limits and GitHub retries", () => {
+  it("adds GitHub authentication only when a token is configured", () => {
+    expect(getAiWorkflowGitHubApiHeaders()).not.toHaveProperty("authorization");
+    expect(getAiWorkflowGitHubApiHeaders("  test-token  ").authorization).toBe("Bearer test-token");
+  });
+
+  it("uses bounded retry delays from rate-limit errors and a safe fallback", () => {
+    expect(getAiWorkflowRateLimitRetryAfterSeconds(new Error("GITHUB_RATE_LIMIT"))).toBe(300);
+    expect(getAiWorkflowRateLimitRetryAfterSeconds(Object.assign(new Error("GITHUB_RATE_LIMIT"), { retryAfterSeconds: 61.2 }))).toBe(62);
+    expect(getAiWorkflowRateLimitRetryAfterSeconds(Object.assign(new Error("GITHUB_RATE_LIMIT"), { retryAfterSeconds: 200_000 }))).toBe(86_400);
+  });
+
+  it("retries a rate-limited candidate while leaving definitive rejections settled", () => {
+    expect(isAiWorkflowCandidateRetryableOutcome({ state: "rejected", reason: "GITHUB_RATE_LIMIT" })).toBe(true);
+    expect(isAiWorkflowCandidateRetryableOutcome({ state: "rejected", reason: "NETWORK_UNAVAILABLE" })).toBe(true);
+    expect(isAiWorkflowCandidateRetryableOutcome({ state: "rejected", reason: "TOPIC_MISMATCH" })).toBe(false);
+    expect(isAiWorkflowCandidateRetryableOutcome({ state: "registered" })).toBe(false);
+  });
+});
 
 describe("AI Workflow registered draft recovery", () => {
   it("counts three saved review drafts as a completed collection quota without requiring publication", () => {

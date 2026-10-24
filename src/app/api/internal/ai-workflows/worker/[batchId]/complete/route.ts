@@ -25,14 +25,21 @@ const failureCodes = [
 const completionSchema = z.object({
   workerId: z.string().min(1).max(80).regex(/^[A-Za-z0-9._:-]+$/),
   leaseToken: z.string().min(24).max(512).regex(/^\S+$/),
-  state: z.enum(["completed", "partial", "failed"]),
+  state: z.enum(["completed", "partial", "failed", "paused"]),
   failureCode: z.enum(failureCodes).optional(),
+  retryAfterSeconds: z.number().int().min(1).max(86_400).optional(),
 }).strict().superRefine((value, context) => {
   if (value.state === "completed" && value.failureCode) {
     context.addIssue({ code: z.ZodIssueCode.custom, path: ["failureCode"], message: "Completed batches cannot include a failure code." });
   }
   if (value.state !== "completed" && !value.failureCode) {
     context.addIssue({ code: z.ZodIssueCode.custom, path: ["failureCode"], message: "Partial and failed batches require a stable failure code." });
+  }
+  if (value.state === "paused" && (value.failureCode !== "GITHUB_RATE_LIMIT" || !value.retryAfterSeconds)) {
+    context.addIssue({ code: z.ZodIssueCode.custom, path: ["retryAfterSeconds"], message: "A rate-limited pause requires a bounded retry delay." });
+  }
+  if (value.state !== "paused" && value.retryAfterSeconds !== undefined) {
+    context.addIssue({ code: z.ZodIssueCode.custom, path: ["retryAfterSeconds"], message: "Only paused batches can include a retry delay." });
   }
 });
 
@@ -87,7 +94,8 @@ export async function POST(
   if (
     (input.state === "completed" && readyCandidateCount !== 3) ||
     (input.state === "partial" && (readyCandidateCount === 0 || readyCandidateCount >= 3)) ||
-    (input.state === "failed" && readyCandidateCount !== 0)
+    (input.state === "failed" && readyCandidateCount !== 0) ||
+    (input.state === "paused" && readyCandidateCount >= 3)
   ) {
     return workerJsonResponse({ ok: false, code: "THREE_VALID_CANDIDATES_REQUIRED" }, 409);
   }
@@ -102,13 +110,13 @@ export async function POST(
     },
     data: {
       status: input.state,
-      completedAt: now,
+      completedAt: input.state === "paused" ? null : now,
       failureReason: input.failureCode ?? null,
-      lastWorkerStage: "complete",
+      lastWorkerStage: input.state === "paused" ? "rate_limit_wait" : "complete",
       lastHeartbeatAt: now,
       leaseOwnerId: null,
       leaseTokenHash: null,
-      leaseExpiresAt: null,
+      leaseExpiresAt: input.state === "paused" ? new Date(now.getTime() + input.retryAfterSeconds! * 1000) : null,
     },
   });
   if (updated.count !== 1) return workerJsonResponse({ ok: false, code: "LEASE_INVALID" }, 409);

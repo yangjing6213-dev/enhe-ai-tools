@@ -6,7 +6,9 @@ import { describe, expect, it, vi } from "vitest";
 import {
   getAiWorkflowFailureCode,
   getAiWorkflowLinkOnlyFailureReason,
+  getAiWorkflowRateLimitRetryAfterSeconds,
   getAiWorkflowRegisteredRepositoryIds,
+  isAiWorkflowCandidateRetryableOutcome,
 } from "./lib/ai-workflow-collector";
 
 // Execute the real batch function without importing the CLI entrypoint, which
@@ -75,6 +77,7 @@ function createBatch(options: { delivery: "package" | "repository_link"; registe
     workerId: () => "fixture-worker",
     getTopicSearchPlan: () => [{ id: "topic-1", name: "Fixture", searchDirections: "Fixture" }],
     getAiWorkflowRegisteredRepositoryIds, getAiWorkflowFailureCode, getAiWorkflowLinkOnlyFailureReason,
+    getAiWorkflowRateLimitRetryAfterSeconds, isAiWorkflowCandidateRetryableOutcome,
     hasPendingRegistrationFor: (current: TestState, id: string) => current.pendingRegistration?.repositoryId === id,
     processCandidate, registerRepositoryLinkOnly, postWorker,
   }) as (lease: unknown, token: string, credentials: unknown) => Promise<void>;

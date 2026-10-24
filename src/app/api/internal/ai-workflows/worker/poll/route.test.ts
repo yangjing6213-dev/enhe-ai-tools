@@ -305,4 +305,60 @@ describe("POST /api/internal/ai-workflows/worker/poll", () => {
       where: expect.objectContaining({ id: "already-ran-today" }),
     }));
   });
+
+  it("resumes an older rate-limited batch before creating a new daily batch", async () => {
+    const retryBatch = { id: "retry-batch", status: "partial", startedAt: new Date("2026-10-19T08:00:00.000Z"), leaseExpiresAt: null };
+    mocks.batchesFindFirst
+      .mockResolvedValueOnce(null)
+      .mockResolvedValueOnce(retryBatch)
+      .mockResolvedValueOnce(retryBatch);
+
+    const result = await body(await POST(request()));
+
+    expect(result).toMatchObject({ ok: true, state: "claimed", batch: { id: "retry-batch" } });
+    expect(mocks.batchesCreate).not.toHaveBeenCalled();
+    expect(mocks.batchesUpdateMany).toHaveBeenCalledWith(expect.objectContaining({
+      where: expect.objectContaining({ id: "retry-batch", status: "partial", failureReason: "GITHUB_RATE_LIMIT" }),
+    }));
+  });
+
+  it("reclaims today's rate-limited partial batch without creating a duplicate", async () => {
+    const partialBatch = {
+      id: "today-partial",
+      status: "partial",
+      failureReason: "GITHUB_RATE_LIMIT",
+      startedAt: new Date("2026-10-20T00:30:00.000Z"),
+      leaseExpiresAt: null,
+    };
+    mocks.batchesFindFirst.mockImplementation(({ where }: { where: Record<string, unknown> }) =>
+      "lastRunDate" in where ? { id: "today-partial" } : partialBatch,
+    );
+
+    const result = await body(await POST(request()));
+
+    expect(result).toMatchObject({ ok: true, state: "claimed", batch: { id: "today-partial" } });
+    expect(mocks.batchesCreate).not.toHaveBeenCalled();
+    expect(mocks.batchesUpdateMany).toHaveBeenCalledWith(expect.objectContaining({
+      where: expect.objectContaining({ id: "today-partial", status: "partial", failureReason: "GITHUB_RATE_LIMIT" }),
+      data: expect.objectContaining({ completedAt: null }),
+    }));
+  });
+
+  it("waits for a rate-limit retry window instead of starting another topic", async () => {
+    mocks.batchesFindFirst.mockImplementation(({ where }: { where: Record<string, unknown> }) =>
+      "lastRunDate" in where ? null : {
+        id: "retry-batch",
+        status: "paused",
+        failureReason: "GITHUB_RATE_LIMIT",
+        startedAt: new Date("2026-10-19T08:00:00.000Z"),
+        leaseExpiresAt: new Date("2026-10-20T01:05:00.000Z"),
+      },
+    );
+
+    const result = await body(await POST(request()));
+
+    expect(result).toMatchObject({ ok: true, state: "idle", reason: "github_rate_limit_backoff" });
+    expect(mocks.batchesCreate).not.toHaveBeenCalled();
+    expect(mocks.batchesUpdateMany).not.toHaveBeenCalled();
+  });
 });

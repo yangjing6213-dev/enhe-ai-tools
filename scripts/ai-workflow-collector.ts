@@ -27,8 +27,11 @@ import { generateAiWorkflowPresentation } from "./lib/ai-workflow-presentation";
 import {
   buildAiWorkflowSearchTerms,
   getAiWorkflowFailureCode,
+  getAiWorkflowGitHubApiHeaders,
   getAiWorkflowLinkOnlyFailureReason,
+  getAiWorkflowRateLimitRetryAfterSeconds,
   getAiWorkflowRegisteredRepositoryIds,
+  isAiWorkflowCandidateRetryableOutcome,
   isAiWorkflowCandidateRelevant,
   redactAiWorkflowCollectorText,
   restoreAiWorkflowCandidateMetadata,
@@ -284,16 +287,21 @@ async function postWorker<T>(path: string, body: unknown, token: string): Promis
   }
 }
 
+function createGitHubRateLimitError(status: number, requestedDelayMs: number) {
+  const error = new Error("GITHUB_RATE_LIMIT") as Error & { status?: number; retryAfterSeconds?: number };
+  error.status = status;
+  error.retryAfterSeconds = requestedDelayMs > 0
+    ? Math.min(86_400, Math.ceil(requestedDelayMs / 1000))
+    : 300;
+  return error;
+}
+
 async function githubJson<T>(path: string) {
   for (let attempt = 0; attempt < 3; attempt += 1) {
     let response: Response;
     try {
       response = await fetch(`${githubApi}${path}`, {
-        headers: {
-          accept: "application/vnd.github+json",
-          "x-github-api-version": "2022-11-28",
-          "user-agent": "ENHE-AI-Workflow-Collector/1.0",
-        },
+        headers: getAiWorkflowGitHubApiHeaders(process.env.GITHUB_TOKEN || process.env.GH_TOKEN),
         signal: AbortSignal.timeout(20000),
       });
     } catch (error) {
@@ -310,20 +318,11 @@ async function githubJson<T>(path: string) {
     );
     const retryableServerError = response.status >= 500 && response.status <= 599;
     if (retryableRateLimit) {
-      if (attempt === 2) {
-        const error = new Error("GITHUB_RATE_LIMIT") as Error & { status?: number };
-        error.status = response.status;
-        throw error;
-      }
       const retryAfter = Number(response.headers.get("retry-after"));
       const resetAt = Number(response.headers.get("x-ratelimit-reset")) * 1000;
       const waitForReset = Number.isFinite(resetAt) && resetAt > Date.now() ? resetAt - Date.now() : 0;
       const requestedDelay = retryAfter > 0 ? retryAfter * 1000 : waitForReset;
-      if (requestedDelay > 60000) {
-        const error = new Error("GITHUB_RATE_LIMIT") as Error & { status?: number };
-        error.status = response.status;
-        throw error;
-      }
+      if (attempt === 2 || requestedDelay > 60000) throw createGitHubRateLimitError(response.status, requestedDelay);
       const delay = Math.max(1200 * (attempt + 1), requestedDelay);
       await new Promise((resolvePromise) => setTimeout(resolvePromise, delay));
       continue;
@@ -1132,6 +1131,11 @@ async function runBatch(lease: WorkerLease, token: string, credentials: { secret
   timer.unref?.();
 
   let failureCode: string | undefined;
+  let retryAfterSeconds = 300;
+  const clearRetryableOutcome = (repositoryId: string) => {
+    state.outcomes = state.outcomes.filter((outcome) =>
+      outcome.repositoryId !== repositoryId || !isAiWorkflowCandidateRetryableOutcome(outcome));
+  };
   try {
     let successes = registeredRepositoryIds.length;
     if (state.pendingRegistration) {
@@ -1183,10 +1187,15 @@ async function runBatch(lease: WorkerLease, token: string, credentials: { secret
         const space = await statfs(runsRoot);
         if (space.bavail * space.bsize < minimumFreeBytes) { failureCode = "BUDGET_EXCEEDED"; break; }
         state.candidateIndex = index;
-        if (existingInBatch.has(candidate.id) || state.completedRepositoryIds.includes(candidate.id)) continue;
+        if (
+          existingInBatch.has(candidate.id) ||
+          state.completedRepositoryIds.includes(candidate.id) ||
+          state.outcomes.some((outcome) => outcome.repositoryId === candidate.id && outcome.state === "rejected" && !isAiWorkflowCandidateRetryableOutcome(outcome))
+        ) continue;
         try {
           stage = "fetch";
           await processCandidate({ candidate, batch, lease, token, credentials, state, statePath, index, signal: controller.signal, setStage: (value) => { stage = value; } });
+          clearRetryableOutcome(candidate.id);
           successes += 1;
         } catch (error) {
           if (hasPendingRegistrationFor(state, candidate.id)) {
@@ -1203,6 +1212,7 @@ async function runBatch(lease: WorkerLease, token: string, credentials: { secret
                 signal: controller.signal,
                 setStage: (value) => { stage = value; },
               });
+              clearRetryableOutcome(candidate.id);
               successes += 1;
               await logEvent("candidate_registered_link_only", { batchId: batch.id, repositoryId: candidate.id, reason: linkOnlyReason });
               continue;
@@ -1219,6 +1229,13 @@ async function runBatch(lease: WorkerLease, token: string, credentials: { secret
               const linkErrorReason = linkError instanceof Error && /^[A-Z0-9_]{2,80}$/.test(linkError.message)
                 ? linkError.message
                 : getAiWorkflowFailureCode(linkError);
+              if (linkErrorReason === "GITHUB_RATE_LIMIT") {
+                failureCode = linkErrorReason;
+                retryAfterSeconds = getAiWorkflowRateLimitRetryAfterSeconds(linkError);
+                await persistRunState(statePath, state);
+                await logEvent("candidate_retry_deferred", { batchId: batch.id, repositoryId: candidate.id, reason: linkErrorReason, retryAfterSeconds });
+                break;
+              }
               state.outcomes.push({ repositoryId: candidate.id, repository: candidate.fullName, state: "rejected", reason: linkErrorReason });
               await persistRunState(statePath, state);
               await logEvent("candidate_link_only_registration_failed", { batchId: batch.id, repositoryId: candidate.id, reason: linkOnlyReason, failure: linkErrorReason });
@@ -1228,6 +1245,13 @@ async function runBatch(lease: WorkerLease, token: string, credentials: { secret
               }
               continue;
             }
+          }
+          if (reason === "GITHUB_RATE_LIMIT") {
+            failureCode = reason;
+            retryAfterSeconds = getAiWorkflowRateLimitRetryAfterSeconds(error);
+            await persistRunState(statePath, state);
+            await logEvent("candidate_retry_deferred", { batchId: batch.id, repositoryId: candidate.id, reason, retryAfterSeconds });
+            break;
           }
           state.outcomes.push({ repositoryId: candidate.id, repository: candidate.fullName, state: "rejected", reason });
           await persistRunState(statePath, state);
@@ -1250,6 +1274,7 @@ async function runBatch(lease: WorkerLease, token: string, credentials: { secret
       return;
     }
     failureCode = reason;
+    if (reason === "GITHUB_RATE_LIMIT") retryAfterSeconds = getAiWorkflowRateLimitRetryAfterSeconds(error);
   } finally {
     clearInterval(timer);
   }
@@ -1259,7 +1284,7 @@ async function runBatch(lease: WorkerLease, token: string, credentials: { secret
     return;
   }
   const readyCount = state.completedRepositoryIds.length;
-  const stateValue = readyCount >= 3 ? "completed" : readyCount > 0 ? "partial" : "failed";
+  const stateValue = readyCount >= 3 ? "completed" : failureCode === "GITHUB_RATE_LIMIT" ? "paused" : readyCount > 0 ? "partial" : "failed";
   if (stateValue === "completed") failureCode = undefined;
   if (failureCode && !completionFailureCodes.has(failureCode)) failureCode = "INSUFFICIENT_CANDIDATES";
   const completion = {
@@ -1267,10 +1292,11 @@ async function runBatch(lease: WorkerLease, token: string, credentials: { secret
     leaseToken: lease.leaseToken,
     state: stateValue,
     ...(stateValue === "completed" ? {} : { failureCode: failureCode ?? "INSUFFICIENT_CANDIDATES" }),
+    ...(stateValue === "paused" ? { retryAfterSeconds } : {}),
   };
   await postWorker(`/${batch.id}/complete`, completion, token);
   await persistRunState(statePath, state);
-  await logEvent("batch_completed", { batchId: batch.id, topic: batch.topicNameSnapshot, state: stateValue, registeredCount: readyCount, failureCode: failureCode ?? null });
+  await logEvent(stateValue === "paused" ? "batch_paused" : "batch_completed", { batchId: batch.id, topic: batch.topicNameSnapshot, state: stateValue, registeredCount: readyCount, failureCode: failureCode ?? null, ...(stateValue === "paused" ? { retryAfterSeconds } : {}) });
 }
 
 async function pollOnce() {

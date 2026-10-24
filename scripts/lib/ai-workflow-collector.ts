@@ -262,6 +262,39 @@ const linkOnlyFailureReasons = new Set([
   "CODEX_DRAFT_INVALID",
 ]);
 
+const retryableCandidateFailureReasons = new Set([
+  "GITHUB_RATE_LIMIT",
+  "NETWORK_UNAVAILABLE",
+  "SANDBOX_UNAVAILABLE",
+  "ARCHIVE_UPLOAD_FAILED",
+  "LOCAL_CONFIGURATION_MISSING",
+  "BUDGET_EXCEEDED",
+  "UNKNOWN",
+]);
+
+export function isAiWorkflowCandidateRetryableOutcome(outcome: { state: "registered" | "rejected"; reason?: string }) {
+  return outcome.state === "rejected" && retryableCandidateFailureReasons.has(outcome.reason ?? "");
+}
+
+export function getAiWorkflowGitHubApiHeaders(token?: string) {
+  const trimmedToken = token?.trim();
+  return {
+    accept: "application/vnd.github+json",
+    "x-github-api-version": "2022-11-28",
+    "user-agent": "ENHE-AI-Workflow-Collector/1.0",
+    ...(trimmedToken ? { authorization: `Bearer ${trimmedToken}` } : {}),
+  };
+}
+
+export function getAiWorkflowRateLimitRetryAfterSeconds(error: unknown) {
+  const retryAfterSeconds = error && typeof error === "object"
+    ? Number((error as { retryAfterSeconds?: unknown }).retryAfterSeconds)
+    : Number.NaN;
+  return Number.isFinite(retryAfterSeconds) && retryAfterSeconds > 0
+    ? Math.min(86_400, Math.ceil(retryAfterSeconds))
+    : 300;
+}
+
 export function getAiWorkflowLinkOnlyFailureReason(error: unknown) {
   const reason = error instanceof Error ? error.message : typeof error === "string" ? error : "";
   return linkOnlyFailureReasons.has(reason) ? reason : null;

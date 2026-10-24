@@ -78,6 +78,14 @@ export async function POST(request: Request) {
         { status: "queued" as const },
         { status: "paused" as const },
         {
+          status: "partial" as const,
+          failureReason: "GITHUB_RATE_LIMIT",
+          OR: [
+            { leaseExpiresAt: null },
+            { leaseExpiresAt: { lte: now } },
+          ],
+        },
+        {
           status: "running" as const,
           OR: [
             { leaseExpiresAt: null },
@@ -98,8 +106,14 @@ export async function POST(request: Request) {
         ...claimableStatuses,
       },
       orderBy: [{ batchDate: "asc" }, { createdAt: "asc" }],
-      select: { id: true, status: true, startedAt: true },
+      select: { id: true, status: true, startedAt: true, failureReason: true, leaseExpiresAt: true },
     });
+    if (
+      availableBatch?.status === "paused" &&
+      availableBatch.failureReason === "GITHUB_RATE_LIMIT" &&
+      availableBatch.leaseExpiresAt &&
+      availableBatch.leaseExpiresAt > now
+    ) return { kind: "idle" as const, reason: "github_rate_limit_backoff" };
     if (dailyQuotaBatch && !availableBatch) return { kind: "idle" as const, reason: "daily_batch_quota_used" };
 
     let batch = availableBatch;
@@ -128,7 +142,7 @@ export async function POST(request: Request) {
           triggerType: "scheduled",
           status: "queued",
         },
-        select: { id: true, status: true, startedAt: true },
+        select: { id: true, status: true, startedAt: true, failureReason: true, leaseExpiresAt: true },
       });
     }
 
@@ -138,7 +152,24 @@ export async function POST(request: Request) {
       batch.status === "queued"
         ? { id: batch.id, status: "queued" as const }
         : batch.status === "paused"
-          ? { id: batch.id, status: "paused" as const }
+          ? {
+            id: batch.id,
+            status: "paused" as const,
+            OR: [
+              { leaseExpiresAt: null },
+              { leaseExpiresAt: { lte: now } },
+            ],
+          }
+          : batch.status === "partial"
+            ? {
+              id: batch.id,
+              status: "partial" as const,
+              failureReason: "GITHUB_RATE_LIMIT",
+              OR: [
+                { leaseExpiresAt: null },
+                { leaseExpiresAt: { lte: now } },
+              ],
+            }
           : {
             id: batch.id,
             status: "running" as const,
@@ -158,6 +189,7 @@ export async function POST(request: Request) {
         lastWorkerStage: "claimed",
         attemptCount: { increment: 1 },
         lastRunDate: batchDate,
+        completedAt: null,
         startedAt: batch.startedAt ?? now,
         failureReason: null,
       },

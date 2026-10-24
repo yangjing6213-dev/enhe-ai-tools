@@ -120,6 +120,45 @@ describe("POST /api/internal/ai-workflows/worker/[batchId]/complete", () => {
     }));
   });
 
+  it("pauses a rate-limited batch until its retry window while keeping its saved candidates", async () => {
+    mocks.candidatesCount.mockResolvedValue(1);
+    const startedAt = Date.now();
+    const response = await POST(request({
+      workerId: "runner-1",
+      leaseToken,
+      state: "paused",
+      failureCode: "GITHUB_RATE_LIMIT",
+      retryAfterSeconds: 300,
+    }), context);
+
+    expect(response.status).toBe(200);
+    expect(await response.json()).toMatchObject({ ok: true, state: "paused", readyCandidateCount: 1 });
+    const update = mocks.batchesUpdateMany.mock.calls[0]?.[0] as { data: Record<string, unknown> };
+    expect(update.data).toMatchObject({
+      status: "paused",
+      failureReason: "GITHUB_RATE_LIMIT",
+      completedAt: null,
+      lastWorkerStage: "rate_limit_wait",
+      leaseOwnerId: null,
+      leaseTokenHash: null,
+    });
+    expect(update.data.leaseExpiresAt).toBeInstanceOf(Date);
+    expect((update.data.leaseExpiresAt as Date).getTime()).toBeGreaterThanOrEqual(startedAt + 300_000);
+    expect((update.data.leaseExpiresAt as Date).getTime()).toBeLessThan(startedAt + 301_000);
+  });
+
+  it("rejects a pause without a bounded GitHub retry delay", async () => {
+    const response = await POST(request({
+      workerId: "runner-1",
+      leaseToken,
+      state: "paused",
+      failureCode: "GITHUB_RATE_LIMIT",
+    }), context);
+
+    expect(response.status).toBe(400);
+    expect(mocks.batchesUpdateMany).not.toHaveBeenCalled();
+  });
+
   it.each([
     { count: 0, state: "partial" },
     { count: 3, state: "partial" },
