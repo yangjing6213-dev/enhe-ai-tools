@@ -145,6 +145,17 @@ beforeEach(() => {
 afterEach(() => vi.unstubAllEnvs());
 
 describe("POST /api/internal/ai-workflows/worker/[batchId]/result", () => {
+  it("rejects a missing result before accessing workflow data", async () => {
+    const response = await POST(request({ workerId: "runner-1", leaseToken }), context);
+
+    expect(response.status).toBe(400);
+    expect(await response.json()).toEqual({ ok: false, code: "INVALID_REQUEST" });
+    expect(mocks.batchesFindUnique).not.toHaveBeenCalled();
+    expect(mocks.settingsFindUnique).not.toHaveBeenCalled();
+    expect(mocks.transaction).not.toHaveBeenCalled();
+    expect(mocks.revalidateTag).not.toHaveBeenCalled();
+  });
+
   it("rejects invalid worker credentials and missing server COS configuration", async () => {
     expect((await POST(request({}), { ...context, params: Promise.resolve({ batchId: "batch-1" }) })).status).toBe(400);
     expect((await POST(request({}, "Bearer invalid-worker-token-1234567890"), context)).status).toBe(401);

@@ -145,6 +145,37 @@ function bundleBase64(
 }
 
 describe("SEO audit report bundles", () => {
+  it("preserves recursive JSON evidence with object keys and mixed arrays", async () => {
+    const evidence = {
+      "": null,
+      "42": false,
+      nested: [true, 0, 0.5, "text", { leaf: ["value", null], empty: {} }],
+    };
+    const report = {
+      ...fullReport,
+      findings: [{ ...fullReport.findings[0], evidence }],
+    };
+
+    const parsed = await parseSeoAuditReportBundle(
+      bundleBase64({ json: report, markdown: "# Evidence report\n" }),
+    );
+
+    expect(parsed.fullReport).toEqual(report);
+  });
+
+  it("rejects a non-finite number nested inside JSON evidence", async () => {
+    const report = {
+      ...fullReport,
+      findings: [{ ...fullReport.findings[0], evidence: { nested: ["NONFINITE_VALUE"] } }],
+    };
+    const rawBundle = JSON.stringify({ json: report, markdown: "# Evidence report\n" })
+      .replace('"NONFINITE_VALUE"', "1e400");
+    const encoded = gzipSync(Buffer.from(rawBundle, "utf8")).toString("base64");
+
+    await expect(parseSeoAuditReportBundle(encoded))
+      .rejects.toMatchObject({ code: "INVALID_REPORT_BUNDLE" });
+  });
+
   it("round-trips the fixed gzip JSON bundle and derives summary data server-side", async () => {
     const parsed = await parseSeoAuditReportBundle(bundleBase64());
 
