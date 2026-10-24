@@ -9,25 +9,9 @@ import { buildLocalizedToolOptionalText, resolveLocalizedToolIdentity, resolveLo
 import { AiWorkflowCoverImage } from "./workflow-cover-image";
 import { AiWorkflowFavoriteButton } from "./workflow-interactions";
 import type { AiWorkflowCatalogFilters } from "@/lib/ai-workflows/catalog";
+import { resolveAiWorkflowTopicLabel } from "@/lib/ai-workflows/topic-label";
 
 type TopicOption = { id: string; name: string; englishName: string | null };
-const topicEnglishFallbacks: Readonly<Record<string, string>> = {
-  "工作效率": "Productivity",
-  "视频生成": "Video generation",
-  "内容创作": "Content creation",
-  "编程开发": "Programming & development",
-  "学习教育": "Learning & education",
-  "搜索研究": "Search & research",
-  "营销销售": "Marketing & sales",
-  "办公自动化": "Office automation",
-  "情感陪伴": "Companionship",
-  "财务法律辅助": "Finance & legal support",
-};
-
-function topicLabel(topic: { name: string; englishName: string | null }, locale: RedesignLocale) {
-  if (locale === "zh") return topic.name;
-  return topic.englishName?.trim() || topicEnglishFallbacks[topic.name] || topic.name;
-}
 
 export type AiWorkflowCatalogCard = {
   id: string;
@@ -132,7 +116,7 @@ export function AiWorkflowDirectory({
           <span className="sr-only">{text.topic}</span>
           <select name="topic" defaultValue={filters.topic} className="w-full rounded-xl border border-border bg-background px-3 py-3 text-sm text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring">
             <option value="">{text.topic}</option>
-            {topics.map((topic) => <option key={topic.id} value={topic.id}>{topicLabel(topic, locale)}</option>)}
+            {topics.map((topic) => <option key={topic.id} value={topic.id}>{resolveAiWorkflowTopicLabel(topic, locale)}</option>)}
           </select>
         </label>
         <label>
@@ -182,7 +166,7 @@ export function AiWorkflowDirectory({
                 <span className="shrink-0 rounded-full bg-[#e8f3ff] px-2.5 py-1 text-xs font-semibold text-[var(--marketing-accent)]">{item.deliveryMode === "repository_link" ? text.repositoryLink : priceLabel}</span>
               </div>
               <p className="mt-4 line-clamp-3 text-sm leading-6 text-[var(--marketing-muted)]">{description}</p>
-              <div className="mt-3 flex flex-wrap gap-2">{item.topic ? <span className="rounded-full border border-[var(--marketing-border)] px-2.5 py-1 text-xs">{topicLabel(item.topic, locale)}</span> : null}{tags.slice(0, 3).map((tag) => <span key={tag} className="rounded-full border border-[var(--marketing-border)] px-2.5 py-1 text-xs">{tag}</span>)}</div>
+              <div className="mt-3 flex flex-wrap gap-2">{item.topic ? <span className="rounded-full border border-[var(--marketing-border)] px-2.5 py-1 text-xs">{resolveAiWorkflowTopicLabel(item.topic, locale)}</span> : null}{tags.slice(0, 3).map((tag) => <span key={tag} className="rounded-full border border-[var(--marketing-border)] px-2.5 py-1 text-xs">{tag}</span>)}</div>
               <div className="mt-auto pt-4">
                 <div className="flex flex-wrap items-center gap-x-3 gap-y-2 text-xs text-[var(--marketing-muted)]">
                   <span aria-label={item.ratingAverage === null ? text.noRating : `${item.ratingAverage.toFixed(1)} / 5`}>{item.ratingAverage === null ? text.noRating : `★ ${item.ratingAverage.toFixed(1)} (${item.reviewCount} ${text.reviews})`}</span>

@@ -68,6 +68,7 @@ import {
 import { getPrimaryToolPrice } from "@/lib/tool-price-specs";
 import { normalizeToolUsageSteps, parseToolChangelogVersion } from "@/lib/tool-usage-instructions";
 import { normalizeGitHubRepositoryUrl, resolveAiWorkflowDeliveryMode } from "@/lib/ai-workflows/rules";
+import { resolveAiWorkflowTopicLabel } from "@/lib/ai-workflows/topic-label";
 import {
   canOpenPublicDownloadEntry,
   canOpenProtectedDownloadEntry,
@@ -1291,7 +1292,7 @@ export async function ToolDetailPageShell({
                     : "工作流来源于 GitHub仓库；使用前请查看下方的获取方式和核验状态。"}
                 />
                 <div className="mt-6 grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
-                  <Info label={forceLocale === "en" ? "Application area" : "应用方向"} value={forceLocale === "en" ? (tool.aiWorkflowCandidate.topic?.englishName || tool.aiWorkflowCandidate.topic?.name || "-") : (tool.aiWorkflowCandidate.topic?.name || "-")} />
+                  <Info label={forceLocale === "en" ? "Application area" : "应用方向"} value={tool.aiWorkflowCandidate.topic ? resolveAiWorkflowTopicLabel(tool.aiWorkflowCandidate.topic, forceLocale) || "-" : "-"} />
                   <Info label={forceLocale === "en" ? "Project type" : "项目类型"} value={workflowProjectType} />
                   <Info label={forceLocale === "en" ? "License" : "开源许可证"} value={tool.aiWorkflowCandidate.licenseSpdx || (forceLocale === "en" ? "Not provided" : "未提供")} />
                   <Info label={workflowLinkOnly ? (forceLocale === "en" ? "Delivery" : "获取方式") : (forceLocale === "en" ? "Package version" : "交付版本")} value={workflowLinkOnly ? (forceLocale === "en" ? "GitHub source ZIP and repository link" : "GitHub 源码 ZIP 与原仓库链接") : tool.aiWorkflowCandidate.packageVersion || tool.version || "-"} />

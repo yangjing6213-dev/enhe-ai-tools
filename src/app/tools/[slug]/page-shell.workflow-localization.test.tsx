@@ -92,6 +92,45 @@ describe("workflow detail localized publication", () => {
     expect(JSON.stringify(metadata)).not.toContain("[[");
   });
 
+  it.each([
+    ["工作效率", null, "Productivity"],
+    ["视频生成", null, "Video generation"],
+    ["内容创作", null, "Content creation"],
+    ["编程开发", null, "Programming & development"],
+    ["学习教育", null, "Learning & education"],
+    ["搜索研究", null, "Search & research"],
+    ["营销销售", null, "Marketing & sales"],
+    ["办公自动化", null, "Office automation"],
+    ["情感陪伴", null, "Companionship"],
+    ["财务法律辅助", null, "Finance & legal support"],
+    ["工作效率", "  ", "Productivity"],
+    ["工作效率", "  Reviewed productivity  ", "Reviewed productivity"],
+    ["自定义主题", null, "自定义主题"],
+    ["", null, "-"],
+  ])("uses the directory topic label for %s with English name %s", async (name, englishName, expected) => {
+    const tool = fixture();
+    mocks.findTool.mockResolvedValue({
+      ...tool,
+      aiWorkflowCandidate: { ...tool.aiWorkflowCandidate, topic: { name, englishName } },
+    });
+    const page = await ToolDetailPageShell({ slug: tool.slug, forceLocale: "en", expectedType: "ai_workflow" });
+    const source = elements(page).find((element) => element.props.id === "workflow-source");
+    const area = elements(source).find((element) => element.props.label === "Application area");
+    expect(area?.props.value).toBe(expected);
+  });
+
+  it("keeps the Chinese topic name and the missing-topic placeholder", async () => {
+    const tool = fixture();
+    const zhPage = await ToolDetailPageShell({ slug: tool.slug, forceLocale: "zh", expectedType: "ai_workflow" });
+    const zhSource = elements(zhPage).find((element) => element.props.id === "workflow-source");
+    expect(elements(zhSource).find((element) => element.props.label === "应用方向")?.props.value).toBe("工作效率");
+
+    mocks.findTool.mockResolvedValue({ ...tool, aiWorkflowCandidate: { ...tool.aiWorkflowCandidate, topic: null } });
+    const enPage = await ToolDetailPageShell({ slug: tool.slug, forceLocale: "en", expectedType: "ai_workflow" });
+    const enSource = elements(enPage).find((element) => element.props.id === "workflow-source");
+    expect(elements(enSource).find((element) => element.props.label === "Application area")?.props.value).toBe("-");
+  });
+
   it("removes the workflow cover label and supplies a generated cover", async () => {
     const page = await ToolDetailPageShell({ slug: "ai-workflow-123-design", forceLocale: "zh", expectedType: "ai_workflow" });
     const hero = elements(page).find((element) => element.type === "section");
