@@ -20,6 +20,7 @@ import {
   buildAiWorkflowSourceArchiveFileName,
   type AiWorkflowSourceArchiveDelivery,
 } from "../src/lib/ai-workflows/source-archive";
+import { getAiWorkflowBatchCompletionState } from "../src/lib/ai-workflows/worker";
 import { parseAiWorkflowRepositoryLinkResult, parseAiWorkflowWorkerResult } from "../src/lib/ai-workflows/worker-result";
 import { isLinkableOpenSourceLicenseId, isPackageRedistributableLicenseId } from "../src/lib/ai-workflows/licenses";
 import { readAiWorkflowCosCredentialsCsv } from "./lib/ai-workflow-cos-credentials";
@@ -65,6 +66,7 @@ type WorkerBatch = {
   topicId: string;
   topicNameSnapshot: string;
   topicSearchDirectionsSnapshot: string;
+  attemptCount: number;
   topicFallbacks?: TopicSearchTarget[];
   checkpoint: unknown;
   candidates: Array<{ repositoryId: string; commitSha: string | null; status: string }>;
@@ -1238,7 +1240,7 @@ async function runBatch(lease: WorkerLease, token: string, credentials: { secret
               }
               state.outcomes.push({ repositoryId: candidate.id, repository: candidate.fullName, state: "rejected", reason: linkErrorReason });
               await persistRunState(statePath, state);
-              await logEvent("candidate_link_only_registration_failed", { batchId: batch.id, repositoryId: candidate.id, reason: linkOnlyReason, failure: linkErrorReason });
+              await logEvent("candidate_link_only_registration_failed", { batchId: batch.id, repositoryId: candidate.id, reason: linkOnlyReason, failure: linkErrorReason, stage });
               if (["GITHUB_RATE_LIMIT", "NETWORK_UNAVAILABLE", "SANDBOX_UNAVAILABLE", "ARCHIVE_UPLOAD_FAILED", "LOCAL_CONFIGURATION_MISSING", "BUDGET_EXCEEDED"].includes(linkErrorReason)) {
                 failureCode = linkErrorReason;
                 if (["GITHUB_RATE_LIMIT", "NETWORK_UNAVAILABLE", "SANDBOX_UNAVAILABLE", "LOCAL_CONFIGURATION_MISSING", "BUDGET_EXCEEDED"].includes(linkErrorReason)) break;
@@ -1250,7 +1252,7 @@ async function runBatch(lease: WorkerLease, token: string, credentials: { secret
             failureCode = reason;
             retryAfterSeconds = getAiWorkflowRateLimitRetryAfterSeconds(error);
             await persistRunState(statePath, state);
-            await logEvent("candidate_retry_deferred", { batchId: batch.id, repositoryId: candidate.id, reason, retryAfterSeconds });
+            await logEvent("candidate_retry_deferred", { batchId: batch.id, repositoryId: candidate.id, reason, stage, retryAfterSeconds });
             break;
           }
           state.outcomes.push({ repositoryId: candidate.id, repository: candidate.fullName, state: "rejected", reason });
@@ -1258,7 +1260,7 @@ async function runBatch(lease: WorkerLease, token: string, credentials: { secret
           const cosFailure = reason === "ARCHIVE_UPLOAD_FAILED"
             ? getAiWorkflowCosOperationFailure(error, "enhe-downloads-1303691623", `ai-workflows/${candidate.id}/<fixed-commit>/<package-sha>.zip`)
             : undefined;
-          await logEvent("candidate_rejected", { batchId: batch.id, repositoryId: candidate.id, reason, ...(cosFailure ? { cosFailure } : {}) });
+          await logEvent("candidate_rejected", { batchId: batch.id, repositoryId: candidate.id, reason, stage, ...(cosFailure ? { cosFailure } : {}) });
           if (["GITHUB_RATE_LIMIT", "NETWORK_UNAVAILABLE", "SANDBOX_UNAVAILABLE", "ARCHIVE_UPLOAD_FAILED", "LOCAL_CONFIGURATION_MISSING", "BUDGET_EXCEEDED"].includes(reason)) {
             failureCode = reason;
             if (["GITHUB_RATE_LIMIT", "NETWORK_UNAVAILABLE", "SANDBOX_UNAVAILABLE", "LOCAL_CONFIGURATION_MISSING", "BUDGET_EXCEEDED"].includes(reason)) break;
@@ -1284,7 +1286,7 @@ async function runBatch(lease: WorkerLease, token: string, credentials: { secret
     return;
   }
   const readyCount = state.completedRepositoryIds.length;
-  const stateValue = readyCount >= 3 ? "completed" : failureCode === "GITHUB_RATE_LIMIT" ? "paused" : readyCount > 0 ? "partial" : "failed";
+  const stateValue = getAiWorkflowBatchCompletionState(readyCount, failureCode, batch.attemptCount);
   if (stateValue === "completed") failureCode = undefined;
   if (failureCode && !completionFailureCodes.has(failureCode)) failureCode = "INSUFFICIENT_CANDIDATES";
   const completion = {

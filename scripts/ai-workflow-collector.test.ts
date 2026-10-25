@@ -10,6 +10,7 @@ import {
   getAiWorkflowRegisteredRepositoryIds,
   isAiWorkflowCandidateRetryableOutcome,
 } from "./lib/ai-workflow-collector";
+import { getAiWorkflowBatchCompletionState } from "../src/lib/ai-workflows/worker";
 
 // Execute the real batch function without importing the CLI entrypoint, which
 // starts the Windows collector. All external effects below are isolated stubs.
@@ -77,7 +78,7 @@ function createBatch(options: { delivery: "package" | "repository_link"; registe
     workerId: () => "fixture-worker",
     getTopicSearchPlan: () => [{ id: "topic-1", name: "Fixture", searchDirections: "Fixture" }],
     getAiWorkflowRegisteredRepositoryIds, getAiWorkflowFailureCode, getAiWorkflowLinkOnlyFailureReason,
-    getAiWorkflowRateLimitRetryAfterSeconds, isAiWorkflowCandidateRetryableOutcome,
+    getAiWorkflowRateLimitRetryAfterSeconds, isAiWorkflowCandidateRetryableOutcome, getAiWorkflowBatchCompletionState,
     hasPendingRegistrationFor: (current: TestState, id: string) => current.pendingRegistration?.repositoryId === id,
     processCandidate, registerRepositoryLinkOnly, postWorker,
   }) as (lease: unknown, token: string, credentials: unknown) => Promise<void>;
@@ -87,6 +88,7 @@ function createBatch(options: { delivery: "package" | "repository_link"; registe
       leaseToken: "fixture-lease",
       batch: {
         id: state.batchId, topicId: "topic-1", topicNameSnapshot: "Fixture", topicSearchDirectionsSnapshot: "Fixture",
+        attemptCount: 1,
         candidates: registeredIds.map((repositoryId) => ({ repositoryId, status: "reviewing", commitSha: null })),
       },
     }, "fixture-token", {}),

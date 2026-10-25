@@ -53,7 +53,7 @@ beforeEach(() => {
 afterEach(() => vi.unstubAllEnvs());
 
 describe("POST /api/internal/ai-workflows/worker/[batchId]/complete", () => {
-  it.each([0, 2, 4])("does not mark a batch with %i registered candidates complete", async (count) => {
+  it.each([0, 2])("does not mark a batch with %i registered candidates complete", async (count) => {
     mocks.candidatesCount.mockResolvedValue(count);
 
     const response = await POST(request({
@@ -65,6 +65,18 @@ describe("POST /api/internal/ai-workflows/worker/[batchId]/complete", () => {
     expect(response.status).toBe(409);
     expect(await response.json()).toMatchObject({ ok: false, code: "THREE_VALID_CANDIDATES_REQUIRED" });
     expect(mocks.batchesUpdateMany).not.toHaveBeenCalled();
+  });
+
+  it("completes a legacy batch with more than three already registered candidates", async () => {
+    mocks.candidatesCount.mockResolvedValue(4);
+
+    const response = await POST(request({ workerId: "runner-1", leaseToken, state: "completed" }), context);
+
+    expect(response.status).toBe(200);
+    expect(await response.json()).toMatchObject({ ok: true, state: "completed", readyCandidateCount: 4 });
+    expect(mocks.batchesUpdateMany).toHaveBeenCalledWith(expect.objectContaining({
+      data: expect.objectContaining({ status: "completed" }),
+    }));
   });
 
   it("counts registered review drafts alongside ready packages without publishing them", async () => {
@@ -145,6 +157,32 @@ describe("POST /api/internal/ai-workflows/worker/[batchId]/complete", () => {
     expect(update.data.leaseExpiresAt).toBeInstanceOf(Date);
     expect((update.data.leaseExpiresAt as Date).getTime()).toBeGreaterThanOrEqual(startedAt + 300_000);
     expect((update.data.leaseExpiresAt as Date).getTime()).toBeLessThan(startedAt + 301_000);
+  });
+
+  it("pauses a network-interrupted batch for a bounded retry window", async () => {
+    mocks.candidatesCount.mockResolvedValue(2);
+
+    const response = await POST(request({
+      workerId: "runner-1",
+      leaseToken,
+      state: "paused",
+      failureCode: "NETWORK_UNAVAILABLE",
+      retryAfterSeconds: 300,
+    }), context);
+
+    expect(response.status).toBe(200);
+    expect(await response.json()).toMatchObject({ ok: true, state: "paused", readyCandidateCount: 2 });
+    expect(mocks.batchesUpdateMany).toHaveBeenCalledWith(expect.objectContaining({
+      data: expect.objectContaining({
+        status: "paused",
+        failureReason: "NETWORK_UNAVAILABLE",
+        completedAt: null,
+        lastWorkerStage: "network_wait",
+        leaseOwnerId: null,
+        leaseTokenHash: null,
+        leaseExpiresAt: expect.any(Date),
+      }),
+    }));
   });
 
   it("rejects a pause without a bounded GitHub retry delay", async () => {

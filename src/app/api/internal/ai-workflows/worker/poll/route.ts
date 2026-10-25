@@ -3,6 +3,8 @@ import { z } from "zod";
 import { prisma } from "@/lib/db";
 import {
   AI_WORKFLOW_BATCH_LEASE_MS,
+  AI_WORKFLOW_MAX_BATCH_ATTEMPTS,
+  AI_WORKFLOW_RETRYABLE_BATCH_FAILURE_CODES,
   createAiWorkflowLeaseToken,
   getAiWorkflowShanghaiDate,
   hashAiWorkflowLeaseToken,
@@ -73,18 +75,15 @@ export async function POST(request: Request) {
       where: { lastRunDate: batchDate },
       select: { id: true },
     });
+    const transientBatchRetry = {
+      failureReason: { in: [...AI_WORKFLOW_RETRYABLE_BATCH_FAILURE_CODES] },
+      attemptCount: { lt: AI_WORKFLOW_MAX_BATCH_ATTEMPTS },
+    };
     const claimableStatuses = {
       OR: [
         { status: "queued" as const },
-        { status: "paused" as const },
-        {
-          status: "partial" as const,
-          failureReason: "GITHUB_RATE_LIMIT",
-          OR: [
-            { leaseExpiresAt: null },
-            { leaseExpiresAt: { lte: now } },
-          ],
-        },
+        { status: "paused" as const, ...transientBatchRetry },
+        { status: "partial" as const, ...transientBatchRetry },
         {
           status: "running" as const,
           OR: [
@@ -106,14 +105,17 @@ export async function POST(request: Request) {
         ...claimableStatuses,
       },
       orderBy: [{ batchDate: "asc" }, { createdAt: "asc" }],
-      select: { id: true, status: true, startedAt: true, failureReason: true, leaseExpiresAt: true },
+      select: { id: true, status: true, startedAt: true, failureReason: true, leaseExpiresAt: true, attemptCount: true },
     });
     if (
-      availableBatch?.status === "paused" &&
-      availableBatch.failureReason === "GITHUB_RATE_LIMIT" &&
+      (availableBatch?.status === "paused" || availableBatch?.status === "partial") &&
+      AI_WORKFLOW_RETRYABLE_BATCH_FAILURE_CODES.includes(availableBatch.failureReason as typeof AI_WORKFLOW_RETRYABLE_BATCH_FAILURE_CODES[number]) &&
       availableBatch.leaseExpiresAt &&
       availableBatch.leaseExpiresAt > now
-    ) return { kind: "idle" as const, reason: "github_rate_limit_backoff" };
+    ) return {
+      kind: "idle" as const,
+      reason: availableBatch.failureReason === "GITHUB_RATE_LIMIT" ? "github_rate_limit_backoff" : "network_unavailable_backoff",
+    };
     if (dailyQuotaBatch && !availableBatch) return { kind: "idle" as const, reason: "daily_batch_quota_used" };
 
     let batch = availableBatch;
@@ -142,7 +144,7 @@ export async function POST(request: Request) {
           triggerType: "scheduled",
           status: "queued",
         },
-        select: { id: true, status: true, startedAt: true, failureReason: true, leaseExpiresAt: true },
+        select: { id: true, status: true, startedAt: true, failureReason: true, leaseExpiresAt: true, attemptCount: true },
       });
     }
 
@@ -155,6 +157,8 @@ export async function POST(request: Request) {
           ? {
             id: batch.id,
             status: "paused" as const,
+            failureReason: { in: [...AI_WORKFLOW_RETRYABLE_BATCH_FAILURE_CODES] },
+            attemptCount: { lt: AI_WORKFLOW_MAX_BATCH_ATTEMPTS },
             OR: [
               { leaseExpiresAt: null },
               { leaseExpiresAt: { lte: now } },
@@ -164,7 +168,8 @@ export async function POST(request: Request) {
             ? {
               id: batch.id,
               status: "partial" as const,
-              failureReason: "GITHUB_RATE_LIMIT",
+              failureReason: { in: [...AI_WORKFLOW_RETRYABLE_BATCH_FAILURE_CODES] },
+              attemptCount: { lt: AI_WORKFLOW_MAX_BATCH_ATTEMPTS },
               OR: [
                 { leaseExpiresAt: null },
                 { leaseExpiresAt: { lte: now } },

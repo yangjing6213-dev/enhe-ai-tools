@@ -1,6 +1,9 @@
 import { z } from "zod";
 import { prisma } from "@/lib/db";
-import { verifyAiWorkflowLeaseToken } from "@/lib/ai-workflows/worker";
+import {
+  AI_WORKFLOW_RETRYABLE_BATCH_FAILURE_CODES,
+  verifyAiWorkflowLeaseToken,
+} from "@/lib/ai-workflows/worker";
 import {
   readBoundedJsonBody,
   verifyWorkerAuthorization,
@@ -35,8 +38,8 @@ const completionSchema = z.object({
   if (value.state !== "completed" && !value.failureCode) {
     context.addIssue({ code: z.ZodIssueCode.custom, path: ["failureCode"], message: "Partial and failed batches require a stable failure code." });
   }
-  if (value.state === "paused" && (value.failureCode !== "GITHUB_RATE_LIMIT" || !value.retryAfterSeconds)) {
-    context.addIssue({ code: z.ZodIssueCode.custom, path: ["retryAfterSeconds"], message: "A rate-limited pause requires a bounded retry delay." });
+  if (value.state === "paused" && (!AI_WORKFLOW_RETRYABLE_BATCH_FAILURE_CODES.includes(value.failureCode as typeof AI_WORKFLOW_RETRYABLE_BATCH_FAILURE_CODES[number]) || !value.retryAfterSeconds)) {
+    context.addIssue({ code: z.ZodIssueCode.custom, path: ["retryAfterSeconds"], message: "A transient pause requires a bounded retry delay." });
   }
   if (value.state !== "paused" && value.retryAfterSeconds !== undefined) {
     context.addIssue({ code: z.ZodIssueCode.custom, path: ["retryAfterSeconds"], message: "Only paused batches can include a retry delay." });
@@ -92,7 +95,7 @@ export async function POST(
     },
   });
   if (
-    (input.state === "completed" && readyCandidateCount !== 3) ||
+    (input.state === "completed" && readyCandidateCount < 3) ||
     (input.state === "partial" && (readyCandidateCount === 0 || readyCandidateCount >= 3)) ||
     (input.state === "failed" && readyCandidateCount !== 0) ||
     (input.state === "paused" && readyCandidateCount >= 3)
@@ -112,7 +115,11 @@ export async function POST(
       status: input.state,
       completedAt: input.state === "paused" ? null : now,
       failureReason: input.failureCode ?? null,
-      lastWorkerStage: input.state === "paused" ? "rate_limit_wait" : "complete",
+      lastWorkerStage: input.state === "paused"
+        ? input.failureCode === "GITHUB_RATE_LIMIT"
+          ? "rate_limit_wait"
+          : input.failureCode === "NETWORK_UNAVAILABLE" ? "network_wait" : "retry_wait"
+        : "complete",
       lastHeartbeatAt: now,
       leaseOwnerId: null,
       leaseTokenHash: null,

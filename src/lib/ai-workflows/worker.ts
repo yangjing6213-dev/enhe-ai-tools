@@ -1,6 +1,31 @@
 import { createHash, randomBytes, timingSafeEqual } from "node:crypto";
 
 export const AI_WORKFLOW_BATCH_LEASE_MS = 5 * 60 * 1000;
+export const AI_WORKFLOW_MAX_BATCH_ATTEMPTS = 5;
+export const AI_WORKFLOW_RETRYABLE_BATCH_FAILURE_CODES = [
+  "GITHUB_RATE_LIMIT",
+  "NETWORK_UNAVAILABLE",
+  "SANDBOX_UNAVAILABLE",
+  "ARCHIVE_UPLOAD_FAILED",
+] as const;
+
+const retryableBatchFailureCodes = new Set<string>(AI_WORKFLOW_RETRYABLE_BATCH_FAILURE_CODES);
+
+export function getAiWorkflowBatchCompletionState(
+  readyCandidateCount: number,
+  failureCode: string | undefined,
+  attemptCount: number,
+): "completed" | "paused" | "partial" | "failed" {
+  if (readyCandidateCount >= 3) return "completed";
+  if (
+    failureCode &&
+    retryableBatchFailureCodes.has(failureCode) &&
+    Number.isSafeInteger(attemptCount) &&
+    attemptCount > 0 &&
+    attemptCount < AI_WORKFLOW_MAX_BATCH_ATTEMPTS
+  ) return "paused";
+  return readyCandidateCount > 0 ? "partial" : "failed";
+}
 
 type OrderedTopic = { id: string; name: string };
 

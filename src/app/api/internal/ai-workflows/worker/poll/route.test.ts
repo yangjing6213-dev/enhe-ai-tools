@@ -318,7 +318,7 @@ describe("POST /api/internal/ai-workflows/worker/poll", () => {
     expect(result).toMatchObject({ ok: true, state: "claimed", batch: { id: "retry-batch" } });
     expect(mocks.batchesCreate).not.toHaveBeenCalled();
     expect(mocks.batchesUpdateMany).toHaveBeenCalledWith(expect.objectContaining({
-      where: expect.objectContaining({ id: "retry-batch", status: "partial", failureReason: "GITHUB_RATE_LIMIT" }),
+      where: expect.objectContaining({ id: "retry-batch", status: "partial", failureReason: { in: expect.arrayContaining(["GITHUB_RATE_LIMIT"]) } }),
     }));
   });
 
@@ -339,7 +339,30 @@ describe("POST /api/internal/ai-workflows/worker/poll", () => {
     expect(result).toMatchObject({ ok: true, state: "claimed", batch: { id: "today-partial" } });
     expect(mocks.batchesCreate).not.toHaveBeenCalled();
     expect(mocks.batchesUpdateMany).toHaveBeenCalledWith(expect.objectContaining({
-      where: expect.objectContaining({ id: "today-partial", status: "partial", failureReason: "GITHUB_RATE_LIMIT" }),
+      where: expect.objectContaining({ id: "today-partial", status: "partial", failureReason: { in: expect.arrayContaining(["GITHUB_RATE_LIMIT"]) } }),
+      data: expect.objectContaining({ completedAt: null }),
+    }));
+  });
+
+  it("reclaims today's network-interrupted partial batch without creating a duplicate", async () => {
+    const partialBatch = {
+      id: "today-network-partial",
+      status: "partial",
+      failureReason: "NETWORK_UNAVAILABLE",
+      attemptCount: 1,
+      startedAt: new Date("2026-10-20T00:30:00.000Z"),
+      leaseExpiresAt: new Date("2026-10-20T00:59:59.000Z"),
+    };
+    mocks.batchesFindFirst.mockImplementation(({ where }: { where: Record<string, unknown> }) =>
+      "lastRunDate" in where ? { id: "today-network-partial" } : partialBatch,
+    );
+
+    const result = await body(await POST(request()));
+
+    expect(result).toMatchObject({ ok: true, state: "claimed", batch: { id: "today-network-partial" } });
+    expect(mocks.batchesCreate).not.toHaveBeenCalled();
+    expect(mocks.batchesUpdateMany).toHaveBeenCalledWith(expect.objectContaining({
+      where: expect.objectContaining({ id: "today-network-partial", status: "partial", failureReason: { in: expect.arrayContaining(["NETWORK_UNAVAILABLE"]) } }),
       data: expect.objectContaining({ completedAt: null }),
     }));
   });
@@ -358,6 +381,24 @@ describe("POST /api/internal/ai-workflows/worker/poll", () => {
     const result = await body(await POST(request()));
 
     expect(result).toMatchObject({ ok: true, state: "idle", reason: "github_rate_limit_backoff" });
+    expect(mocks.batchesCreate).not.toHaveBeenCalled();
+    expect(mocks.batchesUpdateMany).not.toHaveBeenCalled();
+  });
+
+  it("waits for a network retry window instead of starting another topic", async () => {
+    mocks.batchesFindFirst.mockImplementation(({ where }: { where: Record<string, unknown> }) =>
+      "lastRunDate" in where ? null : {
+        id: "retry-batch",
+        status: "paused",
+        failureReason: "NETWORK_UNAVAILABLE",
+        startedAt: new Date("2026-10-19T08:00:00.000Z"),
+        leaseExpiresAt: new Date("2026-10-20T01:05:00.000Z"),
+      },
+    );
+
+    const result = await body(await POST(request()));
+
+    expect(result).toMatchObject({ ok: true, state: "idle", reason: "network_unavailable_backoff" });
     expect(mocks.batchesCreate).not.toHaveBeenCalled();
     expect(mocks.batchesUpdateMany).not.toHaveBeenCalled();
   });

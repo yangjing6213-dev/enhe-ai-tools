@@ -1,6 +1,8 @@
 import { describe, expect, it } from "vitest";
 import {
+  AI_WORKFLOW_MAX_BATCH_ATTEMPTS,
   createAiWorkflowLeaseToken,
+  getAiWorkflowBatchCompletionState,
   getAiWorkflowShanghaiDate,
   hashAiWorkflowLeaseToken,
   isAiWorkflowScheduleDue,
@@ -25,6 +27,14 @@ describe("AI Workflow worker scheduling", () => {
     expect(selectNextAiWorkflowTopic(topics, 1)).toEqual(topics[1]);
     expect(selectNextAiWorkflowTopic(topics, 2)).toEqual(topics[0]);
     expect(selectNextAiWorkflowTopic([], 0)).toBeNull();
+  });
+
+  it("retries transient batch failures a bounded number of times without replacing saved candidates", () => {
+    expect(AI_WORKFLOW_MAX_BATCH_ATTEMPTS).toBe(5);
+    expect(getAiWorkflowBatchCompletionState(2, "NETWORK_UNAVAILABLE", 4)).toBe("paused");
+    expect(getAiWorkflowBatchCompletionState(2, "NETWORK_UNAVAILABLE", 5)).toBe("partial");
+    expect(getAiWorkflowBatchCompletionState(0, "GITHUB_RATE_LIMIT", 5)).toBe("failed");
+    expect(getAiWorkflowBatchCompletionState(3, "NETWORK_UNAVAILABLE", 1)).toBe("completed");
   });
 });
 
