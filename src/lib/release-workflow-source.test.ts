@@ -63,6 +63,19 @@ describe("production release workflow", () => {
     expect(generatedClient).toBeLessThan(testPhase);
   });
 
+  it("keeps database-backed page reads out of static release builds", () => {
+    const adminLayout = read("src/app/admin/layout.tsx");
+    const wrapper = read("scripts/push-and-deploy.ps1");
+    const dockerfile = read("deploy/enhe-ai-tools/Dockerfile");
+
+    expect(adminLayout).toContain('export const dynamic = "force-dynamic";');
+    expect(wrapper).not.toContain("$releaseCheckDatabaseUrl");
+    expect(wrapper).not.toContain("127.0.0.1:1/enhe-release-check");
+    expect(dockerfile).not.toContain("ARG DATABASE_URL=");
+    expect(dockerfile).not.toContain("ENV DATABASE_URL=$DATABASE_URL");
+    expect(dockerfile).toContain("RUN npm run build");
+  });
+
   it("pins standalone output tracing to the current worktree root", () => {
     expect(nextConfig.output).toBe("standalone");
     expect(nextConfig.outputFileTracingRoot).toBe(root);
@@ -620,17 +633,16 @@ describe("production release workflow", () => {
     expect(wrapper.indexOf('"--pull=never"', wrapperDockerRun)).toBeLessThan(wrapperImageRun);
   });
 
-  it("masks dotenv database URLs and disables telemetry during the local build", () => {
+  it("keeps database URLs unset and disables telemetry during the local build", () => {
     const wrapper = read("scripts/push-and-deploy.ps1");
     const buildIndex = wrapper.indexOf('Invoke-Native -FilePath npm -Arguments @("run", "build")');
     const telemetryDisabled = wrapper.indexOf('$env:NEXT_TELEMETRY_DISABLED = "1"');
-    const databaseMask = wrapper.lastIndexOf("$env:DATABASE_URL = $releaseCheckDatabaseUrl", buildIndex);
-    const directUrlMask = wrapper.lastIndexOf("$env:DIRECT_URL = $releaseCheckDatabaseUrl", buildIndex);
+    const databaseMask = wrapper.lastIndexOf("$env:DATABASE_URL = $null", buildIndex);
+    const directUrlMask = wrapper.lastIndexOf("$env:DIRECT_URL = $null", buildIndex);
     const restoreIndex = wrapper.indexOf("} finally {", buildIndex);
 
-    expect(wrapper).toContain(
-      '$releaseCheckDatabaseUrl = "postgresql://127.0.0.1:1/enhe-release-check?connect_timeout=1"',
-    );
+    expect(wrapper).not.toContain("$releaseCheckDatabaseUrl");
+    expect(wrapper).not.toContain("127.0.0.1:1/enhe-release-check");
     expect(wrapper).toContain("$previousDirectUrl = $env:DIRECT_URL");
     expect(wrapper).toContain('$env:NEXT_TELEMETRY_DISABLED = "1"');
     expect(telemetryDisabled).toBeGreaterThan(-1);

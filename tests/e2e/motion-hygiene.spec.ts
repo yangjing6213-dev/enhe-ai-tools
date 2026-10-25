@@ -207,8 +207,8 @@ test("reduced motion keeps product, review, and support controls functional", as
   });
   expect(productMotion).toEqual({
     transform: "none",
-    transitionDuration: "0.001s",
-    transitionProperty: "opacity",
+    transitionDuration: "0s",
+    transitionProperty: "all",
   });
 
   const track = page.locator(".redesign-home-reviews-track");

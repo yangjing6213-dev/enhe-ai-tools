@@ -28,4 +28,12 @@ describe("user center page source", () => {
     expect(avatar).toContain("fallbackSeed = alt");
     expect(avatar).toContain("!src || failed ? getDefaultAvatar(fallbackSeed) : src");
   });
+
+  it("links signed-in users to the verified recovery email settings", () => {
+    const source = readFileSync(resolve(root, "src/app/user/page-shell.tsx"), "utf8");
+
+    expect(source).toContain('buildLocalePath("/user/recovery-email", locale)');
+    expect(source).toContain("设置并验证找回邮箱");
+    expect(source).toContain("Set up a verified recovery email");
+  });
 });

@@ -103,6 +103,10 @@ function buildToolCategoryWhere(categoryId?: string): Prisma.ToolWhereInput {
 
 const getCachedHomeRecommendedTools = unstable_cache(
   async () => {
+    if (!process.env.DATABASE_URL?.trim()) {
+      return [];
+    }
+
     try {
       return await prisma.tool.findMany({
         where: { status: "published" },

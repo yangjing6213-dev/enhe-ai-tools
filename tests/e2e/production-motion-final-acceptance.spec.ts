@@ -510,16 +510,10 @@ async function exerciseHome(
     await page.getByRole("button", { name: route.next }).click();
   }
 
-  await expect(stage).toHaveAttribute("data-motion-variant", "directional-slide");
-  await expect(stage).toHaveAttribute(
-    "data-motion-duration-ms",
-    modality === "pointer" ? "240" : modality === "keyboard" ? "0" : "80",
-  );
-  await expect(stage).toHaveAttribute(
-    "data-motion-enter-transform",
-    modality === "pointer" ? "translateX(12px)" : "none",
-  );
   await expect(currentProduct(page)).toHaveAttribute("data-product-id", "infinitetalk");
+  await expect(currentProduct(page)).toHaveCount(1);
+  await expect(stage.locator('[data-product-previous="true"]')).toHaveCount(0);
+  await expect(stage.locator("[data-motion-variant]")).toHaveCount(0);
   await expect(stage.locator('[aria-selected="true"]')).toHaveCount(0);
   await expect(
     page.locator(".redesign-home-product-counter"),
@@ -655,7 +649,7 @@ for (const route of routes.filter(({ kind }) => kind === "software")) {
   });
 }
 
-test("support avoids mobile controls, stays usable, and returns without moving the page layout", async ({ page }) => {
+test("support stays put when narrowed mobile controls are clear and remains usable", async ({ page }) => {
   await page.setViewportSize({ width: 483, height: 844 });
   await openFormalRoute(page, "/");
   await page.evaluate(() => document.fonts.ready);
@@ -670,7 +664,7 @@ test("support avoids mobile controls, stays usable, and returns without moving t
   const stageBefore = await readStage();
 
   await expectSupportClearOf(page, support, ".redesign-home-product-control", "mobile control avoidance");
-  expect((await support.boundingBox())!.y).toBeLessThan(resting!.y);
+  expect((await support.boundingBox())!.y).toBeCloseTo(resting!.y, 1);
   const stageAfter = await readStage();
   for (const key of ["x", "top", "width", "height"] as const) {
     expect(stageAfter[key]).toBeCloseTo(stageBefore[key], 1);

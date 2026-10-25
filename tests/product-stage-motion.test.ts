@@ -1,148 +1,56 @@
-import { existsSync, readFileSync } from "node:fs";
+import { readFileSync } from "node:fs";
 import { join } from "node:path";
-
 import { describe, expect, it } from "vitest";
+import { getWrappedProductIndex } from "@/components/redesign/home/EnheRedesignProductShowcase";
 
-import * as showcaseModule from "@/components/redesign/home/EnheRedesignProductShowcase";
+const component = readFileSync(
+  join(process.cwd(), "src/components/redesign/home/EnheRedesignProductShowcase.tsx"),
+  "utf8",
+);
+const styles = readFileSync(join(process.cwd(), "src/styles/redesign/home.css"), "utf8");
 
-type MotionResolver = (
-  profile: "pointer" | "keyboard" | "reduced",
-  direction: -1 | 1,
-) => {
-  durationMs: number;
-  ease: "linear" | [number, number, number, number];
-  incoming: {
-    opacity: [number, number];
-    transform?: [string, string];
-  };
-  outgoing: {
-    opacity: number;
-    transform?: string;
-  };
-};
-
-const projectRoot = process.cwd();
-
-function readProjectFile(relativePath: string) {
-  const path = join(projectRoot, relativePath);
-  return existsSync(path) ? readFileSync(path, "utf8") : "";
-}
-
-const componentPath =
-  "src/components/redesign/home/EnheRedesignProductShowcase.tsx";
-const stylesPath =
-  "src/components/redesign/home/EnheRedesignProductStageMotion.module.css";
-const motionPath = "src/lib/motion/product-stage-motion.ts";
-
-describe("production home product directional slide", () => {
-  it("resolves the approved pointer direction, duration, and easing", () => {
-    const resolver = Reflect.get(
-      showcaseModule,
-      "resolveProductStageMotion",
-    ) as MotionResolver | undefined;
-
-    expect(resolver).toBeTypeOf("function");
-    if (!resolver) return;
-
-    expect(resolver("pointer", 1)).toEqual({
-      durationMs: 240,
-      ease: [0.16, 1, 0.3, 1],
-      incoming: {
-        opacity: [0, 1],
-        transform: ["translateX(12px)", "translateX(0)"],
-      },
-      outgoing: {
-        opacity: 0,
-        transform: "translateX(-12px)",
-      },
-    });
-    expect(resolver("pointer", -1)).toEqual({
-      durationMs: 240,
-      ease: [0.16, 1, 0.3, 1],
-      incoming: {
-        opacity: [0, 1],
-        transform: ["translateX(-12px)", "translateX(0)"],
-      },
-      outgoing: {
-        opacity: 0,
-        transform: "translateX(12px)",
-      },
-    });
+describe("homepage featured products without display effects", () => {
+  it("shrinks the showcase to three quarters of its previous display width", () => {
+    expect(styles).toContain(
+      "--redesign-home-product-showcase-width: calc(75% - clamp(66px, 9vw, 120px))",
+    );
+    expect(styles).toContain(
+      "--redesign-home-product-showcase-width: calc(75% - 60px)",
+    );
+    expect(styles).toMatch(
+      /\.redesign-home-product-content\s*\{[\s\S]*?width:\s*var\(--redesign-home-product-showcase-width\)/,
+    );
   });
 
-  it("keeps keyboard instant and reduced motion opacity-only", () => {
-    const resolver = Reflect.get(
-      showcaseModule,
-      "resolveProductStageMotion",
-    ) as MotionResolver | undefined;
+  it("removes the showcase frame and transition effects", () => {
+    const frame = styles.match(/\.redesign-home-product-media-frame\s*\{([^}]*)\}/)?.[1] ?? "";
 
-    expect(resolver).toBeTypeOf("function");
-    if (!resolver) return;
-
-    expect(resolver("keyboard", 1)).toEqual({
-      durationMs: 0,
-      ease: "linear",
-      incoming: { opacity: [1, 1] },
-      outgoing: { opacity: 0 },
-    });
-    expect(resolver("reduced", -1)).toEqual({
-      durationMs: 80,
-      ease: "linear",
-      incoming: { opacity: [0, 1] },
-      outgoing: { opacity: 0 },
-    });
+    expect(frame).not.toMatch(/border\s*:/);
+    expect(frame).not.toMatch(/box-shadow\s*:/);
+    expect(frame).not.toMatch(/transition\s*:/);
+    expect(styles).not.toMatch(/\.redesign-home-product-media-frame:hover\s*\{[\s\S]*?transform/);
+    expect(component).not.toContain('from "motion/react"');
+    expect(component).not.toContain("data-motion-variant");
+    expect(component).not.toContain("useLayoutEffect");
   });
 
-  it("stops obsolete controls and keeps the latest product intent authoritative", () => {
-    const component = readProjectFile(componentPath);
-
-    expect(component).toContain("indexRef.current");
-    expect(component).toContain("stopActiveAnimations");
-    expect(component).toContain("control.stop()");
-    expect(component).toContain("interruptedIncomingStyleRef.current");
-    expect(component).toContain("window.getComputedStyle(returningLayer)");
-    expect(component).toContain("setPreviousIndex(outgoingIndex)");
-    expect(component).toContain("setTransitionKey");
-    expect(component).toContain("key={product.id}");
-    expect(component).toContain('data-motion-variant="directional-slide"');
-    expect(component).toContain("data-product-current");
-    expect(component).not.toMatch(/setInterval/i);
-    expect(component).toContain("window.clearTimeout(timer)");
-    expect(component).toContain("[isAutoRotating, move, transitionKey]");
-  });
-
-  it("keeps formal SSR, keyboard focus, and live-region semantics scoped to the stage", () => {
-    const component = readProjectFile(componentPath);
-
-    expect(component).toContain("useState<number | null>(null)");
-    expect(component).toContain("aria-controls={panelId}");
-    expect(component).toContain('aria-live="polite"');
-    expect(component).toContain('aria-atomic="true"');
+  it("keeps immediate manual, keyboard, and indicator switching", () => {
+    expect(getWrappedProductIndex(0, -1)).toBe(4);
+    expect(getWrappedProductIndex(4, 1)).toBe(0);
     expect(component).toContain('event.key === "ArrowLeft"');
     expect(component).toContain('event.key === "ArrowRight"');
-    expect(component).toContain('event.detail === 0 ? "keyboard" : "pointer"');
-    expect(component).toContain("window.matchMedia(REDUCED_MOTION_QUERY)");
-    expect(component).not.toContain("redesign-preview/motion");
+    expect(component).toContain("selectProduct");
+    expect(component).toContain("setIndex(nextIndex)");
+    expect(component).toContain("setIndex(targetIndex)");
+    expect(component).toContain("onClick={() => move(-1)}");
+    expect(component).toContain("onClick={() => move(1)}");
   });
 
-  it("uses only scoped transform and opacity motion without prohibited patterns", () => {
-    const component = readProjectFile(componentPath);
-    const styles = readProjectFile(stylesPath);
-    const motion = readProjectFile(motionPath);
-    const implementation = `${component}\n${styles}\n${motion}`;
-
-    expect(styles).not.toBe("");
-    expect(motion).not.toBe("");
-    expect(component).toContain('from "motion/react"');
-    expect(component).toContain("transform:");
-    expect(component).not.toMatch(/\b(?:x|y|scale):\s*\[/);
-    expect(implementation).not.toMatch(/transition:\s*all/i);
-    expect(implementation).not.toMatch(/will-change/i);
-    expect(implementation).not.toMatch(/scale\(0\)(?!\.)/);
-    expect(implementation).not.toMatch(/\b(?:spring|bounce|rotate|blur)\b/i);
-    expect(implementation).not.toMatch(
-      /(?:animate|transition)[^;\n]*(?:width|height|margin|padding|top|left)/i,
+  it("keeps automatic switching paused while hidden, hovered, focused, or reduced-motion", () => {
+    expect(component).toContain("const PRODUCT_AUTO_INTERVAL_MS = 6000");
+    expect(component).toContain("window.setTimeout(() => move(1), PRODUCT_AUTO_INTERVAL_MS)");
+    expect(component).toContain(
+      "inView && pageVisible && !prefersReducedMotion && !hovered && !focused",
     );
-    expect(implementation).not.toContain("directional-drawer");
   });
 });

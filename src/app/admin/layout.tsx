@@ -13,6 +13,8 @@ import { getCurrentLocale } from "@/lib/i18n";
 import { AdminNav } from "@/app/admin/admin-nav";
 import { SiteBreadcrumbs } from "@/components/site-breadcrumbs";
 
+export const dynamic = "force-dynamic";
+
 const adminNav = [
   ["dashboard", "/admin"],
   ["seoAudit", "/admin/seo-audit"],

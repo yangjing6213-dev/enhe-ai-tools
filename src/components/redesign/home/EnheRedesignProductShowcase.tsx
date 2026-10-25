@@ -1,13 +1,10 @@
 "use client";
 
 import Image from "next/image";
-import { animate } from "motion/react";
 import { EnheIconfontIcon } from "@/components/redesign/enhe-iconfont-icon";
 import {
   useCallback,
   useEffect,
-  useLayoutEffect,
-  useMemo,
   useRef,
   useState,
   type KeyboardEvent,
@@ -22,27 +19,11 @@ import {
   resolveHomeShowcaseMediaSrc,
   type HomeProductShowcaseItem,
 } from "@/lib/redesign/home/home-product-showcase";
-import {
-  PRODUCT_STAGE_MOTION_REST_TRANSFORM,
-  resolveProductStageMotion,
-  type ProductStageDirection,
-  type ProductStageInputModality,
-  type ProductStageMotionProfile,
-} from "@/lib/motion/product-stage-motion";
 
 import styles from "./EnheRedesignProductStageMotion.module.css";
 
-export { resolveProductStageMotion };
-
 export type ProductMediaStatus = "loading" | "ready" | "error";
 export type ProductMediaState = Record<string, ProductMediaStatus>;
-
-type InterruptedProductStyle = {
-  productId: string;
-  opacity: string;
-  transform: string;
-  transitionKey: number;
-};
 
 export function getWrappedProductIndex(index: number, delta: -1 | 1, count: number = HOME_PRODUCT_COUNT) {
   return count > 0 ? (index + delta + count) % count : 0;
@@ -106,10 +87,6 @@ export function EnheRedesignProductShowcase({
   products?: readonly HomeProductShowcaseItem[];
 }) {
   const [index, setIndex] = useState(HOME_PRODUCT_DEFAULT_INDEX);
-  const [previousIndex, setPreviousIndex] = useState<number | null>(null);
-  const [direction, setDirection] = useState<ProductStageDirection>(1);
-  const [inputModality, setInputModality] =
-    useState<ProductStageInputModality>("pointer");
   const [prefersReducedMotion, setPrefersReducedMotion] = useState(false);
   const [hovered, setHovered] = useState(false);
   const [focused, setFocused] = useState(false);
@@ -117,40 +94,13 @@ export function EnheRedesignProductShowcase({
   const [pageVisible, setPageVisible] = useState(false);
   const stageRef = useRef<HTMLDivElement>(null);
   const isAutoRotating = inView && pageVisible && !prefersReducedMotion && !hovered && !focused;
-  const [transitionKey, setTransitionKey] = useState(0);
   const [mediaState, setMediaState] =
     useState<ProductMediaState>(() => Object.fromEntries(products.map(({ id }) => [id, "loading"])));
   const indexRef = useRef(HOME_PRODUCT_DEFAULT_INDEX);
-  const transitionKeyRef = useRef(0);
-  const currentRef = useRef<HTMLDivElement>(null);
-  const previousRef = useRef<HTMLDivElement>(null);
-  const activeAnimationsRef = useRef<Array<{ stop(): void }>>([]);
-  const interruptedIncomingStyleRef = useRef<InterruptedProductStyle | null>(
-    null,
-  );
   const copy = SHOWCASE_COPY[locale];
   const currentIndex = index < products.length ? index : 0;
   const product = products[currentIndex];
-  const previousProduct =
-    previousIndex === null ? null : products[previousIndex] ?? null;
   const panelId = `redesign-home-product-panel-${locale}`;
-  const motionProfile: ProductStageMotionProfile =
-    inputModality === "keyboard"
-      ? "keyboard"
-      : prefersReducedMotion
-        ? "reduced"
-        : "pointer";
-  const motion = useMemo(
-    () => resolveProductStageMotion(motionProfile, direction),
-    [direction, motionProfile],
-  );
-
-  const stopActiveAnimations = useCallback(() => {
-    for (const control of activeAnimationsRef.current) {
-      control.stop();
-    }
-    activeAnimationsRef.current = [];
-  }, []);
 
   useEffect(() => {
     const mediaQuery = window.matchMedia(REDUCED_MOTION_QUERY);
@@ -163,13 +113,10 @@ export function EnheRedesignProductShowcase({
     return () => mediaQuery.removeEventListener("change", updateReducedMotion);
   }, []);
 
-  useEffect(() => stopActiveAnimations, [stopActiveAnimations]);
-
   useEffect(() => {
     if (index >= products.length) {
       indexRef.current = 0;
       setIndex(0);
-      setPreviousIndex(null);
     }
   }, [index, products.length]);
 
@@ -190,165 +137,21 @@ export function EnheRedesignProductShowcase({
     };
   }, []);
 
-  useLayoutEffect(() => {
-    if (previousIndex === null) {
-      return;
-    }
-
-    const current = currentRef.current;
-    const previous = previousRef.current;
-
-    if (!current || !previous) {
-      setPreviousIndex(null);
-      return;
-    }
-
-    stopActiveAnimations();
-    const activeTransitionKey = transitionKey;
-    const interruptedStyle = interruptedIncomingStyleRef.current;
-    const continuesInterruptedMotion =
-      interruptedStyle?.transitionKey === activeTransitionKey &&
-      interruptedStyle.productId === product.id;
-
-    interruptedIncomingStyleRef.current = null;
-
-    if (motionProfile === "keyboard") {
-      current.style.opacity = "1";
-      current.style.transform = PRODUCT_STAGE_MOTION_REST_TRANSFORM;
-      previous.style.opacity = "0";
-      previous.style.transform = PRODUCT_STAGE_MOTION_REST_TRANSFORM;
-      setPreviousIndex(null);
-      return;
-    }
-
-    current.style.opacity = continuesInterruptedMotion
-      ? interruptedStyle.opacity
-      : String(motion.incoming.opacity[0]);
-
-    if (
-      motionProfile === "pointer" &&
-      motion.incoming.transform &&
-      motion.outgoing.transform
-    ) {
-      current.style.transform = continuesInterruptedMotion
-        ? interruptedStyle.transform
-        : motion.incoming.transform[0];
-    } else {
-      current.style.transform = PRODUCT_STAGE_MOTION_REST_TRANSFORM;
-      previous.style.transform = PRODUCT_STAGE_MOTION_REST_TRANSFORM;
-    }
-
-    const animationOptions = {
-      duration: motion.durationMs / 1000,
-      ease: motion.ease,
-    };
-    const outgoingControl = animate(
-      previous,
-      {
-        opacity: motion.outgoing.opacity,
-        ...(motion.outgoing.transform
-          ? { transform: motion.outgoing.transform }
-          : {}),
-      },
-      animationOptions,
-    );
-    const incomingControl = animate(
-      current,
-      continuesInterruptedMotion
-        ? {
-            opacity: motion.incoming.opacity[1],
-            ...(motion.incoming.transform
-              ? { transform: motion.incoming.transform[1] }
-              : {}),
-          }
-        : {
-            opacity: motion.incoming.opacity,
-            ...(motion.incoming.transform
-              ? { transform: motion.incoming.transform }
-              : {}),
-          },
-      animationOptions,
-    );
-    const controls = [outgoingControl, incomingControl];
-
-    activeAnimationsRef.current = controls;
-    void Promise.all(controls).then(
-      () => {
-        if (transitionKeyRef.current === activeTransitionKey) {
-          activeAnimationsRef.current = [];
-          setPreviousIndex(null);
-        }
-      },
-      () => undefined,
-    );
-  }, [
-    motion,
-    motionProfile,
-    previousIndex,
-    product.id,
-    stopActiveAnimations,
-    transitionKey,
-  ]);
-
   const move = useCallback(
-    (delta: -1 | 1, modality: ProductStageInputModality) => {
+    (delta: -1 | 1) => {
       if (products.length <= 1) return;
-      const outgoingIndex = indexRef.current;
-      const nextIndex = getWrappedProductIndex(outgoingIndex, delta, products.length);
-      const returningLayer = previousRef.current;
-      const returningProductId = products[nextIndex].id;
-
-      stopActiveAnimations();
-      const returningStyle =
-        returningLayer?.dataset.productId === returningProductId
-          ? window.getComputedStyle(returningLayer)
-          : null;
-
+      const nextIndex = getWrappedProductIndex(indexRef.current, delta, products.length);
       indexRef.current = nextIndex;
-      transitionKeyRef.current += 1;
-      interruptedIncomingStyleRef.current = returningStyle
-        ? {
-            productId: returningProductId,
-            opacity: returningStyle.opacity,
-            transform: returningStyle.transform,
-            transitionKey: transitionKeyRef.current,
-          }
-        : null;
-      setPreviousIndex(outgoingIndex);
-      setDirection(delta);
-      setInputModality(modality);
       setIndex(nextIndex);
-      setTransitionKey(transitionKeyRef.current);
     },
-    [products, stopActiveAnimations],
+    [products],
   );
 
   const selectProduct = useCallback((targetIndex: number) => {
-    const outgoingIndex = indexRef.current;
-    if (targetIndex === outgoingIndex || targetIndex < 0 || targetIndex >= products.length || products.length <= 1) return;
-    const forwardDistance = (targetIndex - outgoingIndex + products.length) % products.length;
-    const backwardDistance = (outgoingIndex - targetIndex + products.length) % products.length;
-    const nextDirection: ProductStageDirection = forwardDistance <= backwardDistance ? 1 : -1;
-
-    stopActiveAnimations();
-    const returningLayer = previousRef.current;
-    const returningStyle = returningLayer?.dataset.productId === products[targetIndex].id
-      ? window.getComputedStyle(returningLayer)
-      : null;
+    if (targetIndex === indexRef.current || targetIndex < 0 || targetIndex >= products.length || products.length <= 1) return;
     indexRef.current = targetIndex;
-    transitionKeyRef.current += 1;
-    interruptedIncomingStyleRef.current = returningStyle ? {
-      productId: products[targetIndex].id,
-      opacity: returningStyle.opacity,
-      transform: returningStyle.transform,
-      transitionKey: transitionKeyRef.current,
-    } : null;
-    setPreviousIndex(outgoingIndex);
-    setDirection(nextDirection);
-    setInputModality("pointer");
     setIndex(targetIndex);
-    setTransitionKey(transitionKeyRef.current);
-  }, [products, stopActiveAnimations]);
+  }, [products]);
 
   const handleKeyDown = (event: KeyboardEvent<HTMLDivElement>) => {
     if (event.target instanceof HTMLAnchorElement) {
@@ -357,40 +160,33 @@ export function EnheRedesignProductShowcase({
 
     if (event.key === "ArrowLeft") {
       event.preventDefault();
-      move(-1, "keyboard");
+      move(-1);
     }
     if (event.key === "ArrowRight") {
       event.preventDefault();
-      move(1, "keyboard");
+      move(1);
     }
   };
 
   useEffect(() => {
     if (!isAutoRotating) return;
     // A fresh reading interval follows every manual change or pause.
-    const timer = window.setTimeout(() => move(1, "pointer"), PRODUCT_AUTO_INTERVAL_MS);
+    const timer = window.setTimeout(() => move(1), PRODUCT_AUTO_INTERVAL_MS);
     return () => window.clearTimeout(timer);
-  }, [isAutoRotating, move, transitionKey]);
+  }, [isAutoRotating, index, move]);
 
-  const renderProduct = (
-    product: HomeProductShowcaseItem,
-    isPrevious: boolean,
-  ) => {
+  const renderProduct = (product: HomeProductShowcaseItem) => {
     const mediaStatus = mediaState[product.id];
 
     return (
       <div
         key={product.id}
-        ref={isPrevious ? previousRef : currentRef}
-        id={isPrevious ? undefined : panelId}
-        className={`${styles.layer} ${isPrevious ? styles.previous : styles.current}`}
+        id={panelId}
+        className={`${styles.layer} ${styles.current}`}
         data-product-layer
         data-product-id={product.id}
-        data-product-current={isPrevious ? undefined : "true"}
-        data-product-previous={isPrevious ? "true" : undefined}
-        aria-current={isPrevious ? undefined : "true"}
-        aria-hidden={isPrevious ? true : undefined}
-        inert={isPrevious ? true : undefined}
+        data-product-current="true"
+        aria-current="true"
       >
           <div className="redesign-home-product-media-frame">
             <div className="redesign-home-product-media-inner">
@@ -434,7 +230,7 @@ export function EnheRedesignProductShowcase({
                       src={resolveHomeShowcaseMediaSrc(product.mediaSrc)}
                       alt={product.alt[locale]}
                       fill
-                      sizes="(max-width: 767px) calc(100vw - 120px), (max-width: 1180px) calc(100vw - 216px), 964px"
+                      sizes="(max-width: 767px) calc(75vw - 90px), (max-width: 1180px) calc(66vw - 36px), 930px"
                       loading="lazy"
                       unoptimized={!DEFAULT_HOME_PRODUCTS.some((item) => item.mediaSrc === product.mediaSrc)}
                       onLoad={() =>
@@ -505,26 +301,16 @@ export function EnheRedesignProductShowcase({
               ? "产品展示，可使用左右方向键切换"
               : "Product showcase, use left and right arrow keys to switch"
           }
-          data-motion-variant="directional-slide"
-          data-motion-duration-ms={motion.durationMs}
-          data-motion-modality={motionProfile}
-          data-motion-direction={direction === 1 ? "forward" : "backward"}
-          data-motion-enter-transform={motion.incoming.transform?.[0] ?? "none"}
-          data-motion-exit-transform={motion.outgoing.transform ?? "none"}
-          data-motion-transition-key={transitionKey}
         >
           <div className={`redesign-home-product-content ${styles.viewport}`}>
-            {previousProduct ? renderProduct(previousProduct, true) : null}
-            {renderProduct(product, false)}
+            {renderProduct(product)}
           </div>
           <div className="redesign-home-product-controls">
             <button
               type="button"
               className="redesign-home-product-control"
               disabled={products.length <= 1}
-              onClick={(event) =>
-                move(-1, event.detail === 0 ? "keyboard" : "pointer")
-              }
+              onClick={() => move(-1)}
               aria-label={copy.previous}
               aria-controls={panelId}
             >
@@ -537,9 +323,7 @@ export function EnheRedesignProductShowcase({
               type="button"
               className="redesign-home-product-control"
               disabled={products.length <= 1}
-              onClick={(event) =>
-                move(1, event.detail === 0 ? "keyboard" : "pointer")
-              }
+              onClick={() => move(1)}
               aria-label={copy.next}
               aria-controls={panelId}
             >

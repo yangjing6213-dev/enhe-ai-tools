@@ -44,8 +44,9 @@ describe("public content data access fallback", () => {
     db.tutorialFindMany.mockResolvedValue([]);
     db.toolCategoryFindMany.mockResolvedValue([]);
 
-    const { getPublicToolCategories, getPublicToolListing, getPublicTutorials } = await import("@/lib/public-content");
+    const { getHomeRecommendedTools, getPublicToolCategories, getPublicToolListing, getPublicTutorials } = await import("@/lib/public-content");
 
+    await expect(getHomeRecommendedTools()).resolves.toEqual([]);
     await expect(getPublicToolListing("skill_learning")).resolves.toEqual([]);
     await expect(getPublicTutorials()).resolves.toEqual([]);
     await expect(getPublicToolCategories("skill_learning")).resolves.toEqual([]);

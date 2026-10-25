@@ -115,7 +115,8 @@ describe("homepage UI polish", () => {
     expect(refreshStyles).toMatch(/@media\s*\(width < 768px\)[\s\S]*?\.redesign-home \.redesign-home-products-heading h2\s*\{[^}]*font-size:\s*clamp\(1rem,\s*1\.3vw,\s*1\.2rem\)/);
     expect(homeStyles).not.toMatch(/\.redesign-home-products-heading h2\s*\{[^}]*white-space:\s*nowrap/);
     expect(homeStyles).toMatch(/\.redesign-home-product-control\s*\{[^}]*border:\s*0[^}]*border-radius:\s*0/);
-    expect(refreshStyles).toMatch(/\.redesign-home-product-media-frame\s*\{[^}]*overflow:\s*hidden[^}]*border-radius:\s*22px/);
+    expect(refreshStyles).toMatch(/\.redesign-home-product-media-frame\s*\{[^}]*overflow:\s*hidden/);
+    expect(refreshStyles).not.toMatch(/\.redesign-home-product-media-frame\s*\{[^}]*border-radius:\s*22px/);
   });
 
   it("removes side arrows from the rotating review card while preserving concise AI disclosure", () => {

@@ -176,6 +176,32 @@ describe("homepage approved product showcase", () => {
     expect(showcaseSource).not.toMatch(/setInterval|Audio\(|fetch\(|prisma|database|delivery/i);
   });
 
+  it("reduces the featured display to about three quarters while keeping its controls", () => {
+    expect(homeStyles).toMatch(
+      /--redesign-home-product-showcase-width:\s*calc\(75% - clamp\(66px, 9vw, 120px\)\)/,
+    );
+    expect(homeStyles).toMatch(
+      /\.redesign-home-product-content\s*\{[\s\S]*?width:\s*var\(--redesign-home-product-showcase-width\)/,
+    );
+    expect(homeStyles).toMatch(/\.redesign-home-product-control:first-of-type/);
+    expect(homeStyles).toMatch(/\.redesign-home-product-control:last-of-type/);
+    expect(showcaseSource).toContain("ArrowLeft");
+    expect(showcaseSource).toContain("ArrowRight");
+    expect(showcaseSource).toContain("selectProduct");
+  });
+
+  it("removes the showcase frame and slide animations", () => {
+    const mediaFrame = homeStyles.match(
+      /\.redesign-home-product-media-frame\s*\{([^}]*)\}/,
+    )?.[1] ?? "";
+
+    expect(mediaFrame).not.toMatch(/border\s*:/);
+    expect(mediaFrame).not.toMatch(/box-shadow\s*:/);
+    expect(mediaFrame).not.toMatch(/transition\s*:/);
+    expect(showcaseSource).not.toContain('from "motion/react"');
+    expect(showcaseSource).not.toContain("data-motion-variant");
+  });
+
   it("renders one accessible indicator for each featured product", () => {
     const html = renderToStaticMarkup(createElement(EnheRedesignProductShowcase, { locale: "zh" }));
     expect(html).toContain('aria-label="选择推荐产品"');
@@ -190,21 +216,9 @@ describe("homepage approved product showcase", () => {
       /\.redesign-home-product-detail a\s*\{[\s\S]*?min-height:\s*44px[\s\S]*?display:\s*inline-flex[\s\S]*?align-items:\s*center[\s\S]*?padding:/,
     );
     expect(homeStyles).toMatch(/\.redesign-home-product-control\s*\{[\s\S]*?position:\s*absolute;[\s\S]*?top:\s*50%/);
-    expect(mobileStyles).toMatch(/\.redesign-home-product-content\s*\{[^}]*margin-inline:\s*40px/);
+    expect(mobileStyles).toMatch(/\.redesign-home-product-stage\s*\{[\s\S]*?--redesign-home-product-showcase-width:\s*calc\(75% - 60px\)/);
+    expect(mobileStyles).toMatch(/\.redesign-home-product-content\s*\{[^}]*margin-inline:\s*auto/);
     expect(mobileStyles).toMatch(/\.redesign-home-product-control\s*\{[^}]*width:\s*32px/);
-  });
-
-  it("removes product loading scale under reduced motion", () => {
-    const reducedMotionStyles = homeStyles.slice(
-      homeStyles.lastIndexOf("@media (prefers-reduced-motion: reduce)"),
-    );
-
-    expect(reducedMotionStyles).toMatch(
-      /\.redesign-home-product-media\s*\{[\s\S]*?transition:\s*opacity 1ms linear/,
-    );
-    expect(reducedMotionStyles).toMatch(
-      /\.redesign-home-product-media\[data-media-status="loading"\]\s*\{[\s\S]*?transform:\s*none/,
-    );
   });
 
   it("keeps all five public media files present and matching the Phase 1A manifest", () => {

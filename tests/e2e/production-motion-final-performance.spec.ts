@@ -282,13 +282,14 @@ test("product stage has no relevant layout shift or animation residue", async ({
   );
   await waitForMotionToSettle(page);
   await expect(page.locator('[data-product-previous="true"]')).toHaveCount(0);
+  await expect(page.locator('[data-product-current="true"]')).toHaveCount(1);
   await expect(page.locator('[data-product-current="true"]')).toHaveCSS(
     "transform",
-    "matrix(1, 0, 0, 1, 0, 0)",
+    "none",
   );
   const metric = await readMetric(page, before);
   expectPerformanceMetric(metric);
-  expect(metric.animatedProperties).toEqual(["opacity", "transform"]);
+  expect(metric.animatedProperties).toEqual([]);
   console.log(`FINAL_PRODUCT_STAGE_PERFORMANCE=${JSON.stringify(metric)}`);
 });
 
@@ -377,7 +378,6 @@ test("standalone formal routes exclude prototype code and preview routes", async
   expect(bundleParts).toHaveLength(scriptUrls.size);
   for (const marker of [
     "origin-aware-layer",
-    "directional-slide",
     "directional-drawer",
   ]) {
     expect(productionBundle, `missing production marker ${marker}`).toContain(marker);

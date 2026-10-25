@@ -226,7 +226,6 @@ $previousDatabaseUrl = $env:DATABASE_URL
 $previousDirectUrl = $env:DIRECT_URL
 $previousNextTelemetryDisabled = $env:NEXT_TELEMETRY_DISABLED
 $previousAdminVisualFixture = $env:ENHE_ADMIN_VISUAL_FIXTURE
-$releaseCheckDatabaseUrl = "postgresql://127.0.0.1:1/enhe-release-check?connect_timeout=1"
 $previousPlaywrightProduction = $env:PLAYWRIGHT_USE_PRODUCTION_SERVER
 $previousPlaywrightBaseUrl = $env:PLAYWRIGHT_BASE_URL
 $previousPort = $env:PORT
@@ -254,8 +253,6 @@ try {
   $env:DIRECT_URL = $null
   Invoke-Native -FilePath npm -Arguments @("run", "typecheck")
   Invoke-Native -FilePath npm -Arguments @("run", "lint")
-  $env:DATABASE_URL = $releaseCheckDatabaseUrl
-  $env:DIRECT_URL = $releaseCheckDatabaseUrl
   Invoke-Native -FilePath npm -Arguments @("run", "build")
   $env:DATABASE_URL = $null
   $env:DIRECT_URL = $null

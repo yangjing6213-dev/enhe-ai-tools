@@ -8,6 +8,7 @@ const locales = [
     next: "下一款产品",
     firstName: "无所不能版｜AI生成视频应用",
     secondName: "InfiniteTalk",
+    thirdName: "AI语音生成",
   },
   {
     route: "/en",
@@ -15,6 +16,7 @@ const locales = [
     next: "Next product",
     firstName: "Ultimate Edition | AI Video Generation Suite",
     secondName: "InfiniteTalk",
+    thirdName: "Local AI Voice Generator",
   },
 ] as const;
 
@@ -44,7 +46,7 @@ function currentProduct(stage: Locator) {
 
 for (const width of viewports) {
   for (const locale of locales) {
-    test(`directional product stage passes ${locale.route} at ${width}px`, async ({
+    test(`showcase stays compact, borderless, and switchable on ${locale.route} at ${width}px`, async ({
       page,
     }) => {
       const consoleErrors: string[] = [];
@@ -67,48 +69,64 @@ for (const width of viewports) {
         "false",
       );
 
+      const content = page.locator(".redesign-home-product-content");
+      const widthRatio = await content.evaluate((element) => {
+        const stageElement = element.closest(".redesign-home-product-stage");
+        if (!stageElement) return 0;
+        const stageStyle = window.getComputedStyle(stageElement);
+        const stageContentWidth =
+          stageElement.clientWidth -
+          Number.parseFloat(stageStyle.paddingLeft) -
+          Number.parseFloat(stageStyle.paddingRight);
+        const sideMargin = window.innerWidth < 768
+          ? 40
+          : Math.min(80, Math.max(44, window.innerWidth * 0.06));
+        return element.getBoundingClientRect().width / (stageContentWidth - 2 * sideMargin);
+      });
+      expect(widthRatio).toBeGreaterThan(0.73);
+      expect(widthRatio).toBeLessThan(0.77);
+
+      const frame = currentProduct(stage).locator(
+        ".redesign-home-product-media-frame",
+      );
+      await expect(frame).toHaveCSS("border-top-width", "0px");
+      await expect(frame).toHaveCSS("border-radius", "0px");
+      await expect(frame).toHaveCSS("box-shadow", "none");
+      await expect(frame).toHaveCSS("transition-duration", "0s");
+      await expect(frame).toHaveCSS("transform", "none");
+
       await expect(currentProduct(stage)).toHaveAttribute(
         "data-product-id",
         "ultimate-edition",
       );
       await expect(currentProduct(stage)).toContainText(locale.firstName);
-
       await next.click();
-      await expect(stage).toHaveAttribute(
-        "data-motion-variant",
-        "directional-slide",
-      );
-      await expect(stage).toHaveAttribute("data-motion-duration-ms", "240");
-      await expect(stage).toHaveAttribute("data-motion-modality", "pointer");
-      await expect(stage).toHaveAttribute("data-motion-direction", "forward");
-      await expect(stage).toHaveAttribute(
-        "data-motion-enter-transform",
-        "translateX(12px)",
-      );
-      await expect(stage).toHaveAttribute(
-        "data-motion-exit-transform",
-        "translateX(-12px)",
-      );
+      await expect(currentProduct(stage)).toHaveCount(1);
       await expect(currentProduct(stage)).toHaveAttribute(
         "data-product-id",
         "infinitetalk",
       );
       await expect(currentProduct(stage)).toContainText(locale.secondName);
+      await expect(stage.locator('[data-product-previous="true"]')).toHaveCount(0);
+      await expect(stage.locator("[data-motion-variant]")).toHaveCount(0);
 
       await previous.click();
-      await expect(stage).toHaveAttribute("data-motion-direction", "backward");
-      await expect(stage).toHaveAttribute(
-        "data-motion-enter-transform",
-        "translateX(-12px)",
-      );
-      await expect(stage).toHaveAttribute(
-        "data-motion-exit-transform",
-        "translateX(12px)",
-      );
       await expect(currentProduct(stage)).toHaveAttribute(
         "data-product-id",
         "ultimate-edition",
       );
+      await stage.focus();
+      await stage.press("ArrowRight");
+      await expect(currentProduct(stage)).toHaveAttribute(
+        "data-product-id",
+        "infinitetalk",
+      );
+      await stage.getByRole("button", { name: locale.route === "/" ? "显示第 3 款产品" : "Show product 3" }).click();
+      await expect(currentProduct(stage)).toHaveAttribute(
+        "data-product-id",
+        "ai-voice",
+      );
+      await expect(currentProduct(stage)).toContainText(locale.thirdName);
 
       const rootOverflow = await page.evaluate(
         () =>
@@ -147,111 +165,7 @@ for (const width of viewports) {
   }
 }
 
-for (const locale of locales) {
-  test(`rapid switch keeps latest intent on ${locale.route}`, async ({
-    page,
-  }) => {
-    await page.setViewportSize({ width: 390, height: 844 });
-    await openFormalRoute(page, locale.route);
-
-    const stage = page.locator(".redesign-home-product-stage");
-    const previous = page.getByRole("button", { name: locale.previous });
-    const next = page.getByRole("button", { name: locale.next });
-    await stage.scrollIntoViewIfNeeded();
-
-    await next.click();
-    await next.click();
-    await previous.click();
-
-    await expect(currentProduct(stage)).toHaveCount(1);
-    await expect(currentProduct(stage)).toHaveAttribute(
-      "data-product-id",
-      "infinitetalk",
-    );
-    await expect(currentProduct(stage)).toContainText(locale.secondName);
-    await expect(currentProduct(stage)).not.toContainText("AI语音生成");
-    await page.waitForFunction(() =>
-      Array.from(document.querySelectorAll("[data-product-layer]")).every(
-        (layer) =>
-          layer
-            .getAnimations()
-            .every((animation) => animation.playState === "finished"),
-      ),
-    );
-    await expect(currentProduct(stage)).toHaveAttribute(
-      "data-product-id",
-      "infinitetalk",
-    );
-    await expect(stage.locator('[data-product-previous="true"]')).toHaveCount(
-      0,
-    );
-    await expect(currentProduct(stage).locator("img")).toHaveAttribute(
-      "data-media-status",
-      "ready",
-    );
-  });
-}
-
-test("keyboard switching is instant and retains persistent-control focus", async ({
-  page,
-}) => {
-  await page.setViewportSize({ width: 390, height: 844 });
-  await openFormalRoute(page, "/");
-
-  const stage = page.locator(".redesign-home-product-stage");
-  const previous = page.getByRole("button", { name: "上一款产品" });
-  const next = page.getByRole("button", { name: "下一款产品" });
-  await stage.scrollIntoViewIfNeeded();
-
-  await stage.focus();
-  await stage.press("ArrowRight");
-  await expect(stage).toBeFocused();
-  await expect(stage).toHaveAttribute("data-motion-duration-ms", "0");
-  await expect(stage).toHaveAttribute("data-motion-modality", "keyboard");
-  await expect(stage).toHaveAttribute("data-motion-enter-transform", "none");
-  await expect(currentProduct(stage)).toHaveAttribute(
-    "data-product-id",
-    "infinitetalk",
-  );
-
-  await next.focus();
-  await next.press("Enter");
-  await expect(next).toBeFocused();
-  await expect(currentProduct(stage)).toHaveAttribute(
-    "data-product-id",
-    "ai-voice",
-  );
-
-  await previous.press("ArrowLeft");
-  await expect(previous).toBeFocused();
-  await expect(currentProduct(stage)).toHaveAttribute(
-    "data-product-id",
-    "infinitetalk",
-  );
-
-  const detailLink = currentProduct(stage).getByRole("link");
-  await detailLink.focus();
-  await detailLink.press("ArrowRight");
-  await expect(detailLink).toBeFocused();
-  await expect(currentProduct(stage)).toHaveAttribute(
-    "data-product-id",
-    "infinitetalk",
-  );
-
-  await stage.focus();
-  await page.keyboard.press("Tab");
-  await expect(detailLink).toBeFocused();
-  await page.keyboard.press("Tab");
-  await expect(previous).toBeFocused();
-  await page.keyboard.press("Tab");
-  await expect(next).toBeFocused();
-  await page.keyboard.press("Tab");
-  await expect(
-    stage.getByRole("button", { name: "显示第 1 款产品" }),
-  ).toBeFocused();
-});
-
-test("keyboard remains instant when reduced motion is enabled", async ({
+test("reduced motion keeps manual switching while pausing automatic switching", async ({
   page,
 }) => {
   await page.emulateMedia({ reducedMotion: "reduce" });
@@ -260,74 +174,18 @@ test("keyboard remains instant when reduced motion is enabled", async ({
 
   const stage = page.locator(".redesign-home-product-stage");
   await stage.scrollIntoViewIfNeeded();
-  await stage.focus();
-  await stage.press("ArrowRight");
-
-  await expect(stage).toHaveAttribute("data-motion-duration-ms", "0");
-  await expect(stage).toHaveAttribute("data-motion-modality", "keyboard");
-  await expect(stage).toHaveAttribute("data-motion-enter-transform", "none");
-  await expect(currentProduct(stage)).toHaveAttribute(
-    "data-product-id",
-    "infinitetalk",
+  await stage.hover();
+  await expect(page.locator(".redesign-home-products")).toHaveAttribute(
+    "data-auto-rotating",
+    "false",
   );
-});
-
-test("reduced motion stays 80ms opacity-only", async ({ page }) => {
-  await page.emulateMedia({ reducedMotion: "reduce" });
-  await page.addInitScript(() => {
-    const nativeAnimate = Element.prototype.animate;
-    const recordedProperties: string[] = [];
-
-    Object.defineProperty(window, "__enheProductStageAnimatedProperties", {
-      value: recordedProperties,
-    });
-    Element.prototype.animate = function (
-      keyframes: Keyframe[] | PropertyIndexedKeyframes | null,
-      options?: number | KeyframeAnimationOptions,
-    ) {
-      if (this.matches("[data-product-layer]")) {
-        const metadataKeys = new Set([
-          "offset",
-          "computedOffset",
-          "easing",
-          "composite",
-        ]);
-        const frames = Array.isArray(keyframes)
-          ? keyframes
-          : keyframes
-            ? [keyframes]
-            : [];
-
-        for (const frame of frames) {
-          recordedProperties.push(
-            ...Object.keys(frame).filter((key) => !metadataKeys.has(key)),
-          );
-        }
-      }
-
-      return nativeAnimate.call(this, keyframes, options);
-    };
-  });
-  await page.setViewportSize({ width: 390, height: 844 });
-  await openFormalRoute(page, "/");
-
-  const stage = page.locator(".redesign-home-product-stage");
-  await stage.scrollIntoViewIfNeeded();
   await page.getByRole("button", { name: "下一款产品" }).click();
-
-  const animatedProperties = await page.evaluate(() => [
-    ...((
-      window as Window & {
-        __enheProductStageAnimatedProperties?: string[];
-      }
-    ).__enheProductStageAnimatedProperties ?? []),
-  ]);
-
-  await expect(stage).toHaveAttribute("data-motion-duration-ms", "80");
-  await expect(stage).toHaveAttribute("data-motion-modality", "reduced");
-  await expect(stage).toHaveAttribute("data-motion-enter-transform", "none");
-  await expect(stage).toHaveAttribute("data-motion-exit-transform", "none");
-  expect([...new Set(animatedProperties)]).toEqual(["opacity"]);
+  await expect(currentProduct(stage)).toHaveAttribute(
+    "data-product-id",
+    "infinitetalk",
+  );
+  await expect(currentProduct(stage)).toHaveCount(1);
+  await expect(stage.locator('[data-product-previous="true"]')).toHaveCount(0);
 });
 
 for (const locale of locales) {
