@@ -85,7 +85,7 @@ describe("homepage UI polish", () => {
     expect(homeStyles).toMatch(/\.redesign-home-products-heading h2\s*\{[^}]*font-size:\s*clamp\([^}]*1\.75rem\)/);
     expect(homeStyles).not.toMatch(/\.redesign-home-products-heading h2\s*\{[^}]*white-space:\s*nowrap/);
     expect(homeStyles).toMatch(/\.redesign-home-product-control\s*\{[^}]*border:\s*0[^}]*border-radius:\s*0/);
-    expect(refreshStyles).toMatch(/\.redesign-home-product-media-frame\s*\{[^}]*overflow:\s*hidden[^}]*border-radius:\s*22px/);
+    expect(refreshStyles).toMatch(/\.redesign-home-product-media-frame\s*\{[^}]*overflow:\s*hidden[^}]*border-radius:\s*0/);
   });
 
   it("removes side arrows from the rotating review card while preserving concise AI disclosure", () => {

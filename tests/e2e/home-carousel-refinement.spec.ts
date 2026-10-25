@@ -126,7 +126,7 @@ for (const route of ["/", "/en"]) {
   }
 }
 
-test("product indicators select the matching framed product without mobile overflow", async ({ page }) => {
+test("product indicators select the matching product without mobile overflow", async ({ page }) => {
   await page.setViewportSize({ width: 390, height: 844 });
   await page.goto("/");
   const stage = page.locator(".redesign-home-product-stage");
@@ -137,7 +137,7 @@ test("product indicators select the matching framed product without mobile overf
   await indicators.nth(4).click();
   await expect(stage.locator('[data-product-current="true"]')).toHaveAttribute("data-product-id", "faceswap-studio");
   await expect(indicators.nth(4)).toHaveAttribute("aria-current", "true");
-  await expect(stage.locator('[data-product-current="true"] .redesign-home-product-media-frame')).toHaveCSS("border-radius", "22px");
+  await expect(stage.locator('[data-product-current="true"] .redesign-home-product-media-frame')).toHaveCSS("border-radius", "0px");
   expect(await page.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth)).toBe(0);
 });
 

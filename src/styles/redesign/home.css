@@ -223,8 +223,9 @@
   position: absolute;
   z-index: 3;
   top: 4px;
-  right: calc(4px + clamp(44px, 6vw, 80px));
-  left: calc(4px + clamp(44px, 6vw, 80px));
+  right: 12.5%;
+  left: 12.5%;
+  width: 75%;
   aspect-ratio: 16 / 9;
   pointer-events: none;
 }
@@ -273,26 +274,24 @@
 }
 
 .redesign-home-product-content {
+  position: relative;
+  width: 75%;
   min-width: 0;
-  margin-inline: clamp(44px, 6vw, 80px);
+  margin-inline: auto;
+  overflow: clip;
+  overflow-clip-margin: 8px;
 }
 
 .redesign-home-product-media-frame {
   position: relative;
   aspect-ratio: 16 / 9;
   min-width: 0;
-  padding: clamp(8px, 1.15vw, 16px);
-  border: 1px solid color-mix(in srgb, #f4c15d 45%, #fff 12%);
-  border-radius: 22px;
+  padding: 0;
+  border: 0;
+  border-radius: 0;
   overflow: hidden;
-  background: radial-gradient(ellipse at 78% 6%, rgb(238 177 66 / 20%), transparent 42%), linear-gradient(135deg, #151515, #080808 62%, #211b10);
-  box-shadow: 0 20px 52px rgb(9 11 16 / 20%), inset 0 0 0 1px rgb(255 255 255 / 9%);
-  transition: transform 220ms ease, box-shadow 220ms ease;
-}
-
-.redesign-home-product-media-frame:hover {
-  transform: perspective(1400px) rotateY(-1deg) translateY(-2px);
-  box-shadow: 0 24px 58px rgb(9 11 16 / 24%), inset 0 0 0 1px rgb(255 255 255 / 12%);
+  background: transparent;
+  box-shadow: none;
 }
 
 .redesign-home-product-media-inner {
@@ -300,8 +299,8 @@
   width: 100%;
   height: 100%;
   overflow: hidden;
-  border-radius: 15px;
-  background: #090a0c;
+  border-radius: 0;
+  background: transparent;
 }
 
 .redesign-home-product-media {
@@ -310,13 +309,13 @@
   height: 100%;
   object-fit: contain;
   opacity: 1;
-  transform: scale(1);
-  transition: opacity 180ms ease, transform 180ms ease;
+  transform: none;
+  transition: none;
 }
 
 .redesign-home-product-media[data-media-status="loading"] {
   opacity: 0.72;
-  transform: scale(1.01);
+  transform: none;
 }
 
 .redesign-home-product-media-fallback {
@@ -360,7 +359,7 @@
   border-radius: 999px;
   background: #c6cbd2;
   cursor: pointer;
-  transition: width 180ms ease, background-color 180ms ease;
+  transition: none;
 }
 
 .redesign-home-product-indicators button[aria-current="true"] {
@@ -449,8 +448,8 @@
   }
 
   .redesign-home-product-controls {
-    right: 40px;
-    left: 40px;
+    right: 12.5%;
+    left: 12.5%;
   }
 
   .redesign-home-product-control:first-of-type {
@@ -462,7 +461,8 @@
   }
 
   .redesign-home-product-content {
-    margin-inline: 40px;
+    width: 75%;
+    margin-inline: auto;
   }
 
   .redesign-home-product-control {
@@ -771,25 +771,6 @@
 
   .redesign-home-reviews-rotation:hover,
   .redesign-home-reviews-rotation:active {
-    transform: none;
-  }
-
-  .redesign-home-product-media {
-    transform: none;
-    transition: opacity 1ms linear;
-  }
-
-  .redesign-home-product-media-frame,
-  .redesign-home-product-media-frame:hover {
-    transform: none;
-    transition: none;
-  }
-
-  .redesign-home-product-indicators button {
-    transition: none;
-  }
-
-  .redesign-home-product-media[data-media-status="loading"] {
     transform: none;
   }
 

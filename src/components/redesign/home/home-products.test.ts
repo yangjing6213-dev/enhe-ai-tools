@@ -176,6 +176,22 @@ describe("homepage approved product showcase", () => {
     expect(showcaseSource).not.toMatch(/setInterval|Audio\(|fetch\(|prisma|database|delivery/i);
   });
 
+  it("shrinks the showcase, removes display motion and frame styling, and keeps carousel controls", () => {
+    expect(showcaseSource).not.toContain('from "motion/react"');
+    expect(showcaseSource).not.toContain("animate(");
+    expect(showcaseSource).not.toContain("data-motion-variant=");
+    expect(showcaseSource).toContain("PRODUCT_AUTO_INTERVAL_MS");
+    expect(showcaseSource).toContain("setTimeout");
+    expect(showcaseSource).toContain("redesign-home-product-control");
+    expect(showcaseSource).toContain("redesign-home-product-indicators");
+    expect(homeStyles).toMatch(/\.redesign-home-product-content\s*\{[^}]*width:\s*75%/);
+    expect(homeStyles).toMatch(/\.redesign-home-product-controls\s*\{[^}]*width:\s*75%/);
+    expect(homeStyles).toMatch(/\.redesign-home-product-media-frame\s*\{[^}]*border:\s*0/);
+    expect(homeStyles).toMatch(/\.redesign-home-product-media-frame\s*\{[^}]*box-shadow:\s*none/);
+    expect(homeStyles).not.toMatch(/\.redesign-home-product-media-frame:hover\s*\{[^}]*transform:/);
+    expect(homeStyles).toMatch(/\.redesign-home-product-indicators button\s*\{[^}]*transition:\s*none/);
+  });
+
   it("renders one accessible indicator for each featured product", () => {
     const html = renderToStaticMarkup(createElement(EnheRedesignProductShowcase, { locale: "zh" }));
     expect(html).toContain('aria-label="选择推荐产品"');
@@ -190,20 +206,16 @@ describe("homepage approved product showcase", () => {
       /\.redesign-home-product-detail a\s*\{[\s\S]*?min-height:\s*44px[\s\S]*?display:\s*inline-flex[\s\S]*?align-items:\s*center[\s\S]*?padding:/,
     );
     expect(homeStyles).toMatch(/\.redesign-home-product-control\s*\{[\s\S]*?position:\s*absolute;[\s\S]*?top:\s*50%/);
-    expect(mobileStyles).toMatch(/\.redesign-home-product-content\s*\{[^}]*margin-inline:\s*40px/);
+    expect(mobileStyles).toMatch(/\.redesign-home-product-content\s*\{[^}]*width:\s*75%[^}]*margin-inline:\s*auto/);
     expect(mobileStyles).toMatch(/\.redesign-home-product-control\s*\{[^}]*width:\s*32px/);
   });
 
-  it("removes product loading scale under reduced motion", () => {
-    const reducedMotionStyles = homeStyles.slice(
-      homeStyles.lastIndexOf("@media (prefers-reduced-motion: reduce)"),
+  it("keeps product media motionless while loading and after it is ready", () => {
+    expect(homeStyles).toMatch(
+      /\.redesign-home-product-media\s*\{[^}]*transform:\s*none[^}]*transition:\s*none/,
     );
-
-    expect(reducedMotionStyles).toMatch(
-      /\.redesign-home-product-media\s*\{[\s\S]*?transition:\s*opacity 1ms linear/,
-    );
-    expect(reducedMotionStyles).toMatch(
-      /\.redesign-home-product-media\[data-media-status="loading"\]\s*\{[\s\S]*?transform:\s*none/,
+    expect(homeStyles).toMatch(
+      /\.redesign-home-product-media\[data-media-status="loading"\]\s*\{[^}]*transform:\s*none/,
     );
   });
 

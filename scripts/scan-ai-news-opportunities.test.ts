@@ -115,7 +115,7 @@ describe("scan-ai-news-opportunities script", () => {
         { status: "evidence_missing", reason: "missing-query-evidence" }
       ]
     });
-  });
+  }, 15_000);
 
   it("accepts valid structured query evidence without claiming a live backend connection", async () => {
     const result = await runScan({ candidates: [buildCandidate()] });

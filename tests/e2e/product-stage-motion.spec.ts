@@ -44,7 +44,7 @@ function currentProduct(stage: Locator) {
 
 for (const width of viewports) {
   for (const locale of locales) {
-    test(`directional product stage passes ${locale.route} at ${width}px`, async ({
+    test(`instant product stage passes ${locale.route} at ${width}px`, async ({
       page,
     }) => {
       const consoleErrors: string[] = [];
@@ -74,40 +74,24 @@ for (const width of viewports) {
       await expect(currentProduct(stage)).toContainText(locale.firstName);
 
       await next.click();
-      await expect(stage).toHaveAttribute(
-        "data-motion-variant",
-        "directional-slide",
-      );
-      await expect(stage).toHaveAttribute("data-motion-duration-ms", "240");
-      await expect(stage).toHaveAttribute("data-motion-modality", "pointer");
-      await expect(stage).toHaveAttribute("data-motion-direction", "forward");
-      await expect(stage).toHaveAttribute(
-        "data-motion-enter-transform",
-        "translateX(12px)",
-      );
-      await expect(stage).toHaveAttribute(
-        "data-motion-exit-transform",
-        "translateX(-12px)",
-      );
       await expect(currentProduct(stage)).toHaveAttribute(
         "data-product-id",
         "infinitetalk",
       );
       await expect(currentProduct(stage)).toContainText(locale.secondName);
+      await expect(currentProduct(stage).locator(".redesign-home-product-media")).toHaveCSS(
+        "transition-duration",
+        "0s",
+      );
 
       await previous.click();
-      await expect(stage).toHaveAttribute("data-motion-direction", "backward");
-      await expect(stage).toHaveAttribute(
-        "data-motion-enter-transform",
-        "translateX(-12px)",
-      );
-      await expect(stage).toHaveAttribute(
-        "data-motion-exit-transform",
-        "translateX(12px)",
-      );
       await expect(currentProduct(stage)).toHaveAttribute(
         "data-product-id",
         "ultimate-edition",
+      );
+      await expect(currentProduct(stage).locator(".redesign-home-product-media")).toHaveCSS(
+        "transition-duration",
+        "0s",
       );
 
       const rootOverflow = await page.evaluate(
@@ -206,12 +190,13 @@ test("keyboard switching is instant and retains persistent-control focus", async
   await stage.focus();
   await stage.press("ArrowRight");
   await expect(stage).toBeFocused();
-  await expect(stage).toHaveAttribute("data-motion-duration-ms", "0");
-  await expect(stage).toHaveAttribute("data-motion-modality", "keyboard");
-  await expect(stage).toHaveAttribute("data-motion-enter-transform", "none");
   await expect(currentProduct(stage)).toHaveAttribute(
     "data-product-id",
     "infinitetalk",
+  );
+  await expect(currentProduct(stage).locator(".redesign-home-product-media")).toHaveCSS(
+    "transition-duration",
+    "0s",
   );
 
   await next.focus();
@@ -263,16 +248,17 @@ test("keyboard remains instant when reduced motion is enabled", async ({
   await stage.focus();
   await stage.press("ArrowRight");
 
-  await expect(stage).toHaveAttribute("data-motion-duration-ms", "0");
-  await expect(stage).toHaveAttribute("data-motion-modality", "keyboard");
-  await expect(stage).toHaveAttribute("data-motion-enter-transform", "none");
   await expect(currentProduct(stage)).toHaveAttribute(
     "data-product-id",
     "infinitetalk",
   );
+  await expect(currentProduct(stage).locator(".redesign-home-product-media")).toHaveCSS(
+    "transition-duration",
+    "0s",
+  );
 });
 
-test("reduced motion stays 80ms opacity-only", async ({ page }) => {
+test("reduced motion keeps product switching immediate", async ({ page }) => {
   await page.emulateMedia({ reducedMotion: "reduce" });
   await page.addInitScript(() => {
     const nativeAnimate = Element.prototype.animate;
@@ -323,11 +309,15 @@ test("reduced motion stays 80ms opacity-only", async ({ page }) => {
     ).__enheProductStageAnimatedProperties ?? []),
   ]);
 
-  await expect(stage).toHaveAttribute("data-motion-duration-ms", "80");
-  await expect(stage).toHaveAttribute("data-motion-modality", "reduced");
-  await expect(stage).toHaveAttribute("data-motion-enter-transform", "none");
-  await expect(stage).toHaveAttribute("data-motion-exit-transform", "none");
-  expect([...new Set(animatedProperties)]).toEqual(["opacity"]);
+  await expect(currentProduct(stage)).toHaveAttribute(
+    "data-product-id",
+    "infinitetalk",
+  );
+  await expect(currentProduct(stage).locator(".redesign-home-product-media")).toHaveCSS(
+    "transition-duration",
+    "0s",
+  );
+  expect([...new Set(animatedProperties)]).toEqual([]);
 });
 
 for (const locale of locales) {

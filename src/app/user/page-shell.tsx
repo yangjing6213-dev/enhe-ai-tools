@@ -18,6 +18,7 @@ import { getCurrentLocale, getDictionary, type Locale } from "@/lib/i18n";
 import { getNotificationDisplay } from "@/lib/notification-display";
 import { canUserCancelOrder } from "@/lib/order-rules";
 import { buildCanonicalToolPath } from "@/lib/public-slugs";
+import { buildLocalePath } from "@/lib/seo";
 import { reviewCompletionNotice, reviewCompletionNoticeEn } from "@/lib/review-copy";
 import { buildUserToolEntitlements, type UserEntitlementTool } from "@/lib/user-entitlements";
 import { formatCurrency } from "@/lib/utils";
@@ -222,6 +223,12 @@ export async function UserCenterPageShell({
             <p className="mt-2 text-sm text-[var(--marketing-muted)]">
               {t.userCenter.role.replace("{role}", user.role === "admin" ? t.userCenter.admin : t.userCenter.user)}
             </p>
+            <Link
+              href={buildLocalePath("/user/recovery-email", locale)}
+              className="mt-3 inline-flex text-sm font-semibold text-[var(--marketing-accent)]"
+            >
+              {locale === "en" ? "Set up a verified recovery email" : "设置并验证找回邮箱"}
+            </Link>
             {passwordMessage ? (
               <p className={`mt-4 ${passwordMessage.type === "success" ? "status-success" : "status-danger"}`}>{passwordMessage.text}</p>
             ) : null}

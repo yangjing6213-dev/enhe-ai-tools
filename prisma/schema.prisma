@@ -17,6 +17,13 @@ enum UserStatus {
   disabled
 }
 
+enum AccountRecoveryTokenPurpose {
+  verify_recovery_email
+  reset_password
+
+  @@map("account_recovery_token_purpose")
+}
+
 enum PlanStatus {
   active
   disabled
@@ -272,6 +279,9 @@ model User {
   notifications         Notification[]
   newsletterEmail       String?                @map("newsletter_email")
   acceptEmailUpdates    Boolean                @default(true) @map("accept_email_updates")
+  recoveryEmail         String?                @unique @map("recovery_email")
+  recoveryVerifiedAt    DateTime?              @map("recovery_email_verified_at")
+  accountRecoveryTokens AccountRecoveryToken[]
   newsFavorites         NewsArticleFavorite[]
   newsLikes             NewsArticleLike[]
   toolLikes             ToolLike[]
@@ -1588,4 +1598,32 @@ model GeoRecommendation {
   @@index([status, priority])
   @@index([targetPath])
   @@map("geo_recommendations")
+}
+
+model AccountRecoveryToken {
+  id         String                      @id @default(cuid())
+  userId     String                      @map("user_id")
+  email      String
+  tokenHash  String                      @unique @map("token_hash")
+  purpose    AccountRecoveryTokenPurpose
+  expiresAt  DateTime                    @map("expires_at")
+  consumedAt DateTime?                   @map("consumed_at")
+  createdAt  DateTime                    @default(now()) @map("created_at")
+  user       User                        @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, purpose, expiresAt])
+  @@index([email, purpose, createdAt])
+  @@map("account_recovery_tokens")
+}
+
+model AccountRecoveryAttempt {
+  id        String   @id @default(cuid())
+  emailHash String   @map("email_hash")
+  ipHash    String?  @map("ip_hash")
+  createdAt DateTime @default(now()) @map("created_at")
+
+  @@index([emailHash, createdAt])
+  @@index([ipHash, createdAt])
+  @@index([createdAt])
+  @@map("account_recovery_attempts")
 }

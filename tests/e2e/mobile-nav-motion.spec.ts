@@ -591,60 +591,90 @@ test("mixed keyboard and pointer interruptions preserve the rendered drawer posi
   await resetMotionCapture(page);
   const trigger = page.getByRole("button", { name: "菜单", exact: true });
   const drawer = page.locator(".redesign-mobile-drawer");
+  const escapeState = await page.evaluate(async () => {
+    const trigger = document.querySelector<HTMLButtonElement>(
+      ".redesign-menu-trigger",
+    );
+    if (!trigger) throw new Error("mobile menu trigger missing before open");
+    trigger.dispatchEvent(new MouseEvent("click", { bubbles: true, detail: 1 }));
 
-  await trigger.click();
-  await expect(drawer).toBeVisible();
-  const beforeEscape = await drawerTranslateX(page);
-  expect(beforeEscape).toBeGreaterThan(0.5);
+    let drawer = document.querySelector<HTMLElement>(".redesign-mobile-drawer");
+    const beforeEscape = await new Promise<number>((resolve, reject) => {
+      const startedAt = performance.now();
+      const sampleOpeningDrawer = () => {
+        drawer = document.querySelector<HTMLElement>(".redesign-mobile-drawer");
+        if (drawer) {
+          const transform = getComputedStyle(drawer).transform;
+          const translateX =
+            transform === "none" ? 0 : new DOMMatrixReadOnly(transform).m41;
+          if (translateX > 0.5) {
+            resolve(translateX);
+            return;
+          }
+        }
+        if (performance.now() - startedAt >= 150) {
+          reject(new Error("mobile drawer did not enter its pointer opening motion"));
+          return;
+        }
+        requestAnimationFrame(sampleOpeningDrawer);
+      };
+      requestAnimationFrame(sampleOpeningDrawer);
+    });
+    if (!drawer) throw new Error("mobile drawer missing before Escape");
 
-  await page.evaluate(() => {
-    const captureWindow = window as Window & {
-      __enheEscapeTranslateX?: number;
-    };
+    let atEvent: number | undefined;
     document.addEventListener(
       "keydown",
       (event) => {
         if (event.key !== "Escape") return;
-        const drawer = document.querySelector<HTMLElement>(
+        const mountedDrawer = document.querySelector<HTMLElement>(
           ".redesign-mobile-drawer",
         );
-        if (!drawer) return;
-        captureWindow.__enheEscapeTranslateX = new DOMMatrixReadOnly(
-          getComputedStyle(drawer).transform,
-        ).m41;
+        if (!mountedDrawer) return;
+        const transform = getComputedStyle(mountedDrawer).transform;
+        atEvent =
+          transform === "none" ? 0 : new DOMMatrixReadOnly(transform).m41;
       },
       { capture: true, once: true },
     );
-  });
-  await page.keyboard.press("Escape");
-  const escapeHandoff = await drawer.evaluate((element) => {
+    document.dispatchEvent(
+      new KeyboardEvent("keydown", {
+        key: "Escape",
+        bubbles: true,
+        cancelable: true,
+      }),
+    );
+    await new Promise<void>((resolve) => requestAnimationFrame(() => resolve()));
+
     const captureWindow = window as Window & {
-      __enheEscapeTranslateX?: number;
+      __enheMotionCalls?: CapturedMotion[];
     };
+    const keyboardCloseAnimation = (captureWindow.__enheMotionCalls ?? [])
+      .filter((call) => call.target === "drawer")
+      .at(-1);
+    const mountedDrawer = document.querySelector<HTMLElement>(
+      ".redesign-mobile-drawer",
+    );
+    const transform = mountedDrawer
+      ? getComputedStyle(mountedDrawer).transform
+      : "none";
     return {
-      after: new DOMMatrixReadOnly(getComputedStyle(element).transform).m41,
-      atEvent: captureWindow.__enheEscapeTranslateX,
+      atEvent,
+      after: transform === "none" ? 0 : new DOMMatrixReadOnly(transform).m41,
+      beforeEscape,
+      keyboardCloseAnimation,
     };
   });
-  expect(escapeHandoff.atEvent).toBeDefined();
-  expect(
-    Math.abs(escapeHandoff.after - (escapeHandoff.atEvent ?? Number.NaN)),
-  ).toBeLessThanOrEqual(1);
-  const keyboardCloseAnimations = await drawer.evaluate((element) =>
-    element
-      .getAnimations()
-      .filter((animation) => animation.playState === "running")
-      .map((animation) => ({
-        duration: Number(animation.effect?.getTiming().duration ?? 0),
-        keyframes:
-          animation.effect instanceof KeyframeEffect
-            ? animation.effect.getKeyframes()
-            : [],
-      })),
-  );
-  expect(keyboardCloseAnimations).toHaveLength(1);
-  expect(keyboardCloseAnimations[0]?.duration).toBe(100);
-  expect(keyboardCloseAnimations[0]?.keyframes.some((frame) => frame.transform)).toBe(false);
+  const { after, atEvent } = escapeState;
+  expect(escapeState.beforeEscape).toBeGreaterThan(0.5);
+  expect(atEvent).toBeDefined();
+  expect(Math.abs(after - (atEvent ?? Number.NaN))).toBeLessThanOrEqual(1);
+  expect(escapeState.keyboardCloseAnimation).toMatchObject({
+    duration: 100,
+    easing: "linear",
+    hasOpacity: true,
+    hasTransform: false,
+  });
 
   await trigger.focus();
   await trigger.dispatchEvent("click", { detail: 1 });
@@ -652,29 +682,59 @@ test("mixed keyboard and pointer interruptions preserve the rendered drawer posi
   await expect(drawer).toHaveCSS("opacity", "1");
   await expect.poll(() => drawerTranslateX(page)).toBeLessThanOrEqual(1);
 
-  await page
-    .locator(".redesign-menu-overlay")
-    .click({ position: { x: 8, y: 100 } });
-  await page.waitForTimeout(40);
-  const beforeKeyboardOpen = await drawer.evaluate((element) => ({
-    opacity: Number(getComputedStyle(element).opacity),
-    translateX: new DOMMatrixReadOnly(getComputedStyle(element).transform).m41,
-  }));
-  expect(beforeKeyboardOpen.opacity).toBeGreaterThan(0.9);
-  expect(beforeKeyboardOpen.translateX).toBeGreaterThan(4);
-
   await resetMotionCapture(page);
-  const handoffSamples = await page.evaluate(async () => {
+  const handoffState = await page.evaluate(async () => {
     const trigger = document.querySelector<HTMLButtonElement>(
       ".redesign-menu-trigger",
     );
     const drawer = document.querySelector<HTMLElement>(
       ".redesign-mobile-drawer",
     );
-    if (!trigger || !drawer) throw new Error("mobile drawer controls missing");
+    const overlay = document.querySelector<HTMLElement>(
+      ".redesign-menu-overlay",
+    );
+    if (!trigger || !drawer || !overlay) {
+      throw new Error("mobile drawer controls missing before handoff");
+    }
 
+    overlay.dispatchEvent(new MouseEvent("click", { bubbles: true, detail: 1 }));
+    const pointerCloseStartedAt = performance.now();
+    const beforeKeyboardOpen = await new Promise<{
+      opacity: number;
+      translateX: number;
+    }>((resolve) => {
+      const sampleUntilDrawerMoves = () => {
+        if (!drawer.isConnected) {
+          resolve({ opacity: Number.NaN, translateX: Number.NaN });
+          return;
+        }
+        const style = getComputedStyle(drawer);
+        const sampled = {
+          opacity: Number(style.opacity),
+          translateX: new DOMMatrixReadOnly(style.transform).m41,
+        };
+        if (
+          sampled.translateX > 4 ||
+          performance.now() - pointerCloseStartedAt >= 140
+        ) {
+          resolve(sampled);
+          return;
+        }
+        requestAnimationFrame(sampleUntilDrawerMoves);
+      };
+      requestAnimationFrame(sampleUntilDrawerMoves);
+    });
+    if (!drawer.isConnected) {
+      throw new Error("mobile drawer closed before the handoff could be sampled");
+    }
+
+    const captureWindow = window as Window & {
+      __enheMotionCalls?: CapturedMotion[];
+    };
+    captureWindow.__enheMotionCalls = [];
     trigger.focus();
     trigger.click();
+
     const startedAt = performance.now();
     const samples: Array<{
       elapsed: number;
@@ -697,8 +757,12 @@ test("mixed keyboard and pointer interruptions preserve the rendered drawer posi
       };
       requestAnimationFrame(sample);
     });
-    return samples;
+    return { beforeKeyboardOpen, samples };
   });
+  const { beforeKeyboardOpen } = handoffState;
+  expect(beforeKeyboardOpen.opacity).toBeGreaterThan(0.9);
+  expect(beforeKeyboardOpen.translateX).toBeGreaterThan(4);
+  const handoffSamples = handoffState.samples;
   const readHandoffAnimations = () =>
     page.evaluate(() => {
       const captureWindow = window as Window & {

@@ -97,6 +97,11 @@ export async function LoginPageShell({
         <FormSubmitButton className="login-submit-button mt-8 w-full text-base" pendingLabel={t.auth.loggingIn}>
           {t.auth.loginButton}
         </FormSubmitButton>
+        <p className="mt-4 text-center text-sm">
+          <Link className="font-semibold text-[var(--marketing-accent)]" href={buildLocalePath("/forgot-password", locale)}>
+            {locale === "en" ? "Forgot password?" : "忘记密码？"}
+          </Link>
+        </p>
         <a
           href={`/api/auth/google/start?returnTo=${encodeURIComponent(returnTo)}`}
           className="mt-4 flex min-h-12 w-full items-center justify-center gap-3 rounded-lg border border-slate-300 bg-white px-4 font-semibold text-slate-900 shadow-sm transition-colors hover:bg-slate-50"

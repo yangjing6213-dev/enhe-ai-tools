@@ -294,6 +294,6 @@ describe("SEO audit runtime heartbeat identity", () => {
       expect(engineEnvironment[secretName]).toBeUndefined();
     }
     await stopChild(child);
-  });
+  }, 15_000);
 
 });

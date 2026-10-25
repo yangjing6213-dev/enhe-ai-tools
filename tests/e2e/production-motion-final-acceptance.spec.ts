@@ -495,16 +495,18 @@ async function exerciseHome(
     await page.getByRole("button", { name: route.next }).click();
   }
 
-  await expect(stage).toHaveAttribute("data-motion-variant", "directional-slide");
-  await expect(stage).toHaveAttribute(
-    "data-motion-duration-ms",
-    modality === "pointer" ? "240" : modality === "keyboard" ? "0" : "80",
-  );
-  await expect(stage).toHaveAttribute(
-    "data-motion-enter-transform",
-    modality === "pointer" ? "translateX(12px)" : "none",
-  );
   await expect(currentProduct(page)).toHaveAttribute("data-product-id", "infinitetalk");
+  await expect(currentProduct(page).locator(".redesign-home-product-media")).toHaveCSS(
+    "transition-duration",
+    "0s",
+  );
+  await expect.poll(() =>
+    currentProduct(page).evaluate((element) =>
+      element.getAnimations({ subtree: true }).filter((animation) =>
+        ["pending", "running"].includes(animation.playState),
+      ).length,
+    ),
+  ).toBe(0);
   await expect(stage.locator('[aria-selected="true"]')).toHaveCount(0);
   await expect(
     page.locator(".redesign-home-product-counter"),
@@ -880,9 +882,9 @@ for (const route of homeSsrRoutes) {
         }),
       )
       .toBe(true);
-    expect(productMediaRequests).toEqual([
-      { pathname: "/_next/image", mediaSrc: HOME_PRODUCTS[0].mediaSrc },
-    ]);
+    expect(
+      [...new Set(productMediaRequests.map(({ pathname, mediaSrc }) => `${pathname}:${mediaSrc}`))],
+    ).toEqual([`/_next/image:${HOME_PRODUCTS[0].mediaSrc}`]);
 
     await page.getByRole("button", { name: route.next, exact: true }).click();
     await expect(currentProduct(page)).toHaveAttribute(

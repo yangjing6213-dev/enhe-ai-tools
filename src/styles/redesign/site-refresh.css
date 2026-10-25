@@ -463,7 +463,7 @@
 
 .redesign-home-product-media-frame {
   overflow: hidden;
-  border-radius: 22px;
+  border-radius: 0;
 }
 
 .redesign-home-reviews-disclosure {

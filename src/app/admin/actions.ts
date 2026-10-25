@@ -447,9 +447,16 @@ export async function resetUserPasswordAction(formData: FormData) {
   const id = idSchema.parse(formData.get("id"));
   const password = z.string().min(8).parse(formData.get("password"));
 
-  await prisma.user.update({
-    where: { id },
-    data: { passwordHash: await hashPassword(password) }
+  const resetAt = new Date();
+  await prisma.$transaction(async (tx) => {
+    await tx.user.update({
+      where: { id },
+      data: { passwordHash: await hashPassword(password) }
+    });
+    await tx.session.updateMany({
+      where: { userId: id, revokedAt: null },
+      data: { revokedAt: resetAt }
+    });
   });
   await writeAdminAuditLog({
     adminId: admin.id,
