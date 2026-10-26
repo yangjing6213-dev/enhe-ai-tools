@@ -9,20 +9,56 @@ const AUTOMATION_ACTION = "forum.post.daily_automated";
 const AUDIT_PREFIX = "forum-daily-ai-topic-";
 const SOURCE_LOOKBACK_DAYS = 30;
 const REPEAT_LOOKBACK_DAYS = SOURCE_LOOKBACK_DAYS;
+const SOURCE_SELECT = {
+  id: true, title: true, slug: true, summary: true,
+  publishedAt: true, createdAt: true, viewCount: true,
+} as const;
 
 type AiNewsTopicSource = {
   id: string;
   title: string;
   summary: string;
   slug: string;
+  publishedAt: Date | null;
+  createdAt: Date;
+  viewCount: number;
 };
+
+function headlineKey(title: string) {
+  return title.replace(/^把「([\s\S]*)」变成可复用\s*AI\s*工作流$/, "$1")
+    .normalize("NFKC").toLowerCase().replace(/[\s\p{P}\p{S}]/gu, "");
+}
+
+export function selectDailyAiForumSource(
+  sources: AiNewsTopicSource[],
+  recentlyUsed: Set<string>,
+  recentTitles: string[],
+  now: Date,
+) {
+  const usedTitles = new Set(recentTitles.map(headlineKey));
+  const ageDays = (source: AiNewsTopicSource) =>
+    (now.getTime() - (source.publishedAt ?? source.createdAt).getTime()) / 86_400_000;
+  return sources.filter((source) => {
+    const title = source.title.replace(/\s+/g, " ").trim();
+    const age = ageDays(source);
+    return title.length >= 2 && title.length <= 120 && source.summary.trim() &&
+      age >= 0 && age <= SOURCE_LOOKBACK_DAYS &&
+      !recentlyUsed.has(source.id) && !usedTitles.has(headlineKey(title));
+  }).sort((a, b) => {
+    // Recent editorial coverage first; views are site interest, not global trends.
+    const recentFirst = Number(ageDays(b) <= 7) - Number(ageDays(a) <= 7);
+    return recentFirst || b.viewCount - a.viewCount || ageDays(a) - ageDays(b) || a.id.localeCompare(b.id);
+  })[0];
+}
 
 export function buildDailyAiTipForumPost(source: {
   title: string;
   summary: string;
   sourcePath: string;
 }) {
-  const topic = source.title.replace(/\s+/g, " ").trim().slice(0, 76);
+  // Reuse the reviewed, content-specific headline without inventing a claim or
+  // cutting off eligibility restrictions to make room for a generic wrapper.
+  const topic = source.title.replace(/\s+/g, " ").trim();
   const summary = source.summary.replace(/\s+/g, " ").trim().slice(0, 220);
   const sourcePath = source.sourcePath.startsWith("/ai-news/")
     ? source.sourcePath
@@ -30,7 +66,7 @@ export function buildDailyAiTipForumPost(source: {
 
   return {
     category: "workflow" as const,
-    title: `把「${topic}」变成可复用 AI 工作流`,
+    title: topic,
     content: [
       summary,
       "不必只停留在了解新功能，可以从一个重复的小任务开始练习：",
@@ -98,7 +134,7 @@ export async function publishDueDailyAiTipForumTopic(
       });
       if (!admin) return { status: "no_admin" as const };
 
-      const [recentTopics, sources] = await Promise.all([
+      const [recentTopics, datedSources, undatedSources, recentPosts] = await Promise.all([
         tx.adminAuditLog.findMany({
           where: {
             action: AUTOMATION_ACTION,
@@ -111,24 +147,27 @@ export async function publishDueDailyAiTipForumTopic(
         tx.newsArticle.findMany({
           where: {
             status: "published",
-            OR: [
-              { publishedAt: { gte: since, lte: now } },
-              { publishedAt: null, createdAt: { gte: since, lte: now } },
-            ],
+            publishedAt: { gte: since, lte: now },
           },
-          select: {
-            id: true,
-            title: true,
-            slug: true,
-            summary: true,
-          },
+          select: SOURCE_SELECT,
           orderBy: [
-            { viewCount: "desc" },
-            { publishedAt: "desc" },
+            { publishedAt: { sort: "desc", nulls: "last" } },
             { createdAt: "desc" },
             { id: "asc" },
           ],
           take: 100,
+        }),
+        tx.newsArticle.findMany({
+          where: { status: "published", publishedAt: null, createdAt: { gte: since, lte: now } },
+          select: SOURCE_SELECT,
+          orderBy: [{ createdAt: "desc" }, { id: "asc" }],
+          take: 100,
+        }),
+        tx.forumPost.findMany({
+          where: { status: "approved", createdAt: { gte: repeatSince } },
+          select: { title: true },
+          orderBy: { createdAt: "desc" },
+          take: 500,
         }),
       ]);
       const recentlyUsed = new Set(
@@ -136,12 +175,7 @@ export async function publishDueDailyAiTipForumTopic(
           .map((topic) => readSourceArticleId(topic.metadata))
           .filter((sourceArticleId): sourceArticleId is string => Boolean(sourceArticleId)),
       );
-      const source = (sources as AiNewsTopicSource[]).find(
-        (candidate) =>
-          candidate.title.trim() &&
-          candidate.summary.trim() &&
-          !recentlyUsed.has(candidate.id),
-      );
+      const source = selectDailyAiForumSource([...datedSources, ...undatedSources], recentlyUsed, recentPosts.map((post) => post.title), now);
       if (!source) return { status: "no_source" as const };
 
       const sourcePath = buildCanonicalAiNewsPath(source, "zh");
@@ -173,6 +207,8 @@ export async function publishDueDailyAiTipForumTopic(
             sourceArticleId: source.id,
             sourcePath,
             scheduledMinute,
+            headlineStrategy: "reviewed_content_headline",
+            sourcePublishedAt: (source.publishedAt ?? source.createdAt).toISOString(),
           },
         },
       });
