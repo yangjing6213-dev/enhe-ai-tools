@@ -241,7 +241,7 @@ export function AiPromptManagementPageShell({
             ))}
           </div>
         </section>
-        <div className="mt-8">
+        <div className="mt-8 pb-60 md:pb-80">
           <ProductShareCard locale={forceLocale} title={copy.title} path={path} />
         </div>
       </Container>
