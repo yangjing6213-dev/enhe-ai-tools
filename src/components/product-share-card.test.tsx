@@ -35,11 +35,11 @@ describe("product sharing", () => {
     await expect(copyProductLink("https://example.test/software/a", { writeText: vi.fn().mockRejectedValue(new Error("Denied")) })).resolves.toBe(false);
     await expect(copyProductLink("https://example.test/software/a", undefined)).resolves.toBe(false);
   });
-  it("encodes the homepage rather than the current product in the footer", () => {
+  it("encodes the homepage for the site entry notice", () => {
     vi.stubEnv("APP_URL", "https://www.enhe-tech.com.cn");
     const html = renderToStaticMarkup(<SiteQrCode locale="zh" />);
     expect(qrValues).toEqual(["https://www.enhe-tech.com.cn/"]);
-    expect(html).toContain("扫码进入网站首页");
+    expect(html).toContain("扫码收藏网站");
     expect(html).toContain('role="img"');
   });
 });

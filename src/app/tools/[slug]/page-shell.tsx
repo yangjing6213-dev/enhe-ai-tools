@@ -973,7 +973,7 @@ export async function ToolDetailPageShell({
                       {tool.supportedAgents.length ? (
                         <SupportedAgentsCard agents={tool.supportedAgents} locale={forceLocale} />
                       ) : null}
-                      {visibleDownloadMetric && !workflowLinkOnly ? (
+                      {visibleDownloadMetric && !workflowLinkOnly && !(isAiSkill && tool.slug === "skill") ? (
                         <Info
                           label={td.downloadCount}
                           value={String(visibleDownloadMetric.count)}
@@ -1471,12 +1471,13 @@ export async function ToolDetailPageShell({
           </details>
           ) : null}
 
+          <div className="tool-detail-changelog-share-grid grid gap-6 lg:grid-cols-2">
           <section
             id="tool-changelog"
-            className="tool-detail-changelog-card glass w-full scroll-mt-24 rounded-2xl p-7"
+            className="tool-detail-changelog-card glass w-full min-w-0 scroll-mt-24 rounded-2xl p-7"
           >
             <div className="flex items-center justify-between gap-4">
-              <h2 className="text-xl font-semibold text-[#F6FAFF]">
+              <h2 className="text-3xl font-black tracking-normal text-[var(--marketing-text)] md:text-4xl">
                 {td.changelogTitle}
               </h2>
               <span className="rounded-full border border-white/10 px-3 py-1 text-xs text-[#8F9DB2]">
@@ -1535,6 +1536,7 @@ export async function ToolDetailPageShell({
             title={localizedTool.primaryName}
             path={buildCanonicalToolPath(tool, forceLocale)}
           />
+          </div>
 
           {hasHowToDelivery ? (
             <section id="tool-how-to" className="glass scroll-mt-24 rounded-2xl p-7">

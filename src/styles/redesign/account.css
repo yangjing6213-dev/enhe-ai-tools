@@ -26,9 +26,7 @@
   border-radius: var(--enhe-card-r);
   background: var(--enhe-surface);
   box-shadow: 0 12px 32px rgba(7, 21, 18, 0.08);
-  transition:
-    border-color var(--enhe-motion-panel) var(--enhe-ease-ui-move),
-    box-shadow var(--enhe-motion-panel) var(--enhe-ease-ui-move);
+  transition: none;
 }
 
 .enhe-redesign-production .user-center-page .user-center-purchases {
@@ -42,16 +40,16 @@
 }
 
 .enhe-redesign-production .user-center-page button.user-center-logout[data-variant="outline"]:not(:disabled) {
-  border-color: #a16a00;
-  background-color: #a16a00;
+  border-color: var(--enhe-action);
+  background-color: var(--enhe-action);
   color: #fff !important;
   -webkit-text-fill-color: #fff !important;
 }
 
 
 .enhe-redesign-production .user-center-page button.user-center-logout[data-variant="outline"]:hover {
-  border-color: #855800;
-  background-color: #855800;
+  border-color: var(--enhe-action-hover);
+  background-color: var(--enhe-action-hover);
 }
 
 .enhe-redesign-production .user-center-page .user-center-record {
@@ -191,11 +189,6 @@
 }
 
 @media (hover: hover) and (prefers-reduced-motion: no-preference) {
-  .enhe-redesign-production .user-center-page .user-center-panel:hover {
-    border-color: color-mix(in srgb, var(--enhe-action) 40%, var(--enhe-border));
-    box-shadow: 0 16px 36px rgba(7, 21, 18, 0.12);
-  }
-
   .enhe-redesign-production .user-center-page .user-center-record:hover {
     border-color: color-mix(in srgb, var(--enhe-action) 52%, var(--enhe-border));
     box-shadow: 0 8px 20px rgba(7, 21, 18, 0.08);
@@ -213,6 +206,13 @@
     background-color: var(--enhe-action-hover);
     color: #fff;
   }
+}
+
+.enhe-redesign-production .user-center-page .user-center-panel:hover {
+  border-color: var(--enhe-border);
+  box-shadow: 0 12px 32px rgba(7, 21, 18, 0.08);
+  transform: none;
+  transition: none !important;
 }
 
 @media (prefers-reduced-motion: reduce) {

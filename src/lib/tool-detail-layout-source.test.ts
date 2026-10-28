@@ -83,4 +83,15 @@ describe("tool detail layout source", () => {
     expect(source.slice(changelogStart, changelogEnd)).toContain("tool-detail-changelog-card");
     expect(source.slice(changelogStart, changelogEnd)).toContain("w-full");
   });
+
+  it("pairs changelog and sharing cards and hides the download metric on the generic Skill route", () => {
+    const source = readFileSync(resolve(root, "src/app/tools/[slug]/page-shell.tsx"), "utf8");
+    const sharingStyles = readFileSync(resolve(root, "src/components/product-sharing.module.css"), "utf8");
+
+    expect(source).toContain("tool-detail-changelog-share-grid");
+    expect(source).toContain('!(isAiSkill && tool.slug === "skill")');
+    expect(source).toContain("md:text-4xl");
+    expect(sharingStyles).toContain("font-size: 1.875rem");
+    expect(sharingStyles).toContain("font-size: 2.25rem");
+  });
 });

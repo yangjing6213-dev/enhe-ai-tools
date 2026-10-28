@@ -3,11 +3,11 @@ import type { Locale } from "@/lib/dictionaries";
 import { absoluteUrl } from "@/lib/seo";
 import styles from "./product-sharing.module.css";
 
-export function SiteQrCode({ locale }: { locale: Locale }) {
-  const label = locale === "en" ? "Scan to visit the homepage" : "扫码进入网站首页";
+export function SiteQrCode({ locale, size = 144, className }: { locale: Locale; size?: number; className?: string }) {
+  const label = locale === "en" ? "Scan to bookmark this site" : "扫码收藏网站";
   return (
-    <figure className={styles.siteQr}>
-      <QRCodeSVG value={absoluteUrl("/")} size={144} level="M" marginSize={4} bgColor="#ffffff" fgColor="#000000" role="img" aria-label={label} />
+    <figure className={[styles.siteQr, className].filter(Boolean).join(" ")}>
+      <QRCodeSVG value={absoluteUrl("/")} size={size} level="M" marginSize={4} bgColor="#ffffff" fgColor="#000000" role="img" aria-label={label} />
       <figcaption>{label}</figcaption>
     </figure>
   );

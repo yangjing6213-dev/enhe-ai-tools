@@ -23,6 +23,7 @@ import {
   getSettingsMap
 } from "@/lib/settings";
 import type { RedesignLanguageHrefs } from "@/components/redesign/types";
+import { SiteEntryNotice } from "@/components/site-entry-notice";
 
 export async function PublicSiteChrome({
   children,
@@ -79,6 +80,7 @@ export async function PublicSiteChrome({
           locale={forceLocale}
           languageHrefs={languageHrefs}
         />
+        <SiteEntryNotice locale={forceLocale} />
         <SiteFloatingActions locale={forceLocale} isAuthenticated={Boolean(headerUser)} />
         <div id="main-content" tabIndex={-1}>
           {children}

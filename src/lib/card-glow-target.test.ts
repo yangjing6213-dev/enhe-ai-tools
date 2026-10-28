@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { isCardGlowTarget } from "./card-glow-target";
+import { isCardGlowTarget, isNestedCardGlowTarget } from "./card-glow-target";
 
 describe("sitewide card glow coverage", () => {
   it.each([
@@ -23,5 +23,9 @@ describe("sitewide card glow coverage", () => {
   it("covers the shared UI Card without including its header", () => {
     expect(isCardGlowTarget("DIV", [], "card")).toBe(true);
     expect(isCardGlowTarget("DIV", [], "card-header")).toBe(false);
+  });
+  it("keeps pointer glow on nested cards but skips the outermost card", () => {
+    expect(isNestedCardGlowTarget("SECTION", ["surface-panel"], undefined, false)).toBe(false);
+    expect(isNestedCardGlowTarget("DIV", ["user-center-record", "rounded-xl", "border"], undefined, true)).toBe(true);
   });
 });

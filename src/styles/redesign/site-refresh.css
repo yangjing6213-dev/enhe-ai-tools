@@ -20,6 +20,30 @@
   backdrop-filter: none;
 }
 
+.enhe-redesign-production [data-top-level-card-static] {
+  transition: none !important;
+}
+
+.enhe-redesign-production [data-top-level-card-static]:is(:hover, :focus-within) {
+  transform: none !important;
+}
+
+.enhe-redesign-production :is(
+  .glass,
+  .evidence-card,
+  .dossier-card,
+  .surface-panel:not(.rounded-full),
+  .surface-panel-soft:not(.rounded-full),
+  .filter-surface,
+  .admin-shell-card,
+  .home-product-preview,
+  .home-product-preview-empty,
+  .home-fallback-link,
+  .tool-detail-copy-card
+)[data-top-level-card-static]::after {
+  display: none !important;
+}
+
 .enhe-redesign-production [class*="text-[#F6FAFF]"],
 .enhe-redesign-production [class*="text-[#C5D0E2]"],
 .enhe-redesign-production [class*="text-[#8F9DB2]"] {

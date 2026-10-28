@@ -34,6 +34,11 @@ describe("ENHE visual polish contract", () => {
     expect(styles).toContain(".user-center-record");
     expect(styles).toContain(".user-center-page .status-success");
     expect(styles).toContain(".user-center-page .status-danger");
+    expect(styles).toContain("background-color: var(--enhe-action)");
+    expect(styles).not.toContain("background-color: #a16a00");
+    expect(styles).toContain(".user-center-page .user-center-panel:hover");
+    expect(styles).toContain("transition: none !important");
+    expect(styles).toContain("user-center-record:hover");
     expect(page).toContain('wrapperClassName="user-center-password-input"');
     expect(page).not.toContain("text-[#8B95A7]");
     expect(page).not.toContain("border-white/10");
@@ -63,6 +68,7 @@ describe("ENHE visual polish contract", () => {
     const accountStyles = read("src/styles/redesign/account.css");
     const newsStyles = read("src/styles/redesign/ai-news.css");
     const shellStyles = read("src/styles/redesign/shell.css");
+    const siteRefreshStyles = read("src/styles/redesign/site-refresh.css");
 
     expect(interactions).toContain("ai-news-action");
     expect(interactions).not.toContain("border-white/");
@@ -77,5 +83,7 @@ describe("ENHE visual polish contract", () => {
     expect(accountStyles).toContain("@media (hover: hover) and (prefers-reduced-motion: no-preference)");
     expect(accountStyles).toContain("user-center-record:hover");
     expect(shellStyles).toContain("@media (prefers-reduced-motion: reduce)");
+    expect(siteRefreshStyles).toContain("[data-top-level-card-static]");
+    expect(accountStyles).toContain(".user-center-page .user-center-panel:hover");
   });
 });

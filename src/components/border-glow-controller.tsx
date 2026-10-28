@@ -3,7 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import BorderGlow from "@/components/BorderGlow";
-import { isCardGlowTarget } from "@/lib/card-glow-target";
+import { isCardGlowTarget, isNestedCardGlowTarget } from "@/lib/card-glow-target";
 import "./site-card-glow.css";
 
 // Adapted from React Bits BorderGlow, licensed MIT + Commons Clause.
@@ -98,9 +98,26 @@ function findGlowCard(target: EventTarget | null) {
   let element = target instanceof Element ? target : null;
   if (element?.closest(".redesign-home-product-stage, .tool-detail-page, .enhe-admin-shell, [data-no-card-glow]")) return null;
   while (element && element !== document.body) {
-    if (element instanceof HTMLElement && !element.closest(".enhe-edge-effect") &&
-        (element.matches(CARD_SELECTOR) || isCardGlowTarget(element.tagName, Array.from(element.classList), element.dataset.slot))) {
-      return element;
+    if (element instanceof HTMLElement && !element.closest(".enhe-edge-effect")) {
+      const tag = element.tagName;
+      const classes = Array.from(element.classList);
+      const slot = element.dataset.slot;
+      const isCard = element.matches(CARD_SELECTOR) || isCardGlowTarget(tag, classes, slot);
+      if (isCard) {
+        let hasCardAncestor = false;
+        for (let parent = element.parentElement; parent && parent !== document.body; parent = parent.parentElement) {
+          if (parent instanceof HTMLElement &&
+              (parent.matches(CARD_SELECTOR) || isCardGlowTarget(parent.tagName, Array.from(parent.classList), parent.dataset.slot))) {
+            hasCardAncestor = true;
+            break;
+          }
+        }
+        if (!isNestedCardGlowTarget(tag, classes, slot, hasCardAncestor)) {
+          element.dataset.topLevelCardStatic = "true";
+          return null;
+        }
+        return element;
+      }
     }
     element = element.parentElement;
   }

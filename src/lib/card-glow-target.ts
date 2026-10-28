@@ -12,3 +12,12 @@ export function isCardGlowTarget(tag: string, classes: string[], slot?: string |
   const surface = classes.some(name => name === "border" || name === "bg-card" || name.startsWith("bg-[var(--marketing-card"));
   return rounded && surface && !classes.includes("rounded-full") && (tag !== "A" || classes.includes("block"));
 }
+
+export function isNestedCardGlowTarget(
+  tag: string,
+  classes: string[],
+  slot: string | null | undefined,
+  hasCardAncestor: boolean,
+) {
+  return hasCardAncestor && isCardGlowTarget(tag, classes, slot);
+}
