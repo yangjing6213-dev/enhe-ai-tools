@@ -8,6 +8,7 @@ import { getOrCreateCsrfToken } from "@/lib/csrf";
 import { prisma } from "@/lib/db";
 import { getCurrentLocale, type Locale } from "@/lib/i18n";
 import { buildLocalePath } from "@/lib/seo";
+import styles from "@/app/(auth)/recovery-buttons.module.css";
 
 export async function RecoveryEmailPageShell({
   searchParams,
@@ -92,7 +93,7 @@ export async function RecoveryEmailPageShell({
             hideLabel={isEnglish ? "Hide password" : "隐藏密码"}
             className="form-control-dark"
           />
-          <FormSubmitButton pendingLabel={isEnglish ? "Sending..." : "正在发送..."}>
+          <FormSubmitButton className={styles.primary} pendingLabel={isEnglish ? "Sending..." : "正在发送..."}>
             {isEnglish ? "Send verification link" : "发送验证邮件"}
           </FormSubmitButton>
         </form>}

@@ -256,26 +256,22 @@ function buildEnglishTrendFallbackTitle(slug: string) {
 }
 
 function buildEnglishTrendFallbackSummary(slug: string) {
-  return `Daily AI demand summary for ${slug}, highlighting practical workflow demand, adoption signals, and the next actions worth tracking.`;
+  return `The ${slug} briefing is available in its original Chinese edition. An English summary has not been provided.`;
 }
 
 function buildEnglishTrendFallbackConclusion(slug: string) {
-  return `This ${slug} briefing focuses on repeatable AI workflows, measurable efficiency gains, and product opportunities shaped by real-world demand signals.`;
+  return `Read the original Chinese briefing for the ${slug} issue's conclusions, evidence, and limitations.`;
 }
 
 function buildEnglishTrendFallbackHighlights(slug: string) {
-  return [
-    `Workflow demand remained the clearest signal in the ${slug} briefing.`,
-    "Users continue to value AI that saves time, reduces repetition, and improves delivery quality.",
-    "Lower-risk, high-frequency use cases remain the strongest opportunity area."
-  ];
+  return [`The original ${slug} briefing contains this issue's analysis and source notes.`];
 }
 
 function localizeAiTrendSourceSignal(signal: AiTrendSourceSignal): AiTrendSourceSignal {
   return {
     ...signal,
     observedSignal: hasCjk(signal.observedSignal)
-      ? "Public source signal captured from trend, product, or community activity."
+      ? "The original source observation is available in the Chinese briefing."
       : normalizeEnglishSentence(signal.observedSignal),
     credibilityNote: hasCjk(signal.credibilityNote)
       ? "Source note available in the original published briefing."
@@ -284,9 +280,7 @@ function localizeAiTrendSourceSignal(signal: AiTrendSourceSignal): AiTrendSource
 }
 
 function buildLocalizedAiTrendHtml(view: AiTrendBriefingView) {
-  return `<article><h1>${buildEnglishTrendFallbackTitle(view.slug)}</h1><p>${buildEnglishTrendFallbackConclusion(
-    view.slug
-  )}</p></article>`;
+  return `<article lang="en"><h1>AI Demand Briefing</h1><p>The full analysis is available in Chinese. An English translation has not been provided.</p><p><a href="/ai-trends/daily/${encodeURIComponent(view.slug)}" target="_blank" rel="noopener noreferrer">Read the original Chinese report</a></p></article>`;
 }
 
 export function sanitizeAiTrendBriefingHtml(value: string) {
@@ -386,7 +380,6 @@ export function normalizeAiTrendDemandBreakdowns(value: unknown): AiTrendDemandB
               } satisfies AiTrendDemandScenario;
             })
             .filter((scenario): scenario is AiTrendDemandScenario => Boolean(scenario))
-            .sort((left, right) => right.heat - left.heat)
             .slice(0, 12)
         : [];
 
@@ -400,7 +393,6 @@ export function normalizeAiTrendDemandBreakdowns(value: unknown): AiTrendDemandB
       } satisfies AiTrendDemandBreakdown;
     })
     .filter((item): item is AiTrendDemandBreakdown => Boolean(item))
-    .sort((left, right) => right.heat - left.heat)
     .slice(0, 12);
 }
 
@@ -550,6 +542,7 @@ export function toAiTrendBriefingView(
 
 export function localizeAiTrendBriefingView(view: AiTrendBriefingView, locale: "zh" | "en") {
   if (locale === "zh") return view;
+  const englishHighlights = view.publicHighlights.filter((item) => !hasCjk(item)).map(normalizeEnglishSentence);
 
   return {
     ...view,
@@ -558,11 +551,10 @@ export function localizeAiTrendBriefingView(view: AiTrendBriefingView, locale: "
     coreConclusion: hasCjk(view.coreConclusion)
       ? buildEnglishTrendFallbackConclusion(view.slug)
       : normalizeEnglishSentence(view.coreConclusion),
-    publicHighlights: view.publicHighlights.length
-      ? view.publicHighlights.map((item, index) =>
-          hasCjk(item) ? buildEnglishTrendFallbackHighlights(view.slug)[index] ?? "Practical demand signal captured in this briefing." : normalizeEnglishSentence(item)
-        )
+    publicHighlights: englishHighlights.length
+      ? englishHighlights
       : buildEnglishTrendFallbackHighlights(view.slug),
+    demandBreakdowns: view.demandBreakdowns.filter((item) => !hasCjk(JSON.stringify(item))),
     sourceSignals: view.sourceSignals.map(localizeAiTrendSourceSignal),
     ...(view.fullHtml ? { fullHtml: hasCjk(view.fullHtml) ? buildLocalizedAiTrendHtml(view) : view.fullHtml } : {})
   };

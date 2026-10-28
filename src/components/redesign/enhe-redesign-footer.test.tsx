@@ -20,4 +20,11 @@ describe("footer decoration around account forms", () => {
     expect(html).toContain("redesign-footer-mascot");
     expect(html).toContain("enhe-dino-peek-mirrored.webp");
   });
+
+  it.each(["zh", "en"] as const)("places the homepage QR between the slogan and legal footer in %s", (locale) => {
+    const html = renderToStaticMarkup(<EnheRedesignFooter locale={locale} />);
+    const qrLabel = locale === "en" ? "Scan to visit the homepage" : "扫码进入网站首页";
+    expect(html.indexOf(qrLabel)).toBeGreaterThan(html.indexOf("redesign-home-brand-value-title"));
+    expect(html.indexOf(qrLabel)).toBeLessThan(html.indexOf('class="footer-bottom"'));
+  });
 });

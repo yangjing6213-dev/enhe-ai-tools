@@ -52,9 +52,9 @@ describe("product editor isolated save path", () => {
     expect(mocks.db.tool.update.mock.calls[0][0].data.downloadFileId).toBeNull();
     expect(mocks.db.file.update).not.toHaveBeenCalled();
   });
-  it("defaults a new software product to the logged-in creator and records a manual review date", async () => {
+  it.each(["software", "ai_skill"])("defaults a new %s product to the logged-in creator and records a manual review date", async (type) => {
     const data = form({
-      type: "software",
+      type,
       name: "New product",
       slug: "new-product",
       shortDescription: "Summary",
@@ -78,6 +78,17 @@ describe("product editor isolated save path", () => {
     mocks.admin.mockRejectedValue(new Error("FORBIDDEN"));
     await expect(upsertToolAction(form({ type: "software" }))).rejects.toThrow("FORBIDDEN");
     expect(mocks.db.tool.update).not.toHaveBeenCalled();
+  });
+  it.each([true, false])("preserves the original AI Skill review date only while review is selected (%s)", async (reviewed) => {
+    const reviewedAt = new Date("2026-10-20T08:00:00Z");
+    mocks.db.tool.findUnique.mockResolvedValue({ creatorId: "local-admin", securityReviewedAt: reviewedAt });
+    const data = form({ id: "local-tool", type: "ai_skill", name: "Skill", slug: "skill", shortDescription: "Summary", content: "Detail", status: "draft" });
+    if (reviewed) data.set("securityReviewed", "on");
+    await expect(upsertToolAction(data)).rejects.toThrow("?saved=1");
+    expect(mocks.db.tool.update.mock.calls[0][0].data).toMatchObject({
+      creatorId: "local-admin",
+      securityReviewedAt: reviewed ? reviewedAt : null,
+    });
   });
   it("stores ordered how-to steps and the prompt without including prompt text in the audit event", async () => {
     const privatePrompt = "private prompt text that must not enter audit metadata";

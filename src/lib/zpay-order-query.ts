@@ -36,7 +36,7 @@ export async function queryZpayOrder(
     const data = result as Record<string, unknown>;
     if (String(data.code) === "0" && data.msg === "订单编号不存在") return { kind: "not_found" };
     const expectedType = mapPaymentMethodToZpayType(order.paymentMethod, config.defaultType);
-    const receivedType = data.type === "wxpay2" ? "wxpay" : data.type;
+    const receivedType = data.type === "wxpay2" ? "wxpay" : data.type === "alipay4" ? "alipay" : data.type;
     const tradeNo = typeof data.trade_no === "string" ? data.trade_no.trim()
       : typeof data.trade_no === "number" && Number.isSafeInteger(data.trade_no) && data.trade_no > 0
         ? String(data.trade_no) : "";

@@ -2,6 +2,7 @@ import { Prisma, type Order, type PaymentMethod, type PaymentTransaction, type T
 import { createAdminAuditCreateData } from "@/lib/admin-audit";
 import { trackAnalyticsEvent } from "@/lib/analytics";
 import { prisma } from "@/lib/db";
+import { countFirstPaidProductDownload } from "@/lib/paid-product-downloads";
 import { isOrderPaymentExpired } from "@/lib/order-payment-deadline";
 import { lockSoftwareEntitlement } from "@/lib/membership";
 import { LATE_PAYMENT_AFTER_LOCAL_REFUND_ERROR_CODE } from "@/lib/refund-reconciliation";
@@ -842,6 +843,7 @@ export async function activateOrderFromZpayNotify(
     if (current.orderStatus === "refunded") {
       return { validationFailure: null, purchaseEvents: [] };
     }
+    await countFirstPaidProductDownload(tx, current, "paid");
     if (current.orderStatus !== "paid" && !wasActivated) {
       await tx.order.update({
         where: { id: current.id },

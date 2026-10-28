@@ -22,7 +22,7 @@ const copy = {
     title: "最新一期已发布 AI 趋势简报的视频",
     playLabel: "播放最新一期 AI 趋势简报视频",
     fallbackText: "当前浏览器不支持 HTML5 视频播放。",
-    cta: "查看对应日报",
+    cta: "查看对应周报",
     summaryLabel: "核心结论",
     videoLabel: "视频摘要"
   },
@@ -31,7 +31,7 @@ const copy = {
     title: "Latest published AI trend briefing video",
     playLabel: "Play the latest AI trend briefing video",
     fallbackText: "Your browser does not support HTML5 video playback.",
-    cta: "Open the daily briefing",
+    cta: "Open the weekly briefing",
     summaryLabel: "Core conclusion",
     videoLabel: "Video summary"
   }

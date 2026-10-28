@@ -11,5 +11,5 @@ export const metadata: Metadata = {
 };
 
 export default async function EnglishUserLayout({ children }: { children: React.ReactNode }) {
-  return <PublicSiteChrome forceLocale="en">{children}</PublicSiteChrome>;
+  return <PublicSiteChrome forceLocale="en" showFooterMascot={false}>{children}</PublicSiteChrome>;
 }

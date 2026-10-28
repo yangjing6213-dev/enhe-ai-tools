@@ -1,10 +1,21 @@
 ﻿import { describe, expect, it } from "vitest";
+import { mkdtemp, rm } from "node:fs/promises";
+import { tmpdir } from "node:os";
+import { join } from "node:path";
+import { vi } from "vitest";
 import {
   buildVideoProps,
   buildVideoSummaryPayload,
   parseArgs,
   runVideoGeneration
 } from "./generate-ai-trend-briefing-video";
+
+vi.mock("@remotion/bundler", () => ({ bundle: vi.fn().mockResolvedValue("http://localhost/render") }));
+vi.mock("@remotion/renderer", () => ({
+  selectComposition: vi.fn().mockResolvedValue({}),
+  renderMedia: vi.fn().mockResolvedValue(undefined),
+  renderStill: vi.fn().mockResolvedValue(undefined)
+}));
 
 const validInput = {
   date: "2026-06-30",
@@ -67,7 +78,11 @@ describe("generate-ai-trend-briefing-video script helpers", () => {
     const props = buildVideoProps(validInput);
     expect(props.title).toBe(validInput.title);
     expect(props.scenes[0]?.title).toBe("工作效率");
-    expect(props.scenes[0]?.heat).toBe(96);
+    expect(props.scenes[0]?.heat).toBeUndefined();
+  });
+
+  it("does not invent a heat score when a report has no scenario breakdown", () => {
+    expect(buildVideoProps({ ...validInput, demandBreakdowns: [] }).scenes[0]?.heat).toBeUndefined();
   });
 
   it("returns graceful failure when no video source is available and render is disabled", async () => {
@@ -96,5 +111,22 @@ describe("generate-ai-trend-briefing-video script helpers", () => {
         videoDurationSeconds: 52
       }
     });
+  });
+
+  it("uses the newly rendered poster instead of inheriting an earlier issue's poster", async () => {
+    const outputDir = await mkdtemp(join(tmpdir(), "ai-trend-poster-test-"));
+    try {
+      await expect(
+        runVideoGeneration({ ...validInput, videoPosterUrl: "/uploads/ai-trends/2026-06-01/old-poster.png" }, { outputDir })
+      ).resolves.toMatchObject({
+        success: true,
+        video: {
+          videoUrl: "/api/uploads/ai-trends/2026-06-30/briefing.mp4",
+          videoPosterUrl: "/api/uploads/ai-trends/2026-06-30/briefing-poster.png"
+        }
+      });
+    } finally {
+      await rm(outputDir, { recursive: true, force: true });
+    }
   });
 });

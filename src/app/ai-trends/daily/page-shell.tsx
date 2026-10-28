@@ -13,33 +13,33 @@ const archivePath = "/ai-trends/daily";
 
 const copy = {
   zh: {
-    title: "AI 需求趋势每日分析",
-    description: "AI 需求趋势每日分析历史。公开用户可阅读摘要，登录用户可阅读完整 HTML 报告。",
-    intro: "每日追踪公开趋势信号，整理“人类最渴望用 AI 解决哪些问题”。公开用户可浏览摘要，登录后可阅读完整视觉化 HTML 报告。",
+    title: "AI 需求趋势每周分析",
+    description: "AI 需求趋势周报历史。公开用户可阅读摘要，登录用户可阅读完整 HTML 报告。",
+    intro: "每周结合公开资料分析可实际验证的 AI 应用场景，审核后发布。可浏览摘要，登录后可阅读完整报告。",
     back: "返回趋势总览",
     login: "登录查看完整报告",
     archiveTitle: "分析历史",
     readFull: "阅读全文",
     readSummary: "阅读摘要",
     emptyTitle: "暂无分析",
-    emptyText: "自动化发布第一份 AI 需求趋势分析后，这里会显示公开摘要。",
+    emptyText: "第一份 AI 趋势周报发布后，这里会显示公开摘要。",
     sources: "个来源信号",
     scenarioTitle: "细分场景",
     developmentPriority: "开发优先级",
     loginHint: "登录后看全文"
   },
   en: {
-    title: "Daily AI Demand Analysis",
-    description: "Daily AI demand analysis history. Public readers can view summaries, and signed-in users can read full HTML reports.",
+    title: "Weekly AI Demand Analysis",
+    description: "Weekly AI demand analysis history. Public readers can view summaries, and signed-in users can read full HTML reports.",
     intro:
-      "Track public demand signals every day around what people most want AI to solve. Public readers can browse the summary, and signed-in users can read the full visual HTML report.",
+      "Weekly reviews use public sources to identify AI tasks you can test, then publish after review. Browse the summary or sign in to read the full report.",
     back: "Back to trend overview",
     login: "Log in to read the full report",
     archiveTitle: "Analysis history",
     readFull: "Read full report",
     readSummary: "Read summary",
     emptyTitle: "No analysis yet",
-    emptyText: "Public summaries will appear here after the first automated AI demand analysis is published.",
+    emptyText: "Public summaries will appear here after the first AI trend briefing is published.",
     sources: "source signals",
     scenarioTitle: "Scenarios",
     developmentPriority: "Development priority",
@@ -82,11 +82,11 @@ export async function AiTrendDailyArchivePageShell({ forceLocale = "zh" }: { for
       <ContentlessState
         locale={forceLocale}
         className="ai-trends-daily-page"
-        eyebrow={forceLocale === "en" ? "Daily Analysis" : "每日趋势分析"}
+        eyebrow={forceLocale === "en" ? "Weekly Analysis" : "每周趋势分析"}
         title={text.title}
         intro={text.intro}
         statusLabel="UNVERIFIED"
-        stateTitle={forceLocale === "en" ? "Daily analysis is being prepared" : "每日分析准备中"}
+        stateTitle={forceLocale === "en" ? "Weekly analysis is being prepared" : "每周分析准备中"}
         statusText={
           forceLocale === "en"
             ? "Verified trend summaries will appear after the source data and reports are reviewed."
@@ -113,7 +113,7 @@ export async function AiTrendDailyArchivePageShell({ forceLocale = "zh" }: { for
   return (
     <Container className="py-14">
       <section className="surface-panel p-7 md:p-10">
-        <Badge className="text-[var(--marketing-accent)]">Daily Analysis</Badge>
+        <Badge className="text-[var(--marketing-accent)]">{forceLocale === "en" ? "Weekly Analysis" : "每周趋势分析"}</Badge>
         <h1 className="mt-5 text-4xl font-black leading-tight text-[var(--marketing-text)] md:text-5xl">{text.title}</h1>
         <p className="mt-5 max-w-3xl text-base font-medium leading-8 text-[var(--marketing-muted)]">{text.intro}</p>
         <div className="mt-7 flex flex-wrap gap-3">
@@ -164,7 +164,6 @@ export async function AiTrendDailyArchivePageShell({ forceLocale = "zh" }: { for
                           <div key={`${briefing.id}-${scenario.name}`} className="rounded-xl border border-white/10 bg-white/7 p-3">
                             <div className="flex items-start justify-between gap-3">
                               <p className="text-sm font-bold leading-6 text-[var(--marketing-text)]">{scenario.name}</p>
-                              <span className="shrink-0 text-sm font-black text-[var(--marketing-accent)]">{scenario.heat}</span>
                             </div>
                             {scenario.developmentPriority || scenario.urgency ? (
                               <p className="mt-2 text-xs leading-5 text-[var(--marketing-muted)]">

@@ -53,14 +53,14 @@ const content = {
     scenarioIntro: "以下是工作效率任务的编辑参考，顺序与开发优先级不是统计排名。评估产品前，请自行验证任务频次、需求、使用成本和接入难度。",
     scenarioPriority: "开发优先级",
     prioritiesTitle: "机会优先级建议",
-    prioritiesIntro: "优先做高频、低合规风险、能明确节省时间或增加收入的任务型产品。",
-    recentTitle: "近期分析",
+    prioritiesIntro: "先从可验收、使用条件清楚的任务开始，记录人工核对、错误和总耗时，再判断是否值得做成产品。",
+    recentTitle: "近期趋势周报",
     recentIntro:
-      "每日自动化报告公开摘要可分享，完整 HTML 报告登录后阅读；日更页不会进入 sitemap，也不会参与索引竞争。",
-    dailyButton: "查看每日分析",
+      "每周整理公开趋势信号与分析，审核后发布。可浏览和分享摘要，登录后阅读完整报告。",
+    dailyButton: "查看每周分析",
     newsButton: "查看 AI 前沿资讯",
     readSummary: "阅读摘要",
-    emptyRecent: "还没有已发布的每日分析。自动化发布后，这里会显示最近的公开摘要。",
+    emptyRecent: "还没有已发布的趋势周报。发布后，这里会显示最近的公开摘要。",
     home: "首页",
     aiTrends: "AI 趋势分析"
   },
@@ -78,14 +78,14 @@ const content = {
     scenarioPriority: "Development priority",
     prioritiesTitle: "Opportunity priorities",
     prioritiesIntro:
-      "Prioritize task-shaped products with frequent use, lower compliance risk, and clear time-saving or revenue impact.",
-    recentTitle: "Recent analysis",
+      "Start with a task you can verify and whose conditions are clear. Track human review, errors, and total time before deciding whether it merits a product.",
+    recentTitle: "Recent weekly briefings",
     recentIntro:
-      "Daily automated reports publish public summaries for sharing. Full HTML reports are available after sign-in. Daily pages stay out of sitemap and do not compete for indexing.",
-    dailyButton: "View daily analysis",
+      "Public trend signals and analysis are prepared weekly and published after review. Browse and share summaries, or sign in to read the full report.",
+    dailyButton: "View weekly analysis",
     newsButton: "View AI news",
     readSummary: "Read summary",
-    emptyRecent: "No published daily analysis yet. Recent public summaries will appear here after automated publishing runs.",
+    emptyRecent: "No published weekly briefings yet. Recent public summaries will appear here after publication.",
     home: "Home",
     aiTrends: "AI Trends"
   }
@@ -145,14 +145,14 @@ const aiTrendsSourceLinks = [
 const aiTrendsFaqItems = {
   zh: [
     {
-      question: "AI趋势热度排行的数据应该如何理解？",
+      question: "AI趋势分析中的方向和场景应该如何理解？",
       answer:
         "本页方向与场景是编辑参考，不是实时统计排行。目前没有可复核的评分数据，因此不显示热度分数。报告与视频保留原始发布日期，外部链接用于进一步阅读。",
     },
     {
       question: "AI趋势页面如何帮助我决定下一步做什么？",
       answer:
-        "先看高热度方向，再选择对应的AI前沿资讯、AI软件应用、AI技能课程或账号服务咨询，把趋势转化为可执行的工具测试、教程学习和工作流搭建。",
+        "先选一个具体任务并核对对应来源，再进入AI前沿资讯、AI软件应用、AI技能课程或账号服务咨询，把趋势转化为可执行的工具测试、教程学习和工作流搭建。",
     },
     {
       question: "AI趋势分析是否等同于投资或商业承诺？",
@@ -162,14 +162,14 @@ const aiTrendsFaqItems = {
   ],
   en: [
     {
-      question: "How should I interpret the AI demand heat ranking?",
+      question: "How should I understand the directions and scenarios in AI trend analysis?",
       answer:
         "Directions and scenarios are editorial references, not a live statistical ranking. No numeric scores are published without reproducible data. Reports and videos retain their original publication dates; external links are for further reading.",
     },
     {
       question: "How does the AI Trends page help me choose the next action?",
       answer:
-        "Start with high-demand areas, then move to related AI news, software apps, skill courses, or account service guidance so a trend becomes a tool test, learning path, or workflow.",
+        "Choose a specific task and check its sources, then use AI news, software apps, skill courses, or account service guidance to turn the topic into a tool test, learning path, or workflow.",
     },
     {
       question: "Is AI trend analysis an investment or business guarantee?",
@@ -635,7 +635,7 @@ export async function AiTrendTopicPageShell({ forceLocale = "zh" }: { forceLocal
         </section>
 
         <section className="ai-trends-recent-briefings mt-12">
-        <SectionTitle title={copy.recentTitle} intro={copy.recentIntro} />
+        <SectionTitle title={copy.recentTitle} intro={`${copy.recentIntro}${recentBriefings[0] ? (forceLocale === "en" ? ` Latest issue: ${recentBriefings[0].slug}.` : ` 最新一期：${recentBriefings[0].slug}。`) : ""}`} />
         {recentBriefings.length ? (
           <div className="ai-trends-recent-briefings-grid grid gap-4 md:grid-cols-3">
             {recentBriefings.map((briefing) => (

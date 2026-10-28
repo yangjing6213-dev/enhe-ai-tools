@@ -155,7 +155,7 @@ describe("AI trend briefing helpers", () => {
     ).toEqual(validSourceSignals);
   });
 
-  it("normalizes structured demand breakdowns for second-level scenario ranking", () => {
+  it("normalizes structured demand breakdowns", () => {
     expect(
       normalizeAiTrendDemandBreakdowns([
         ...validDemandBreakdowns,
@@ -163,6 +163,25 @@ describe("AI trend briefing helpers", () => {
         { direction: "空场景", scenarios: [] }
       ])
     ).toEqual(validDemandBreakdowns);
+  });
+
+  it("preserves editorial order instead of sorting by unverified heat values", () => {
+    const source = validDemandBreakdowns[0];
+    const normalized = normalizeAiTrendDemandBreakdowns([
+      {
+        ...source,
+        direction: "先列出的方向",
+        heat: 0,
+        scenarios: [
+          { ...source.scenarios[0], name: "先列出的场景", heat: 0 },
+          { ...source.scenarios[1], name: "后列出的场景", heat: 100 }
+        ]
+      },
+      { ...source, direction: "后列出的方向", heat: 100 }
+    ]);
+
+    expect(normalized.map((item) => item.direction)).toEqual(["先列出的方向", "后列出的方向"]);
+    expect(normalized[0].scenarios.map((item) => item.name)).toEqual(["先列出的场景", "后列出的场景"]);
   });
 
   it("keeps full HTML out of public views and includes it for logged-in users", () => {
@@ -206,6 +225,42 @@ describe("AI trend briefing helpers", () => {
     expect(localized.sourceSignals[0]?.observedSignal).not.toMatch(/[\u3400-\u9fff]/);
     expect(localized.fullHtml).toContain("AI Demand Briefing");
     expect(localized.fullHtml).not.toMatch(/[\u3400-\u9fff]/);
+  });
+
+  it("discloses missing English analysis without inventing findings or replacing the source record", () => {
+    const view = toAiTrendBriefingView(validBriefing, true);
+    const localized = localizeAiTrendBriefingView(view, "en");
+
+    expect(localized.summary).toContain("An English summary has not been provided");
+    expect(localized.coreConclusion).toContain("original Chinese briefing");
+    expect(localized.publicHighlights.join(" ")).not.toMatch(/clearest signal|strongest opportunity|saves time/i);
+    expect(localized.demandBreakdowns).toEqual([]);
+    expect(localized.slug).toBe(view.slug);
+    expect(localized.sourceSignals).toEqual(view.sourceSignals);
+    expect(localized.fullHtml).toContain('href="/ai-trends/daily/2026-06-19"');
+    expect(localized.fullHtml).toContain('target="_blank"');
+    expect(localized.fullHtml).not.toMatch(/measurable efficiency gains|real-world demand signals/i);
+    expect(localizeAiTrendBriefingView(toAiTrendBriefingView(validBriefing, false), "en")).not.toHaveProperty("fullHtml");
+  });
+
+  it("preserves supplied English analysis and scenarios instead of substituting fallback claims", () => {
+    const view = {
+      ...toAiTrendBriefingView(validBriefing, true),
+      title: "Source review",
+      summary: "One official release was reviewed.",
+      coreConclusion: "A feature announcement does not establish demand.",
+      publicHighlights: ["Verify account availability before testing."],
+      demandBreakdowns: [{
+        direction: "Research", heat: 0, summary: "Check sources", scenarios: [{
+          name: "Review one document", heat: 0, urgency: "", typicalUsers: ["Creators"],
+          painPoint: "Claims need checking", representativeScenarios: ["Review a draft"],
+          aiValue: "Draft assistance", productOpportunity: "Unvalidated", developmentPriority: "Try a sample", evidenceSignals: ["Official source"]
+        }]
+      }],
+      fullHtml: "<article><p>Actual English analysis.</p></article>"
+    };
+
+    expect(localizeAiTrendBriefingView(view, "en")).toEqual(view);
   });
 
   it("normalizes serialized date fields before topic-page rendering", () => {

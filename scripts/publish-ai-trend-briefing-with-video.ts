@@ -3,28 +3,31 @@ import { promisify } from "node:util";
 import { resolve } from "node:path";
 import { materializeAiTrendBriefingArtifacts } from "./write-ai-trend-briefing-artifacts";
 import type { AiTrendBriefingPublishInput } from "@/lib/ai-trends";
+import type { GeneratedAiTrendVideo } from "./generate-ai-trend-briefing-video";
 import { readFile } from "node:fs/promises";
 
 const execFileAsync = promisify(execFile);
 
-function readArg(name: string) {
-  const index = process.argv.indexOf(name);
+function readArg(name: string, argv: string[]) {
+  const index = argv.indexOf(name);
   if (index === -1) return null;
-  const value = process.argv[index + 1] ?? null;
+  const value = argv[index + 1] ?? null;
   if (!value || value.startsWith("--")) {
     throw new Error(`Missing value for ${name}.`);
   }
   return value;
 }
 
-async function main() {
-  const inputFile = readArg("--input-file");
-  const date = readArg("--date");
-  const summaryFileArg = readArg("--summary-file");
-  const htmlFileArg = readArg("--file");
-  const mode = readArg("--mode") ?? "published";
-  const outputDir = readArg("--output-dir");
-  const baseName = readArg("--base-name");
+type CommandRunner = (file: string, args: string[], options: { cwd: string; maxBuffer: number }) => Promise<{ stdout: string; stderr?: string }>;
+
+export async function runAiTrendPublication(argv: string[], execute: CommandRunner = execFileAsync) {
+  const inputFile = readArg("--input-file", argv);
+  const date = readArg("--date", argv);
+  const summaryFileArg = readArg("--summary-file", argv);
+  const htmlFileArg = readArg("--file", argv);
+  const mode = readArg("--mode", argv) ?? "published";
+  const outputDir = readArg("--output-dir", argv);
+  const baseName = readArg("--base-name", argv);
 
   const node = process.execPath;
   const root = process.cwd();
@@ -58,25 +61,30 @@ async function main() {
     resolvedDate,
     "--summary-file",
     summaryFile,
+    "--file",
+    htmlFile,
     "--output-file",
     videoResultFile
   ];
 
-  const renderResult = await execFileAsync(node, renderArgs, {
-    cwd: root,
-    maxBuffer: 10 * 1024 * 1024
-  });
-
-  const parsed = JSON.parse(renderResult.stdout.trim()) as {
-    success: boolean;
-    video: {
-      videoUrl: string;
-      videoTitle: string;
-      videoDescription: string;
-      videoPosterUrl: string | null;
-      videoDurationSeconds: number | null;
-    } | null;
-  };
+  let video: GeneratedAiTrendVideo["video"] = null;
+  let videoFailure: string | null = null;
+  try {
+    const renderResult = await execute(node, renderArgs, {
+      cwd: root,
+      maxBuffer: 10 * 1024 * 1024
+    });
+    const parsed = JSON.parse(renderResult.stdout.trim()) as GeneratedAiTrendVideo;
+    const currentIssuePaths = [`/uploads/ai-trends/${resolvedDate}/`, `/api/uploads/ai-trends/${resolvedDate}/`];
+    const posterBelongsToCurrentIssue = !parsed.video?.videoPosterUrl || currentIssuePaths.some((prefix) => parsed.video!.videoPosterUrl!.startsWith(prefix));
+    if (parsed.success && parsed.video && currentIssuePaths.some((prefix) => parsed.video!.videoUrl.startsWith(prefix)) && posterBelongsToCurrentIssue) {
+      video = parsed.video;
+    } else {
+      videoFailure = "No verified video asset for this briefing date.";
+    }
+  } catch {
+    videoFailure = "Video generation failed; publishing the HTML report without a video.";
+  }
 
   const publishArgs = [
     "--import",
@@ -92,32 +100,40 @@ async function main() {
     "true"
   ];
 
-  if (parsed.video?.videoUrl) {
-    publishArgs.push("--video-url", parsed.video.videoUrl);
+  if (argv.includes("--require-production-target")) publishArgs.push("--require-production-target");
+  if (!video) publishArgs.push("--clear-video");
+  if (video?.videoUrl) {
+    publishArgs.push("--video-url", video.videoUrl);
   }
-  if (parsed.video?.videoPosterUrl) {
-    publishArgs.push("--video-poster-url", parsed.video.videoPosterUrl);
+  if (video?.videoPosterUrl) {
+    publishArgs.push("--video-poster-url", video.videoPosterUrl);
   }
-  if (parsed.video?.videoTitle) {
-    publishArgs.push("--video-title", parsed.video.videoTitle);
+  if (video?.videoTitle) {
+    publishArgs.push("--video-title", video.videoTitle);
   }
-  if (parsed.video?.videoDescription) {
-    publishArgs.push("--video-description", parsed.video.videoDescription);
+  if (video?.videoDescription) {
+    publishArgs.push("--video-description", video.videoDescription);
   }
-  if (typeof parsed.video?.videoDurationSeconds === "number") {
-    publishArgs.push("--video-duration-seconds", String(parsed.video.videoDurationSeconds));
+  if (typeof video?.videoDurationSeconds === "number") {
+    publishArgs.push("--video-duration-seconds", String(video.videoDurationSeconds));
   }
 
-  const publishResult = await execFileAsync(node, publishArgs, {
+  const publishResult = await execute(node, publishArgs, {
     cwd: root,
     maxBuffer: 10 * 1024 * 1024
   });
 
-  process.stdout.write(renderResult.stdout);
-  process.stdout.write(publishResult.stdout);
+  return { status: video ? "complete" : "partial", date: resolvedDate, mode, video, videoFailure, publishOutput: publishResult.stdout };
 }
 
-main().catch((error) => {
-  console.error(error instanceof Error ? error.message : String(error));
-  process.exit(1);
-});
+if (process.argv[1] && /publish-ai-trend-briefing-with-video\.ts$/i.test(process.argv[1])) {
+  runAiTrendPublication(process.argv.slice(2))
+    .then(({ publishOutput, ...result }) => {
+      process.stdout.write(publishOutput);
+      console.log(JSON.stringify(result, null, 2));
+    })
+    .catch((error) => {
+      console.error(error instanceof Error ? error.message : String(error));
+      process.exit(1);
+    });
+}

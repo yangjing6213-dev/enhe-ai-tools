@@ -87,8 +87,7 @@ export function buildVideoProps(input: AiTrendBriefingPublishInput): AiTrendVide
       breakdown.scenarios
         .slice(0, 2)
         .map((scenario) => `${scenario.name}：${scenario.aiValue}`)
-        .join(" "),
-    heat: breakdown.heat
+        .join(" ")
   }));
 
   if (!scenes.length) {
@@ -97,8 +96,7 @@ export function buildVideoProps(input: AiTrendBriefingPublishInput): AiTrendVide
       body:
         data.publicHighlights.slice(0, 2).join("；") ||
         data.summary ||
-        data.coreConclusion,
-      heat: 80
+        data.coreConclusion
     });
   }
 
@@ -212,7 +210,7 @@ export async function runVideoGeneration(
     if (!videoUrl && !options.disableRender) {
       const rendered = await renderVideoAssets(props, props.date, options.outputDir);
       videoUrl = rendered.publicVideoUrl;
-      posterUrl = posterUrl || rendered.publicPosterUrl;
+      posterUrl = rendered.publicPosterUrl;
 
       const targetFile = options.outputFile ? resolve(options.outputFile) : rendered.resultJsonFile;
       await ensureDir(dirname(targetFile));

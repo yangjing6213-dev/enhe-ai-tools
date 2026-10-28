@@ -23,6 +23,14 @@ describe("read-only provider order verification", () => {
     vi.stubGlobal("fetch", vi.fn().mockResolvedValue(Response.json({ ...response, type: "wxpay2" })));
     expect(await queryZpayOrder({ ...order, paymentMethod: "wechat" }, config)).toEqual({ kind: "unpaid" });
   });
+  it.each([[0, "unpaid"], [1, "paid"]] as const)("recognizes the observed alipay4 query alias with status %s", async (status, kind) => {
+    vi.stubGlobal("fetch", vi.fn().mockResolvedValue(Response.json({ ...response, type: "alipay4", status })));
+    expect(await queryZpayOrder(order, config)).toEqual({ kind });
+  });
+  it("does not accept an alipay4 response for a WeChat order", async () => {
+    vi.stubGlobal("fetch", vi.fn().mockResolvedValue(Response.json({ ...response, type: "alipay4", status: 1 })));
+    expect(await queryZpayOrder({ ...order, paymentMethod: "wechat" }, config)).toEqual({ kind: "unknown" });
+  });
   it.each([["订单编号不存在", "not_found"], ["KEY错误", "unknown"]])("distinguishes missing orders from failed queries", async (msg, kind) => {
     vi.stubGlobal("fetch", vi.fn().mockResolvedValue(Response.json({ code: 0, msg })));
     expect((await queryZpayOrder(order, config)).kind).toBe(kind);

@@ -542,7 +542,7 @@ export async function sendCreatorMessageAction(
       creator: { select: { nickname: true } },
     },
   });
-  if (!tool || tool.type !== "software" || tool.status !== "published" || !tool.creatorId) {
+  if (!tool || (tool.type !== "software" && tool.type !== "ai_skill") || tool.status !== "published" || !tool.creatorId) {
     return { status: "error", message: locale === "en" ? "This creator cannot be contacted for this product." : "该产品暂未开放创作者联系。" };
   }
   if (tool.creatorId === user.id) {

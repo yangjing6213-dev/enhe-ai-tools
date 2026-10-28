@@ -1,0 +1,9 @@
+.primary.primary {
+  color: #fff !important;
+  -webkit-text-fill-color: #fff !important;
+}
+
+.primary.primary:focus-visible {
+  outline: 3px solid var(--enhe-action, #0067cb);
+  outline-offset: 3px;
+}

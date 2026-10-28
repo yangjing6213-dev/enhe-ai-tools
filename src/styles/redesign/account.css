@@ -21,6 +21,7 @@
 }
 
 .enhe-redesign-production .user-center-page .user-center-panel {
+  scroll-margin-top: calc(var(--enhe-header-h, 80px) + 24px);
   border: 1px solid var(--enhe-border);
   border-radius: var(--enhe-card-r);
   background: var(--enhe-surface);
@@ -28,6 +29,29 @@
   transition:
     border-color var(--enhe-motion-panel) var(--enhe-ease-ui-move),
     box-shadow var(--enhe-motion-panel) var(--enhe-ease-ui-move);
+}
+
+.enhe-redesign-production .user-center-page .user-center-purchases {
+  scroll-margin-top: calc(var(--enhe-header-h, 80px) + 24px);
+}
+
+.enhe-redesign-production .user-center-page .user-center-shortcuts .user-center-action {
+  min-height: 48px;
+  flex-wrap: wrap;
+  text-align: center;
+}
+
+.enhe-redesign-production .user-center-page button.user-center-logout[data-variant="outline"]:not(:disabled) {
+  border-color: #a16a00;
+  background-color: #a16a00;
+  color: #fff !important;
+  -webkit-text-fill-color: #fff !important;
+}
+
+
+.enhe-redesign-production .user-center-page button.user-center-logout[data-variant="outline"]:hover {
+  border-color: #855800;
+  background-color: #855800;
 }
 
 .enhe-redesign-production .user-center-page .user-center-record {

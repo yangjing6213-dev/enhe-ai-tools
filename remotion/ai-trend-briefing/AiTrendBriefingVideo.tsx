@@ -31,17 +31,16 @@ const miSansStylesheetHrefs = [
 
 const fontWarmupTexts = [
   "AI\u9700\u6c42\u8d8b\u52bf\u6838\u5fc3\u7ed3\u8bba",
-  "\u516c\u5f00\u4fe1\u53f7\u9ad8\u9891\u65b9\u5411",
-  "\u672c\u6bb5\u7126\u70b9\u9700\u6c42\u70ed\u5ea6\u6458\u8981"
+  "\u516c\u5f00\u6765\u6e90\u672c\u671f\u65b9\u5411",
+  "\u672c\u6bb5\u7126\u70b9\u6458\u8981"
 ] as const;
 
 const labels = {
   publishedAt: "\u53d1\u5e03\u65e5\u671f",
-  sourceSignals: "\u516c\u5f00\u4fe1\u53f7",
+  sourceSignals: "\u516c\u5f00\u6765\u6e90",
   coreConclusion: "\u6838\u5fc3\u7ed3\u8bba",
   sceneFocus: "\u672c\u6bb5\u7126\u70b9",
-  demandHeat: "\u9700\u6c42\u70ed\u5ea6",
-  directions: "\u9ad8\u9891\u65b9\u5411",
+  directions: "\u672c\u671f\u65b9\u5411",
   summary: "\u6458\u8981"
 } as const;
 
@@ -281,32 +280,6 @@ export const AiTrendBriefingVideo: React.FC<AiTrendVideoProps> = ({
             <div style={{ fontSize: 22, fontWeight: 800, color: palette.accentSoft }}>{labels.sceneFocus}</div>
             <h2 style={{ margin: "14px 0 0", fontSize: 44, lineHeight: 1.15, fontWeight: 900 }}>{scene?.title}</h2>
             <p style={{ margin: "16px 0 0", fontSize: 28, lineHeight: 1.55, color: palette.muted }}>{scene?.body}</p>
-            {typeof scene?.heat === "number" ? (
-              <div style={{ marginTop: 22 }}>
-                <div style={{ display: "flex", justifyContent: "space-between", fontSize: 18, color: palette.muted, fontWeight: 700 }}>
-                  <span>{labels.demandHeat}</span>
-                  <span>{scene.heat}</span>
-                </div>
-                <div
-                  style={{
-                    marginTop: 10,
-                    height: 14,
-                    borderRadius: 999,
-                    overflow: "hidden",
-                    background: "rgba(255,255,255,0.08)"
-                  }}
-                >
-                  <div
-                    style={{
-                      width: `${scene.heat}%`,
-                      height: "100%",
-                      borderRadius: 999,
-                      background: `linear-gradient(90deg, ${palette.accent}, ${palette.accentSoft})`
-                    }}
-                  />
-                </div>
-              </div>
-            ) : null}
           </div>
 
           <div

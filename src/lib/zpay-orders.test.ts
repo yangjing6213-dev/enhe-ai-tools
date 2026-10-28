@@ -243,6 +243,7 @@ describe("activateOrderFromZpayNotify", () => {
       },
       paymentTransaction: { upsert: vi.fn() },
       toolPurchase: { upsert: vi.fn() },
+      tool: { update: vi.fn() },
       orderRefundRecord: {
         create: vi.fn().mockResolvedValue({ id: "refund-1" }),
         update: vi.fn()
@@ -284,6 +285,7 @@ describe("activateOrderFromZpayNotify", () => {
       },
       paymentTransaction: { upsert: vi.fn() },
       toolPurchase: { upsert: vi.fn() },
+      tool: { update: vi.fn() },
       adminAuditLog: { create: vi.fn() }
     };
     const db = {
@@ -335,6 +337,9 @@ describe("activateOrderFromZpayNotify", () => {
       metadata: expect.objectContaining({ orderType: "software_download", toolId: "tool-1", paymentProvider: "zpay" }),
     }));
     expect(trackEvent.mock.calls[0][0].metadata).not.toHaveProperty("amount");
+    expect(tx.tool.update).toHaveBeenCalledExactlyOnceWith({
+      where: { id: "tool-1" }, data: { downloadCount: { increment: 1 } },
+    });
   });
 
   it("activates an AI Workflow ZPAY order for the exact purchased package version", async () => {
@@ -365,6 +370,7 @@ describe("activateOrderFromZpayNotify", () => {
       paymentTransaction: { upsert: vi.fn() },
       orderRefundRecord: { create: vi.fn(), update: vi.fn() },
       toolPurchase: { upsert: vi.fn() },
+      tool: { update: vi.fn() },
       aiWorkflowVersionPurchase: { upsert: vi.fn() },
       adminAuditLog: { create: vi.fn() },
     };
@@ -389,6 +395,9 @@ describe("activateOrderFromZpayNotify", () => {
         orderId: order.id,
         amount: order.amount,
       },
+    });
+    expect(tx.tool.update).toHaveBeenCalledExactlyOnceWith({
+      where: { id: "workflow-tool-1" }, data: { downloadCount: { increment: 1 } },
     });
   });
 

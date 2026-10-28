@@ -128,13 +128,13 @@ describe("comment and user profile actions", () => {
     expect(mocks.createComment).not.toHaveBeenCalled();
   });
 
-  it("sends a contact message to the product's creator through the notification inbox", async () => {
+  it.each(["software", "ai_skill"])("sends a contact message to the %s creator through the notification inbox", async (type) => {
     mocks.findTool.mockResolvedValue({
       id: "tool-1",
       slug: "example-tool",
       name: "示例工具",
       englishName: "Example Tool",
-      type: "software",
+      type,
       status: "published",
       creatorId: "creator-1",
       creator: { nickname: "作者" }

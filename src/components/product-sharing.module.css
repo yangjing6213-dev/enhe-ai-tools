@@ -1,0 +1,96 @@
+.card {
+  padding: clamp(24px, 4vw, 40px);
+}
+
+.card h2 {
+  margin: 0 0 20px;
+  font-size: 1.5rem;
+  font-weight: 600;
+}
+
+.content {
+  display: flex;
+  align-items: center;
+  gap: 24px;
+}
+
+.content > svg {
+  flex: 0 0 160px;
+  background: #fff;
+}
+
+.details {
+  min-width: 0;
+}
+
+.details p {
+  line-height: 1.6;
+}
+
+.actions {
+  margin-top: 16px;
+}
+
+.card .copyButton {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 44px;
+  padding: 10px 20px;
+  border: 0;
+  border-radius: 5px;
+  background: #0065c9;
+  color: #fff !important;
+  -webkit-text-fill-color: #fff !important;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.copyButton:hover {
+  filter: brightness(0.92);
+}
+
+.copyButton:focus-visible {
+  outline: 3px solid #84bfff;
+  outline-offset: 3px;
+}
+
+.feedback {
+  min-height: 1.5em;
+  margin-top: 8px;
+  font-size: 0.875rem;
+}
+
+.manualLink {
+  width: 100%;
+  padding: 10px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+}
+
+.siteQr {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  margin: 32px auto;
+  text-align: center;
+}
+
+.siteQr > svg {
+  background: #fff;
+}
+
+.siteQr figcaption {
+  color: #fff !important;
+  -webkit-text-fill-color: #fff !important;
+  font-size: 0.875rem;
+}
+
+@media (max-width: 479px) {
+  .content {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 16px;
+  }
+}

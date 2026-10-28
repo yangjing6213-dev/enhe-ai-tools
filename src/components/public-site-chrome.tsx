@@ -28,9 +28,11 @@ export async function PublicSiteChrome({
   children,
   forceLocale,
   languageHrefs,
+  showFooterMascot = true,
 }: React.PropsWithChildren<{
   forceLocale: Locale;
   languageHrefs?: RedesignLanguageHrefs;
+  showFooterMascot?: boolean;
 }>) {
   const [settings, headerUser] = await Promise.all([
     getSettingsMap(),
@@ -82,7 +84,7 @@ export async function PublicSiteChrome({
           {children}
         </div>
         <CustomerSupportWidget locale={forceLocale} faqs={getCustomerSupportFaqs(forceLocale)} />
-        <EnheRedesignPublicFooter locale={forceLocale} />
+        <EnheRedesignPublicFooter locale={forceLocale} showMascot={showFooterMascot} />
       </div>
     </>
   );

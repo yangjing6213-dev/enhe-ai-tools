@@ -86,19 +86,24 @@ export async function UserCenterPageShell({
     prisma.tool.findMany({
       where: {
         status: "published",
-        OR: [{ type: "software" }, { type: "online" }, { type: "skill_learning" }, { type: "ai_workflow" }]
+        OR: [{ type: "software" }, { type: "online" }, { type: "skill_learning" }, { type: "ai_skill" }, { type: "ai_workflow" }]
       },
       orderBy: [{ sortOrder: "asc" }, { createdAt: "desc" }]
-    })
+    }),
+    prisma.user.findUnique({
+      where: { id: user.id },
+      select: { recoveryVerifiedAt: true }
+    }),
+    prisma.notification.count({ where: { userId: user.id, readAt: null } })
     ])
   ]);
-  const [notifications, orders, downloads, usages, comments, purchases, publishedTools] = userData;
+  const [notifications, orders, downloads, usages, comments, purchases, publishedTools, recovery, unreadNotificationCount] = userData;
 
   const entitlementSummary = buildUserToolEntitlements({
     purchasedToolIds: purchases.map((purchase) => purchase.toolId),
     tools: publishedTools
   });
-  const unreadNotificationCount = notifications.filter((notification) => !notification.readAt).length;
+  const purchasedProductCount = entitlementSummary.purchasedSoftware.length + entitlementSummary.purchasedCourses.length;
   const userCenterIntro =
     locale === "en"
       ? "View orders, paid downloads, usage records, comments, notifications, and account security settings."
@@ -106,17 +111,23 @@ export async function UserCenterPageShell({
 
   return (
     <Container className="user-center-page py-14">
-      <div className="mb-8 flex items-center justify-between gap-4">
+      <div className="mb-6 flex flex-wrap items-start justify-between gap-4">
         <SectionTitle title={t.userCenter.title} intro={userCenterIntro} />
         <form action={logoutAction}>
-          <FormSubmitButton variant="secondary" pendingLabel={locale === "en" ? "Logging out..." : "退出中..."}>
+          <FormSubmitButton className="user-center-logout" variant="secondary" pendingLabel={locale === "en" ? "Logging out..." : "退出中..."}>
             {t.userCenter.logout}
           </FormSubmitButton>
         </form>
       </div>
+      <nav className="user-center-shortcuts mb-6 grid grid-cols-2 gap-3 lg:grid-cols-4" aria-label={locale === "en" ? "Account shortcuts" : "用户中心快捷入口"}>
+        <Link href="#orders" className="user-center-action">{t.userCenter.orders}<span className="user-center-badge rounded-full border px-2 py-0.5 text-xs">{orders.length}</span></Link>
+        <Link href="#purchased-products" className="user-center-action">{locale === "en" ? "Purchased products" : "已购产品"}<span className="user-center-badge rounded-full border px-2 py-0.5 text-xs">{purchasedProductCount}</span></Link>
+        <Link href="#notifications" className="user-center-action">{locale === "en" ? "Unread notifications" : "未读通知"}<span className="user-center-badge rounded-full border px-2 py-0.5 text-xs">{unreadNotificationCount}</span></Link>
+        <Link href="#account-security" className="user-center-action">{locale === "en" ? "Account security" : "账户安全"}</Link>
+      </nav>
       {orderMessage ? <p className="status-success mb-6">{orderMessage}</p> : null}
-      <div className="grid gap-6 lg:grid-cols-[320px_1fr]">
-        <aside className="space-y-4">
+      <div className="grid gap-6 lg:grid-cols-[320px_minmax(0,1fr)]">
+        <aside className="order-2 min-w-0 space-y-4 lg:order-1">
           <Panel title={locale === "en" ? "Profile" : "个人资料"}>
             <div className="flex items-center gap-4">
               <UserAvatar
@@ -143,11 +154,13 @@ export async function UserCenterPageShell({
           </Panel>
 
           <Panel id="notifications" title={t.notifications.title.replace("{count}", String(unreadNotificationCount))}>
+            <p className="mb-3 text-xs text-[var(--marketing-muted)]">{locale === "en" ? "Showing your 8 most recent notifications." : "展示最近 8 条通知。"}</p>
             {notifications.length ? (
               <div className="space-y-3">
                 <form action={markAllNotificationsReadAction}>
                   <FormSubmitButton
                     variant="secondary"
+                    disabled={unreadNotificationCount === 0}
                     pendingLabel={locale === "en" ? "Processing..." : "处理中..."}
                     className="px-3 py-1 text-xs"
                   >
@@ -218,17 +231,24 @@ export async function UserCenterPageShell({
             </form>
           </Panel>
 
-          <Panel title={t.userCenter.accountSettings}>
-            <p className="text-[var(--marketing-text)]">{user.email ?? user.phone}</p>
+          <Panel id="account-security" title={t.userCenter.accountSettings}>
+            <p className="break-all text-[var(--marketing-text)]">{user.email ?? user.phone}</p>
             <p className="mt-2 text-sm text-[var(--marketing-muted)]">
               {t.userCenter.role.replace("{role}", user.role === "admin" ? t.userCenter.admin : t.userCenter.user)}
             </p>
-            <Link
+            {!user.googleSubject ? <p className="mt-3 text-sm text-[var(--marketing-muted)]">
+              {recovery?.recoveryVerifiedAt
+                ? locale === "en" ? "Recovery email verified" : "找回邮箱已验证"
+                : locale === "en" ? "No verified recovery email yet" : "尚未验证找回邮箱"}
+            </p> : null}
+            {!user.googleSubject ? <Link
               href={buildLocalePath("/user/recovery-email", locale)}
               className="mt-3 inline-flex text-sm font-semibold text-[var(--marketing-accent)]"
             >
-              {locale === "en" ? "Set up a verified recovery email" : "设置并验证找回邮箱"}
-            </Link>
+              {recovery?.recoveryVerifiedAt
+                ? locale === "en" ? "Manage recovery email" : "管理找回邮箱"
+                : locale === "en" ? "Set up a verified recovery email" : "设置并验证找回邮箱"}
+            </Link> : null}
             {passwordMessage ? (
               <p className={`mt-4 ${passwordMessage.type === "success" ? "status-success" : "status-danger"}`}>{passwordMessage.text}</p>
             ) : null}
@@ -240,6 +260,7 @@ export async function UserCenterPageShell({
             <PasswordInput
               wrapperClassName="user-center-password-input"
               name="currentPassword"
+                aria-label={t.userCenter.currentPassword}
                 required
                 autoComplete="current-password"
                 placeholder={t.userCenter.currentPassword}
@@ -250,6 +271,7 @@ export async function UserCenterPageShell({
             <PasswordInput
               wrapperClassName="user-center-password-input"
               name="newPassword"
+                aria-label={t.userCenter.newPassword}
                 minLength={8}
                 required
                 autoComplete="new-password"
@@ -261,6 +283,7 @@ export async function UserCenterPageShell({
             <PasswordInput
               wrapperClassName="user-center-password-input"
               name="confirmPassword"
+                aria-label={t.userCenter.confirmPassword}
                 minLength={8}
                 required
                 autoComplete="new-password"
@@ -274,20 +297,24 @@ export async function UserCenterPageShell({
           </Panel>
         </aside>
 
-        <div className="space-y-6">
+        <div className="order-1 min-w-0 space-y-6 lg:order-2">
           <Panel id="orders" title={t.userCenter.orders}>
             <div className="space-y-3">
               {orders.length ? (
                 orders.map((order) => (
                   <div key={order.id} className="user-center-record rounded-xl border p-4">
                     <div className="flex flex-wrap justify-between gap-3">
-                      <span>{order.orderNo}</span>
+                      <span className="break-all">{order.orderNo}</span>
                       <span className="font-semibold text-[var(--enhe-action)]">{formatCurrency(order.amount.toString())}</span>
                     </div>
                     <p className="mt-2 text-sm text-[var(--marketing-muted)]">
-                      {order.plan ? formatLegacyPlanName(locale) : order.tool?.name ?? t.userCenter.orderItem} 路 {formatStatus(order.orderStatus, locale)} 路 {t.userCenter.proof}{" "}
-                      {formatStatus(order.paymentProof?.reviewStatus ?? "not_submitted", locale)}
+                      {order.plan ? formatLegacyPlanName(locale) : order.tool?.name ?? t.userCenter.orderItem}
                     </p>
+                    <div className="mt-2 flex flex-wrap items-center gap-2 text-sm">
+                      <span className="user-center-badge rounded-full border px-2 py-1">{formatStatus(order.orderStatus, locale)}</span>
+                      {order.paymentProof ? <span className="text-[var(--marketing-muted)]">{t.userCenter.proof} {formatStatus(order.paymentProof.reviewStatus, locale)}</span> : null}
+                      <time dateTime={order.createdAt.toISOString()} className="text-xs text-[var(--marketing-muted)]">{formatDateTime(order.createdAt, locale)}</time>
+                    </div>
                     {order.orderStatus === "pending_review" || order.paymentProof?.reviewStatus === "pending" ? (
                       <p className="mt-2 text-xs leading-5 text-[var(--marketing-muted)]">{getReviewNotice(locale)}</p>
                     ) : null}
@@ -316,18 +343,21 @@ export async function UserCenterPageShell({
                   </div>
                 ))
               ) : (
-                <EmptyText>{t.userCenter.noOrders}</EmptyText>
+                <><EmptyText>{t.userCenter.noOrders}</EmptyText><BrowseProducts locale={locale} /></>
               )}
             </div>
           </Panel>
 
+          <section id="purchased-products" className="user-center-purchases space-y-6" aria-label={locale === "en" ? "Purchased products" : "已购产品"}>
           <Panel title={t.userCenter.purchasedCourses}>
             <ToolAccessList tools={entitlementSummary.purchasedCourses} emptyText={t.userCenter.noPurchasedCourses} locale={locale} action="details" />
           </Panel>
 
-          <Panel title={t.userCenter.purchasedSoftware}>
+          <Panel title={`${t.userCenter.purchasedSoftware} / AI Skills / ${locale === "en" ? "Workflows" : "工作流"}`}>
             <ToolAccessList tools={entitlementSummary.purchasedSoftware} emptyText={t.userCenter.noPurchasedSoftware} locale={locale} action="details" />
+            {!entitlementSummary.purchasedSoftware.length ? <BrowseProducts locale={locale} /> : null}
           </Panel>
+          </section>
 
           <Panel title={t.userCenter.availableOnlineTools}>
             <ToolAccessList tools={entitlementSummary.availableOnlineTools} emptyText={t.userCenter.noAvailableOnlineTools} locale={locale} action="use" />
@@ -337,7 +367,7 @@ export async function UserCenterPageShell({
             {downloads.length ? (
               downloads.map((log) => (
                 <p key={log.id} className="border-b border-[var(--marketing-border)] py-3 text-sm text-[var(--marketing-muted)]">
-                  {log.tool.name} 路 {formatDateTime(log.createdAt, locale)}
+                  <Link href={buildCanonicalToolPath(log.tool, locale)} className="font-semibold text-[var(--marketing-accent)]">{log.tool.name}</Link> · {formatDateTime(log.createdAt, locale)}
                 </p>
               ))
             ) : (
@@ -349,7 +379,7 @@ export async function UserCenterPageShell({
             {usages.length ? (
               usages.map((log) => (
                 <p key={log.id} className="border-b border-[var(--marketing-border)] py-3 text-sm text-[var(--marketing-muted)]">
-                  {log.tool.name} 路 {formatDateTime(log.createdAt, locale)}
+                  <Link href={buildCanonicalToolPath(log.tool, locale)} className="font-semibold text-[var(--marketing-accent)]">{log.tool.name}</Link> · {formatDateTime(log.createdAt, locale)}
                 </p>
               ))
             ) : (
@@ -361,8 +391,8 @@ export async function UserCenterPageShell({
             {comments.length ? (
               comments.map((comment) => (
                 <p key={comment.id} className="border-b border-[var(--marketing-border)] py-3 text-sm text-[var(--marketing-muted)]">
-                  {comment.tool.name} 路 {formatStatus(comment.status, locale)} 路 <EmojiText text={comment.content} />
-                  {comment.status === "pending" ? <span> 路 {getReviewNotice(locale)}</span> : null}
+                  <Link href={buildCanonicalToolPath(comment.tool, locale)} className="font-semibold text-[var(--marketing-accent)]">{comment.tool.name}</Link> · {formatStatus(comment.status, locale)} · <EmojiText text={comment.content} />
+                  {comment.status === "pending" ? <span> · {getReviewNotice(locale)}</span> : null}
                 </p>
               ))
             ) : (
@@ -386,6 +416,13 @@ function Panel({ id, title, children }: React.PropsWithChildren<{ id?: string; t
 
 function EmptyText({ children }: React.PropsWithChildren) {
   return <p className="text-sm text-[var(--marketing-muted)]">{children}</p>;
+}
+
+function BrowseProducts({ locale }: { locale: Locale }) {
+  return <div className="mt-3 flex flex-wrap gap-2">
+    <Link href={buildLocalePath("/software", locale)} className="user-center-action user-center-action--compact">{locale === "en" ? "Browse AI tools" : "浏览 AI 工具"}</Link>
+    <Link href={buildLocalePath("/ai-skills", locale)} className="user-center-action user-center-action--compact">{locale === "en" ? "Browse AI Skills" : "浏览 AI Skills"}</Link>
+  </div>;
 }
 
 function ToolAccessList({

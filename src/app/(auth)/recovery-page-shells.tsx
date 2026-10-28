@@ -7,6 +7,7 @@ import { Container } from "@/components/ui";
 import { getOrCreateCsrfToken } from "@/lib/csrf";
 import { getCurrentLocale, type Locale } from "@/lib/i18n";
 import { buildLocalePath } from "@/lib/seo";
+import styles from "./recovery-buttons.module.css";
 
 export function getRecoveryPageMetadata(locale: Locale): Metadata {
   return {
@@ -58,7 +59,7 @@ export async function ForgotPasswordPageShell({
             className="form-control-dark mt-2"
             placeholder={isEnglish ? "you@example.com" : "请输入找回邮箱"}
           />
-          <FormSubmitButton className="mt-6 w-full" pendingLabel={isEnglish ? "Sending..." : "正在发送..."}>
+          <FormSubmitButton className={`${styles.primary} mt-6 w-full`} pendingLabel={isEnglish ? "Sending..." : "正在发送..."}>
             {isEnglish ? "Send recovery link" : "发送找回链接"}
           </FormSubmitButton>
           <p className="mt-5 text-center text-sm text-[var(--marketing-muted)]">
@@ -141,7 +142,7 @@ export async function ResetPasswordPageShell({
                 hideLabel={isEnglish ? "Hide password" : "隐藏密码"}
                 className="form-control-dark"
               />
-              <FormSubmitButton pendingLabel={isEnglish ? "Updating..." : "正在更新..."}>
+              <FormSubmitButton className={styles.primary} pendingLabel={isEnglish ? "Updating..." : "正在更新..."}>
                 {isEnglish ? "Update password" : "更新密码"}
               </FormSubmitButton>
             </form>
@@ -179,7 +180,7 @@ export async function VerifyRecoveryEmailPageShell({
               <input type="hidden" name="csrfToken" value={csrfToken} />
               <input type="hidden" name="token" value={params.token} />
               <p className="text-sm leading-6 text-[var(--marketing-muted)]">{isEnglish ? "Confirm only if you requested this change. The link can be used once and expires in 30 minutes." : "只有在你本人申请了此操作时才继续。此链接仅可使用一次，并将在 30 分钟后失效。"}</p>
-              <FormSubmitButton pendingLabel={isEnglish ? "Verifying..." : "正在验证..."}>
+              <FormSubmitButton className={styles.primary} pendingLabel={isEnglish ? "Verifying..." : "正在验证..."}>
                 {isEnglish ? "Verify recovery email" : "确认验证邮箱"}
               </FormSubmitButton>
             </form>

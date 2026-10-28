@@ -1,5 +1,5 @@
 import { execFile } from "node:child_process";
-import { mkdtemp, writeFile } from "node:fs/promises";
+import { mkdtemp, readFile, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { promisify } from "node:util";
@@ -80,6 +80,16 @@ async function runScript(args: string[], env: Record<string, string> = {}): Prom
 }
 
 describe("publish-ai-trend-briefing-html script", () => {
+  it("clears stale video metadata when publishing an HTML-only fallback", async () => {
+    const { htmlFile, summaryFile } = await createFiles();
+    const summary = JSON.parse(await readFile(summaryFile, "utf8"));
+    await writeFile(summaryFile, JSON.stringify({ ...summary, videoUrl: "/uploads/ai-trends/2026-05-01/briefing.mp4", videoTitle: "Old video", videoDurationSeconds: 9 }), "utf8");
+    const result = await runScript(["--file", htmlFile, "--summary-file", summaryFile, "--mode", "published", "--clear-video", "--dry-run"]);
+    expect(result.code).toBe(0);
+    expect(result.stdout).toContain("Video: none");
+    expect(result.stdout).toContain("database upsert skipped");
+  });
+
   it("requires both HTML and summary file paths", async () => {
     const result = await runScript([]);
 

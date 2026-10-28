@@ -15,18 +15,18 @@ import { absoluteUrl, buildLocalePath, buildMetaDescription, buildMetadataTitle,
 
 const copy = {
   zh: {
-    description: "AI 需求趋势每日分析详情页。公开展示摘要，登录后阅读完整视觉化 HTML 报告。",
+    description: "AI 需求趋势周报详情页。公开展示摘要，登录后阅读完整视觉化 HTML 报告。",
     back: "返回分析历史",
     summary: "公开摘要",
     fullHtml: "完整 HTML 报告",
     loginVisible: "登录可见",
     loginTitle: "登录即可阅读完整报告",
     loginIntro:
-      "完整报告包含视觉化 HTML、需求热度排行、方向分析、来源链接和机会优先级建议。这里不要求付费会员，登录账户即可查看。",
+      "完整报告包含视觉化 HTML、需求方向分析、来源链接和机会优先级建议。这里不要求付费会员，登录账户即可查看。",
     loginButton: "登录看全文",
     sourceSignals: "来源信号",
-    scenarioRankings: "细分场景排行",
-    scenarioIntro: "公开摘要会展示方向下的高优先级任务，帮助判断下一步开发计划；完整 HTML 分析仍需登录查看。",
+    scenarioRankings: "细分场景分析",
+    scenarioIntro: "公开摘要会展示本期讨论的任务场景；完整 HTML 分析仍需登录查看。",
     typicalUsers: "典型用户",
     scenarios: "代表场景",
     aiValue: "AI 价值",
@@ -37,18 +37,18 @@ const copy = {
     trendOverview: "查看趋势总览"
   },
   en: {
-    description: "Daily AI demand analysis detail page. Public readers see the summary, and signed-in users can read the full visual HTML report.",
+    description: "Weekly AI demand analysis detail page. Public readers see the summary, and signed-in users can read the full visual HTML report.",
     back: "Back to analysis history",
     summary: "Public summary",
     fullHtml: "Full HTML report",
     loginVisible: "Visible after sign-in",
     loginTitle: "Log in to read the full report",
     loginIntro:
-      "The full report includes visual HTML, demand heat rankings, directional analysis, source links, and opportunity priority notes. No paid membership is required here. A signed-in account is enough.",
+      "The full report includes visual HTML, demand direction analysis, source links, and opportunity priority notes. No paid membership is required here. A signed-in account is enough.",
     loginButton: "Log in for full access",
     sourceSignals: "Source signals",
-    scenarioRankings: "Scenario rankings",
-    scenarioIntro: "The public summary shows high-priority tasks under each direction for product planning. The full HTML analysis still requires sign-in.",
+    scenarioRankings: "Scenario analysis",
+    scenarioIntro: "The public summary shows task scenarios discussed in this issue. The full HTML analysis still requires sign-in.",
     typicalUsers: "Typical users",
     scenarios: "Representative scenarios",
     aiValue: "AI value",
@@ -146,21 +146,16 @@ export async function AiTrendDailyDetailPageShell({
                           <h2 className="text-2xl font-black leading-snug text-[var(--marketing-text)]">{breakdown.direction}</h2>
                           {breakdown.summary ? <p className="mt-2 text-sm leading-7 text-[var(--marketing-muted)]">{breakdown.summary}</p> : null}
                         </div>
-                        <span className="inline-flex shrink-0 items-center justify-center rounded-full border border-[var(--marketing-accent)]/35 px-4 py-2 text-sm font-black text-[var(--marketing-accent)]">
-                          {breakdown.heat}
-                        </span>
                       </div>
 
                       <div className="mt-5 grid gap-4">
-                        {breakdown.scenarios.map((scenario, index) => (
+                        {breakdown.scenarios.map((scenario) => (
                           <article key={`${breakdown.direction}-${scenario.name}`} className="rounded-xl border border-white/10 bg-black/10 p-4">
                             <div className="flex flex-col gap-3 md:flex-row md:items-start md:justify-between">
                               <div>
-                                <p className="text-xs font-black text-[var(--marketing-accent)]">#{index + 1}</p>
                                 <h3 className="mt-1 text-xl font-black leading-snug text-[var(--marketing-text)]">{scenario.name}</h3>
                               </div>
                               <div className="flex flex-wrap gap-2">
-                                <Badge className="text-[var(--marketing-accent)]">{scenario.heat}</Badge>
                                 {scenario.developmentPriority || scenario.urgency ? <Badge>{scenario.developmentPriority || scenario.urgency}</Badge> : null}
                               </div>
                             </div>
@@ -236,7 +231,7 @@ export async function AiTrendDailyDetailPageShell({
             )}
           </main>
 
-          <section className="space-y-5 lg:sticky lg:top-28 lg:self-start" aria-label="Daily trend support links">
+          <section className="space-y-5 lg:sticky lg:top-28 lg:self-start" aria-label={forceLocale === "en" ? "Weekly trend support links" : "趋势周报相关链接"}>
             <section className="surface-panel-soft p-5">
               <h2 className="text-lg font-black text-[var(--marketing-text)]">{text.sourceSignals}</h2>
               <div className="mt-4 grid gap-3">

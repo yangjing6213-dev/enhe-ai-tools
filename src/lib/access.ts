@@ -44,6 +44,7 @@ export async function assertDownloadAccess(toolId: string, anonymousVisitorKey?:
   }))) throw new Error("AI 工作流尚未完成价格确认或交付版本归档");
   const downloadPrice = isAiWorkflow ? Number(tool.downloadPrice) : getPrimaryToolPrice(tool.priceSpecs, tool.downloadPrice);
   const isPaid = tool.isDownloadPaid && downloadPrice > 0;
+  const countedOnPayment = isPaid || ((tool.type === "online" || tool.type === "skill_learning") && downloadPrice > 0);
   if (!user && !(isAiWorkflow && !isPaid)) redirect("/login");
 
   const headerStore = await headers();
@@ -107,7 +108,7 @@ export async function assertDownloadAccess(toolId: string, anonymousVisitorKey?:
         skipDuplicates: true
       });
       if (event.count === 1) {
-        await tx.tool.update({ where: { id: tool.id }, data: { downloadCount: { increment: 1 } } });
+        if (!countedOnPayment) await tx.tool.update({ where: { id: tool.id }, data: { downloadCount: { increment: 1 } } });
         await tx.file.update({ where: { id: file.id }, data: { downloadCount: { increment: 1 } } });
       }
       if (user) {
@@ -119,7 +120,7 @@ export async function assertDownloadAccess(toolId: string, anonymousVisitorKey?:
 
   if (!user) redirect("/login");
   await prisma.downloadLog.create({ data: { userId: user.id, toolId: tool.id, fileId: file.id, ip, userAgent } });
-  await prisma.tool.update({ where: { id: tool.id }, data: { downloadCount: { increment: 1 } } });
+  if (!countedOnPayment) await prisma.tool.update({ where: { id: tool.id }, data: { downloadCount: { increment: 1 } } });
   await prisma.file.update({ where: { id: file.id }, data: { downloadCount: { increment: 1 } } });
   return file;
 }

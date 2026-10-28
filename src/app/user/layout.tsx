@@ -22,7 +22,7 @@ export default async function UserLayout({ children }: { children: React.ReactNo
 
   return (
     <RootDocument lang={locale === "en" ? "en-US" : "zh-CN"} disableLegacyVisualEffects>
-      <PublicSiteChrome forceLocale={locale}>{children}</PublicSiteChrome>
+      <PublicSiteChrome forceLocale={locale} showFooterMascot={false}>{children}</PublicSiteChrome>
     </RootDocument>
   );
 }

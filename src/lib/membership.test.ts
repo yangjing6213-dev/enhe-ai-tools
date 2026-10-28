@@ -24,6 +24,7 @@ const db = vi.hoisted(() => ({
       delete: vi.fn(),
       deleteMany: vi.fn()
     },
+    tool: { update: vi.fn() },
     seoAuditCredit: {
       updateMany: vi.fn()
     },
@@ -116,6 +117,7 @@ describe("membership service", () => {
       metadata: expect.objectContaining({ orderType: "vip", paymentProvider: "manual" }),
     }));
     expect(db.trackEvent.mock.calls[0][0].metadata).not.toHaveProperty("amount");
+    expect(db.tx.tool.update).not.toHaveBeenCalled();
   });
 
   it("repairs a VIP order that is already activated but has no active membership", async () => {
@@ -187,6 +189,28 @@ describe("membership service", () => {
       entityId: "order-2",
       metadata: expect.objectContaining({ orderType: "software_download", toolId: "tool-1" }),
     }));
+    expect(db.tx.tool.update).toHaveBeenCalledExactlyOnceWith({
+      where: { id: "tool-1" }, data: { downloadCount: { increment: 1 } },
+    });
+  });
+
+  it.each([
+    { label: "previously paid", orderStatus: "paid", paidAt: new Date("2026-10-20T00:00:00Z") },
+    { label: "historical paid without timestamp", orderStatus: "paid", paidAt: null },
+    { label: "reopened after payment", orderStatus: "pending_review", paidAt: new Date("2026-10-20T00:00:00Z") },
+    { label: "already activated", orderStatus: "activated", paidAt: null },
+    { label: "refunded", orderStatus: "refunded", paidAt: null },
+    { label: "cancelled", orderStatus: "cancelled", paidAt: null },
+    { label: "test order", orderStatus: "pending_review", paidAt: null, isTestData: true },
+    { label: "zero amount", orderStatus: "pending_review", paidAt: null, amount: 0 },
+  ])("does not count $label software orders as a new paid download", async (overrides) => {
+    const { activateVipForOrder } = await import("@/lib/membership");
+    db.tx.order.findUnique.mockResolvedValue({
+      id: "order-2", userId: "user-1", toolId: "tool-1", orderType: "software_download",
+      amount: 19, plan: null, paymentProof: null, ...overrides,
+    });
+    await activateVipForOrder("order-2", "admin-1");
+    expect(db.tx.tool.update).not.toHaveBeenCalled();
   });
 
   it.each(["refunded", "cancelled"] as const)(

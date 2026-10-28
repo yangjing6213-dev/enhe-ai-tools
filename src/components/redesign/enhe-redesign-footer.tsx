@@ -2,6 +2,7 @@ import { Fragment } from "react";
 import Image from "next/image";
 import { ChevronDown, Github } from "lucide-react";
 import { companyProfile } from "@/lib/company-profile";
+import { SiteQrCode } from "@/components/site-qr-code";
 import { EnheRedesignBrandValue } from "./home/EnheRedesignBrandValue";
 import type { ProductionFiling } from "@/lib/production-filing";
 import type { RedesignFooterCopy, RedesignLocale } from "./types";
@@ -147,6 +148,7 @@ export function EnheRedesignFooter({
             ))}
           </div>
         </div>
+        <SiteQrCode locale={locale} />
         <div className="footer-bottom">
           <p className="footer-copyright-filings">
             <span>{copy.copyright}</span>

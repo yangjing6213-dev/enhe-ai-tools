@@ -2,6 +2,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 import {
   SOFTWARE_CATALOG_PAGE_SIZE,
+  buildPublicSoftwareCatalogItem,
   buildSoftwareCatalogLanguageHrefs,
   buildSoftwareCatalogPage,
   parseSoftwareCatalogSearchParams,
@@ -35,6 +36,13 @@ function buildRows(count: number) {
 }
 
 describe("production software catalog adapter", () => {
+  it("carries only an actual AI Skill safety review to its catalog card", () => {
+    const row = { ...buildRows(1)[0], type: "ai_skill" as const };
+    expect(buildPublicSoftwareCatalogItem(row, "zh").securityReviewedAt).toBeNull();
+    const reviewedAt = new Date("2026-10-26T08:00:00.000Z");
+    expect(buildPublicSoftwareCatalogItem({ ...row, securityReviewedAt: reviewedAt }, "zh").securityReviewedAt).toEqual(reviewedAt);
+  });
+
   it("carries the administrator's manual safety review date to product cards", () => {
     const reviewedAt = new Date("2026-10-20T08:00:00.000Z");
     const rows = buildRows(1);

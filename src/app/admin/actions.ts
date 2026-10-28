@@ -1265,18 +1265,19 @@ export async function upsertToolAction(formData: FormData) {
 
   try {
     const id = parseOptionalString(formData.get("id"));
-    const existingSoftware = type === "software" && id
+    const supportsCreatorAndSafety = type === "software" || type === "ai_skill";
+    const existingProduct = supportsCreatorAndSafety && id
       ? await prisma.tool.findUnique({
           where: { id },
           select: { creatorId: true, securityReviewedAt: true },
         })
       : null;
-    const creatorId = type === "software"
+    const creatorId = supportsCreatorAndSafety
       ? formData.has("creatorId")
         ? parseOptionalString(formData.get("creatorId"))
-        : existingSoftware?.creatorId ?? (id ? null : admin.id)
+        : existingProduct?.creatorId ?? (id ? null : admin.id)
       : undefined;
-    if (creatorId && creatorId !== admin.id && creatorId !== existingSoftware?.creatorId) {
+    if (creatorId && creatorId !== admin.id && creatorId !== existingProduct?.creatorId) {
       throw new Error("创作者账号只能设为当前登录账号或保留现有创作者。 ");
     }
     const creatorBioValue = formData.get("creatorBio");
@@ -1391,10 +1392,10 @@ export async function upsertToolAction(formData: FormData) {
       } : {}),
       status: requestedStatus,
       sortOrder: parseNumberField(formData.get("sortOrder"), 0),
-      ...(type === "software" ? {
+      ...(supportsCreatorAndSafety ? {
         creatorId: creatorId ?? null,
         securityReviewedAt: parseBooleanField(formData.get("securityReviewed"))
-          ? existingSoftware?.securityReviewedAt ?? new Date()
+          ? existingProduct?.securityReviewedAt ?? new Date()
           : null,
       } : {})
     };
@@ -1404,7 +1405,7 @@ export async function upsertToolAction(formData: FormData) {
         ? (await tx.tool.update({ where: { id }, data })).id
         : (await tx.tool.create({ data })).id;
       await syncToolPriceSpecs(tx, transactionToolId, priceSpecs);
-      if (type === "software" && creatorId && creatorBio !== undefined) {
+      if (supportsCreatorAndSafety && creatorId && creatorBio !== undefined) {
         await tx.user.update({ where: { id: creatorId }, data: { creatorBio } });
       }
       return transactionToolId;
@@ -1426,7 +1427,7 @@ export async function upsertToolAction(formData: FormData) {
       targetType: "tool",
       targetId: savedToolId,
       summary: id ? "Updated tool." : "Created tool.",
-      metadata: { type, name, slug: data.slug, status: data.status, downloadFileUrl: downloadFileUrl ?? null, priceSpecs: priceSpecs.length, ...(type === "software" ? { creatorId: creatorId ?? null, securityReviewed: Boolean(data.securityReviewedAt) } : {}) }
+      metadata: { type, name, slug: data.slug, status: data.status, downloadFileUrl: downloadFileUrl ?? null, priceSpecs: priceSpecs.length, ...(supportsCreatorAndSafety ? { creatorId: creatorId ?? null, securityReviewed: Boolean(data.securityReviewedAt) } : {}) }
     });
     revalidatePath(adminPath);
     revalidatePath("/admin/files");

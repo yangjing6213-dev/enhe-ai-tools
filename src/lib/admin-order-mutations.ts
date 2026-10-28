@@ -4,6 +4,7 @@ import {
   type AuditRequestContext,
 } from "@/lib/admin-audit";
 import { getOrderTimestampPatch } from "@/lib/admin-order";
+import { countFirstPaidProductDownload } from "@/lib/paid-product-downloads";
 import { lockVipEntitlementUser, revokeEntitlementsForRefundedOrder } from "@/lib/membership";
 import {
   assertAdminOrderFinancialUpdateAllowed,
@@ -57,6 +58,7 @@ export async function updateOrderForAdmin(input: UpdateOrderForAdminInput) {
       if (timestampPatch.paidAt && !order.paidAt) timestampPatch.paidAt = input.now;
       if (timestampPatch.activatedAt && !order.activatedAt) timestampPatch.activatedAt = input.now;
     }
+    await countFirstPaidProductDownload(tx, { ...order, amount: new Prisma.Decimal(input.amount) }, input.orderStatus);
     const updated = await tx.order.update({
       where: { id: order.id },
       data: {

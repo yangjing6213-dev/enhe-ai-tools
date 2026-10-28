@@ -430,7 +430,7 @@ export function ToolEditor({
                 </Field>
               </>
             ) : null}
-            {type === "software" ? (
+            {type === "software" || isAiSkill ? (
               <div className="grid gap-4 md:col-span-2 md:grid-cols-2">
                 <div>
                   <label className="flex min-h-14 items-center gap-3 rounded-xl border border-white/10 bg-white/6 px-4 py-3 text-sm text-[#F6FAFF]">

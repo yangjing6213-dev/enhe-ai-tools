@@ -1,6 +1,7 @@
 import { Prisma, type OrderType, type PaymentRefundState } from "@prisma/client";
 import { prisma } from "@/lib/db";
 import { trackAnalyticsEvent } from "@/lib/analytics";
+import { countFirstPaidProductDownload } from "@/lib/paid-product-downloads";
 import { applyVipCancellation, applyVipGrant, type MembershipSnapshot } from "@/lib/membership-rules";
 
 type MembershipDelegate = {
@@ -697,6 +698,7 @@ export async function activateVipForOrder(orderId: string, reviewerId?: string, 
         }
       });
 
+      await countFirstPaidProductDownload(tx, order, "activated");
       return tx.order.update({
         where: { id: orderId },
         data: {

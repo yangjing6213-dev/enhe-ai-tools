@@ -89,6 +89,7 @@ async function main() {
   const videoPosterUrl = normalizeOptionalArg("--video-poster-url");
   const videoDurationSecondsArg = normalizeOptionalArg("--video-duration-seconds");
   const includeInTopicPage = parseOptionalBooleanArg("--include-in-topic-page");
+  const dryRun = hasFlag("--dry-run");
   if (hasFlag("--require-production-target") && (isLocalAppUrl(process.env.APP_URL) || isLocalAppUrl(process.env.NEXT_PUBLIC_APP_URL))) {
     throw new Error("Production publishing requires non-local APP_URL and NEXT_PUBLIC_APP_URL.");
   }
@@ -108,6 +109,9 @@ async function main() {
     ...(videoPosterUrl ? { videoPosterUrl: normalizeMediaSrc(videoPosterUrl) } : {}),
     ...(videoDurationSecondsArg ? { videoDurationSeconds: Number.parseInt(videoDurationSecondsArg, 10) } : {}),
     ...(typeof includeInTopicPage === "boolean" ? { isIncludedInTopicPage: includeInTopicPage } : {}),
+    ...(hasFlag("--clear-video") ? {
+      videoUrl: null, videoTitle: null, videoDescription: null, videoPosterUrl: null, videoDurationSeconds: null,
+    } : {}),
     status
   } as AiTrendBriefingPublishInput);
 
@@ -119,7 +123,7 @@ async function main() {
   console.log(`Video: ${data.videoUrl ? "attached" : "none"}`);
   console.log(`Topic page: ${data.isIncludedInTopicPage ? "included" : "excluded"}`);
 
-  if (hasFlag("--dry-run")) {
+  if (dryRun) {
     console.log("Dry run: database upsert skipped.");
     return;
   }
@@ -206,5 +210,5 @@ main()
     process.exit(1);
   })
   .finally(async () => {
-    await prisma.$disconnect();
+    if (!hasFlag("--dry-run")) await prisma.$disconnect();
   });

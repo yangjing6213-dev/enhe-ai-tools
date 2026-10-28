@@ -15,6 +15,7 @@ import { HoldDeleteForm } from "@/components/hold-delete-form";
 import { CreatorContactForm } from "@/components/creator-contact-form";
 import { StarRatingInput, CommentRatingDisplay } from "@/components/star-rating-input";
 import { ProductVideoPlayer } from "@/components/product-video-player";
+import { ProductShareCard } from "@/components/product-share-card";
 import { StructuredData } from "@/components/structured-data";
 import { Badge, ButtonLink, Container, SectionTitle } from "@/components/ui";
 import { ToolCard } from "@/components/tool-card";
@@ -275,18 +276,18 @@ export async function ToolDetailPageShell({
     permanentRedirect(buildCanonicalToolPath(tool, forceLocale));
   }
 
-  const productCreator = tool.type === "software" ? tool.creator : null;
+  const productCreator = tool.type === "software" || tool.type === "ai_skill" ? tool.creator : null;
   const creatorProfile = productCreator
     ? await (async () => {
         const [productCount, rating, avatarSrc] = await Promise.all([
           prisma.tool.count({
-            where: { creatorId: productCreator.id, type: "software", status: "published" },
+            where: { creatorId: productCreator.id, type: { in: ["software", "ai_skill"] }, status: "published" },
           }),
           prisma.comment.aggregate({
             where: {
               status: "approved",
               rating: { not: null },
-              tool: { is: { creatorId: productCreator.id, type: "software", status: "published" } },
+              tool: { is: { creatorId: productCreator.id, type: { in: ["software", "ai_skill"] }, status: "published" } },
             },
             _avg: { rating: true },
             _count: { _all: true },
@@ -441,6 +442,21 @@ export async function ToolDetailPageShell({
     : tool.downloadFile;
   const isPurchasableAccountService = isAccountService && servicePrice > 0;
   const paidSkillCourse = isSkillLearning && servicePrice > 0;
+  const hasRefundPolicy = paidDownloadProduct || isPurchasableAccountService || paidSkillCourse;
+  const refundPolicyCard = hasRefundPolicy ? (
+    <div className="product-refund-policy-card" data-refund-guarantee>
+      <RotateCcw size={19} aria-hidden="true" />
+      <div>
+        <strong>{forceLocale === "en" ? "Refund guarantee" : "退款保障"}</strong>
+        <p>{forceLocale === "en"
+          ? "Refund requests are handled under the published rules. Activated, downloaded, or used digital services are generally not eligible for no-reason refunds."
+          : "符合退款条件时可提交申请；已开通、下载或使用的数字服务通常不支持无理由退款。"}</p>
+        <Link href={forceLocale === "en" ? "/en/legal/membership-refund" : "/legal/membership-refund"}>
+          {forceLocale === "en" ? "Read the refund rules" : "查看完整退款规则"}
+        </Link>
+      </div>
+    </div>
+  ) : null;
   const isFreeSkillCourse = isSkillLearning && servicePrice <= 0;
   const coverImage = resolveToolImageSrc(tool.coverImage) || (isAiWorkflow ? `/api/ai-workflows/covers/${encodeURIComponent(tool.slug)}` : null);
   const productVideos = resolveProductVideos([
@@ -897,7 +913,7 @@ export async function ToolDetailPageShell({
                   {localizedSummary}
                 </p>
 
-                <div className={`tool-detail-facts-grid mt-6${tool.type === "software" && shouldShowPurchaseForm ? " has-refund" : ""}`}>
+                <div className={`tool-detail-facts-grid mt-6${hasRefundPolicy ? " has-refund" : ""}`}>
                   {isAccountService ? (
                     <>
                       <Info
@@ -920,6 +936,7 @@ export async function ToolDetailPageShell({
                         />
                       ) : null}
                       <Info label={td.supportEmail} value={supportEmail} />
+                      {refundPolicyCard}
                     </>
                   ) : (
                     <>
@@ -935,7 +952,7 @@ export async function ToolDetailPageShell({
                           />
                         </>
                       ) : null}
-                      {tool.type === "software" && tool.securityReviewedAt ? (
+                      {isDownloadProduct && tool.securityReviewedAt ? (
                         <div className="product-safety-info-card">
                           <p className="text-xs text-[#8F9DB2]">{forceLocale === "en" ? "TRUST & SAFETY" : "信任与安全"}</p>
                           <div className="product-safety-info-heading">
@@ -952,20 +969,7 @@ export async function ToolDetailPageShell({
                           </p>
                         </div>
                       ) : null}
-                      {tool.type === "software" && shouldShowPurchaseForm ? (
-                        <div className="product-refund-policy-card" data-refund-guarantee>
-                          <RotateCcw size={19} aria-hidden="true" />
-                          <div>
-                            <strong>{forceLocale === "en" ? "Refund guarantee" : "退款保障"}</strong>
-                            <p>{forceLocale === "en"
-                              ? "Refund requests are handled under the published rules. Activated, downloaded, or used digital services are generally not eligible for no-reason refunds."
-                              : "符合退款条件时可提交申请；已开通、下载或使用的数字服务通常不支持无理由退款。"}</p>
-                            <Link href={forceLocale === "en" ? "/en/legal/membership-refund" : "/legal/membership-refund"}>
-                              {forceLocale === "en" ? "Read the refund rules" : "查看完整退款规则"}
-                            </Link>
-                          </div>
-                        </div>
-                      ) : null}
+                      {refundPolicyCard}
                       {tool.supportedAgents.length ? (
                         <SupportedAgentsCard agents={tool.supportedAgents} locale={forceLocale} />
                       ) : null}
@@ -1525,6 +1529,12 @@ export async function ToolDetailPageShell({
               )}
             </div>
           </section>
+
+          <ProductShareCard
+            locale={forceLocale}
+            title={localizedTool.primaryName}
+            path={buildCanonicalToolPath(tool, forceLocale)}
+          />
 
           {hasHowToDelivery ? (
             <section id="tool-how-to" className="glass scroll-mt-24 rounded-2xl p-7">
