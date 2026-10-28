@@ -470,14 +470,11 @@ export function validateAiTrendBriefingInput(input: AiTrendBriefingPublishInput)
     throw new Error("Published AI trend briefing requires at least one source signal.");
   }
 
-  const publishedAt =
-    input.publishedAt === null
-      ? null
-      : input.publishedAt
-        ? new Date(input.publishedAt)
-        : status === "published"
-          ? new Date()
-          : null;
+  const publishedAt = input.publishedAt
+    ? new Date(input.publishedAt)
+    : status === "published"
+      ? new Date()
+      : null;
 
   if (publishedAt && Number.isNaN(publishedAt.getTime())) {
     throw new Error("AI trend briefing publishedAt must be a valid date.");

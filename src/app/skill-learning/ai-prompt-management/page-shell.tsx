@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { AiPromptManagementWorkbench } from "@/components/ai-prompt-management-workbench";
+import { ProductShareCard } from "@/components/product-share-card";
 import { StructuredData } from "@/components/structured-data";
 import { Container } from "@/components/ui";
 import { aiPromptManagementManifest } from "@/data/ai-prompt-management-manifest";
@@ -240,6 +241,9 @@ export function AiPromptManagementPageShell({
             ))}
           </div>
         </section>
+        <div className="mt-8">
+          <ProductShareCard locale={forceLocale} title={copy.title} path={path} />
+        </div>
       </Container>
     </main>
   );

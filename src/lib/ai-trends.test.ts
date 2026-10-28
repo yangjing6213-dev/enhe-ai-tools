@@ -1,4 +1,4 @@
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, vi } from "vitest";
 import {
   aiTrendDateSlugToDate,
   buildAiTrendLoginUrl,
@@ -132,6 +132,25 @@ describe("AI trend briefing helpers", () => {
       videoPosterUrl: "/api/uploads/ai-trends/2026-06-19/poster.jpg",
       videoDurationSeconds: 48
     });
+  });
+
+  it("sets the publication time when publishing a draft with an explicit null timestamp", () => {
+    vi.useFakeTimers();
+    vi.setSystemTime(new Date("2026-10-28T09:00:00.000Z"));
+
+    try {
+      const data = validateAiTrendBriefingInput({ ...validInput, publishedAt: null });
+
+      expect(data.publishedAt).toEqual(new Date("2026-10-28T09:00:00.000Z"));
+    } finally {
+      vi.useRealTimers();
+    }
+  });
+
+  it("keeps a draft's explicit null publication time unpublished", () => {
+    const data = validateAiTrendBriefingInput({ ...validInput, status: "draft", publishedAt: null });
+
+    expect(data.publishedAt).toBeNull();
   });
 
   it("rejects encoding-corrupted Chinese briefing text before publish or render", () => {
