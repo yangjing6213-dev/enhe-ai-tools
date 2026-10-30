@@ -46,6 +46,7 @@ function copy(locale: Locale) {
     back: "Back to discussions",
     replyDeleted: "This reply was deleted.",
     deleteReply: "Delete reply",
+    comment: "Comment",
   } : {
     title: "共创AI论坛",
     coverAlt: "笔记本电脑和手机上的 ENHE 官网画面",
@@ -72,6 +73,7 @@ function copy(locale: Locale) {
     back: "返回话题列表",
     replyDeleted: "这条回复已删除。",
     deleteReply: "删除回复",
+    comment: "评论",
   };
 }
 
@@ -126,11 +128,11 @@ export function ForumIndexContent({ locale, posts, selectedCategory, isAuthentic
   );
 }
 
-function ReplyForm({ locale, postId, parentId }: { locale: Locale; postId: string; parentId?: string }) {
+function ReplyForm({ locale, postId, parentId, label }: { locale: Locale; postId: string; parentId?: string; label?: string }) {
   const t = copy(locale);
   return (
     <details className="forum-reply-form">
-      <summary className="forum-primary-button">{t.reply}</summary>
+      <summary className="forum-primary-button">{label ?? t.reply}</summary>
       <form action={createForumReplyAction}>
         <input type="hidden" name="postId" value={postId} />
         {parentId ? <input type="hidden" name="parentId" value={parentId} /> : null}
@@ -170,7 +172,7 @@ export function ForumPostContent({ locale, post, isAuthenticated, currentUserId,
         <div className="forum-post-meta forum-topic-meta"><ForumPostActions locale={locale} postId={post.id} title={post.title} replyCount={post.replyCount} shareCount={post._count.shares} likeCount={post._count.likes} isLiked={post.isLiked} isBookmarked={post.isBookmarked} isAuthenticated={isAuthenticated} replyHref="#replies" />{isAuthenticated && isAdmin ? <ForumDeletePostButton locale={locale} postId={post.id} /> : null}</div>
       </article>
       <section className="forum-replies" id="replies">
-        <div className="forum-section-heading">{isAuthenticated ? <ReplyForm locale={locale} postId={post.id} /> : <JoinLink locale={locale} />}</div>
+        <div className="forum-section-heading">{isAuthenticated ? <ReplyForm locale={locale} postId={post.id} label={t.comment} /> : <JoinLink locale={locale} />}</div>
         {post.replies.length ? <ReplyBranch locale={locale} postId={post.id} replies={post.replies} isAuthenticated={isAuthenticated} currentUserId={currentUserId} isAdmin={isAdmin} /> : <p className="forum-empty-state">{locale === "en" ? "No replies yet." : "还没有回复。"}</p>}
       </section>
     </main>

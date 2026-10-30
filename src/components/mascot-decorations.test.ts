@@ -25,6 +25,16 @@ describe("public mascot decorations", () => {
     );
   });
 
+  it("cuts the footer dinosaur size and offset in half on desktop and mobile", () => {
+    const desktopRule = siteRefreshStyles.match(/\.redesign-footer-mascot\s*\{([^}]*)\}/)?.[1] ?? "";
+    const mobileRule = siteRefreshStyles.match(/@media\s*\(max-width:\s*767px\)[\s\S]*?\.redesign-footer-mascot\s*\{([^}]*)\}/)?.[1] ?? "";
+
+    expect(desktopRule).toContain("--footer-mascot-size: 198px;");
+    expect(desktopRule).toContain("left: 24px;");
+    expect(mobileRule).toContain("min(147px, calc(50vw - 48px))");
+    expect(mobileRule).toContain("left: 22px;");
+  });
+
   it("keeps the header decoration desktop-only and respects reduced motion", () => {
     expect(redesignStyles).toMatch(/@media\s*\(min-width:\s*1024px\)[\s\S]*?\.redesign-hanging-mascot/);
     expect(redesignStyles).toContain("@keyframes enhe-hanging-tag-swing");

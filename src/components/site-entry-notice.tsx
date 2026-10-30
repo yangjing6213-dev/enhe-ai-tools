@@ -4,52 +4,46 @@ import { Bell, X } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import type { Locale } from "@/lib/dictionaries";
 import { companyProfile } from "@/lib/company-profile";
+import type { SiteEntryNoticeConfig } from "@/lib/site-entry-notice";
 import { SiteQrCode } from "@/components/site-qr-code";
 import styles from "./site-entry-notice.module.css";
 
 const dismissedKey = "enhe-entry-notice-dismissed-v1";
 
-const NOTICE_COPY = {
-  zh: [
-    "感谢您访问 ENHE AI 官网。",
-    "本站部分自制软件可能尚未上架应用市场，部分安全软件可能出现误报。介意请勿下载；下载前请核对产品页面说明。",
-    "本站资源包含 AI 开发应用、Skills、虚拟服务等；各产品的审核状态、功能与运行要求以对应产品页面为准。",
-    "数字商品下载或服务开通后通常视为已交付；已开通、已下载或使用的数字服务通常不支持无理由退款。未交付、重复付款、质量问题等情形，按法律规定及本站退款规则处理。",
-    "请认真阅读系统与配置要求，确认设备满足要求后再付款。",
-  ],
-  en: [
-    "Thank you for visiting the ENHE AI website.",
-    "Some software made by ENHE AI may not be listed in app stores, and security software may report a false positive. If this is a concern, please do not download it; review the product page first.",
-    "The site offers AI development apps, Skills, and virtual services. Review status, features, and system requirements are shown on each product page.",
-    "A digital product download or service activation is generally treated as delivery. Activated, downloaded, or used digital services are generally not eligible for no-reason refunds. Non-delivery, duplicate payment, quality issues, and other cases are handled under applicable law and the published refund rules.",
-    "Read the system requirements carefully and confirm your device meets them before paying.",
-  ],
-} as const;
-
-export function SiteEntryNotice({ locale }: { locale: Locale }) {
+export function SiteEntryNotice({ locale, config }: { locale: Locale; config: SiteEntryNoticeConfig }) {
   const [visible, setVisible] = useState(false);
   const dialogRef = useRef<HTMLDialogElement>(null);
   const english = locale === "en";
+  const title = english ? config.enTitle : config.zhTitle;
+  const paragraphs = (english ? config.enBody : config.zhBody).split(/\n\s*\n/u).filter(Boolean);
+  const ending = english ? config.enEnding : config.zhEnding;
 
   useEffect(() => {
+    if (!config.enabled) {
+      setVisible(false);
+      return;
+    }
     try {
-      if (window.sessionStorage.getItem(dismissedKey) === "1") return;
+      if (window.localStorage.getItem(dismissedKey) === String(config.version)) {
+        setVisible(false);
+        return;
+      }
     } catch {
       // Show the notice for this page when browser storage is unavailable.
     }
     setVisible(true);
-  }, []);
+  }, [config.enabled, config.version]);
 
   useEffect(() => {
     const dialog = dialogRef.current;
-    if (visible && dialog && !dialog.open && typeof dialog.showModal === "function") {
-      dialog.showModal();
-    }
-  }, [visible]);
+    if (!dialog) return;
+    if (visible && config.enabled && !dialog.open && typeof dialog.showModal === "function") dialog.showModal();
+    else if ((!visible || !config.enabled) && dialog.open) dialog.close();
+  }, [visible, config.enabled]);
 
   function dismiss() {
     try {
-      window.sessionStorage.setItem(dismissedKey, "1");
+      window.localStorage.setItem(dismissedKey, String(config.version));
     } catch {
       // The notice can still be dismissed for the current page.
     }
@@ -64,7 +58,7 @@ export function SiteEntryNotice({ locale }: { locale: Locale }) {
     }
   }
 
-  if (!visible) return null;
+  if (!config.enabled || !visible) return null;
 
   return (
     <dialog
@@ -81,18 +75,15 @@ export function SiteEntryNotice({ locale }: { locale: Locale }) {
       <div className={styles.card}>
         <h2 id="site-entry-notice-title" className={styles.title}>
           <Bell aria-hidden="true" size={22} />
-          {english ? "Latest Site Announcement" : "本站最新公告通知"}
+          {title}
         </h2>
         <div className={styles.message}>
-          {NOTICE_COPY[english ? "en" : "zh"].map((paragraph, index) => (
+          {paragraphs.map((paragraph, index) => (
             <p key={paragraph} className={index === 1 || index === 3 ? styles.warning : undefined}>
               {paragraph}
             </p>
           ))}
-          <p>
-            {english ? "Questions? Contact " : "如有任何疑问，请联系客服："}
-            <a href={companyProfile.email.href}>{companyProfile.email.value}</a>
-          </p>
+          {ending ? <p>{ending} <a href={companyProfile.email.href}>{companyProfile.email.value}</a></p> : null}
         </div>
         <SiteQrCode locale={locale} size={112} className={styles.qr} />
       </div>

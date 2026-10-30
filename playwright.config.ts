@@ -18,8 +18,17 @@ const chromiumExecutablePath = process.env.ENHE_PLAYWRIGHT_CHROMIUM_EXECUTABLE_P
 const fixtureHost = "127.0.0.1";
 const explicitBaseURL = process.env.PLAYWRIGHT_BASE_URL?.trim();
 const baseURL = explicitBaseURL ?? `http://${fixtureHost}:${port}`;
-const isDatabaseFree = !process.env.DATABASE_URL?.trim();
 const baseURLUrl = new URL(baseURL);
+const routineE2EStorageState = {
+  cookies: [],
+  origins: [
+    {
+      origin: baseURLUrl.origin,
+      localStorage: [{ name: "enhe-entry-notice-dismissed-v1", value: "1" }],
+    },
+  ],
+};
+const isDatabaseFree = !process.env.DATABASE_URL?.trim();
 const expectedPort = new URL(`http://${fixtureHost}:${port}`).port;
 const baseURLHostname = baseURLUrl.hostname;
 const isLoopbackBaseURL = ["localhost", "127.0.0.1", "::1", "[::1]"].includes(baseURLHostname);
@@ -105,6 +114,7 @@ export default defineConfig({
   reporter: [["list"]],
   use: {
     baseURL,
+    storageState: routineE2EStorageState,
     extraHTTPHeaders: { "x-tencent-country": "CN" },
     trace: "retain-on-failure"
   },

@@ -62,3 +62,22 @@ User explicitly requested implementation, push and production deployment of nine
 - Follow-up verification: 32 targeted tests, complete lint and typecheck pass. The final deployment builds the exact follow-up Git tree before switching the running application. Existing broader validation is retained for unchanged code.
 - Public follow-up checks confirmed the new report, source/date labels, archive access and login boundaries. Both languages played the approved video beyond one second without a media error. Remaining final-release acceptance and deployed identity are recorded in `D:/ENHE-Audits/2026-10-26/product-experience/release-receipt-20261028.json`; consult that receipt before considering another release.
 - Final phone screenshots exposed footer artwork overlapping the newly added workbench sharing controls. Reserve bottom space only on this new sharing wrapper (240px on small screens, 320px from the medium breakpoint) so the existing mascot retains its placement and motion. No other page styles or functions change. The final release receipt records the before/after browser geometry and final deployment.
+
+## User scope extension — 2026-10-30
+
+The user added five items to the next combined release: rename only the topic-level reply control to “评论” (keep nested reply labels), halve the footer dinosaur artwork, make login placeholders readable in dark mode, let administrators enable/disable and edit the entry popup title/body/ending, and add the supplied Gradient Waves effect above the footer. The existing page layouts and unrelated controls stay unchanged.
+
+Acceptance checks: focused forum/auth/footer/announcement tests; admin save path requires server-side admin authorization and audit logging; public popup reflects saved bilingual settings and reappears after a new revision; wave animation remains decorative, responsive, and respects reduced-motion/browser capability. Status: implementation and local acceptance checks pass; exact release script and deployment remain pending.
+
+### Implementation and evidence
+
+- Forum topic detail: only the top-level form now says “评论” / “Comment”; nested reply forms keep “回复” / “Reply”. Focused rendering assertions verify all three labels.
+- Footer dinosaur: desktop size/offset changed from 396px/48px to 198px/24px; mobile maximum size and offset are halved. Existing motion and placement are unchanged.
+- Mobile dark theme: auth placeholder text uses the site’s muted text color instead of hardcoded black. Browser check sets the real saved `theme=dark` preference before navigation so hydration cannot reset the test to light mode.
+- Entry notice: editable Chinese and English title/body/ending plus an enable switch live in Admin → 网站设置. Saves require server-side admin authentication, validate length/content, increment a display revision, write the existing `site_settings` row, log an admin audit record, and refresh public settings. No schema change. Browser dismissal remains per browser and an edited revision is shown again.
+- Footer Gradient Waves: integrated the supplied component and settings above the footer; uses a responsive 240px desktop / 180px mobile region, medium quality, DPR 1, and the effect’s existing visibility/reduced-motion handling. A fallback gradient remains if WebGL is unavailable. The region is decorative and does not cover footer controls. Added the upstream MIT + Commons Clause notice and source attribution.
+- Focused unit tests: 6 files, 22 tests pass, including admin authorization, saved bilingual values, revision increment, disabled state, and audit logging.
+- Full unit suite on the exact source snapshot: 657 files passed, 13 skipped; 3,731 tests passed, 128 skipped (database/opt-in cases).
+- `npm run lint`: PASS. `npm run typecheck`: PASS. `npm run build`: PASS; all 100 static pages generated, and the output had no database-connection warning.
+- Browser acceptance: 13 focused mobile/auth/popup/wave checks passed; the isolated read-only Admin settings visual fixture passed at 7 viewport widths and confirmed the six editable fields and enable switch are visible. The user-facing popup was checked in Chinese and English; the footer effect produced its canvas in Chromium.
+- The full browser suite has not yet completed against the final commit. The release script will perform its own exact-ref audit and full browser run before allowing the push/deployment.

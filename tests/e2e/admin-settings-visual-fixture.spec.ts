@@ -42,6 +42,11 @@ test("site settings remain contained and read-only in the empty local fixture", 
   expect(response?.status()).toBe(200);
   await expect(page.locator(".enhe-admin-shell")).toBeVisible();
   await expect(page.locator("#main-content h1")).toBeVisible();
+  await expect(page.getByRole("heading", { name: "进入网站公告弹窗" })).toBeVisible();
+  await expect(page.getByRole("checkbox", { name: "启用进入网站公告弹窗" })).toBeVisible();
+  for (const field of ["zhTitle", "zhBody", "zhEnding", "enTitle", "enBody", "enEnding"]) {
+    await expect(page.locator(`[name='${field}']`)).toBeVisible();
+  }
 
   for (const width of [320, 390, 480, 768, 1024, 1280, 1440]) {
     await test.step(`/admin/settings fits at ${width}px`, async () => {

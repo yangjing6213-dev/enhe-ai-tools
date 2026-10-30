@@ -95,3 +95,16 @@ for (const route of routes) {
     });
   }
 }
+
+test("mobile login placeholders remain readable in dark mode", async ({ page }) => {
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.addInitScript(() => window.localStorage.setItem("theme", "dark"));
+  await page.goto("/login", { waitUntil: "load" });
+  await expect(page.locator("html")).toHaveClass(/dark/);
+
+  const placeholderColor = await page.locator("#login-email").evaluate((element) =>
+    getComputedStyle(element, "::placeholder").color,
+  );
+
+  expect(placeholderColor).not.toBe("rgb(0, 0, 0)");
+});

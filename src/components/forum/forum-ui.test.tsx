@@ -82,7 +82,11 @@ describe("forum public surfaces", () => {
     const html = renderToStaticMarkup(<ForumPostContent locale="zh" post={post} isAuthenticated currentUserId="author" replySubmitted={false} />);
     expect(html).toContain('aria-label="回复：2"');
     expect(html).toContain('aria-pressed="true"');
-    expect(html).toContain('<summary class="forum-primary-button">回复</summary>');
+    const replyFormLabels = Array.from(
+      html.matchAll(/<summary class="forum-primary-button">([^<]+)<\/summary>/g),
+      (match) => match[1],
+    );
+    expect(replyFormLabels).toEqual(["评论", "回复", "回复"]);
     expect(html).not.toContain("<h2>回复</h2>");
     expect(html).toContain("◀");
     expect(html).not.toContain("←");
