@@ -1,8 +1,11 @@
 .dialog {
   position: fixed;
+  inset: 0;
+  margin: auto;
+  height: fit-content;
   width: min(520px, calc(100vw - 32px));
   max-width: none;
-  max-height: calc(100dvh - 92px);
+  max-height: calc(100dvh - 144px);
   overflow: visible;
   border: 0;
   background: transparent;
@@ -16,7 +19,7 @@
 }
 
 .card {
-  max-height: calc(100dvh - 92px);
+  max-height: calc(100dvh - 144px);
   overflow-y: auto;
   border-radius: 10px;
   background: #fff;
@@ -94,11 +97,6 @@
 }
 
 @media (width < 480px) {
-  .dialog,
-  .card {
-    max-height: calc(100dvh - 84px);
-  }
-
   .card {
     padding-block: 20px 16px;
   }

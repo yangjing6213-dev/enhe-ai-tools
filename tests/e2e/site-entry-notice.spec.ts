@@ -23,6 +23,22 @@ test.describe("new visitors", () => {
       await expect(dialog).toBeVisible();
       await expect(dialog.getByRole("img", { name: locale.qr })).toBeVisible();
 
+      for (const viewport of [{ width: 1440, height: 900 }, { width: 390, height: 844 }, { width: 844, height: 390 }]) {
+        await page.setViewportSize(viewport);
+        await expect.poll(async () => {
+          const bounds = await dialog.boundingBox();
+          if (!bounds) return Number.POSITIVE_INFINITY;
+          return Math.max(
+            Math.abs(bounds.x + bounds.width / 2 - viewport.width / 2),
+            Math.abs(bounds.y + bounds.height / 2 - viewport.height / 2),
+          );
+        }).toBeLessThanOrEqual(1);
+        const closeBounds = await dialog.getByRole("button", { name: locale.close }).boundingBox();
+        expect(closeBounds).not.toBeNull();
+        expect(closeBounds!.y).toBeGreaterThanOrEqual(8);
+        expect(closeBounds!.y + closeBounds!.height).toBeLessThanOrEqual(viewport.height - 8);
+      }
+
       const footer = page.locator(".redesign-footer");
       await expect(footer.getByRole("img", { name: /bookmark|收藏/ })).toHaveCount(0);
 

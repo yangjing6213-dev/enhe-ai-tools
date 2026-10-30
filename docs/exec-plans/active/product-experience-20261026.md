@@ -102,3 +102,13 @@ Acceptance checks: focused forum/auth/footer/announcement tests; admin save path
 - Adjusted only test execution: allowed longer budgets for the homepage, support-launcher, and topic keyboard viewport checks; removed a second awaited overlay click after the first click can unmount it (a separate test still covers repeated close behavior); added a `PLAYWRIGHT_WORKERS` override for controlled release runs.
 - Focused rerun of all five previously failing checks with one browser worker: 5 passed (1.6 minutes). Typecheck, lint, and `git diff --check` also pass. The full release script must still pass on the updated commit before deployment.
 - The next release attempt exposed one source-guard unit test still asserting the old fixed worker count. Updated that assertion to cover the configurable worker setting; the focused source-guard suite passes (37 tests). The release script stopped before build/browser checks, with no push or deployment.
+
+## Footer and notice follow-up — 2026-10-30
+
+- User requested removal of the footer wave region and viewport centering of the entry notice, with push and deployment authorized.
+- Baseline: deployed release `05920dbbf405ae533cc3d94b38aa79b8a97692e6`; clean worktree before edits.
+- Removed the wave region, its unused component/styles, and its sole third-party notice. Retained the footer and half-size dinosaur.
+- Root cause: Tailwind resets dialog margins to zero. Explicit fixed insets, auto margins and fit-content height now center the notice. Card height reserves 144px so the external close button remains visible on short screens; long content scrolls inside the card.
+- Extended existing browser checks for both languages at desktop, phone and landscape dimensions, close-button bounds, dismissal persistence, and absence of the wave region. Against the previous production build, wave absence and both centering checks failed as expected (460px desktop center offset); routine dismissal passed.
+- Independent read-only review found no blocking issue. The initial local probe lacked its test-only auth setting; the corrected production probe reproduced the defects. Development preview cannot use this worktree's external node_modules symlink with Turbopack, so final verification uses the official production build/release gate.
+- Final exact-ref release validation and deployment: pending.

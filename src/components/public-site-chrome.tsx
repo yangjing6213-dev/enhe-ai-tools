@@ -24,7 +24,6 @@ import {
 } from "@/lib/settings";
 import type { RedesignLanguageHrefs } from "@/components/redesign/types";
 import { SiteEntryNotice } from "@/components/site-entry-notice";
-import GradientWaves from "@/components/redesign/gradient-waves";
 import { parseSiteEntryNotice, SITE_ENTRY_NOTICE_KEY } from "@/lib/site-entry-notice";
 
 export async function PublicSiteChrome({
@@ -89,38 +88,6 @@ export async function PublicSiteChrome({
           {children}
         </div>
         <CustomerSupportWidget locale={forceLocale} faqs={getCustomerSupportFaqs(forceLocale)} />
-        <div className="redesign-footer-gradient-waves" data-testid="footer-gradient-waves" aria-hidden="true">
-          <GradientWaves
-            horizonColor="#1a59ee"
-            waveColor="#126cfc"
-            crestColor="#ffffff"
-            speed={0.4}
-            amplitude={1.75}
-            relief={0.99}
-            lightAngle={115}
-            mouseInteraction
-            swellOnClick
-            lightMode
-            waveScale={0.76}
-            waveRatio={0.5}
-            swell={21}
-            turbulence={32.5}
-            tilt={80}
-            zoom={1.33}
-            height={2.5}
-            fogDepth={24}
-            sheen={0.16}
-            brightness={1.32}
-            opacity={0.99}
-            grain={0.17}
-            quality="medium"
-            intro
-            parallaxStrength={0.59}
-            mouseStrength={0.57}
-            paused={false}
-            dpr={1}
-          />
-        </div>
         <EnheRedesignPublicFooter locale={forceLocale} showMascot={showFooterMascot} />
       </div>
     </>
