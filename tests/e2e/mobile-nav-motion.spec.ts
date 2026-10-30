@@ -351,7 +351,6 @@ for (const route of routes) {
           .getByRole("button", { name: route.closeLabel, exact: true })
           .click();
       }
-      await expect(drawer).toHaveAttribute("data-motion-duration-ms", "190");
       await expectCapturedMotion(page, "drawer", {
         duration: 190,
         easing: "directional",

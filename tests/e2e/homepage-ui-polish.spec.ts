@@ -214,8 +214,10 @@ test("homepage polish stays readable, responsive, and interactive without extern
       expect(activeReviewBounds.width).toBeGreaterThan(width * 0.75);
     }
     const activeReviewQuote = reviews.locator('.redesign-home-review-card[data-position="0"] blockquote');
-    const initialReviewQuote = await activeReviewQuote.textContent();
     await reviews.focus();
+    await expect(reviews).toBeFocused();
+    await expect(reviews.locator(".redesign-home-reviews-track")).toHaveAttribute("aria-live", "polite");
+    const initialReviewQuote = await activeReviewQuote.textContent();
     await page.keyboard.press("ArrowRight");
     await expect.poll(() => activeReviewQuote.textContent()).not.toBe(initialReviewQuote);
     await page.keyboard.press("ArrowLeft");

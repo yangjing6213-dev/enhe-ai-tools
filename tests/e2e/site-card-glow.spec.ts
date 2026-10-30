@@ -1,8 +1,9 @@
 import { expect, test } from "@playwright/test";
 
 for (const route of ["/about", "/en/about"]) {
-  test(`About cards are compact and glow at the edges on ${route}`, async ({ page }) => {
+  test(`top-level about cards stay static and compact on ${route}`, async ({ page }) => {
     await page.goto(route);
+    await page.emulateMedia({ reducedMotion: "no-preference" });
     // Pointer coordinates must stay stable; this test is not a scroll animation test.
     await page.addStyleTag({ content: "html { scroll-behavior: auto !important; }" });
     const cards = page.locator(".about-section-grid .enhe-reference-editorial-card");
@@ -14,19 +15,18 @@ for (const route of ["/about", "/en/about"]) {
     expect(before!.height).toBeLessThan(340);
     await page.mouse.move(before!.x + before!.width / 2, before!.y + before!.height / 2);
     const effect = page.locator(".enhe-edge-effect");
-    await expect(effect).toHaveCount(1);
-    await expect(effect).toHaveCSS("pointer-events", "none");
-    await expect(effect).toHaveCSS("background-color", "rgba(0, 0, 0, 0)");
-    await expect.poll(() => card.evaluate(node => Number(node.style.getPropertyValue("--edge-proximity")))).toBeLessThan(1);
+    await expect(card).toHaveAttribute("data-top-level-card-static", "true");
+    await expect(card).toHaveCSS("transform", "none");
+    await expect(effect).toHaveCount(0);
     const edgeBounds = await card.boundingBox();
     await page.mouse.move(edgeBounds!.x + edgeBounds!.width - 2, edgeBounds!.y + edgeBounds!.height / 2);
-    await expect.poll(() => card.evaluate(node => Number(node.style.getPropertyValue("--edge-proximity")))).toBeGreaterThan(95);
-    await expect.poll(() => effect.evaluate(node => Number(getComputedStyle(node, "::before").opacity))).toBeGreaterThan(0.8);
+    await expect.poll(async () => Number(await card.evaluate(node => node.style.getPropertyValue("--edge-proximity") || "0"))).toBe(0);
+    await expect(effect).toHaveCount(0);
     const after = await card.boundingBox();
     expect(after!.width).toBe(before!.width);
     expect(after!.height).toBe(before!.height);
     await page.mouse.move(0, 0);
-    await expect.poll(() => effect.evaluate(node => Number(getComputedStyle(node, "::before").opacity))).toBe(0);
+    await expect(effect).toHaveCount(0);
     await page.setViewportSize({ width: 320, height: 900 });
     expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBe(320);
     for (const item of await cards.all()) {
@@ -35,19 +35,25 @@ for (const route of ["/about", "/en/about"]) {
   });
 }
 
-test("glow reaches public cards and dynamic account/admin cards without affecting controls", async ({ page }) => {
+test("top-level cards stay static while nested cards retain glow without affecting controls", async ({ page }) => {
   for (const route of ["/", "/ai-news", "/ai-trends", "/login"]) {
     await page.goto(route);
+    await page.emulateMedia({ reducedMotion: "no-preference" });
     await page.evaluate(() => {
       const section = document.createElement("div");
       section.id = "dynamic-glow-fixture";
       section.style.cssText = "position:fixed;top:100px;left:32px;z-index:10000;background:white";
-      section.innerHTML = '<article class="enhe-admin-card" style="padding:24px;width:280px;height:160px">Order card <button type="button">Action</button></article><div class="rounded-xl border" style="padding:24px;width:280px;height:160px">Account card</div><div data-slot="card" style="padding:24px;width:280px;height:160px">UI card</div>';
+      section.innerHTML = '<article id="outer-card" class="enhe-admin-card" style="padding:24px;width:360px;height:280px">Order card <div id="nested-ui-card" data-slot="card" style="padding:24px;width:280px;height:80px">UI card</div><div id="nested-account-card" class="rounded-xl border" style="padding:24px;width:280px;height:80px">Account card</div><button type="button">Action</button></article>';
       document.body.append(section);
     });
-    for (const selector of ["article.enhe-admin-card", ".rounded-xl.border", '[data-slot="card"]']) {
-      const card = page.locator(`#dynamic-glow-fixture ${selector}`);
-      await card.hover({ position: { x: 2, y: 80 } });
+    const outer = page.locator("#outer-card");
+    await outer.hover({ position: { x: 2, y: 12 } });
+    await expect(outer).toHaveAttribute("data-top-level-card-static", "true");
+    await expect(outer).toHaveCSS("transform", "none");
+    await expect(page.locator(".enhe-edge-effect")).toHaveCount(0);
+    for (const selector of ["#nested-ui-card", "#nested-account-card"]) {
+      const card = page.locator(selector);
+      await card.hover({ position: { x: 2, y: 40 } });
       await expect(page.locator(".enhe-edge-effect")).toHaveCount(1);
     }
     const button = page.locator("#dynamic-glow-fixture button");
@@ -60,14 +66,18 @@ test("glow reaches public cards and dynamic account/admin cards without affectin
   }
 });
 
-test("touch and reduced motion disable the glow immediately", async ({ page }) => {
+test("nested glow respects reduced motion and touch input", async ({ page }) => {
   await page.goto("/about");
-  await page.addStyleTag({ content: "html { scroll-behavior: auto !important; }" });
-  const card = page.locator(".about-section-grid article").first();
-  await card.evaluate(node => node.scrollIntoView({ behavior: "instant", block: "center" }));
-  await page.evaluate(() => new Promise<void>(resolve => requestAnimationFrame(() => requestAnimationFrame(() => resolve()))));
-  const bounds = (await card.boundingBox())!;
-  await page.mouse.move(bounds.x + 2, bounds.y + 60);
+  await page.emulateMedia({ reducedMotion: "no-preference" });
+  await page.evaluate(() => {
+    const parent = document.createElement("article");
+    parent.className = "enhe-admin-card";
+    parent.style.cssText = "position:fixed;top:100px;left:32px;width:320px;height:180px;padding:24px;z-index:10000;background:white";
+    parent.innerHTML = '<div id="nested-motion-card" data-slot="card" style="width:260px;height:100px;padding:24px">Nested card</div>';
+    document.body.append(parent);
+  });
+  const card = page.locator("#nested-motion-card");
+  await card.hover({ position: { x: 2, y: 50 } });
   await expect(page.locator(".enhe-edge-effect")).toBeVisible();
   await page.emulateMedia({ reducedMotion: "reduce" });
   await expect(page.locator(".enhe-edge-effect")).toBeHidden();

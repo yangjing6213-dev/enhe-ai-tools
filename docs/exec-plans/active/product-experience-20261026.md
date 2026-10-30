@@ -63,6 +63,16 @@ User explicitly requested implementation, push and production deployment of nine
 - Public follow-up checks confirmed the new report, source/date labels, archive access and login boundaries. Both languages played the approved video beyond one second without a media error. Remaining final-release acceptance and deployed identity are recorded in `D:/ENHE-Audits/2026-10-26/product-experience/release-receipt-20261028.json`; consult that receipt before considering another release.
 - Final phone screenshots exposed footer artwork overlapping the newly added workbench sharing controls. Reserve bottom space only on this new sharing wrapper (240px on small screens, 320px from the medium breakpoint) so the existing mascot retains its placement and motion. No other page styles or functions change. The final release receipt records the before/after browser geometry and final deployment.
 
+## Release-gate recheck — 2026-10-30
+
+- The first exact-ref release run stopped at full E2E with 17 failures; no push or deployment occurred.
+- Reproduced and corrected stale card-motion expectations: top-level cards must remain static under the existing approved UI rule, while nested cards still glow. Reduced-motion and touch cases continue to be covered.
+- Made the homepage keyboard test pause the review carousel and capture its initial quote only after focus is confirmed; this removes a race with the 3-second automatic rotation.
+- The mobile-nav close test now verifies the actual captured exit animation (duration/easing/properties) instead of checking a transient drawer attribute after its exit animation can already have unmounted it.
+- The shared-shell viewport matrix now loads each route once and resizes the same page through its viewport list, avoiding nine redundant server navigations per route while checking live responsive behavior.
+- Targeted rechecks: 16 passed, 1 intentionally skipped across the card-motion, language-switch, and AI News contrast files; homepage + three mobile drawer widths passed; both Chinese and English AI News topic routes passed the nine-width matrix.
+- The release script must still run its complete E2E suite and all other exact-ref checks before any push or deployment.
+
 ## User scope extension — 2026-10-30
 
 The user added five items to the next combined release: rename only the topic-level reply control to “评论” (keep nested reply labels), halve the footer dinosaur artwork, make login placeholders readable in dark mode, let administrators enable/disable and edit the entry popup title/body/ending, and add the supplied Gradient Waves effect above the footer. The existing page layouts and unrelated controls stay unchanged.

@@ -65,15 +65,14 @@ test("touch switch works with reduced motion", async ({ browser }) => {
   await context.close();
 });
 
-test("non-product cards retain the edge glow interaction", async ({ page }) => {
+test("top-level non-product cards remain static", async ({ page }) => {
   await page.goto("/about");
+  await page.emulateMedia({ reducedMotion: "no-preference" });
   const card = page.locator('.enhe-reference-editorial-card').first();
   await card.scrollIntoViewIfNeeded();
-  // The controller attaches after hydration; repeat a real edge gesture while waiting.
-  await expect.poll(async () => {
-    const box = (await card.boundingBox())!;
-    await page.mouse.move(box.x + 1, box.y + box.height / 2);
-    await page.mouse.move(box.x + 3, box.y + box.height / 2);
-    return page.locator('.enhe-edge-effect').isVisible();
-  }).toBe(true);
+  const box = (await card.boundingBox())!;
+  await page.mouse.move(box.x + 3, box.y + box.height / 2);
+  await expect(card).toHaveAttribute("data-top-level-card-static", "true");
+  await expect(card).toHaveCSS("transform", "none");
+  await expect(page.locator('.enhe-edge-effect')).toHaveCount(0);
 });
