@@ -385,8 +385,9 @@ describe("production release workflow", () => {
     expect(playwright).toContain('npm run dev -- --hostname ${fixtureHost} --port ${port}');
     expect(playwright).toContain('npm exec -- next dev --hostname ${fixtureHost} --port ${port}');
     expect(playwright).toContain(
-      "workers: useProductionServer ? 2 : isDatabaseFree ? 1 : undefined",
+      "workers: workerCount ?? (useProductionServer ? 2 : isDatabaseFree ? 1 : undefined)",
     );
+    expect(playwright).toContain("const configuredWorkers = process.env.PLAYWRIGHT_WORKERS?.trim();");
     expect(playwright).toContain(
       "const isDatabaseFree = !process.env.DATABASE_URL?.trim();",
     );
