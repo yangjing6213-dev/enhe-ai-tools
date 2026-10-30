@@ -136,7 +136,7 @@ function ReplyForm({ locale, postId, parentId, label }: { locale: Locale; postId
       <form action={createForumReplyAction}>
         <input type="hidden" name="postId" value={postId} />
         {parentId ? <input type="hidden" name="parentId" value={parentId} /> : null}
-        <textarea name="content" required minLength={2} maxLength={2000} placeholder={t.replyPlaceholder} />
+        <textarea name="content" data-emoji-picker="on" required minLength={2} maxLength={2000} placeholder={t.replyPlaceholder} />
         <ForumMediaEditor locale={locale} allowVideo={false} />
         <button type="submit">{t.sendReply}</button>
       </form>

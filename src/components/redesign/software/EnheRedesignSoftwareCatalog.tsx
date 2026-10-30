@@ -136,21 +136,6 @@ function renderProductionCatalog({
         />
       </div>
 
-      {listing.newReleases.length > 0 ? (
-        <CatalogSection
-          locale={locale}
-          heading={copy.sections.newReleases.heading}
-          description={
-            locale === "en"
-              ? "The newest published entries, ordered by their public release record."
-              : undefined
-          }
-          items={listing.newReleases}
-          sectionId="new-releases"
-          rail="new"
-        />
-      ) : null}
-
       {listing.featuredProducts.length > 0 ? (
         <CatalogSection
           locale={locale}

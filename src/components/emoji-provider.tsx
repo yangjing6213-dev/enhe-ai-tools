@@ -64,8 +64,15 @@ export function EmojiProvider({ children }: { children: React.ReactNode }) {
         selectionRef.current = { start: target.selectionStart, end: target.selectionEnd };
         setMessage("");
       } else {
+        if (target instanceof HTMLInputElement || target instanceof HTMLTextAreaElement) {
+          setField(null);
+          setOpen(false);
+          return;
+        }
         dismissTimer = window.setTimeout(() => {
-          if (document.activeElement instanceof HTMLInputElement || document.activeElement instanceof HTMLTextAreaElement) return;
+          const active = document.activeElement;
+          if (active && pickerRef.current?.contains(active)) return;
+          if ((active instanceof HTMLInputElement || active instanceof HTMLTextAreaElement) && isOrdinaryTextField(active)) return;
           setField(null);
           setOpen(false);
         }, 150);

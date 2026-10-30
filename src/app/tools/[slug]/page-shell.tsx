@@ -1579,6 +1579,7 @@ export async function ToolDetailPageShell({
                 <textarea
                   id="tool-comment-content"
                   name="content"
+                  data-emoji-picker="on"
                   required
                   minLength={2}
                   maxLength={1000}

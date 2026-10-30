@@ -56,11 +56,12 @@ describe("AI tools candidate catalog", () => {
     expect(renderResponse.cookies.get("enhe_locale")?.value).toBe("en");
   });
 
-  it("keeps one H1, three ordered sections, and the exact 4/3/12 section contract", () => {
+  it("keeps one H1, three ordered sections, and the exact 4/3/12 preview section contract", () => {
     const catalog = readCandidate("components/redesign/software/EnheRedesignSoftwareCatalog.tsx");
     const previewCatalog = readCandidate(
       "components/redesign/software/EnheRedesignSoftwarePreviewCatalog.tsx",
     );
+    const previewBranch = catalog.split("function renderPreviewCatalog")[1] ?? "";
 
     const sectionOrder = [
       'sectionId="new-releases"',
@@ -70,7 +71,7 @@ describe("AI tools candidate catalog", () => {
 
     let lastIndex = -1;
     for (const marker of sectionOrder) {
-      const nextIndex = catalog.indexOf(marker);
+      const nextIndex = previewBranch.indexOf(marker);
       expect(nextIndex, `missing or misordered marker: ${marker}`).toBeGreaterThan(lastIndex);
       lastIndex = nextIndex;
     }

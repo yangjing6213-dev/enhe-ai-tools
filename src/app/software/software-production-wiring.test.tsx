@@ -91,7 +91,10 @@ describe("production software route wiring", () => {
     expect(productionBranch).not.toContain("hidden=");
   });
 
-  it("server-renders one H1 and the initial public product semantics without candidate text or private download paths", () => {
+  it.each([
+    ["zh", "/software"],
+    ["en", "/en/software"],
+  ] as const)("renders the %s catalog without new-release recommendations while keeping catalog controls", (locale, basePath) => {
     const item = {
       id: "public-tool",
       type: "software" as const, secondaryName: null, isPaid: true, highlights: ["Software app", "Paid download"], downloadCount: 0, usageCount: 0,
@@ -99,34 +102,48 @@ describe("production software route wiring", () => {
       name: "Public AI Video Tool",
       description: "Creates a practical video draft from approved source material.",
       price: "¥19.00",
-      detailHref: "/en/software/public-ai-video-tool",
+      detailHref: `${basePath}/public-ai-video-tool`,
       media: null,
     };
     const listing: SoftwareCatalogPage = {
       items: [item],
       newReleases: [item],
       featuredProducts: [item],
-      total: 1,
-      page: 1,
-      pageSize: 12,
-      totalPages: 1,
-      hasPrevious: false,
-      hasNext: false,
-      previousHref: null,
-      nextHref: null,
+      total: 3,
+      page: 2,
+      pageSize: 1,
+      totalPages: 3,
+      hasPrevious: true,
+      hasNext: true,
+      previousHref: `${basePath}?category=video&q=Public`,
+      nextHref: `${basePath}?category=video&page=3&q=Public`,
     };
     const html = renderToStaticMarkup(
       React.createElement(EnheRedesignSoftwareCatalog, {
-        locale: "en",
+        locale,
         mode: "production",
         listing,
+        selectedCategory: "video",
+        initialQuery: "Public",
       }),
     );
 
     expect(html.match(/<h1(?:\s[^>]*)?>/g)).toHaveLength(1);
     expect(html).toContain("data-production-catalog");
     expect(html).toContain("Public AI Video Tool");
-    expect(html).toContain('href="/en/software/public-ai-video-tool"');
+    expect(html).toContain(`href="${basePath}/public-ai-video-tool"`);
+    expect(html).not.toContain('data-section="new-releases"');
+    expect(html).not.toContain('data-horizontal-cards="new"');
+    expect(html).not.toMatch(/最新推荐|New releases/);
+    expect(html).toContain('data-section="featured-products"');
+    expect(html).toContain('data-section="all-products"');
+    expect(html).toContain('data-selected-category="video"');
+    expect(html).toContain('role="search"');
+    expect(html).toContain('name="q"');
+    expect(html).toContain('value="Public"');
+    expect(html).toContain(`action="${basePath}"`);
+    expect(html).toContain(`href="${basePath}?category=video&amp;q=Public" rel="prev"`);
+    expect(html).toContain(`href="${basePath}?category=video&amp;page=3&amp;q=Public" rel="next"`);
     expect(html).toContain('role="list"');
     expect(html).toContain('aria-labelledby="all-products-heading"');
     expect(html).toContain('role="listitem"');

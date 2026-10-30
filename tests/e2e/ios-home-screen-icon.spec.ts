@@ -14,7 +14,7 @@ for (const path of ["/", "/en"]) {
     const link = page.locator('head link[rel="apple-touch-icon"]');
     await expect(link).toHaveCount(1);
     await expect(link).toHaveAttribute("sizes", "180x180");
-    await expect(link).toHaveAttribute("href", "/apple-touch-icon-20261016.png");
+    await expect(link).toHaveAttribute("href", "/apple-touch-icon-20261030.png");
 
     const declared = await request.get((await link.getAttribute("href"))!);
     expect(declared.status()).toBe(200);
@@ -22,6 +22,9 @@ for (const path of ["/", "/en"]) {
     const bytes = await declared.body();
     const metadata = await sharp(bytes).metadata();
     expect(metadata).toMatchObject({ format: "png", width: 180, height: 180, hasAlpha: false });
+    const lowerEdge = await sharp(bytes).extract({ left: 90, top: 178, width: 1, height: 1 }).raw().toBuffer();
+    expect(lowerEdge[0]).toBeLessThan(50);
+    expect(lowerEdge[2]).toBeGreaterThan(200);
 
     const fallback = await request.get("/apple-touch-icon.png");
     expect(fallback.status()).toBe(200);

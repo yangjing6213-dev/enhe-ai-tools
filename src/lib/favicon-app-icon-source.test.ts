@@ -33,7 +33,7 @@ describe("favicon and app icon source contract", () => {
     expect(sharedRootMetadata.manifest).toBe("/manifest.webmanifest");
     expect(sharedRootMetadata.icons).toMatchObject({
       shortcut: `/favicon.ico${version}`,
-      apple: [{ url: "/apple-touch-icon-20261016.png", type: "image/png", sizes: "180x180" }]
+      apple: [{ url: "/apple-touch-icon-20261030.png", type: "image/png", sizes: "180x180" }]
     });
     expect(manifest().icons?.map(icon => icon.src)).toEqual([
       `/icon-192.png${version}`, `/icon-512.png${version}`
@@ -46,9 +46,21 @@ describe("favicon and app icon source contract", () => {
     }
   });
 
-  it("provides an opaque Apple home-screen icon and the conventional root fallback", async () => {
-    const expected = await sharp(source).resize(180, 180).flatten({ background: "#fff" }).raw().toBuffer();
-    for (const file of ["apple-touch-icon-20261016.png", "apple-touch-icon.png", "apple-icon.png"]) {
+  it("removes only the transparent outer margin from opaque Apple home-screen icons", async () => {
+    const crop = { left: 81, top: 81, width: 1092, height: 1092 };
+    const { data, info } = await sharp(source).ensureAlpha().raw().toBuffer({ resolveWithObject: true });
+    let maxDiscardedAlpha = 0;
+    for (let y = 0; y < info.height; y += 1) {
+      for (let x = 0; x < info.width; x += 1) {
+        if (x < crop.left || x >= crop.left + crop.width || y < crop.top || y >= crop.top + crop.height) {
+          maxDiscardedAlpha = Math.max(maxDiscardedAlpha, data[(y * info.width + x) * 4 + 3]);
+        }
+      }
+    }
+    // Keep all visible artwork, including its original pale background and rounded corners.
+    expect(maxDiscardedAlpha).toBeLessThan(16);
+    const expected = await sharp(source).extract(crop).resize(180, 180).flatten({ background: "#fff" }).raw().toBuffer();
+    for (const file of ["apple-touch-icon-20261030.png", "apple-touch-icon.png", "apple-icon.png"]) {
       const icon = sharp(join(process.cwd(), "public", file));
       const metadata = await icon.metadata();
       expect(metadata.format).toBe("png");
@@ -56,6 +68,11 @@ describe("favicon and app icon source contract", () => {
       expect(metadata.height).toBe(180);
       expect(metadata.hasAlpha).toBe(false);
       expect((await icon.raw().toBuffer()).equals(expected)).toBe(true);
+      const lowerEdge = await sharp(join(process.cwd(), "public", file))
+        .extract({ left: 90, top: 178, width: 1, height: 1 }).raw().toBuffer();
+      // The blue mascot reaches the lower edge instead of sitting above a white strip.
+      expect(lowerEdge[0]).toBeLessThan(50);
+      expect(lowerEdge[2]).toBeGreaterThan(200);
     }
   });
 

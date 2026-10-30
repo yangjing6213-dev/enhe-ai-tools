@@ -56,13 +56,16 @@ describe("ordinary text insertion", () => {
     expect(insertEmojiAtCaret("ab", 1, 1, ":enhe_01:", 5)).toBeNull();
   });
 
-  it("covers usernames/search/body while excluding structured and secret fields", () => {
+  it("requires explicit comment-field opt-in and still excludes structured and secret fields", () => {
     const field = (props: Record<string, unknown> = {}) => ({ tagName: "INPUT", type: "text", name: "nickname", id: "", disabled: false, readOnly: false, pattern: "", inputMode: "", autocomplete: "", dataset: {}, ...props });
-    expect(isOrdinaryTextField(field())).toBe(true);
-    expect(isOrdinaryTextField(field({ name: "q", type: "search" }))).toBe(true);
-    expect(isOrdinaryTextField(field({ tagName: "TEXTAREA", name: "content" }))).toBe(true);
+    expect(isOrdinaryTextField(field())).toBe(false);
+    expect(isOrdinaryTextField(field({ name: "q", type: "search" }))).toBe(false);
+    expect(isOrdinaryTextField(field({ tagName: "TEXTAREA", name: "content" }))).toBe(false);
+    expect(isOrdinaryTextField(field({ tagName: "TEXTAREA", name: "content", dataset: { emojiPicker: "on" } }))).toBe(true);
+    expect(isOrdinaryTextField(field({ tagName: "TEXTAREA", name: "content", id: "tool-comment-content", dataset: { emojiPicker: "on" } }))).toBe(true);
+    expect(isOrdinaryTextField(field({ tagName: "TEXTAREA", name: "content", dataset: { emojiPicker: "off" } }))).toBe(false);
     for (const props of [{ type: "email" }, { type: "password" }, { type: "tel" }, { name: "toolId" }, { name: "slug" }, { name: "apiKey" }, { name: "email" }, { name: "coverImage" }, { name: "relatedTagIds" }, { name: "filePath" }, { placeholder: "https://example.com" }, { pattern: "[0-9]+" }, { disabled: true }, { readOnly: true }, { inputMode: "numeric" }]) {
-      expect(isOrdinaryTextField(field(props))).toBe(false);
+      expect(isOrdinaryTextField(field({ dataset: { emojiPicker: "on" }, ...props }))).toBe(false);
     }
   });
 });

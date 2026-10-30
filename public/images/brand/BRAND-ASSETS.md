@@ -10,6 +10,6 @@ Regenerate favicon ICO (16/32/48/64 px), app icons (192/512 px), Apple icon (180
 node scripts/generate-enhe-brand-assets.mjs
 ```
 
-Apple home-screen icons use an opaque white background. Metadata declares the versioned filename `apple-touch-icon-20261016.png`; `apple-touch-icon.png` supplies Apple's conventional root fallback, and `apple-icon.png` remains a compatible legacy URL. Browser favicon and manifest icons retain their original transparency.
+Apple home-screen icons use an opaque white background. The Apple-only derivative crops the source's transparent outer margin to the square `(81, 81, 1092, 1092)` before resizing to 180 px; all source pixels with alpha at least 16/255 remain inside that crop. The original pale background, rounded corners, colors and mascot are retained. Metadata declares `apple-touch-icon-20261030.png`; `apple-touch-icon.png` supplies Apple's conventional root fallback, and `apple-icon.png` remains a compatible legacy URL. The old `apple-touch-icon-20261016.png` remains available for existing references. Browser favicon and manifest icons retain their original transparency and dimensions.
 
 The old orange icon generator predates this artwork and must not be used to regenerate these mascot assets.

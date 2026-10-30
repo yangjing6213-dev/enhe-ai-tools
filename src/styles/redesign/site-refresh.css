@@ -1208,7 +1208,12 @@ body .redesign-footer nav {
 
   .footer-navigation {
     flex-wrap: wrap;
+    justify-content: center;
     gap: 8px 20px;
+  }
+
+  .redesign-footer .footer-bottom .footer-copyright-filings {
+    margin-inline: var(--support-exclusion-applied, 0px);
   }
 }
 

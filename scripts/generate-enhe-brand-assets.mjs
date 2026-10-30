@@ -10,9 +10,11 @@ for (const [size, path] of [[192, "icon-192.png"], [512, "icon-512.png"]]) {
   await writeFile(resolve("public", path), await resizeIcon(size));
 }
 
-// Keep an opaque Apple-specific tile, a fresh declared URL, and Apple's root fallback.
-const appleIcon = await sharp(source).resize(180, 180).flatten({ background: "#fff" }).png().toBuffer();
-for (const path of ["apple-touch-icon-20261016.png", "apple-touch-icon.png", "apple-icon.png"]) {
+// Remove the supplied source's transparent outer margin before Apple's white flattening.
+// This source-specific square preserves the artwork's pale background and rounded corners.
+const appleIcon = await sharp(source).extract({ left: 81, top: 81, width: 1092, height: 1092 })
+  .resize(180, 180).flatten({ background: "#fff" }).png().toBuffer();
+for (const path of ["apple-touch-icon-20261030.png", "apple-touch-icon.png", "apple-icon.png"]) {
   await writeFile(resolve("public", path), appleIcon);
 }
 

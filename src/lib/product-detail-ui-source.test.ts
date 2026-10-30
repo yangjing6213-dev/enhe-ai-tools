@@ -5,6 +5,11 @@ import { describe, expect, it } from "vitest";
 const root = resolve(__dirname, "../..");
 
 describe("product detail UI source", () => {
+  it("opts the shared product review textarea into the comment-only emoji picker", () => {
+    const pageSource = readFileSync(resolve(root, "src/app/tools/[slug]/page-shell.tsx"), "utf8");
+    const commentField = pageSource.match(/<textarea\s+id="tool-comment-content"[\s\S]*?\/>/)?.[0];
+    expect(commentField).toContain('data-emoji-picker="on"');
+  });
   it("keeps product FAQ visible above comments without rendering empty disclosure cards", () => {
     const pageSource = readFileSync(
       resolve(root, "src/app/tools/[slug]/page-shell.tsx"),

@@ -13,7 +13,7 @@ type TextFieldDescription = {
 };
 
 export function isOrdinaryTextField(field: TextFieldDescription) {
-  if (!["INPUT", "TEXTAREA"].includes(field.tagName) || field.disabled || field.readOnly || field.dataset?.emojiPicker === "off") return false;
+  if (!["INPUT", "TEXTAREA"].includes(field.tagName) || field.disabled || field.readOnly || field.dataset?.emojiPicker !== "on") return false;
   if (field.tagName === "INPUT" && !["text", "search"].includes(field.type || "text")) return false;
   if (field.pattern || ["email", "url", "tel", "numeric", "decimal"].includes(field.inputMode || "")) return false;
   if (/password|one-time-code|email|tel|cc-|bday/.test(field.autocomplete || "")) return false;

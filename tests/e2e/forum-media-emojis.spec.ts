@@ -118,17 +118,9 @@ test("images, playable video and replies become public immediately after publish
   const title = `附件话题 ${prefix}`;
   await page.getByLabel("标题", { exact: true }).fill(title);
   const content = page.getByLabel("内容", { exact: true });
-  await content.fill("这是一条图片和视频测试话题 ");
+  await content.fill("这是一条图片和视频测试话题 :enhe_01:");
   await content.click();
-  await page.getByRole("button", { name: "插入表情", exact: true }).click();
-  await page.getByRole("button", { name: "插入出发表情", exact: true }).click();
-  await expect(content).toHaveValue(/:enhe_01:/);
-  const emojiButton = page.getByRole("button", { name: "插入表情", exact: true });
-  await expect(emojiButton).toHaveCSS("position", "static");
-  const contentBounds = (await content.boundingBox())!;
-  const emojiBounds = (await emojiButton.boundingBox())!;
-  expect(emojiBounds.y).toBeGreaterThanOrEqual(contentBounds.y + contentBounds.height);
-  expect(Math.abs(emojiBounds.x - contentBounds.x)).toBeLessThanOrEqual(2);
+  await expect(page.getByRole("button", { name: "插入表情", exact: true })).toHaveCount(0);
   let releaseUpload!: () => void;
   const uploadGate = new Promise<void>((resolve) => { releaseUpload = resolve; });
   await page.route("**/api/forum/media", async (route) => { await uploadGate; await route.continue(); });
@@ -162,7 +154,17 @@ test("images, playable video and replies become public immediately after publish
   await expect(page.locator(".forum-media-display__video")).not.toHaveAttribute("autoplay");
   await page.locator(".forum-section-heading .forum-reply-form > summary").click();
   const form = page.locator(".forum-section-heading .forum-reply-form form");
-  await form.locator("textarea").fill("这是一条带图片的回复 :enhe_02:");
+  const replyContent = form.locator("textarea");
+  await replyContent.fill("这是一条带图片的回复 ");
+  const emojiButton = page.getByRole("button", { name: "插入表情", exact: true });
+  await emojiButton.click();
+  await page.getByRole("button", { name: "插入挥手表情", exact: true }).click();
+  await expect(replyContent).toHaveValue(/:enhe_02:/);
+  await expect(emojiButton).toHaveCSS("position", "static");
+  const contentBounds = (await replyContent.boundingBox())!;
+  const emojiBounds = (await emojiButton.boundingBox())!;
+  expect(emojiBounds.y).toBeGreaterThanOrEqual(contentBounds.y + contentBounds.height);
+  expect(Math.abs(emojiBounds.x - contentBounds.x)).toBeLessThanOrEqual(2);
   const postWidth = (await page.locator(".forum-post-detail").boundingBox())!.width;
   const replyFormWidth = (await form.boundingBox())!.width;
   expect(Math.abs(postWidth - replyFormWidth)).toBeLessThanOrEqual(2);
@@ -182,14 +184,13 @@ test("images, playable video and replies become public immediately after publish
   await guest.close();
 });
 
-test("ordinary text fields accept managed stickers and only administrators manage assets", async ({ page, browser, baseURL }) => {
+test("non-comment fields hide sticker pickers while existing stickers and admin asset management remain usable", async ({ page, browser, baseURL }) => {
   expect((await page.request.get("/api/admin/emojis")).status()).toBe(403);
   await page.goto("/user");
   const name = page.getByLabel("用户名", { exact: true });
-  await name.fill("测试");
+  await name.fill("测试:enhe_02:");
   await name.click();
-  await page.getByRole("button", { name: "插入表情", exact: true }).click();
-  await page.getByRole("button", { name: "插入挥手表情", exact: true }).click();
+  await expect(page.getByRole("button", { name: "插入表情", exact: true })).toHaveCount(0);
   await expect(name).toHaveValue("测试:enhe_02:");
   await page.getByRole("button", { name: "保存用户名", exact: true }).click();
   await expect.poll(async () => (await db.user.findUniqueOrThrow({ where: { id: userId } })).nickname).toBe("测试:enhe_02:");
@@ -209,11 +210,10 @@ test("ordinary text fields accept managed stickers and only administrators manag
   const label = adminPage.locator(".enhe-emoji-admin-row").first().locator('input').first();
   await label.fill("出发测试");
   await label.focus();
-  await adminPage.getByRole("button", { name: "插入表情", exact: true }).click();
-  await adminPage.getByRole("button", { name: "插入出发表情", exact: true }).click();
+  await expect(adminPage.getByRole("button", { name: "插入表情", exact: true })).toHaveCount(0);
   await label.press("End");
   await label.pressSequentially("字");
-  await expect(label).toHaveValue(/:enhe_01:字$/);
+  await expect(label).toHaveValue("出发测试字");
   await adminPage.getByRole("button", { name: "保存目录", exact: true }).click();
   await expect(adminPage.getByRole("status")).toContainText("已保存");
   await expect(adminPage.getByRole("button", { name: "保存目录", exact: true })).toHaveCSS("color", "rgb(255, 255, 255)");

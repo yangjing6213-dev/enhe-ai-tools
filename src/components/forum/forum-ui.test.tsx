@@ -15,6 +15,16 @@ const post = {
 } as unknown as Parameters<typeof ForumPostContent>[0]["post"];
 
 describe("forum public surfaces", () => {
+  it("enables stickers only in topic comments and nested replies, not topic creation", () => {
+    for (const locale of ["zh", "en"] as const) {
+      const detail = renderToStaticMarkup(<ForumPostContent locale={locale} post={post} isAuthenticated replySubmitted={false} />);
+      const replyFields = detail.match(/<textarea[^>]*>/g) ?? [];
+      expect(replyFields).toHaveLength(3);
+      expect(replyFields.every(field => field.includes('data-emoji-picker="on"'))).toBe(true);
+      const newPost = renderToStaticMarkup(<ForumNewPostContent locale={locale} isAuthenticated />);
+      expect(newPost).not.toContain('data-emoji-picker="on"');
+    }
+  });
   it("offers topic deletion on both surfaces only to signed-in administrators", () => {
     const listPosts = [post] as unknown as Parameters<typeof ForumIndexContent>[0]["posts"];
     const adminList = renderToStaticMarkup(<ForumIndexContent locale="zh" posts={listPosts} isAuthenticated isAdmin />);

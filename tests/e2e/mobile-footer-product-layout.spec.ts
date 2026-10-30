@@ -11,12 +11,13 @@ const productStyles = [
 ].map((path) => readFileSync(resolve(process.cwd(), path), "utf8")).join("\n");
 
 for (const locale of ["zh", "en"] as const) {
-  test(`footer logo and social links stay centered on mobile (${locale})`, async ({ page }) => {
+  test(`footer content stays centered on mobile (${locale})`, async ({ page }) => {
     await page.goto(locale === "en" ? "/en" : "/");
     const footer = page.locator(".redesign-footer");
     await expect(footer.locator(".footer-social-links a")).toHaveCount(3);
+    await expect(footer.locator(".redesign-footer-mascot")).toBeVisible();
 
-    for (const width of [320, 390, 767, 768, 1440]) {
+    for (const width of [320, 390, 430, 767, 768, 1440]) {
       await page.setViewportSize({ width, height: 900 });
       await footer.scrollIntoViewIfNeeded();
       await expect.poll(() => footer.locator(".footer-brand-logo").evaluate((image) =>
@@ -25,11 +26,27 @@ for (const locale of ["zh", "en"] as const) {
       const layout = await footer.evaluate((element) => {
         const bounds = (selector: string) =>
           element.querySelector(selector)!.getBoundingClientRect().toJSON();
+        const headingRange = document.createRange();
+        headingRange.selectNodeContents(element.querySelector(".redesign-home-brand-value-inner h2")!);
+        const navigationRows = new Map<number, { left: number; right: number }>();
+        for (const item of element.querySelectorAll(".footer-navigation > nav")) {
+          const box = item.getBoundingClientRect();
+          const row = navigationRows.get(box.top);
+          navigationRows.set(box.top, {
+            left: Math.min(row?.left ?? box.left, box.left),
+            right: Math.max(row?.right ?? box.right, box.right),
+          });
+        }
         return {
           logo: bounds(".footer-brand-logo"),
           socials: bounds(".footer-social-links"),
           value: bounds(".redesign-home-brand-value"),
           navigation: bounds(".footer-navigation"),
+          navigationCenters: [...navigationRows.values()].map((row) => (row.left + row.right) / 2),
+          headingCenters: [...headingRange.getClientRects()].map((line) => line.x + line.width / 2),
+          filings: bounds(".footer-copyright-filings"),
+          filingLinks: [...element.querySelectorAll(".footer-copyright-filings a")].map((link) => link.getBoundingClientRect().toJSON()),
+          supportLeft: document.querySelector('button[aria-controls="customer-support-panel"]')!.getBoundingClientRect().left,
           pageWidth: document.documentElement.scrollWidth,
         };
       });
@@ -41,6 +58,14 @@ for (const locale of ["zh", "en"] as const) {
         expect(Math.abs(layout.socials.x + layout.socials.width / 2 - width / 2)).toBeLessThanOrEqual(1);
         expect(layout.logo.x).toBeGreaterThanOrEqual(0);
         expect(layout.logo.right).toBeLessThanOrEqual(width);
+        for (const center of [...layout.headingCenters, ...layout.navigationCenters, layout.filings.x + layout.filings.width / 2]) {
+          expect(Math.abs(center - width / 2), `footer content center at ${width}px`).toBeLessThanOrEqual(1);
+        }
+        expect(layout.filings.right, `filings keep the customer support lane at ${width}px`).toBeLessThanOrEqual(layout.supportLeft - 8);
+        for (const link of layout.filingLinks) {
+          expect(link.x).toBeGreaterThanOrEqual(layout.filings.x);
+          expect(link.right).toBeLessThanOrEqual(layout.filings.right);
+        }
       } else if (width >= 1280) {
         expect(layout.logo.right).toBeLessThan(layout.value.left);
         expect(layout.value.right).toBeLessThan(layout.navigation.left);

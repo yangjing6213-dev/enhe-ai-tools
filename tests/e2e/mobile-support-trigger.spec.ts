@@ -172,7 +172,7 @@ test("uses a 44px icon-only launcher on bilingual mobile software routes", async
   }
 });
 
-test("does not cover the first new-release detail link at the mobile card state", async ({
+test("does not cover the first all-products detail link at the mobile card state", async ({
   page,
 }) => {
   test.skip(!hasProductCatalogTestDatabase, productCatalogSkipReason);
@@ -181,7 +181,7 @@ test("does not cover the first new-release detail link at the mobile card state"
   for (const route of mobileRoutes) {
     await openFormalRoute(page, route.path);
     const launcher = page.getByRole("button", { name: route.label, exact: true });
-    const firstCard = page.locator('[data-section="new-releases"] [data-catalog-card]').first();
+    const firstCard = page.locator('[data-section="all-products"] [data-catalog-card]').first();
     const detailLink = firstCard.locator(".redesign-software-card-link");
 
     await expect(detailLink).toBeVisible();
@@ -198,7 +198,7 @@ test("does not cover the first new-release detail link at the mobile card state"
     const linkRect = await rect(detailLink);
     expect(
       intersects(launcherRect, linkRect),
-      `${route.path} launcher intersects the first new-release detail link: ${JSON.stringify({ launcherRect, linkRect })}`,
+      `${route.path} launcher intersects the first all-products detail link: ${JSON.stringify({ launcherRect, linkRect })}`,
     ).toBe(false);
   }
 });
@@ -409,12 +409,6 @@ for (const viewportSize of mobileViewports) {
       );
 
       for (const state of [
-        {
-          name: "new releases",
-          anchor: '[data-section="new-releases"] [data-catalog-card]',
-          targets: '[data-section="new-releases"] .redesign-software-card-link',
-          block: "end" as const,
-        },
         {
           name: "featured products",
           anchor: '[data-section="featured-products"] [data-catalog-card]',
@@ -674,11 +668,6 @@ test("keeps component exclusions aligned with a non-zero right safe area", async
     expect(Math.abs(390 - launcherBounds.right - 40)).toBeLessThanOrEqual(0.1);
 
     for (const state of [
-      {
-        name: "new releases",
-        anchor: '[data-section="new-releases"] [data-catalog-card]',
-        targets: '[data-section="new-releases"] .redesign-software-card-link',
-      },
       {
         name: "featured products",
         anchor: '[data-section="featured-products"] [data-catalog-card]',

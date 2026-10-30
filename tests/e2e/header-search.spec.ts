@@ -29,7 +29,7 @@ test("public header replaces the search link, opens recommendations, and submits
       await expect(footer.locator(".redesign-home-brand-value-cta")).toHaveCount(0);
       await expect(footer.locator(".redesign-home-brand-value-inner h2")).toHaveCSS("color", "rgb(255, 255, 255)");
       await expect(footer.locator(".redesign-home-brand-value")).toHaveCSS("background-color", "rgba(0, 0, 0, 0)");
-      await expect(footer.locator(".footer-navigation")).toHaveCSS("justify-content", "flex-end");
+      await expect(footer.locator(".footer-navigation")).toHaveCSS("justify-content", width < 768 ? "center" : "flex-end");
       if (width >= 1280) {
         const logoPositionError = await footer.evaluate((element) => {
           const logo = element.querySelector<HTMLElement>(".footer-brand-logo")!.getBoundingClientRect();

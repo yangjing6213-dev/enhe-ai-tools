@@ -123,7 +123,7 @@ describe("AI GEO foundations", () => {
     expect(software).toContain("buildSoftwareCollectionSchema");
     expect(software).toContain('"@type": "ItemList"');
     expect(softwareCatalog).toContain("copy.page.intro");
-    expect(softwareCatalog).toContain("listing.newReleases");
+    expect(softwareCatalog).not.toContain("listing.newReleases");
     expect(softwareCatalog).toContain("listing.featuredProducts");
     expect(softwareCatalog).toContain("listing.items");
     expect(softwareCard).toContain("href={product.detailHref}");

@@ -6,17 +6,16 @@ test.beforeEach(async ({ context, baseURL }) => {
   await context.addCookies([{ name: "enhe_session", value: "fixture-only", url: baseURL! }]);
 });
 
-test("product copy supports insertion at the caret and preserves emoji in submitted form data", async ({ page }) => {
+test("product copy has no emoji menu and preserves typed emoji in submitted form data", async ({ page }) => {
   await page.goto("/admin/software/local-visual-tool", { waitUntil: "networkidle" });
   const field = page.locator('textarea[name="content"]');
   await expect(field).toBeVisible();
   await field.fill("First\n\n  Second 👨‍👩‍👧‍👦");
-  await field.evaluate(node => { node.focus(); (node as HTMLTextAreaElement).setSelectionRange(5, 5); });
   const root = field.locator("..");
-  await root.locator("summary").click();
-  await root.getByRole("button", { name: "插入 ✅", exact: true }).click();
-  await expect(field).toHaveValue("First✅\n\n  Second 👨‍👩‍👧‍👦");
-  expect(await field.evaluate(node => new FormData((node as HTMLTextAreaElement).form!).get("content"))).toBe("First✅\n\n  Second 👨‍👩‍👧‍👦");
+  await expect(root.locator("summary")).toHaveCount(0);
+  await expect(field).toHaveAccessibleName(/\S/);
+  await expect(field).toHaveValue("First\n\n  Second 👨‍👩‍👧‍👦");
+  expect(await field.evaluate(node => new FormData((node as HTMLTextAreaElement).form!).get("content"))).toBe("First\n\n  Second 👨‍👩‍👧‍👦");
   expect(await field.evaluate(node => getComputedStyle(node).fontFamily)).toContain("Segoe UI Emoji");
   const images = page.locator('input[name="existingScreenshots"]');
   expect(await images.count()).toBe(2);
@@ -43,14 +42,15 @@ test("video uploads block premature saves and bind the finished URL", async ({ p
   await expect(page.locator('[aria-busy="true"]')).toHaveCount(0);
 });
 
-test("related copy editors expose editable emoji-enabled text and bound fields", async ({ page }) => {
-  for (const [route, field] of [["tutorials/local-visual-tutorial", "content"], ["faqs/local-visual-faq", "answer"], ["changelogs/local-visual-changelog", "content"]]) {
+test("related copy editors preserve text and bound labels without emoji menus", async ({ page }) => {
+  for (const [route, field, label] of [["tutorials/local-visual-tutorial", "content", "教程正文"], ["faqs/local-visual-faq", "answer", "答案"], ["changelogs/local-visual-changelog", "content", "更新内容"]]) {
     await page.goto(`/admin/${route}`, { waitUntil: "networkidle" });
     const input = page.locator(`textarea[name="${field}"]`);
     await expect(input).toBeVisible();
+    await expect(input).toHaveAccessibleName(label);
     await input.fill("Hello ✅\n\n  Details 🚀");
     expect(await input.evaluate(node => new FormData((node as HTMLTextAreaElement).form!).get((node as HTMLTextAreaElement).name))).toBe("Hello ✅\n\n  Details 🚀");
-    await expect(input.locator("..").locator("summary")).toContainText("插入表情");
+    await expect(input.locator("..").locator("summary")).toHaveCount(0);
   }
 });
 
