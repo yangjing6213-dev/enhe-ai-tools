@@ -34,6 +34,14 @@ for (const route of ["/ai-news", "/en/ai-news"] as const) {
         card.append(title, summary, action);
         main.append(card);
 
+        // Exercise a genuinely nested card separately from the static
+        // top-level news card, matching the site's two motion rules.
+        const nestedPanel = document.createElement("section");
+        nestedPanel.className = "glass rounded-2xl p-5";
+        nestedPanel.dataset.testid = "nested-news-card-fixture";
+        nestedPanel.append(card.cloneNode(true));
+        main.append(nestedPanel);
+
         // The DB-free listing is a preview, so exercise the production CTA's
         // descendant text-fill cascade alongside the synthetic content card.
         if (!main.querySelector(".ai-news-subscribe-action")) {
@@ -86,11 +94,20 @@ for (const route of ["/ai-news", "/en/ai-news"] as const) {
       });
       expect(subscribeInk).toEqual({ background: "rgb(4, 98, 194)", fill: "rgb(255, 255, 255)" });
 
-      const card = page.locator(".ai-news-interactive-card");
+      const topLevelCard = page.locator("main.ai-news-page > .ai-news-interactive-card");
+      await expect.poll(async () => {
+        await topLevelCard.hover();
+        return topLevelCard.getAttribute("data-top-level-card-static");
+      }).toBe("true");
+      await expect.poll(() => topLevelCard.evaluate((element) => getComputedStyle(element).transform)).toBe("none");
+
+      const card = page.getByTestId("nested-news-card-fixture").locator(".ai-news-interactive-card");
       const action = card.locator("button.ai-news-action");
-      await card.hover();
       await expect
-        .poll(() => card.evaluate((element) => getComputedStyle(element).transform))
+        .poll(async () => {
+          await card.hover();
+          return card.evaluate((element) => getComputedStyle(element).transform);
+        })
         .not.toBe("none");
       await action.hover();
       await expect
