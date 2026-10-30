@@ -343,37 +343,39 @@ async function expectSupportClearOf(
   await target.evaluate((element) =>
     element.scrollIntoView({ behavior: "instant", block: "end", inline: "nearest" }),
   );
-  await page.evaluate(
-    () =>
-      new Promise((resolve) =>
-        requestAnimationFrame(() => requestAnimationFrame(resolve)),
-      ),
-  );
-
-  const { supportBox, targetBoxes } = await support.evaluate((launcher, targetSelector) => {
-    const supportRect = launcher.getBoundingClientRect();
-    return {
-      supportBox: { x: supportRect.x, y: supportRect.y, width: supportRect.width, height: supportRect.height },
-      targetBoxes: Array.from(document.querySelectorAll(targetSelector)).flatMap((element) => {
-        const style = getComputedStyle(element);
-        const rect = element.getBoundingClientRect();
-        return style.display !== "none" &&
-          style.visibility !== "hidden" &&
-          rect.width > 0 &&
-          rect.height > 0
-          ? [{ x: rect.x, y: rect.y, width: rect.width, height: rect.height }]
-          : [];
-      }),
-    };
-  }, selector);
-  expect(supportBox, `${label} support box`).not.toBeNull();
-  expect(targetBoxes.length, `${label} visible target count`).toBeGreaterThan(0);
-  for (const targetBox of targetBoxes) {
-    expect(
-      intersectionArea(supportBox ?? { x: 0, y: 0, width: 0, height: 0 }, targetBox),
-      `${label} support intersection`,
-    ).toBe(0);
-  }
+  await expect.poll(
+    async () => {
+      const { supportBox, targetBoxes } = await support.evaluate((launcher, targetSelector) => {
+        const supportRect = launcher.getBoundingClientRect();
+        return {
+          supportBox: { x: supportRect.x, y: supportRect.y, width: supportRect.width, height: supportRect.height },
+          targetBoxes: Array.from(document.querySelectorAll(targetSelector)).flatMap((element) => {
+            const style = getComputedStyle(element);
+            const rect = element.getBoundingClientRect();
+            return style.display !== "none" &&
+              style.visibility !== "hidden" &&
+              rect.width > 0 &&
+              rect.height > 0
+              ? [{ x: rect.x, y: rect.y, width: rect.width, height: rect.height }]
+              : [];
+          }),
+        };
+      }, selector);
+      const overlaps = targetBoxes.map((targetBox) =>
+        intersectionArea(
+          supportBox ?? { x: 0, y: 0, width: 0, height: 0 },
+          targetBox,
+        ),
+      );
+      return {
+        clear: Boolean(supportBox) && targetBoxes.length > 0 && overlaps.every((area) => area === 0),
+        supportBox,
+        targetBoxes,
+        overlaps,
+      };
+    },
+    { message: `${label} support clears visible targets`, timeout: 10_000 },
+  ).toMatchObject({ clear: true });
 }
 
 function currentProduct(page: Page) {
