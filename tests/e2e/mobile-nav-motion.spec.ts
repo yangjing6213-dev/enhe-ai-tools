@@ -568,10 +568,20 @@ test("repeated close intents let the active exit finish", async ({ page }) => {
 
   await trigger.click();
   await expect(drawer).toBeVisible();
+  await expect.poll(() => drawerTranslateX(page)).toBeLessThanOrEqual(1);
   await overlay.click({ position: { x: 8, y: 100 } });
   await expect(drawer).toHaveAttribute("data-motion-phase", "close");
   await page.waitForTimeout(25);
-  await overlay.dispatchEvent("click", { detail: 1 });
+  const repeatedCloseDelivered = await page.evaluate(() => {
+    const activeOverlay = document.querySelector<HTMLElement>(
+      ".redesign-menu-overlay",
+    );
+    if (!activeOverlay) return false;
+    return activeOverlay.dispatchEvent(
+      new MouseEvent("click", { bubbles: true, detail: 1 }),
+    );
+  });
+  expect(repeatedCloseDelivered).toBe(true);
 
   await expect(drawer).toBeHidden();
   await expect(drawer).toHaveCount(0);
