@@ -1377,6 +1377,7 @@ test("mobile navigation closes for a delayed desktop breakpoint event", async ({
 });
 
 test("mobile navigation survives 30 rapid close and resize rounds", async ({ page }) => {
+  test.setTimeout(90_000);
   const errors = monitorErrors(page);
   await page.setViewportSize({ width: 390, height: 844 });
   await openFormalRoute(page, "/software");

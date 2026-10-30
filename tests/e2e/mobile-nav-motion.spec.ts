@@ -569,18 +569,33 @@ test("repeated close intents let the active exit finish", async ({ page }) => {
   await trigger.click();
   await expect(drawer).toBeVisible();
   await expect.poll(() => drawerTranslateX(page)).toBeLessThanOrEqual(1);
-  await overlay.click({ position: { x: 8, y: 100 } });
-  await expect(drawer).toHaveAttribute("data-motion-phase", "close");
-  await page.waitForTimeout(25);
-  const repeatedCloseDelivered = await page.evaluate(() => {
+  await page.evaluate(() => {
     const activeOverlay = document.querySelector<HTMLElement>(
       ".redesign-menu-overlay",
     );
-    if (!activeOverlay) return false;
-    return activeOverlay.dispatchEvent(
-      new MouseEvent("click", { bubbles: true, detail: 1 }),
+    if (!activeOverlay) throw new Error("The active overlay is missing.");
+    const testWindow = window as Window & {
+      __enheRepeatedCloseDelivered?: boolean;
+    };
+    activeOverlay.addEventListener(
+      "click",
+      () => {
+        queueMicrotask(() => {
+          testWindow.__enheRepeatedCloseDelivered =
+            activeOverlay.isConnected && activeOverlay.dispatchEvent(
+              new MouseEvent("click", { bubbles: true, detail: 1 }),
+            );
+        });
+      },
+      { once: true },
     );
   });
+  await overlay.click({ position: { x: 8, y: 100 } });
+  await expect(drawer).toHaveAttribute("data-motion-phase", "close");
+  const repeatedCloseDelivered = await page.evaluate(() =>
+    (window as Window & { __enheRepeatedCloseDelivered?: boolean })
+      .__enheRepeatedCloseDelivered === true,
+  );
   expect(repeatedCloseDelivered).toBe(true);
 
   await expect(drawer).toBeHidden();

@@ -72,6 +72,9 @@ User explicitly requested implementation, push and production deployment of nine
 - The shared-shell viewport matrix now loads each route once and resizes the same page through its viewport list, avoiding nine redundant server navigations per route while checking live responsive behavior.
 - Targeted rechecks: 16 passed, 1 intentionally skipped across the card-motion, language-switch, and AI News contrast files; homepage + three mobile drawer widths passed; both Chinese and English AI News topic routes passed the nine-width matrix.
 - The release script must still run its complete E2E suite and all other exact-ref checks before any push or deployment.
+- The next complete E2E run finished with 423 passed, 194 database/opt-in skips, and five test timeouts; the release script correctly stopped without pushing or deploying. The failures were in test execution: the homepage check reloaded the same page six times, the drawer test waited past a short overlay animation, two topic-shell matrices exceeded their default 30-second budget under load, and a 30-round navigation stress test exceeded its default budget.
+- Adjusted those checks only: the homepage now loads once before viewport changes, the duplicate close event is sent in the same browser event cycle, and the three high-cost cases have a 90-second budget without reducing their assertions or round counts.
+- Focused production-build recheck of all affected cases: 7 passed, including the 30-round navigation test and all four Chinese/English topic-shell viewport matrices. Full exact-ref release validation is still required.
 
 ## User scope extension — 2026-10-30
 

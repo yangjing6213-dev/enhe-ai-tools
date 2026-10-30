@@ -30,6 +30,7 @@ const routes = [
 
 for (const route of routes) {
   test(`${route} uses one shared masthead and the quiet reference shell at mobile and desktop widths`, async ({ page }) => {
+    test.setTimeout(90_000);
     const rejectedOrigins = await installSameOriginRequestGuard(page);
     const errors: string[] = [];
     page.on("pageerror", (error) => errors.push(error.message));

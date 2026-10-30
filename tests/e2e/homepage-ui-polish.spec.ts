@@ -62,10 +62,11 @@ test("homepage polish stays readable, responsive, and interactive without extern
     url: `http://127.0.0.1:${port}`,
   }]);
 
+  const homepageResponse = await page.goto("/", { waitUntil: "load" });
+  expect(homepageResponse?.status(), "homepage response").toBe(200);
+
   for (const width of [1440, 1024, 900, 768, 390, 320]) {
     await page.setViewportSize({ width, height: 900 });
-    const response = await page.goto("/", { waitUntil: "load" });
-    expect(response?.status(), `homepage at ${width}px`).toBe(200);
 
     const brand = page.locator(".redesign-brand-lockup");
     const brandLabel = page.locator(".redesign-header[data-home='true'] .redesign-brand-label");
