@@ -21,7 +21,7 @@ describe("forum public surfaces", () => {
       const replyFields = detail.match(/<textarea[^>]*>/g) ?? [];
       expect(replyFields).toHaveLength(3);
       expect(replyFields.every(field => field.includes('data-emoji-picker="on"'))).toBe(true);
-      const newPost = renderToStaticMarkup(<ForumNewPostContent locale={locale} isAuthenticated />);
+      const newPost = renderToStaticMarkup(<ForumNewPostContent locale={locale} isAuthenticated submitted={false} />);
       expect(newPost).not.toContain('data-emoji-picker="on"');
     }
   });
