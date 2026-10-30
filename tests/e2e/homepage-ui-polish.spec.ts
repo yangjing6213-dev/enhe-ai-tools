@@ -46,7 +46,7 @@ for (const path of ["/", "/en"]) {
 }
 
 test("homepage polish stays readable, responsive, and interactive without external services", async ({ page }) => {
-  test.setTimeout(90_000);
+  test.setTimeout(180_000);
 
   if (process.env.DATABASE_URL?.trim()) {
     throw new Error("Homepage UI checks require an unset DATABASE_URL.");

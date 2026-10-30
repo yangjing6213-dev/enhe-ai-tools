@@ -15,6 +15,11 @@ const useProductionServer = process.env.PLAYWRIGHT_USE_PRODUCTION_SERVER === "1"
 const useAdminVisualFixture = process.env.ENHE_ADMIN_VISUAL_FIXTURE === "1";
 const allowDatabaseMutation = process.env.ENHE_E2E_ALLOW_DATABASE_MUTATION === "1";
 const chromiumExecutablePath = process.env.ENHE_PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH?.trim();
+const configuredWorkers = process.env.PLAYWRIGHT_WORKERS?.trim();
+const workerCount = configuredWorkers ? Number(configuredWorkers) : undefined;
+if (workerCount !== undefined && (!Number.isSafeInteger(workerCount) || workerCount < 1)) {
+  throw new Error("PLAYWRIGHT_WORKERS must be a positive integer.");
+}
 const fixtureHost = "127.0.0.1";
 const explicitBaseURL = process.env.PLAYWRIGHT_BASE_URL?.trim();
 const baseURL = explicitBaseURL ?? `http://${fixtureHost}:${port}`;
@@ -109,7 +114,7 @@ export default defineConfig({
     ...configuredDatabaseTestIgnore,
   ],
   fullyParallel: false,
-  workers: useProductionServer ? 2 : isDatabaseFree ? 1 : undefined,
+  workers: workerCount ?? (useProductionServer ? 2 : isDatabaseFree ? 1 : undefined),
   retries: process.env.CI ? 1 : 0,
   reporter: [["list"]],
   use: {

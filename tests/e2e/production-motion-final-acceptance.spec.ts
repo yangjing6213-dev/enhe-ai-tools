@@ -1393,9 +1393,6 @@ test("mobile navigation survives 30 rapid close and resize rounds", async ({ pag
       await page.locator(".redesign-menu-overlay").dispatchEvent("click", {
         detail: 1,
       });
-      await page.locator(".redesign-menu-overlay").dispatchEvent("click", {
-        detail: 1,
-      });
     } else {
       await page.setViewportSize({ width: 768, height: 900 });
       await expect(drawer).toBeHidden();

@@ -748,6 +748,8 @@ test("keeps component exclusions aligned with a non-zero right safe area", async
 });
 
 test("uses a circular icon-only white launcher from 768px upward", async ({ page }) => {
+  test.setTimeout(90_000);
+
   for (const viewportSize of [
     { width: 768, height: 900, offset: 24 },
     { width: 1024, height: 900, offset: 24 },

@@ -205,6 +205,8 @@ for (const locale of ["zh", "en"] as const) {
   for (const topicRoute of ["/ai-news/topics", "/ai-news/topics/ai-agent"] as const) {
     for (const width of [320, 390, 768, 1440]) {
       test(`AI News local navigation is keyboard reachable (${locale}, ${topicRoute}, ${width}px)`, async ({ page }) => {
+        test.setTimeout(90_000);
+
         const rejectedOrigins = await installSameOriginRequestGuard(page);
         const prefix = locale === "en" ? "/en" : "";
         const target = `${prefix}${topicRoute}`;

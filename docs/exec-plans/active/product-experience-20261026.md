@@ -94,3 +94,10 @@ Acceptance checks: focused forum/auth/footer/announcement tests; admin save path
 - `npm run lint`: PASS. `npm run typecheck`: PASS. `npm run build`: PASS; all 100 static pages generated, and the output had no database-connection warning.
 - Browser acceptance: 13 focused mobile/auth/popup/wave checks passed; the isolated read-only Admin settings visual fixture passed at 7 viewport widths and confirmed the six editable fields and enable switch are visible. The user-facing popup was checked in Chinese and English; the footer effect produced its canvas in Chromium.
 - The full browser suite has not yet completed against the final commit. The release script will perform its own exact-ref audit and full browser run before allowing the push/deployment.
+
+## Release stability follow-up — 2026-10-30
+
+- The first full exact-ref release retry passed dependency, migration, shell, unit, typecheck, lint, and build gates, then stopped at E2E: 423 passed, 194 skipped, 5 failed. No push or deployment occurred.
+- Failure evidence showed four long browser checks hit their own time limits, while the English DB-free route's CSS request failures did not reproduce when run alone. This points to browser-suite load and timing, not a confirmed public-page regression.
+- Adjusted only test execution: allowed longer budgets for the homepage, support-launcher, and topic keyboard viewport checks; removed a second awaited overlay click after the first click can unmount it (a separate test still covers repeated close behavior); added a `PLAYWRIGHT_WORKERS` override for controlled release runs.
+- Focused rerun of all five previously failing checks with one browser worker: 5 passed (1.6 minutes). Typecheck, lint, and `git diff --check` also pass. The full release script must still pass on the updated commit before deployment.
