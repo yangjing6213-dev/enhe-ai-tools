@@ -245,6 +245,7 @@ export function selectAiWorkflowRepositoryCandidates(
 
 const linkOnlyFailureReasons = new Set([
   "LICENSE_NOT_REDISTRIBUTABLE",
+  "GITHUB_ARCHIVE_UNAVAILABLE",
   "PACKAGE_LANGUAGE_UNSUPPORTED",
   "NODE_MANIFEST_MISSING",
   "NODE_MANIFEST_INVALID",
@@ -302,16 +303,22 @@ export function getAiWorkflowLinkOnlyFailureReason(error: unknown) {
 
 export function getAiWorkflowFailureCode(error: unknown): "GITHUB_RATE_LIMIT" | "NETWORK_UNAVAILABLE" | "SANDBOX_UNAVAILABLE" | "ARCHIVE_UPLOAD_FAILED" | "UNKNOWN" {
   if (!error || typeof error !== "object") return "UNKNOWN";
-  const record = error as { code?: unknown; status?: unknown; message?: unknown; cause?: unknown };
+  const record = error as { code?: unknown; name?: unknown; status?: unknown; message?: unknown; cause?: unknown };
   const code = typeof record.code === "string" ? record.code : "";
   const message = typeof record.message === "string" ? record.message : "";
-  const cause = record.cause && typeof record.cause === "object" ? record.cause as { code?: unknown; message?: unknown } : null;
-  const causeText = cause ? `${typeof cause.code === "string" ? cause.code : ""} ${typeof cause.message === "string" ? cause.message : ""}` : "";
   if (code === "GITHUB_RATE_LIMIT" || message === "GITHUB_RATE_LIMIT") return "GITHUB_RATE_LIMIT";
-  if (/ENOTFOUND|ECONNRESET|ETIMEDOUT|EAI_AGAIN|NETWORK/i.test(code + " " + message + " " + causeText)) return "NETWORK_UNAVAILABLE";
+  const errorText = collectAiWorkflowFailureText(error);
+  if (/TimeoutError|AbortError|ENOTFOUND|ECONNRESET|ETIMEDOUT|EAI_AGAIN|ECONNREFUSED|EHOSTUNREACH|ENETUNREACH|ECONNABORTED|UND_ERR_(?:CONNECT_TIMEOUT|HEADERS_TIMEOUT|SOCKET)|fetch failed|failed to fetch|socket hang up|NETWORK/i.test(errorText)) return "NETWORK_UNAVAILABLE";
   if (/SANDBOX_UNAVAILABLE/.test(message)) return "SANDBOX_UNAVAILABLE";
   if (/COS|UPLOAD|PRIVATE_COS_ACCESS|SIGNED_COS_READ/i.test(message)) return "ARCHIVE_UPLOAD_FAILED";
   return "UNKNOWN";
+}
+
+function collectAiWorkflowFailureText(error: unknown, depth = 0): string {
+  if (!error || typeof error !== "object" || depth > 4) return "";
+  const record = error as { code?: unknown; name?: unknown; message?: unknown; cause?: unknown };
+  const fields = [record.code, record.name, record.message].filter((value): value is string => typeof value === "string");
+  return `${fields.join(" ")} ${collectAiWorkflowFailureText(record.cause, depth + 1)}`;
 }
 
 export function redactAiWorkflowCollectorText(value: string, secrets: readonly string[] = []) {
