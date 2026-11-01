@@ -2,6 +2,8 @@ import { randomUUID } from "node:crypto";
 import { Prisma, PrismaClient } from "@prisma/client";
 import { afterAll, beforeAll, describe, expect, it, vi } from "vitest";
 import { buildZpaySignedParams } from "@/lib/zpay";
+import { hashSessionToken } from "@/lib/auth-security";
+import { zpayReturnSessionIdPrefix } from "@/lib/zpay-payment-return";
 import type { ZpayConfig } from "@/lib/zpay-config";
 import {
   activateOrderFromZpayNotify,
@@ -307,6 +309,15 @@ describePostgres("PostgreSQL ZPAY payment creation serialization", () => {
 
     try {
       const request = await providerStarted.promise;
+      expect(new URL(String(request.params.return_url)).search).toBe("");
+      const returnTicket = new URL(String(request.params.return_url)).pathname.split("/").pop() ?? "";
+      const ticketSession = await db.session.findUnique({ where: { tokenHash: hashSessionToken(returnTicket) } });
+      expect(ticketSession).toMatchObject({
+        userId: fixture.user.id,
+        revokedAt: null,
+      });
+      expect(ticketSession?.id.startsWith(zpayReturnSessionIdPrefix)).toBe(true);
+      expect(ticketSession?.expiresAt.getTime()).toBe(fixture.order.createdAt.getTime() + 10 * 60 * 1000);
       const placeholder = await db.paymentTransaction.findUnique({
         where: { orderId: fixture.order.id },
       });

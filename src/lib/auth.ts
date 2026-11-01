@@ -17,6 +17,7 @@ import {
   verifySessionCookieValue
 } from "@/lib/auth-security";
 import { buildLocalePath } from "@/lib/seo";
+import { zpayReturnSessionIdPrefix } from "@/lib/zpay-payment-return";
 
 const cookieName = process.env.AUTH_COOKIE_NAME ?? "enhe_session";
 const sessionDays = 30;
@@ -112,7 +113,7 @@ export async function getCurrentUser() {
     },
     include: { user: true }
   });
-  if (!session || session.user.status !== "active") return null;
+  if (!session || session.user.status !== "active" || session.id.startsWith(zpayReturnSessionIdPrefix)) return null;
 
   await prisma.session.update({
     where: { id: session.id },

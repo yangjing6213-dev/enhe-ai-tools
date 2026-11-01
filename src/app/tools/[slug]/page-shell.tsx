@@ -407,9 +407,6 @@ export async function ToolDetailPageShell({
     downloadCount: tool.downloadCount,
     usageCount: tool.usageCount,
   });
-  const visibleDownloadMetric = visibleToolMetrics.find(
-    (metric) => metric.type === "download",
-  );
   const visibleUsageMetric = visibleToolMetrics.find(
     (metric) => metric.type === "usage",
   );
@@ -972,13 +969,6 @@ export async function ToolDetailPageShell({
                       {refundPolicyCard}
                       {tool.supportedAgents.length ? (
                         <SupportedAgentsCard agents={tool.supportedAgents} locale={forceLocale} />
-                      ) : null}
-                      {visibleDownloadMetric && !workflowLinkOnly && !(isAiSkill && tool.slug === "skill") ? (
-                        <Info
-                          label={td.downloadCount}
-                          value={String(visibleDownloadMetric.count)}
-                          numeric
-                        />
                       ) : null}
                       {visibleUsageMetric ? (
                         <Info
