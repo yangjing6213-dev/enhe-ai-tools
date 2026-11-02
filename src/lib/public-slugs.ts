@@ -6,6 +6,8 @@ import { buildLocalePath } from "@/lib/seo";
 const explicitToolCanonicalSlugs: Record<string, string> = {
   zfb: "zfb-transfer-link-qr-code-generator",
   "ai-ai-ilo5a5": "ai-monetization-side-hustle-course",
+  "tool-mq12l5w6": "no-code-chat-screenshot-maker",
+  "ai-skill": "intentbridge",
 };
 
 const explicitAiNewsCanonicalSlugs: Record<string, string> = {
