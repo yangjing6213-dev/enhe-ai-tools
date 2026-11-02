@@ -1,10 +1,19 @@
-import { readFileSync } from "node:fs";
+import { readdirSync, readFileSync } from "node:fs";
 import { describe, expect, it } from "vitest";
 
 const read = (relativePath: string) =>
   readFileSync(new URL(`./${relativePath}`, import.meta.url), "utf8");
 
 describe("admin shell foundation", () => {
+  it("lists each module once and leaves detail, import and disabled pages to their existing entrypoints", () => {
+    const expected = readdirSync(new URL("./", import.meta.url), { recursive: true, encoding: "utf8" })
+      .map(path => path.replaceAll("\\", "/"))
+      .filter(path => /(^|\/)page\.tsx$/.test(path) && !path.includes("["))
+      .map(path => `/admin/${path}`.replace(/\/page\.tsx$/, ""))
+      .filter(path => !["/admin/ai-news/import", "/admin/plans"].includes(path));
+    const actual = [...read("layout.tsx").matchAll(/\["[^"]+", "(\/admin[^"]*)"\]/g)].map(match => match[1]);
+    expect(actual.sort()).toEqual(expected.sort());
+  });
   it("keeps authorization first and mounts the semantic ENHE shell", () => {
     const layout = read("layout.tsx");
 

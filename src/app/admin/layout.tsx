@@ -16,40 +16,70 @@ import { SiteBreadcrumbs } from "@/components/site-breadcrumbs";
 export const dynamic = "force-dynamic";
 
 const adminNav = [
-  ["dashboard", "/admin"],
-  ["seoAudit", "/admin/seo-audit"],
-  ["seoInsights", "/admin/seo-insights"],
-  ["geoMonitoring", "/admin/geo-monitoring"],
-  ["manuals", "/admin/manuals"],
-  ["messages", "/admin/messages"],
-  ["development", "/admin/development"],
-  ["releases", "/admin/releases"],
-  ["users", "/admin/users"],
-  ["orders", "/admin/orders"],
-  ["payments", "/admin/payments"],
-  ["paymentCodes", "/admin/payment-codes"],
-  ["refunds", "/admin/refunds"],
-  ["software", "/admin/software"],
-  ["aiWorkflows", "/admin/ai-workflows"],
-  ["aiSkills", "/admin/ai-skills"],
-  ["onlineTools", "/admin/online-tools"],
-  ["skillLearning", "/admin/skill-learning"],
-  ["productDemos", "/admin/product-demos"],
-  ["aiNews", "/admin/ai-news"],
-  ["aiNewsTopics", "/admin/ai-news/topics"],
-  ["aiNewsKeywords", "/admin/ai-news/keywords"],
-  ["categories", "/admin/categories"],
-  ["tags", "/admin/tags"],
-  ["tutorials", "/admin/tutorials"],
-  ["faqs", "/admin/faqs"],
-  ["changelogs", "/admin/changelogs"],
-  ["comments", "/admin/comments"],
-  ["forum", "/admin/forum"],
-  ["emojis", "/admin/emojis"],
-  ["files", "/admin/files"],
-  ["licenseGenerator", "/admin/license-generator"],
-  ["audit", "/admin/audit"],
-  ["settings", "/admin/settings"]
+  {
+    label: { zh: "工作台", en: "Workspace" },
+    items: [
+      ["dashboard", "/admin"],
+      ["messages", "/admin/messages"],
+      ["manuals", "/admin/manuals"]
+    ]
+  },
+  {
+    label: { zh: "产品与交付", en: "Products and delivery" },
+    items: [
+      ["software", "/admin/software"],
+      ["aiSkills", "/admin/ai-skills"],
+      ["aiWorkflows", "/admin/ai-workflows"],
+      ["onlineTools", "/admin/online-tools"],
+      ["skillLearning", "/admin/skill-learning"],
+      ["productDemos", "/admin/product-demos"],
+      ["categories", "/admin/categories"],
+      ["tags", "/admin/tags"],
+      ["tutorials", "/admin/tutorials"],
+      ["faqs", "/admin/faqs"],
+      ["changelogs", "/admin/changelogs"],
+      ["files", "/admin/files"],
+      ["licenseGenerator", "/admin/license-generator"]
+    ]
+  },
+  {
+    label: { zh: "内容与社区", en: "Editorial and community" },
+    items: [
+      ["aiNews", "/admin/ai-news"],
+      ["aiNewsTopics", "/admin/ai-news/topics"],
+      ["aiNewsKeywords", "/admin/ai-news/keywords"],
+      ["forum", "/admin/forum"],
+      ["comments", "/admin/comments"],
+      ["emojis", "/admin/emojis"]
+    ]
+  },
+  {
+    label: { zh: "交易与用户", en: "Transactions and users" },
+    items: [
+      ["orders", "/admin/orders"],
+      ["payments", "/admin/payments"],
+      ["refunds", "/admin/refunds"],
+      ["paymentCodes", "/admin/payment-codes"],
+      ["users", "/admin/users"]
+    ]
+  },
+  {
+    label: { zh: "搜索与曝光", en: "Search visibility" },
+    items: [
+      ["seoAudit", "/admin/seo-audit"],
+      ["seoInsights", "/admin/seo-insights"],
+      ["geoMonitoring", "/admin/geo-monitoring"]
+    ]
+  },
+  {
+    label: { zh: "站点维护", en: "Site maintenance" },
+    items: [
+      ["settings", "/admin/settings"],
+      ["development", "/admin/development"],
+      ["releases", "/admin/releases"],
+      ["audit", "/admin/audit"]
+    ]
+  }
 ] as const;
 
 export const metadata = sharedRootMetadata;
@@ -94,7 +124,11 @@ export default async function AdminLayout({ children }: { children: React.ReactN
           <Container className="enhe-admin-container grid gap-6 py-10">
             <aside className="admin-shell-card admin-sidebar h-fit p-4">
               <h2 className="admin-sidebar-title px-3 py-2 text-lg font-black">{t.layout.title}</h2>
-              <AdminNav items={adminNav} labels={t.nav} ariaLabel={locale === "en" ? "Admin navigation" : "后台导航"} />
+              <AdminNav
+                groups={adminNav.map(({ label, items }) => ({ label: label[locale], items }))}
+                labels={t.nav}
+                ariaLabel={locale === "en" ? "Admin navigation" : "后台导航"}
+              />
             </aside>
             <main id="main-content" className="admin-main" tabIndex={-1}>
               {children}

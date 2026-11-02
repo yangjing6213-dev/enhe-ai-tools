@@ -723,16 +723,35 @@ test("Admin content editors and remaining lists fit mobile screens", async ({ pa
   expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBe(true);
 });
 
-test("Admin dashboard cards stack vertically, blue actions stay legible, and approved comments have a display control", async ({ page }) => {
-  await page.setViewportSize({ width: 1440, height: 1000 });
+test("Dashboard cards share desktop rows and stack on phones", async ({ page }) => {
   await page.goto("/admin", { waitUntil: "load" });
-  const dashboardCards = page.locator(".enhe-admin-shell .grid:has(> .surface-panel)").first();
-  await expect(dashboardCards).toBeVisible();
-  const dashboardColumnCount = await dashboardCards.evaluate((element) =>
-    getComputedStyle(element).gridTemplateColumns.trim().split(/\s+/).length
-  );
-  expect(dashboardColumnCount).toBe(1);
+  const card = (label: string) => page.getByText(label, { exact: true }).evaluate((element) => {
+    const rect = element.closest(".surface-panel, .enhe-admin-card")!.getBoundingClientRect();
+    return { left: rect.left, right: rect.right, top: rect.top, bottom: rect.bottom, width: rect.width };
+  });
 
+  for (const width of [1440, 390]) {
+    await page.setViewportSize({ width, height: 980 });
+    const [revenue, today, visit, view, trend, reminders, popular] = await Promise.all(
+      ["实收金额", "今日收入", "访问首页", "查看工具", "7 天收入趋势", "运营提醒", "热门工具"].map(card)
+    );
+    for (const [left, right] of [[revenue, today], [visit, view], [trend, reminders]]) {
+      if (width === 1440) {
+        expect(right.top).toBe(left.top);
+        expect(right.left).toBeGreaterThan(left.right);
+      } else {
+        expect(right.left).toBe(left.left);
+        expect(right.top).toBeGreaterThan(left.bottom);
+      }
+    }
+    if (width === 1440) expect(trend.width).toBeGreaterThan(reminders.width);
+    expect(popular.top).toBeGreaterThan(reminders.bottom);
+    expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBeLessThanOrEqual(width);
+  }
+});
+
+test("Blue admin actions stay legible and approved comments have a display control", async ({ page }) => {
+  await page.setViewportSize({ width: 1440, height: 1000 });
   await page.goto("/admin/software", { waitUntil: "load" });
   const createProduct = page.locator('a[href="/admin/software/new"]');
   await expect(createProduct).toBeVisible();

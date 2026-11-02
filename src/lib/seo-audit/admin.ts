@@ -518,6 +518,7 @@ export async function getSeoAuditAdminDashboard(
   });
 
   return {
+    asOf: now,
     windowDays: dashboardWindowDays,
     funnel: buildAdminFunnel(funnelRows, funnelEvents),
     commercial: summarizeSeoAuditCommercialOrders(commercialOrders),
@@ -528,6 +529,7 @@ export async function getSeoAuditAdminDashboard(
         (statusCounts.get("cancel_requested") ?? 0),
       completedRuns,
       failedRuns,
+      paidReportRuns,
       ...rates,
     },
     workerHeartbeats: workerHeartbeats.map((heartbeat) => ({

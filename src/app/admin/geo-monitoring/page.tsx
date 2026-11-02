@@ -9,12 +9,13 @@ import {
   type GeoMonitoringRecommendation
 } from "@/lib/geo-monitoring";
 import { prisma } from "@/lib/db";
-import { ensureGeoMonitoringDefaults, recordGeoVisibilityResultAction } from "./actions";
+import { requireAdmin } from "@/lib/auth";
+import { recordGeoVisibilityResultAction } from "./actions";
 
 export const dynamic = "force-dynamic";
 
 export default async function AdminGeoMonitoringPage() {
-  await ensureGeoMonitoringDefaults();
+  await requireAdmin();
   const latestResultRead = await getLatestGeoVisibilityResults();
   const queryResults = latestResultRead.results.map((result) => ({
     query: result.queryText,
@@ -34,8 +35,8 @@ export default async function AdminGeoMonitoringPage() {
     competitors: result.competitors
   }));
   const [savedQueries, savedProviders] = await Promise.all([
-    prisma.geoQuery.count().catch(() => 0),
-    prisma.geoProvider.count().catch(() => 0)
+    prisma.geoQuery.count().catch(() => null),
+    prisma.geoProvider.count().catch(() => null)
   ]);
   const report = buildGeoMonitoringReport({ queryResults });
   const globalProviders = report.providers.filter((provider) => provider.region === "global");
@@ -62,7 +63,8 @@ export default async function AdminGeoMonitoringPage() {
 
       <div className="mt-4 flex flex-wrap gap-x-6 gap-y-2 border-y border-white/10 py-3 text-sm text-[var(--marketing-muted)]">
         <span>日期范围：{formatDateRange(report.summary.firstCheckedAt, report.summary.lastCheckedAt)}</span>
-        <span>最近巡检时间：{formatCheckedAt(report.summary.lastCheckedAt)}</span>
+        <span>最近巡检时间（人工登记，北京时间）：{formatCheckedAt(report.summary.lastCheckedAt)}</span>
+        <span>同一查询在同一平台仅保留最新一条参与统计，包含最近登记的未采集或不可用状态。刷新页面不会发起平台查询。</span>
         <span>最低有效样本：{GEO_MINIMUM_VALID_SAMPLE_SIZE} 条</span>
         <span>已排除搜索绩效结果：{report.summary.excludedResults} 条</span>
         {latestResultRead.failed ? <span>数据库读取失败，当前按空态显示。</span> : null}
@@ -78,7 +80,7 @@ export default async function AdminGeoMonitoringPage() {
             </p>
           </div>
           <span className="rounded-full border border-white/10 bg-white/8 px-3 py-1 text-xs font-semibold text-[var(--marketing-muted)]">
-            数据库已保存 {savedProviders} 个平台
+            {savedProviders === null ? "平台数读取失败" : `数据库已保存 ${savedProviders} 个平台`}
           </span>
         </div>
         <div className="mt-6 grid gap-5 xl:grid-cols-2">
@@ -92,7 +94,7 @@ export default async function AdminGeoMonitoringPage() {
           <div className="flex flex-wrap items-center justify-between gap-3">
             <h2 className="text-xl font-semibold text-[var(--marketing-text)]">20+ 核心 GEO 查询</h2>
             <span className="rounded-full border border-white/10 bg-white/8 px-3 py-1 text-xs font-semibold text-[var(--marketing-muted)]">
-              数据库已保存 {savedQueries} 条查询
+              {savedQueries === null ? "查询数读取失败" : `数据库已保存 ${savedQueries} 条查询`}
             </span>
           </div>
           <div className="mt-5 grid gap-3">

@@ -309,6 +309,10 @@
   font-size: 14px;
 }
 
+.redesign-header[data-home="true"] .redesign-header-search input {
+  border-radius: 999px;
+}
+
 .redesign-header-search .redesign-header-search-submit {
   position: absolute;
   right: 1px;

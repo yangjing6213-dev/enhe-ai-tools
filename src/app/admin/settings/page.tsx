@@ -1,4 +1,7 @@
+import Link from "next/link";
 import { prisma } from "@/lib/db";
+import { emojiCatalogKey } from "@/lib/emojis";
+import { HOME_PRODUCT_SHOWCASE_SETTING_KEY } from "@/lib/redesign/home/home-product-showcase";
 import { updateSiteSettingAction } from "@/app/admin/actions";
 import { AdminSection, Field, inputClass, SubmitButton, textareaClass } from "@/app/admin/admin-ui";
 import { parseSiteAnnouncement, SITE_ANNOUNCEMENT_KEY } from "@/lib/site-announcement";
@@ -10,10 +13,16 @@ export default async function AdminSettingsPage() {
   const settings = await prisma.siteSetting.findMany({ where: { NOT: { key: { startsWith: "card-like:" } } }, orderBy: { key: "asc" } });
   const announcement = parseSiteAnnouncement(settings.find((setting) => setting.key === SITE_ANNOUNCEMENT_KEY)?.value);
   const entryNotice = parseSiteEntryNotice(settings.find((setting) => setting.key === SITE_ENTRY_NOTICE_KEY)?.value);
-  const generalSettings = settings.filter((setting) => setting.key !== SITE_ANNOUNCEMENT_KEY && setting.key !== SITE_ENTRY_NOTICE_KEY);
+  const dedicatedKeys = [SITE_ANNOUNCEMENT_KEY, SITE_ENTRY_NOTICE_KEY, "alipay_qr", "wechat_qr", emojiCatalogKey, HOME_PRODUCT_SHOWCASE_SETTING_KEY];
+  const generalSettings = settings.filter((setting) => !dedicatedKeys.includes(setting.key));
   return (
-    <AdminSection title="网站设置" intro="支付宝/微信收款码、网站名称、Logo、首页文案、用户协议、隐私政策、退款规则均存储在 site_settings。">
+    <AdminSection title="网站设置" intro="维护网站公告、首页文案和其他通用配置。">
       <div className="enhe-admin-content-management enhe-admin-settings">
+        <nav aria-label="专用设置" className="flex flex-wrap gap-4 text-sm font-semibold underline">
+          <Link href="/admin/payment-codes">收款码管理</Link>
+          <Link href="/admin/emojis">表情素材</Link>
+          <Link href="/admin/product-demos">首页推荐产品管理</Link>
+        </nav>
         <AnnouncementForm initial={announcement} />
         <EntryNoticeForm initial={entryNotice} />
         <section className="enhe-admin-settings-create-card">

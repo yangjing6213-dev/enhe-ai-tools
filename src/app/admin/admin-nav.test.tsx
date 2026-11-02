@@ -41,7 +41,10 @@ function renderNav(pathname: string | null) {
   navigation.pathname = pathname;
   return renderToStaticMarkup(
     React.createElement(AdminNav, {
-      items,
+      groups: [
+        { label: "运营", items: [items[0], items[4]] },
+        { label: "内容", items: items.slice(1, 4) },
+      ],
       labels,
       ariaLabel: "后台导航",
     }),
@@ -88,5 +91,14 @@ describe("AdminNav active route selection", () => {
       expect(markup).toContain(labels[key]);
     }
     expect(markup).toContain('aria-label="后台导航"');
+  });
+
+  it("opens the task group owning a nested route without expanding unrelated groups", () => {
+    const markup = renderNav("/admin/ai-news/topics/editor");
+    const groups = [...markup.matchAll(/<details\b([^>]*)>([\s\S]*?)<\/details>/g)];
+    expect(groups).toHaveLength(2);
+    expect(groups[0][1]).not.toMatch(/\bopen\b/);
+    expect(groups[1][1]).toMatch(/\bopen\b/);
+    expect(groups[1][2]).toMatch(/<summary\b[^>]*>内容<\/summary>/);
   });
 });

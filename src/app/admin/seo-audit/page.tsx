@@ -2,8 +2,8 @@ import type { ReactNode } from "react";
 import Link from "next/link";
 import { CircleX, Pause, RotateCcw } from "lucide-react";
 import { AdminSection, SubmitButton } from "@/app/admin/admin-ui";
-import { getCurrentLocale, type Locale } from "@/lib/i18n";
 import { getSeoAuditAdminDashboard } from "@/lib/seo-audit/admin";
+import { auditActionError, auditValue } from "./display";
 import {
   cancelSeoAuditRunAction,
   pauseSeoAuditScheduleAction,
@@ -17,26 +17,25 @@ type PageProps = {
 };
 
 export default async function AdminSeoAuditPage({ searchParams }: PageProps) {
-  const [locale, dashboard, params] = await Promise.all([
-    getCurrentLocale(),
+  const [dashboard, params] = await Promise.all([
     getSeoAuditAdminDashboard(),
     searchParams ?? Promise.resolve({}),
   ]);
-  const t = labels[locale];
 
   return (
     <AdminSection title={t.title} intro={t.intro}>
-      <Notice params={params} locale={locale} />
+      <Notice params={params} />
+      <p className="mb-4 text-sm text-[#8B95A7]">{t.readAt}{dateTime(dashboard.asOf)} · {t.dataScope}</p>
 
       <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
-        <Metric label={t.revenue} value={money(dashboard.commercial.effectiveRevenue, locale)} accent />
-        <Metric label={t.refunds} value={money(dashboard.commercial.refundAmount, locale)} warn={dashboard.commercial.refundCount > 0} />
+        <Metric label={t.revenue} value={money(dashboard.commercial.effectiveRevenue)} accent />
+        <Metric label={t.refunds} value={money(dashboard.commercial.refundAmount)} warn={dashboard.commercial.refundCount > 0} />
         <Metric label={t.refundRate} value={`${dashboard.commercial.refundRate}%`} warn={dashboard.commercial.refundRate > 5} />
         <Metric label={t.renewals} value={`${dashboard.commercial.renewalCount} / ${dashboard.commercial.renewalRate}%`} />
         <Metric label={t.queued} value={dashboard.operations.queuedRuns} warn={dashboard.operations.queuedRuns > 10} />
         <Metric label={t.running} value={dashboard.operations.runningRuns} />
-        <Metric label={t.failureRate} value={`${dashboard.operations.failureRate}%`} warn={dashboard.operations.failureRate > 2} />
-        <Metric label={t.deliveryRate} value={`${dashboard.operations.paidReportDeliveryRate}%`} warn={dashboard.operations.paidReportDeliveryRate < 95} />
+        <Metric label={t.failureRate} value={dashboard.operations.completedRuns + dashboard.operations.failedRuns ? `${dashboard.operations.failureRate}%` : t.noSample} warn={dashboard.operations.failureRate > 2} />
+        <Metric label={t.deliveryRate} value={dashboard.operations.paidReportRuns ? `${dashboard.operations.paidReportDeliveryRate}%` : t.noSample} warn={dashboard.operations.paidReportRuns > 0 && dashboard.operations.paidReportDeliveryRate < 95} />
       </div>
 
       <div className="enhe-admin-card-grid mt-6 grid gap-6 xl:grid-cols-2">
@@ -57,7 +56,7 @@ export default async function AdminSeoAuditPage({ searchParams }: PageProps) {
             <thead className="text-xs uppercase text-[#8B95A7]"><tr><th className="py-2">{t.offer}</th><th>{t.orders}</th><th>{t.amount}</th></tr></thead>
             <tbody className="divide-y divide-white/10">
               {dashboard.commercial.offerMix.map((offer) => (
-                <tr key={offer.offerId}><td className="py-3 font-semibold text-[#E8EEF8]">{offer.name}</td><td className="text-[#C5D0E2]">{offer.orders}</td><td className="text-[#C5D0E2]">{money(offer.revenue, locale)}</td></tr>
+                <tr key={offer.offerId}><td className="py-3 font-semibold text-[#E8EEF8]">{offer.name}</td><td className="text-[#C5D0E2]">{offer.orders}</td><td className="text-[#C5D0E2]">{money(offer.revenue)}</td></tr>
               ))}
               {dashboard.commercial.offerMix.length === 0 ? <EmptyRow colSpan={3} label={t.empty} /> : null}
             </tbody>
@@ -69,12 +68,12 @@ export default async function AdminSeoAuditPage({ searchParams }: PageProps) {
         <Panel title={t.workers}>
           <div className="overflow-x-auto">
             <table className="w-full min-w-[620px] text-left text-sm">
-              <thead className="text-xs uppercase text-[#8B95A7]"><tr><th className="py-2">Worker</th><th>{t.status}</th><th>{t.run}</th><th>{t.lastSeen}</th></tr></thead>
+              <thead className="text-xs uppercase text-[#8B95A7]"><tr><th className="py-2">{t.worker}</th><th>{t.status}</th><th>{t.run}</th><th>{t.lastSeen}</th></tr></thead>
               <tbody className="divide-y divide-white/10">
                 {dashboard.workerHeartbeats.map((worker) => (
-                  <tr key={worker.id}><td className="py-3 font-semibold text-[#E8EEF8]">{worker.workerId}</td><td><Badge label={worker.healthy ? t.healthy : t.stale} tone={worker.healthy ? "good" : "warn"} /></td><td className="text-[#C5D0E2]">{worker.currentRunId ? shortId(worker.currentRunId) : "-"}</td><td className="text-[#8B95A7]">{dateTime(worker.lastSeenAt, locale)}</td></tr>
+                  <tr key={worker.id}><td className="py-3 font-semibold text-[#E8EEF8]">{worker.workerId}</td><td><Badge label={worker.healthy ? t.healthy : t.stale} tone={worker.healthy ? "good" : "warn"} /></td><td className="text-[#C5D0E2]">{worker.currentRunId ? shortId(worker.currentRunId) : "-"}</td><td className="text-[#8B95A7]">{dateTime(worker.lastSeenAt)}</td></tr>
                 ))}
-                {dashboard.workerHeartbeats.length === 0 ? <EmptyRow colSpan={4} label={t.empty} /> : null}
+                {dashboard.workerHeartbeats.length === 0 ? <EmptyRow colSpan={4} label={t.noHeartbeats} /> : null}
               </tbody>
             </table>
           </div>
@@ -89,14 +88,14 @@ export default async function AdminSeoAuditPage({ searchParams }: PageProps) {
                   <tr key={subscription.id}>
                     <td className="py-3 text-[#C5D0E2]">{userLabel(subscription.user)}</td>
                     <td className="text-[#C5D0E2]">{hostLabel(subscription.project.normalizedOrigin)}</td>
-                    <td className="text-[#C5D0E2]">{dateTime(subscription.expiresAt, locale)}</td>
-                    <td className="text-[#C5D0E2]">{subscription.schedule?.enabled ? subscription.schedule.cadence : "-"}</td>
+                    <td className="text-[#C5D0E2]">{dateTime(subscription.expiresAt)}</td>
+                    <td className="text-[#C5D0E2]">{subscription.schedule?.enabled ? auditValue(subscription.schedule.cadence) : subscription.schedule ? t.schedulePaused : "—"}</td>
                     <td className="text-right">
-                      {subscription.schedule ? (
+                      {subscription.schedule?.enabled ? (
                         <form action={pauseSeoAuditScheduleAction}>
                           <input type="hidden" name="subscriptionId" value={subscription.id} />
                           <input type="hidden" name="returnTo" value="/admin/seo-audit" />
-                          <SubmitButton variant="secondary" className="gap-2 px-3 py-2 text-xs" pendingLabel="..."><Pause className="h-3.5 w-3.5" />{t.pause}</SubmitButton>
+                          <SubmitButton variant="secondary" className="gap-2 px-3 py-2 text-xs" pendingLabel={t.pausing}><Pause className="h-3.5 w-3.5" />{t.pause}</SubmitButton>
                         </form>
                       ) : "-"}
                     </td>
@@ -116,16 +115,16 @@ export default async function AdminSeoAuditPage({ searchParams }: PageProps) {
             <tbody className="divide-y divide-white/10">
               {dashboard.recentRuns.map((run) => (
                 <tr key={run.id}>
-                  <td className="py-3"><Link href={`/admin/seo-audit/${run.id}`} className="font-semibold text-[#E8EEF8] hover:text-[#48F5D3]">{shortId(run.id)}</Link><p className="mt-1 text-xs text-[#8B95A7]">{run.kind}</p></td>
+                  <td className="py-3"><Link href={`/admin/seo-audit/${run.id}`} className="font-semibold text-[#E8EEF8] hover:text-[#48F5D3]">{shortId(run.id)}</Link><p className="mt-1 text-xs text-[#8B95A7]">{auditValue(run.kind)}</p></td>
                   <td className="text-[#C5D0E2]">{userLabel(run.user)}</td>
                   <td className="text-[#C5D0E2]">{hostLabel(run.normalizedOrigin)}</td>
-                  <td className="text-[#C5D0E2]">{run.offer?.name ?? run.subscription?.status ?? "-"}</td>
-                  <td><Badge label={run.status} tone={statusTone(run.status)} /></td>
-                  <td className="text-[#8B95A7]">{dateTime(run.updatedAt, locale)}</td>
+                  <td className="text-[#C5D0E2]">{run.offer?.name ?? auditValue(run.subscription?.status)}</td>
+                  <td><Badge label={auditValue(run.status)} tone={statusTone(run.status)} /></td>
+                  <td className="text-[#8B95A7]">{dateTime(run.updatedAt)}</td>
                   <td><div className="flex flex-wrap justify-end gap-2">
                     <Link href={`/admin/seo-audit/${run.id}`} className="rounded-full border border-white/15 px-3 py-2 text-xs font-semibold text-[#E8EEF8] hover:text-[#48F5D3]">{t.detail}</Link>
-                    {run.status === "failed" ? <RunAction action={retrySeoAuditRunAction} runId={run.id} label={t.retry} icon="retry" /> : null}
-                    {run.status === "queued" || run.status === "running" ? <RunAction action={cancelSeoAuditRunAction} runId={run.id} label={t.cancel} icon="cancel" danger /> : null}
+                    {run.status === "failed" ? <RunAction action={retrySeoAuditRunAction} runId={run.id} label={t.retry} pendingLabel={t.retrying} icon="retry" /> : null}
+                    {run.status === "queued" || run.status === "running" ? <RunAction action={cancelSeoAuditRunAction} runId={run.id} label={t.cancel} pendingLabel={t.cancelling} icon="cancel" danger /> : null}
                   </div></td>
                 </tr>
               ))}
@@ -138,28 +137,27 @@ export default async function AdminSeoAuditPage({ searchParams }: PageProps) {
   );
 }
 
-const uiLabels = {
-  title: "SEO/GEO Audit Operations",
-  intro: "Audit funnel, revenue, queue, workers, delivery, and subscriptions.",
-  revenue: "Effective revenue", refunds: "Refund amount", refundRate: "Refund rate", renewals: "Renewals",
-  queued: "Queued", running: "Running/cancelling", failureRate: "Failure rate", deliveryRate: "Paid report delivery",
-  funnel: "visit -> run -> pay funnel", offerMix: "Offer mix", workers: "Worker heartbeat", expiring: "Expiring subscriptions", recent: "Recent runs",
-  offer: "Offer", orders: "Orders", amount: "Amount", status: "Status", run: "Run", lastSeen: "Last seen",
-  user: "User", domain: "Domain", expires: "Expires", schedule: "Schedule", action: "Action", updated: "Updated",
-  empty: "No data.", healthy: "Healthy", stale: "Stale", pause: "Pause schedule", retry: "Retry", cancel: "Cancel", detail: "Details",
-  errorPrefix: "Action was not completed: ",
-  result: { retried: "Run requeued.", cancelled: "Run cancelled or cancellation requested.", paused: "Subscription schedule paused." },
-  funnelStages: { visit: "Visit", run: "Run", pay: "Pay" },
+const t = {
+  title: "SEO/GEO 巡检运营", intro: "查看本站巡检服务的订单、任务、报告交付和订阅情况。",
+  readAt: "本次读取（北京时间）", dataScope: "刷新页面会重新读取数据库。访问漏斗和任务数按近 30 天统计，收入、退款、续订和付费报告交付按全部历史记录统计。任务心跳在最近 2 分钟内上报时显示为近期有响应。",
+  revenue: "有效收入", refunds: "退款金额", refundRate: "退款订单占比", renewals: "续订次数 / 续订率",
+  queued: "排队中的任务", running: "执行中或正在取消", failureRate: "巡检失败率", deliveryRate: "付费报告交付率",
+  funnel: "访问、提交巡检与购买（事件次数）", offerMix: "各套餐订单分布", workers: "执行端心跳", expiring: "未来 7 天到期的订阅", recent: "最近创建的 30 条巡检任务",
+  offer: "套餐", orders: "订单数", amount: "金额", status: "状态", run: "任务", worker: "执行端", lastSeen: "上次任务心跳",
+  user: "用户", domain: "域名", expires: "到期时间", schedule: "执行计划", action: "操作", updated: "更新时间",
+  empty: "暂无记录", noHeartbeats: "暂无任务心跳记录", noSample: "暂无样本", healthy: "近期有响应", stale: "近期无任务心跳",
+  pause: "暂停计划", schedulePaused: "已暂停", retry: "重试", cancel: "取消", detail: "查看详情",
+  pausing: "正在暂停…", retrying: "正在重试…", cancelling: "正在取消…",
+  errorPrefix: "操作未完成：",
+  result: { retried: "巡检已重新进入队列。", cancelled: "巡检已取消或已提交取消请求。", paused: "订阅计划已暂停。" },
+  funnelStages: { visit: "访问服务页", run: "提交巡检", pay: "完成购买" },
 } as const;
 
-const labels = { zh: uiLabels, en: uiLabels } as const;
-
-function Notice({ params, locale }: { params: { result?: string; error?: string }; locale: Locale }) {
-  const t = labels[locale];
+function Notice({ params }: { params: { result?: string; error?: string } }) {
   if (params.error) {
-    return <p className="mb-5 rounded-lg border border-[#FFB86B]/35 bg-[#FFB86B]/10 px-4 py-3 text-sm text-[#FFB86B]">{t.errorPrefix}{params.error}</p>;
+    return <p className="mb-5 rounded-lg border border-[#FFB86B]/35 bg-[#FFB86B]/10 px-4 py-3 text-sm text-[#FFB86B]">{t.errorPrefix}{auditActionError(params.error)}</p>;
   }
-  if (params.result && params.result in t.result) {
+  if (params.result && Object.hasOwn(t.result, params.result)) {
     return <p className="mb-5 rounded-lg border border-[#48F5D3]/35 bg-[#48F5D3]/10 px-4 py-3 text-sm text-[#48F5D3]">{t.result[params.result as keyof typeof t.result]}</p>;
   }
   return null;
@@ -178,18 +176,19 @@ function EmptyRow({ colSpan, label }: { colSpan: number; label: string }) {
   return <tr><td colSpan={colSpan} className="py-8 text-center text-[#8B95A7]">{label}</td></tr>;
 }
 
-function money(value: number, locale: Locale) {
-  return new Intl.NumberFormat(locale === "zh" ? "zh-CN" : "en-US", {
+function money(value: number) {
+  return new Intl.NumberFormat("zh-CN", {
     style: "currency",
     currency: "CNY",
   }).format(value);
 }
 
-function dateTime(value: Date | string | null, locale: Locale) {
+function dateTime(value: Date | string | null) {
   if (!value) return "-";
-  return new Intl.DateTimeFormat(locale === "zh" ? "zh-CN" : "en-US", {
+  return new Intl.DateTimeFormat("zh-CN", {
     dateStyle: "medium",
     timeStyle: "short",
+    timeZone: "Asia/Shanghai",
   }).format(new Date(value));
 }
 
@@ -228,12 +227,14 @@ function RunAction({
   action,
   runId,
   label,
+  pendingLabel,
   icon,
   danger = false,
 }: {
   action: (formData: FormData) => Promise<void>;
   runId: string;
   label: string;
+  pendingLabel: string;
   icon: "retry" | "cancel";
   danger?: boolean;
 }) {
@@ -245,7 +246,7 @@ function RunAction({
       <SubmitButton
         variant={danger ? "danger" : "secondary"}
         className="gap-2 px-3 py-2 text-xs"
-        pendingLabel="..."
+        pendingLabel={pendingLabel}
       >
         <Icon className="h-3.5 w-3.5" />
         {label}

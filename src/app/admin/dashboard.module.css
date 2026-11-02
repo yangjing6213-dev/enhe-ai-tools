@@ -1,0 +1,32 @@
+.dashboard {
+  container-type: inline-size;
+}
+
+.stats,
+.funnel,
+.trendAndReminders {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+}
+
+@container (min-width: 36rem) {
+  .stats {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .funnel {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+@container (min-width: 48rem) {
+  .trendAndReminders {
+    grid-template-columns: minmax(0, 3fr) minmax(0, 2fr);
+  }
+}
+
+@container (min-width: 55rem) {
+  .stats {
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+  }
+}

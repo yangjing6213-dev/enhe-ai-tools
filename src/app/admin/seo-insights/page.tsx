@@ -57,9 +57,9 @@ export default async function AdminSeoInsightsPage() {
       intro="汇总近 30 天自然搜索、AI 问答引擎、站内搜索和转化信号，自动推导下一步文章、软件、账号服务和课程方向。"
     >
       <div className="grid gap-4 md:grid-cols-3 xl:grid-cols-8">
-        <InsightStat label="SEO访问" value={report.summary.totalSeoViews} accent />
+        <InsightStat label="落地页访问总数" value={report.summary.totalSeoViews} accent />
         <InsightStat label="自然搜索" value={report.summary.organicLandings} />
-        <InsightStat label="AI问答入口" value={report.summary.aiAnswerLandings} />
+        <InsightStat label="AI 问答来源访问" value={report.summary.aiAnswerLandings} />
         <InsightStat label="活动流量" value={report.summary.campaignLandings} />
         <InsightStat label="直接访问" value={report.summary.directLandings} />
         <InsightStat label="站内搜索" value={report.summary.searchEvents} />
@@ -68,7 +68,8 @@ export default async function AdminSeoInsightsPage() {
       </div>
 
       <p className="mt-4 text-xs leading-5 text-[var(--marketing-muted)]">
-        数据窗口为近 {SEO_ATTRIBUTION_WINDOW_DAYS} 天，按每批 {SEO_INSIGHTS_EVENT_BATCH_SIZE.toLocaleString("zh-CN")} 条游标读取完整 Analytics 事件，不截断 landing 与后续转化链路。
+        统计截止（北京时间）{formatEventTime(until)}，最近一条相关站内事件：{eventRows[0] ? formatEventTime(eventRows[0].createdAt) : "近 30 天暂无记录"}。
+        刷新页面会重算近 {SEO_ATTRIBUTION_WINDOW_DAYS} 天已入库的相关事件，每批 {SEO_INSIGHTS_EVENT_BATCH_SIZE.toLocaleString("zh-CN")} 条，不截断 landing 与后续转化链路。本页没有接入搜索平台的实时曝光、排名或 AI 引用数据。
       </p>
 
       <section className="surface-panel mt-8 p-6">
@@ -210,6 +211,10 @@ export default async function AdminSeoInsightsPage() {
       </section>
     </AdminSection>
   );
+}
+
+function formatEventTime(value: Date) {
+  return new Intl.DateTimeFormat("zh-CN", { timeZone: "Asia/Shanghai", dateStyle: "medium", timeStyle: "medium" }).format(value);
 }
 
 async function loadSeoInsightEvents(since: Date, until: Date) {

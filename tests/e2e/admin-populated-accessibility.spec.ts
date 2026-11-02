@@ -106,7 +106,7 @@ test("SEO run error, failed status, and high finding have readable warning label
   await expect(page.locator("#main-content h1")).toHaveText("SEO/GEO 巡检详情");
   for (const width of [1440, 1280, 1024, 768, 480, 390, 320]) {
     await page.setViewportSize({ width, height: 900 });
-    for (const label of [page.getByText("操作未完成：", { exact: false }), page.getByText("失败", { exact: true }), page.getByText("high", { exact: true })]) {
+    for (const label of [page.getByText("操作未完成：", { exact: false }), page.getByText("失败", { exact: true }), page.getByText("高风险", { exact: true })]) {
       await expect(label).toBeVisible();
       expect.soft(await contrast(label)).toBeGreaterThanOrEqual(4.5);
     }

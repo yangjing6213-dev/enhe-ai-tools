@@ -26,9 +26,8 @@ describe("GEO monitoring source wiring", () => {
     expect(dictionary).not.toContain('geoMonitoring: "GEO 监控中心"');
     expect(dictionary).not.toContain('geoMonitoring: "GEO monitoring"');
     expect(page).toContain("buildGeoMonitoringReport");
-    expect(page).toContain("ensureGeoMonitoringDefaults");
+    expect(page).not.toContain("ensureGeoMonitoringDefaults");
     expect(page).toContain("recordGeoVisibilityResultAction");
-    expect(actions).toContain("export async function ensureGeoMonitoringDefaults");
     expect(actions).toContain("export async function recordGeoVisibilityResultAction");
     expect(page).toContain("GEO 人工巡检证据台账");
     expect(page).toContain("百度");
