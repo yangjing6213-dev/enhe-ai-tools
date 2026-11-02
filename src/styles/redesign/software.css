@@ -269,7 +269,7 @@
 
 .redesign-software-card-body {
   display: grid;
-  grid-template-rows: 36px 72px 54px 54px 24px minmax(16px, 1fr);
+  grid-template-rows: 36px 72px 54px 24px minmax(16px, 1fr);
   gap: 2px;
   flex: 1;
   min-height: auto;
@@ -277,12 +277,13 @@
 }
 
 .redesign-software-card-body.has-trust {
-  grid-template-rows: 36px 72px 54px 54px 24px auto minmax(12px, 1fr);
+  grid-template-rows: 36px 72px 54px 24px auto minmax(12px, 1fr);
 }
 
 .redesign-software-card-category,
 .redesign-software-card-body h3,
-.redesign-software-card-description {
+.redesign-software-card-description,
+.redesign-software-card-price {
   margin: 0;
 }
 
@@ -390,27 +391,11 @@
   line-height: 1.4;
 }
 
-.redesign-software-card-description strong,
-.redesign-software-card-highlights svg,
-.redesign-software-card-audience svg {
+.redesign-software-card-description strong {
   color: var(--enhe-action-text, #0462C2);
   flex-shrink: 0;
 }
 
-.redesign-software-card-highlights {
-  display: grid;
-  grid-template-rows: repeat(3, minmax(0, 1fr));
-  gap: 0;
-  min-height: 0;
-  overflow: hidden;
-  margin: 0;
-  padding: 0;
-  list-style: none;
-  font-size: 0.875rem;
-}
-
-.redesign-software-card-highlights li,
-.redesign-software-card-audience,
 .redesign-software-card-bottom,
 .redesign-software-card-metrics,
 .redesign-software-card-metrics > span {
@@ -419,22 +404,13 @@
   gap: 8px;
 }
 
-.redesign-software-card-highlights li {
-  min-width: 0;
-  overflow: hidden;
-  line-height: 20px;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
-.redesign-software-card-audience {
+.redesign-software-card-price {
   min-width: 0;
   overflow: hidden;
   margin: 0;
-  padding: 0 12px;
-  border: 1px solid var(--enhe-border);
-  border-radius: 999px;
-  font-size: 0.75rem;
+  color: var(--enhe-text);
+  font-size: 0.875rem;
+  font-weight: 700;
   text-overflow: ellipsis;
   white-space: nowrap;
 }

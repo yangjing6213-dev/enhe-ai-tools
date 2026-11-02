@@ -87,7 +87,7 @@ describe("AI News editorial token boundary", () => {
       'className="mt-5 break-words max-w-3xl text-lg font-medium',
     );
     expect(detail).toContain(
-      'className="mt-4 break-words text-base leading-8',
+      'className="ai-news-detail-summary mt-5 break-words max-w-4xl text-base leading-8',
     );
     expect(detail).toContain(
       'className="break-words font-semibold text-[var(--marketing-text)]',
@@ -95,6 +95,23 @@ describe("AI News editorial token boundary", () => {
     expect(detail).toContain(
       'className="mt-2 break-words text-sm leading-6',
     );
+  });
+
+  it("puts article title, date, and summary before the collapsible topic tags", () => {
+    const detail = read("app/ai-news/[slug]/page-shell.tsx");
+    const titleIndex = detail.indexOf("{localized.title}");
+    const summaryIndex = detail.indexOf("{localized.summary}");
+    const tagsIndex = detail.indexOf("article.tagLinks.map", summaryIndex);
+
+    expect(titleIndex).toBeGreaterThan(-1);
+    expect(summaryIndex).toBeGreaterThan(titleIndex);
+    expect(tagsIndex).toBeGreaterThan(summaryIndex);
+    expect(detail).toContain("<details");
+    expect(detail).toContain("article.tagLinks.length");
+
+    const listing = read("app/ai-news/page-shell.tsx");
+    expect(listing).toContain("ai-news-latest-teaser");
+    expect(listing).toContain("latestArticle");
   });
 
   it("uses localized labels for the three supporting landmarks", () => {

@@ -7,25 +7,21 @@ const routes = [
     path: "/",
     menuLabel: "菜单",
     closeLabel: "收起菜单",
-    supportLabel: "客服",
   },
   {
     path: "/software",
     menuLabel: "菜单",
     closeLabel: "收起菜单",
-    supportLabel: "客服",
   },
   {
     path: "/en",
     menuLabel: "Menu",
     closeLabel: "Close menu",
-    supportLabel: "Chat",
   },
   {
     path: "/en/software",
     menuLabel: "Menu",
     closeLabel: "Close menu",
-    supportLabel: "Chat",
   },
 ] as const;
 
@@ -324,22 +320,10 @@ for (const route of routes) {
         .toBeLessThanOrEqual(1);
 
       if (width === 483 || width === 484) {
-        const support = page.getByRole("button", {
-          name: route.supportLabel,
-          exact: true,
-        });
-        const supportBounds = await support.boundingBox();
-        expect(supportBounds).not.toBeNull();
-        const menuOwnsHit = await page.evaluate(({ x, y }) => {
-          const hit = document.elementFromPoint(x, y);
-          return Boolean(
-            hit?.closest(".redesign-mobile-drawer, .redesign-menu-overlay"),
-          );
-        }, {
-          x: (supportBounds?.x ?? 0) + (supportBounds?.width ?? 0) / 2,
-          y: (supportBounds?.y ?? 0) + (supportBounds?.height ?? 0) / 2,
-        });
-        expect(menuOwnsHit, `${route.path} ${width}px support interception`).toBe(true);
+        await expect(page.locator(".site-floating-actions"))
+          .toHaveCSS("display", "none");
+        await expect(page.locator(".site-floating-mobile-menu-toggle"))
+          .toBeHidden();
       }
 
       if (width > 360) {
@@ -367,6 +351,12 @@ for (const route of routes) {
       });
       await expect(drawer).toBeHidden();
       await expect(trigger).toBeFocused();
+      if (width === 483 || width === 484) {
+        await expect(page.locator(".site-floating-actions"))
+          .toHaveCSS("display", "flex");
+        await expect(page.locator(".site-floating-mobile-menu-toggle"))
+          .toBeVisible();
+      }
       await expect.poll(() => page.evaluate(() => document.body.style.overflow)).toBe("");
 
       expect(errors.consoleErrors).toEqual([]);

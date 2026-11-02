@@ -3,7 +3,7 @@
 import Image from "next/image";
 import { CardLikeAction } from "@/components/card-like-action";
 import { useState } from "react";
-import { ArrowUpRight, Check, Download, MousePointer2, ShieldCheck, UserRound } from "lucide-react";
+import { ArrowUpRight, Download, MousePointer2, ShieldCheck } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import { getDictionary, type Locale } from "@/lib/dictionaries";
 import { buildValueSentence } from "@/lib/tool-card-highlights";
@@ -91,12 +91,9 @@ export function EnheRedesignSoftwareCard({
               {product.secondaryName ? <p className="redesign-software-card-secondary">{product.secondaryName}</p> : null}
             </div>
             <p className="redesign-software-card-description"><strong>{t.valuePrefix}:</strong>{summary}</p>
-            <ul className="redesign-software-card-highlights">
-              {product.highlights.map((highlight) => (
-                <li key={highlight}><Check size={14} aria-hidden="true" />{highlight}</li>
-              ))}
-            </ul>
-            <p className="redesign-software-card-audience"><UserRound size={14} aria-hidden="true" />{t.audienceLabel}: {categoryLabel}</p>
+            <p className="redesign-software-card-price" aria-label={`${t.priceLabel}: ${product.price}`}>
+              {product.price}
+            </p>
             {hasSafetyReview ? (
               <div className="redesign-software-card-trust" data-trust-safety>
                 <ShieldCheck size={18} aria-hidden="true" />

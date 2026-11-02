@@ -36,6 +36,7 @@ export type PublicSoftwareCatalogRow = {
   createdAt: Date | string;
   updatedAt?: Date | string;
   category: { name: string } | null;
+  supportedAgents?: string[];
   priceSpecs: Array<{
     price: unknown;
     status: "active" | "disabled";
@@ -49,6 +50,7 @@ export type SoftwareCatalogItem = {
   secondaryName: string | null;
   isPaid: boolean;
   securityReviewedAt?: Date | string | null;
+  supportedAgents?: string[];
   highlights: string[];
   downloadCount: number;
   usageCount: number;
@@ -385,6 +387,7 @@ function buildCatalogItem(
     id: row.id,
     type: row.type,
     securityReviewedAt: row.securityReviewedAt ?? null,
+    supportedAgents: row.supportedAgents ?? [],
     secondaryName: locale === "zh" ? localizedIdentity.secondaryName : null,
     isPaid,
     highlights: buildToolCardHighlights({ ...row, isDownloadPaid: isPaid }, locale),

@@ -13,6 +13,7 @@ const dismissedKey = "enhe-entry-notice-dismissed-v1";
 export function SiteEntryNotice({ locale, config }: { locale: Locale; config: SiteEntryNoticeConfig }) {
   const [visible, setVisible] = useState(false);
   const dialogRef = useRef<HTMLDialogElement>(null);
+  const titleRef = useRef<HTMLHeadingElement>(null);
   const english = locale === "en";
   const title = english ? config.enTitle : config.zhTitle;
   const paragraphs = (english ? config.enBody : config.zhBody).split(/\n\s*\n/u).filter(Boolean);
@@ -37,7 +38,10 @@ export function SiteEntryNotice({ locale, config }: { locale: Locale; config: Si
   useEffect(() => {
     const dialog = dialogRef.current;
     if (!dialog) return;
-    if (visible && config.enabled && !dialog.open && typeof dialog.showModal === "function") dialog.showModal();
+    if (visible && config.enabled && !dialog.open && typeof dialog.showModal === "function") {
+      dialog.showModal();
+      titleRef.current?.focus({ preventScroll: true });
+    }
     else if ((!visible || !config.enabled) && dialog.open) dialog.close();
   }, [visible, config.enabled]);
 
@@ -73,7 +77,7 @@ export function SiteEntryNotice({ locale, config }: { locale: Locale; config: Si
       onClose={dismiss}
     >
       <div className={styles.card}>
-        <h2 id="site-entry-notice-title" className={styles.title}>
+        <h2 ref={titleRef} tabIndex={-1} id="site-entry-notice-title" className={styles.title}>
           <Bell aria-hidden="true" size={22} />
           {title}
         </h2>
@@ -92,9 +96,9 @@ export function SiteEntryNotice({ locale, config }: { locale: Locale; config: Si
         className={styles.close}
         onClick={closeDialog}
         aria-label={english ? "Close announcement" : "关闭公告"}
-        autoFocus
       >
-        <X aria-hidden="true" size={24} />
+        <X aria-hidden="true" size={18} />
+        <span>{english ? "Got it" : "我知道了"}</span>
       </button>
     </dialog>
   );

@@ -460,7 +460,7 @@ test("floating cart and inbox match the white circular support icon and open per
     }),
   );
 
-  await page.setViewportSize({ width: 390, height: 844 });
+  await page.setViewportSize({ width: 1440, height: 900 });
   await page.goto("/", { waitUntil: "load" });
 
   const cart = page.getByRole("button", { name: "查看购买订单" });

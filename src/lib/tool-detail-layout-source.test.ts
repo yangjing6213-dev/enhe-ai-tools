@@ -5,10 +5,13 @@ import { describe, expect, it } from "vitest";
 const root = resolve(__dirname, "../..");
 
 describe("tool detail layout source", () => {
-  it("stacks media above text and preserves full image visibility", () => {
+  it("shows the product summary and real next step before the cover", () => {
     const source = readFileSync(resolve(root, "src/app/tools/[slug]/page-shell.tsx"), "utf8");
 
     expect(source).toContain("tool-detail-hero-stack");
+    expect(source).toContain("tool-detail-summary");
+    expect(source).toContain("tool-detail-quick-price");
+    expect(source).toContain('href="#tool-purchase"');
     expect(source).toContain("tool-detail-cover-frame");
     expect(source).toContain("tool-detail-product-gallery");
     expect(source).toContain("tool-detail-copy-card");
@@ -21,7 +24,14 @@ describe("tool detail layout source", () => {
     expect(source).not.toContain("lg:grid-cols-[minmax(0,0.95fr)_minmax(0,1.05fr)]");
     expect(source).not.toContain("lg:grid-cols-[minmax(0,0.9fr)_minmax(0,1.1fr)]");
 
-    expect(source.indexOf("tool-detail-product-gallery")).toBeLessThan(source.indexOf("tool-detail-copy-card"));
+    expect(source.indexOf("tool-detail-summary")).toBeLessThan(source.indexOf("tool-detail-cover-frame"));
+  });
+
+  it("uses a two-column product summary and cover on wide screens", () => {
+    const styles = readFileSync(resolve(root, "src/styles/redesign/site-refresh.css"), "utf8");
+    expect(styles).toContain(".tool-detail-summary");
+    expect(styles).toContain(".tool-detail-hero-stack");
+    expect(styles).toContain("grid-template-columns: minmax(0, 1fr) minmax(0, 1fr)");
   });
 
   it("loads the core product cover eagerly with high fetch priority", () => {

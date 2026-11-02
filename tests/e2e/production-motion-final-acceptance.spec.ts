@@ -114,8 +114,8 @@ const homeSsrViewports = [
 ] as const;
 
 const categorySupportRoutes = [
-  { path: "/software", otherPath: "/about", support: "客服" },
-  { path: "/en/software", otherPath: "/en/about", support: "Chat" },
+  { path: "/software", otherPath: "/about", support: "打开快捷入口", desktopSupport: "客服" },
+  { path: "/en/software", otherPath: "/en/about", support: "Open quick links", desktopSupport: "Chat" },
 ] as const;
 
 const categorySupportViewports = [
@@ -554,8 +554,11 @@ for (const route of routes) {
         await expect(page.getByRole("heading", { level: 1, name: route.h1 })).toBeVisible();
         expect(await rootOverflow(page), `${route.path} root overflow`).toBe(0);
 
+        const isMobile = viewport.width < 768;
         const support = page.getByRole("button", {
-          name: route.support,
+          name: isMobile
+            ? route.path.startsWith("/en") ? "Open quick links" : "打开快捷入口"
+            : route.support,
           exact: true,
         });
         await expect(support).toBeVisible();
@@ -571,7 +574,21 @@ for (const route of routes) {
         expect(supportReserve).toBe("52px");
         expect(supportBox?.width).toBe(44);
         expect(supportBox?.height).toBe(44);
-        await expect(support.locator(".customer-support-launcher-label")).toHaveClass(/sr-only/);
+        if (isMobile) {
+          await expect(support).toHaveAttribute("aria-haspopup", "true");
+          await support.click();
+          const quickLinks = page.getByRole("navigation", {
+            name: route.path.startsWith("/en") ? "Quick links" : "快捷入口",
+          });
+          await expect(quickLinks).toBeVisible();
+          await expect(quickLinks.getByRole("button", {
+            name: route.path.startsWith("/en") ? "Customer support" : "联系客服",
+          })).toBeVisible();
+          await support.click();
+          await expect(quickLinks).toBeHidden();
+        } else {
+          await expect(support.locator(".customer-support-launcher-label")).toHaveClass(/sr-only/);
+        }
 
 
         if (route.kind === "home") {
@@ -603,19 +620,17 @@ for (const route of routes) {
 
           const { drawer, trigger } = await openMobileMenu(page, route, modality);
           await expect(drawer.locator("[aria-selected]")).toHaveCount(0);
-          const openSupportBox = await support.boundingBox();
-          expect(openSupportBox).not.toBeNull();
-          const navigationOwnsSupportHit = await page.evaluate(({ x, y }) => {
-            const target = document.elementFromPoint(x, y);
-            return Boolean(
-              target?.closest(".redesign-mobile-drawer, .redesign-menu-overlay"),
-            );
-          }, {
-            x: (openSupportBox?.x ?? 0) + (openSupportBox?.width ?? 0) / 2,
-            y: (openSupportBox?.y ?? 0) + (openSupportBox?.height ?? 0) / 2,
-          });
-          expect(navigationOwnsSupportHit).toBe(true);
+          await expect(page.locator(".site-floating-actions")).toHaveCSS(
+            "display",
+            "none",
+          );
+          await expect(support).toBeHidden();
           await closeMobileMenu(page, drawer, trigger);
+          await expect(page.locator(".site-floating-actions")).toHaveCSS(
+            "display",
+            "flex",
+          );
+          await expect(support).toBeVisible();
         } else {
           await expect(page.locator(".redesign-menu-trigger")).toBeHidden();
           await expect(page.locator(".redesign-desktop-nav")).toBeVisible();
@@ -655,7 +670,7 @@ test("support stays put when narrowed mobile controls are clear and remains usab
   await page.setViewportSize({ width: 483, height: 844 });
   await openFormalRoute(page, "/");
   await page.evaluate(() => document.fonts.ready);
-  const support = page.getByRole("button", { name: "客服", exact: true });
+  const support = page.getByRole("button", { name: "打开快捷入口", exact: true });
   await expect(support).toBeVisible();
   const resting = await support.boundingBox();
   expect(resting).not.toBeNull();
@@ -673,6 +688,8 @@ test("support stays put when narrowed mobile controls are clear and remains usab
   }
 
   await support.click();
+  const quickLinks = page.getByRole("navigation", { name: "快捷入口" });
+  await quickLinks.getByRole("button", { name: "联系客服", exact: true }).click();
   await expect(page.getByRole("dialog", { name: "客服助手" })).toBeVisible();
   await page.getByRole("button", { name: "关闭客服", exact: true }).click();
   await expect(support).toBeVisible();
@@ -689,7 +706,7 @@ for (const supportWidth of [483, 484] as const) {
     for (const route of routes) {
       await openFormalRoute(page, route.path);
       const support = page.getByRole("button", {
-        name: route.support,
+        name: route.path.startsWith("/en") ? "Open quick links" : "打开快捷入口",
         exact: true,
       });
       await expect(support).toBeVisible();
@@ -728,7 +745,7 @@ for (const supportWidth of [483, 484] as const) {
     for (const route of routes.filter(({ kind }) => kind === "software")) {
       await openFormalRoute(page, route.path);
       const support = page.getByRole("button", {
-        name: route.support,
+        name: route.path.startsWith("/en") ? "Open quick links" : "打开快捷入口",
         exact: true,
       });
       await expect(support).toBeVisible();
@@ -1075,7 +1092,7 @@ for (const route of categorySupportRoutes) {
         await page.setViewportSize({ width: 768, height: 900 });
         await expect(beforeResize.panel).toBeVisible();
         await expect(beforeResize.panel).not.toHaveAttribute("aria-modal", "true");
-        const desktopSupport = await captureSupportBaseline(page, route.support);
+        const desktopSupport = await captureSupportBaseline(page, route.desktopSupport);
         expect(desktopSupport.width).toBeGreaterThan(44);
         await expect
           .poll(() => page.evaluate(() => document.body.style.overflow))
@@ -1083,7 +1100,7 @@ for (const route of categorySupportRoutes) {
         await page.keyboard.press("Escape");
         await expect(beforeResize.panel).toBeHidden();
         await expect(root).toHaveAttribute("data-layer-rendered", "false");
-        await expectSupportRestored(page, route.support, desktopSupport);
+        await expectSupportRestored(page, route.desktopSupport, desktopSupport);
 
         expect((await modalMonitorState(page)).maxDialogs).toBeLessThanOrEqual(1);
         expect(await rootOverflow(page)).toBe(0);
@@ -1163,13 +1180,13 @@ for (const locale of [
     path: "/software",
     otherPath: "/about",
     menu: "菜单",
-    support: "客服",
+    support: "打开快捷入口",
   },
   {
     path: "/en/software",
     otherPath: "/en/about",
     menu: "Menu",
-    support: "Chat",
+    support: "Open quick links",
   },
 ] as const) {
   test(`software category and mobile navigation keep one active modal on ${locale.path}`, async ({

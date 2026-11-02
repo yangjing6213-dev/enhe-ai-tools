@@ -18,7 +18,7 @@ describe("AI tools candidate responsive browsing", () => {
     expect(css).toMatch(/\.redesign-software-grid\s*\{[^}]*grid-template-columns:\s*repeat\(3,\s*minmax\(0,\s*1fr\)\)/);
     expect(css).toMatch(/@media\s*\(max-width:\s*768px\)[\s\S]*\.redesign-software-grid\s*\{[^}]*grid-template-columns:\s*minmax\(0,\s*1fr\)/);
     expect(css).not.toContain(":nth-child(");
-    expect(css).toContain("grid-template-rows: 36px 72px 54px 54px 24px minmax(16px, 1fr)");
+    expect(css).toContain("grid-template-rows: 36px 72px 54px 24px minmax(16px, 1fr)");
     expect(css).toMatch(/\.redesign-software-card-badges\s*\{[^}]*justify-content:\s*space-between;/);
     expect(css).toMatch(/\.redesign-software-card-full-link\s*\{[^}]*display:\s*flex;/);
     expect(css).toMatch(/width\s*<\s*768px/);

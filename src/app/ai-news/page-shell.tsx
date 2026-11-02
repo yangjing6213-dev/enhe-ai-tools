@@ -333,7 +333,7 @@ export async function AiNewsPageShell({
       />
     );
   }
-  const [{ articles, total }, otherLanguageListing, hot, categories, tags, discovery, topics] =
+  const [{ articles, total }, otherLanguageListing, hot, categories, tags, discovery, topics, latestPublished] =
     await Promise.all([
       getPublicNewsListing({
         ...(filters satisfies PublicNewsListingFilters),
@@ -345,7 +345,9 @@ export async function AiNewsPageShell({
       getPublicNewsTags(forceLocale),
       getPublicAiNewsDiscovery(forceLocale),
       getPublicAiNewsTopics(),
+      getPublicNewsListing({ sort: "latest", take: 1, locale: forceLocale }),
     ]);
+  const latestArticle = toNewsListingCards(latestPublished.articles, forceLocale)[0] ?? null;
   const pageCount = getNewsPageCount(total);
   if (
     pageOverride &&
@@ -419,6 +421,17 @@ export async function AiNewsPageShell({
           filters={filters}
           locale={forceLocale}
         />
+
+        {!filtered && filters.page === 1 && latestArticle ? (
+          <section className="ai-news-latest-teaser" aria-label={t.aiNews.latestTitle}>
+            <span>{t.aiNews.latestTitle}</span>
+            <Link href={latestArticle.href}>
+              <time>{latestArticle.dateLabel}</time>
+              <strong>{latestArticle.title}</strong>
+              <span aria-hidden="true">{t.aiNews.readMore} →</span>
+            </Link>
+          </section>
+        ) : null}
 
         <section className="glass ai-news-workspace-takeaway mt-8 rounded-2xl p-6">
           <p className="text-xs font-bold uppercase tracking-[0.16em] text-[var(--marketing-accent)]">

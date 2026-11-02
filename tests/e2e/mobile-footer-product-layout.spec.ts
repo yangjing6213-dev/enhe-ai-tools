@@ -46,7 +46,7 @@ for (const locale of ["zh", "en"] as const) {
           headingCenters: [...headingRange.getClientRects()].map((line) => line.x + line.width / 2),
           filings: bounds(".footer-copyright-filings"),
           filingLinks: [...element.querySelectorAll(".footer-copyright-filings a")].map((link) => link.getBoundingClientRect().toJSON()),
-          supportLeft: document.querySelector('button[aria-controls="customer-support-panel"]')!.getBoundingClientRect().left,
+          quickLauncher: document.querySelector<HTMLElement>(".site-floating-mobile-menu-toggle")!.getBoundingClientRect().toJSON(),
           pageWidth: document.documentElement.scrollWidth,
         };
       });
@@ -61,7 +61,12 @@ for (const locale of ["zh", "en"] as const) {
         for (const center of [...layout.headingCenters, ...layout.navigationCenters, layout.filings.x + layout.filings.width / 2]) {
           expect(Math.abs(center - width / 2), `footer content center at ${width}px`).toBeLessThanOrEqual(1);
         }
-        expect(layout.filings.right, `filings keep the customer support lane at ${width}px`).toBeLessThanOrEqual(layout.supportLeft - 8);
+        const filingsOverlapLauncher =
+          layout.filings.x < layout.quickLauncher.right &&
+          layout.filings.right > layout.quickLauncher.x &&
+          layout.filings.y < layout.quickLauncher.bottom &&
+          layout.filings.bottom > layout.quickLauncher.y;
+        expect(filingsOverlapLauncher, `filings do not overlap quick links at ${width}px`).toBe(false);
         for (const link of layout.filingLinks) {
           expect(link.x).toBeGreaterThanOrEqual(layout.filings.x);
           expect(link.right).toBeLessThanOrEqual(layout.filings.right);

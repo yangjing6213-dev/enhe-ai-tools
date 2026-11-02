@@ -60,7 +60,7 @@ function assertLocaleSurface(locale: RedesignLocale, html: string) {
   expect(html).toContain(copy.actions.pageTwo);
   expect(html).not.toContain(getDictionary(locale).toolCard.compareBeforeBuy);
   expect(html).not.toContain(getDictionary(locale).toolCard.getFreeTool);
-  expect(html).not.toContain("redesign-software-card-price");
+  expect(html).toContain("redesign-software-card-price");
   expect(html).not.toContain("redesign-software-card-commerce");
 
   for (const product of SOFTWARE_PRODUCTS) {

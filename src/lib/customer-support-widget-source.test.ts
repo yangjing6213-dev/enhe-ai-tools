@@ -192,8 +192,8 @@ describe("customer support widget source", () => {
     expect(home).toContain('className="redesign-home-product-control"');
     expect(software).toContain("var(--support-exclusion-applied)");
     expect(software).not.toContain(":nth-child(");
-    expect(software).toContain("grid-template-rows: 36px 72px 54px 54px 24px minmax(16px, 1fr)");
-    expect(software).toContain("grid-template-rows: 36px 72px 54px 54px 24px auto minmax(12px, 1fr)");
+    expect(software).toContain("grid-template-rows: 36px 72px 54px 24px minmax(16px, 1fr)");
+    expect(software).toContain("grid-template-rows: 36px 72px 54px 24px auto minmax(12px, 1fr)");
     expect(software).toContain("height: 600px;");
     expect(software).toContain("@media (width < 768px)");
     expect(software).not.toContain("@media (max-width: 767px)");

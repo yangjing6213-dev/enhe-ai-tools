@@ -229,6 +229,7 @@ const getCachedPublicSoftwareCatalogRows = unstable_cache(
           downloadPrice: true,
           isHomeRecommended: true,
           securityReviewedAt: true,
+          supportedAgents: true,
           downloadCount: true,
           usageCount: true,
           sortOrder: true,

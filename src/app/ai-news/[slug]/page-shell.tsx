@@ -252,11 +252,6 @@ export async function AiNewsDetailPageShell({
                 {t.aiNews.featured}
               </Badge>
             ) : null}
-            {article.tagLinks.map(({ tag }) => (
-              <Badge key={tag.id}>
-                {resolveLocalizedNewsTagName(tag.name, forceLocale) || tag.name}
-              </Badge>
-            ))}
           </div>
           <h1 className="mt-6 break-words max-w-5xl text-4xl font-black leading-tight text-[var(--marketing-text)] md:text-6xl">
             {localized.title}
@@ -274,6 +269,25 @@ export async function AiNewsDetailPageShell({
             <span className="tabular-nums">{article.readingTime} min</span>
             <span className="tabular-nums">{article.viewCount} views</span>
           </div>
+          <p className="ai-news-detail-summary mt-5 break-words max-w-4xl text-base leading-8 text-[var(--marketing-text)]">
+            {localized.summary}
+          </p>
+          {article.tagLinks.length ? (
+            <details className="ai-news-detail-tags mt-5">
+              <summary>
+                {forceLocale === "en"
+                  ? `More topic tags (${article.tagLinks.length})`
+                  : `更多专题标签（${article.tagLinks.length}）`}
+              </summary>
+              <div className="mt-3 flex flex-wrap gap-2">
+                {article.tagLinks.map(({ tag }) => (
+                  <Badge key={tag.id}>
+                    {resolveLocalizedNewsTagName(tag.name, forceLocale) || tag.name}
+                  </Badge>
+                ))}
+              </div>
+            </details>
+          ) : null}
           {coverImage ? (
             <div className="relative mt-8 aspect-[16/9] overflow-hidden rounded-2xl border border-[var(--marketing-border)] bg-[var(--marketing-card-soft)]">
               <Image
@@ -290,26 +304,21 @@ export async function AiNewsDetailPageShell({
 
         <div className="mt-10 grid gap-8 lg:grid-cols-[minmax(0,1fr)_300px]">
           <div className="space-y-8">
-            {!embeddedSections.keyTakeaways ? (
+            {!embeddedSections.keyTakeaways && localized.keyTakeaways.length ? (
             <section className="glass rounded-2xl p-6">
               <h2 className="text-xl font-black text-[var(--marketing-text)]">
                 {t.aiNews.keyTakeaways}
               </h2>
-              <p className="mt-4 break-words text-base leading-8 text-[var(--marketing-muted)]">
-                {localized.summary}
-              </p>
-              {localized.keyTakeaways.length ? (
-                <div className="mt-5 grid gap-3 md:grid-cols-2">
-                  {localized.keyTakeaways.map((item) => (
-                    <div
-                      key={item}
-                      className="rounded-xl border border-[var(--marketing-border)] bg-[var(--marketing-card)] p-4 text-sm leading-6 text-[var(--marketing-text)]"
-                    >
-                      {item}
-                    </div>
-                  ))}
-                </div>
-              ) : null}
+              <div className="mt-5 grid gap-3 md:grid-cols-2">
+                {localized.keyTakeaways.map((item) => (
+                  <div
+                    key={item}
+                    className="rounded-xl border border-[var(--marketing-border)] bg-[var(--marketing-card)] p-4 text-sm leading-6 text-[var(--marketing-text)]"
+                  >
+                    {item}
+                  </div>
+                ))}
+              </div>
             </section>
             ) : null}
 

@@ -16,6 +16,10 @@ describe("site entry notice", () => {
     expect(component).toContain("localStorage");
     expect(component).toContain("String(config.version)");
     expect(component).toContain('aria-modal="true"');
+    expect(component).toContain('titleRef.current?.focus({ preventScroll: true })');
+    expect(component).toContain("Got it");
+    expect(component).toContain("我知道了");
+    expect(component).not.toContain("autoFocus");
     expect(qr).toContain("扫码收藏网站");
     expect(qr).toContain("Scan to bookmark this site");
     expect(config).toContain("ENHE AI");

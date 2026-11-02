@@ -33,7 +33,8 @@ describe("tool listing localization source", () => {
       softwareSource.indexOf('data-section="all-products"'),
     );
     expect(softwareCardSource).not.toContain('className="redesign-software-card-commerce"');
-    expect(softwareCardSource).not.toContain("product.price");
+    expect(softwareCardSource).toContain("product.price");
+    expect(softwareCardSource).not.toContain("product.highlights");
     expect(softwareCardSource).toContain("href={product.detailHref}");
     expect(softwareCardSource).toContain("aria-labelledby={headingId}");
     expect(accountServicesSource).toContain("<ListingGuidanceFold forceLocale={forceLocale} />");
