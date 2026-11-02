@@ -3,6 +3,7 @@ import { join } from "node:path";
 import { describe, expect, it } from "vitest";
 import {
   buildLocalizedToolMetaDescription,
+  buildLocalizedToolPreviewText,
   buildLocalizedToolSummary,
 } from "@/lib/tool-localization";
 
@@ -20,6 +21,21 @@ describe("tool detail copy", () => {
     expect(localizationSource).toContain("产品介绍和使用教程");
     expect(localizationSource).not.toContain("工具介绍和使用教程");
   });
+  it.each(["windows-ai", "faceswap-studio-ai"])(
+    "uses the bilingual product summary for %s in the catalog and search metadata",
+    (slug) => {
+      const summary = "为创作者整理已授权的项目素材。";
+      const tool = {
+        slug,
+        name: "创作工具",
+        type: "software" as const,
+        shortDescription: `[[zh]]${summary}[[/zh]][[en]]Organize authorized project material for creators.[[/en]]`,
+      };
+      expect(buildLocalizedToolPreviewText(tool, "zh")).toBe(summary);
+      expect(buildLocalizedToolMetaDescription(tool, "zh")).toBe(summary);
+    },
+  );
+
   it("uses user-first copy overrides for priority paid detail pages", () => {
     const riskyVideoTool = {
       slug: "ultimate-edition-ai-video-generation-suite",

@@ -161,6 +161,11 @@ function getUserFirstToolCopyOverride(
 ) {
   if (locale === "en") return "";
 
+  if (tool.type === "software" && (tool.slug === "windows-ai" || tool.slug === "faceswap-studio-ai")) {
+    const { blocks } = extractLocalizedBlocks(tool.shortDescription);
+    if (blocks.zh && blocks.en) return "";
+  }
+
   if (
     tool.type === "online" &&
     (hasAccountServiceRiskCopy(tool.shortDescription) ||
