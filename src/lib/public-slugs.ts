@@ -8,6 +8,10 @@ const explicitToolCanonicalSlugs: Record<string, string> = {
   "ai-ai-ilo5a5": "ai-monetization-side-hustle-course",
   "tool-mq12l5w6": "no-code-chat-screenshot-maker",
   "ai-skill": "intentbridge",
+  "ai-prompt": "ai-prompt-management-system-418-bilingual-prompts-for-writing-seo-and-ai-creation",
+  "ai-ai": "local-ai-voice-generator-for-voiceover-materials",
+  "ai-codex": "product-video",
+  "ai-video-studio-ai-ai-video-studio-ai": "ultimate-edition-ai-video-generation-suite",
 };
 
 const explicitAiNewsCanonicalSlugs: Record<string, string> = {
