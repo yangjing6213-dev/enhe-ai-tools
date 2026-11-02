@@ -3836,6 +3836,18 @@
   overflow-wrap: anywhere;
 }
 
+.enhe-admin-shell .enhe-admin-tool-table[data-tool-type="ai_skill"] :is(.enhe-admin-tool-table-heading, .enhe-admin-tool-list-row) {
+  grid-template-columns: minmax(0, 1.6fr) 0.8fr 0.6fr 0.8fr 6.5rem 6.5rem;
+}
+
+.enhe-admin-shell .enhe-admin-tool-table[data-tool-type="ai_skill"] :is(.enhe-admin-tool-table-heading, .enhe-admin-tool-list-rows) {
+  min-width: 52rem;
+}
+
+.enhe-admin-shell .enhe-admin-tool-table[data-tool-type="ai_skill"] :is(.enhe-admin-tool-table-heading, .enhe-admin-tool-list-row) > :last-child {
+  text-align: start;
+}
+
 /* Shared list geometry keeps headings and records on the same compact grid. */
 .enhe-admin-shell :is(.enhe-admin-content-table, .enhe-admin-content-records, .enhe-admin-refund-records) > .grid,
 .enhe-admin-shell :is(.enhe-admin-content-table, .enhe-admin-content-records, .enhe-admin-refund-records) > [class*="divide-y"] > .grid {
