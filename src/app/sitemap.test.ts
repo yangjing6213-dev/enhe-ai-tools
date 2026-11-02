@@ -169,7 +169,7 @@ describe("sitemap canonical URL contract", () => {
   it("includes only public canonical routes and excludes private or legacy routes", async () => {
     prismaMock.tool.findMany.mockResolvedValue([
       {
-        slug: "ai-ai",
+        slug: "ai-legacy",
         name: "AI Voice Generator Flexible Edition",
         englishName: "AI Voice Generator Flexible Edition",
         shortDescription: "Generate voice content for production workflows.",

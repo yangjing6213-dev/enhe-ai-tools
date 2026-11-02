@@ -35,7 +35,7 @@ describe("public content canonical slug resolution", () => {
     db.toolFindMany.mockResolvedValue([
       {
         id: "tool-1",
-        slug: "ai-ai",
+        slug: "ai-legacy",
         name: "AI语音生成",
         englishName: "AI Voice Generator - Flexible Edition"
       }
@@ -44,16 +44,26 @@ describe("public content canonical slug resolution", () => {
 
     const { resolvePublicToolSlug } = await import("@/lib/public-content");
 
-    await expect(resolvePublicToolSlug("ai-ai")).resolves.toEqual({
+    await expect(resolvePublicToolSlug("ai-legacy")).resolves.toEqual({
       id: "tool-1",
-      slug: "ai-ai",
+      slug: "ai-legacy",
       canonicalSlug: "ai-voice-generator-flexible-edition"
     });
     await expect(resolvePublicToolSlug("ai-voice-generator-flexible-edition")).resolves.toEqual({
       id: "tool-1",
-      slug: "ai-ai",
+      slug: "ai-legacy",
       canonicalSlug: "ai-voice-generator-flexible-edition"
     });
+  });
+
+  it("resolves the protected voice tool URL after its title changes", async () => {
+    const canonicalSlug = "local-ai-voice-generator-for-voiceover-materials";
+    const tool = { id: "voice-tool", slug: "ai-ai", name: "本地 AI 语音生成", englishName: "Local AI Voice Generator | Windows Workspace for Narration and Multi-Character Audio" };
+    db.toolFindMany.mockResolvedValue([tool]);
+    const { resolvePublicToolSlug } = await import("@/lib/public-content");
+    for (const slug of [tool.slug, canonicalSlug]) {
+      await expect(resolvePublicToolSlug(slug)).resolves.toEqual({ id: tool.id, slug: tool.slug, canonicalSlug });
+    }
   });
 
   it("resolves AI news detail requests by raw or canonical slug", async () => {
