@@ -657,7 +657,7 @@ function FilterBar({
         <option value="hot">{t.aiNews.hot}</option>
         <option value="featured">{t.aiNews.featured}</option>
       </select>
-      <button className="ai-news-filter-control rounded-xl bg-[var(--marketing-button)] px-5 font-bold text-[var(--marketing-card)] transition-colors hover:bg-[var(--marketing-accent)] lg:col-span-4">
+      <button className="ai-news-filter-control rounded-xl bg-[var(--marketing-button)] px-5 font-bold text-[var(--marketing-card)] transition-colors hover:bg-[var(--marketing-accent)]">
         {t.aiNews.filter}
       </button>
     </form>

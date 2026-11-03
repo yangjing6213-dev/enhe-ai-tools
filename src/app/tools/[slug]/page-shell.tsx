@@ -826,6 +826,37 @@ export async function ToolDetailPageShell({
       <main>
         <section className="glass overflow-hidden rounded-[2rem] p-4 md:p-6 lg:p-8">
           <div className="tool-detail-hero-stack">
+            <div className="tool-detail-cover-frame relative overflow-hidden rounded-[1.75rem] border border-[rgba(210,230,255,0.16)] bg-[#07101E]">
+              <div className="relative aspect-[16/9]">
+                {isAiWorkflow ? (
+                  <AiWorkflowCoverImage
+                    coverImage={tool.coverImage}
+                    slug={tool.slug}
+                    alt={localizedTool.primaryName}
+                    fill
+                    className="content-thumbnail-outline object-contain"
+                    sizes="(min-width: 1024px) 1120px, 100vw"
+                    priority
+                    fetchPriority="high"
+                    unoptimized
+                  />
+                ) : coverImage ? (
+                  <Image
+                    src={coverImage}
+                    alt={localizedTool.primaryName}
+                    fill
+                    className="content-thumbnail-outline object-contain"
+                    sizes="(min-width: 1024px) 1120px, 100vw"
+                    priority
+                    fetchPriority="high"
+                    unoptimized
+                  />
+                ) : (
+                  <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_20%,rgba(65,197,219,0.2),transparent_32%),radial-gradient(circle_at_72%_70%,rgba(255,184,107,0.16),transparent_36%),repeating-linear-gradient(135deg,rgba(238,246,255,0.08)_0_2px,transparent_2px_18px),linear-gradient(135deg,rgba(255,255,255,0.08),transparent)]" />
+                )}
+              </div>
+            </div>
+
             <div className="tool-detail-summary">
               <div className="flex flex-wrap gap-2">
                 <Badge>{localizedCategoryName ?? td.uncategorized}</Badge>
@@ -891,37 +922,6 @@ export async function ToolDetailPageShell({
                 <a className="tool-detail-quick-action" href="#tool-purchase">
                   {quickActionLabel}
                 </a>
-              </div>
-            </div>
-
-            <div className="tool-detail-cover-frame relative overflow-hidden rounded-[1.75rem] border border-[rgba(210,230,255,0.16)] bg-[#07101E]">
-              <div className="relative aspect-[16/9]">
-                {isAiWorkflow ? (
-                  <AiWorkflowCoverImage
-                    coverImage={tool.coverImage}
-                    slug={tool.slug}
-                    alt={localizedTool.primaryName}
-                    fill
-                    className="content-thumbnail-outline object-contain"
-                    sizes="(min-width: 1024px) 1120px, 100vw"
-                    priority
-                    fetchPriority="high"
-                    unoptimized
-                  />
-                ) : coverImage ? (
-                  <Image
-                    src={coverImage}
-                    alt={localizedTool.primaryName}
-                    fill
-                    className="content-thumbnail-outline object-contain"
-                    sizes="(min-width: 1024px) 1120px, 100vw"
-                    priority
-                    fetchPriority="high"
-                    unoptimized
-                  />
-                ) : (
-                  <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_20%,rgba(65,197,219,0.2),transparent_32%),radial-gradient(circle_at_72%_70%,rgba(255,184,107,0.16),transparent_36%),repeating-linear-gradient(135deg,rgba(238,246,255,0.08)_0_2px,transparent_2px_18px),linear-gradient(135deg,rgba(255,255,255,0.08),transparent)]" />
-                )}
               </div>
             </div>
 

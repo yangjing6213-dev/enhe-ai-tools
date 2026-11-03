@@ -11,15 +11,17 @@ function readCandidate(relativePath: string) {
 }
 
 describe("AI tools candidate responsive browsing", () => {
-  it("keeps the desktop grid, gives bilingual titles flexible space, and preserves the mobile rail", () => {
+  it("keeps the desktop grid, shows full bilingual titles, and preserves the mobile rail", () => {
     const css = readCandidate("styles/redesign/software.css");
 
     expect(css).toMatch(/\.redesign-software\s*\{[^}]*background-color:\s*var\(--enhe-page-bg\)/);
     expect(css).toMatch(/\.redesign-software-grid\s*\{[^}]*grid-template-columns:\s*repeat\(3,\s*minmax\(0,\s*1fr\)\)/);
     expect(css).toMatch(/@media\s*\(max-width:\s*768px\)[\s\S]*\.redesign-software-grid\s*\{[^}]*grid-template-columns:\s*minmax\(0,\s*1fr\)/);
     expect(css).not.toContain(":nth-child(");
-    expect(css).toContain("grid-template-rows: 36px minmax(100px, auto) auto 24px auto minmax(16px, 1fr)");
-    expect(css).toMatch(/\.redesign-software-card-identity\s*\{[^}]*min-height:\s*100px/);
+    expect(css).toContain(".redesign-software-card-identity");
+    expect(css).toMatch(/\.redesign-software-card-identity\s*\{[^}]*min-height:\s*0/);
+    expect(css).toMatch(/\.redesign-software-card-secondary\s*\{[^}]*overflow:\s*visible/);
+    expect(css).not.toMatch(/\.redesign-software-card-secondary\s*\{[^}]*-webkit-line-clamp/);
     expect(css).toMatch(/\.redesign-software-card-badges\s*\{[^}]*justify-content:\s*space-between;/);
     expect(css).toMatch(/\.redesign-software-card-full-link\s*\{[^}]*display:\s*flex;/);
     expect(css).toMatch(/width\s*<\s*768px/);
@@ -39,14 +41,16 @@ describe("AI tools candidate responsive browsing", () => {
     expect(css).toContain("margin-inline: calc(50% - 50vw)");
   });
 
-  it("matches the requested software catalogue layout and equal-height cards", () => {
+  it("uses content-sized catalogue cards with a compact cover", () => {
     const css = readCandidate("styles/redesign/software.css");
     const catalog = readCandidate("components/redesign/software/EnheRedesignSoftwareCatalog.tsx");
 
     expect(css).toContain("padding: 144px 24px 120px");
     expect(css).toContain("font-size: clamp(0.9rem, 2vw, 1.5rem)");
-    expect(css).toContain("height: 600px;");
+    expect(css).toContain("max-height: 180px;");
     expect(css).toContain("min-height: 0;");
+    expect(css).not.toMatch(/\.redesign-software-card\s*\{[^}]*min-height:\s*600px/);
+    expect(css).not.toMatch(/\.redesign-software-card\s*\{[^}]*height:\s*600px/);
     expect(css).toContain("font-weight: 900;");
     expect(catalog).not.toContain("按公开发布时间展示最新上架的工具入口。");
     expect(catalog).not.toContain("通过已跟踪的编辑推荐字段筛选公开产品。");
@@ -139,7 +143,7 @@ describe("AI tools candidate responsive browsing", () => {
     expect(css).not.toMatch(/overflow-x:\s*hidden/);
   });
 
-  it("gives reviewed product cards room for trust details and keeps likes borderless beside downloads", () => {
+  it("keeps only the original safety review badge and likes borderless beside downloads", () => {
     const css = readCandidate("styles/redesign/software.css");
     const card = readCandidate("components/redesign/software/EnheRedesignSoftwareCard.tsx");
     const actions = readCandidate("components/card-like-action.tsx");
@@ -149,8 +153,11 @@ describe("AI tools candidate responsive browsing", () => {
     expect(css).toContain(".redesign-software-card-trust {");
     expect(card).toContain('downloadCount={product.downloadCount}');
     expect(card).toContain('"安全审核通过"');
-    expect(card).toContain('data-trust-price');
-    expect(card).toContain('data-trust-refund');
+    expect(card).toContain("data-trust-safety");
+    expect(card).not.toContain("data-trust-price");
+    expect(card).not.toContain("data-trust-refund");
+    expect(css).toContain("border-radius: 12px;");
+    expect(css).toContain("background: color-mix(in srgb, #00a875 5%, var(--enhe-page-bg));");
     expect(card).not.toContain("reviewDate");
     expect(card).not.toContain("管理员人工确认");
     expect(actions).toContain('className="card-download-count"');

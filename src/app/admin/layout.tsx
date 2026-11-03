@@ -2,6 +2,7 @@ import "../globals.css";
 import "@/styles/redesign/tokens.css";
 import "@/styles/redesign/shell.css";
 import "@/styles/redesign/forum.css";
+import "@/styles/redesign/chat.css";
 import { RootDocument, sharedRootMetadata } from "@/app/root-layout-shared";
 import { requireAdmin } from "@/lib/auth";
 import { Container } from "@/components/ui";
@@ -49,6 +50,7 @@ const adminNav = [
       ["aiNewsTopics", "/admin/ai-news/topics"],
       ["aiNewsKeywords", "/admin/ai-news/keywords"],
       ["forum", "/admin/forum"],
+      ["chatGroups", "/admin/chat-groups"],
       ["comments", "/admin/comments"],
       ["emojis", "/admin/emojis"]
     ]

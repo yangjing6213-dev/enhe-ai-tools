@@ -44,7 +44,7 @@ export function EnheRedesignHero({ locale }: { locale: RedesignLocale }) {
         </h1>
         <p className="redesign-home-subtitle">{copy.subtitle}</p>
         <div className="redesign-home-cta-row">
-          {[copy.cta, copy.forumCta].map((cta) => (
+          {[copy.cta, copy.forumCta, copy.groupChatCta].map((cta) => (
             <StarBorder
               key={cta.href}
               as="a"
@@ -52,7 +52,7 @@ export function EnheRedesignHero({ locale }: { locale: RedesignLocale }) {
               href={cta.href}
               data-analytics-event="home_entry_click"
               data-analytics-meta-surface="hero"
-              data-analytics-meta-target={cta === copy.cta ? "tools" : "forum"}
+              data-analytics-meta-target={cta === copy.cta ? "tools" : cta === copy.forumCta ? "forum" : "group-chat"}
               color="#ffffff"
               trailColor="#ffffff"
               textColor="#ffffff"

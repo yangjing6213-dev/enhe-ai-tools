@@ -133,7 +133,7 @@ describe("customer support widget source", () => {
     expect(spinnerRule).toContain("animation: none");
   });
 
-  it("keeps support spacing separate from the fixed product card layout", () => {
+  it("keeps support spacing separate from content-sized product cards", () => {
     const card = readFileSync(
       new URL(
         "../components/redesign/software/EnheRedesignSoftwareCard.tsx",
@@ -193,8 +193,10 @@ describe("customer support widget source", () => {
     expect(home).toContain('className="redesign-home-product-control"');
     expect(software).toContain("var(--support-exclusion-applied)");
     expect(software).not.toContain(":nth-child(");
-    expect(software).toContain("grid-template-rows: 36px minmax(100px, auto) auto 24px auto minmax(16px, 1fr)");
-    expect(productCardBlock).toContain("min-height: 600px;");
+    expect(software).toContain(".redesign-software-card-identity");
+    expect(software).toContain("max-height: 180px;");
+    expect(productCardBlock).toContain("min-height: 0;");
+    expect(productCardBlock).not.toContain("min-height: 600px;");
     expect(productCardBlock).not.toMatch(/(?<!min-)height:\s*600px/);
     expect(software).toContain("@media (width < 768px)");
     expect(software).not.toContain("@media (max-width: 767px)");

@@ -14,7 +14,7 @@ describe("software catalog card clarity", () => {
     expect(source).not.toContain("{t.audienceLabel}: {categoryLabel}");
   });
 
-  it("renders the dedicated value copy without truncation and adds two factual trust cues", () => {
+  it("renders dedicated value copy and the original safety badge without truncation", () => {
     const source = readFileSync(
       resolve(root, "src/components/redesign/software/EnheRedesignSoftwareCard.tsx"),
       "utf8",
@@ -24,8 +24,9 @@ describe("software catalog card clarity", () => {
     expect(source).toContain("product.valueProposition");
     expect(source).toContain('<p className="redesign-software-card-description redesign-software-card-value">');
     expect(source).not.toContain("buildValueSentence(product.description");
-    expect(source).toContain("data-trust-price");
-    expect(source).toContain("data-trust-refund");
+    expect(source).toContain("data-trust-safety");
+    expect(source).not.toContain("data-trust-price");
+    expect(source).not.toContain("data-trust-refund");
     expect(styles).toContain(".redesign-software-card-identity");
     expect(styles).toContain(".redesign-software-card-value");
     expect(styles).not.toMatch(/\.redesign-software-card-value\s*\{[^}]*-webkit-line-clamp/);

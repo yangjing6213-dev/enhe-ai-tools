@@ -764,27 +764,20 @@
 }
 
 .enhe-redesign-production .tool-detail-hero-stack {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr);
-  grid-template-areas:
-    "summary"
-    "cover"
-    "details";
+  display: flex;
+  flex-direction: column;
   gap: 2rem;
 }
 
 .enhe-redesign-production .tool-detail-summary {
-  grid-area: summary;
   min-width: 0;
 }
 
 .enhe-redesign-production .tool-detail-cover-frame {
-  grid-area: cover;
   min-width: 0;
 }
 
 .enhe-redesign-production .tool-detail-main-content {
-  grid-area: details;
   min-width: 0;
 }
 
@@ -839,16 +832,6 @@
 .enhe-redesign-production .tool-detail-quick-action:focus-visible {
   outline: 3px solid var(--enhe-focus);
   outline-offset: 3px;
-}
-
-@media (width >= 1024px) {
-  .enhe-redesign-production .tool-detail-hero-stack {
-    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
-    grid-template-areas:
-      "summary cover"
-      "details details";
-    align-items: start;
-  }
 }
 
 .enhe-redesign-production .tool-detail-hero-stack :is(.glass, .evidence-card, .dossier-card, .surface-panel, .surface-panel-soft, .filter-surface, .admin-shell-card) {

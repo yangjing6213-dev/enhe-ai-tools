@@ -191,15 +191,17 @@ describe("homepage UI polish", () => {
     for (const href of ["/software", "/ai-skills", "/ai-news", "/ai-trends"]) expect(features).toContain(`"${href}"`);
   });
 
-  it("keeps catalog cards tall enough for bilingual titles and preserves the existing hover motion", () => {
+  it("keeps catalog cards content-sized for full bilingual titles and preserves hover motion", () => {
     const cardBlock = softwareStyles.match(/\.redesign-software-card\s*\{([^}]*)\}/)?.[1] ?? "";
     expect(softwareStyles).toMatch(/\.redesign-software-page\s*\{[^}]*width:\s*min\(100%,\s*1280px\)/);
     expect(softwareStyles).toMatch(/\.redesign-software-grid\s*\{[^}]*grid-template-columns:\s*repeat\(3,\s*minmax\(0,\s*1fr\)\)/);
-    expect(cardBlock).toMatch(/min-height:\s*600px/);
+    expect(cardBlock).toMatch(/min-height:\s*0/);
     expect(cardBlock).not.toMatch(/(?<!min-)height:\s*600px/);
+    expect(cardBlock).not.toMatch(/min-height:\s*600px/);
     expect(softwareStyles).toMatch(/\.redesign-software-card\s*\{[^}]*border-radius:\s*0/);
     expect(softwareStyles).toMatch(/\.redesign-software-card:hover\s*\{[^}]*transform:\s*translateY\(-3px\)/);
-    expect(softwareStyles).toMatch(/\.redesign-software-card-body h3\s*\{[^}]*-webkit-line-clamp:\s*3/);
+    expect(softwareStyles).toMatch(/\.redesign-software-card-body h3\s*\{[^}]*overflow:\s*visible/);
+    expect(softwareStyles).not.toMatch(/\.redesign-software-card-body h3\s*\{[^}]*-webkit-line-clamp/);
     expect(softwareStyles).toMatch(/\.redesign-software-card-value\s*\{[^}]*overflow-wrap:\s*anywhere/);
   });
 

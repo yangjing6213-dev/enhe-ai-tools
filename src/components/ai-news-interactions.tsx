@@ -60,7 +60,7 @@ export function AiNewsInteractions({ slug, labels }: Props) {
 
   return (
     <div
-      className="ai-news-interactions glass flex flex-wrap items-center gap-2 rounded-2xl p-3"
+      className="ai-news-interactions flex flex-wrap items-center gap-2 p-3"
       role="group"
       aria-label={labels.articleSupportLabel}
     >
@@ -72,7 +72,7 @@ export function AiNewsInteractions({ slug, labels }: Props) {
           aria-label={label}
           title={label}
           className={cn(
-            "ai-news-action ai-news-icon-action rounded-full border"
+            "ai-news-action ai-news-icon-action rounded-full"
           )}
         >
           <Icon aria-hidden="true" size={20} strokeWidth={1.8} />

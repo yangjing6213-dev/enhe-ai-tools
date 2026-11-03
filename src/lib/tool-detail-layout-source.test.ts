@@ -5,7 +5,7 @@ import { describe, expect, it } from "vitest";
 const root = resolve(__dirname, "../..");
 
 describe("tool detail layout source", () => {
-  it("shows the product summary and real next step before the cover", () => {
+  it("shows the full-width cover before the product summary and real next step", () => {
     const source = readFileSync(resolve(root, "src/app/tools/[slug]/page-shell.tsx"), "utf8");
 
     expect(source).toContain("tool-detail-hero-stack");
@@ -24,14 +24,15 @@ describe("tool detail layout source", () => {
     expect(source).not.toContain("lg:grid-cols-[minmax(0,0.95fr)_minmax(0,1.05fr)]");
     expect(source).not.toContain("lg:grid-cols-[minmax(0,0.9fr)_minmax(0,1.1fr)]");
 
-    expect(source.indexOf("tool-detail-summary")).toBeLessThan(source.indexOf("tool-detail-cover-frame"));
+    expect(source.indexOf("tool-detail-cover-frame")).toBeLessThan(source.indexOf("tool-detail-summary"));
   });
 
-  it("uses a two-column product summary and cover on wide screens", () => {
+  it("keeps the original cover-first, full-width product detail layout on wide screens", () => {
     const styles = readFileSync(resolve(root, "src/styles/redesign/site-refresh.css"), "utf8");
     expect(styles).toContain(".tool-detail-summary");
     expect(styles).toContain(".tool-detail-hero-stack");
-    expect(styles).toContain("grid-template-columns: minmax(0, 1fr) minmax(0, 1fr)");
+    expect(styles).toMatch(/\.tool-detail-hero-stack\s*\{[^}]*display:\s*flex;[^}]*flex-direction:\s*column;/);
+    expect(styles).not.toMatch(/\.tool-detail-hero-stack\s*\{[^}]*grid-template-columns:/);
   });
 
   it("loads the core product cover eagerly with high fetch priority", () => {

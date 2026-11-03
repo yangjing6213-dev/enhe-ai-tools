@@ -5,6 +5,7 @@ import "@/styles/redesign/home.css";
 import "@/styles/redesign/ai-news.css";
 import "@/styles/redesign/site-refresh.css";
 import "@/styles/redesign/forum.css";
+import "@/styles/redesign/chat.css";
 import { RootDocument, sharedRootMetadata } from "@/app/root-layout-shared";
 
 export const metadata = sharedRootMetadata;
