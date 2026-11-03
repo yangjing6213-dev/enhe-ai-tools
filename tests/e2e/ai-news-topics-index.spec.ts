@@ -3,7 +3,7 @@ import { isSameLoopbackOrigin } from "../fixtures/loopback-origin";
 
 for (const locale of ["zh", "en"] as const) {
   for (const width of [320, 390, 1440]) {
-    test(`Topics navigation opens the collection: ${locale}, ${width}px`, async ({ page, baseURL }) => {
+    test(`Topics collection remains reachable after list navigation is removed: ${locale}, ${width}px`, async ({ page, baseURL }) => {
       if (process.env.DATABASE_URL?.trim() || !baseURL || !isSameLoopbackOrigin(baseURL, baseURL)) {
         throw new Error("Topics collection checks require a DB-free local server.");
       }
@@ -31,10 +31,9 @@ for (const locale of ["zh", "en"] as const) {
       await page.setViewportSize({ width, height: 900 });
       await page.goto(`${prefix}/ai-news`, { waitUntil: "load" });
       const nav = ".ai-news-section-nav";
-      const response = page.waitForResponse((response) => new URL(response.url()).pathname === target && response.request().isNavigationRequest());
-      await page.locator(`${nav} a[href="${target}"]`).click();
-      expect((await response).status()).toBe(200);
-      await page.waitForLoadState("load");
+      await expect(page.locator(nav)).toHaveCount(0);
+      const response = await page.goto(target, { waitUntil: "load" });
+      expect(response?.status()).toBe(200);
       await expect(page.locator("main[data-content-status='UNVERIFIED']")).toBeVisible();
       await expect(page.locator("header.redesign-header")).toHaveCount(1);
       await expect(page.getByRole("heading", { level: 1, name: locale === "en" ? "Topic Collections" : "专题合集", exact: true })).toBeVisible();
