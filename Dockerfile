@@ -10,7 +10,7 @@ ENV NEXT_TELEMETRY_DISABLED=1
 COPY --from=deps /app/node_modules ./node_modules
 COPY . .
 RUN npx prisma generate
-RUN npm run build
+RUN NODE_OPTIONS=--max-old-space-size=3072 npm run build
 
 FROM node:24-alpine AS runner
 WORKDIR /app
