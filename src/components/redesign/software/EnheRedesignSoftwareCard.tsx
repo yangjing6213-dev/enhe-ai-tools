@@ -89,11 +89,9 @@ export function EnheRedesignSoftwareCard({
               <h3 id={headingId}>{product.name}</h3>
               {product.secondaryName ? <p className="redesign-software-card-secondary">{product.secondaryName}</p> : null}
             </div>
-            {valueProposition ? (
-              <p className="redesign-software-card-description redesign-software-card-value">
-                <strong>{t.valuePrefix}:</strong>{valueProposition}
-              </p>
-            ) : null}
+            <p className="redesign-software-card-description redesign-software-card-value">
+              {valueProposition ? <><strong>{t.valuePrefix}:</strong>{valueProposition}</> : null}
+            </p>
             <p className="redesign-software-card-price" aria-label={`${t.priceLabel}: ${product.price}`}>
               {product.price}
             </p>
