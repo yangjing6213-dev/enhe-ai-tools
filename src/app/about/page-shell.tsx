@@ -286,7 +286,7 @@ export function AboutPageShell({ forceLocale }: { forceLocale: Locale }) {
 
         <section className="enhe-reference-editorial-sections about-section-grid mt-8 grid gap-5 lg:grid-cols-2">
           {copy.sections.map((section) => (
-            <article key={section.title} className="enhe-reference-editorial-card rounded-2xl p-6">
+            <article key={section.title} data-top-level-card-static="true" className="enhe-reference-editorial-card rounded-2xl p-6">
               <h2 className="text-2xl font-black text-[var(--marketing-text)]">{section.title}</h2>
               {section.paragraphs.map((paragraph) => (
                 <p key={paragraph} className="mt-4 text-sm leading-7 text-[var(--marketing-muted)]">{paragraph}</p>

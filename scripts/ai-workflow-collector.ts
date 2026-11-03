@@ -375,6 +375,20 @@ function buildWorkerCheckpoint(state: RunState) {
   };
 }
 
+function getSafeFailureDiagnostic(error: unknown) {
+  if (!error || typeof error !== "object") return {};
+  const record = error as { name?: unknown; code?: unknown; cause?: unknown };
+  const name = typeof record.name === "string" && /^[A-Za-z][A-Za-z0-9]{0,39}$/.test(record.name) ? record.name : undefined;
+  const code = typeof record.code === "string" && /^[A-Z0-9_]{1,64}$/.test(record.code) ? record.code : undefined;
+  const cause = record.cause && typeof record.cause === "object" ? record.cause as { code?: unknown } : null;
+  const causeCode = cause && typeof cause.code === "string" && /^[A-Z0-9_]{1,64}$/.test(cause.code) ? cause.code : undefined;
+  return {
+    ...(name ? { errorType: name } : {}),
+    ...(code ? { errorCode: code } : {}),
+    ...(causeCode ? { causeCode } : {}),
+  };
+}
+
 function hasPendingRegistrationFor(state: RunState, repositoryId: string) {
   return state.pendingRegistration?.repositoryId === repositoryId;
 }
@@ -419,24 +433,29 @@ async function sha256File(path: string) {
 }
 
 async function downloadRepositoryArchive(candidate: AiWorkflowGitHubRepositoryCandidate, commitSha: string, outputPath: string) {
-  const response = await fetch(`https://${githubZipHost}/${candidate.fullName}/zip/${commitSha}`, {
-    headers: { "user-agent": "ENHE-AI-Workflow-Collector/1.0" },
-    signal: AbortSignal.timeout(60000),
-  });
-  if (!response.ok || !response.body || new URL(response.url).hostname !== githubZipHost) throw new Error("GITHUB_ARCHIVE_UNAVAILABLE");
-  const declared = Number(response.headers.get("content-length") ?? "0");
-  if (declared > 120 * 1024 * 1024) throw new Error("ARCHIVE_SIZE_LIMIT");
-  let bytes = 0;
-  const limit = new Transform({
-    transform(chunk: Buffer, _encoding, callback) {
-      bytes += chunk.length;
-      if (bytes > 120 * 1024 * 1024) callback(new Error("ARCHIVE_SIZE_LIMIT"));
-      else callback(null, chunk);
-    },
-  });
-  await pipeline(Readable.fromWeb(response.body as import("node:stream/web").ReadableStream<Uint8Array>), limit, createWriteStream(outputPath, { flags: "wx" }));
-  if (bytes <= 0) throw new Error("EMPTY_GITHUB_ARCHIVE");
-  return bytes;
+  try {
+    const response = await fetch(`https://${githubZipHost}/${candidate.fullName}/zip/${commitSha}`, {
+      headers: { "user-agent": "ENHE-AI-Workflow-Collector/1.0" },
+      signal: AbortSignal.timeout(60000),
+    });
+    if (!response.ok || !response.body || new URL(response.url).hostname !== githubZipHost) throw new Error("GITHUB_ARCHIVE_UNAVAILABLE");
+    const declared = Number(response.headers.get("content-length") ?? "0");
+    if (declared > 120 * 1024 * 1024) throw new Error("ARCHIVE_SIZE_LIMIT");
+    let bytes = 0;
+    const limit = new Transform({
+      transform(chunk: Buffer, _encoding, callback) {
+        bytes += chunk.length;
+        if (bytes > 120 * 1024 * 1024) callback(new Error("ARCHIVE_SIZE_LIMIT"));
+        else callback(null, chunk);
+      },
+    });
+    await pipeline(Readable.fromWeb(response.body as import("node:stream/web").ReadableStream<Uint8Array>), limit, createWriteStream(outputPath, { flags: "wx" }));
+    if (bytes <= 0) throw new Error("EMPTY_GITHUB_ARCHIVE");
+    return bytes;
+  } catch (error) {
+    if (getAiWorkflowFailureCode(error) === "NETWORK_UNAVAILABLE") throw new Error("GITHUB_ARCHIVE_UNAVAILABLE");
+    throw error;
+  }
 }
 
 async function prepareArchive(action: "extract" | "package", config: Record<string, unknown>) {
@@ -763,6 +782,8 @@ async function registerRepositoryLinkOnly(input: {
   let sourceArchive: AiWorkflowSourceArchiveDelivery;
   if (!isPackageRedistributableLicenseId(license.spdx)) {
     sourceArchive = sourceArchiveFallback(upstreamUrl, "LICENSE_NOT_REDISTRIBUTABLE");
+  } else if (failureReason === "GITHUB_ARCHIVE_UNAVAILABLE") {
+    sourceArchive = sourceArchiveFallback(upstreamUrl, "GITHUB_ARCHIVE_UNAVAILABLE");
   } else {
     const updateArchiveStage = async (stage: "fetch" | "upload") => {
       if (signal.aborted) throw new Error("BATCH_PAUSED_OR_LEASE_LOST");
@@ -871,6 +892,7 @@ async function processCandidate(input: {
   const candidateDir = join(batchReal, candidate.id);
   if (!pathIsWithin(rootReal, candidateDir)) throw new Error("UNSAFE_RUN_PATH");
   let candidateReal: string;
+  let resetExistingCandidateDirectory = false;
   try {
     await mkdir(candidateDir, { recursive: false });
     candidateReal = await realpath(candidateDir);
@@ -879,6 +901,15 @@ async function processCandidate(input: {
     const existing = await readFile(join(candidateDir, ".enhe-workflow-owner.json"), "utf8").catch(() => "");
     if (!existing.includes(`"batchId":"${batch.id}"`) || !existing.includes(`"repositoryId":"${candidate.id}"`)) throw new Error("RUN_DIRECTORY_ALREADY_EXISTS");
     candidateReal = await realpath(candidateDir);
+    resetExistingCandidateDirectory = true;
+  }
+  if (resetExistingCandidateDirectory) {
+    if (!await removeOwnedCandidateDirectory(candidateDir, rootReal, batch.id, candidate.id)) throw new Error("RUN_DIRECTORY_ALREADY_EXISTS");
+    await mkdir(candidateDir, { recursive: false });
+    candidateReal = await realpath(candidateDir);
+    if (!pathIsWithin(rootReal, candidateReal)) throw new Error("UNSAFE_RUN_PATH");
+    await writeFile(join(candidateReal, ".enhe-workflow-owner.json"), JSON.stringify({ batchId: batch.id, repositoryId: candidate.id }), { flag: "wx" });
+    await logEvent("candidate_temp_reset", { batchId: batch.id, repositoryId: candidate.id, reason: "RETRY_OWNED_DIRECTORY" });
   }
   const sourceZip = join(candidateReal, "source.zip");
   const sourceDir = join(candidateReal, "source");
@@ -1260,7 +1291,11 @@ async function runBatch(lease: WorkerLease, token: string, credentials: { secret
           const cosFailure = reason === "ARCHIVE_UPLOAD_FAILED"
             ? getAiWorkflowCosOperationFailure(error, "enhe-downloads-1303691623", `ai-workflows/${candidate.id}/<fixed-commit>/<package-sha>.zip`)
             : undefined;
-          await logEvent("candidate_rejected", { batchId: batch.id, repositoryId: candidate.id, reason, stage, ...(cosFailure ? { cosFailure } : {}) });
+          await logEvent("candidate_rejected", {
+            batchId: batch.id, repositoryId: candidate.id, reason, stage,
+            ...(reason === "UNKNOWN" ? getSafeFailureDiagnostic(error) : {}),
+            ...(cosFailure ? { cosFailure } : {}),
+          });
           if (["GITHUB_RATE_LIMIT", "NETWORK_UNAVAILABLE", "SANDBOX_UNAVAILABLE", "ARCHIVE_UPLOAD_FAILED", "LOCAL_CONFIGURATION_MISSING", "BUDGET_EXCEEDED"].includes(reason)) {
             failureCode = reason;
             if (["GITHUB_RATE_LIMIT", "NETWORK_UNAVAILABLE", "SANDBOX_UNAVAILABLE", "LOCAL_CONFIGURATION_MISSING", "BUDGET_EXCEEDED"].includes(reason)) break;

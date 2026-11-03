@@ -19,13 +19,13 @@ describe("independent Alipay and WeChat channels", () => {
   it.each([["alipay", "18670", "alipay"], ["wechat", "18680", "wxpay"]] as const)(
     "routes %s to its own channel", (paymentMethod, cid, type) => {
       const config = loadZpayConfig({ env: { ...env, ZPAY_ALIPAY_CHANNEL_ID: "18670", ZPAY_WECHAT_CHANNEL_ID: "18680" } });
-      const request = buildZpayPaymentRequest({ config, order: { ...order, paymentMethod }, itemName: "Unit product", clientIp: "127.0.0.1" });
+      const request = buildZpayPaymentRequest({ config, order: { ...order, paymentMethod }, returnToken: "one-time-return-ticket", itemName: "Unit product", clientIp: "127.0.0.1" });
       expect(request.params).toMatchObject({ cid, type });
     },
   );
 
   it("does not leak the legacy WeChat channel into Alipay or send undefined", async () => {
-    const request = buildZpayPaymentRequest({ config: loadZpayConfig({ env }), order, itemName: "Unit product", clientIp: "127.0.0.1" });
+    const request = buildZpayPaymentRequest({ config: loadZpayConfig({ env }), order, returnToken: "one-time-return-ticket", itemName: "Unit product", clientIp: "127.0.0.1" });
     expect(request.params.cid).toBeUndefined();
     const fetchMock = vi.fn().mockResolvedValue(Response.json({ code: 1, qrcode: "https://pay.example.test/unit" }));
     vi.stubGlobal("fetch", fetchMock);

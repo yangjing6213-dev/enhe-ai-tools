@@ -3,7 +3,7 @@ import { createAdminAuditCreateData } from "@/lib/admin-audit";
 import { trackAnalyticsEvent } from "@/lib/analytics";
 import { prisma } from "@/lib/db";
 import { countFirstPaidProductDownload } from "@/lib/paid-product-downloads";
-import { isOrderPaymentExpired } from "@/lib/order-payment-deadline";
+import { isOrderPaymentExpired, unpaidOrderTimeoutMs } from "@/lib/order-payment-deadline";
 import { lockSoftwareEntitlement } from "@/lib/membership";
 import { LATE_PAYMENT_AFTER_LOCAL_REFUND_ERROR_CODE } from "@/lib/refund-reconciliation";
 import { grantSeoAuditEntitlementsForPaidOrderInTransaction } from "@/lib/seo-audit/entitlements";
@@ -23,6 +23,11 @@ import {
   verifyZpayNotifyPayload,
   type ZpayParams
 } from "@/lib/zpay";
+import {
+  createZpayPaymentReturnTicket,
+  getZpayPaymentReturnSessionIdPrefix,
+  zpayReturnSessionIdPrefix,
+} from "@/lib/zpay-payment-return";
 
 type AmountLike = { toString(): string };
 type OrderForPaymentRequest = {
@@ -316,6 +321,7 @@ async function persistZpayPaymentCreationState(
 export function buildZpayPaymentRequest(input: {
   config: ZpayConfig;
   order: OrderForPaymentRequest;
+  returnToken: string;
   itemName: string;
   clientIp: string;
 }) {
@@ -329,7 +335,7 @@ export function buildZpayPaymentRequest(input: {
       type: paymentType,
       out_trade_no: input.order.orderNo,
       notify_url: `${input.config.siteUrl}/api/zpay/notify`,
-    return_url: `${input.config.siteUrl}/orders/${encodeURIComponent(input.order.id)}`,
+      return_url: `${input.config.siteUrl}/api/zpay/return/${input.returnToken}`,
       name: itemName,
       money: formatZpayAmount(input.order.amount.toString()),
       clientip: input.clientIp,
@@ -408,6 +414,7 @@ export async function ensureZpayPaymentForOrder(
 ) {
   const db = dependencies.db ?? prisma;
   const config = dependencies.config ?? loadZpayConfig();
+  const returnTicket = createZpayPaymentReturnTicket(input.orderId);
   assertZpayPaymentCreationAllowed(config);
   const claim = await db.$transaction(async (tx) => {
     const lockedOrders = await tx.$queryRaw<Array<{ id: string }>>(Prisma.sql`
@@ -445,6 +452,7 @@ export async function ensureZpayPaymentForOrder(
     const request = buildZpayPaymentRequest({
       config,
       order,
+      returnToken: returnTicket.token,
       itemName: buildOrderPaymentName(order),
       clientIp: input.clientIp ?? "127.0.0.1",
     });
@@ -533,6 +541,23 @@ export async function ensureZpayPaymentForOrder(
         status: "pending",
         amount: order.amount,
         rawResponse: toJson(dispatchMetadata),
+      },
+    });
+    const now = dependencies.now?.() ?? new Date();
+    await tx.session.updateMany({
+      where: {
+        userId: order.userId,
+        id: { startsWith: getZpayPaymentReturnSessionIdPrefix(order.id) },
+        revokedAt: null,
+      },
+      data: { revokedAt: now },
+    });
+    await tx.session.create({
+      data: {
+        id: returnTicket.id,
+        userId: order.userId,
+        tokenHash: returnTicket.tokenHash,
+        expiresAt: new Date(order.createdAt.getTime() + unpaidOrderTimeoutMs),
       },
     });
 

@@ -19,8 +19,9 @@ import {
   type LucideIcon,
 } from "lucide-react";
 import { AdminSection, SubmitButton } from "@/app/admin/admin-ui";
-import { getCurrentLocale, type Locale } from "@/lib/i18n";
 import { getSeoAuditAdminRunDetail } from "@/lib/seo-audit/admin";
+import { getLocalizedStatusLabel } from "@/lib/status-labels";
+import { auditActionError, auditFailureMessage, auditValue } from "../display";
 import {
   cancelSeoAuditRunAction,
   retrySeoAuditRunAction,
@@ -38,20 +39,18 @@ export default async function AdminSeoAuditRunDetailPage({
   searchParams,
 }: PageProps) {
   const { id } = await params;
-  const [locale, run, query] = await Promise.all([
-    getCurrentLocale(),
+  const [run, query] = await Promise.all([
     getSeoAuditAdminRunDetail(id),
     searchParams ?? Promise.resolve({}),
   ]);
   if (!run) notFound();
 
-  const t = copy[locale];
   const returnTo = `/admin/seo-audit/${run.id}`;
   const schedule = run.subscription?.schedule;
 
   return (
     <AdminSection title={t.title} intro={t.intro}>
-      <Notice params={query} locale={locale} />
+      <Notice params={query} />
 
       <div className="mb-6 flex flex-wrap items-center gap-3">
         <Link
@@ -130,13 +129,13 @@ export default async function AdminSeoAuditRunDetailPage({
                 value: (
                   <StatusBadge
                     status={run.status}
-                    label={runStatusLabels[locale][run.status] ?? run.status}
+                    label={auditValue(run.status)}
                   />
                 ),
               },
               {
                 label: t.kind,
-                value: runKindLabels[locale][run.kind] ?? run.kind,
+                value: auditValue(run.kind),
               },
               { label: t.domain, value: maskedDomain(run.normalizedOrigin) },
               { label: t.user, value: maskedUser(run.user) },
@@ -146,8 +145,8 @@ export default async function AdminSeoAuditRunDetailPage({
                 label: t.attempts,
                 value: `${run.attemptCount} / ${run.maxAttempts}`,
               },
-              { label: t.createdAt, value: dateTime(run.createdAt, locale) },
-              { label: t.updatedAt, value: dateTime(run.updatedAt, locale) },
+              { label: t.createdAt, value: dateTime(run.createdAt) },
+              { label: t.updatedAt, value: dateTime(run.updatedAt) },
             ]}
           />
         </Panel>
@@ -160,13 +159,13 @@ export default async function AdminSeoAuditRunDetailPage({
                 label: t.timeout,
                 value: `${run.totalTimeoutSeconds} ${t.seconds}`,
               },
-              { label: t.availableAt, value: dateTime(run.availableAt, locale) },
-              { label: t.startedAt, value: dateTime(run.startedAt, locale) },
-              { label: t.completedAt, value: dateTime(run.completedAt, locale) },
-              { label: t.failedAt, value: dateTime(run.failedAt, locale) },
+              { label: t.availableAt, value: dateTime(run.availableAt) },
+              { label: t.startedAt, value: dateTime(run.startedAt) },
+              { label: t.completedAt, value: dateTime(run.completedAt) },
+              { label: t.failedAt, value: dateTime(run.failedAt) },
               {
                 label: t.cancelRequestedAt,
-                value: dateTime(run.cancelRequestedAt, locale),
+                value: dateTime(run.cancelRequestedAt),
               },
             ]}
           />
@@ -178,11 +177,11 @@ export default async function AdminSeoAuditRunDetailPage({
           <InfoGrid
             columns="md:grid-cols-3"
             items={[
-              { label: t.failureCategory, value: run.failure.category },
+              { label: t.failureCategory, value: auditValue(run.failure.category) },
               { label: t.failureCode, value: run.failure.code },
               {
                 label: t.failureMessage,
-                value: run.failure.message,
+                value: auditFailureMessage(run.failure.message),
                 wide: true,
               },
             ]}
@@ -197,12 +196,12 @@ export default async function AdminSeoAuditRunDetailPage({
               { label: t.offer, value: run.offer?.name ?? "-" },
               { label: t.offerCode, value: run.offer?.code ?? "-" },
               { label: t.orderNumber, value: run.sourceOrder?.orderNo ?? "-" },
-              { label: t.orderType, value: run.sourceOrder?.orderType ?? "-" },
-              { label: t.orderStatus, value: run.sourceOrder?.orderStatus ?? "-" },
+              { label: t.orderType, value: auditValue(run.sourceOrder?.orderType) },
+              { label: t.orderStatus, value: run.sourceOrder ? getLocalizedStatusLabel("order", run.sourceOrder.orderStatus, "zh") : "—" },
               {
                 label: t.orderAmount,
                 value: run.sourceOrder
-                  ? money(run.sourceOrder.amount, locale)
+                  ? money(run.sourceOrder.amount)
                   : "-",
               },
               {
@@ -221,11 +220,11 @@ export default async function AdminSeoAuditRunDetailPage({
               },
               {
                 label: t.creditExpiresAt,
-                value: dateTime(run.credit?.expiresAt, locale),
+                value: dateTime(run.credit?.expiresAt),
               },
               {
                 label: t.creditRefundedAt,
-                value: dateTime(run.credit?.refundedAt, locale),
+                value: dateTime(run.credit?.refundedAt),
               },
             ]}
           />
@@ -235,18 +234,18 @@ export default async function AdminSeoAuditRunDetailPage({
           <InfoGrid
             items={[
               { label: t.subscriptionId, value: shortId(run.subscription?.id) },
-              { label: t.subscriptionStatus, value: run.subscription?.status ?? "-" },
+              { label: t.subscriptionStatus, value: auditValue(run.subscription?.status) },
               {
                 label: t.subscriptionOffer,
                 value: run.subscription?.offer.name ?? "-",
               },
               {
                 label: t.subscriptionStartsAt,
-                value: dateTime(run.subscription?.startsAt, locale),
+                value: dateTime(run.subscription?.startsAt),
               },
               {
                 label: t.subscriptionExpiresAt,
-                value: dateTime(run.subscription?.expiresAt, locale),
+                value: dateTime(run.subscription?.expiresAt),
               },
               {
                 label: t.scheduledUsage,
@@ -259,13 +258,13 @@ export default async function AdminSeoAuditRunDetailPage({
                 value: run.subscription?.manualRunsRemaining ?? "-",
               },
               { label: t.scheduleId, value: shortId(schedule?.id) },
-              { label: t.cadence, value: schedule?.cadence ?? "-" },
+              { label: t.cadence, value: auditValue(schedule?.cadence) },
               {
                 label: t.scheduleEnabled,
                 value: schedule ? (schedule.enabled ? t.yes : t.no) : "-",
               },
-              { label: t.nextRunAt, value: dateTime(schedule?.nextRunAt, locale) },
-              { label: t.lastRunAt, value: dateTime(schedule?.lastRunAt, locale) },
+              { label: t.nextRunAt, value: dateTime(schedule?.nextRunAt) },
+              { label: t.lastRunAt, value: dateTime(schedule?.lastRunAt) },
             ]}
           />
         </Panel>
@@ -299,202 +298,89 @@ export default async function AdminSeoAuditRunDetailPage({
   );
 }
 
-const copy = {
-  zh: {
-    title: "SEO/GEO 巡检详情",
-    intro: "查看脱敏后的运行状态、运营关联和公开发现摘要。",
-    back: "返回巡检总览",
-    retry: "重试巡检",
-    retrying: "正在重试...",
-    cancel: "取消巡检",
-    cancelling: "正在取消...",
-    actionFailed: "操作未完成：",
-    retried: "巡检已重新进入队列。",
-    cancelled: "巡检已取消或已请求取消。",
-    score: "总分",
-    pages: "已巡检页面",
-    coverage: "证据覆盖率",
-    critical: "严重问题",
-    high: "高风险问题",
-    medium: "中风险问题",
-    overview: "运行概览",
-    runId: "运行 ID",
-    status: "状态",
-    kind: "类型",
-    domain: "脱敏域名",
-    user: "脱敏用户",
-    project: "项目引用",
-    pageLimit: "页面上限",
-    attempts: "尝试次数 / 上限",
-    createdAt: "创建时间",
-    updatedAt: "更新时间",
-    worker: "Worker / 执行信息",
-    engine: "引擎版本",
-    timeout: "总超时",
-    seconds: "秒",
-    availableAt: "可执行时间",
-    startedAt: "开始时间",
-    completedAt: "完成时间",
-    failedAt: "失败时间",
-    cancelRequestedAt: "取消请求时间",
-    failure: "分类失败信息",
-    failureCategory: "分类",
-    failureCode: "错误码",
-    failureMessage: "脱敏消息",
-    funding: "套餐、订单与次数包",
-    offer: "套餐",
-    offerCode: "套餐代码",
-    orderNumber: "订单号",
-    orderType: "订单类型",
-    orderStatus: "订单状态",
-    orderAmount: "订单金额",
-    testData: "测试数据",
-    credit: "次数包引用",
-    creditTotal: "总次数",
-    creditRemaining: "剩余次数",
-    creditExpiresAt: "次数包到期时间",
-    creditRefundedAt: "次数包退款时间",
-    subscription: "订阅与计划",
-    subscriptionId: "订阅引用",
-    subscriptionStatus: "订阅状态",
-    subscriptionOffer: "订阅套餐",
-    subscriptionStartsAt: "订阅开始时间",
-    subscriptionExpiresAt: "订阅到期时间",
-    scheduledUsage: "计划次数已用 / 上限",
-    manualRemaining: "手动次数剩余",
-    scheduleId: "计划引用",
-    cadence: "执行周期",
-    scheduleEnabled: "计划已启用",
-    nextRunAt: "下次执行",
-    lastRunAt: "上次执行",
-    findings: "公开发现摘要",
-    noFindings: "暂无可公开展示的发现摘要。",
-    yes: "是",
-    no: "否",
-  },
-  en: {
-    title: "SEO/GEO audit run detail",
-    intro: "Review redacted run status, operational links, and public finding summaries.",
-    back: "Back to audit overview",
-    retry: "Retry run",
-    retrying: "Retrying...",
-    cancel: "Cancel run",
-    cancelling: "Cancelling...",
-    actionFailed: "Action was not completed: ",
-    retried: "The run was requeued.",
-    cancelled: "The run was cancelled or cancellation was requested.",
-    score: "Score",
-    pages: "Pages audited",
-    coverage: "Evidence coverage",
-    critical: "Critical findings",
-    high: "High findings",
-    medium: "Medium findings",
-    overview: "Run overview",
-    runId: "Run ID",
-    status: "Status",
-    kind: "Kind",
-    domain: "Redacted domain",
-    user: "Redacted user",
-    project: "Project reference",
-    pageLimit: "Page limit",
-    attempts: "Attempts / limit",
-    createdAt: "Created at",
-    updatedAt: "Updated at",
-    worker: "Worker / execution",
-    engine: "Engine version",
-    timeout: "Total timeout",
-    seconds: "seconds",
-    availableAt: "Available at",
-    startedAt: "Started at",
-    completedAt: "Completed at",
-    failedAt: "Failed at",
-    cancelRequestedAt: "Cancellation requested at",
-    failure: "Classified failure",
-    failureCategory: "Category",
-    failureCode: "Code",
-    failureMessage: "Redacted message",
-    funding: "Offer, order, and credit",
-    offer: "Offer",
-    offerCode: "Offer code",
-    orderNumber: "Order number",
-    orderType: "Order type",
-    orderStatus: "Order status",
-    orderAmount: "Order amount",
-    testData: "Test data",
-    credit: "Credit reference",
-    creditTotal: "Total runs",
-    creditRemaining: "Remaining runs",
-    creditExpiresAt: "Credit expires at",
-    creditRefundedAt: "Credit refunded at",
-    subscription: "Subscription and schedule",
-    subscriptionId: "Subscription reference",
-    subscriptionStatus: "Subscription status",
-    subscriptionOffer: "Subscription offer",
-    subscriptionStartsAt: "Subscription starts at",
-    subscriptionExpiresAt: "Subscription expires at",
-    scheduledUsage: "Scheduled runs used / limit",
-    manualRemaining: "Manual runs remaining",
-    scheduleId: "Schedule reference",
-    cadence: "Cadence",
-    scheduleEnabled: "Schedule enabled",
-    nextRunAt: "Next run at",
-    lastRunAt: "Last run at",
-    findings: "Public finding summaries",
-    noFindings: "No public finding summaries are available.",
-    yes: "Yes",
-    no: "No",
-  },
+const t = {
+  title: "SEO/GEO 巡检详情",
+  intro: "刷新页面可查看最新任务状态。下列时间均为北京时间，巡检结果来自执行端最近写入的报告。",
+  back: "返回巡检总览",
+  retry: "重试巡检",
+  retrying: "正在重试...",
+  cancel: "取消巡检",
+  cancelling: "正在取消...",
+  actionFailed: "操作未完成：",
+  retried: "巡检已重新进入队列。",
+  cancelled: "巡检已取消或已请求取消。",
+  score: "总分",
+  pages: "已巡检页面",
+  coverage: "证据覆盖率",
+  critical: "严重问题",
+  high: "高风险问题",
+  medium: "中风险问题",
+  overview: "运行概览",
+  runId: "运行 ID",
+  status: "状态",
+  kind: "类型",
+  domain: "脱敏域名",
+  user: "脱敏用户",
+  project: "项目引用",
+  pageLimit: "页面上限",
+  attempts: "尝试次数 / 上限",
+  createdAt: "创建时间",
+  updatedAt: "更新时间",
+  worker: "执行端信息",
+  engine: "引擎版本",
+  timeout: "总超时",
+  seconds: "秒",
+  availableAt: "可执行时间",
+  startedAt: "开始时间",
+  completedAt: "完成时间",
+  failedAt: "失败时间",
+  cancelRequestedAt: "取消请求时间",
+  failure: "分类失败信息",
+  failureCategory: "分类",
+  failureCode: "错误码",
+  failureMessage: "脱敏消息",
+  funding: "套餐、订单与次数包",
+  offer: "套餐",
+  offerCode: "套餐代码",
+  orderNumber: "订单号",
+  orderType: "订单类型",
+  orderStatus: "订单状态",
+  orderAmount: "订单金额",
+  testData: "测试数据",
+  credit: "次数包引用",
+  creditTotal: "总次数",
+  creditRemaining: "剩余次数",
+  creditExpiresAt: "次数包到期时间",
+  creditRefundedAt: "次数包退款时间",
+  subscription: "订阅与计划",
+  subscriptionId: "订阅引用",
+  subscriptionStatus: "订阅状态",
+  subscriptionOffer: "订阅套餐",
+  subscriptionStartsAt: "订阅开始时间",
+  subscriptionExpiresAt: "订阅到期时间",
+  scheduledUsage: "计划次数已用 / 上限",
+  manualRemaining: "手动次数剩余",
+  scheduleId: "计划引用",
+  cadence: "执行周期",
+  scheduleEnabled: "计划已启用",
+  nextRunAt: "下次执行",
+  lastRunAt: "上次执行",
+  findings: "公开发现摘要（引擎原文）",
+  noFindings: "暂无可公开展示的发现摘要。",
+  yes: "是",
+  no: "否",
 } as const;
-
-const runStatusLabels: Record<Locale, Record<string, string>> = {
-  zh: {
-    queued: "排队中",
-    running: "执行中",
-    completed: "已完成",
-    failed: "失败",
-    cancel_requested: "正在取消",
-    cancelled: "已取消",
-  },
-  en: {
-    queued: "Queued",
-    running: "Running",
-    completed: "Completed",
-    failed: "Failed",
-    cancel_requested: "Cancelling",
-    cancelled: "Cancelled",
-  },
-};
-
-const runKindLabels: Record<Locale, Record<string, string>> = {
-  zh: {
-    free: "免费巡检",
-    professional: "专业巡检",
-    deep: "深度巡检",
-    recheck: "复检",
-    scheduled: "计划巡检",
-  },
-  en: {
-    free: "Free",
-    professional: "Professional",
-    deep: "Deep",
-    recheck: "Recheck",
-    scheduled: "Scheduled",
-  },
-};
 
 function Notice({
   params,
-  locale,
 }: {
   params: { result?: string; error?: string };
-  locale: Locale;
 }) {
-  const t = copy[locale];
   if (params.error) {
     return (
       <p className="enhe-admin-audit-warning mb-5 rounded-lg border border-[#FFB86B]/35 bg-[#FFB86B]/10 px-4 py-3 text-sm">
         {t.actionFailed}
-        <span className="font-mono">{params.error}</span>
+        {auditActionError(params.error)}
       </p>
     );
   }
@@ -658,7 +544,7 @@ function FindingBadge({ severity }: { severity: string }) {
     <span
       className={`inline-flex rounded-full border px-2.5 py-1 text-xs font-semibold uppercase ${className}`}
     >
-      {severity}
+      {auditValue(normalized)}
     </span>
   );
 }
@@ -671,21 +557,21 @@ function percentOrDash(value: number | null) {
   return value === null ? "-" : `${value}%`;
 }
 
-function dateTime(value: Date | string | null | undefined, locale: Locale) {
+function dateTime(value: Date | string | null | undefined) {
   if (!value) return "-";
-  return new Intl.DateTimeFormat(locale === "zh" ? "zh-CN" : "en-US", {
+  return new Intl.DateTimeFormat("zh-CN", {
     dateStyle: "medium",
     timeStyle: "short",
+    timeZone: "Asia/Shanghai",
   }).format(new Date(value));
 }
 
 function money(
   value: number | string | { toString(): string },
-  locale: Locale,
 ) {
   const amount = Number(typeof value === "number" ? value : value.toString());
   if (!Number.isFinite(amount)) return "-";
-  return new Intl.NumberFormat(locale === "zh" ? "zh-CN" : "en-US", {
+  return new Intl.NumberFormat("zh-CN", {
     style: "currency",
     currency: "CNY",
   }).format(amount);

@@ -85,7 +85,10 @@ test("does not render on authentication or admin routes", async ({ page }) => {
 test("fits within a mobile viewport without horizontal overflow", async ({ page }) => {
   await page.setViewportSize({ width: 390, height: 844 });
   await page.goto("/");
-  await page.getByRole("button", { name: "客服", exact: true }).click();
+  await page.getByRole("button", { name: "打开快捷入口", exact: true }).click();
+  await page.getByRole("navigation", { name: "快捷入口" })
+    .getByRole("button", { name: "联系客服", exact: true })
+    .click();
 
   const dialog = page.getByRole("dialog");
   await expect(dialog).toBeVisible();

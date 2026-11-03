@@ -66,6 +66,7 @@ export function CustomerSupportWidget({
   const honeypotRef = useRef<HTMLInputElement>(null);
   const launcherRef = useRef<HTMLButtonElement>(null);
   const panelRef = useRef<HTMLElement>(null);
+  const returnFocusRef = useRef<HTMLElement | null>(null);
   const [isOpen, setIsOpen] = useState(false);
   const [selectedFaqId, setSelectedFaqId] = useState<string | null>(null);
   const [showMessageForm, setShowMessageForm] = useState(false);
@@ -130,8 +131,23 @@ export function CustomerSupportWidget({
     setSelectedFaqId(null);
     setShowMessageForm(false);
     setStatus("idle");
-    launcherRef.current?.focus();
   }
+
+  useEffect(() => {
+    if (isOpen) return;
+    const returnTarget = returnFocusRef.current;
+    if (!returnTarget) return;
+    returnFocusRef.current = null;
+
+    const frame = requestAnimationFrame(() => {
+      if (returnTarget.isConnected && returnTarget.getClientRects().length > 0) {
+        returnTarget.focus();
+      } else {
+        launcherRef.current?.focus();
+      }
+    });
+    return () => cancelAnimationFrame(frame);
+  }, [isOpen]);
 
   function focusPanelStart() {
     requestAnimationFrame(() => {
@@ -142,6 +158,23 @@ export function CustomerSupportWidget({
         ?.focus();
     });
   }
+
+  useEffect(() => {
+    const openSupport = (event: Event) => {
+      const returnFocusTarget = event instanceof CustomEvent
+        ? (event.detail as { returnFocusTarget?: unknown } | null)?.returnFocusTarget
+        : null;
+      returnFocusRef.current = returnFocusTarget instanceof HTMLElement
+        ? returnFocusTarget
+        : document.activeElement instanceof HTMLElement
+          ? document.activeElement
+          : launcherRef.current;
+      setIsOpen(true);
+      focusPanelStart();
+    };
+    window.addEventListener("enhe:open-support", openSupport);
+    return () => window.removeEventListener("enhe:open-support", openSupport);
+  }, []);
 
   function handlePanelKeyDown(event: KeyboardEvent<HTMLElement>) {
     if (event.key === "Escape") {
@@ -422,7 +455,10 @@ export function CustomerSupportWidget({
       <button
         ref={launcherRef}
         type="button"
-        onClick={() => setIsOpen(true)}
+        onClick={() => {
+          returnFocusRef.current = launcherRef.current;
+          setIsOpen(true);
+        }}
         aria-label={copy.launcherLabel}
         aria-expanded={isOpen}
         aria-controls="customer-support-panel"

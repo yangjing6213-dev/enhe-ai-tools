@@ -1364,6 +1364,8 @@ export async function upsertToolAction(formData: FormData) {
       categoryId: parseOptionalString(formData.get("categoryId")),
       shortDescription: normalizeToolSummaryForStorage(z.string().min(1).parse(formData.get("shortDescription"))),
       content: normalizeToolContentForStorage(z.string().min(1).parse(formData.get("content"))),
+      valueProposition: z.string().trim().max(240).parse(String(formData.get("valueProposition") ?? "")) || null,
+      englishValueProposition: z.string().trim().max(240).parse(String(formData.get("englishValueProposition") ?? "")) || null,
       coverImage: uploadedCoverImage ?? parseOptionalString(formData.get("coverImage")),
       screenshots: mergeToolProductImages(existingProductImages, uploadedProductImages),
       videoUrl: parseOptionalString(formData.get("videoUrl")),

@@ -114,7 +114,7 @@ export async function UserCenterPageShell({
       <div className="mb-6 flex flex-wrap items-start justify-between gap-4">
         <SectionTitle title={t.userCenter.title} intro={userCenterIntro} />
         <form action={logoutAction}>
-          <FormSubmitButton className="user-center-logout" variant="secondary" pendingLabel={locale === "en" ? "Logging out..." : "退出中..."}>
+          <FormSubmitButton className="user-center-logout" clearChatDraftsOnSubmit variant="secondary" pendingLabel={locale === "en" ? "Logging out..." : "退出中..."}>
             {t.userCenter.logout}
           </FormSubmitButton>
         </form>

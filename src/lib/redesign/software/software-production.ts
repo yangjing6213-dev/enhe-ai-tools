@@ -25,6 +25,8 @@ export type PublicSoftwareCatalogRow = {
   type: "software" | "online" | "skill_learning" | "ai_skill" | "ai_workflow";
   shortDescription: string;
   content: string;
+  valueProposition?: string | null;
+  englishValueProposition?: string | null;
   coverImage: string | null;
   isDownloadPaid: boolean;
   downloadPrice: unknown;
@@ -36,6 +38,7 @@ export type PublicSoftwareCatalogRow = {
   createdAt: Date | string;
   updatedAt?: Date | string;
   category: { name: string } | null;
+  supportedAgents?: string[];
   priceSpecs: Array<{
     price: unknown;
     status: "active" | "disabled";
@@ -49,12 +52,14 @@ export type SoftwareCatalogItem = {
   secondaryName: string | null;
   isPaid: boolean;
   securityReviewedAt?: Date | string | null;
+  supportedAgents?: string[];
   highlights: string[];
   downloadCount: number;
   usageCount: number;
   categoryId: SoftwareLeafCategoryId;
   name: string;
   description: string;
+  valueProposition?: string;
   price: string;
   detailHref: string;
   media: {
@@ -368,6 +373,9 @@ function buildCatalogItem(
     { ...row, categoryName: row.category?.name },
     locale,
   );
+  const localizedValueProposition = locale === "en"
+    ? row.englishValueProposition?.trim()
+    : row.valueProposition?.trim();
   const primaryPrice = getPrimaryToolPrice(
     row.priceSpecs,
     row.type === "software" || row.type === "ai_skill" || row.type === "ai_workflow"
@@ -385,6 +393,7 @@ function buildCatalogItem(
     id: row.id,
     type: row.type,
     securityReviewedAt: row.securityReviewedAt ?? null,
+    supportedAgents: row.supportedAgents ?? [],
     secondaryName: locale === "zh" ? localizedIdentity.secondaryName : null,
     isPaid,
     highlights: buildToolCardHighlights({ ...row, isDownloadPaid: isPaid }, locale),
@@ -393,6 +402,7 @@ function buildCatalogItem(
     categoryId,
     name: localizedIdentity.primaryName,
     description,
+    valueProposition: localizedValueProposition || undefined,
     price: isPaid
       ? `¥${primaryPrice.toFixed(2)}`
       : locale === "en"

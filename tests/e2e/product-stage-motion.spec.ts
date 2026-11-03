@@ -136,9 +136,7 @@ for (const width of viewports) {
       expect(rootOverflow, `${locale.route} ${width}px root overflow`).toBe(0);
 
       if (width < 768) {
-        const launcher = page.locator(
-          'button[aria-controls="customer-support-panel"]',
-        );
+        const launcher = page.locator(".site-floating-mobile-menu-toggle");
         const productTargets = [
           previous,
           next,

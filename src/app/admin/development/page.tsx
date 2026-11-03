@@ -14,38 +14,11 @@ import {
   getDevelopmentPriorityMeta,
   getDevelopmentStatusMeta,
   getDevelopmentVersionStatusMeta,
-  groupDevelopmentItemsByModule,
-  type DevelopmentItemStatus
+  groupDevelopmentItemsByModule
 } from "@/lib/development-progress";
 import { getCurrentLocale, type Locale } from "@/lib/i18n";
 
 type VersionWithItems = DevelopmentVersion & { items: DevelopmentItem[] };
-type ReadonlyDevelopmentItem = Pick<DevelopmentItem, "id" | "module" | "name" | "status" | "priority" | "relatedFiles" | "notes" | "sortOrder" | "updatedAt">;
-
-const defaultDevelopmentItems = [
-  ["基础页面", "首页与工具入口", "completed", "medium", "src/app/page.tsx, src/app/software/page.tsx, src/app/online-tools/page.tsx", "首页、AI软件应用、AI账号服务入口已具备。", 10],
-  ["用户与权限", "注册登录与用户中心", "completed", "high", "src/app/(auth), src/app/user/page.tsx, src/lib/auth.ts", "已支持注册、登录、退出、用户中心和会话安全。", 20],
-  ["用户与权限", "管理员后台权限", "completed", "high", "src/app/admin/layout.tsx, src/lib/auth.ts", "普通用户不能进入后台，管理员可访问后台菜单。", 30],
-  ["工具系统", "工具分类后台自定义", "completed", "high", "src/app/admin/categories/page.tsx", "AI软件应用与AI账号服务分类由后台维护。", 40],
-  ["工具系统", "AI软件应用管理", "completed", "high", "src/app/admin/software/page.tsx, src/app/admin/software/[id]/page.tsx", "已支持清单、详情编辑、封面上传、下载文件绑定和上架检查。", 50],
-  ["工具系统", "AI账号服务管理", "completed", "high", "src/app/admin/online-tools/page.tsx, src/app/admin/online-tools/[id]/page.tsx", "已支持服务信息、服务价格和上架管理。", 60],
-  ["工具系统", "工具详情页与教程", "completed", "high", "src/app/tools/[slug]/page.tsx, src/app/admin/tutorials/page.tsx", "详情页已展示教程、截图、评论和相关推荐；教程支持注意事项与常见错误。", 70],
-  ["付费下载与订单", "套餐功能停用", "completed", "high", "src/app/admin/plans/page.tsx, src/app/pricing/page.tsx", "统一套餐入口已下线，收费软件改为按工具单独购买。", 80],
-  ["付费下载与订单", "订单创建与取消", "completed", "high", "src/app/actions.ts, src/app/user/page.tsx", "用户可创建软件订单，并可取消允许取消状态的订单。", 90],
-  ["付费下载与订单", "个人收款码支付页", "completed", "high", "src/app/orders/[id]/pay/page.tsx, public/images/payment", "支付页已展示支付宝和微信收款码，并提示备注订单号。", 100],
-  ["付费下载与订单", "付款截图上传与预览", "completed", "high", "src/app/api/uploads/payment-proof/route.ts, src/app/orders/[id]/page.tsx", "上传后进入订单详情并展示付款凭证预览。", 110],
-  ["付费下载与订单", "后台支付审核自动开通软件权益", "completed", "high", "src/app/actions.ts, src/lib/membership.ts", "审核通过后创建对应工具的软件购买权益。", 120],
-  ["权限控制", "收费软件下载权限", "completed", "high", "src/app/api/tools/[id]/download/route.ts, src/lib/access.ts", "下载权限在服务端校验。", 130],
-  ["权限控制", "AI账号服务使用记录", "completed", "high", "src/app/api/tools/[id]/use/route.ts, src/lib/access.ts", "AI账号服务入口在服务端校验权限并记录使用日志。", 140],
-  ["内容互动", "用户评论与后台审核", "completed", "medium", "src/app/tools/[slug]/page.tsx, src/app/admin/comments/page.tsx", "评论需后台审核，支持置顶和删除。", 150],
-  ["文件与存储", "文件上传与 COS 闭环", "completed", "high", "src/lib/storage.ts, src/app/admin/files/page.tsx", "已支持本地上传、COS 环境变量自动切换、配置体检、远程对象删除和失败提示。", 160],
-  ["售后与通知", "退款/售后记录", "completed", "medium", "src/app/orders/[id]/page.tsx, src/app/admin/orders/page.tsx", "用户可申请售后/退款，后台可处理并记录。", 170],
-  ["售后与通知", "站内通知", "completed", "medium", "src/app/user/page.tsx, src/lib/notifications.ts", "支付审核和退款处理会通知用户。", 180],
-  ["部署运维", "Docker 与腾讯云部署配置", "completed", "high", "Dockerfile, deploy.sh, deploy/enhe-ai-tools", "已拆分独立部署文件，避免影响旧项目端口。", 190],
-  ["安全与质量", "关键流程测试", "partial", "medium", "src/lib/*.test.ts, tests/e2e/commercial-flow.spec.ts", "核心单元测试和商业闭环 E2E 已存在；后续可补更多管理端浏览器回归。", 200],
-  ["运营后台", "管理员消息中心", "completed", "medium", "src/app/admin/messages/page.tsx", "已集中展示待审核付款、退款申请和上传异常。", 210],
-  ["运营后台", "产品发布版本管理", "completed", "medium", "src/app/admin/releases/page.tsx", "已打通开发版本、产品版本、工具版本三层记录。", 220]
-] as const;
 
 export default async function AdminDevelopmentPage({
   searchParams
@@ -55,10 +28,7 @@ export default async function AdminDevelopmentPage({
   const params = await searchParams;
   const locale = await getCurrentLocale();
   const copy = developmentCopy[locale];
-  const statusMeta = getDevelopmentStatusMeta(locale);
-  const priorityMeta = getDevelopmentPriorityMeta(locale);
   const versionStatusMeta = getDevelopmentVersionStatusMeta(locale);
-  const dateLocale = locale === "en" ? "en-US" : "zh-CN";
   const versions = await prisma.developmentVersion.findMany({
     include: {
       items: {
@@ -67,40 +37,13 @@ export default async function AdminDevelopmentPage({
     },
     orderBy: [{ sortOrder: "desc" }, { createdAt: "desc" }]
   });
-  const selectedVersion = versions.find((version) => version.id === params.version) ?? versions.find((version) => version.status === "active") ?? versions[0] ?? null;
-  const fallbackUpdatedAt = new Date("2026-05-22T00:00:00");
-  const fallbackItems: ReadonlyDevelopmentItem[] = defaultDevelopmentItems.map(([module, name, status, priority, relatedFiles, notes, sortOrder]) => ({
-    id: `default-${sortOrder}`,
-    module,
-    name,
-    status,
-    priority,
-    relatedFiles,
-    notes,
-    sortOrder,
-    updatedAt: fallbackUpdatedAt
-  }));
-  const displayVersion = selectedVersion ?? {
-    version: "V1.0",
-    name: locale === "en" ? "Commercial loop edition" : "商业闭环版",
-    description: locale === "en"
-      ? "Default progress snapshot. Create a version or run seed to maintain these progress items in the database."
-      : "默认进度快照。创建版本或运行 seed 后可在数据库中维护这些进度项。",
-    status: "active" as const
-  };
-  const displayItems = localizeDevelopmentItems(selectedVersion?.items ?? fallbackItems, locale);
-  const summary = calculateDevelopmentSummary(displayItems as { status: DevelopmentItemStatus }[]);
-  const groupedItems = groupDevelopmentItemsByModule(displayItems);
-  const [productReleaseCount, toolChangelogCount] = await Promise.all([
-    prisma.productRelease.count(),
-    prisma.toolChangelog.count()
-  ]);
+  const selectedVersion = versions.find((version) => version.id === params.version) ?? versions.find((version) => version.status === "active") ?? versions[0];
+  const items = selectedVersion?.items ?? [];
+  const summary = calculateDevelopmentSummary(items);
+  const groupedItems = groupDevelopmentItemsByModule(items);
 
   return (
-    <AdminSection
-      title={copy.title}
-      intro={copy.intro}
-    >
+    <AdminSection title={copy.title} intro={copy.intro}>
       {params.deleted ? (
         <p className="mb-5 rounded-xl border border-[#48F5D3]/30 bg-[#48F5D3]/10 px-4 py-3 text-sm text-[#48F5D3]">
           {copy.deleted}
@@ -109,101 +52,85 @@ export default async function AdminDevelopmentPage({
 
       <div className="grid gap-4 xl:grid-cols-[1.1fr_0.9fr]">
         <section className="glass rounded-2xl p-6">
-          <div className="flex flex-wrap items-start justify-between gap-4">
-            <div>
-              <p className="text-sm text-[#48F5D3]">{copy.currentVersion}</p>
-              <h2 className="mt-2 text-3xl font-semibold">{`${displayVersion.version} · ${localizeDevelopmentValue(displayVersion.name, locale)}`}</h2>
-              {displayVersion.description ? (
-                <p className="mt-3 max-w-3xl text-sm leading-6 text-[#8B95A7]">
-                  {localizeDevelopmentValue(displayVersion.description, locale)}
-                </p>
-              ) : null}
-            </div>
-            <span className="rounded-full border border-white/10 px-3 py-1 text-xs text-[#8B95A7]">
-              {versionStatusMeta[displayVersion.status]}
-            </span>
-          </div>
-
-          <div className="mt-8 grid gap-4 md:grid-cols-5">
-            <ProgressStat label={copy.completion} value={`${summary.completionPercent}%`} accent />
-            <ProgressStat label={copy.totalItems} value={summary.total} />
-            <ProgressStat label={copy.completed} value={summary.completed} />
-            <ProgressStat label={copy.partial} value={summary.partial} />
-            <ProgressStat label={copy.todo} value={summary.notStarted + summary.recommended} />
-          </div>
-          <div className="mt-5 grid gap-3 md:grid-cols-3">
-            <Link href="/admin/development" className="enhe-admin-card rounded-xl border border-white/10 bg-white/5 px-4 py-3 text-sm text-[#8B95A7] hover:border-[#48F5D3]/40">
-              {copy.developmentVersions} · {versions.length}
-            </Link>
-            <Link href="/admin/releases" className="enhe-admin-card rounded-xl border border-white/10 bg-white/5 px-4 py-3 text-sm text-[#8B95A7] hover:border-[#48F5D3]/40">
-              {copy.productVersions} · {productReleaseCount}
-            </Link>
-            <Link href="/admin/changelogs" className="enhe-admin-card rounded-xl border border-white/10 bg-white/5 px-4 py-3 text-sm text-[#8B95A7] hover:border-[#48F5D3]/40">
-              {copy.toolVersions} · {toolChangelogCount}
-            </Link>
-          </div>
-          <div className="mt-6 h-3 overflow-hidden rounded-full bg-white/8">
-            <div className="h-full rounded-full bg-gradient-to-r from-[#48F5D3] via-[#7AA7FF] to-[#A78BFA]" style={{ width: `${summary.completionPercent}%` }} />
-          </div>
-
-          <div className="mt-6 flex flex-wrap gap-2">
-            {versions.map((version) => (
-              <Link
-                key={version.id}
-                href={`/admin/development?version=${version.id}`}
-                className={`rounded-full border px-3 py-1 text-xs transition ${
-                  selectedVersion?.id === version.id
-                    ? "border-[#48F5D3]/50 bg-[#48F5D3]/10 text-[#48F5D3]"
-                    : "border-white/10 text-[#8B95A7] hover:border-[#48F5D3]/40 hover:text-[#48F5D3]"
-                }`}
-              >
-                {version.version}
-              </Link>
-            ))}
-          </div>
-        </section>
-
-        <VersionForm version={selectedVersion} locale={locale} />
-      </div>
-
-      <div className="enhe-admin-card-grid mt-8 grid gap-6 xl:grid-cols-[1fr_360px]">
-        <div className="space-y-6">
-          {groupedItems.map((group) => (
-            <section key={group.module} className="glass rounded-2xl p-6">
-              <div className="mb-5 flex flex-wrap items-center justify-between gap-3">
-                <h2 className="text-xl font-semibold">{group.module}</h2>
-                <span className="text-xs text-[#8B95A7]">{copy.itemCount.replace("{count}", String(group.items.length))}</span>
-              </div>
-              <div className="space-y-4">
-                {group.items.map((item) =>
-                  selectedVersion ? (
-                    <DevelopmentItemCard key={item.id} item={item as DevelopmentItem} versionId={selectedVersion.id} locale={locale} />
-                  ) : (
-                    <ReadonlyDevelopmentItemCard key={item.id} item={item as ReadonlyDevelopmentItem} locale={locale} />
-                  )
-                )}
-              </div>
-            </section>
-          ))}
-        </div>
-
-        <div className="space-y-6">
           {selectedVersion ? (
             <>
+              <p className="text-sm text-[#48F5D3]">{copy.currentVersion} · {versionStatusMeta[selectedVersion.status]}</p>
+              <h2 className="mt-2 text-3xl font-semibold">{selectedVersion.version} · {localizeDevelopmentValue(selectedVersion.name, locale)}</h2>
+              {selectedVersion.description ? (
+                <p className="mt-3 max-w-3xl text-sm leading-6 text-[#8B95A7]">{localizeDevelopmentValue(selectedVersion.description, locale)}</p>
+              ) : null}
+              {items.length ? (
+                <>
+                  <div className="mt-8 grid gap-4 md:grid-cols-5">
+                    <ProgressStat label={copy.completion} value={`${summary.completionPercent}%`} accent />
+                    <ProgressStat label={copy.totalItems} value={summary.total} />
+                    <ProgressStat label={copy.completed} value={summary.completed} />
+                    <ProgressStat label={copy.partial} value={summary.partial} />
+                    <ProgressStat label={copy.todo} value={summary.notStarted + summary.recommended} />
+                  </div>
+                  <div className="mt-6 h-3 overflow-hidden rounded-full bg-white/8" aria-hidden="true">
+                    <div className="h-full rounded-full bg-gradient-to-r from-[#48F5D3] via-[#7AA7FF] to-[#A78BFA]" style={{ width: `${summary.completionPercent}%` }} />
+                  </div>
+                </>
+              ) : <p className="mt-4 text-sm leading-6">{copy.noItems}</p>}
+              <div className="mt-6 flex flex-wrap gap-2">
+                {versions.map((version) => (
+                  <Link key={version.id} href={`/admin/development?version=${version.id}`}
+                    aria-current={selectedVersion.id === version.id ? "page" : undefined}
+                    className={`rounded-full border px-3 py-1 text-xs transition ${selectedVersion.id === version.id
+                      ? "border-[#48F5D3]/50 bg-[#48F5D3]/10 text-[#48F5D3]"
+                      : "border-white/10 text-[#8B95A7] hover:border-[#48F5D3]/40 hover:text-[#48F5D3]"}`}
+                  >{version.version}</Link>
+                ))}
+              </div>
+            </>
+          ) : (
+            <>
+              <h2 className="text-xl font-semibold">{copy.noVersions}</h2>
+              <p className="mt-3 text-sm leading-6">{copy.createFirstVersion}</p>
+            </>
+          )}
+        </section>
+
+        <div className="space-y-4">
+          <VersionForm version={selectedVersion ?? null} locale={locale} />
+          {selectedVersion ? (
+            <details className="glass rounded-2xl p-4">
+              <summary className="cursor-pointer font-semibold">{copy.newVersion}</summary>
+              <VersionForm version={null} locale={locale} />
+            </details>
+          ) : null}
+        </div>
+      </div>
+
+      {selectedVersion ? (
+        <div className="enhe-admin-card-grid mt-8 grid gap-6 xl:grid-cols-[1fr_360px]">
+          <div className="space-y-6">
+            {groupedItems.map((group) => (
+              <section key={group.module} className="glass rounded-2xl p-6">
+                <div className="mb-5 flex flex-wrap items-center justify-between gap-3">
+                  <h2 className="text-xl font-semibold">{localizeDevelopmentValue(group.module, locale)}</h2>
+                  <span className="text-xs text-[#8B95A7]">{copy.itemCount.replace("{count}", String(group.items.length))}</span>
+                </div>
+                <div className="space-y-4">
+                  {group.items.map((item) => (
+                    <DevelopmentItemCard key={item.id} item={item} versionId={selectedVersion.id} locale={locale} />
+                  ))}
+                </div>
+              </section>
+            ))}
+          </div>
+
+          <div className="space-y-6">
             <DevelopmentItemForm versionId={selectedVersion.id} locale={locale} />
             <HoldDeleteForm action={deleteDevelopmentVersionAction} label={copy.deleteVersion} locale={locale} className="glass rounded-2xl border border-red-400/20 p-6" buttonClassName="mt-5">
               <input type="hidden" name="id" value={selectedVersion.id} />
               <h2 className="text-xl font-semibold text-red-100">{copy.deleteVersionTitle}</h2>
               <p className="mt-3 text-sm leading-6 text-[#8B95A7]">{copy.deleteVersionIntro}</p>
             </HoldDeleteForm>
-            </>
-          ) : (
-            <div className="glass rounded-2xl p-6 text-sm leading-6 text-[#8B95A7]">
-              {copy.defaultSnapshot}
-            </div>
-          )}
+          </div>
         </div>
-      </div>
+      ) : null}
     </AdminSection>
   );
 }
@@ -253,14 +180,14 @@ function DevelopmentItemCard({ item, versionId, locale }: { item: DevelopmentIte
       <summary className="cursor-pointer list-none">
         <div className="flex flex-wrap items-start justify-between gap-3">
           <div>
-            <h3 className="font-semibold text-[#E8EEF8]">{item.name}</h3>
+            <h3 className="font-semibold text-[#E8EEF8]">{localizeDevelopmentValue(item.name, locale)}</h3>
             <p className="mt-2 text-xs text-[#8B95A7]">
               {priorityMeta[item.priority].label} · {copy.updatedAt.replace("{date}", item.updatedAt.toLocaleDateString(dateLocale))}
             </p>
           </div>
           <span className={`rounded-full border px-3 py-1 text-xs ${meta.className}`}>{meta.label}</span>
         </div>
-        {item.notes ? <p className="mt-3 text-sm leading-6 text-[#8B95A7]">{item.notes}</p> : null}
+        {item.notes ? <p className="mt-3 text-sm leading-6 text-[#8B95A7]">{localizeDevelopmentValue(item.notes, locale)}</p> : null}
         {item.relatedFiles ? (
           <div className="mt-3 flex flex-wrap gap-2">
             {splitRelatedFiles(item.relatedFiles).map((file) => (
@@ -276,35 +203,6 @@ function DevelopmentItemCard({ item, versionId, locale }: { item: DevelopmentIte
         </HoldDeleteForm>
       </div>
     </details>
-  );
-}
-
-function ReadonlyDevelopmentItemCard({ item, locale }: { item: ReadonlyDevelopmentItem; locale: Locale }) {
-  const copy = developmentCopy[locale];
-  const statusMeta = getDevelopmentStatusMeta(locale);
-  const priorityMeta = getDevelopmentPriorityMeta(locale);
-  const dateLocale = locale === "en" ? "en-US" : "zh-CN";
-  const meta = statusMeta[item.status];
-  return (
-    <div className="rounded-xl border border-white/10 bg-white/6 p-4">
-      <div className="flex flex-wrap items-start justify-between gap-3">
-        <div>
-          <h3 className="font-semibold text-[#E8EEF8]">{item.name}</h3>
-          <p className="mt-2 text-xs text-[#8B95A7]">
-            {priorityMeta[item.priority].label} · {copy.updatedAt.replace("{date}", item.updatedAt.toLocaleDateString(dateLocale))}
-          </p>
-        </div>
-        <span className={`rounded-full border px-3 py-1 text-xs ${meta.className}`}>{meta.label}</span>
-      </div>
-      {item.notes ? <p className="mt-3 text-sm leading-6 text-[#8B95A7]">{item.notes}</p> : null}
-      {item.relatedFiles ? (
-        <div className="mt-3 flex flex-wrap gap-2">
-          {splitRelatedFiles(item.relatedFiles).map((file) => (
-            <code key={file} className="rounded-full border border-white/10 px-2 py-1 text-xs text-[#8B95A7]">{file}</code>
-          ))}
-        </div>
-      ) : null}
-    </div>
   );
 }
 
@@ -351,23 +249,22 @@ function splitRelatedFiles(value: string) {
 
 const developmentCopy = {
   zh: {
-    title: "开发进度驾驶舱",
-    intro: "用于记录当前网站版本、功能完成状态、未完成模块、建议补强项和关联文件，让后续开发进度可以在后台直接维护。",
+    title: "开发进度",
+    intro: "按开发版本维护功能项、人工填写的状态和关联文件。完成度按当前所选版本中已记录的功能项计算。",
     deleted: "已删除对应开发进度记录。",
-    currentVersion: "当前版本",
-    completion: "整体完成度",
+    currentVersion: "所选开发版本",
+    completion: "本版完成度",
     totalItems: "总功能项",
     completed: "已完成",
     partial: "部分完成",
     todo: "待处理",
-    developmentVersions: "开发版本",
-    productVersions: "产品版本",
-    toolVersions: "工具版本",
     itemCount: "{count} 项",
     deleteVersionTitle: "删除当前版本",
     deleteVersionIntro: "删除版本会同时删除该版本下的所有开发进度项。",
     deleteVersion: "删除版本",
-    defaultSnapshot: "当前展示的是默认只读进度快照。右上方新增版本后，即可在数据库中维护版本和功能项。",
+    noVersions: "暂无开发版本",
+    createFirstVersion: "先创建一个开发版本，再添加需要跟踪的功能项。",
+    noItems: "此版本还没有功能项。添加后即可查看完成度。",
     editVersion: "编辑当前版本",
     newVersion: "新增开发版本",
     versionNo: "版本号",
@@ -393,23 +290,22 @@ const developmentCopy = {
     createItem: "新增功能项"
   },
   en: {
-    title: "Development dashboard",
-    intro: "Track the current site version, feature status, unfinished modules, recommended improvements, and related files from the admin panel.",
+    title: "Development progress",
+    intro: "Track features, manually recorded status and related files by development version. Completion is calculated from the items recorded for the selected version.",
     deleted: "Development progress record deleted.",
-    currentVersion: "Current version",
+    currentVersion: "Selected development version",
     completion: "Completion",
     totalItems: "Total items",
     completed: "Completed",
     partial: "Partial",
     todo: "To handle",
-    developmentVersions: "Development versions",
-    productVersions: "Product versions",
-    toolVersions: "Tool versions",
     itemCount: "{count} items",
     deleteVersionTitle: "Delete current version",
     deleteVersionIntro: "Deleting this version also deletes all development progress items under it.",
     deleteVersion: "Delete version",
-    defaultSnapshot: "This is the default read-only progress snapshot. Create a version to maintain versions and feature items in the database.",
+    noVersions: "No development versions yet",
+    createFirstVersion: "Create a development version, then add the features you want to track.",
+    noItems: "Add the first feature to this version to see its progress.",
     editVersion: "Edit current version",
     newVersion: "New development version",
     versionNo: "Version",
@@ -495,16 +391,6 @@ const developmentTranslations: Record<string, string> = {
   "产品发布版本管理": "Product release management",
   "已打通开发版本、产品版本、工具版本三层记录。": "Development, product, and tool versions are connected as three record layers."
 };
-
-function localizeDevelopmentItems<T extends ReadonlyDevelopmentItem | DevelopmentItem>(items: T[], locale: Locale): T[] {
-  if (locale === "zh") return items;
-  return items.map((item) => ({
-    ...item,
-    module: localizeDevelopmentValue(item.module, locale),
-    name: localizeDevelopmentValue(item.name, locale),
-    notes: item.notes ? localizeDevelopmentValue(item.notes, locale) : item.notes
-  }));
-}
 
 function localizeDevelopmentValue(value: string, locale: Locale) {
   if (locale === "zh") return value;

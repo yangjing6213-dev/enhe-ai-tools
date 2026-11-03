@@ -333,7 +333,7 @@ export async function AiNewsPageShell({
       />
     );
   }
-  const [{ articles, total }, otherLanguageListing, hot, categories, tags, discovery, topics] =
+  const [{ articles, total }, otherLanguageListing, hot, categories, tags, discovery, topics, latestPublished] =
     await Promise.all([
       getPublicNewsListing({
         ...(filters satisfies PublicNewsListingFilters),
@@ -345,7 +345,9 @@ export async function AiNewsPageShell({
       getPublicNewsTags(forceLocale),
       getPublicAiNewsDiscovery(forceLocale),
       getPublicAiNewsTopics(),
+      getPublicNewsListing({ sort: "latest", take: 1, locale: forceLocale }),
     ]);
+  const latestArticle = toNewsListingCards(latestPublished.articles, forceLocale)[0] ?? null;
   const pageCount = getNewsPageCount(total);
   if (
     pageOverride &&
@@ -419,6 +421,17 @@ export async function AiNewsPageShell({
           filters={filters}
           locale={forceLocale}
         />
+
+        {!filtered && filters.page === 1 && latestArticle ? (
+          <section className="ai-news-latest-teaser" aria-label={t.aiNews.latestTitle}>
+            <span>{t.aiNews.latestTitle}</span>
+            <Link href={latestArticle.href}>
+              <time>{latestArticle.dateLabel}</time>
+              <strong>{latestArticle.title}</strong>
+              <span aria-hidden="true">{t.aiNews.readMore} →</span>
+            </Link>
+          </section>
+        ) : null}
 
         <section className="glass ai-news-workspace-takeaway mt-8 rounded-2xl p-6">
           <p className="text-xs font-bold uppercase tracking-[0.16em] text-[var(--marketing-accent)]">
@@ -591,7 +604,7 @@ function FilterBar({
         aria-label={t.aiNews.searchPlaceholder}
         placeholder={t.aiNews.searchPlaceholder}
         title={t.aiNews.searchPlaceholder}
-        className="form-control-dark"
+        className="form-control-dark ai-news-filter-control"
       />
       <label className="sr-only" htmlFor="ai-news-category">
         {t.aiNews.allCategories}
@@ -602,7 +615,7 @@ function FilterBar({
         aria-label={t.aiNews.allCategories}
         defaultValue={filters.category ?? ""}
         title={t.aiNews.allCategories}
-        className="form-select-dark"
+        className="form-select-dark ai-news-filter-control"
       >
         <option value="">{t.aiNews.allCategories}</option>
         {categories.map((category) => (
@@ -620,7 +633,7 @@ function FilterBar({
         aria-label={t.aiNews.allTags}
         defaultValue={filters.tag ?? ""}
         title={t.aiNews.allTags}
-        className="form-select-dark"
+        className="form-select-dark ai-news-filter-control"
       >
         <option value="">{t.aiNews.allTags}</option>
         {tags.map((tag) => (
@@ -638,13 +651,13 @@ function FilterBar({
         aria-label={t.aiNews.latest}
         defaultValue={filters.sort}
         title={t.aiNews.latest}
-        className="form-select-dark"
+        className="form-select-dark ai-news-filter-control"
       >
         <option value="latest">{t.aiNews.latest}</option>
         <option value="hot">{t.aiNews.hot}</option>
         <option value="featured">{t.aiNews.featured}</option>
       </select>
-               <button className="rounded-full bg-[var(--marketing-button)] px-5 py-3 font-bold text-[var(--marketing-card)] transition-colors hover:bg-[var(--marketing-accent)] lg:col-span-4">
+      <button className="ai-news-filter-control rounded-xl bg-[var(--marketing-button)] px-5 font-bold text-[var(--marketing-card)] transition-colors hover:bg-[var(--marketing-accent)]">
         {t.aiNews.filter}
       </button>
     </form>

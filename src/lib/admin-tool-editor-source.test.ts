@@ -10,6 +10,17 @@ describe("admin tool editor source", () => {
     expect(source).not.toContain('action={upsertToolAction} method=');
   });
 
+  it("provides independent Chinese and English value fields for product cards", () => {
+    const editor = readFileSync(join(process.cwd(), "src/app/admin/tool-admin-list.tsx"), "utf8");
+    const actions = readFileSync(join(process.cwd(), "src/app/admin/actions.ts"), "utf8");
+
+    expect(editor).toContain('name="valueProposition"');
+    expect(editor).toContain('name="englishValueProposition"');
+    expect(editor).toContain("copy.valueProposition");
+    expect(actions).toContain('valueProposition: z.string().trim().max(240).parse(String(formData.get("valueProposition") ?? "")) || null');
+    expect(actions).toContain('englishValueProposition: z.string().trim().max(240).parse(String(formData.get("englishValueProposition") ?? "")) || null');
+  });
+
   it("places an unrestricted download link field below product images", () => {
     const source = readFileSync(join(process.cwd(), "src/app/admin/tool-admin-list.tsx"), "utf8");
 

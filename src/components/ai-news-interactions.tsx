@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { ArrowUp, Bookmark, Copy, Heart, Share2 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 type Props = {
@@ -12,6 +13,7 @@ type Props = {
     copyLink: string;
     backToTop: string;
     loginRequired: string;
+    articleSupportLabel: string;
   };
 };
 
@@ -44,29 +46,43 @@ export function AiNewsInteractions({ slug, labels }: Props) {
     await copy();
   }
 
-  const actions: Array<[string, () => void | Promise<void>]> = [
-    [labels.like, () => post("like")],
-    [labels.favorite, () => post("favorite")],
-    [labels.share, share],
-    [labels.copyLink, copy],
-    [labels.backToTop, () => window.scrollTo({ top: 0, behavior: "smooth" })]
+  const actions = [
+    { label: labels.like, Icon: Heart, onClick: () => post("like") },
+    { label: labels.favorite, Icon: Bookmark, onClick: () => post("favorite") },
+    { label: labels.share, Icon: Share2, onClick: share },
+    { label: labels.copyLink, Icon: Copy, onClick: copy },
+    {
+      label: labels.backToTop,
+      Icon: ArrowUp,
+      onClick: () => window.scrollTo({ top: 0, behavior: "smooth" }),
+    },
   ];
 
   return (
-    <div className="glass flex flex-wrap items-center gap-3 rounded-2xl p-4">
-      {actions.map(([label, action]) => (
+    <div
+      className="ai-news-interactions flex flex-wrap items-center gap-2 p-3"
+      role="group"
+      aria-label={labels.articleSupportLabel}
+    >
+      {actions.map(({ label, Icon, onClick }) => (
         <button
           key={label}
           type="button"
-          onClick={action}
+          onClick={onClick}
+          aria-label={label}
+          title={label}
           className={cn(
-            "ai-news-action rounded-full border px-4 py-2 text-sm font-semibold"
+            "ai-news-action ai-news-icon-action rounded-full"
           )}
         >
-          {label}
+          <Icon aria-hidden="true" size={20} strokeWidth={1.8} />
         </button>
       ))}
-      {message ? <span className="text-sm text-[var(--marketing-accent)]">{message}</span> : null}
+      {message ? (
+        <span className="px-2 text-sm text-[var(--marketing-accent)]" role="status" aria-live="polite">
+          {message}
+        </span>
+      ) : null}
     </div>
   );
 }

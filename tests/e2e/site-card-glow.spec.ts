@@ -103,7 +103,7 @@ test("admin cards have no edge glow in the read-only local fixture", async ({ pa
     for (const item of await decoratedCards.all()) {
       expect(await item.evaluate(node => getComputedStyle(node, "::after").content)).toBe("none");
     }
-    const nav = page.locator(".admin-nav-link").first();
+    const nav = page.locator(".admin-nav-link[aria-current='page']");
     await nav.focus();
     await expect(nav).toHaveCSS("outline-style", "solid");
     await expect(page.locator(".enhe-edge-effect")).toHaveCount(0);

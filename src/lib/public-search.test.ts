@@ -2,6 +2,7 @@ import { describe, expect, it } from "vitest";
 import {
   buildBrandSearchResult,
   buildPublicToolSearchWhere,
+  mapPublicToolSearchType,
   normalizePublicSearchQuery,
 } from "@/lib/public-search";
 
@@ -32,5 +33,12 @@ describe("public search", () => {
     expect(where).toContain('"category"');
     expect(where).toContain('"shortDescription"');
     expect(where).toContain('"content"');
+  });
+
+  it("labels search results using the published product type", () => {
+    expect(mapPublicToolSearchType("software")).toBe("software");
+    expect(mapPublicToolSearchType("ai_skill")).toBe("ai_skill");
+    expect(mapPublicToolSearchType("ai_workflow")).toBe("ai_workflow");
+    expect(mapPublicToolSearchType("online")).toBe("online");
   });
 });

@@ -24,6 +24,10 @@ import type { Prisma } from "@prisma/client";
 
 export type PublicSearchResultType =
   | "tool"
+  | "software"
+  | "online"
+  | "ai_skill"
+  | "ai_workflow"
   | "news"
   | "trend"
   | "tutorial"
@@ -36,6 +40,15 @@ export type PublicSearchResult = {
   excerpt: string;
   href: string;
 };
+
+export function mapPublicToolSearchType(
+  type: string,
+): Extract<PublicSearchResultType, "tool" | "software" | "online" | "ai_skill" | "ai_workflow"> {
+  if (type === "software" || type === "online" || type === "ai_skill" || type === "ai_workflow") {
+    return type;
+  }
+  return "tool";
+}
 
 const resultLimitPerType = 8;
 
@@ -126,7 +139,7 @@ async function searchTools(query: string, locale: Locale) {
       };
       return {
         id: `tool-${tool.id}`,
-        type: "tool",
+        type: mapPublicToolSearchType(tool.type),
         title: resolveLocalizedToolIdentity(tool, locale).primaryName,
         excerpt: toPlainExcerpt(
           buildLocalizedToolSummary(localizationInput, locale),

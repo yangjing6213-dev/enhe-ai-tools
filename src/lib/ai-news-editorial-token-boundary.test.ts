@@ -87,7 +87,7 @@ describe("AI News editorial token boundary", () => {
       'className="mt-5 break-words max-w-3xl text-lg font-medium',
     );
     expect(detail).toContain(
-      'className="mt-4 break-words text-base leading-8',
+      'className="ai-news-detail-summary mt-5 break-words max-w-4xl text-base leading-8',
     );
     expect(detail).toContain(
       'className="break-words font-semibold text-[var(--marketing-text)]',
@@ -97,11 +97,29 @@ describe("AI News editorial token boundary", () => {
     );
   });
 
+  it("puts article title, date, and summary before the collapsible topic tags", () => {
+    const detail = read("app/ai-news/[slug]/page-shell.tsx");
+    const titleIndex = detail.indexOf("{localized.title}");
+    const summaryIndex = detail.indexOf("{localized.summary}");
+    const tagsIndex = detail.indexOf("article.tagLinks.map", summaryIndex);
+
+    expect(titleIndex).toBeGreaterThan(-1);
+    expect(summaryIndex).toBeGreaterThan(titleIndex);
+    expect(tagsIndex).toBeGreaterThan(summaryIndex);
+    expect(detail).toContain("<details");
+    expect(detail).toContain("article.tagLinks.length");
+
+    const listing = read("app/ai-news/page-shell.tsx");
+    expect(listing).toContain("ai-news-latest-teaser");
+    expect(listing).toContain("latestArticle");
+  });
+
   it("uses localized labels for the three supporting landmarks", () => {
     const dictionaries = read("lib/dictionaries.ts");
     const listing = read("app/ai-news/page-shell.tsx");
     const topic = read("app/ai-news/topics/[slug]/page-shell.tsx");
     const detail = read("app/ai-news/[slug]/page-shell.tsx");
+    const interactions = read("components/ai-news-interactions.tsx");
 
     expect(dictionaries).toContain('discoveryRegionLabel: "AI资讯探索"');
     expect(dictionaries).toContain('discoveryRegionLabel: "AI news discovery"');
@@ -112,7 +130,9 @@ describe("AI News editorial token boundary", () => {
 
     expect(listing).toContain('aria-label={t.aiNews.discoveryRegionLabel}');
     expect(topic).toContain('aria-label={t.aiNews.topicSupportLabel}');
-    expect(detail).toContain('aria-label={t.aiNews.articleSupportLabel}');
+    expect(detail).toContain("articleSupportLabel: t.aiNews.articleSupportLabel");
+    expect(interactions).toContain('role="group"');
+    expect(interactions).toContain("aria-label={labels.articleSupportLabel}");
     expect(listing).not.toContain('aria-label="AI news filters"');
     expect(topic).not.toContain('aria-label="Topic support links"');
     expect(detail).not.toContain('aria-label="Article support links"');

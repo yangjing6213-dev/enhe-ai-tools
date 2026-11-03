@@ -10,8 +10,8 @@ type Rect = {
 };
 
 const mobileRoutes = [
-  { path: "/software", label: "客服" },
-  { path: "/en/software", label: "Chat" },
+  { path: "/software", label: "打开快捷入口", supportLabel: "联系客服", desktopLabel: "客服" },
+  { path: "/en/software", label: "Open quick links", supportLabel: "Customer support", desktopLabel: "Chat" },
 ] as const;
 
 const mobileViewports = [
@@ -69,7 +69,7 @@ async function expectNoVisibleIntersections(
 ) {
   const result = await page.evaluate((targetSelector) => {
     const launcher = document.querySelector<HTMLButtonElement>(
-      'button[aria-controls="customer-support-panel"]',
+      ".site-floating-mobile-menu-toggle",
     );
     if (!launcher) throw new Error("Missing customer support launcher");
 
@@ -134,17 +134,16 @@ test("uses a 44px icon-only launcher on bilingual mobile software routes", async
         Math.abs(bounds.height - 44),
         `${route.path} ${viewportSize.width}px launcher height`,
       ).toBeLessThanOrEqual(1);
-      await expect(launcher.locator("span", { hasText: route.label })).toBeHidden();
+      await expect(launcher.locator(".customer-support-launcher-label")).toHaveCount(0);
       await expect(launcher.locator("svg")).toBeVisible();
       await expect(launcher).toHaveAttribute("aria-label", route.label);
       await expect(launcher).toHaveAttribute("aria-expanded", "false");
-      await expect(launcher).toHaveAttribute("aria-controls", "customer-support-panel");
+      await expect(launcher).toHaveAttribute("aria-haspopup", "true");
 
       const viewport = await launcher.evaluate((button) => {
         const wrapper = button.parentElement;
         if (!wrapper) throw new Error("Missing support launcher wrapper");
         const wrapperRect = wrapper.getBoundingClientRect();
-        const wrapperStyle = getComputedStyle(wrapper);
         const outsidePoint = document.elementFromPoint(
           Math.max(0, wrapperRect.left - 8),
           wrapperRect.top + wrapperRect.height / 2,
@@ -157,7 +156,7 @@ test("uses a 44px icon-only launcher on bilingual mobile software routes", async
           wrapperHeight: wrapperRect.height,
           rightOffset: window.innerWidth - wrapperRect.right,
           bottomOffset: window.innerHeight - wrapperRect.bottom,
-          zIndex: wrapperStyle.zIndex,
+          zIndex: getComputedStyle(button.closest(".site-floating-actions")!).zIndex,
           outsideHitsWrapper: Boolean(outsidePoint && wrapper.contains(outsidePoint)),
         };
       });
@@ -166,7 +165,7 @@ test("uses a 44px icon-only launcher on bilingual mobile software routes", async
       expect(Math.abs(viewport.wrapperHeight - 44)).toBeLessThanOrEqual(1);
       expect(viewport.rightOffset).toBeGreaterThanOrEqual(16);
       expect(viewport.bottomOffset).toBeGreaterThanOrEqual(16);
-      expect(viewport.zIndex).toBe("10");
+      expect(viewport.zIndex).toBe("69");
       expect(viewport.outsideHitsWrapper).toBe(false);
     }
   }
@@ -210,7 +209,7 @@ test("reserves an 8px fixed safe zone for the 320px featured action", async ({
   await page.setViewportSize({ width: 320, height: 844 });
   await openFormalRoute(page, "/software");
 
-  const launcher = page.getByRole("button", { name: "客服", exact: true });
+  const launcher = page.getByRole("button", { name: mobileRoutes[0].label, exact: true });
   const rail = page.locator('[data-section="featured-products"] .redesign-software-rail');
   const card = rail.locator("[data-catalog-card]").first();
   const action = card.locator(".redesign-software-card-link");
@@ -335,7 +334,10 @@ test("uses compact exclusion for the icon-only launcher at every width", async (
       await page.setViewportSize({ width: contract.width, height: 900 });
       await openFormalRoute(page, route.path);
 
-      const launcher = page.getByRole("button", { name: route.label, exact: true });
+      const launcher = page.getByRole("button", {
+        name: contract.width < 768 ? route.label : route.desktopLabel,
+        exact: true,
+      });
       const card = page
         .locator('[data-section="all-products"] [data-catalog-card]')
         .nth(contract.cardIndex);
@@ -375,7 +377,7 @@ test("uses compact exclusion for the icon-only launcher at every width", async (
       expect.soft(geometry.gap, JSON.stringify(geometry)).toBeGreaterThanOrEqual(8);
       expect.soft(actionRect.height, JSON.stringify(geometry)).toBeGreaterThanOrEqual(44);
       expect.soft(layout.rootOverflow, JSON.stringify(geometry)).toBe(0);
-      await expect(launcher.locator(".customer-support-launcher-label")).toHaveClass(/sr-only/);
+      await expect(launcher).toHaveAttribute("aria-label", contract.width < 768 ? route.label : route.desktopLabel);
 
       if (contract.width === 768) {
         const nonRightAction = page
@@ -458,8 +460,8 @@ for (const viewportSize of mobileViewports) {
     }
 
     for (const route of [
-      { path: "/", label: "客服" },
-      { path: "/en", label: "Chat" },
+      { path: "/", label: "打开快捷入口" },
+      { path: "/en", label: "Open quick links" },
     ] as const) {
       await openFormalRoute(page, route.path);
       await expect(page.getByRole("button", { name: route.label, exact: true })).toBeVisible();
@@ -505,51 +507,26 @@ for (const viewportSize of mobileViewports) {
   });
 }
 
-test("keeps keyboard activation, Escape close, state sync, and focus return", async ({
-  page,
-}) => {
+test("keeps keyboard activation, Escape close, and focus return through mobile quick links", async ({ page }) => {
   await page.setViewportSize({ width: 390, height: 844 });
   await openFormalRoute(page, "/software");
 
-  const launcher = page.getByRole("button", { name: "客服", exact: true });
+  const launcher = page.getByRole("button", { name: mobileRoutes[0].label, exact: true });
   await launcher.focus();
+  await page.keyboard.press("Enter");
+  const quickLinks = page.getByRole("navigation", { name: "快捷入口" });
+  await expect(quickLinks).toBeVisible();
+  await expect(launcher).toHaveAttribute("aria-expanded", "true");
+  await quickLinks.getByRole("button", { name: mobileRoutes[0].supportLabel, exact: true }).focus();
   await page.keyboard.press("Enter");
   const dialog = page.getByRole("dialog");
   await expect(dialog).toBeVisible();
-  await expect(launcher).toHaveAttribute("aria-expanded", "true");
-  await expect(launcher).toHaveAttribute("tabindex", "-1");
   await expect(dialog.locator("button").first()).toBeFocused();
-
-  const panelFocusables = dialog.locator(
-    'a[href], button:not([disabled]), input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])',
-  );
-  const panelFocusableCount = await panelFocusables.count();
-  expect(panelFocusableCount).toBeGreaterThan(1);
-  for (let index = 0; index < panelFocusableCount; index += 1) {
-    await page.keyboard.press("Tab");
-  }
-  await expect(panelFocusables.first()).toBeFocused();
-
-  await dialog.locator("button").nth(1).click();
-  await expect(dialog.locator("button").first()).toBeFocused();
-  await dialog.locator("button").last().click();
-  await expect(dialog.locator("button").first()).toBeFocused();
+  await expect(page.locator(".site-floating-actions")).toHaveCSS("display", "none");
+  await expect(launcher).toBeHidden();
 
   await page.keyboard.press("Escape");
   await expect(dialog).toBeHidden();
-  await expect(launcher).toBeFocused();
-
-  await page.keyboard.press("Space");
-  const reopenedDialog = page.getByRole("dialog");
-  await expect(reopenedDialog).toBeVisible();
-  const reopenedFocusables = reopenedDialog.locator(
-    'a[href], button:not([disabled]), input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])',
-  );
-  await expect(reopenedFocusables.first()).toBeFocused();
-  await page.keyboard.press("Shift+Tab");
-  await expect(reopenedFocusables.last()).toBeFocused();
-  await page.keyboard.press("Escape");
-  await expect(reopenedDialog).toBeHidden();
   await expect(launcher).toBeFocused();
 });
 
@@ -557,43 +534,14 @@ test("keeps the mobile launcher below the open navigation drawer", async ({ page
   await page.setViewportSize({ width: 390, height: 844 });
   await openFormalRoute(page, "/software");
 
-  const launcher = page.getByRole("button", { name: "客服", exact: true });
-  const launcherRect = await rect(launcher);
+  const launcher = page.getByRole("button", { name: mobileRoutes[0].label, exact: true });
   await launcher.click();
-  const dialog = page.getByRole("dialog");
-  await expect(dialog).toBeVisible();
-  const dialogRect = await rect(dialog);
+  await expect(page.getByRole("navigation", { name: "快捷入口" })).toBeVisible();
   const menuTrigger = page.locator(".redesign-menu-trigger");
   await menuTrigger.click();
   await expect(page.locator(".redesign-mobile-drawer")).toBeVisible();
-
-  const hit = await page.evaluate(({ x, y }) => {
-    const target = document.elementFromPoint(x, y);
-    return {
-      isSupport: Boolean(target?.closest(".customer-support-widget")),
-      isMenu: Boolean(target?.closest(".redesign-mobile-drawer, .redesign-menu-overlay")),
-    };
-  }, {
-    x: launcherRect.left + launcherRect.width / 2,
-    y: launcherRect.top + launcherRect.height / 2,
-  });
-
-  expect(hit.isSupport).toBe(false);
-  expect(hit.isMenu).toBe(true);
-
-  const openPanelHit = await page.evaluate(({ x, y }) => {
-    const target = document.elementFromPoint(x, y);
-    return {
-      isSupport: Boolean(target?.closest("#customer-support-panel")),
-      isMenu: Boolean(target?.closest(".redesign-mobile-drawer, .redesign-menu-overlay")),
-    };
-  }, {
-    x: dialogRect.left + dialogRect.width / 2,
-    y: dialogRect.top + dialogRect.height / 2,
-  });
-
-  expect(openPanelHit.isSupport).toBe(false);
-  expect(openPanelHit.isMenu).toBe(true);
+  await expect(page.locator(".site-floating-actions")).toHaveCSS("display", "none");
+  await expect(launcher).toBeHidden();
 
   await page.locator(".redesign-drawer-close").click();
   await expect(page.locator(".redesign-mobile-drawer")).toBeHidden();
@@ -604,11 +552,7 @@ test("keeps the mobile launcher below the open navigation drawer", async ({ page
       ),
   );
   await expect(menuTrigger).toBeFocused();
-  await expect(dialog).toBeVisible();
-  await dialog.locator("button").first().focus();
-  await page.keyboard.press("Escape");
-  await expect(dialog).toBeHidden();
-  await expect(launcher).toBeFocused();
+  await expect(launcher).toBeVisible();
 });
 
 test("keeps the mobile launcher below the open category sheet", async ({ page }) => {
@@ -616,7 +560,7 @@ test("keeps the mobile launcher below the open category sheet", async ({ page })
   await page.setViewportSize({ width: 390, height: 844 });
   await openFormalRoute(page, "/software");
 
-  const launcher = page.locator('button[aria-controls="customer-support-panel"]');
+  const launcher = page.locator(".site-floating-mobile-menu-toggle");
   const launcherRect = await rect(launcher);
   await page.locator(".redesign-software-category-trigger").click();
   const overlay = page.locator(".redesign-software-category-overlay");
@@ -645,7 +589,7 @@ test("keeps the mobile launcher below the open category sheet", async ({ page })
   await overlay.click({ position: { x: 8, y: 8 } });
   await expect(panel).toBeHidden();
   await launcher.click();
-  await expect(page.getByRole("dialog")).toBeVisible();
+  await expect(page.getByRole("navigation", { name: "快捷入口" })).toBeVisible();
 });
 
 test("keeps component exclusions aligned with a non-zero right safe area", async ({
@@ -663,7 +607,7 @@ test("keeps component exclusions aligned with a non-zero right safe area", async
         "24px",
       );
     });
-    const launcher = page.locator('button[aria-controls="customer-support-panel"]');
+    const launcher = page.locator(".site-floating-mobile-menu-toggle");
     const launcherBounds = await rect(launcher);
     expect(Math.abs(390 - launcherBounds.right - 40)).toBeLessThanOrEqual(0.1);
 
@@ -704,7 +648,7 @@ test("keeps component exclusions aligned with a non-zero right safe area", async
         "24px",
       );
     });
-    const launcher = page.locator('button[aria-controls="customer-support-panel"]');
+    const launcher = page.locator(".site-floating-mobile-menu-toggle");
     const launcherBounds = await rect(launcher);
     expect(Math.abs(390 - launcherBounds.right - 40)).toBeLessThanOrEqual(0.1);
 

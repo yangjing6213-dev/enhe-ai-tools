@@ -9,6 +9,7 @@ const environmentNames = ["windows", "wsl2", "macos", "linux", "docker"] as cons
 const projectTypes = ["workflow", "automation", "agent", "template", "companion"] as const;
 const repositoryLinkFailureReasons = [
   "LICENSE_NOT_REDISTRIBUTABLE",
+  "GITHUB_ARCHIVE_UNAVAILABLE",
   "PACKAGE_LANGUAGE_UNSUPPORTED",
   "NODE_MANIFEST_MISSING",
   "NODE_MANIFEST_INVALID",

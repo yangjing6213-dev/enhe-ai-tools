@@ -23,6 +23,10 @@ const searchCopy = {
     resultCount: "找到 {count} 条公开内容",
     types: {
       tool: "AI工具",
+      software: "软件应用",
+      online: "在线服务",
+      ai_skill: "AI Skill",
+      ai_workflow: "AI 工作流",
       news: "AI资讯",
       trend: "AI趋势",
       tutorial: "AI教程",
@@ -42,6 +46,10 @@ const searchCopy = {
     resultCount: "{count} public results",
     types: {
       tool: "AI Tool",
+      software: "Software",
+      online: "Online service",
+      ai_skill: "AI Skill",
+      ai_workflow: "AI workflow",
       news: "AI News",
       trend: "AI Trend",
       tutorial: "AI Tutorial",

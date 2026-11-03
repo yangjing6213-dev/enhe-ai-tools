@@ -108,9 +108,7 @@ for (const width of viewports) {
       }
 
       if (!isDatabaseFree && (width === 390 || width === 320)) {
-        const launcher = page.locator(
-          'button[aria-controls="customer-support-panel"]',
-        );
+        const launcher = page.locator(".site-floating-mobile-menu-toggle");
         const launcherRect = await launcher.boundingBox();
         expect(launcherRect).not.toBeNull();
         const hitCategory = await page.evaluate(({ x, y }) => {

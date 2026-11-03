@@ -155,25 +155,27 @@ for (const route of routes) {
       if (!route.includes("about")) {
         await expect(page.locator(".ai-news-section-shell .redesign-language-switch, .ai-news-section-shell .redesign-login-link, .ai-news-section-shell .redesign-account-menu")).toHaveCount(0);
         const localNavigation = page.locator(".ai-news-section-nav");
-        await expect(localNavigation).toBeVisible();
-        await expect(localNavigation.locator("a")).toHaveCount(2);
-        await expect(page.locator(".ai-news-section-shell > .ai-news-section-nav")).toHaveCount(1);
         await expect(page.locator(".ai-news-section-shell .redesign-header, .ai-news-section-shell [role='banner']")).toHaveCount(0);
-        await expect(localNavigation).toHaveAttribute("aria-label", route.startsWith("/en/") ? "AI News" : "AI资讯");
-        const latestSectionLink = localNavigation.locator('a[href="' + primaryNewsLinkHref + '"]');
-        await expect(latestSectionLink).toHaveCount(1);
         if (route.endsWith("/ai-news")) {
-          await expect(latestSectionLink).toHaveAttribute("aria-current", "page");
+          await expect(localNavigation).toHaveCount(0);
         } else {
+          await expect(page.locator(".ai-news-section-shell > .ai-news-section-nav")).toHaveCount(1);
+          await expect(localNavigation).toBeVisible();
+          await expect(localNavigation.locator("a")).toHaveCount(2);
+          await expect(localNavigation).toHaveAttribute("aria-label", route.startsWith("/en/") ? "AI News" : "AI资讯");
+          const latestSectionLink = localNavigation.locator('a[href="' + primaryNewsLinkHref + '"]');
+          await expect(latestSectionLink).toHaveCount(1);
           await expect(latestSectionLink).not.toHaveAttribute("aria-current");
         }
-        const horizontalGutter = width <= 767 ? 40 : width <= 1023 ? 64 : 96;
-        const expectedNavigationWidth = Math.min(width - horizontalGutter, 1024);
-        expect(Math.round(await localNavigation.evaluate((nav) => nav.getBoundingClientRect().width)), `${route} section gutter at ${width}px`)
-          .toBe(expectedNavigationWidth);
-        expect(await localNavigation.locator("a").evaluateAll((links) =>
-          links.every((link) => (link as HTMLElement).getBoundingClientRect().height >= 44),
-        ), `${route} section links meet the touch target`).toBe(true);
+        if (!route.endsWith("/ai-news")) {
+          const horizontalGutter = width <= 767 ? 40 : width <= 1023 ? 64 : 96;
+          const expectedNavigationWidth = Math.min(width - horizontalGutter, 1024);
+          expect(Math.round(await localNavigation.evaluate((nav) => nav.getBoundingClientRect().width)), `${route} section gutter at ${width}px`)
+            .toBe(expectedNavigationWidth);
+          expect(await localNavigation.locator("a").evaluateAll((links) =>
+            links.every((link) => (link as HTMLElement).getBoundingClientRect().height >= 44),
+          ), `${route} section links meet the touch target`).toBe(true);
+        }
       }
     }
 

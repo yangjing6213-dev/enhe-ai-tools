@@ -90,6 +90,27 @@
   border: 0 !important;
 }
 
+.enhe-redesign-production .ai-news-page .ai-news-filter-surface :is(.ai-news-filter-control) {
+  box-sizing: border-box;
+  width: 100%;
+  min-width: 0;
+  height: 52px;
+  min-height: 52px;
+  max-height: 52px;
+}
+
+.enhe-redesign-production .ai-news-page .ai-news-filter-surface button.ai-news-filter-control {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding-block: 0;
+  height: 52px;
+  min-height: 52px;
+  max-height: 52px;
+  line-height: 1.25;
+  border-radius: 0.75rem;
+}
+
 .enhe-redesign-production .ai-news-page input.form-control-dark:focus-visible {
   outline: 2px solid var(--enhe-action) !important;
   outline-offset: 1px;
@@ -216,6 +237,22 @@
     box-shadow var(--enhe-motion-fast) var(--enhe-ease-ui-move),
     color var(--enhe-motion-fast) var(--enhe-ease-ui-move),
     transform var(--enhe-motion-fast) var(--enhe-ease-ui-move);
+}
+
+.enhe-redesign-production .ai-news-page .ai-news-icon-action {
+  display: inline-flex;
+  width: 44px;
+  min-width: 44px;
+  height: 44px;
+  min-height: 44px;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+}
+
+.enhe-redesign-production .ai-news-page .ai-news-interactions .ai-news-icon-action {
+  border: 0;
+  background: transparent;
 }
 
 .enhe-redesign-production .ai-news-page .ai-news-interactive-card {
@@ -349,6 +386,53 @@
 
 .enhe-redesign-production .ai-news-detail-page .tool-product-card-body-compact .tool-product-card-footer {
   margin-top: 0.25rem;
+}
+
+.enhe-redesign-production .ai-news-latest-teaser {
+  display: grid;
+  gap: 8px;
+  margin-top: 1rem;
+  padding: 16px 20px;
+  border: 1px solid var(--enhe-border);
+  border-radius: 16px;
+  background: var(--enhe-page-bg);
+}
+
+.enhe-redesign-production .ai-news-latest-teaser > span {
+  color: var(--enhe-text-muted);
+  font-size: 0.8125rem;
+  font-weight: 700;
+}
+
+.enhe-redesign-production .ai-news-latest-teaser a {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 8px 14px;
+  color: var(--enhe-text);
+  text-decoration: none;
+}
+
+.enhe-redesign-production .ai-news-latest-teaser time,
+.enhe-redesign-production .ai-news-latest-teaser a > span {
+  color: var(--enhe-action);
+  font-size: 0.8125rem;
+  font-weight: 700;
+}
+
+.enhe-redesign-production .ai-news-latest-teaser strong {
+  flex: 1 1 240px;
+  min-width: 0;
+  font-size: 1rem;
+  line-height: 1.5;
+}
+
+.enhe-redesign-production .ai-news-detail-tags > summary {
+  width: fit-content;
+  color: var(--enhe-action);
+  cursor: pointer;
+  font-size: 0.875rem;
+  font-weight: 700;
 }
 
 @media (width <= 1023px) {

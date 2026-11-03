@@ -97,7 +97,7 @@ function result(overrides: Record<string, unknown> = {}) {
 }
 
 describe("AI Workflow worker result intake", () => {
-  it("accepts a link-only listing for a licensed repository that could not be packaged", () => {
+  it("accepts a link-only listing when GitHub cannot provide a source archive", () => {
     const parsed = parseAiWorkflowRepositoryLinkResult({
       deliveryMode: "repository_link",
       repositoryId,
@@ -110,7 +110,12 @@ describe("AI Workflow worker result intake", () => {
       updatedAt: "2026-10-20T01:00:00.000Z",
       language: "Python",
       description: "Reusable AI agent workflow for research tasks.",
-      failureReason: "PACKAGE_LANGUAGE_UNSUPPORTED",
+      failureReason: "GITHUB_ARCHIVE_UNAVAILABLE",
+      sourceArchive: {
+        deliveryMode: "github",
+        upstreamUrl: `https://github.com/example/agent-flow/archive/${commit}.zip`,
+        failureReason: "GITHUB_ARCHIVE_UNAVAILABLE",
+      },
     });
 
     expect(parsed.success).toBe(true);

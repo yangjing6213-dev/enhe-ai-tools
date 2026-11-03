@@ -1,11 +1,12 @@
 "use client";
 
-import { Bell, ShoppingCart, X } from "lucide-react";
+import { Bell, Menu, MessageCircle, ShoppingCart, X } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 
 import type { Locale } from "@/lib/dictionaries";
 import { getDictionary } from "@/lib/dictionaries";
 import { formatCurrency } from "@/lib/utils";
+import { getSupportLauncherOffset } from "@/lib/customer-support-placement";
 
 type QuickAccessOrder = {
   id: string;
@@ -42,6 +43,7 @@ export function SiteFloatingActions({
 }) {
   const [hasUnread, setHasUnread] = useState(false);
   const [openPanel, setOpenPanel] = useState<OpenPanel>(null);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [data, setData] = useState<QuickAccessData | null>(null);
   const [loading, setLoading] = useState(false);
   const [loadFailed, setLoadFailed] = useState(false);
@@ -52,6 +54,55 @@ export function SiteFloatingActions({
   const userHref = isEnglish ? "/en/user" : "/user";
   const loginHref = isEnglish ? "/en/login" : "/login";
   const dictionary = getDictionary(locale);
+
+  useEffect(() => {
+    const root = rootRef.current;
+    const surface = root?.closest(".enhe-redesign-production");
+    if (!root || !surface) return;
+
+    let frame = 0;
+    let offset = 0;
+    const mobile = window.matchMedia("(width < 768px)");
+    const update = () => {
+      frame = 0;
+      let nextOffset = 0;
+      if (mobile.matches) {
+        const box = root.getBoundingClientRect();
+        const obstacles = Array.from(surface.querySelectorAll(
+          ".tool-detail-page :is(h1, h2, h3), .tool-detail-summary, .filter-surface input, .filter-surface select, .filter-surface button, .filter-surface a, .redesign-home-cta, .redesign-home-product-control, .redesign-footer a, .redesign-footer button, .redesign-footer summary, .footer-copyright-filings, .redesign-software-card-full-link, .redesign-software-load-row a",
+        )).flatMap((element) => {
+          const rect = element.getBoundingClientRect();
+          return rect.width > 0 && rect.height > 0 && getComputedStyle(element).visibility !== "hidden"
+            ? [{ x: rect.x, y: rect.y, width: rect.width, height: rect.height }]
+            : [];
+        });
+        nextOffset = getSupportLauncherOffset(
+          { x: box.x, y: box.y + offset, width: box.width, height: box.height },
+          obstacles,
+          window.innerHeight,
+        );
+      }
+      if (nextOffset === offset) return;
+      offset = nextOffset;
+      if (offset) root.style.translate = `0 -${offset}px`;
+      else root.style.removeProperty("translate");
+    };
+    const schedule = () => {
+      if (!frame) frame = requestAnimationFrame(update);
+    };
+    const observer = new ResizeObserver(schedule);
+    observer.observe(surface);
+    window.addEventListener("scroll", schedule, { passive: true, capture: true });
+    window.addEventListener("resize", schedule);
+    update();
+    return () => {
+      cancelAnimationFrame(frame);
+      observer.disconnect();
+      window.removeEventListener("scroll", schedule, true);
+      window.removeEventListener("resize", schedule);
+      root.style.removeProperty("translate");
+    };
+  }, []);
 
   useEffect(() => {
     if (!isAuthenticated) return;
@@ -109,13 +160,19 @@ export function SiteFloatingActions({
   }, [openPanel, isAuthenticated, locale, refreshKey]);
 
   useEffect(() => {
-    if (openPanel === null) return;
+    if (openPanel === null && !mobileMenuOpen) return;
 
     const closeOnOutsideClick = (event: PointerEvent) => {
-      if (!rootRef.current?.contains(event.target as Node)) setOpenPanel(null);
+      if (!rootRef.current?.contains(event.target as Node)) {
+        setOpenPanel(null);
+        setMobileMenuOpen(false);
+      }
     };
     const closeOnEscape = (event: KeyboardEvent) => {
-      if (event.key === "Escape") setOpenPanel(null);
+      if (event.key === "Escape") {
+        setOpenPanel(null);
+        setMobileMenuOpen(false);
+      }
     };
     document.addEventListener("pointerdown", closeOnOutsideClick);
     document.addEventListener("keydown", closeOnEscape);
@@ -123,12 +180,15 @@ export function SiteFloatingActions({
       document.removeEventListener("pointerdown", closeOnOutsideClick);
       document.removeEventListener("keydown", closeOnEscape);
     };
-  }, [openPanel]);
+  }, [openPanel, mobileMenuOpen]);
 
   const togglePanel = (panel: Exclude<OpenPanel, null>) => {
     setOpenPanel((current) => current === panel ? null : panel);
   };
-  const closePanel = () => setOpenPanel(null);
+  const closePanel = () => {
+    setOpenPanel(null);
+    setMobileMenuOpen(false);
+  };
   const orderStatus = (status: string) =>
     dictionary.userCenter.status[status as keyof typeof dictionary.userCenter.status] ?? status;
   const dateLabel = (value: string) =>
@@ -218,7 +278,7 @@ export function SiteFloatingActions({
       role="region"
       aria-label={isEnglish ? "Account shortcuts" : "个人中心快捷入口"}
     >
-      <div className="site-floating-action-container">
+      <div className="site-floating-action-container" data-desktop-only="true">
         <button
           className="site-floating-action customer-support-launcher shadow-[0_14px_38px_rgba(0,8,14,0.42)] backdrop-blur-xl transition-[border-color,transform] hover:-translate-y-0.5 hover:border-[var(--marketing-accent)]"
           type="button"
@@ -252,7 +312,7 @@ export function SiteFloatingActions({
         ) : null}
       </div>
 
-      <div className="site-floating-action-container">
+      <div className="site-floating-action-container" data-desktop-only="true">
         <button
           className="site-floating-action customer-support-launcher shadow-[0_14px_38px_rgba(0,8,14,0.42)] backdrop-blur-xl transition-[border-color,transform] hover:-translate-y-0.5 hover:border-[var(--marketing-accent)]"
           type="button"
@@ -289,6 +349,50 @@ export function SiteFloatingActions({
             </a>
           </section>
         ) : null}
+      </div>
+
+      <div className="site-floating-mobile-launcher" data-mobile-only="true">
+        {mobileMenuOpen ? (
+          <nav className="site-floating-mobile-menu" aria-label={isEnglish ? "Quick links" : "快捷入口"}>
+            <a href={userHref + "#orders"} onClick={closePanel}>
+              <ShoppingCart size={17} aria-hidden="true" />
+              {isEnglish ? "Orders" : "我的订单"}
+            </a>
+            <a href={userHref + "#notifications"} onClick={closePanel}>
+              <span className="site-floating-mobile-menu-icon">
+                <Bell size={17} aria-hidden="true" />
+                {hasUnread ? <span className="site-floating-action-unread" aria-hidden="true" /> : null}
+              </span>
+              {isEnglish ? "Messages" : "站内消息"}
+            </a>
+            <button
+              type="button"
+              onClick={() => {
+                closePanel();
+                window.dispatchEvent(new CustomEvent("enhe:open-support", {
+                  detail: {
+                    returnFocusTarget: rootRef.current
+                      ?.querySelector<HTMLButtonElement>(".site-floating-mobile-menu-toggle") ?? null,
+                  },
+                }));
+              }}
+            >
+              <MessageCircle size={17} aria-hidden="true" />
+              {isEnglish ? "Customer support" : "联系客服"}
+            </button>
+          </nav>
+        ) : null}
+        <button
+          className="site-floating-action customer-support-launcher site-floating-mobile-menu-toggle"
+          type="button"
+          aria-label={isEnglish ? "Open quick links" : "打开快捷入口"}
+          aria-expanded={mobileMenuOpen}
+          aria-haspopup="true"
+          onClick={() => setMobileMenuOpen((current) => !current)}
+        >
+          {mobileMenuOpen ? <X size={20} aria-hidden="true" /> : <Menu size={20} aria-hidden="true" />}
+          {hasUnread ? <span className="site-floating-action-unread" aria-hidden="true" /> : null}
+        </button>
       </div>
     </div>
   );

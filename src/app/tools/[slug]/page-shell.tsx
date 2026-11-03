@@ -407,9 +407,6 @@ export async function ToolDetailPageShell({
     downloadCount: tool.downloadCount,
     usageCount: tool.usageCount,
   });
-  const visibleDownloadMetric = visibleToolMetrics.find(
-    (metric) => metric.type === "download",
-  );
   const visibleUsageMetric = visibleToolMetrics.find(
     (metric) => metric.type === "usage",
   );
@@ -623,6 +620,22 @@ export async function ToolDetailPageShell({
         : servicePrice > 0
           ? td.buyDownload.replace("{price}", Number(servicePrice).toFixed(2))
           : freeDownloadButtonLabel;
+  const quickPriceLabel = workflowLinkOnly
+    ? (forceLocale === "en" ? "GitHub source and repository" : "GitHub 源码与原仓库")
+    : tool.isDownloadPaid && servicePrice <= 0
+      ? (forceLocale === "en" ? "Price pending" : "价格待确认")
+      : servicePrice > 0
+        ? localizedPriceSpecs.length > 1
+          ? (forceLocale === "en" ? `From ¥${servicePrice.toFixed(2)}` : `¥${servicePrice.toFixed(2)} 起`)
+          : `¥${servicePrice.toFixed(2)}`
+        : td.free;
+  const quickActionLabel = shouldShowPurchaseForm
+    ? (forceLocale === "en" ? "View purchase options" : "查看购买方案")
+    : isDownloadProduct && !tool.isDownloadPaid
+      ? (forceLocale === "en" ? "View free access" : "查看免费获取方式")
+      : hasDownloadPurchase
+        ? (forceLocale === "en" ? "View purchased access" : "查看已购内容")
+        : (forceLocale === "en" ? "View access options" : "查看获取方式");
   const workflowDetailsTitle = forceLocale === "en" ? "AI workflow details" : "AI 工作流详情";
   const introTitle = isAiWorkflow
     ? forceLocale === "en" ? "Workflow introduction" : "工作流介绍"
@@ -812,7 +825,7 @@ export async function ToolDetailPageShell({
       />
       <main>
         <section className="glass overflow-hidden rounded-[2rem] p-4 md:p-6 lg:p-8">
-          <div className="tool-detail-hero-stack flex flex-col gap-8">
+          <div className="tool-detail-hero-stack">
             <div className="tool-detail-cover-frame relative overflow-hidden rounded-[1.75rem] border border-[rgba(210,230,255,0.16)] bg-[#07101E]">
               <div className="relative aspect-[16/9]">
                 {isAiWorkflow ? (
@@ -844,75 +857,76 @@ export async function ToolDetailPageShell({
               </div>
             </div>
 
-            <div className="flex min-w-0 flex-col gap-7">
-              <div>
-                <div className="flex flex-wrap gap-2">
-                  <Badge>{localizedCategoryName ?? td.uncategorized}</Badge>
-                  <Badge>
-                    {tool.type === "software"
-                      ? td.software
-                      : tool.type === "ai_skill"
-                        ? td.aiSkill
-                      : tool.type === "skill_learning"
-                        ? td.skillLearning
-                        : isAiWorkflow
-                          ? forceLocale === "en" ? "AI workflow" : "AI 工作流"
-                        : td.online}
+            <div className="tool-detail-summary">
+              <div className="flex flex-wrap gap-2">
+                <Badge>{localizedCategoryName ?? td.uncategorized}</Badge>
+                <Badge>
+                  {tool.type === "software"
+                    ? td.software
+                    : tool.type === "ai_skill"
+                      ? td.aiSkill
+                    : tool.type === "skill_learning"
+                      ? td.skillLearning
+                      : isAiWorkflow
+                        ? forceLocale === "en" ? "AI workflow" : "AI 工作流"
+                      : td.online}
+                </Badge>
+                <Badge
+                  className={
+                    paidSkillCourse ||
+                    (isDownloadProduct && tool.isDownloadPaid) ||
+                    (isAccountService && servicePrice > 0)
+                      ? "text-[#FFB86B]"
+                      : "text-[#5EF1C7]"
+                  }
+                >
+                  {workflowLinkOnly
+                    ? forceLocale === "en" ? "GitHub source ZIP and repository" : "GitHub 源码 ZIP 与原仓库"
+                    : paidSkillCourse
+                    ? forceLocale === "en" ? "Paid course" : "付费课程"
+                    : tool.type === "software" && tool.isDownloadPaid
+                      ? forceLocale === "en" ? "Paid software" : "收费软件"
+                      : paidAiSkill
+                        ? forceLocale === "en" ? "Paid AI Skill" : "收费 AI Skill"
+                      : isAccountService && servicePrice > 0
+                        ? forceLocale === "en" ? "Paid service" : "收费服务"
+                        : td.free}
+                </Badge>
+                {localizedTagItems.map((tag) => (
+                  <Badge key={tag.id} className="text-[var(--marketing-accent)]">
+                    {tag.name}
                   </Badge>
-                  <Badge
-                    className={
-                      paidSkillCourse ||
-                      (isDownloadProduct && tool.isDownloadPaid) ||
-                      (isAccountService && servicePrice > 0)
-                        ? "text-[#FFB86B]"
-                        : "text-[#5EF1C7]"
-                    }
-                  >
-                    {workflowLinkOnly
-                      ? forceLocale === "en" ? "GitHub source ZIP and repository" : "GitHub 源码 ZIP 与原仓库"
-                      : paidSkillCourse
-                      ? forceLocale === "en"
-                        ? "Paid course"
-                        : "付费课程"
-                      : tool.type === "software" && tool.isDownloadPaid
-                        ? forceLocale === "en"
-                          ? "Paid software"
-                          : "收费软件"
-                        : paidAiSkill
-                          ? forceLocale === "en"
-                            ? "Paid AI Skill"
-                            : "收费 AI Skill"
-                        : isAccountService && servicePrice > 0
-                          ? forceLocale === "en"
-                            ? "Paid service"
-                            : "收费服务"
-                          : td.free}
-                  </Badge>
-                  {localizedTagItems.map((tag) => (
-                    <Badge
-                      key={tag.id}
-                      className="text-[var(--marketing-accent)]"
-                    >
-                      {tag.name}
-                    </Badge>
-                  ))}
-                </div>
-
-                {!isAiWorkflow ? <p className="mt-5 text-xs font-semibold uppercase tracking-[0.18em] text-[var(--marketing-accent)]">
+                ))}
+              </div>
+              {!isAiWorkflow ? (
+                <p className="mt-5 text-xs font-semibold uppercase tracking-[0.18em] text-[var(--marketing-accent)]">
                   {td.coverLabel}
-                </p> : null}
-                <h1 className="mt-5 text-4xl font-semibold leading-tight text-[#F6FAFF] md:text-5xl">
-                  {localizedTool.primaryName}
-                </h1>
-                {shouldShowSecondaryName ? (
-                  <p className="mt-3 text-lg font-medium tracking-wide text-[var(--marketing-accent)] md:text-xl">
-                    {localizedTool.secondaryName}
-                  </p>
-                ) : null}
-                <p className="enhe-authored-text whitespace-pre-wrap break-words mt-5 max-w-3xl text-base leading-8 text-[#8F9DB2] md:text-lg">
-                  {localizedSummary}
                 </p>
+              ) : null}
+              <h1 className="mt-5 break-words text-4xl font-semibold leading-tight text-[#F6FAFF] md:text-5xl">
+                {localizedTool.primaryName}
+              </h1>
+              {shouldShowSecondaryName ? (
+                <p className="mt-3 text-lg font-medium tracking-wide text-[var(--marketing-accent)] md:text-xl">
+                  {localizedTool.secondaryName}
+                </p>
+              ) : null}
+              <p className="enhe-authored-text whitespace-pre-wrap break-words mt-5 max-w-3xl text-base leading-8 text-[#8F9DB2] md:text-lg">
+                {localizedSummary}
+              </p>
+              <div className="tool-detail-quick-offer" aria-label={forceLocale === "en" ? "Price and next step" : "价格与下一步"}>
+                <div className="tool-detail-quick-price">
+                  <span>{forceLocale === "en" ? "Price" : "价格"}</span>
+                  <strong>{quickPriceLabel}</strong>
+                </div>
+                <a className="tool-detail-quick-action" href="#tool-purchase">
+                  {quickActionLabel}
+                </a>
+              </div>
+            </div>
 
+            <div className="tool-detail-main-content flex min-w-0 flex-col gap-7">
+              <div>
                 <div className={`tool-detail-facts-grid mt-6${hasRefundPolicy ? " has-refund" : ""}`}>
                   {isAccountService ? (
                     <>
@@ -972,13 +986,6 @@ export async function ToolDetailPageShell({
                       {refundPolicyCard}
                       {tool.supportedAgents.length ? (
                         <SupportedAgentsCard agents={tool.supportedAgents} locale={forceLocale} />
-                      ) : null}
-                      {visibleDownloadMetric && !workflowLinkOnly && !(isAiSkill && tool.slug === "skill") ? (
-                        <Info
-                          label={td.downloadCount}
-                          value={String(visibleDownloadMetric.count)}
-                          numeric
-                        />
                       ) : null}
                       {visibleUsageMetric ? (
                         <Info

@@ -5,10 +5,13 @@ import { describe, expect, it } from "vitest";
 const root = resolve(__dirname, "../..");
 
 describe("tool detail layout source", () => {
-  it("stacks media above text and preserves full image visibility", () => {
+  it("shows the full-width cover before the product summary and real next step", () => {
     const source = readFileSync(resolve(root, "src/app/tools/[slug]/page-shell.tsx"), "utf8");
 
     expect(source).toContain("tool-detail-hero-stack");
+    expect(source).toContain("tool-detail-summary");
+    expect(source).toContain("tool-detail-quick-price");
+    expect(source).toContain('href="#tool-purchase"');
     expect(source).toContain("tool-detail-cover-frame");
     expect(source).toContain("tool-detail-product-gallery");
     expect(source).toContain("tool-detail-copy-card");
@@ -21,7 +24,15 @@ describe("tool detail layout source", () => {
     expect(source).not.toContain("lg:grid-cols-[minmax(0,0.95fr)_minmax(0,1.05fr)]");
     expect(source).not.toContain("lg:grid-cols-[minmax(0,0.9fr)_minmax(0,1.1fr)]");
 
-    expect(source.indexOf("tool-detail-product-gallery")).toBeLessThan(source.indexOf("tool-detail-copy-card"));
+    expect(source.indexOf("tool-detail-cover-frame")).toBeLessThan(source.indexOf("tool-detail-summary"));
+  });
+
+  it("keeps the original cover-first, full-width product detail layout on wide screens", () => {
+    const styles = readFileSync(resolve(root, "src/styles/redesign/site-refresh.css"), "utf8");
+    expect(styles).toContain(".tool-detail-summary");
+    expect(styles).toContain(".tool-detail-hero-stack");
+    expect(styles).toMatch(/\.tool-detail-hero-stack\s*\{[^}]*display:\s*flex;[^}]*flex-direction:\s*column;/);
+    expect(styles).not.toMatch(/\.tool-detail-hero-stack\s*\{[^}]*grid-template-columns:/);
   });
 
   it("loads the core product cover eagerly with high fetch priority", () => {
@@ -84,12 +95,11 @@ describe("tool detail layout source", () => {
     expect(source.slice(changelogStart, changelogEnd)).toContain("w-full");
   });
 
-  it("pairs changelog and sharing cards and hides the download metric on the generic Skill route", () => {
+  it("pairs changelog and sharing cards with the shared detail text scale", () => {
     const source = readFileSync(resolve(root, "src/app/tools/[slug]/page-shell.tsx"), "utf8");
     const sharingStyles = readFileSync(resolve(root, "src/components/product-sharing.module.css"), "utf8");
 
     expect(source).toContain("tool-detail-changelog-share-grid");
-    expect(source).toContain('!(isAiSkill && tool.slug === "skill")');
     expect(source).toContain("md:text-4xl");
     expect(sharingStyles).toContain("font-size: 1.875rem");
     expect(sharingStyles).toContain("font-size: 2.25rem");

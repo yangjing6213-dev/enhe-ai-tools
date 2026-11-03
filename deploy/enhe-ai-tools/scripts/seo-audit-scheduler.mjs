@@ -66,6 +66,28 @@ async function enqueue(config) {
   }
 }
 
+async function cleanupExpiredChatMedia(config) {
+  const controller = new AbortController();
+  const timeout = setTimeout(() => controller.abort(), 15_000);
+  try {
+    const response = await fetch(`${config.baseUrl}/api/internal/chat/media-cleanup`, {
+      method: "POST",
+      headers: {
+        authorization: `Bearer ${config.token}`,
+        "content-type": "application/json"
+      },
+      body: "{}",
+      redirect: "error",
+      signal: controller.signal
+    });
+    if (!response.ok) throw new Error("CHAT_MEDIA_CLEANUP_FAILED");
+    const result = await response.json();
+    if (!result || result.ok !== true) throw new Error("CHAT_MEDIA_CLEANUP_FAILED");
+  } finally {
+    clearTimeout(timeout);
+  }
+}
+
 async function publishDailyForumTopicWhenDue(config) {
   const due = isDailyAiForumTopicDue();
   if (!due.due || forumTopicHandledDate === due.date) return;
@@ -120,6 +142,11 @@ async function main() {
     }
     try {
       await enqueue(config);
+    } catch {
+      status = "blocked";
+    }
+    try {
+      await cleanupExpiredChatMedia(config);
     } catch {
       status = "blocked";
     }

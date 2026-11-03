@@ -9,6 +9,7 @@ export type FormSubmitButtonProps = ButtonHTMLAttributes<HTMLButtonElement> & {
   pendingLabel?: ReactNode;
   duplicateSubmitLabel?: ReactNode;
   variant?: "primary" | "success" | "secondary" | "danger";
+  clearChatDraftsOnSubmit?: boolean;
 };
 
 const buttonVariant = {
@@ -23,6 +24,7 @@ export function FormSubmitButton({
   pendingLabel = "处理中...",
   duplicateSubmitLabel = "已经提交，请勿重复提交",
   variant = "primary",
+  clearChatDraftsOnSubmit = false,
   className,
   disabled,
   onClick,
@@ -78,6 +80,17 @@ export function FormSubmitButton({
     if (event.defaultPrevented || !isSubmitButton) return;
 
     if (form && !form.checkValidity()) return;
+
+    if (clearChatDraftsOnSubmit) {
+      try {
+        for (let index = sessionStorage.length - 1; index >= 0; index -= 1) {
+          const key = sessionStorage.key(index);
+          if (key?.startsWith("enhe-chat-draft:")) sessionStorage.removeItem(key);
+        }
+      } catch {
+        // Logout still proceeds when browser storage is unavailable.
+      }
+    }
 
     if (form) {
       form.dataset.submitted = "true";

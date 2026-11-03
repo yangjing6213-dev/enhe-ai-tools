@@ -79,15 +79,20 @@
   position: absolute;
   bottom: -56px;
   left: 50%;
-  display: grid;
-  width: 40px;
+  display: inline-flex;
+  min-width: 108px;
   height: 40px;
-  place-items: center;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
   transform: translateX(-50%);
-  border: 0;
-  border-radius: 50%;
+  border: 1px solid #d1d5db;
+  border-radius: 999px;
   background: #fff;
   color: #111827;
+  padding: 0 14px;
+  font: inherit;
+  font-weight: 700;
   cursor: pointer;
 }
 

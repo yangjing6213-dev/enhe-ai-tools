@@ -1,6 +1,7 @@
 "use client";
 
 import { useMemo, useState } from "react";
+import { buildAiSkillsSearchHref } from "@/lib/ai-skills-search";
 
 import { EnheRedesignSoftwareCard } from "@/components/redesign/software/EnheRedesignSoftwareCard";
 import type { RedesignLocale } from "@/components/redesign/types";
@@ -21,7 +22,7 @@ export function filterAiSkillCatalog(
   if (!normalizedQuery) return entries;
 
   return entries.filter(({ product, categoryLabel }) =>
-    [product.name, product.secondaryName, product.description, categoryLabel, ...product.highlights]
+    [product.name, product.secondaryName, product.description, categoryLabel, ...product.highlights, ...(product.supportedAgents ?? [])]
       .filter(Boolean)
       .some((value) =>
         value!.toLocaleLowerCase(locale === "en" ? "en-US" : "zh-CN").includes(normalizedQuery),
@@ -52,6 +53,14 @@ export function AiSkillsCatalog({
   const resultLabel = locale === "en"
     ? visibleEntries.length + (visibleEntries.length === 1 ? " AI Skill found" : " AI Skills found")
     : "找到 " + visibleEntries.length + " 个 AI Skill";
+  const updateQuery = (nextQuery: string) => {
+    setQuery(nextQuery);
+    window.history.replaceState(
+      null,
+      "",
+      buildAiSkillsSearchHref(window.location.pathname, window.location.search, nextQuery),
+    );
+  };
 
   return (
     <>
@@ -63,7 +72,7 @@ export function AiSkillsCatalog({
           value={query}
           placeholder={searchLabel}
           className="w-full rounded-xl border border-border bg-background px-4 py-3 text-sm text-foreground placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
-          onChange={(event) => setQuery(event.currentTarget.value)}
+          onChange={(event) => updateQuery(event.currentTarget.value)}
         />
       </div>
 

@@ -10,6 +10,7 @@ import {
   rankPopularTools
 } from "@/lib/admin-dashboard";
 import { getCurrentLocale } from "@/lib/i18n";
+import styles from "./dashboard.module.css";
 
 export default async function AdminDashboardPage() {
   const locale = await getCurrentLocale();
@@ -94,13 +95,13 @@ export default async function AdminDashboardPage() {
   const maxFunnelCount = Math.max(1, ...analyticsFunnel.map((row) => row.count));
 
   return (
-    <div>
+    <div className={styles.dashboard}>
       <h1 className="text-3xl font-black text-[var(--marketing-text)]">{t.title}</h1>
       <p className="mt-3 max-w-3xl text-sm leading-6 text-[#8B95A7]">
         {t.intro}
       </p>
 
-      <div className="mt-8 grid gap-4 md:grid-cols-4">
+      <div className={`${styles.stats} mt-8 gap-4`}>
         <Stat label={t.stats.paidRevenue} value={formatDashboardAmount(paidAmount._sum.amount?.toString())} accent />
         <Stat label={t.stats.todayRevenue} value={formatDashboardAmount(todayPaidAmount._sum.amount?.toString())} />
         <Stat label={t.stats.paymentReviews} value={pendingProofs} href="/admin/payments" warn={pendingProofs > 0} />
@@ -118,7 +119,7 @@ export default async function AdminDashboardPage() {
           <h2 className="text-xl font-semibold">{t.funnelTitle}</h2>
           <span className="text-xs text-[#8B95A7]">{t.funnelNote}</span>
         </div>
-        <div className="enhe-admin-card-grid mt-5 grid gap-3 md:grid-cols-7">
+        <div className={`${styles.funnel} mt-5 gap-3`}>
           {analyticsFunnel.map((row) => (
             <div key={row.eventName} className="enhe-admin-card min-w-0 rounded-2xl border border-white/10 bg-white/6 p-4">
               <p className="text-sm font-semibold text-[#E8EEF8]">{t.funnelLabels[row.eventName]}</p>
@@ -132,16 +133,16 @@ export default async function AdminDashboardPage() {
         </div>
       </section>
 
-      <div className="mt-8 grid gap-6 xl:grid-cols-[1fr_360px]">
+      <div className={`${styles.trendAndReminders} mt-8 gap-6`}>
         <section className="surface-panel p-6">
           <div className="flex flex-wrap items-center justify-between gap-3">
             <h2 className="text-xl font-semibold">{t.trendTitle}</h2>
             <span className="text-xs text-[#8B95A7]">{t.trendNote}</span>
           </div>
-          <div className="mt-5 grid h-56 grid-cols-7 items-end gap-3">
+          <div className="mt-5 grid h-56 grid-cols-7 items-end gap-1 sm:gap-3">
             {revenueTrend.map((bucket) => (
               <div key={bucket.date} className="flex h-full flex-col justify-end gap-2">
-                <div className="text-center text-[11px] text-[#8B95A7]">{formatDashboardAmount(bucket.amount)}</div>
+                <div className="text-center text-[11px] text-[#8B95A7] [overflow-wrap:anywhere]">{formatDashboardAmount(bucket.amount)}</div>
                 <div
                   className="rounded-t-xl bg-gradient-to-t from-[var(--marketing-accent)] to-[#56bfd0]"
                   style={{ height: `${Math.max(8, (bucket.amount / maxTrendAmount) * 150)}px` }}

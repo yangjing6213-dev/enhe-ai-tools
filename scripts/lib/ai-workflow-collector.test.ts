@@ -204,6 +204,7 @@ describe("AI Workflow collector diagnostics", () => {
     expect(getAiWorkflowLinkOnlyFailureReason("NO_LOCKED_NODE_TEST_SUITE")).toBe("NO_LOCKED_NODE_TEST_SUITE");
     expect(getAiWorkflowLinkOnlyFailureReason("NODE_MANIFEST_INVALID")).toBe("NODE_MANIFEST_INVALID");
     expect(getAiWorkflowLinkOnlyFailureReason(new Error("ARCHIVE_SIZE_LIMIT"))).toBe("ARCHIVE_SIZE_LIMIT");
+    expect(getAiWorkflowLinkOnlyFailureReason("GITHUB_ARCHIVE_UNAVAILABLE")).toBe("GITHUB_ARCHIVE_UNAVAILABLE");
     expect(getAiWorkflowLinkOnlyFailureReason("POSSIBLE_SECRET_IN_SOURCE")).toBeNull();
     expect(getAiWorkflowLinkOnlyFailureReason("LICENSE_NOT_REDISTRIBUTABLE")).toBe("LICENSE_NOT_REDISTRIBUTABLE");
     expect(getAiWorkflowLinkOnlyFailureReason("NETWORK_UNAVAILABLE")).toBeNull();
@@ -237,6 +238,19 @@ describe("AI Workflow collector diagnostics", () => {
     expect(getAiWorkflowFailureCode({ code: "GITHUB_RATE_LIMIT", message: "GITHUB_RATE_LIMIT" })).toBe("GITHUB_RATE_LIMIT");
     expect(getAiWorkflowFailureCode({ status: 403, message: "WORKER_FORBIDDEN" })).toBe("UNKNOWN");
     expect(getAiWorkflowFailureCode({ code: "ENOTFOUND", message: "network unavailable" })).toBe("NETWORK_UNAVAILABLE");
+  });
+
+  it("classifies request timeouts as transient network failures", () => {
+    expect(getAiWorkflowFailureCode({ name: "TimeoutError", message: "The operation was aborted due to timeout" })).toBe("NETWORK_UNAVAILABLE");
+  });
+
+  it("classifies fetch failures and nested Undici connection timeouts as transient", () => {
+    expect(getAiWorkflowFailureCode(new TypeError("fetch failed"))).toBe("NETWORK_UNAVAILABLE");
+    expect(getAiWorkflowFailureCode({
+      name: "TypeError",
+      message: "fetch failed",
+      cause: { code: "UND_ERR_CONNECT_TIMEOUT", message: "Connect Timeout Error" },
+    })).toBe("NETWORK_UNAVAILABLE");
   });
 
   it("removes supplied credentials and signed URL query values from log text", () => {

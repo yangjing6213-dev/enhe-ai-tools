@@ -21,64 +21,6 @@ const queryTextSchema = z.string().refine(isConfiguredGeoQuery, {
 });
 const collectionStatusSchema = z.enum(["collected", "uncollected", "unavailable"]);
 
-export async function ensureGeoMonitoringDefaults() {
-  await requireAdmin();
-
-  try {
-    await Promise.all([
-      ...GEO_MONITORING_QUERIES.map((query, index) =>
-        prisma.geoQuery.upsert({
-          where: { query_locale: { query: query.query, locale: query.locale } },
-          update: {
-            intent: query.intent,
-            topic: query.topic,
-            targetPath: query.targetPath,
-            tags: query.tags,
-            status: "active",
-            sortOrder: index
-          },
-          create: {
-            query: query.query,
-            locale: query.locale,
-            intent: query.intent,
-            topic: query.topic,
-            targetPath: query.targetPath,
-            tags: query.tags,
-            status: "active",
-            sortOrder: index
-          }
-        })
-      ),
-      ...GEO_MONITORING_PROVIDERS.map((provider, index) =>
-        prisma.geoProvider.upsert({
-          where: { providerKey: provider.id },
-          update: {
-            name: provider.name,
-            region: provider.region,
-            mode: provider.mode,
-            officialUrl: provider.officialUrl,
-            description: provider.description,
-            status: "active",
-            sortOrder: index
-          },
-          create: {
-            providerKey: provider.id,
-            name: provider.name,
-            region: provider.region,
-            mode: provider.mode,
-            officialUrl: provider.officialUrl,
-            description: provider.description,
-            status: "active",
-            sortOrder: index
-          }
-        })
-      )
-    ]);
-  } catch (error) {
-    console.error("[geo-monitoring] failed to sync defaults", error);
-  }
-}
-
 export async function recordGeoVisibilityResultAction(formData: FormData) {
   await requireAdmin();
 
@@ -101,27 +43,37 @@ export async function recordGeoVisibilityResultAction(formData: FormData) {
     ? optionalText(formData.get("sentiment"))
     : `geo:${collectionStatus}`;
 
-  const [query, provider] = await Promise.all([
-    prisma.geoQuery.findFirst({ where: { query: queryText }, select: { id: true } }),
-    prisma.geoProvider.findUnique({ where: { providerKey }, select: { id: true } })
-  ]);
+  const queryIndex = GEO_MONITORING_QUERIES.findIndex((item) => item.query === queryText);
+  const providerIndex = GEO_MONITORING_PROVIDERS.findIndex((item) => item.id === providerKey);
+  const query = GEO_MONITORING_QUERIES[queryIndex];
+  const provider = GEO_MONITORING_PROVIDERS[providerIndex];
+  const queryKey = { query: query.query, locale: query.locale };
 
-  await prisma.geoVisibilityResult.create({
-    data: {
-      queryText,
-      providerKey,
-      queryId: query?.id,
-      providerId: provider?.id,
-      answerSummary,
-      isBrandMentioned,
-      isDomainCited,
-      citedUrls,
-      competitors,
-      screenshotUrl,
-      sentiment,
-      checkedAt: new Date()
-    }
-  });
+  await prisma.$transaction([
+    prisma.geoQuery.createMany({
+      data: {
+        ...queryKey, intent: query.intent, topic: query.topic, targetPath: query.targetPath,
+        tags: query.tags, sortOrder: queryIndex
+      },
+      skipDuplicates: true
+    }),
+    prisma.geoProvider.createMany({
+      data: {
+        providerKey, name: provider.name, region: provider.region, mode: provider.mode,
+        officialUrl: provider.officialUrl, description: provider.description, sortOrder: providerIndex
+      },
+      skipDuplicates: true
+    }),
+    prisma.geoVisibilityResult.create({
+      data: {
+        queryText, providerKey,
+        query: { connect: { query_locale: queryKey } },
+        provider: { connect: { providerKey } },
+        answerSummary, isBrandMentioned, isDomainCited, citedUrls, competitors, screenshotUrl, sentiment,
+        checkedAt: new Date()
+      }
+    })
+  ]);
 
   revalidatePath("/admin/geo-monitoring");
   redirect("/admin/geo-monitoring?saved=1");

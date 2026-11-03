@@ -1,4 +1,4 @@
-param(
+﻿param(
   [string]$ProjectRoot = (Resolve-Path (Join-Path $PSScriptRoot "..")).Path,
   [string]$TaskName = "ENHE AI Workflow Collector"
 )
@@ -14,12 +14,13 @@ foreach ($required in @("scripts\ai-workflow-collector.ts", "node_modules\tsx", 
 
 $runRoot = "E:\AiProject\各平台内容发布项目\ai-workflows\runs"
 $runnerRoot = "E:\AiProject\各平台内容发布项目\ai-workflows\runner"
-$null = New-Item -ItemType Directory -Force -Path $runRoot, $runnerRoot, (Join-Path $runnerRoot "state"), (Join-Path $runnerRoot "logs"), (Join-Path $runnerRoot "codex"), (Join-Path $runnerRoot "empty-github-config"), (Join-Path $runnerRoot "empty-docker-config")
+$hiddenRunnerRoot = Join-Path $runnerRoot "run-collector-hidden"
+$null = New-Item -ItemType Directory -Force -Path $runRoot, $runnerRoot, $hiddenRunnerRoot, (Join-Path $runnerRoot "state"), (Join-Path $runnerRoot "logs"), (Join-Path $runnerRoot "codex"), (Join-Path $runnerRoot "empty-github-config"), (Join-Path $runnerRoot "empty-docker-config")
 
 $identity = [Security.Principal.WindowsIdentity]::GetCurrent()
 $userSid = $identity.User.Value
 $icacls = Join-Path $env:SystemRoot "System32\icacls.exe"
-foreach ($protectedPath in @($runRoot, $runnerRoot)) {
+foreach ($protectedPath in @($runRoot, $runnerRoot, $hiddenRunnerRoot)) {
   $item = Get-Item -Force -LiteralPath $protectedPath
   if ($item.Attributes -band [IO.FileAttributes]::ReparsePoint) { throw "A protected workflow folder cannot be a junction or symbolic link." }
   & $icacls $protectedPath "/inheritance:r" "/remove:g" "*S-1-1-0" "*S-1-5-11" "*S-1-5-32-545" "*S-1-5-4" "/grant:r" "*$($userSid):(OI)(CI)F" "*S-1-5-18:(OI)(CI)F" "*S-1-5-32-544:(OI)(CI)F" | Out-Null
@@ -32,6 +33,20 @@ foreach ($protectedPath in @($runRoot, $runnerRoot)) {
 
 $node = Get-Command node.exe -ErrorAction Stop
 $python = Get-Command python.exe -ErrorAction Stop
+if ($python.Source -match '[\\/]WindowsApps[\\/]python\.exe$') {
+  $previousConfigPath = Join-Path $runnerRoot "config.json"
+  if (-not (Test-Path -LiteralPath $previousConfigPath -PathType Leaf)) { throw "python.exe resolves to the WindowsApps alias and no configured Python runtime is available." }
+  $previousConfigItem = Get-Item -Force -LiteralPath $previousConfigPath
+  if ($previousConfigItem.Attributes -band [IO.FileAttributes]::ReparsePoint) { throw "The saved collector configuration cannot be a link." }
+  $previousConfig = Get-Content -LiteralPath $previousConfigPath -Raw -Encoding UTF8 | ConvertFrom-Json
+  $configuredPythonPath = [string]$previousConfig.pythonPath
+  if ([string]::IsNullOrWhiteSpace($configuredPythonPath) -or $configuredPythonPath -match '[\\/]WindowsApps[\\/]python\.exe$' -or -not (Test-Path -LiteralPath $configuredPythonPath -PathType Leaf)) {
+    throw "The saved Python runtime is unavailable; install a Python runtime outside WindowsApps and expose python.exe on PATH."
+  }
+  $python = [pscustomobject]@{ Source = $configuredPythonPath }
+}
+$pythonwPath = Join-Path (Split-Path -Parent $python.Source) "pythonw.exe"
+if (-not (Test-Path -LiteralPath $pythonwPath -PathType Leaf)) { throw "The matching pythonw.exe runtime is missing." }
 $codex = Get-Command codex.exe -ErrorAction Stop
 $docker = Get-Command docker.exe -ErrorAction Stop
 $config = [ordered]@{
@@ -46,10 +61,30 @@ $config = [ordered]@{
 $configPath = Join-Path $runnerRoot "config.json"
 [System.IO.File]::WriteAllText($configPath, ($config | ConvertTo-Json), [System.Text.UTF8Encoding]::new($false))
 
+$hiddenLauncherSource = Join-Path $PSScriptRoot "lib\ai-workflow-collector-launcher.pyw"
+if (-not (Test-Path -LiteralPath $hiddenLauncherSource -PathType Leaf)) { throw "The bundled collector Job launcher is missing." }
+$hiddenLauncherPath = Join-Path $hiddenRunnerRoot "launcher.pyw"
+if (Test-Path -LiteralPath $hiddenLauncherPath) {
+  $existingLauncher = Get-Item -Force -LiteralPath $hiddenLauncherPath
+  if ($existingLauncher.Attributes -band [IO.FileAttributes]::ReparsePoint) { throw "The collector launcher cannot be a link." }
+}
+$sourceLauncherHash = (Get-FileHash -LiteralPath $hiddenLauncherSource -Algorithm SHA256).Hash
+$installedLauncherHash = if (Test-Path -LiteralPath $hiddenLauncherPath -PathType Leaf) { (Get-FileHash -LiteralPath $hiddenLauncherPath -Algorithm SHA256).Hash } else { "" }
+if ($sourceLauncherHash -cne $installedLauncherHash) { Copy-Item -LiteralPath $hiddenLauncherSource -Destination $hiddenLauncherPath -Force }
+
+$collectorScriptPath = Join-Path $ProjectRoot "scripts\ai-workflow-collector.ts"
+$collectorConfigPath = Join-Path $hiddenRunnerRoot "collector.json"
+$collectorConfig = [ordered]@{
+  executable = $node.Source
+  arguments = "--import tsx `"$collectorScriptPath`""
+  workingDirectory = $ProjectRoot
+}
+[System.IO.File]::WriteAllText($collectorConfigPath, ($collectorConfig | ConvertTo-Json), [System.Text.UTF8Encoding]::new($false))
+
 $startBoundary = (Get-Date).Date.ToString("yyyy-MM-dd'T'HH:mm:ss")
 $escapedUser = [Security.SecurityElement]::Escape($userSid)
-$escapedCommand = [Security.SecurityElement]::Escape($node.Source)
-$escapedArgs = [Security.SecurityElement]::Escape("--import tsx `"$(Join-Path $ProjectRoot 'scripts\ai-workflow-collector.ts')`"")
+$escapedCommand = [Security.SecurityElement]::Escape($pythonwPath)
+$escapedArgs = [Security.SecurityElement]::Escape(('"{0}" "{1}"' -f $hiddenLauncherPath, $collectorConfigPath))
 $escapedWorkingDirectory = [Security.SecurityElement]::Escape($ProjectRoot)
 $xml = @"
 <?xml version="1.0" encoding="UTF-16"?>

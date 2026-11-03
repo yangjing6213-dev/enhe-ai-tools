@@ -14,6 +14,7 @@ vi.mock("@/lib/db", () => ({
   prisma: {
     tool: { findUnique: mocks.findTool, findMany: vi.fn(async () => []) },
     toolPurchase: { findUnique: mocks.findPurchase },
+    aiWorkflowVersionPurchase: { findFirst: vi.fn(async () => null) },
   },
 }));
 vi.mock("@/lib/public-content", () => ({
@@ -32,7 +33,7 @@ vi.mock("next/navigation", () => ({
 
 import { ToolDetailPageShell } from "./page-shell";
 
-function toolFixture(type: "software" | "online" | "skill_learning" | "ai_skill") {
+function toolFixture(type: "software" | "online" | "skill_learning" | "ai_skill" | "ai_workflow") {
   return {
     id: "tool-1",
     slug: "purchase-fixture",
@@ -56,6 +57,23 @@ function toolFixture(type: "software" | "online" | "skill_learning" | "ai_skill"
     comments: [],
     screenshots: [],
     supportedAgents: [],
+    aiWorkflowCandidate: type === "ai_workflow" ? {
+      status: "published",
+      fileId: null,
+      repositoryUrl: "https://github.com/example/workflow",
+      repositoryOwner: "example",
+      repositoryName: "workflow",
+      projectType: "workflow",
+      topic: null,
+      licenseSpdx: null,
+      packageVersion: null,
+      packageSize: null,
+      githubStars: 0,
+      starsUpdatedAt: null,
+      failureReason: null,
+      verifiedEnvironments: [],
+    } : null,
+    aiWorkflowReviews: [],
   };
 }
 
@@ -72,6 +90,7 @@ const products = [
   { type: "skill_learning", path: "/skill-learning", panelId: "download-purchase" },
   { type: "ai_skill", path: "/ai-skills", panelId: "download-purchase" },
 ] as const;
+const productTypes = ["software", "online", "skill_learning", "ai_skill", "ai_workflow"] as const;
 
 describe.each(["zh", "en"] as const)("%s product purchase login return", (locale) => {
   beforeEach(() => {
@@ -122,5 +141,14 @@ describe.each(["zh", "en"] as const)("%s product purchase login return", (locale
     expect(elements(form).find((element) => element.props.name === "paymentMethod")?.props.defaultValue).toBe("wechat");
     expect(renderToStaticMarkup(panel)).not.toContain("/login?returnTo=");
     expect(mocks.createOrder).not.toHaveBeenCalled();
+  });
+
+  it.each(productTypes)("hides the download count on %s product details", async (type) => {
+    mocks.findTool.mockResolvedValue({ ...toolFixture(type), downloadCount: 703, usageCount: 37 });
+    const page = await ToolDetailPageShell({ slug: "purchase-fixture", forceLocale: locale, expectedType: type });
+    const html = renderToStaticMarkup(page);
+
+    expect(html).not.toContain("703");
+    expect(html).not.toMatch(/下载次数|download count/i);
   });
 });
