@@ -331,7 +331,7 @@ CREATE TABLE "chat_group_reference_stats" (
 );
 
 -- CreateIndex
-CREATE UNIQUE INDEX "chat_group_reference_stats_group_id_reference_type_reference_id_key" ON "chat_group_reference_stats"("group_id", "reference_type", "reference_id");
+CREATE UNIQUE INDEX "chat_group_reference_stats_reference_unique" ON "chat_group_reference_stats"("group_id", "reference_type", "reference_id");
 CREATE INDEX "chat_group_reference_stats_group_id_click_count_idx" ON "chat_group_reference_stats"("group_id", "click_count");
 
 -- AddForeignKey

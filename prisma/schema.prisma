@@ -1850,7 +1850,7 @@ model ChatGroupReferenceStat {
   updatedAt     DateTime  @updatedAt @map("updated_at")
   group         ChatGroup @relation(fields: [groupId], references: [id], onDelete: Cascade)
 
-  @@unique([groupId, referenceType, referenceId])
+  @@unique([groupId, referenceType, referenceId], map: "chat_group_reference_stats_reference_unique")
   @@index([groupId, clickCount])
   @@map("chat_group_reference_stats")
 }
