@@ -61,6 +61,8 @@ describe("production software public query", () => {
       name: true,
       englishName: true,
       type: true,
+      valueProposition: true,
+      englishValueProposition: true,
       shortDescription: true,
       content: true,
       coverImage: true,

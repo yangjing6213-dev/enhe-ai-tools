@@ -41,7 +41,7 @@ export default async function EnglishAiNewsPage({ searchParams }: { searchParams
       forceLocale="en"
       languageHrefs={languageHrefs}
     >
-      <AiNewsWorkspaceShell locale="en" currentPathname="/en/ai-news">
+      <AiNewsWorkspaceShell locale="en" currentPathname="/en/ai-news" showNavigation={false}>
         <AiNewsPageShell searchParams={Promise.resolve(params)} forceLocale="en" />
       </AiNewsWorkspaceShell>
     </PublicSiteChrome>

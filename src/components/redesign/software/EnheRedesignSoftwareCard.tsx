@@ -3,10 +3,9 @@
 import Image from "next/image";
 import { CardLikeAction } from "@/components/card-like-action";
 import { useState } from "react";
-import { ArrowUpRight, Download, MousePointer2, ShieldCheck } from "lucide-react";
+import { ArrowUpRight, CircleDollarSign, Download, FileText, MousePointer2, ShieldCheck } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import { getDictionary, type Locale } from "@/lib/dictionaries";
-import { buildValueSentence } from "@/lib/tool-card-highlights";
 import { getVisibleToolMetrics } from "@/lib/tool-metrics";
 
 import type { SoftwareCatalogItem } from "@/lib/redesign/software/software-production";
@@ -30,7 +29,7 @@ export function EnheRedesignSoftwareCard({
   const showTextCover = product.media === null || mediaFailed;
   const headingId = `${sectionId}-${product.id}-title`;
   const t = getDictionary(locale).toolCard;
-  const summary = buildValueSentence(product.description, locale);
+  const valueProposition = product.valueProposition;
   const metrics = getVisibleToolMetrics(product);
   const hasSafetyReview = Boolean(product.securityReviewedAt);
   const CardElement = listItem ? "div" : "article";
@@ -75,7 +74,7 @@ export function EnheRedesignSoftwareCard({
               </div>
             ) : null}
           </div>
-          <div className={`redesign-software-card-body${hasSafetyReview ? " has-trust" : ""}`}>
+          <div className="redesign-software-card-body">
             <div className="redesign-software-card-badges">
               <p className="redesign-software-card-category">{categoryLabel}</p>
               <span
@@ -90,18 +89,30 @@ export function EnheRedesignSoftwareCard({
               <h3 id={headingId}>{product.name}</h3>
               {product.secondaryName ? <p className="redesign-software-card-secondary">{product.secondaryName}</p> : null}
             </div>
-            <p className="redesign-software-card-description"><strong>{t.valuePrefix}:</strong>{summary}</p>
+            {valueProposition ? (
+              <p className="redesign-software-card-description redesign-software-card-value">
+                <strong>{t.valuePrefix}:</strong>{valueProposition}
+              </p>
+            ) : null}
             <p className="redesign-software-card-price" aria-label={`${t.priceLabel}: ${product.price}`}>
               {product.price}
             </p>
-            {hasSafetyReview ? (
-              <div className="redesign-software-card-trust" data-trust-safety>
-                <ShieldCheck size={18} aria-hidden="true" />
-                <span>
-                  <strong>{locale === "en" ? "Manual safety review passed" : "安全审核通过"}</strong>
-                </span>
+            <div className="redesign-software-card-trust-list">
+              {hasSafetyReview ? (
+                <div className="redesign-software-card-trust" data-trust-safety>
+                  <ShieldCheck size={18} aria-hidden="true" />
+                  <span><strong>{locale === "en" ? "Safety review passed" : "安全审核通过"}</strong></span>
+                </div>
+              ) : null}
+              <div className="redesign-software-card-trust" data-trust-price>
+                <CircleDollarSign size={18} aria-hidden="true" />
+                <span><strong>{locale === "en" ? "Price shown" : "价格已公示"}</strong></span>
               </div>
-            ) : null}
+              <div className="redesign-software-card-trust" data-trust-refund>
+                <FileText size={18} aria-hidden="true" />
+                <span><strong>{locale === "en" ? "Refund rules available" : "退款规则可查"}</strong></span>
+              </div>
+            </div>
             {metrics.length ? <div className="redesign-software-card-bottom">
               <span className="redesign-software-card-metrics">
                 {metrics.map((metric) => <span key={metric.type}>

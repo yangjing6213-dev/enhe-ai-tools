@@ -5,7 +5,7 @@ import { notFound, redirect } from "next/navigation";
 import { AiNewsInteractions } from "@/components/ai-news-interactions";
 import { AiNewsVideo } from "@/components/ai-news-video";
 import { StructuredData } from "@/components/structured-data";
-import { Badge, ButtonLink, Container, SectionTitle } from "@/components/ui";
+import { Badge, Container, SectionTitle } from "@/components/ui";
 import { ToolCard } from "@/components/tool-card";
 import { enheOrganizationReference } from "@/lib/brand-entity";
 import {
@@ -14,7 +14,6 @@ import {
   buildAiNewsDescriptionFallback,
   buildAiNewsSerpTitle,
   detectAiNewsEmbeddedSections,
-  extractNewsTableOfContents,
   isEnglishNewsArticleIndexable,
   mergeAiNewsRelatedItems,
   renderNewsContentBlocks,
@@ -31,8 +30,6 @@ import {
   buildLocalizedNewsKeywordList,
   buildLocalizedNewsSummary,
   buildLocalizedNewsTitle,
-  buildLocalizedTutorialPreviewTitle,
-  buildLocalizedTutorialPreviewToolName,
   resolveLocalizedNewsCategoryName,
   resolveLocalizedNewsTagName,
 } from "@/lib/ai-news-localization";
@@ -40,7 +37,6 @@ import { getDictionary, type Locale } from "@/lib/dictionaries";
 import { normalizeImageSrc } from "@/lib/media";
 import {
   buildCanonicalAiNewsPath,
-  buildCanonicalToolPath,
   getCanonicalAiNewsSlug,
 } from "@/lib/public-slugs";
 import { publicPageCacheSeconds } from "@/lib/public-routes";
@@ -187,7 +183,6 @@ export async function AiNewsDetailPageShell({
   );
   const publishedAt = article.publishedAt ?? article.createdAt;
   const embeddedSections = detectAiNewsEmbeddedSections(localized.content);
-  const toc = extractNewsTableOfContents(localized.content);
   const contentBlocks = renderNewsContentBlocks(localized.content);
   const articleVideo = resolveNewsVideo(article, localized.title);
   const relatedKeywords = buildAiNewsRelatedKeywords({
@@ -197,9 +192,8 @@ export async function AiNewsDetailPageShell({
     categoryName: article.category?.name,
     tagNames: article.tagLinks.map(({ tag }) => tag.name),
   });
-  const [relatedTools, relatedTutorials, relatedArticles] = await Promise.all([
+  const [relatedTools, relatedArticles] = await Promise.all([
     getRelatedTools(article.relatedToolIds, relatedKeywords),
-    getRelatedTutorials(article.relatedTutorialIds, relatedKeywords),
     getRelatedNewsArticles(article, relatedKeywords),
   ]);
   const breadcrumbSchema = buildBreadcrumbSchema({
@@ -302,7 +296,7 @@ export async function AiNewsDetailPageShell({
           ) : null}
         </section>
 
-        <div className="mt-10 grid gap-8 lg:grid-cols-[minmax(0,1fr)_300px]">
+        <div className="mt-10">
           <div className="space-y-8">
             {!embeddedSections.keyTakeaways && localized.keyTakeaways.length ? (
             <section className="glass rounded-2xl p-6">
@@ -329,6 +323,18 @@ export async function AiNewsDetailPageShell({
             {articleVideo ? (
               <AiNewsVideo video={articleVideo} locale={forceLocale} articleTitle={localized.title} />
             ) : null}
+
+            <AiNewsInteractions
+              slug={canonicalSlug}
+              labels={{
+                like: t.aiNews.like,
+                favorite: t.aiNews.favorite,
+                share: t.aiNews.share,
+                copyLink: t.aiNews.copyLink,
+                backToTop: t.aiNews.backToTop,
+                loginRequired: t.aiNews.loginRequired,
+              }}
+            />
 
             {localized.impactNotes ? (
               <section className="glass rounded-2xl p-6">
@@ -359,75 +365,6 @@ export async function AiNewsDetailPageShell({
                   ))}
                 </div>
               </section>
-            ) : null}
-
-            {relatedTutorials.length && !embeddedSections.relatedTutorials ? (
-              <section className="glass rounded-2xl p-6">
-                <h2 className="text-2xl font-black text-[var(--marketing-text)]">
-                  {t.aiNews.relatedTutorials}
-                </h2>
-                <div className="mt-5 grid gap-3">
-                  {relatedTutorials.map((tutorial) => (
-                    <Link
-                      key={tutorial.id}
-                      href={buildCanonicalToolPath(tutorial.tool, forceLocale)}
-                    className="rounded-xl border border-[var(--marketing-border)] bg-[var(--marketing-card)] p-4 transition-colors hover:border-[var(--marketing-accent)]/45"
-                    >
-                      <p className="break-words font-semibold text-[var(--marketing-text)]">
-                        {buildLocalizedTutorialPreviewTitle(
-                          tutorial.title,
-                          tutorial.tool,
-                          forceLocale,
-                        )}
-                      </p>
-                      <p className="mt-2 text-sm text-[var(--marketing-muted)]">
-                        {buildLocalizedTutorialPreviewToolName(
-                          tutorial.tool,
-                          forceLocale,
-                        )}
-                      </p>
-                    </Link>
-                  ))}
-                </div>
-              </section>
-            ) : null}
-
-            {!embeddedSections.relatedTools &&
-            !embeddedSections.relatedTutorials ? (
-            <section className="glass rounded-2xl p-6">
-              <h2 className="text-2xl font-black text-[var(--marketing-text)]">
-                {forceLocale === "en" ? "Related Tools And Tutorials" : "相关工具/教程"}
-              </h2>
-              <p className="mt-4 text-base leading-8 text-[var(--marketing-muted)]">
-                {forceLocale === "en"
-                  ? "Use the following ENHE AI sections to continue from the news signal into tool selection, account-service guidance, or practical learning."
-                  : "你可以从下面的 ENHE AI 栏目继续把资讯信号转成工具选择、账号服务判断或实操学习路径。"}
-              </p>
-              <div className="mt-5 grid gap-3 md:grid-cols-3">
-                {[
-                  {
-                    href: buildLocalePath("/software", forceLocale),
-                    label: forceLocale === "en" ? "AI Software Apps" : "AI软件应用",
-                  },
-                  {
-                    href: buildLocalePath("/skill-learning", forceLocale),
-                    label: forceLocale === "en" ? "AI Skill Tutorials" : "AI技能教程",
-                  },
-                  {
-                    href: buildLocalePath("/account-services", forceLocale),
-                    label: forceLocale === "en" ? "AI Account Services" : "AI账号服务",
-                  },
-                ].map((item) => (
-                  <Link
-                    key={item.href}
-                    href={item.href}
-                    className="rounded-xl border border-[var(--marketing-border)] bg-[var(--marketing-card)] p-4 text-sm font-bold text-[var(--marketing-text)] transition-[border-color,color] hover:border-[var(--marketing-accent)]/45 hover:text-[var(--marketing-accent)]"
-                  >
-                    {item.label}
-                  </Link>
-                ))}
-              </div>
-            </section>
             ) : null}
 
             {relatedArticles.length ? (
@@ -487,34 +424,6 @@ export async function AiNewsDetailPageShell({
               </section>
             ) : null}
 
-            {article.externalSources.length && !embeddedSections.sources ? (
-              <section className="glass rounded-2xl p-6">
-                <h2 className="text-2xl font-black text-[var(--marketing-text)]">
-                  {t.aiNews.sources}
-                </h2>
-                <div className="mt-5 grid gap-3">
-                  {article.externalSources.map((source) => (
-                    <a
-                      key={source.id}
-                      href={source.url}
-                      target="_blank"
-                      rel="nofollow noopener noreferrer"
-                      className="rounded-xl border border-[var(--marketing-border)] bg-[var(--marketing-card)] p-4 transition-colors hover:border-[var(--marketing-accent)]/45"
-                    >
-                      <p className="font-semibold text-[var(--marketing-text)]">
-                        {source.title}
-                      </p>
-                      {source.description ? (
-                        <p className="mt-2 text-sm leading-6 text-[var(--marketing-muted)]">
-                          {source.description}
-                        </p>
-                      ) : null}
-                    </a>
-                  ))}
-                </div>
-              </section>
-            ) : null}
-
             {!embeddedSections.faq ? (
             <section className="glass rounded-2xl p-6">
               <h2 className="text-2xl font-black text-[var(--marketing-text)]">
@@ -535,52 +444,7 @@ export async function AiNewsDetailPageShell({
             </section>
             ) : null}
 
-            <AiNewsInteractions
-              slug={canonicalSlug}
-              labels={{
-                like: t.aiNews.like,
-                favorite: t.aiNews.favorite,
-                share: t.aiNews.share,
-                copyLink: t.aiNews.copyLink,
-                backToTop: t.aiNews.backToTop,
-                loginRequired: t.aiNews.loginRequired,
-              }}
-            />
           </div>
-
-          <section className="space-y-5 lg:sticky lg:top-28 lg:self-start" aria-label={t.aiNews.articleSupportLabel}>
-            {!embeddedSections.tableOfContents ? (
-            <section className="glass rounded-2xl p-5">
-              <h2 className="text-lg font-black text-[var(--marketing-text)]">
-                {t.aiNews.tableOfContents}
-              </h2>
-              <div className="mt-4 grid gap-2">
-                {toc.length ? (
-                  toc.map((item) => (
-                    <a
-                      key={item.id}
-                      href={`#${item.id}`}
-                          className={`rounded-lg px-3 py-2 text-sm transition-colors hover:bg-[var(--marketing-card-soft)] hover:text-[var(--marketing-accent)] ${item.level === 3 ? "ml-4 text-[var(--marketing-muted)]" : "text-[var(--marketing-text)]"}`}
-                    >
-                      {item.title}
-                    </a>
-                  ))
-                ) : (
-                  <p className="text-sm text-[var(--marketing-muted)]">
-                    {localized.title}
-                  </p>
-                )}
-              </div>
-            </section>
-            ) : null}
-            <ButtonLink
-              href={buildLocalePath("/ai-news", forceLocale)}
-              variant="ghost"
-              className="w-full"
-            >
-              {t.aiNews.latestTitle}
-            </ButtonLink>
-          </section>
         </div>
         </article>
       </main>
@@ -860,37 +724,6 @@ function buildToolKeywordOr(keywords: string[]) {
   ];
 }
 
-function buildTutorialKeywordOr(keywords: string[]) {
-  return [
-    ...buildKeywordContainsOr(keywords, [
-      "title",
-      "content",
-      "notes",
-      "commonErrors",
-    ]),
-    ...keywords.flatMap((keyword) => [
-      { tool: { name: { contains: keyword, mode: "insensitive" as const } } },
-      {
-        tool: {
-          englishName: { contains: keyword, mode: "insensitive" as const },
-        },
-      },
-      {
-        tool: {
-          shortDescription: { contains: keyword, mode: "insensitive" as const },
-        },
-      },
-      {
-        tool: {
-          category: {
-            name: { contains: keyword, mode: "insensitive" as const },
-          },
-        },
-      },
-    ]),
-  ];
-}
-
 function buildNewsKeywordOr(keywords: string[]) {
   return [
     ...buildKeywordContainsOr(keywords, [
@@ -957,43 +790,6 @@ async function getRelatedTools(ids: string[], keywords: string[]) {
         { sortOrder: "asc" },
         { createdAt: "desc" },
       ],
-      take: 6,
-    }),
-  ]);
-
-  return mergeAiNewsRelatedItems([explicit, keywordMatched, fallback], 3);
-}
-
-async function getRelatedTutorials(ids: string[], keywords: string[]) {
-  const { prisma } = await import("@/lib/db");
-  const [explicit, keywordMatched, fallback] = await Promise.all([
-    ids.length
-      ? prisma.tutorial.findMany({
-          where: {
-            id: { in: ids },
-            status: "active",
-            tool: { status: "published" },
-          },
-          include: { tool: true },
-          take: 3,
-        })
-      : Promise.resolve([]),
-    keywords.length
-      ? prisma.tutorial.findMany({
-          where: {
-            status: "active",
-            tool: { status: "published" },
-            OR: buildTutorialKeywordOr(keywords),
-          },
-          include: { tool: true },
-          orderBy: [{ sortOrder: "asc" }, { createdAt: "desc" }],
-          take: 6,
-        })
-      : Promise.resolve([]),
-    prisma.tutorial.findMany({
-      where: { status: "active", tool: { status: "published" } },
-      include: { tool: true },
-      orderBy: [{ sortOrder: "asc" }, { createdAt: "desc" }],
       take: 6,
     }),
   ]);

@@ -604,7 +604,7 @@ function FilterBar({
         aria-label={t.aiNews.searchPlaceholder}
         placeholder={t.aiNews.searchPlaceholder}
         title={t.aiNews.searchPlaceholder}
-        className="form-control-dark"
+        className="form-control-dark ai-news-filter-control"
       />
       <label className="sr-only" htmlFor="ai-news-category">
         {t.aiNews.allCategories}
@@ -615,7 +615,7 @@ function FilterBar({
         aria-label={t.aiNews.allCategories}
         defaultValue={filters.category ?? ""}
         title={t.aiNews.allCategories}
-        className="form-select-dark"
+        className="form-select-dark ai-news-filter-control"
       >
         <option value="">{t.aiNews.allCategories}</option>
         {categories.map((category) => (
@@ -633,7 +633,7 @@ function FilterBar({
         aria-label={t.aiNews.allTags}
         defaultValue={filters.tag ?? ""}
         title={t.aiNews.allTags}
-        className="form-select-dark"
+        className="form-select-dark ai-news-filter-control"
       >
         <option value="">{t.aiNews.allTags}</option>
         {tags.map((tag) => (
@@ -651,13 +651,13 @@ function FilterBar({
         aria-label={t.aiNews.latest}
         defaultValue={filters.sort}
         title={t.aiNews.latest}
-        className="form-select-dark"
+        className="form-select-dark ai-news-filter-control"
       >
         <option value="latest">{t.aiNews.latest}</option>
         <option value="hot">{t.aiNews.hot}</option>
         <option value="featured">{t.aiNews.featured}</option>
       </select>
-               <button className="rounded-full bg-[var(--marketing-button)] px-5 py-3 font-bold text-[var(--marketing-card)] transition-colors hover:bg-[var(--marketing-accent)] lg:col-span-4">
+      <button className="ai-news-filter-control rounded-xl bg-[var(--marketing-button)] px-5 font-bold text-[var(--marketing-card)] transition-colors hover:bg-[var(--marketing-accent)] lg:col-span-4">
         {t.aiNews.filter}
       </button>
     </form>

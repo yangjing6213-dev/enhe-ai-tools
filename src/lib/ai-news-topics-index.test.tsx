@@ -19,6 +19,18 @@ beforeEach(() => {
 afterEach(() => vi.unstubAllEnvs());
 
 describe("AI News topics collection entry", () => {
+  it.each(["zh", "en"] as const)("can omit the Latest and Topics navigation on the news listing (%s)", (locale) => {
+    const html = renderToStaticMarkup(
+      <AiNewsWorkspaceShell locale={locale} currentPathname={`${locale === "en" ? "/en" : ""}/ai-news`} showNavigation={false}>
+        Listing
+      </AiNewsWorkspaceShell>,
+    );
+
+    expect(html).not.toContain("ai-news-section-nav");
+    expect(html).not.toContain(locale === "en" ? "Topics" : "专题集合");
+    expect(html).toContain("Listing");
+  });
+
   it.each(["zh", "en"] as const)("keeps one localized section navigation (%s)", (locale) => {
     const path = `${locale === "en" ? "/en" : ""}/ai-news/topics`;
     const html = renderToStaticMarkup(<AiNewsWorkspaceShell locale={locale} currentPathname={path}>Collection</AiNewsWorkspaceShell>);

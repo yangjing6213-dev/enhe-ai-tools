@@ -19,6 +19,8 @@ function buildRows(count: number) {
       name: `工具 ${item}`,
       englishName: `Practical AI Tool ${item}`,
       type: "software" as const,
+      valueProposition: "省下重复整理时间，直接开始可复用的流程。",
+      englishValueProposition: "Skip repetitive sorting and start with a reusable workflow.",
       shortDescription:
         "[[zh]]用于完成真实工作任务。[[/zh]][[en]]A practical AI tool for completing a clear everyday workflow.[[/en]]",
       content:
@@ -36,6 +38,24 @@ function buildRows(count: number) {
 }
 
 describe("production software catalog adapter", () => {
+  it("uses the separately managed bilingual value proposition instead of the product summary", () => {
+    const rows = buildRows(1);
+
+    expect(buildPublicSoftwareCatalogItem(rows[0], "zh").valueProposition).toBe(
+      "省下重复整理时间，直接开始可复用的流程。",
+    );
+    expect(buildPublicSoftwareCatalogItem(rows[0], "en").valueProposition).toBe(
+      "Skip repetitive sorting and start with a reusable workflow.",
+    );
+  });
+
+  it("does not reuse the product summary as value copy before an editor supplies one", () => {
+    const row = { ...buildRows(1)[0], valueProposition: null, englishValueProposition: null };
+
+    expect(buildPublicSoftwareCatalogItem(row, "zh").valueProposition).toBeUndefined();
+    expect(buildPublicSoftwareCatalogItem(row, "en").valueProposition).toBeUndefined();
+  });
+
   it("carries only an actual AI Skill safety review to its catalog card", () => {
     const row = { ...buildRows(1)[0], type: "ai_skill" as const };
     expect(buildPublicSoftwareCatalogItem(row, "zh").securityReviewedAt).toBeNull();

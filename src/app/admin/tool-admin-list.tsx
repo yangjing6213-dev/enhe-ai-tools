@@ -29,6 +29,8 @@ type ToolItem = {
   status: string;
   sortOrder: number;
   shortDescription: string;
+  valueProposition: string | null;
+  englishValueProposition: string | null;
   content: string;
   coverImage: string | null;
   screenshots: string[];
@@ -507,6 +509,12 @@ export function ToolEditor({
 
         <EditorSection title={copy.detailSection} intro={copy.detailSectionIntro}>
           <div className="grid gap-4">
+            <EmojiField label={copy.valueProposition}>
+              <EmojiTextarea locale="zh" name="valueProposition" maxLength={240} defaultValue={tool?.valueProposition ?? ""} className={textareaClass} />
+            </EmojiField>
+            <EmojiField label={copy.englishValueProposition}>
+              <EmojiTextarea locale="en" name="englishValueProposition" maxLength={240} defaultValue={tool?.englishValueProposition ?? ""} className={textareaClass} />
+            </EmojiField>
             <EmojiField label={copy.shortDescription}>
               <EmojiTextarea locale={locale} name="shortDescription" required defaultValue={tool?.shortDescription ?? ""} className={textareaClass} />
             </EmojiField>
@@ -801,6 +809,8 @@ const toolAdminCopy = {
     deleteProtectedIntro: "该产品关联了历史订单或购买权益，因此暂不支持删除。",
     deleteProtectedFallback: "如需停止展示，请将状态改为“下架”；原有交易记录和权益会保留。",
     servicePrice: "服务价格",
+    valueProposition: "价值文案（中文）",
+    englishValueProposition: "价值文案（英文）",
     shortDescription: "简介",
     content: "详细介绍",
     productVideo: "详细介绍产品视频",
@@ -938,6 +948,8 @@ const toolAdminCopy = {
     deleteProtectedIntro: "This product has historical orders or purchase entitlements, so it cannot be deleted.",
     deleteProtectedFallback: "To stop showing it, change its status to “Offline”. Existing transactions and entitlements will be retained.",
     servicePrice: "Service price",
+    valueProposition: "Value proposition (Chinese)",
+    englishValueProposition: "Value proposition (English)",
     shortDescription: "Short description",
     content: "Detailed introduction",
     productVideo: "Product video in detail intro",
