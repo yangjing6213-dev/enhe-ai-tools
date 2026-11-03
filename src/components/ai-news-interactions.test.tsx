@@ -14,6 +14,7 @@ describe("AI news detail interaction toolbar", () => {
       copyLink: "Copy link",
       backToTop: "Back to top",
       loginRequired: "Please sign in",
+      articleSupportLabel: "Article support links",
     };
     const html = renderToStaticMarkup(<AiNewsInteractions slug="fixture" labels={labels} />);
 
@@ -22,6 +23,7 @@ describe("AI news detail interaction toolbar", () => {
       expect(html).toContain(`title="${label}"`);
     }
     expect(html.match(/<button\b/g)).toHaveLength(5);
+    expect(html).toContain('role="group" aria-label="Article support links"');
     expect(html).toContain("<svg");
     expect(html).not.toContain(">Like</button>");
     expect(html).not.toContain(">Save</button>");

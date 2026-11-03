@@ -333,6 +333,7 @@ export async function AiNewsDetailPageShell({
                 copyLink: t.aiNews.copyLink,
                 backToTop: t.aiNews.backToTop,
                 loginRequired: t.aiNews.loginRequired,
+                articleSupportLabel: t.aiNews.articleSupportLabel,
               }}
             />
 

@@ -67,8 +67,11 @@ describe("AI news source contracts", () => {
     expect(detail).toContain("resolveLocalizedNewsCategoryName");
     expect(detail).toContain("resolveLocalizedNewsTagName");
     expect(detail).toContain("buildLocalizedNewsKeywordList");
-    expect(detail).toContain("buildLocalizedTutorialPreviewTitle");
-    expect(detail).toContain("buildLocalizedTutorialPreviewToolName");
+    expect(detail).toContain("getRelatedTools(article.relatedToolIds, relatedKeywords)");
+    expect(detail).toContain('<ToolCard tool={tool} locale={forceLocale} variant="compact" />');
+    expect(detail).not.toContain("buildLocalizedTutorialPreviewTitle");
+    expect(detail).not.toContain("buildLocalizedTutorialPreviewToolName");
+    expect(detail).not.toContain("t.aiNews.relatedTutorials");
   });
 
   it("uses sanitized AI news descriptions for metadata and structured data", () => {

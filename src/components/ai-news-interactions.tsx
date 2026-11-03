@@ -13,6 +13,7 @@ type Props = {
     copyLink: string;
     backToTop: string;
     loginRequired: string;
+    articleSupportLabel: string;
   };
 };
 
@@ -58,7 +59,11 @@ export function AiNewsInteractions({ slug, labels }: Props) {
   ];
 
   return (
-    <div className="ai-news-interactions glass flex flex-wrap items-center gap-2 rounded-2xl p-3">
+    <div
+      className="ai-news-interactions glass flex flex-wrap items-center gap-2 rounded-2xl p-3"
+      role="group"
+      aria-label={labels.articleSupportLabel}
+    >
       {actions.map(({ label, Icon, onClick }) => (
         <button
           key={label}

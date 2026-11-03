@@ -116,10 +116,12 @@ describe("GEO brand profile source contracts", () => {
 
     expect(detail).toContain("buildAiNewsFaqItems");
     expect(detail).toContain("FAQ");
-    expect(detail).toContain("相关工具/教程");
+    expect(detail).toContain("t.aiNews.relatedTools");
+    expect(detail).not.toContain("t.aiNews.relatedTutorials");
+    expect(detail).not.toContain("参考来源");
+    expect(detail).not.toContain("文章目录");
+    expect(detail).not.toContain("最新资讯");
     expect(detail).toContain("buildFaqSchema");
-    expect(detail).toContain('buildLocalePath("/software", forceLocale)');
-    expect(detail).toContain('buildLocalePath("/skill-learning", forceLocale)');
-    expect(detail).toContain('buildLocalePath("/account-services", forceLocale)');
+    expect(detail).toContain("AI软件应用、AI技能教程和 AI账号服务");
   });
 });

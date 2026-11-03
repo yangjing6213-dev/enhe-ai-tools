@@ -9,7 +9,6 @@ import { describe, expect, it } from "vitest";
 import type { RedesignLocale } from "@/components/redesign/types";
 import { middleware } from "@/middleware";
 import { SOFTWARE_CATEGORIES, SOFTWARE_FILTER_CATEGORIES } from "@/lib/redesign/software/software-categories";
-import { buildValueSentence } from "@/lib/tool-card-highlights";
 import { getDictionary } from "@/lib/i18n";
 import { SOFTWARE_COPY } from "@/lib/redesign/software/software-copy";
 import { SOFTWARE_PRODUCTS } from "@/lib/redesign/software/software-products";
@@ -65,11 +64,9 @@ function assertLocaleSurface(locale: RedesignLocale, html: string) {
 
   for (const product of SOFTWARE_PRODUCTS) {
     expect(html).toContain(product.name[locale]);
-    expect(html).toContain(buildValueSentence(product.description[locale], locale));
+    expect(html).not.toContain(product.description[locale]);
     expect(html).toContain(product.detailHref[locale]);
-
     expect(html).not.toContain(product.description[otherLocale]);
-
   }
 
   for (const value of [
