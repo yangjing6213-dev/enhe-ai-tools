@@ -22,6 +22,7 @@ describe("software catalog card clarity", () => {
     const styles = readFileSync(resolve(root, "src/styles/redesign/software.css"), "utf8");
 
     expect(source).toContain("product.valueProposition");
+    expect(source).toContain('<p className="redesign-software-card-description redesign-software-card-value">');
     expect(source).not.toContain("buildValueSentence(product.description");
     expect(source).toContain("data-trust-price");
     expect(source).toContain("data-trust-refund");
