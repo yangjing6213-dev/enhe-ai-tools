@@ -174,6 +174,7 @@ describe("customer support widget source", () => {
       new URL("../styles/redesign/software.css", import.meta.url),
       "utf8",
     );
+    const productCardBlock = software.match(/\.redesign-software-card\s*\{([^}]*)\}/)?.[1] ?? "";
     const shell = readFileSync(
       new URL("../styles/redesign/shell.css", import.meta.url),
       "utf8",
@@ -192,9 +193,9 @@ describe("customer support widget source", () => {
     expect(home).toContain('className="redesign-home-product-control"');
     expect(software).toContain("var(--support-exclusion-applied)");
     expect(software).not.toContain(":nth-child(");
-    expect(software).toContain("grid-template-rows: 36px 72px 54px 24px minmax(16px, 1fr)");
-    expect(software).toContain("grid-template-rows: 36px 72px 54px 24px auto minmax(12px, 1fr)");
-    expect(software).toContain("height: 600px;");
+    expect(software).toContain("grid-template-rows: 36px minmax(100px, auto) auto 24px auto minmax(16px, 1fr)");
+    expect(productCardBlock).toContain("min-height: 600px;");
+    expect(productCardBlock).not.toMatch(/(?<!min-)height:\s*600px/);
     expect(software).toContain("@media (width < 768px)");
     expect(software).not.toContain("@media (max-width: 767px)");
     expect(software).not.toContain("--mobile-support-action-reserve");

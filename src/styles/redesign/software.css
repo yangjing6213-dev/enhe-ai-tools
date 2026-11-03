@@ -199,9 +199,7 @@
   box-sizing: border-box;
   display: flex;
   flex-direction: column;
-  height: 600px;
-  min-height: 0;
-  align-self: start;
+  min-height: 600px;
   padding: 0;
   gap: 0;
   min-width: 0;
@@ -269,15 +267,11 @@
 
 .redesign-software-card-body {
   display: grid;
-  grid-template-rows: 36px 72px 54px 24px minmax(16px, 1fr);
-  gap: 2px;
+  grid-template-rows: 36px minmax(100px, auto) auto 24px auto minmax(16px, 1fr);
+  gap: 8px;
   flex: 1;
   min-height: auto;
   padding: 10px 12px;
-}
-
-.redesign-software-card-body.has-trust {
-  grid-template-rows: 36px 72px 54px 24px auto minmax(12px, 1fr);
 }
 
 .redesign-software-card-category,
@@ -307,15 +301,16 @@
 
 .redesign-software-card-identity {
   display: grid;
-  grid-template-rows: 45px 25px;
-  gap: 2px;
+  grid-template-rows: auto auto;
+  align-content: start;
+  gap: 6px;
   min-width: 0;
-  min-height: 72px;
+  min-height: 100px;
   overflow: hidden;
 }
 
 .redesign-software-card-body h3 {
-  height: 45px;
+  min-height: 2.5em;
   overflow: hidden;
   font-size: 1.125rem;
   font-weight: 700;
@@ -324,14 +319,10 @@
   overflow-wrap: anywhere;
   display: -webkit-box;
   -webkit-box-orient: vertical;
-  -webkit-line-clamp: 2;
+  -webkit-line-clamp: 3;
 }
 
 .redesign-software-card-description {
-  display: -webkit-box;
-  -webkit-box-orient: vertical;
-  -webkit-line-clamp: 3;
-  overflow: hidden;
   color: var(--enhe-text);
   font-size: 0.875rem;
   line-height: 1.7;
@@ -379,7 +370,7 @@
   -webkit-line-clamp: 1;
   overflow: hidden;
   overflow-wrap: anywhere;
-  height: 25px;
+  min-height: 20px;
   margin: 0;
   color: var(--enhe-action-text, #0462C2);
   font-size: 0.8125rem;
@@ -387,8 +378,40 @@
 }
 
 .redesign-software-card-description {
-  height: 60px;
+  min-height: 0;
   line-height: 1.4;
+}
+
+.redesign-software-card-value {
+  overflow-wrap: anywhere;
+}
+
+.redesign-software-card-trust-list {
+  display: flex;
+  flex-wrap: wrap;
+  align-content: start;
+  gap: 6px;
+  min-width: 0;
+}
+
+.redesign-software-card-trust {
+  box-sizing: border-box;
+  display: inline-flex;
+  min-width: 0;
+  min-height: 34px;
+  flex: 1 1 145px;
+  align-items: center;
+  gap: 8px;
+  padding: 5px 10px;
+  border: 1px solid var(--enhe-border);
+  border-radius: 999px;
+  color: #00845f;
+  font-size: 0.75rem;
+  line-height: 1.25;
+}
+
+.redesign-software-card-trust svg {
+  flex: 0 0 auto;
 }
 
 .redesign-software-card-description strong {
@@ -608,7 +631,7 @@
   align-items: center;
   gap: 9px;
   min-width: 0;
-  margin-top: 10px;
+  margin-top: 0;
   padding: 5px 8px;
   border: 1px solid color-mix(in srgb, #00a875 24%, var(--enhe-border));
   border-radius: 12px;

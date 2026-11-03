@@ -47,7 +47,7 @@ export default async function EnglishAiNewsPaginationPage({
 
   return (
     <PublicSiteChrome forceLocale="en" languageHrefs={languageHrefs}>
-      <AiNewsWorkspaceShell locale="en" currentPathname={`/en/ai-news/page/${page}`}>
+      <AiNewsWorkspaceShell locale="en" currentPathname={`/en/ai-news/page/${page}`} showNavigation={false}>
         <AiNewsPageShell
           searchParams={Promise.resolve(resolvedSearchParams)}
           forceLocale="en"

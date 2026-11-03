@@ -47,7 +47,7 @@ export default async function AiNewsPaginationPage({
 
   return (
     <PublicSiteChrome forceLocale="zh" languageHrefs={languageHrefs}>
-      <AiNewsWorkspaceShell locale="zh" currentPathname={`/ai-news/page/${page}`}>
+      <AiNewsWorkspaceShell locale="zh" currentPathname={`/ai-news/page/${page}`} showNavigation={false}>
         <AiNewsPageShell
           searchParams={Promise.resolve(resolvedSearchParams)}
           forceLocale="zh"

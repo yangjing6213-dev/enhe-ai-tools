@@ -25,6 +25,8 @@ export type PublicSoftwareCatalogRow = {
   type: "software" | "online" | "skill_learning" | "ai_skill" | "ai_workflow";
   shortDescription: string;
   content: string;
+  valueProposition?: string | null;
+  englishValueProposition?: string | null;
   coverImage: string | null;
   isDownloadPaid: boolean;
   downloadPrice: unknown;
@@ -57,6 +59,7 @@ export type SoftwareCatalogItem = {
   categoryId: SoftwareLeafCategoryId;
   name: string;
   description: string;
+  valueProposition?: string;
   price: string;
   detailHref: string;
   media: {
@@ -370,6 +373,9 @@ function buildCatalogItem(
     { ...row, categoryName: row.category?.name },
     locale,
   );
+  const localizedValueProposition = locale === "en"
+    ? row.englishValueProposition?.trim()
+    : row.valueProposition?.trim();
   const primaryPrice = getPrimaryToolPrice(
     row.priceSpecs,
     row.type === "software" || row.type === "ai_skill" || row.type === "ai_workflow"
@@ -396,6 +402,7 @@ function buildCatalogItem(
     categoryId,
     name: localizedIdentity.primaryName,
     description,
+    valueProposition: localizedValueProposition || undefined,
     price: isPaid
       ? `¥${primaryPrice.toFixed(2)}`
       : locale === "en"

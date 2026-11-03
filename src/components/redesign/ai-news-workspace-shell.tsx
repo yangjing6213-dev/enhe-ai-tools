@@ -17,10 +17,12 @@ const copy = {
 export function AiNewsWorkspaceShell({
   locale,
   currentPathname,
+  showNavigation = true,
   children,
 }: {
   locale: Locale;
   currentPathname?: string;
+  showNavigation?: boolean;
   children: ReactNode;
 }) {
   const language = locale === "en" ? "en" : "zh";
@@ -38,23 +40,25 @@ export function AiNewsWorkspaceShell({
 
   return (
     <div className="ai-news-section-shell">
-      <nav className="ai-news-section-nav" aria-label={t.section}>
-        {navItems.map(({ key, href, label }) => (
-          <a
-            key={key}
-            href={href}
-            aria-current={
-              normalizedCurrentPathname === href.replace(/\/+$/, "")
-                ? "page"
-                : activeSection === key
-                  ? "location"
-                  : undefined
-            }
-          >
-            {label}
-          </a>
-        ))}
-      </nav>
+      {showNavigation ? (
+        <nav className="ai-news-section-nav" aria-label={t.section}>
+          {navItems.map(({ key, href, label }) => (
+            <a
+              key={key}
+              href={href}
+              aria-current={
+                normalizedCurrentPathname === href.replace(/\/+$/, "")
+                  ? "page"
+                  : activeSection === key
+                    ? "location"
+                    : undefined
+              }
+            >
+              {label}
+            </a>
+          ))}
+        </nav>
+      ) : null}
       <div className="ai-news-section-content">{children}</div>
     </div>
   );

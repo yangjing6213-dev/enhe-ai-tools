@@ -393,6 +393,8 @@ model Tool {
   categoryId            String?         @map("category_id")
   shortDescription      String          @map("short_description")
   content               String
+  valueProposition       String?         @map("value_proposition")
+  englishValueProposition String?        @map("english_value_proposition")
   coverImage            String?         @map("cover_image")
   screenshots           String[]        @default([])
   videoUrl              String?         @map("video_url")

@@ -119,6 +119,7 @@ describe("AI News editorial token boundary", () => {
     const listing = read("app/ai-news/page-shell.tsx");
     const topic = read("app/ai-news/topics/[slug]/page-shell.tsx");
     const detail = read("app/ai-news/[slug]/page-shell.tsx");
+    const interactions = read("components/ai-news-interactions.tsx");
 
     expect(dictionaries).toContain('discoveryRegionLabel: "AI资讯探索"');
     expect(dictionaries).toContain('discoveryRegionLabel: "AI news discovery"');
@@ -129,7 +130,9 @@ describe("AI News editorial token boundary", () => {
 
     expect(listing).toContain('aria-label={t.aiNews.discoveryRegionLabel}');
     expect(topic).toContain('aria-label={t.aiNews.topicSupportLabel}');
-    expect(detail).toContain('aria-label={t.aiNews.articleSupportLabel}');
+    expect(detail).toContain("articleSupportLabel: t.aiNews.articleSupportLabel");
+    expect(interactions).toContain('role="group"');
+    expect(interactions).toContain("aria-label={labels.articleSupportLabel}");
     expect(listing).not.toContain('aria-label="AI news filters"');
     expect(topic).not.toContain('aria-label="Topic support links"');
     expect(detail).not.toContain('aria-label="Article support links"');

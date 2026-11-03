@@ -11,14 +11,15 @@ function readCandidate(relativePath: string) {
 }
 
 describe("AI tools candidate responsive browsing", () => {
-  it("keeps the fixed AI Skills-sized desktop grid and mobile rail CSS contract", () => {
+  it("keeps the desktop grid, gives bilingual titles flexible space, and preserves the mobile rail", () => {
     const css = readCandidate("styles/redesign/software.css");
 
     expect(css).toMatch(/\.redesign-software\s*\{[^}]*background-color:\s*var\(--enhe-page-bg\)/);
     expect(css).toMatch(/\.redesign-software-grid\s*\{[^}]*grid-template-columns:\s*repeat\(3,\s*minmax\(0,\s*1fr\)\)/);
     expect(css).toMatch(/@media\s*\(max-width:\s*768px\)[\s\S]*\.redesign-software-grid\s*\{[^}]*grid-template-columns:\s*minmax\(0,\s*1fr\)/);
     expect(css).not.toContain(":nth-child(");
-    expect(css).toContain("grid-template-rows: 36px 72px 54px 24px minmax(16px, 1fr)");
+    expect(css).toContain("grid-template-rows: 36px minmax(100px, auto) auto 24px auto minmax(16px, 1fr)");
+    expect(css).toMatch(/\.redesign-software-card-identity\s*\{[^}]*min-height:\s*100px/);
     expect(css).toMatch(/\.redesign-software-card-badges\s*\{[^}]*justify-content:\s*space-between;/);
     expect(css).toMatch(/\.redesign-software-card-full-link\s*\{[^}]*display:\s*flex;/);
     expect(css).toMatch(/width\s*<\s*768px/);
@@ -144,9 +145,12 @@ describe("AI tools candidate responsive browsing", () => {
     const actions = readCandidate("components/card-like-action.tsx");
     const actionCss = readCandidate("components/card-like-action.css");
 
-    expect(css).toContain(".redesign-software-card-body.has-trust");
+    expect(css).toContain(".redesign-software-card-trust-list");
+    expect(css).toContain(".redesign-software-card-trust {");
     expect(card).toContain('downloadCount={product.downloadCount}');
     expect(card).toContain('"安全审核通过"');
+    expect(card).toContain('data-trust-price');
+    expect(card).toContain('data-trust-refund');
     expect(card).not.toContain("reviewDate");
     expect(card).not.toContain("管理员人工确认");
     expect(actions).toContain('className="card-download-count"');

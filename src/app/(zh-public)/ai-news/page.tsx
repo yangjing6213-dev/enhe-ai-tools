@@ -39,7 +39,7 @@ export default async function AiNewsPage({ searchParams }: { searchParams: Promi
       forceLocale="zh"
       languageHrefs={languageHrefs}
     >
-      <AiNewsWorkspaceShell locale="zh" currentPathname="/ai-news">
+      <AiNewsWorkspaceShell locale="zh" currentPathname="/ai-news" showNavigation={false}>
         <AiNewsPageShell searchParams={Promise.resolve(params)} forceLocale="zh" />
       </AiNewsWorkspaceShell>
     </PublicSiteChrome>

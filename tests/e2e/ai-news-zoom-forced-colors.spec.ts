@@ -83,25 +83,29 @@ for (const route of routes) {
     );
     await expect(page.locator(".redesign-skip-link")).toBeAttached();
 
+    const hasSectionNavigation = route.path.includes("/topics/");
     const sectionNav = page.locator(".ai-news-section-nav");
-    await expect(sectionNav).toBeVisible();
-    const expectedCurrentState = route.path.includes("/topics/") ? "location" : "page";
-    const currentSectionNavItem = sectionNav.locator(`a[aria-current="${expectedCurrentState}"]`);
-    await expect(currentSectionNavItem).toHaveCount(1);
-    const currentSectionNavStyles = await currentSectionNavItem.evaluate((element) => {
-      const styles = getComputedStyle(element);
-      return { borderWidth: styles.borderBottomWidth, textColor: styles.color };
-    });
-    expect(currentSectionNavStyles.borderWidth).toBe("2px");
-    expect(currentSectionNavStyles.textColor).not.toBe("rgba(0, 0, 0, 0)");
+    if (hasSectionNavigation) {
+      await expect(sectionNav).toBeVisible();
+      const currentSectionNavItem = sectionNav.locator('a[aria-current="location"]');
+      await expect(currentSectionNavItem).toHaveCount(1);
+      const currentSectionNavStyles = await currentSectionNavItem.evaluate((element) => {
+        const styles = getComputedStyle(element);
+        return { borderWidth: styles.borderBottomWidth, textColor: styles.color };
+      });
+      expect(currentSectionNavStyles.borderWidth).toBe("2px");
+      expect(currentSectionNavStyles.textColor).not.toBe("rgba(0, 0, 0, 0)");
 
-    await currentSectionNavItem.focus();
-    const sectionFocus = await currentSectionNavItem.evaluate((element) => {
-      const styles = getComputedStyle(element);
-      return { active: document.activeElement === element, outlineWidth: styles.outlineWidth };
-    });
-    expect(sectionFocus.active).toBe(true);
-    expect(sectionFocus.outlineWidth).not.toBe("0px");
+      await currentSectionNavItem.focus();
+      const sectionFocus = await currentSectionNavItem.evaluate((element) => {
+        const styles = getComputedStyle(element);
+        return { active: document.activeElement === element, outlineWidth: styles.outlineWidth };
+      });
+      expect(sectionFocus.active).toBe(true);
+      expect(sectionFocus.outlineWidth).not.toBe("0px");
+    } else {
+      await expect(sectionNav).toHaveCount(0);
+    }
 
     const focusTarget = page.locator(
       route.path.includes("/topics/")
