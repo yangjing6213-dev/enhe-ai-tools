@@ -5,12 +5,12 @@ for (const prefix of ["", "/en"]) {
     await page.goto(prefix || "/");
     await expect(page.locator(".site-breadcrumbs")).toHaveCount(0);
     const actions = page.locator(".redesign-home-cta");
-    await expect(actions).toHaveCount(2);
+    await expect(actions).toHaveCount(3);
     const typography = await actions.evaluateAll(elements => elements.map(element => {
       const style = getComputedStyle(element);
       return { font: style.fontFamily, size: style.fontSize, weight: style.fontWeight, synthesis: style.fontSynthesis, lineHeight: style.lineHeight };
     }));
-    expect(typography[1]).toEqual(typography[0]);
+    expect(typography.slice(1)).toEqual([typography[0], typography[0]]);
 
     await actions.first().click();
     await expect(page).toHaveURL(`${prefix}/software`);
