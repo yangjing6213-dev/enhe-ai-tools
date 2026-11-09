@@ -173,6 +173,11 @@
   padding-block: 12px;
 }
 
+.redesign-header[data-home="true"] .redesign-brand-region,
+.redesign-header[data-home="true"] .redesign-header-search {
+  transform: translateX(clamp(0px, calc(50vw - 640px), 164px));
+}
+
 .redesign-brand-lockup {
   width: 154px;
   min-height: 48px;
@@ -394,13 +399,21 @@
   }
 }
 
-/* Keep card shapes intact; only interactive controls adopt small rounded corners. */
+/* Keep the homepage controls and card shapes intact; other page controls use pill corners. */
 :is(.enhe-redesign-production, .enhe-redesign-preview):not(.enhe-admin-shell)
   :is(button, [role="button"], [data-slot="button"], input[type="submit"], input[type="reset"],
     a[class*="button"], a[class*="btn"], a[class*="cta"], a[class*="control"],
     .enhe-contentless-action, .redesign-login-link, .redesign-avatar-trigger,
     .redesign-language-switch, .redesign-nav-link, .footer-group > summary) {
   border-radius: var(--enhe-button-r) !important;
+}
+
+:is(.enhe-redesign-production, .enhe-redesign-preview):not(:has(.redesign-home-hero))
+  :is(button, [role="button"], [data-slot="button"], input[type="submit"], input[type="reset"], select,
+    a[class*="button"], a[class*="btn"], a[class*="cta"], a[class*="control"],
+    .enhe-contentless-action, .redesign-login-link, .redesign-avatar-trigger,
+    .redesign-language-switch, .redesign-nav-link, .footer-group > summary) {
+  border-radius: 999px !important;
 }
 
 .redesign-home .redesign-home-cta:hover {
@@ -1129,8 +1142,7 @@ body .redesign-footer nav {
 }
 
 .redesign-footer .footer-brand-logo {
-  filter: none;
-  mix-blend-mode: lighten;
+  filter: brightness(0) invert(1);
   transform: translateY(10%);
 }
 

@@ -157,9 +157,9 @@ describe("homepage UI polish", () => {
     expect(refreshStyles).toMatch(/\.redesign-footer\s*\{[^}]*background:\s*var\(--enhe-footer\)/);
     expect(shellStyles).toMatch(/\.redesign-footer-inner\s*\{[^}]*position:\s*relative/);
     expect(shellStyles).not.toContain(".footer-back-to-top-row");
-    expect(footer).toContain('/images/brand/enhe-infinity-animated-dark.gif');
+    expect(footer).toContain('/images/brand/enhe-footer-wordmark.png');
     expect(read('src/components/redesign/enhe-brand-lockup.tsx')).toContain('/images/brand/enhe-infinity-animated-transparent.svg');
-    expect(footer).toContain('alt={locale === "en" ? "ENHE Infinity brand" : "ENHE Infinity 品牌标志"}');
+    expect(footer).toContain('alt={locale === "en" ? "ENHE brand" : "ENHE 品牌标志"}');
     expect(footer).not.toContain("brandIntro.map");
     expect(shellStyles).toMatch(/\.footer-group-trigger h3\s*\{[^}]*font-weight:\s*800/);
   });

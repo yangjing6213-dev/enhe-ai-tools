@@ -21,8 +21,8 @@ test("public header replaces the search link, opens recommendations, and submits
       await expect(footer).toHaveCSS("background-color", "rgb(13, 58, 109)");
       await expect(footer.locator("h3").first()).toHaveCSS("color", "rgb(255, 255, 255)");
       await expect(footer.locator("nav").first()).toHaveCSS("background-color", "rgb(13, 58, 109)");
-      await expect(footer.locator(".footer-brand-logo")).toHaveCSS("filter", "none");
-      await expect(footer.locator(".footer-brand-logo")).toHaveAttribute("src", /enhe-infinity-animated-dark\.gif/);
+      await expect(footer.locator(".footer-brand-logo")).toHaveCSS("filter", "brightness(0) invert(1)");
+      await expect(footer.locator(".footer-brand-logo")).toHaveAttribute("src", /enhe-footer-wordmark\.png/);
       await expect(footer.locator(".footer-bottom")).toHaveCSS("justify-content", "center");
       await expect(footer.locator(".footer-bottom p")).toHaveCount(1);
       await expect(footer.locator(".footer-bottom p")).toHaveCSS("color", "rgb(255, 255, 255)");
@@ -95,6 +95,47 @@ test("public header replaces the search link, opens recommendations, and submits
     await input.press("Enter");
     await expect(page).toHaveURL(new RegExp(`${english ? "/en" : ""}/search\\?q=AI\\+%E8%A7%86%E9%A2%91`));
   }
+});
+
+test("homepage header brand and search align with the software catalog content edge", async ({ page }) => {
+  await page.setViewportSize({ width: 1920, height: 1000 });
+
+  await page.goto("/software");
+  const catalogContentLeft = await page.locator(".redesign-software-page").evaluate((element) => {
+    const rect = element.getBoundingClientRect();
+    return rect.left + Number.parseFloat(getComputedStyle(element).paddingLeft);
+  });
+
+  await page.goto("/");
+  const headerPositions = await page.locator(".redesign-header[data-home='true']").evaluate((header) => {
+    const brand = header.querySelector<HTMLElement>(".redesign-brand-mark")!.getBoundingClientRect();
+    const search = header.querySelector<HTMLElement>(".redesign-header-search")!.getBoundingClientRect();
+    return { brandLeft: brand.left, brandRight: brand.right, searchLeft: search.left };
+  });
+
+  expect(Math.abs(headerPositions.brandLeft - catalogContentLeft)).toBeLessThanOrEqual(1);
+  expect(Math.abs(headerPositions.searchLeft - headerPositions.brandRight - 16)).toBeLessThanOrEqual(1);
+});
+
+test("footer restores the original ENHE wordmark and white treatment", async ({ page }) => {
+  await page.goto("/");
+  const logo = page.locator(".redesign-footer .footer-brand-logo");
+  await expect(logo).toHaveAttribute("src", /enhe-footer-wordmark\.png/);
+  await expect(logo).toHaveAttribute("alt", "ENHE 品牌标志");
+  await expect(logo).toHaveCSS("filter", "brightness(0) invert(1)");
+  await expect(logo).toHaveCSS("mix-blend-mode", "normal");
+});
+
+test("non-home buttons and dropdowns are pill shaped while homepage controls keep their existing shape", async ({ page }) => {
+  await page.setViewportSize({ width: 1440, height: 1000 });
+
+  await page.goto("/");
+  await expect(page.locator(".redesign-header[data-home='true'] button.redesign-nav-link").first()).toHaveCSS("border-radius", "4px");
+  await expect(page.locator(".redesign-home-cta").first()).toHaveCSS("border-radius", "12px");
+
+  await page.goto("/register");
+  await expect(page.locator(".redesign-header:not([data-home='true']) button.redesign-nav-link").first()).toHaveCSS("border-radius", "999px");
+  await expect(page.locator("#register-gender")).toHaveCSS("border-radius", "999px");
 });
 
 test("public search fields use the homepage capsule outline and news filtering stays compact", async ({ page }) => {
