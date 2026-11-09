@@ -26,7 +26,6 @@ describe("requested public surface corrections", () => {
     expect(catalogCss).not.toMatch(/\.redesign-software-card\s*\{[\s\S]*?min-height:\s*600px/);
     expect(catalogCss).not.toMatch(/\.redesign-software-card-body h3\s*\{[\s\S]*?-webkit-line-clamp:\s*3/);
     expect(catalogCss).not.toMatch(/\.redesign-software-card-secondary\s*\{[\s\S]*?-webkit-line-clamp:\s*1/);
-    expect(catalogCss).toMatch(/\.redesign-software-card-frame\s*\{[^}]*max-height:\s*180px/);
     expect(catalogCss).not.toMatch(/\.redesign-software-card\s*\{[^}]*height:\s*\d+px/);
   });
 

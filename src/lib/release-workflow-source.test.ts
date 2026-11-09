@@ -73,7 +73,7 @@ describe("production release workflow", () => {
     expect(wrapper).not.toContain("127.0.0.1:1/enhe-release-check");
     expect(dockerfile).not.toContain("ARG DATABASE_URL=");
     expect(dockerfile).not.toContain("ENV DATABASE_URL=$DATABASE_URL");
-    expect(dockerfile).toContain("RUN npm run build");
+    expect(dockerfile).toContain("RUN NODE_OPTIONS=--max-old-space-size=2560 npm run build");
   });
 
   it("pins standalone output tracing to the current worktree root", () => {

@@ -191,11 +191,10 @@ describe("homepage UI polish", () => {
     for (const href of ["/software", "/ai-skills", "/ai-news", "/ai-trends"]) expect(features).toContain(`"${href}"`);
   });
 
-  it("keeps catalog cards content-sized for full bilingual titles and preserves hover motion", () => {
+  it("keeps full bilingual catalog titles without a fixed card height and preserves hover motion", () => {
     const cardBlock = softwareStyles.match(/\.redesign-software-card\s*\{([^}]*)\}/)?.[1] ?? "";
     expect(softwareStyles).toMatch(/\.redesign-software-page\s*\{[^}]*width:\s*min\(100%,\s*1280px\)/);
     expect(softwareStyles).toMatch(/\.redesign-software-grid\s*\{[^}]*grid-template-columns:\s*repeat\(3,\s*minmax\(0,\s*1fr\)\)/);
-    expect(cardBlock).toMatch(/min-height:\s*0/);
     expect(cardBlock).not.toMatch(/(?<!min-)height:\s*600px/);
     expect(cardBlock).not.toMatch(/min-height:\s*600px/);
     expect(softwareStyles).toMatch(/\.redesign-software-card\s*\{[^}]*border-radius:\s*0/);

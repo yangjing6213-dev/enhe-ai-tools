@@ -1,6 +1,17 @@
 import { readFileSync } from "node:fs";
 import { join } from "node:path";
-import { describe, expect, it } from "vitest";
+import React from "react";
+import { renderToStaticMarkup } from "react-dom/server";
+import { describe, expect, it, vi } from "vitest";
+import { EnheRedesignSoftwareCatalog } from "@/components/redesign/software/EnheRedesignSoftwareCatalog";
+import type { SoftwareCatalogPage } from "@/lib/redesign/software/software-production";
+
+Object.assign(globalThis, { React });
+
+vi.mock("next/navigation", async (importOriginal) => ({
+  ...await importOriginal<typeof import("next/navigation")>(),
+  useRouter: () => ({ replace: vi.fn() }),
+}));
 
 function read(path: string) {
   return readFileSync(join(process.cwd(), path), "utf8");
@@ -44,9 +55,20 @@ describe("SEO follow-up source contracts", () => {
   });
 
   it("keeps public listing and tool detail content inside semantic main landmarks", () => {
-    const software = read(
-      "src/components/redesign/software/EnheRedesignSoftwareCatalog.tsx",
-    );
+    const listing: SoftwareCatalogPage = {
+      items: [], newReleases: [], featuredProducts: [],
+      total: 0, page: 1, pageSize: 12, totalPages: 0,
+      hasPrevious: false, hasNext: false, previousHref: null, nextHref: null,
+    };
+    for (const locale of ["zh", "en"] as const) {
+      const html = renderToStaticMarkup(React.createElement(EnheRedesignSoftwareCatalog, {
+        locale, mode: "production", listing,
+      }));
+      expect(html.match(/<main\b/g)).toHaveLength(1);
+      const mainContent = html.match(/<main\b[^>]*>([\s\S]*?)<\/main>/)?.[1] ?? "";
+      expect(mainContent).toMatch(/<h1\b/);
+      expect(mainContent).toContain("data-all-products-root");
+    }
     const accountServices = read("src/app/account-services/page-shell.tsx");
     const skillLearning = read("src/app/skill-learning/page-shell.tsx");
     const aiNews = read("src/app/ai-news/page-shell.tsx");
@@ -56,7 +78,6 @@ describe("SEO follow-up source contracts", () => {
     const legalDetail = read("src/app/legal/[slug]/page-shell.tsx");
 
     for (const source of [
-      software,
       accountServices,
       skillLearning,
       aiNews,
