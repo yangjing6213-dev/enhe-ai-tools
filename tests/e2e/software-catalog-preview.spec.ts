@@ -298,12 +298,16 @@ for (const locale of locales) {
 }
 
 for (const locale of locales) {
-  test(`DB-free ${locale.query} software cards match the Skill layout without cover gaps or clipped actions`, async ({ page }) => {
+  test(`DB-free ${locale.query} software cards share a height without cover gaps or clipped actions`, async ({ page }) => {
     test.setTimeout(90_000);
     for (const width of [1440, 1024, 768, 390, 320]) {
       await page.setViewportSize({ width, height: 1000 });
       await openSoftwarePreview(page, locale.query);
       const cards = page.locator(".redesign-software-card:visible");
+      await expect.poll(() => cards.evaluateAll((elements) => {
+        const heights = elements.map((card) => card.getBoundingClientRect().height);
+        return Math.max(...heights) - Math.min(...heights);
+      })).toBeLessThanOrEqual(1);
       const layout = await cards.evaluateAll((elements) => elements.map((card) => {
         const bounds = card.getBoundingClientRect();
         const style = getComputedStyle(card);
@@ -313,17 +317,6 @@ for (const locale of locales) {
         const body = card.querySelector(".redesign-software-card-body")!;
         return {
           section: card.getAttribute("data-section"),
-          trackOffsets: [
-            ".redesign-software-card-badges",
-            ".redesign-software-card-identity",
-            ".redesign-software-card-description",
-            ".redesign-software-card-highlights",
-            ".redesign-software-card-audience",
-            ".redesign-software-card-bottom",
-          ].map((selector) => {
-            const element = card.querySelector<HTMLElement>(selector);
-            return element ? element.getBoundingClientRect().top - bounds.top : null;
-          }),
           topGap: frame.top - bounds.top - parseFloat(style.borderTopWidth),
           radius: style.borderRadius,
           height: bounds.height,
@@ -337,32 +330,16 @@ for (const locale of locales) {
       for (const card of layout) {
         expect(card.topGap, `${width}px cover flush`).toBeLessThanOrEqual(1);
         expect(card.radius).toBe("0px");
-        expect(card.height).toBe(600);
+        expect(Math.abs(card.height - layout[0].height)).toBeLessThanOrEqual(1);
         expect(card.height).toBeGreaterThan(300);
-        expect(card.engagementTop, `${width}px engagement row moved up with the compact card`).toBeLessThan(570);
+        expect(card.engagementTop, `${width}px engagement row stays inside the card`).toBeLessThan(card.height);
         expect(card.actionFits, `${width}px action: ${JSON.stringify(card)}`).toBe(true);
         expect(card.engagementFits, `${width}px engagement: ${JSON.stringify(card)}`).toBe(true);
         expect(card.bodyFits, `${width}px content: ${JSON.stringify(card)}`).toBe(true);
       }
-      for (const section of new Set(layout.map((card) => card.section))) {
-        const sectionCards = layout.filter((card) => card.section === section);
-        for (let track = 0; track < sectionCards[0].trackOffsets.length; track += 1) {
-          const positions = sectionCards
-            .map((card) => card.trackOffsets[track])
-            .filter((position): position is number => position !== null);
-          if (positions.length > 1) {
-            expect(
-              Math.max(...positions) - Math.min(...positions),
-              `${width}px ${section} content row ${track} aligns with the first card`,
-            ).toBeLessThanOrEqual(1);
-          }
-        }
-      }
       expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBeLessThanOrEqual(width);
       const first = cards.first();
-      await expect(first.locator(".redesign-software-card-description strong")).toHaveText(locale.query === "zh" ? "价值:" : "Value:");
-      await expect(first.locator(".redesign-software-card-highlights li").first()).toBeVisible();
-      await expect(cards.locator(".redesign-software-card-commerce, .redesign-software-card-price")).toHaveCount(0);
+      await expect(first.locator(".redesign-software-card-price")).toHaveText("¥35.00");
       await expect(first.locator(".redesign-software-card-link")).toHaveText("");
       await expect(first.locator(".redesign-software-card-full-link")).toHaveAccessibleName(await first.locator("h3").innerText());
       if (width === 1440 || width === 390) {

@@ -99,6 +99,8 @@ function findGlowCard(target: EventTarget | null) {
   if (element?.closest(".redesign-home-product-stage, .tool-detail-page, .enhe-admin-shell, [data-no-card-glow]")) return null;
   while (element && element !== document.body) {
     if (element instanceof HTMLElement && !element.closest(".enhe-edge-effect")) {
+      // Stop at the wrapper itself; nested cards can still be selected first.
+      if (element.hasAttribute("data-top-level-card-static")) return null;
       const tag = element.tagName;
       const classes = Array.from(element.classList);
       const slot = element.dataset.slot;

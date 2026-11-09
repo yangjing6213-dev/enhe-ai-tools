@@ -10,7 +10,7 @@ describe("tool detail layout source", () => {
 
     expect(source).toContain("tool-detail-hero-stack");
     expect(source).toContain("tool-detail-summary");
-    expect(source).toContain("tool-detail-quick-price");
+    expect(source).not.toContain("tool-detail-quick-offer");
     expect(source).toContain('href="#tool-purchase"');
     expect(source).toContain("tool-detail-cover-frame");
     expect(source).toContain("tool-detail-product-gallery");

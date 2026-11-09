@@ -66,6 +66,36 @@ test("top-level cards stay static while nested cards retain glow without affecti
   }
 });
 
+test("news takeaway wrapper stays static inside an article while its inner cards retain glow", async ({ page }) => {
+  await page.goto("/about", { waitUntil: "networkidle" });
+  await page.emulateMedia({ reducedMotion: "no-preference" });
+  await page.evaluate(() => {
+    const article = document.createElement("article");
+    article.id = "news-takeaway-fixture";
+    article.className = "enhe-redesign-production";
+    article.style.cssText = "position:fixed;top:180px;left:32px;width:360px;z-index:10000;background:white";
+    article.innerHTML = '<section id="takeaway-wrapper" class="glass rounded-2xl" data-top-level-card-static="true" style="padding:24px"><h2>Key takeaways</h2><div id="takeaway-inner" class="rounded-xl border" style="margin-top:24px;padding:24px;height:80px">First key takeaway</div></section>';
+    document.body.append(article);
+  });
+  const wrapper = page.locator("#takeaway-wrapper");
+  const inner = page.locator("#takeaway-inner");
+  const effect = page.locator(".enhe-edge-effect");
+  await wrapper.hover({ position: { x: 2, y: 12 } });
+  await expect.poll(() => wrapper.evaluate(node => Number(node.style.getPropertyValue("--edge-proximity") || "0"))).toBe(0);
+  await expect(effect).toHaveCount(0);
+  await expect(wrapper).toHaveCSS("transform", "none");
+
+  await inner.hover({ position: { x: 2, y: 40 } });
+  await expect.poll(() => inner.evaluate(node => Number(node.style.getPropertyValue("--edge-proximity") || "0"))).toBeGreaterThan(0);
+  await expect(effect).toHaveCount(1);
+
+  await wrapper.hover({ position: { x: 2, y: 12 } });
+  await expect.poll(() => inner.evaluate(node => Number(node.style.getPropertyValue("--edge-proximity") || "0"))).toBe(0);
+  await expect.poll(() => effect.evaluate(node => Number((node as HTMLElement).style.getPropertyValue("--edge-proximity") || "0"))).toBe(0);
+  await page.locator("#news-takeaway-fixture").evaluate(node => node.remove());
+  await expect(effect).toHaveCount(0);
+});
+
 test("nested glow respects reduced motion and touch input", async ({ page }) => {
   await page.goto("/about");
   await page.emulateMedia({ reducedMotion: "no-preference" });

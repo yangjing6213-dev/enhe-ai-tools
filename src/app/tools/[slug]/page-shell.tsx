@@ -620,22 +620,6 @@ export async function ToolDetailPageShell({
         : servicePrice > 0
           ? td.buyDownload.replace("{price}", Number(servicePrice).toFixed(2))
           : freeDownloadButtonLabel;
-  const quickPriceLabel = workflowLinkOnly
-    ? (forceLocale === "en" ? "GitHub source and repository" : "GitHub 源码与原仓库")
-    : tool.isDownloadPaid && servicePrice <= 0
-      ? (forceLocale === "en" ? "Price pending" : "价格待确认")
-      : servicePrice > 0
-        ? localizedPriceSpecs.length > 1
-          ? (forceLocale === "en" ? `From ¥${servicePrice.toFixed(2)}` : `¥${servicePrice.toFixed(2)} 起`)
-          : `¥${servicePrice.toFixed(2)}`
-        : td.free;
-  const quickActionLabel = shouldShowPurchaseForm
-    ? (forceLocale === "en" ? "View purchase options" : "查看购买方案")
-    : isDownloadProduct && !tool.isDownloadPaid
-      ? (forceLocale === "en" ? "View free access" : "查看免费获取方式")
-      : hasDownloadPurchase
-        ? (forceLocale === "en" ? "View purchased access" : "查看已购内容")
-        : (forceLocale === "en" ? "View access options" : "查看获取方式");
   const workflowDetailsTitle = forceLocale === "en" ? "AI workflow details" : "AI 工作流详情";
   const introTitle = isAiWorkflow
     ? forceLocale === "en" ? "Workflow introduction" : "工作流介绍"
@@ -914,15 +898,6 @@ export async function ToolDetailPageShell({
               <p className="enhe-authored-text whitespace-pre-wrap break-words mt-5 max-w-3xl text-base leading-8 text-[#8F9DB2] md:text-lg">
                 {localizedSummary}
               </p>
-              <div className="tool-detail-quick-offer" aria-label={forceLocale === "en" ? "Price and next step" : "价格与下一步"}>
-                <div className="tool-detail-quick-price">
-                  <span>{forceLocale === "en" ? "Price" : "价格"}</span>
-                  <strong>{quickPriceLabel}</strong>
-                </div>
-                <a className="tool-detail-quick-action" href="#tool-purchase">
-                  {quickActionLabel}
-                </a>
-              </div>
             </div>
 
             <div className="tool-detail-main-content flex min-w-0 flex-col gap-7">

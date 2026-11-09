@@ -77,8 +77,8 @@ export function ChatHub({ isSiteAdmin = false, initialTab = "mine" }: { isSiteAd
     <section className="enhe-chat-page">
       <header className="enhe-chat-hero">
         <div className="enhe-chat-hero-content">
-          <h1>AI搭子群聊</h1>
-          <p>围绕 AI 工具、方法和真实工作场景交流。入群申请经管理员审核后开放聊天。</p>
+          <h1 className="enhe-chat-hub-title">AI搭子群聊</h1>
+          <p>用于共同沟通、探讨 AI 相关话题。入群申请经管理员审核后开放聊天。</p>
         </div>
       </header>
       <div className="enhe-chat-row" style={{ justifyContent: "space-between", marginBottom: 16 }}>

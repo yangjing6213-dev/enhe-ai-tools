@@ -19,6 +19,7 @@
 .enhe-chat-hero .aurora-container { position: absolute; inset: 0; z-index: -1; }
 .enhe-chat-hero-content { position: relative; padding: 28px clamp(22px, 4vw, 48px); text-shadow: 0 1px 16px #07142fcc; }
 .enhe-chat-hero h1 { margin: 0; font-size: clamp(1.6rem, 3vw, 2.3rem); font-weight: 800; }
+.enhe-chat-hero .enhe-chat-hub-title { color: #000; }
 .enhe-chat-hero p { max-width: 760px; margin: 8px 0 0; color: #f4f7ff; }
 
 .enhe-chat-tabs, .enhe-chat-actions, .enhe-chat-toolbar, .enhe-chat-row { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; }

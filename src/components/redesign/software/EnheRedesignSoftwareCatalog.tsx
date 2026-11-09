@@ -20,6 +20,7 @@ import { EnheRedesignSoftwareCard } from "./EnheRedesignSoftwareCard";
 import { EnheRedesignSoftwareLoadMore } from "./EnheRedesignSoftwareLoadMore";
 import { EnheRedesignSoftwareRail } from "./EnheRedesignSoftwareRail";
 import { EnheRedesignSoftwareSearch } from "./EnheRedesignSoftwareSearch";
+import { EnheRedesignSoftwareLayout } from "./EnheRedesignSoftwareLayout";
 
 const INITIAL_VISIBLE_ALL_PRODUCTS = 9;
 const SOFTWARE_CATALOG_ROOT_ID = "redesign-software-catalog";
@@ -107,7 +108,7 @@ function renderProductionCatalog({
       : "返回 ENHE AI 首页";
 
   return (
-    <main
+    <EnheRedesignSoftwareLayout
       id={SOFTWARE_CATALOG_ROOT_ID}
       className="redesign-software redesign-software-page"
       data-locale={locale}
@@ -231,7 +232,7 @@ function renderProductionCatalog({
           </p>
         </div>
       </section>
-    </main>
+    </EnheRedesignSoftwareLayout>
   );
 }
 
@@ -293,7 +294,7 @@ function renderPreviewCatalog({
   );
 
   return (
-    <main
+    <EnheRedesignSoftwareLayout
       id={SOFTWARE_CATALOG_ROOT_ID}
       className="redesign-software redesign-software-page"
       data-locale={locale}
@@ -377,7 +378,7 @@ function renderPreviewCatalog({
           </a>
         </div>
       </section>
-    </main>
+    </EnheRedesignSoftwareLayout>
   );
 }
 

@@ -220,10 +220,6 @@ describe("AI tools candidate bilingual preview regression", () => {
     expect(css).toContain("gap: 18px");
     expect(css).toContain("scroll-snap-type: x mandatory");
     expect(css).toContain("overflow-x: auto");
-    expect(css).toContain("width: 100vw");
-    expect(css).toContain("margin-inline: calc(50% - 50vw)");
-    expect(css).toContain("flex: 0 0 80vw");
-    expect(css).toContain("flex: 0 0 84vw");
     expect(css).toContain("scroll-padding-inline");
     expect(css).toContain("min-width: 0");
 

@@ -1,13 +1,20 @@
+import React from "react";
+import { renderToStaticMarkup } from "react-dom/server";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 const publicContent = vi.hoisted(() => ({
   getPublicNewsArticleBySlug: vi.fn(),
   resolvePublicNewsArticleSlug: vi.fn(),
 }));
+const prismaFixture = vi.hoisted(() => ({
+  tool: { findMany: vi.fn(async () => []) },
+  newsArticle: { findMany: vi.fn(async () => []) },
+}));
 
 vi.mock("@/lib/public-content", () => publicContent);
+vi.mock("@/lib/db", () => ({ prisma: prismaFixture }));
 
-import { generateAiNewsDetailPageMetadata } from "@/app/ai-news/[slug]/page-shell";
+import { AiNewsDetailPageShell, generateAiNewsDetailPageMetadata } from "@/app/ai-news/[slug]/page-shell";
 
 const configuredArticle = {
   id: "configured-news",
@@ -39,10 +46,21 @@ const configuredArticle = {
   englishImpactNotes: null,
   conclusion: null,
   englishConclusion: null,
+  createdAt: new Date("2026-11-09T00:00:00Z"),
+  updatedAt: new Date("2026-11-09T00:00:00Z"),
+  publishedAt: new Date("2026-11-09T00:00:00Z"),
+  author: "ENHE AI",
+  readingTime: 3,
+  viewCount: 0,
+  tagLinks: [],
+  relatedToolIds: [],
+  relatedArticleIds: [],
 };
 
 describe("AI News detail configured metadata", () => {
   beforeEach(() => {
+    vi.stubGlobal("React", React);
+    vi.stubGlobal("prisma", prismaFixture);
     vi.stubEnv("DATABASE_URL", "postgresql://configured.invalid/enhe");
     vi.clearAllMocks();
     publicContent.resolvePublicNewsArticleSlug.mockResolvedValue({
@@ -56,6 +74,23 @@ describe("AI News detail configured metadata", () => {
 
   afterEach(() => {
     vi.unstubAllEnvs();
+    vi.unstubAllGlobals();
+  });
+
+  it.each(["zh", "en"] as const)("marks only the takeaway wrapper static while retaining its inner cards (%s)", async (locale) => {
+    publicContent.getPublicNewsArticleBySlug.mockResolvedValueOnce({
+      ...configuredArticle,
+      keyTakeaways: ["第一条核心看点", "第二条核心看点"],
+      englishKeyTakeaways: ["First key takeaway", "Second key takeaway"],
+    });
+    const html = renderToStaticMarkup(await AiNewsDetailPageShell({ slug: "canonical-news", forceLocale: locale }));
+    const staticSection = html.match(/<section\b[^>]*data-top-level-card-static="true"[^>]*>[\s\S]*?<\/section>/)?.[0] ?? "";
+
+    expect(staticSection).toContain(locale === "en" ? "First key takeaway" : "第一条核心看点");
+    expect(staticSection).toContain(locale === "en" ? "Second key takeaway" : "第二条核心看点");
+    expect(staticSection.match(/data-top-level-card-static/g)).toHaveLength(1);
+    expect(staticSection).not.toContain("data-no-card-glow");
+    expect(staticSection.match(/class="rounded-xl border /g)).toHaveLength(2);
   });
 
   it("resolves the canonical slug and returns indexable English metadata", async () => {

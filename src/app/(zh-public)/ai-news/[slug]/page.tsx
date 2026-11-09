@@ -16,7 +16,7 @@ export default async function AiNewsDetailPage({ params }: { params: Promise<{ s
   const { slug } = await params;
   return (
     <PublicSiteChrome forceLocale="zh">
-      <AiNewsWorkspaceShell locale="zh" currentPathname={`/ai-news/${slug}`}>
+      <AiNewsWorkspaceShell locale="zh" currentPathname={`/ai-news/${slug}`} showNavigation={false}>
         <AiNewsDetailPageShell slug={slug} forceLocale="zh" />
       </AiNewsWorkspaceShell>
     </PublicSiteChrome>

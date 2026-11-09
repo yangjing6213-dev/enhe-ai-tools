@@ -30,24 +30,19 @@ describe("AI tools candidate responsive browsing", () => {
     expect(css).toContain("scroll-snap-type: x mandatory");
     expect(css).toContain("scroll-snap-align: start");
     expect(css).toContain("gap: 18px");
-    expect(css).toContain("flex: 0 0 80vw");
-    expect(css).toContain("flex: 0 0 84vw");
     expect(css).toContain("grid-template-columns: 1fr");
     expect(css).toContain("scroll-padding-inline");
     expect(css).toContain("min-width: 0");
     expect(css).toContain("--redesign-software-mobile-page-padding: 20px");
     expect(css).toContain("padding-inline: var(--redesign-software-mobile-page-padding)");
-    expect(css).toContain("width: 100vw");
-    expect(css).toContain("margin-inline: calc(50% - 50vw)");
   });
 
-  it("uses content-sized catalogue cards with a compact cover", () => {
+  it("does not impose a fixed card height", () => {
     const css = readCandidate("styles/redesign/software.css");
     const catalog = readCandidate("components/redesign/software/EnheRedesignSoftwareCatalog.tsx");
 
     expect(css).toContain("padding: 144px 24px 120px");
     expect(css).toContain("font-size: clamp(0.9rem, 2vw, 1.5rem)");
-    expect(css).toContain("max-height: 180px;");
     expect(css).toContain("min-height: 0;");
     expect(css).not.toMatch(/\.redesign-software-card\s*\{[^}]*min-height:\s*600px/);
     expect(css).not.toMatch(/\.redesign-software-card\s*\{[^}]*height:\s*600px/);

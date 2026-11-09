@@ -299,7 +299,7 @@ export async function AiNewsDetailPageShell({
         <div className="mt-10">
           <div className="space-y-8">
             {!embeddedSections.keyTakeaways && localized.keyTakeaways.length ? (
-            <section className="glass rounded-2xl p-6">
+            <section className="glass rounded-2xl p-6" data-top-level-card-static="true">
               <h2 className="text-xl font-black text-[var(--marketing-text)]">
                 {t.aiNews.keyTakeaways}
               </h2>

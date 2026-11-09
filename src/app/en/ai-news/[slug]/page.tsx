@@ -16,7 +16,7 @@ export default async function EnglishAiNewsDetailPage({ params }: { params: Prom
   const { slug } = await params;
   return (
     <PublicSiteChrome forceLocale="en">
-      <AiNewsWorkspaceShell locale="en" currentPathname={`/en/ai-news/${slug}`}>
+      <AiNewsWorkspaceShell locale="en" currentPathname={`/en/ai-news/${slug}`} showNavigation={false}>
         <AiNewsDetailPageShell slug={slug} forceLocale="en" />
       </AiNewsWorkspaceShell>
     </PublicSiteChrome>
