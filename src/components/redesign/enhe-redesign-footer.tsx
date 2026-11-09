@@ -88,7 +88,7 @@ export function EnheRedesignFooter({
   );
 
   return (
-    <footer className="redesign-footer" aria-label={copy.ariaLabel}>
+    <footer className="redesign-footer" data-locale={locale} aria-label={copy.ariaLabel}>
       {showMascot ? <span className="redesign-footer-mascot" aria-hidden="true">
         <Image
           src="/images/mascots/enhe-dino-peek-mirrored.webp"

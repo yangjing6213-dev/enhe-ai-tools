@@ -1819,6 +1819,59 @@ body .customer-support-widget .customer-support-launcher,
   white-space: nowrap;
 }
 
+/* Keep footer geometry stable and compact; open navigation panels float above it. */
+.redesign-footer .footer-bottom {
+  margin-top: 16px;
+}
+
+@media (width >= 1280px) {
+  .redesign-footer {
+    height: 304px;
+    padding: 48px 0 24px;
+  }
+
+  .redesign-footer .footer-grid {
+    min-height: 176px;
+  }
+}
+
+@media (768px <= width < 1280px) {
+  .redesign-footer {
+    height: 328px;
+    padding: 48px 0 24px;
+  }
+
+  .redesign-footer .footer-grid {
+    gap: 16px;
+    row-gap: 4px;
+  }
+}
+
+@media (width < 768px) {
+  .redesign-footer {
+    height: 448px;
+    padding: 32px 0;
+  }
+
+  .redesign-footer[data-locale="en"] {
+    height: 528px;
+  }
+
+  .redesign-footer .footer-grid {
+    gap: 16px;
+  }
+
+  .redesign-footer .footer-navigation nav:first-child .footer-group[open] > .footer-group-links {
+    inset-inline-start: 0;
+    inset-inline-end: auto;
+  }
+
+  .redesign-footer .footer-navigation nav:last-child .footer-group[open] > .footer-group-links {
+    inset-inline-start: auto;
+    inset-inline-end: 0;
+  }
+}
+
 .enhe-redesign-production:not(.enhe-admin-shell) .enhe-search-control {
   border-color: var(--enhe-text) !important;
   border-radius: 999px !important;

@@ -763,6 +763,8 @@
 }
 
 .footer-group > summary {
+  position: relative;
+  z-index: 1;
   display: flex;
   min-height: 44px;
   align-items: center;
@@ -792,6 +794,37 @@
 .footer-group-links {
   display: grid;
   align-content: start;
+}
+
+.redesign-footer .footer-group {
+  position: relative;
+}
+
+.redesign-footer .footer-group[open] {
+  z-index: 2;
+}
+
+.redesign-footer .footer-group[open] > .footer-group-links {
+  position: absolute;
+  inset-inline-end: 0;
+  inset-block-end: calc(100% + 8px);
+  z-index: 2;
+  width: max-content;
+  min-width: 200px;
+  max-width: min(288px, calc(100vw - 32px));
+  max-height: min(45vh, 280px);
+  overflow: auto;
+  padding: 8px;
+  border: 1px solid rgb(255 255 255 / 24%);
+  border-radius: 14px;
+  background: var(--enhe-footer);
+  box-shadow: 0 12px 32px rgb(0 0 0 / 24%);
+}
+
+.redesign-footer .footer-group-links a {
+  min-height: 40px;
+  padding-inline: 12px;
+  white-space: normal;
 }
 
 .footer-grid a {
