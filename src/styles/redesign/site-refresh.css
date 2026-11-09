@@ -184,7 +184,7 @@
 .redesign-brand-mark {
   width: 154px;
   height: auto;
-  filter: brightness(0) saturate(100%);
+  filter: none;
   object-fit: contain;
 }
 
@@ -205,14 +205,6 @@
 }
 
 .dark .redesign-brand-mark {
-  filter: brightness(0) invert(1);
-}
-
-.redesign-header[data-home="true"] .redesign-brand-mark {
-  filter: brightness(0) saturate(100%);
-}
-
-.dark .redesign-header[data-home="true"] .redesign-brand-mark {
   filter: brightness(0) invert(1);
 }
 
@@ -1141,7 +1133,8 @@ body .redesign-footer nav {
 }
 
 .redesign-footer .footer-brand-logo {
-  filter: brightness(0) invert(1);
+  filter: none;
+  mix-blend-mode: lighten;
   transform: translateY(10%);
 }
 

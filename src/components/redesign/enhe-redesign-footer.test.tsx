@@ -11,7 +11,7 @@ describe("footer decoration around account forms", () => {
     expect(html).not.toContain("redesign-footer-mascot");
     expect(html).not.toContain("enhe-dino-peek-mirrored.webp");
     expect(html).toContain("redesign-footer-inner");
-    expect(html).toContain("enhe-footer-wordmark.png");
+    expect(html).toContain("enhe-infinity-animated-dark.gif");
     expect(html).toContain("legal/privacy-policy");
   });
 

@@ -40,7 +40,7 @@ describe("ENHE public visual refresh contract", () => {
   });
 
   it("uses a white, image-free hero, white cards, and a dark-blue footer", () => {
-    expect(brandLockup).toContain("/images/enhe-logo-white.png");
+    expect(brandLockup).toContain("/images/brand/enhe-infinity-animated-transparent.svg");
     expect(refreshStyles).toMatch(/\.redesign-home-hero\s*\{[^}]*background-image:\s*none/);
     expect(refreshStyles).toMatch(/\.redesign-home-hero\s*\{[^}]*color:\s*var\(--enhe-text\)/);
     expect(tokens).toContain("--enhe-page-bg: var(--background, #ffffff)");
