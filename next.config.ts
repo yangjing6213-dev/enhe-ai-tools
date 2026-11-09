@@ -236,6 +236,7 @@ const nextConfig: NextConfig = {
   },
   experimental: {
     cpus: 1,
+    webpackMemoryOptimizations: true,
     serverActions: {
       bodySizeLimit: adminFileUploadBodySizeLimit
     }
