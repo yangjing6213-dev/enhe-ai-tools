@@ -1160,6 +1160,12 @@ body .redesign-footer nav {
   transform: translateX(-20%);
 }
 
+@media (width < 1280px) {
+  .redesign-footer .footer-brand-logo {
+    transform: none;
+  }
+}
+
 @media (width >= 1280px) {
   .redesign-footer .footer-brand {
     position: relative;
@@ -1176,7 +1182,7 @@ body .redesign-footer nav {
 
   .redesign-footer .footer-social-links {
     position: absolute;
-    inset-block-end: 0;
+    inset-block-end: -4px;
     inset-inline-start: 20%;
     width: min(100%, 240px);
     justify-content: center;
