@@ -111,7 +111,7 @@ function FilterBar({ categories, locale }: { categories: { id: string; name: str
         aria-label={t.listing.searchPlaceholder}
         placeholder={t.listing.searchPlaceholder}
         title={t.listing.searchPlaceholder}
-        className="form-control-dark"
+        className="form-control-dark enhe-search-control"
       />
       <label className="sr-only" htmlFor="online-tools-category">
         {t.listing.allCategories}

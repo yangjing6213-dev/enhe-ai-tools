@@ -17,6 +17,7 @@ const newsPageShell = read("src/app/ai-news/page-shell.tsx");
 const newsWorkspaceShell = read("src/components/redesign/ai-news-workspace-shell.tsx");
 const chatRoom = read("src/components/chat/ChatRoom.tsx");
 const chatGroupRoute = read("src/app/api/chat/groups/[groupId]/route.ts");
+const aiNewsDetailCss = read("src/styles/redesign/ai-news.css");
 
 describe("requested public surface corrections", () => {
   it("keeps complete bilingual product card titles and only the original safety badge", () => {
@@ -45,6 +46,44 @@ describe("requested public surface corrections", () => {
     expect(newsPageShell).not.toMatch(/ai-news-filter-control[^\"]*lg:col-span-4/);
     expect(newsFilterCss).toMatch(/\.ai-news-filter-control\s*\{[\s\S]*?height:\s*52px/);
     expect(newsFilterCss).toMatch(/\.ai-news-filter-surface button\.ai-news-filter-control\s*\{[\s\S]*?height:\s*52px/);
+  });
+
+  it("places a compact AI news filter button before the search box", () => {
+    const filterButton = newsPageShell.indexOf('<button className="ai-news-filter-control');
+    const searchInput = newsPageShell.indexOf('id="ai-news-search"');
+
+    expect(filterButton).toBeGreaterThanOrEqual(0);
+    expect(searchInput).toBeGreaterThan(filterButton);
+    expect(newsPageShell).toContain("lg:grid-cols-[132px_minmax(0,1fr)_180px_160px_140px]");
+    expect(newsFilterCss).toMatch(/\.ai-news-filter-surface button\.ai-news-filter-control\s*\{[^}]*width:\s*132px/);
+  });
+
+  it("shows complete covers in related products on AI news detail pages", () => {
+    expect(aiNewsDetailCss).toMatch(/\.ai-news-detail-page \.tool-product-card-compact\s+\.tool-product-card-cover\s+img\s*\{[^}]*object-fit:\s*contain/);
+  });
+
+  it("uses the homepage capsule treatment for public search controls", () => {
+    expect(refreshCss).toMatch(/\.redesign-header-search input\s*\{[^}]*border-radius:\s*999px/);
+    expect(refreshCss).toMatch(/\.enhe-search-control\s*\{[^}]*border-radius:\s*999px/);
+    expect(refreshCss).toMatch(/\.enhe-search-surface\s*\{[^}]*border-radius:\s*999px/);
+
+    const searchSurfaceClasses = [
+      ["src/app/ai-news/page-shell.tsx", "enhe-search-control"],
+      ["src/app/ai-skills/ai-skills-catalog.tsx", "enhe-search-control"],
+      ["src/app/account-services/page-shell.tsx", "enhe-search-control"],
+      ["src/app/skill-learning/page-shell.tsx", "enhe-search-control"],
+      ["src/app/online-tools/page-shell.tsx", "enhe-search-control"],
+      ["src/app/ai-workflows/workflow-directory.tsx", "enhe-search-control"],
+      ["src/components/redesign/software/EnheRedesignSoftwareSearch.tsx", "enhe-search-control"],
+      ["src/components/build-your-own-x-navigator.tsx", "enhe-search-surface"],
+      ["src/components/ai-prompt-management-workbench.tsx", "enhe-search-control"],
+      ["src/components/chat/ChatRoom.tsx", "enhe-search-control"],
+      ["src/components/public-search-dialog.tsx", "enhe-search-surface"],
+    ];
+
+    for (const [sourcePath, className] of searchSurfaceClasses) {
+      expect(read(sourcePath), sourcePath).toContain(className);
+    }
   });
 
   it("removes the decorative frame around the AI news action toolbar", () => {

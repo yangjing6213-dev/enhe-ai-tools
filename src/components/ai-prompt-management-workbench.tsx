@@ -156,7 +156,7 @@ export function AiPromptManagementWorkbench({
               setQuery(event.target.value);
               setVisibleCount(pageSize);
             }}
-            className="w-full rounded-lg border border-[var(--marketing-border)] bg-white py-3 pl-10 pr-4 text-sm text-[#15171c] outline-none focus:border-[var(--marketing-accent)]"
+            className="enhe-search-control w-full rounded-lg border border-[var(--marketing-border)] bg-white py-3 pl-10 pr-4 text-sm text-[#15171c] outline-none focus:border-[var(--marketing-accent)]"
             placeholder={t.search}
           />
         </div>

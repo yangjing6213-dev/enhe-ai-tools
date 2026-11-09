@@ -553,7 +553,7 @@ function FilterBar({
         aria-label={t.listing.searchPlaceholder}
         placeholder={t.listing.searchPlaceholder}
         title={t.listing.searchPlaceholder}
-        className="form-control-dark"
+        className="form-control-dark enhe-search-control"
       />
       <label className="sr-only" htmlFor="skill-learning-category">
         {t.listing.allCategories}

@@ -68,6 +68,7 @@ export function EnheRedesignSoftwareSearch({
       {category ? <input type="hidden" name="category" value={category} /> : null}
       <Input
         id="software-search"
+        className="enhe-search-control"
         name="q"
         type="search"
         maxLength={200}

@@ -21,7 +21,8 @@ test("public header replaces the search link, opens recommendations, and submits
       await expect(footer).toHaveCSS("background-color", "rgb(13, 58, 109)");
       await expect(footer.locator("h3").first()).toHaveCSS("color", "rgb(255, 255, 255)");
       await expect(footer.locator("nav").first()).toHaveCSS("background-color", "rgb(13, 58, 109)");
-      await expect(footer.locator(".footer-brand-logo")).toHaveCSS("filter", "brightness(0) invert(1)");
+      await expect(footer.locator(".footer-brand-logo")).toHaveCSS("filter", "none");
+      await expect(footer.locator(".footer-brand-logo")).toHaveAttribute("src", /enhe-infinity-animated-dark\.gif/);
       await expect(footer.locator(".footer-bottom")).toHaveCSS("justify-content", "center");
       await expect(footer.locator(".footer-bottom p")).toHaveCount(1);
       await expect(footer.locator(".footer-bottom p")).toHaveCSS("color", "rgb(255, 255, 255)");
@@ -94,6 +95,50 @@ test("public header replaces the search link, opens recommendations, and submits
     await input.press("Enter");
     await expect(page).toHaveURL(new RegExp(`${english ? "/en" : ""}/search\\?q=AI\\+%E8%A7%86%E9%A2%91`));
   }
+});
+
+test("public search fields use the homepage capsule outline and news filtering stays compact", async ({ page }) => {
+  await page.setViewportSize({ width: 1440, height: 1000 });
+
+  const routeSearches = [
+    ["/software", "#software-search"],
+    ["/ai-skills", "#ai-skills-search"],
+    ["/account-services", "#account-services-search"],
+    ["/skill-learning", "#skill-learning-search"],
+    ["/online-tools", "#online-tools-search"],
+    ["/ai-workflows", 'input[name="q"]'],
+    ["/search", ".public-search-form"],
+    ["/build-your-own-x", ".byox-search"],
+  ] as const;
+
+  for (const [route, selector] of routeSearches) {
+    await page.goto(route);
+    await expect(page.locator(".redesign-header-search input")).toHaveCSS("border-radius", "999px");
+    const routeSearch = page.locator(selector).first();
+    if (await routeSearch.count() === 0) {
+      await expect(page.locator("main")).toContainText(/待核验|内容准备中|当前本地预览/);
+      continue;
+    }
+    await expect(routeSearch).toHaveCSS("border-radius", "999px");
+  }
+
+  await page.goto("/ai-news");
+  const newsSearch = page.locator("#ai-news-search");
+  if (await newsSearch.count() === 0) {
+    await expect(page.getByRole("heading", { name: "内容准备中" })).toBeVisible();
+    return;
+  }
+
+  const filterForm = page.locator(".ai-news-filter-surface");
+  const filterButton = filterForm.locator("button.ai-news-filter-control");
+  await expect(filterButton).toHaveCSS("width", "132px");
+  await expect(filterButton).toHaveCSS("border-radius", "999px");
+  const filterPrecedesSearch = await filterForm.evaluate((form) => {
+    const buttonIndex = Array.from(form.children).findIndex((element) => element.matches("button"));
+    const inputIndex = Array.from(form.children).findIndex((element) => element.querySelector("#ai-news-search"));
+    return buttonIndex >= 0 && inputIndex > buttonIndex;
+  });
+  expect(filterPrecedesSearch).toBe(true);
 });
 
 test("download recommendations support keyboard and product navigation", async ({ page }) => {

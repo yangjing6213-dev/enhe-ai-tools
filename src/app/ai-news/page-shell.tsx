@@ -585,7 +585,7 @@ function FilterBar({
   return (
     <form
       action={buildLocalePath("/ai-news", locale)}
-      className="filter-surface ai-news-filter-surface mt-8 grid gap-3 lg:grid-cols-[1fr_180px_160px_140px]"
+      className="filter-surface ai-news-filter-surface mt-8 grid gap-3 lg:grid-cols-[132px_minmax(0,1fr)_180px_160px_140px]"
       aria-label={t.aiNews.filterFormLabel}
       data-analytics-event="search_ai_news"
       data-analytics-meta-locale={locale}
@@ -594,17 +594,21 @@ function FilterBar({
       data-analytics-meta-tag={filters.tag ?? ""}
       data-analytics-meta-sort={filters.sort}
     >
+      <button className="ai-news-filter-control rounded-xl bg-[var(--marketing-button)] px-5 font-bold text-[var(--marketing-card)] transition-colors hover:bg-[var(--marketing-accent)]">
+        {t.aiNews.filter}
+      </button>
       <label className="sr-only" htmlFor="ai-news-search">
         {t.aiNews.searchPlaceholder}
       </label>
       <input
         id="ai-news-search"
         name="q"
+        type="search"
         defaultValue={filters.q}
         aria-label={t.aiNews.searchPlaceholder}
         placeholder={t.aiNews.searchPlaceholder}
         title={t.aiNews.searchPlaceholder}
-        className="form-control-dark ai-news-filter-control"
+        className="form-control-dark ai-news-filter-control enhe-search-control"
       />
       <label className="sr-only" htmlFor="ai-news-category">
         {t.aiNews.allCategories}
@@ -657,9 +661,6 @@ function FilterBar({
         <option value="hot">{t.aiNews.hot}</option>
         <option value="featured">{t.aiNews.featured}</option>
       </select>
-      <button className="ai-news-filter-control rounded-xl bg-[var(--marketing-button)] px-5 font-bold text-[var(--marketing-card)] transition-colors hover:bg-[var(--marketing-accent)]">
-        {t.aiNews.filter}
-      </button>
     </form>
   );
 }

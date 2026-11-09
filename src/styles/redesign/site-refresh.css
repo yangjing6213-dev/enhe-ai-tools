@@ -294,15 +294,11 @@
 .redesign-header-search input {
   height: 46px;
   padding: 10px 48px 10px 14px;
-  border: 1px solid #000;
-  border-radius: var(--enhe-button-r);
+  border: 1px solid var(--enhe-text);
+  border-radius: 999px;
   background: var(--enhe-page-bg);
   color: var(--enhe-text);
   font-size: 14px;
-}
-
-.redesign-header[data-home="true"] .redesign-header-search input {
-  border-radius: 999px;
 }
 
 .redesign-header-search .redesign-header-search-submit {
@@ -1809,4 +1805,22 @@ body .customer-support-widget .customer-support-launcher,
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+}
+
+.enhe-redesign-production:not(.enhe-admin-shell) .enhe-search-control {
+  border-color: var(--enhe-text) !important;
+  border-radius: 999px !important;
+  background-color: var(--enhe-page-bg) !important;
+  color: var(--enhe-text) !important;
+}
+
+.enhe-redesign-production:not(.enhe-admin-shell) .enhe-search-surface {
+  border: 1px solid var(--enhe-text) !important;
+  border-radius: 999px !important;
+  background-color: var(--enhe-page-bg) !important;
+  color: var(--enhe-text) !important;
+}
+
+.enhe-redesign-production:not(.enhe-admin-shell) .enhe-search-surface::after {
+  display: none;
 }

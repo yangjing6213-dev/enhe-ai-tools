@@ -282,7 +282,7 @@ export function BuildYourOwnXNavigator({
         </div>
 
         <div className="byox-controls">
-          <label className="byox-search">
+          <label className="byox-search enhe-search-surface">
             <Search size={17} aria-hidden="true" />
             <input
               value={query}

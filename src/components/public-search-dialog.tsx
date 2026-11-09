@@ -201,7 +201,7 @@ export function PublicSearchDialog({
         </h1>
 
         <form
-          className="public-search-form"
+          className="public-search-form enhe-search-surface"
           action={searchPath}
           method="get"
           role="search"

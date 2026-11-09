@@ -110,7 +110,7 @@ export function AiWorkflowDirectory({
         <label className="relative sm:col-span-2">
           <span className="sr-only">{text.search}</span>
           <Search aria-hidden="true" className="pointer-events-none absolute left-4 top-1/2 size-5 -translate-y-1/2 text-[var(--marketing-muted)]" />
-          <input name="q" type="search" value={query} placeholder={text.search} className="w-full rounded-xl border border-border bg-background py-3 pl-12 pr-4 text-sm text-foreground placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring" onChange={(event) => setQuery(event.currentTarget.value)} />
+          <input name="q" type="search" value={query} placeholder={text.search} className="enhe-search-control w-full rounded-xl border border-border bg-background py-3 pl-12 pr-4 text-sm text-foreground placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring" onChange={(event) => setQuery(event.currentTarget.value)} />
         </label>
         <label>
           <span className="sr-only">{text.topic}</span>

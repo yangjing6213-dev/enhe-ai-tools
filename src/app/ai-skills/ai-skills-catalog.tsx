@@ -71,7 +71,7 @@ export function AiSkillsCatalog({
           type="search"
           value={query}
           placeholder={searchLabel}
-          className="w-full rounded-xl border border-border bg-background px-4 py-3 text-sm text-foreground placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+          className="enhe-search-control w-full rounded-xl border border-border bg-background px-4 py-3 text-sm text-foreground placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
           onChange={(event) => updateQuery(event.currentTarget.value)}
         />
       </div>

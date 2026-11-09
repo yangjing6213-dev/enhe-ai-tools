@@ -108,7 +108,9 @@
   min-height: 52px;
   max-height: 52px;
   line-height: 1.25;
-  border-radius: 0.75rem;
+  width: 132px;
+  max-width: 100%;
+  border-radius: 999px;
 }
 
 .enhe-redesign-production .ai-news-page input.form-control-dark:focus-visible {
@@ -341,6 +343,10 @@
   aspect-ratio: auto;
   border-right: 1px solid var(--enhe-border);
   border-bottom: 0;
+}
+
+.enhe-redesign-production .ai-news-detail-page .tool-product-card-compact .tool-product-card-cover img {
+  object-fit: contain;
 }
 
 .enhe-redesign-production .ai-news-detail-page .tool-product-card-body-compact {
