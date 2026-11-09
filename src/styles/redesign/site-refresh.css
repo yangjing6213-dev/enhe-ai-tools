@@ -173,8 +173,8 @@
   padding-block: 12px;
 }
 
-.redesign-header[data-home="true"] .redesign-brand-region,
-.redesign-header[data-home="true"] .redesign-header-search {
+.redesign-header .redesign-brand-region,
+.redesign-header .redesign-header-search {
   transform: translateX(clamp(0px, calc(50vw - 640px), 164px));
 }
 

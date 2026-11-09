@@ -117,6 +117,31 @@ test("homepage header brand and search align with the software catalog content e
   expect(Math.abs(headerPositions.searchLeft - headerPositions.brandRight - 16)).toBeLessThanOrEqual(1);
 });
 
+test("public headers align the brand and search with the shared content edge on every page", async ({ page }) => {
+  await page.setViewportSize({ width: 1920, height: 1000 });
+  await page.goto("/software");
+
+  const catalogContentLeft = await page.locator(".redesign-software-page").evaluate((element) => {
+    const rect = element.getBoundingClientRect();
+    return rect.left + Number.parseFloat(getComputedStyle(element).paddingLeft);
+  });
+
+  for (const route of ["/software", "/ai-news", "/register", "/en/software", "/en/ai-news"]) {
+    await page.goto(route, { waitUntil: "domcontentloaded" });
+    await page.locator(".redesign-header").waitFor({ state: "visible" });
+    const headerPositions = await page.locator(".redesign-header").evaluate((header) => {
+      const brand = header.querySelector<HTMLElement>(".redesign-brand-mark")!.getBoundingClientRect();
+      const search = header.querySelector<HTMLElement>(".redesign-header-search")!.getBoundingClientRect();
+      const navigation = header.querySelector<HTMLElement>(".redesign-desktop-nav")!.getBoundingClientRect();
+      return { brandLeft: brand.left, brandRight: brand.right, searchLeft: search.left, searchRight: search.right, navigationLeft: navigation.left };
+    });
+
+    expect(Math.abs(headerPositions.brandLeft - catalogContentLeft), `${route} logo alignment`).toBeLessThanOrEqual(1);
+    expect(Math.abs(headerPositions.searchLeft - headerPositions.brandRight - 16), `${route} search alignment`).toBeLessThanOrEqual(1);
+    expect(headerPositions.searchRight, `${route} search must not overlap navigation`).toBeLessThanOrEqual(headerPositions.navigationLeft);
+  }
+});
+
 test("footer restores the original ENHE wordmark and white treatment", async ({ page }) => {
   await page.goto("/");
   const logo = page.locator(".redesign-footer .footer-brand-logo");
