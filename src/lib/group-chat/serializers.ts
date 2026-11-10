@@ -53,7 +53,7 @@ export async function serializeChatMessages(messages: IncludedChatMessage[]) {
       clientMessageId: message.clientMessageId,
       sequence: message.sequence,
       createdAt: message.createdAt,
-      sender: publicChatProfile(message.sender),
+      sender: await publicChatProfile(message.sender),
       status: message.status,
       pinnedAt: message.status === "active" ? message.pinnedAt?.toISOString() ?? null : null,
       text: available ? message.text : message.status === "retracted" ? "消息已撤回" : "消息已移除",

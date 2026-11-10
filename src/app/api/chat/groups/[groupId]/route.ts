@@ -2,7 +2,7 @@ import { getCurrentUser } from "@/lib/auth";
 import { prisma } from "@/lib/db";
 import { groupUpdateInputSchema, isChatMemberMuted } from "@/lib/group-chat/policy";
 import { chatError, chatJson, isChatSameOriginRequest, readChatJson, recordChatAudit } from "@/lib/group-chat/http";
-import { getChatManagerScope } from "@/lib/group-chat/service";
+import { getChatManagerScope, publicChatProfile } from "@/lib/group-chat/service";
 import { chatAnnouncementInclude, serializeChatAnnouncements } from "@/lib/group-chat/serializers";
 
 export const runtime = "nodejs";
@@ -29,10 +29,17 @@ export async function GET(_request: Request, { params }: Context) {
   if (!isMember && !manager && group.visibility !== "listed" && !group.applications.length) return chatError("CHAT_GROUP_NOT_FOUND", 404);
   const { ownerId: _ownerId, members, applications, announcements, ...publicGroup } = group;
   const safeAnnouncements = await serializeChatAnnouncements(announcements);
+  const publicMembers = isMember || manager ? await Promise.all(members.map(async ({ user, role, joinedAt, muted, mutedUntil }) => ({
+    ...await publicChatProfile(user),
+    role,
+    joinedAt,
+    muted: isChatMemberMuted({ muted, mutedUntil }),
+    mutedUntil,
+  }))) : [];
   return chatJson({
     group: { ...publicGroup, announcements: safeAnnouncements, readOnly: publicGroup.readOnly || publicGroup.status !== "active" },
     member: ownMember ? { role: ownMember.role, muted: isChatMemberMuted({ muted: ownMember.muted, mutedUntil: ownMember.mutedUntil }), mutedUntil: ownMember.mutedUntil, lastReadSequence: ownMember.lastReadSequence } : null,
-    members: isMember || manager ? members.map(({ user, role, joinedAt, muted, mutedUntil }) => ({ ...user, nickname: user.nickname?.trim() || "ENHE 用户", role, joinedAt, muted: isChatMemberMuted({ muted, mutedUntil }), mutedUntil })) : [],
+    members: publicMembers,
     application: applications[0] ?? null,
     isManager: Boolean(manager),
     isSiteAdmin: Boolean(manager?.isSiteAdmin),

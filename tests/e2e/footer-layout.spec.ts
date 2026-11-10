@@ -17,7 +17,7 @@ test.describe("footer menu layout", () => {
       await footer.scrollIntoViewIfNeeded();
       await expect(footer).toBeVisible();
       const initialHeight = await footer.evaluate((element) => element.getBoundingClientRect().height);
-      const expectedHeight = width >= 1280 ? 304 : width >= 768 ? 328 : locale === "en" ? 528 : 448;
+      const expectedHeight = width >= 1280 ? 276 : width >= 768 ? 328 : locale === "en" ? 528 : 448;
       expect(initialHeight).toBe(expectedHeight);
 
       const verticalLayout = await footer.evaluate((element) => {
@@ -25,7 +25,7 @@ test.describe("footer menu layout", () => {
         const legal = element.querySelector(".footer-bottom")!.getBoundingClientRect();
         return { sloganBottom: slogan.bottom, legalTop: legal.top, legalBottom: legal.bottom, footerBottom: element.getBoundingClientRect().bottom };
       });
-      expect(verticalLayout.legalTop - verticalLayout.sloganBottom).toBeLessThan(width >= 768 ? 170 : 160);
+      expect(verticalLayout.legalTop - verticalLayout.sloganBottom).toBeLessThan(width >= 1280 ? 100 : width >= 768 ? 170 : 160);
       expect(verticalLayout.legalBottom).toBeLessThanOrEqual(verticalLayout.footerBottom);
 
       for (const menu of await footer.locator(".footer-navigation details").all()) {

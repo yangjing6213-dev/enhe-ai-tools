@@ -2,10 +2,11 @@
 
 import { useCallback, useEffect, useMemo, useRef, useState, type ChangeEvent, type DragEvent, type FormEvent, type KeyboardEvent, type ClipboardEvent } from "react";
 import Link from "next/link";
-import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { ArrowDown, ArrowLeft, BellOff, ChevronLeft, ChevronRight, ImagePlus, Link2, Paperclip, Pin, Search, Send, Smile, Users, X } from "lucide-react";
 import Aurora from "@/components/chat/Aurora";
+import { ChatMessageActions } from "@/components/chat/ChatMessageActions";
+import { ChatProfileAvatar } from "@/components/chat/ChatProfileAvatar";
 import { chatMuteRemainingMs } from "@/lib/group-chat/policy";
 
 type Profile = { id: string; nickname: string; avatar: string | null; role: string; joinedAt?: string };
@@ -421,25 +422,30 @@ export function ChatRoom({ groupId, currentUserId }: { groupId: string; currentU
 
   return (
     <section className="enhe-chat-page">
-      <header className="enhe-chat-room-header">
-        <div className="enhe-chat-hero">
-          <Aurora colorStops={["#3b82f6", "#3bf647", "#5227ff"]} amplitude={1} blend={0.39} height={0.54} speed={1.85} glow={0.5} scale={1} brightness={1} layers={1} direction="top" opacity={1} mouseInteraction intro lightMode />
+      <div className="enhe-chat-room-shell">
+        <Aurora colorStops={["#3b82f6", "#3bf647", "#5227ff"]} amplitude={1} blend={0.39} height={0.54} speed={1.85} glow={0.5} scale={1} brightness={1} layers={1} direction="top" opacity={1} mouseInteraction intro lightMode />
+        <header className="enhe-chat-hero">
           <div className="enhe-chat-hero-content">
             <Link className="enhe-chat-back" href="/chat"><ArrowLeft size={18} />群聊列表</Link>
-            <div className="enhe-chat-room-title-row"><div><h1>{group.name}</h1><p>{group.activeMemberCount} / {group.maxMembers} 位成员 · {group.status === "archived" ? "已归档，只读" : group.readOnly ? "全员禁言" : "群聊"}</p></div><button className="enhe-chat-icon-button" type="button" onClick={() => setSideOpen((open) => !open)} aria-expanded={sideOpen} aria-label="群组资料"><Users size={18} /></button></div>
+            <div className="enhe-chat-room-title-row">
+              <div>
+                <h1>{group.name}</h1>
+                <p className="enhe-chat-member-count"><Users size={17} aria-hidden="true" /><span>{group.activeMemberCount} / {group.maxMembers} 位成员 · {group.status === "archived" ? "已归档，只读" : group.readOnly ? "全员禁言" : "群聊"}</span></p>
+              </div>
+              <button className="enhe-chat-icon-button" type="button" onClick={() => setSideOpen((open) => !open)} aria-expanded={sideOpen} aria-label="群组资料"><Users size={18} /></button>
+            </div>
           </div>
-        </div>
-      </header>
-      {group.announcements?.length > 0 && <div className="enhe-chat-announcements">{group.announcements.filter((item) => item.pinned || item.id !== announcementSeen).slice(0, 3).map((item) => <article className="enhe-chat-announcement" key={item.id}><strong>{item.title}{item.pinned ? " · 置顶" : ""}</strong><p>{item.content}</p>{item.media && <img className="enhe-chat-announcement-image" src={item.media.url} alt={`公告图片：${item.title}`} loading="lazy" />}{item.reference && ("href" in item.reference ? <a href={item.reference.href}>{item.reference.title}</a> : <p className="enhe-chat-muted">关联内容暂不可用</p>)}<small>更新：{item.updatedBy.nickname} · {new Date(item.updatedAt).toLocaleString("zh-CN")}</small>{!item.pinned && <button type="button" onClick={() => setAnnouncementSeen(item.id)}>我已读</button>}</article>)}</div>}
-      {error && <p className="enhe-chat-inline-error" role="alert">{error}</p>}
-      <div className={`enhe-chat-room${dropActive ? " enhe-chat-drop-active" : ""}${sideOpen ? " enhe-chat-room-has-side" : ""}`} onDragOver={(event) => { event.preventDefault(); setDropActive(true); }} onDragLeave={() => setDropActive(false)} onDrop={onDrop}>
+        </header>
+        {group.announcements?.length > 0 && <div className="enhe-chat-announcements">{group.announcements.filter((item) => item.pinned || item.id !== announcementSeen).slice(0, 3).map((item) => <article className="enhe-chat-announcement" key={item.id}><strong>{item.title}{item.pinned ? " · 置顶" : ""}</strong><p>{item.content}</p>{item.media && <img className="enhe-chat-announcement-image" src={item.media.url} alt={`公告图片：${item.title}`} loading="lazy" />}{item.reference && ("href" in item.reference ? <a href={item.reference.href}>{item.reference.title}</a> : <p className="enhe-chat-muted">关联内容暂不可用</p>)}<small>更新：{item.updatedBy.nickname} · {new Date(item.updatedAt).toLocaleString("zh-CN")}</small>{!item.pinned && <button type="button" onClick={() => setAnnouncementSeen(item.id)}>我已读</button>}</article>)}</div>}
+        {error && <p className="enhe-chat-inline-error" role="alert">{error}</p>}
+        <div className={`enhe-chat-room${dropActive ? " enhe-chat-drop-active" : ""}${sideOpen ? " enhe-chat-room-has-side" : ""}`} onDragOver={(event) => { event.preventDefault(); setDropActive(true); }} onDragLeave={() => setDropActive(false)} onDrop={onDrop}>
         <aside className="enhe-chat-room-list enhe-chat-card">
           <h2>群成员 <span className="enhe-chat-muted">{members.length}</span></h2>
-          {members.map((profile) => <div className="enhe-chat-member" key={profile.id}>{profile.avatar ? <img className="enhe-chat-avatar" src={profile.avatar} alt="" /> : <span className="enhe-chat-avatar" aria-hidden="true">{profile.nickname.slice(0, 1)}</span>}<div><strong>{profile.nickname}</strong><div className="enhe-chat-muted">{roleNames[profile.role] ?? "成员"}</div></div><button type="button" className="enhe-chat-quiet-button" onClick={() => addMention(profile)}>@</button></div>)}
+          {members.map((profile) => <div className="enhe-chat-member" key={profile.id}><ChatProfileAvatar className="enhe-chat-avatar" src={profile.avatar} nickname={profile.nickname} /><div className="enhe-chat-member-info"><strong>{profile.nickname}</strong><div className="enhe-chat-muted">{roleNames[profile.role] ?? "成员"}</div></div><button type="button" className="enhe-chat-quiet-button" onClick={() => addMention(profile)} aria-label={`提及${profile.nickname}`}>@</button></div>)}
         </aside>
         <main className="enhe-chat-room-main enhe-chat-card" aria-label="群聊消息">
           <div className="enhe-chat-toolbar">
-            <form className="enhe-chat-search" onSubmit={(event) => event.preventDefault()}><Search size={16} aria-hidden="true" /><input className="enhe-chat-input enhe-search-control" aria-label="搜索群聊消息" placeholder="搜索本群消息" value={searchQuery} onChange={(event) => setSearchQuery(event.target.value)} /><button type="button" onClick={() => setSearchOpen((open) => !open)}>{searchOpen ? "隐藏筛选" : "筛选"}</button></form>
+            <form className="enhe-chat-search" onSubmit={(event) => event.preventDefault()}><Search size={16} aria-hidden="true" /><input className="enhe-chat-input enhe-search-control" aria-label="搜索群聊消息" placeholder="搜索本群消息" value={searchQuery} onChange={(event) => setSearchQuery(event.target.value)} /><button className="enhe-chat-button" type="button" aria-expanded={searchOpen} onClick={() => setSearchOpen((open) => !open)}>{searchOpen ? "隐藏筛选" : "筛选"}</button></form>
             <button type="button" className="enhe-chat-icon-button" aria-label={quiet ? "关闭免打扰" : "开启免打扰"} onClick={() => setQuiet((value) => !value)}><BellOff size={17} />{quiet ? "免打扰中" : "免打扰"}</button>
           </div>
           {searchOpen && <div className="enhe-chat-filter-row"><select className="enhe-chat-select" aria-label="消息类型" value={searchKind} onChange={(event) => setSearchKind(event.target.value as ChatKind)}><option value="all">所有类型</option><option value="text">文字</option><option value="image">图片</option><option value="reference">关联内容</option></select><select className="enhe-chat-select" aria-label="发送人" value={searchSenderId} onChange={(event) => setSearchSenderId(event.target.value)}><option value="all">所有成员</option>{members.map((profile) => <option key={profile.id} value={profile.id}>{profile.nickname}</option>)}</select></div>}
@@ -450,14 +456,14 @@ export function ChatRoom({ groupId, currentUserId }: { groupId: string; currentU
           }}>
             {!searchMessages && hasMore && <button className="enhe-chat-button enhe-chat-load-older" type="button" disabled={loadingOlder} onClick={() => void loadOlderMessages()}>{loadingOlder ? "正在加载…" : "加载更早消息"}</button>}
             {filteredMessages.length === 0 ? <p className="enhe-chat-muted">{searchQuery ? "没有匹配的消息。" : "这里还没有消息。发起一次友好的交流吧。"}</p> : filteredMessages.map((message) => <article className="enhe-chat-message" data-mine={message.sender.id === currentUserId} key={message.id}>
-              <div className="enhe-chat-message-meta">{message.sender.avatar ? <img className="enhe-chat-avatar enhe-chat-avatar-small" src={message.sender.avatar} alt="" /> : <span className="enhe-chat-avatar enhe-chat-avatar-small" aria-hidden="true">{message.sender.nickname.slice(0, 1)}</span>}<strong>{message.sender.nickname}</strong><span>{roleNames[message.sender.role] ?? "成员"}</span><time dateTime={message.createdAt}>{new Date(message.createdAt).toLocaleString("zh-CN", { hour: "2-digit", minute: "2-digit" })}</time></div>
+              <div className="enhe-chat-message-meta"><ChatProfileAvatar className="enhe-chat-avatar enhe-chat-avatar-small" src={message.sender.avatar} nickname={message.sender.nickname} /><strong>{message.sender.nickname}</strong><span>{roleNames[message.sender.role] ?? "成员"}</span><time dateTime={message.createdAt}>{new Date(message.createdAt).toLocaleString("zh-CN", { hour: "2-digit", minute: "2-digit" })}</time></div>
               {message.pinnedAt && <p className="enhe-chat-pinned-label"><Pin size={14} />管理员置顶</p>}
               {message.replyTo && <div className="enhe-chat-reply-preview">回复 {message.replyTo.sender}：{message.replyTo.text}</div>}
               {message.text && <p className="enhe-chat-message-content">{message.text}</p>}
               {!!message.emojiIds.length && <div className="enhe-chat-message-emojis">{message.emojiIds.map((id) => <span key={id} title={emojis.find((emoji) => emoji.id === id)?.name}>{emojis.find((emoji) => emoji.id === id)?.value ?? emojis.find((emoji) => emoji.id === id)?.emoji ?? "▫"}</span>)}</div>}
               {message.media.length > 0 && <div className="enhe-chat-media-grid">{message.media.map((image, index) => <button key={image.id} type="button" aria-label={`查看图片 ${index + 1}/${message.media.length}`} onClick={() => openLightbox(message.media, index)}><img src={image.thumbnailUrl} alt="群聊图片" loading="lazy" /></button>)}</div>}
               {message.reference && (isReference(message.reference) ? <a className="enhe-chat-reference" href={message.reference.href}><img src={message.reference.image ?? "/images/brand/enhe-icon-gradient-white-bg-cropped.png"} alt="" loading="lazy" /><span><small>{message.reference.type === "tool" ? "站内产品" : "AI 资讯"}</small><strong>{message.reference.title}</strong>{message.reference.description && <span>{message.reference.description}</span>}</span></a> : <div className="enhe-chat-reference enhe-chat-muted">内容暂不可用</div>)}
-              <div className="enhe-chat-message-actions"><button type="button" onClick={() => setReplyTo(message)}>回复</button><button type="button" onClick={() => void navigator.clipboard.writeText(message.text)}>复制文字</button>{canManage && message.status === "active" && <button type="button" onClick={() => void togglePin(message)}>{message.pinnedAt ? "取消置顶" : "置顶"}</button>}{message.sender.id === currentUserId && message.status === "active" && <button type="button" onClick={() => void retract(message)}>撤回</button>}{message.sender.id !== currentUserId && message.status === "active" && <button type="button" onClick={() => void report(message)}>举报</button>}</div>
+              <ChatMessageActions canManage={canManage} canRetract={message.sender.id === currentUserId} canReport={message.sender.id !== currentUserId} isActive={message.status === "active"} isPinned={Boolean(message.pinnedAt)} onReply={() => setReplyTo(message)} onCopy={() => void navigator.clipboard.writeText(message.text)} onTogglePin={() => void togglePin(message)} onRetract={() => void retract(message)} onReport={() => void report(message)} />
             </article>)}
           </div>
           {newMessageCount > 0 && <button className="enhe-chat-unread-marker enhe-chat-button enhe-chat-button-primary" type="button" onClick={() => { if (messageListRef.current) messageListRef.current.scrollTop = messageListRef.current.scrollHeight; bottomRef.current = true; setNewMessageCount(0); void updateReadCursor(); }}><ArrowDown size={15} />{newMessageCount} 条新消息</button>}
@@ -479,7 +485,8 @@ export function ChatRoom({ groupId, currentUserId }: { groupId: string; currentU
             </div>
           </form>
         </main>
-        {sideOpen && <aside className="enhe-chat-room-side enhe-chat-card"><h2>群资料</h2><p>{group.description}</p><section className="enhe-chat-panel"><h3>群规</h3><p style={{ whiteSpace: "pre-wrap" }}>{group.rules || "群主暂未填写群规。"}</p></section><h3>群成员</h3>{members.map((profile) => <div className="enhe-chat-member" key={profile.id}>{profile.avatar ? <img className="enhe-chat-avatar" src={profile.avatar} alt="" /> : <span className="enhe-chat-avatar" aria-hidden="true">{profile.nickname.slice(0, 1)}</span>}<div><strong>{profile.nickname}</strong><div className="enhe-chat-muted">{roleNames[profile.role] ?? "成员"}</div></div><button type="button" className="enhe-chat-quiet-button" onClick={() => addMention(profile)}>@</button></div>)}{canManage && <Link className="enhe-chat-button" href={`/chat/${group.id}/manage`}>群管理</Link>}<button className="enhe-chat-button" type="button" onClick={() => void leaveGroup()}>退出群聊</button></aside>}
+        {sideOpen && <aside className="enhe-chat-room-side enhe-chat-card"><h2>群资料</h2><p>{group.description}</p><section className="enhe-chat-panel"><h3>群规</h3><p style={{ whiteSpace: "pre-wrap" }}>{group.rules || "群主暂未填写群规。"}</p></section><h3>群成员</h3>{members.map((profile) => <div className="enhe-chat-member" key={profile.id}><ChatProfileAvatar className="enhe-chat-avatar" src={profile.avatar} nickname={profile.nickname} /><div className="enhe-chat-member-info"><strong>{profile.nickname}</strong><div className="enhe-chat-muted">{roleNames[profile.role] ?? "成员"}</div></div><button type="button" className="enhe-chat-quiet-button" onClick={() => addMention(profile)} aria-label={`提及${profile.nickname}`}>@</button></div>)}{canManage && <Link className="enhe-chat-button" href={`/chat/${group.id}/manage`}>群管理</Link>}<button className="enhe-chat-button" type="button" onClick={() => void leaveGroup()}>退出群聊</button></aside>}
+      </div>
       </div>
       {lightboxIndex !== null && lightboxImages[lightboxIndex] && <div className="enhe-chat-lightbox" role="dialog" aria-modal="true" aria-label="群聊图片查看器" onClick={() => setLightboxIndex(null)}><button type="button" className="enhe-chat-lightbox-close" aria-label="关闭图片" onClick={() => setLightboxIndex(null)}><X size={24} /></button>{lightboxImages.length > 1 && <button type="button" className="enhe-chat-lightbox-nav enhe-chat-lightbox-prev" aria-label="上一张" onClick={(event) => { event.stopPropagation(); setLightboxIndex((index) => index === null ? null : (index + lightboxImages.length - 1) % lightboxImages.length); }}><ChevronLeft size={28} /></button>}<img src={lightboxImages[lightboxIndex].url} alt={`群聊图片 ${lightboxIndex + 1}/${lightboxImages.length}`} onClick={(event) => event.stopPropagation()} />{lightboxImages.length > 1 && <button type="button" className="enhe-chat-lightbox-nav enhe-chat-lightbox-next" aria-label="下一张" onClick={(event) => { event.stopPropagation(); setLightboxIndex((index) => index === null ? null : (index + 1) % lightboxImages.length); }}><ChevronRight size={28} /></button>}<span>{lightboxIndex + 1} / {lightboxImages.length}</span></div>}
     </section>

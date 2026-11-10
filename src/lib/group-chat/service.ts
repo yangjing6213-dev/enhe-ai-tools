@@ -2,6 +2,8 @@ import { createChatInviteToken, encryptChatInviteToken, hashChatInviteToken } fr
 import { prisma } from "@/lib/db";
 import { buildCanonicalAiNewsPath, buildCanonicalToolPath } from "@/lib/public-slugs";
 import { isChatMemberMuted } from "@/lib/group-chat/policy";
+import { getDefaultAvatar } from "@/lib/default-avatar";
+import { resolveUserAvatarSrc } from "@/lib/user-avatar";
 import type { Prisma } from "@prisma/client";
 
 export type ChatActor = { id: string; role: string; status?: string };
@@ -9,8 +11,9 @@ type Tx = Prisma.TransactionClient;
 
 export const chatProfileSelect = { id: true, nickname: true, avatar: true, role: true } as const;
 
-export function publicChatProfile(user: { id: string; nickname: string | null; avatar: string | null; role: string }) {
-  return { id: user.id, nickname: user.nickname?.trim() || "ENHE 用户", avatar: user.avatar, role: user.role === "admin" ? "网站管理员" : "成员" };
+export async function publicChatProfile(user: { id: string; nickname: string | null; avatar: string | null; role: string }) {
+  const avatar = await resolveUserAvatarSrc(user.avatar);
+  return { id: user.id, nickname: user.nickname?.trim() || "ENHE 用户", avatar: avatar || getDefaultAvatar(user.id), role: user.role === "admin" ? "网站管理员" : "成员" };
 }
 
 export async function findChatMembership(groupId: string, userId: string) {
