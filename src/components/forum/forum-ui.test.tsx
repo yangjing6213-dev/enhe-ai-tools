@@ -48,9 +48,10 @@ describe("forum public surfaces", () => {
     expect(english).toContain("Topic deleted. The topic and its replies are no longer public.");
   });
 
-  it("keeps the cover's full image dimensions and separates the topic tag from the author", () => {
+  it("keeps the cover filling its stable frame and separates the topic tag from the author", () => {
     const html = renderToStaticMarkup(<ForumIndexContent locale="zh" posts={[post] as unknown as Parameters<typeof ForumIndexContent>[0]["posts"]} isAuthenticated />);
-    expect(html).toContain('width="1448" height="620"');
+    expect(html).toContain("forum-cover-logo4.png");
+    expect(html).toContain('data-nimg="fill"');
     expect(html).toContain('class="forum-post-header"');
     expect(html).toContain('class="forum-category-tag"');
     expect(html).not.toContain("举报");

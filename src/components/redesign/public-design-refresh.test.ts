@@ -40,7 +40,12 @@ describe("ENHE public visual refresh contract", () => {
   });
 
   it("uses a white, image-free hero, white cards, and a dark-blue footer", () => {
-    expect(brandLockup).toContain("/images/brand/enhe-infinity-animated-transparent.svg");
+    expect(brandLockup).toContain("/images/brand/enhe-standard-black-preview.gif");
+    expect(footer).toContain("/images/brand/enhe-white-en-preview.gif");
+    expect(read("src/app/ai-news/page-shell.tsx")).toContain("/images/ai-news-cover-logo4.jpg");
+    expect(read("src/app/about/page-shell.tsx")).toContain("/images/about/enhe-about-cover-logo4.jpg");
+    expect(read("src/components/forum/forum-ui.tsx")).toContain("/images/forum-cover-logo4.png");
+    expect(read("src/styles/redesign/forum.css")).toContain("aspect-ratio: 1448 / 620");
     expect(refreshStyles).toMatch(/\.redesign-home-hero\s*\{[^}]*background-image:\s*none/);
     expect(refreshStyles).toMatch(/\.redesign-home-hero\s*\{[^}]*color:\s*var\(--enhe-text\)/);
     expect(tokens).toContain("--enhe-page-bg: var(--background, #ffffff)");

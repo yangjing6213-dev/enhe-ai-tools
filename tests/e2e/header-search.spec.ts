@@ -21,8 +21,9 @@ test("public header replaces the search link, opens recommendations, and submits
       await expect(footer).toHaveCSS("background-color", "rgb(13, 58, 109)");
       await expect(footer.locator("h3").first()).toHaveCSS("color", "rgb(255, 255, 255)");
       await expect(footer.locator("nav").first()).toHaveCSS("background-color", "rgb(13, 58, 109)");
-      await expect(footer.locator(".footer-brand-logo")).toHaveCSS("filter", "brightness(0) invert(1)");
-      await expect(footer.locator(".footer-brand-logo")).toHaveAttribute("src", /enhe-footer-wordmark\.png/);
+      await expect(footer.locator(".footer-brand-logo")).toHaveCSS("filter", "none");
+      await expect(footer.locator(".footer-brand-logo")).toHaveCSS("mix-blend-mode", "lighten");
+      await expect(footer.locator(".footer-brand-logo")).toHaveAttribute("src", /enhe-white-en-preview\.gif/);
       await expect(footer.locator(".footer-bottom")).toHaveCSS("justify-content", "center");
       await expect(footer.locator(".footer-bottom p")).toHaveCount(1);
       await expect(footer.locator(".footer-bottom p")).toHaveCSS("color", "rgb(255, 255, 255)");
@@ -142,13 +143,13 @@ test("public headers align the brand and search with the shared content edge on 
   }
 });
 
-test("footer restores the original ENHE wordmark and white treatment", async ({ page }) => {
+test("footer uses the supplied animated white ENHE logo", async ({ page }) => {
   await page.goto("/");
   const logo = page.locator(".redesign-footer .footer-brand-logo");
-  await expect(logo).toHaveAttribute("src", /enhe-footer-wordmark\.png/);
+  await expect(logo).toHaveAttribute("src", /enhe-white-en-preview\.gif/);
   await expect(logo).toHaveAttribute("alt", "ENHE 品牌标志");
-  await expect(logo).toHaveCSS("filter", "brightness(0) invert(1)");
-  await expect(logo).toHaveCSS("mix-blend-mode", "normal");
+  await expect(logo).toHaveCSS("filter", "none");
+  await expect(logo).toHaveCSS("mix-blend-mode", "lighten");
 });
 
 test("non-home buttons and dropdowns are pill shaped while homepage controls keep their existing shape", async ({ page }) => {

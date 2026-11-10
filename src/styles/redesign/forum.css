@@ -10,6 +10,7 @@
 .forum-cover {
   position: relative;
   width: 100%;
+  aspect-ratio: 1448 / 620;
   margin: 0 0 36px;
   overflow: hidden;
   border: 1px solid var(--enhe-border, #d8d8d8);
@@ -20,9 +21,7 @@
 
 .forum-cover-image {
   display: block;
-  width: 100%;
-  height: auto;
-  object-fit: contain;
+  object-fit: cover;
 }
 
 .forum-heading,

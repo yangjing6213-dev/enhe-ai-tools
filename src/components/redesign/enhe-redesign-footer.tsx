@@ -103,11 +103,12 @@ export function EnheRedesignFooter({
           <div className="footer-brand">
             <Image
               className="footer-brand-logo"
-              src="/images/brand/enhe-footer-wordmark.png"
+              src="/images/brand/enhe-white-en-preview.gif"
               alt={locale === "en" ? "ENHE brand" : "ENHE 品牌标志"}
-              width={2172}
-              height={724}
+              width={800}
+              height={266}
               sizes="240px"
+              unoptimized
             />
             <nav className="footer-social-links" aria-label={locale === "en" ? "ENHE AI social media" : "ENHE AI 社交平台"}>
               <a href="https://github.com/yangjing6213-dev/yangjing6213-dev" target="_blank" rel="noreferrer" aria-label="GitHub">

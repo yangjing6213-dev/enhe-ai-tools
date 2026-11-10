@@ -233,8 +233,8 @@ test("homepage polish stays readable, responsive, and interactive without extern
 
     const footer = page.locator(".redesign-footer");
     await expect(footer).toHaveCSS("background-color", "rgb(13, 58, 109)");
-    await expect(page.locator(".redesign-brand-mark")).toHaveAttribute("src", /enhe-infinity-animated-transparent\.svg/);
-    await expect(footer.locator(".footer-brand-logo")).toHaveAttribute("src", /enhe-footer-wordmark\.png/);
+    await expect(page.locator(".redesign-brand-mark")).toHaveAttribute("src", /enhe-standard-black-preview\.gif/);
+    await expect(footer.locator(".footer-brand-logo")).toHaveAttribute("src", /enhe-white-en-preview\.gif/);
     const footerAlignment = await footer.evaluate((element) => {
       const heading = element.querySelector<HTMLElement>(".redesign-home-brand-value-inner h2");
       const logo = element.querySelector<HTMLElement>(".footer-brand-logo");

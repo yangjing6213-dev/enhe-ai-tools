@@ -96,10 +96,9 @@ export function ForumIndexContent({ locale, posts, selectedCategory, isAuthentic
     <main className="forum-page">
       <div className="forum-cover">
         <Image
-          src="/images/forum-cover.png"
+          src="/images/forum-cover-logo4.png"
           alt={t.coverAlt}
-          width={1448}
-          height={620}
+          fill
           priority
           sizes="(max-width: 768px) 100vw, 1120px"
           className="forum-cover-image"

@@ -210,7 +210,7 @@
 }
 
 .dark .redesign-brand-mark {
-  filter: brightness(0) invert(1);
+  filter: none;
 }
 
 .redesign-header[data-home="true"] .redesign-desktop-nav {
@@ -1155,7 +1155,8 @@ body .redesign-footer nav {
 }
 
 .redesign-footer .footer-brand-logo {
-  filter: brightness(0) invert(1);
+  filter: none;
+  mix-blend-mode: lighten;
   transform: translateY(10%);
 }
 

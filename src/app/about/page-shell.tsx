@@ -261,7 +261,7 @@ export function AboutPageShell({ forceLocale }: { forceLocale: Locale }) {
       <Container className="enhe-reference-editorial-container py-14">
         <StructuredData data={[breadcrumbSchema, aboutPageSchema, faqSchema]} />
         <PageCover
-          src="/images/about/enhe-about-cover.webp"
+          src="/images/about/enhe-about-cover-logo4.jpg"
           alt={forceLocale === "en" ? "ENHE AI illuminated brand mark" : "ENHE AI 品牌灯光标志"}
         />
         <section className="enhe-reference-editorial-hero relative overflow-hidden p-0 text-left">
