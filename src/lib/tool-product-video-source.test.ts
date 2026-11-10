@@ -109,6 +109,23 @@ describe("tool product video source", () => {
     expect(helper).toContain("slice(0, 3)");
   });
 
+  it("keeps every product video window in a clipped 16:9 rectangular frame", () => {
+    const css = readProjectFile("src/app/globals.css");
+    const stage = css.match(/\.tool-detail-video-stage\s*\{([^}]*)\}/)?.[1] ?? "";
+    const video = css.match(/\.tool-detail-video-stage\s*>\s*video\s*\{([^}]*)\}/)?.[1] ?? "";
+    const preview = css.match(/\.tool-detail-video-preview\s*>\s*span:first-child\s*\{([^}]*)\}/)?.[1] ?? "";
+
+    expect(stage).toMatch(/aspect-ratio:\s*16\s*\/\s*9/);
+    expect(stage).toMatch(/overflow:\s*hidden/);
+    expect(stage).toMatch(/border-radius:\s*var\(--enhe-card-r,\s*16px\)/);
+    expect(video).toMatch(/display:\s*block/);
+    expect(video).toMatch(/width:\s*100%/);
+    expect(video).toMatch(/height:\s*100%/);
+    expect(video).toMatch(/border-radius:\s*0/);
+    expect(preview).toMatch(/width:\s*100%/);
+    expect(preview).toMatch(/height:\s*100%/);
+  });
+
   it("proxies private COS product videos instead of rendering forbidden public URLs", () => {
     const helper = readProjectFile("src/lib/product-video.ts");
     const route = readProjectFile("src/app/api/tool-videos/route.ts");

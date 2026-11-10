@@ -13,16 +13,31 @@ test("AI Skill page filters software-style cards as soon as the search text chan
   await expect(page.getByRole("button", { name: "筛选" })).toHaveCount(0);
 
   const cards = page.locator(".redesign-software-card");
+  const expectUniformCardHeight = async () => {
+    await expect.poll(async () => {
+      const [heights, assignedHeight] = await Promise.all([
+        cards.evaluateAll((items) => items.map((item) => item.getBoundingClientRect().height)),
+        page.locator("main").evaluate((main) => Number.parseFloat(
+          getComputedStyle(main).getPropertyValue("--redesign-software-card-height"),
+        )),
+      ]);
+      return heights.length > 0 && assignedHeight > 0 && heights.every((height) =>
+        Math.abs(height - assignedHeight) <= 1 && Math.abs(height - heights[0]) <= 1,
+      );
+    }).toBe(true);
+  };
   await expect(cards).toHaveCount(2);
-  await expect(cards.first()).toHaveCSS("height", "658px");
+  await expectUniformCardHeight();
   await expect(cards.first()).toHaveCSS("border-radius", "0px");
 
   await search.fill("本地开发");
   await expect(cards).toHaveCount(1);
   await expect(cards.first()).toContainText("本地开发排错 Skill");
+  await expectUniformCardHeight();
 
   await search.fill("");
   await expect(cards).toHaveCount(2);
+  await expectUniformCardHeight();
 });
 
 test("quick-access data is private to a signed-in user", async ({ request }) => {

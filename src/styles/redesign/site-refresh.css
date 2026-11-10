@@ -285,7 +285,7 @@
 
 .redesign-home .redesign-home-cta {
   border: 1px solid var(--blue-11);
-  border-radius: 999px;
+  border-radius: 12px;
   background: var(--blue-11);
   color: #fff;
 }
@@ -297,6 +297,9 @@
 }
 
 .redesign-header-search input {
+  box-sizing: border-box;
+  width: 100%;
+  max-width: 100%;
   height: 46px;
   padding: 10px 48px 10px 14px;
   border: 1px solid var(--enhe-text);
@@ -404,7 +407,12 @@
   :is(button, [role="button"], [data-slot="button"], input[type="submit"], input[type="reset"],
     a[class*="button"], a[class*="btn"], a[class*="cta"], a[class*="control"],
     .enhe-contentless-action, .redesign-login-link, .redesign-avatar-trigger,
-    .redesign-language-switch, .redesign-nav-link, .footer-group > summary) {
+    .redesign-language-switch, .redesign-nav-link, .footer-group > summary):where(:not(
+      .tool-detail-video-preview,
+      .site-floating-action,
+      .customer-support-launcher,
+      .redesign-home-cta
+    )) {
   border-radius: var(--enhe-button-r) !important;
 }
 
@@ -412,7 +420,12 @@
   :is(button, [role="button"], [data-slot="button"], input[type="submit"], input[type="reset"], select,
     a[class*="button"], a[class*="btn"], a[class*="cta"], a[class*="control"],
     .enhe-contentless-action, .redesign-login-link, .redesign-avatar-trigger,
-    .redesign-language-switch, .redesign-nav-link, .footer-group > summary) {
+    .redesign-language-switch, .redesign-nav-link, .footer-group > summary):where(:not(
+      .tool-detail-video-preview,
+      .site-floating-action,
+      .customer-support-launcher,
+      .redesign-home-cta
+    )) {
   border-radius: 999px !important;
 }
 

@@ -212,6 +212,11 @@ test("download recommendations support keyboard and product navigation", async (
   await page.context().addCookies([{ name: "enhe_locale", value: "en", url: `http://127.0.0.1:${process.env.PORT ?? "3000"}/` }]);
   await page.goto("/redesign-preview/home");
   const input = page.locator(".redesign-header").getByRole("combobox");
+  const searchBounds = await input.evaluate((element) => {
+    const form = element.closest(".redesign-header-search")!;
+    return { inputRight: element.getBoundingClientRect().right, formRight: form.getBoundingClientRect().right };
+  });
+  expect(searchBounds.inputRight).toBeLessThanOrEqual(searchBounds.formRight + 1);
   await input.click();
   const panel = page.getByRole("dialog", { name: "Most downloaded" });
   const links = panel.getByRole("link");

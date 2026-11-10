@@ -5,6 +5,7 @@ import Link from "next/link";
 import { StructuredData } from "@/components/structured-data";
 import { ContentlessState } from "@/components/redesign/contentless-state";
 import { AiSkillsCatalog } from "@/app/ai-skills/ai-skills-catalog";
+import { EnheRedesignSoftwareLayout } from "@/components/redesign/software/EnheRedesignSoftwareLayout";
 import { Container, SectionTitle } from "@/components/ui";
 import { getDictionary, type Locale } from "@/lib/dictionaries";
 import { getPublicToolListing } from "@/lib/public-content";
@@ -126,7 +127,7 @@ export async function AiSkillsPageShell({
   };
 
   return (
-    <main>
+    <EnheRedesignSoftwareLayout>
       <Container className="py-14">
         <StructuredData data={[breadcrumbSchema, collectionSchema]} />
         <SectionTitle as="h1" title={copy.title} titleClassName="redesign-bold-copy" intro={copy.intro} />
@@ -154,6 +155,6 @@ export async function AiSkillsPageShell({
           </Link>
         </p>
       </Container>
-    </main>
+    </EnheRedesignSoftwareLayout>
   );
 }

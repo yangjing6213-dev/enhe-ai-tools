@@ -51,6 +51,19 @@ describe("AI tools candidate responsive browsing", () => {
     expect(catalog).not.toContain("通过已跟踪的编辑推荐字段筛选公开产品。");
   });
 
+  it("keeps AI Skill cards at one measured height and omits inline download metrics", () => {
+    const page = readCandidate("app/ai-skills/page-shell.tsx");
+    const card = readCandidate("components/redesign/software/EnheRedesignSoftwareCard.tsx");
+    const layout = readCandidate("components/redesign/software/EnheRedesignSoftwareLayout.tsx");
+
+    expect(page).toContain("EnheRedesignSoftwareLayout");
+    expect(page).toContain("<EnheRedesignSoftwareLayout");
+    expect(card).toMatch(/getVisibleToolMetrics\(product\)\.filter/);
+    expect(card).toContain('product.type !== "ai_skill"');
+    expect(card).toContain('metric.type !== "download"');
+    expect(layout).toContain("--redesign-software-card-height");
+  });
+
   it("keeps primary and secondary catalogue controls at the locked 48px height", () => {
     const css = readCandidate("styles/redesign/software.css");
 

@@ -19,8 +19,11 @@ export async function GET(request: Request, { params }: Context) {
   const query = (url.searchParams.get("q") ?? "").trim().slice(0, 100);
   if (!query || (type !== "tool" && type !== "news")) return chatJson({ items: [] });
   if (type === "tool") {
-    const rows = await prisma.tool.findMany({ where: { status: "published", OR: [{ name: { contains: query, mode: "insensitive" } }, { englishName: { contains: query, mode: "insensitive" } }, { shortDescription: { contains: query, mode: "insensitive" } }] }, select: { id: true }, orderBy: { updatedAt: "desc" }, take: 20 });
-    const items = (await Promise.all(rows.map((row) => resolvePublicReference({ type: "tool", id: row.id }, prisma)))).filter(Boolean);
+    const rows = await prisma.tool.findMany({ where: { status: "published", OR: [{ name: { contains: query, mode: "insensitive" } }, { englishName: { contains: query, mode: "insensitive" } }, { shortDescription: { contains: query, mode: "insensitive" } }] }, select: { id: true, type: true }, orderBy: { updatedAt: "desc" }, take: 20 });
+    const items = (await Promise.all(rows.map(async (row) => {
+      const reference = await resolvePublicReference({ type: "tool", id: row.id }, prisma);
+      return reference ? { ...reference, category: row.type } : null;
+    }))).filter(Boolean);
     return chatJson({ items });
   }
   const rows = await prisma.newsArticle.findMany({ where: { status: "published", OR: [{ title: { contains: query, mode: "insensitive" } }, { englishTitle: { contains: query, mode: "insensitive" } }, { summary: { contains: query, mode: "insensitive" } }] }, select: { id: true }, orderBy: [{ publishedAt: "desc" }, { updatedAt: "desc" }], take: 20 });

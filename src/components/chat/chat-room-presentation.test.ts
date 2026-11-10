@@ -1,5 +1,6 @@
 import { readFileSync } from "node:fs";
 import { describe, expect, it } from "vitest";
+import { groupChatContentReferences } from "@/lib/group-chat/content-reference-groups";
 
 const source = readFileSync(new URL("./ChatRoom.tsx", import.meta.url), "utf8");
 const actions = readFileSync(new URL("./ChatMessageActions.tsx", import.meta.url), "utf8");
@@ -41,5 +42,52 @@ describe("chat room presentation", () => {
     expect(styles).toMatch(/\.enhe-chat-search\s*>\s*input\s*\{[^}]*flex:\s*1/);
     expect(styles).toMatch(/\.enhe-chat-search\s*>\s*\.enhe-chat-button\s*\{[^}]*min-height:\s*42px/);
     expect(styles).toMatch(/\.enhe-chat-filter-row\s*\{[^}]*display:\s*flex/);
+  });
+
+  it("shows the group introduction beside the title without a separate card surface", () => {
+    expect(source).toContain('className="enhe-chat-hero-summary"');
+    expect(source).toContain('className="enhe-chat-hero-description"');
+    expect(styles).toMatch(/\.enhe-chat-room-shell\s*>\s*\.enhe-chat-hero\s*\{[^}]*border:\s*0[^}]*background:\s*transparent/);
+    expect(styles).toMatch(/\.enhe-chat-room-shell\s+\.enhe-chat-hero-content\s*\{[^}]*display:\s*grid/);
+    expect(styles).toMatch(/grid-template-columns:\s*minmax\(0,\s*2fr\)\s+minmax\(0,\s*1fr\)/);
+  });
+
+  it("gives compact controls consistent spacing and distinguishes quiet mode", () => {
+    expect(styles).toMatch(/\.enhe-chat-room-shell\s+\.enhe-chat-toolbar\s*\{[^}]*gap:\s*10px/);
+    expect(styles).toMatch(/\.enhe-chat-composer-tools\s*\{[^}]*gap:\s*8px/);
+    expect(styles).toMatch(/\.enhe-chat-room-shell\s+\.enhe-chat-dnd-button\[aria-pressed="false"\][^{]*\{[^}]*background:\s*#e8f7ed/);
+    expect(styles).toMatch(/\.enhe-chat-room-shell\s+\.enhe-chat-dnd-button\[aria-pressed="true"\][^{]*\{[^}]*background:\s*#f1f3f5/);
+    expect(source).toContain('aria-pressed={quiet}');
+  });
+
+  it("renders linked-content results in labeled, separated groups", () => {
+    expect(source).toContain("groupChatContentReferences(contentResults)");
+    expect(source).toContain('className="enhe-chat-reference-group"');
+    expect(source).toContain('className="enhe-chat-result"');
+    expect(styles).toMatch(/\.enhe-chat-reference-group\s*\{[^}]*display:\s*grid/);
+    expect(styles).toMatch(/\.enhe-chat-result\s*\{[^}]*display:\s*block/);
+  });
+});
+
+describe("chat linked-content result grouping", () => {
+  it("separates products by their actual product type and keeps news distinct", () => {
+    const groups = groupChatContentReferences([
+      { type: "tool", category: "ai_skill", id: "skill" },
+      { type: "tool", category: "software", id: "software" },
+      { type: "news", id: "news" },
+      { type: "tool", category: "ai_skill", id: "skill-2" },
+    ]);
+
+    expect(groups.map(({ label, items }) => [label, items.map(({ id }) => id)])).toEqual([
+      ["桌面软件", ["software"]],
+      ["AI Skill", ["skill", "skill-2"]],
+      ["AI 资讯", ["news"]],
+    ]);
+  });
+
+  it("keeps unknown product types in a general product group", () => {
+    expect(groupChatContentReferences([{ type: "tool", category: "legacy", id: "legacy" }])).toEqual([
+      { key: "product", label: "产品", items: [{ type: "tool", category: "legacy", id: "legacy" }] },
+    ]);
   });
 });

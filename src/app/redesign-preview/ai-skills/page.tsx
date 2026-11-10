@@ -1,6 +1,7 @@
 import { notFound } from "next/navigation";
 
 import { AiSkillsCatalog, type AiSkillCatalogEntry } from "@/app/ai-skills/ai-skills-catalog";
+import { EnheRedesignSoftwareLayout } from "@/components/redesign/software/EnheRedesignSoftwareLayout";
 
 const sampleEntries: AiSkillCatalogEntry[] = [
   {
@@ -45,7 +46,7 @@ export default function AiSkillsPreviewPage() {
   if (process.env.NODE_ENV === "production") notFound();
 
   return (
-    <main className="redesign-software redesign-software-page">
+    <EnheRedesignSoftwareLayout className="redesign-software redesign-software-page">
       <section className="redesign-software-hero">
         <h1>AI Skill</h1>
         <p className="redesign-software-intro">可安装到常见 AI 助手中的专业工作技能。</p>
@@ -58,6 +59,6 @@ export default function AiSkillsPreviewPage() {
         emptyTitle="没有找到匹配的 AI Skill"
         emptyText="试试更短的关键词。"
       />
-    </main>
+    </EnheRedesignSoftwareLayout>
   );
 }

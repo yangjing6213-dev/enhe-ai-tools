@@ -30,7 +30,9 @@ export function EnheRedesignSoftwareCard({
   const headingId = `${sectionId}-${product.id}-title`;
   const t = getDictionary(locale).toolCard;
   const valueProposition = product.valueProposition;
-  const metrics = getVisibleToolMetrics(product);
+  const metrics = getVisibleToolMetrics(product).filter(
+    (metric) => product.type !== "ai_skill" || metric.type !== "download",
+  );
   const hasSafetyReview = Boolean(product.securityReviewedAt);
   const CardElement = listItem ? "div" : "article";
   const catalogImageSrc = product.media?.src.startsWith("/api/tool-images?")
