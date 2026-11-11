@@ -6,6 +6,7 @@ const source = readFileSync(new URL("./ChatRoom.tsx", import.meta.url), "utf8");
 const actions = readFileSync(new URL("./ChatMessageActions.tsx", import.meta.url), "utf8");
 const avatar = readFileSync(new URL("./ChatProfileAvatar.tsx", import.meta.url), "utf8");
 const styles = readFileSync(new URL("../../styles/redesign/chat.css", import.meta.url), "utf8");
+const globalStyles = readFileSync(new URL("../../app/globals.css", import.meta.url), "utf8");
 
 describe("chat room presentation", () => {
   it("keeps the animated background around both the member list and the chat window", () => {
@@ -50,6 +51,10 @@ describe("chat room presentation", () => {
     expect(styles).toMatch(/\.enhe-chat-room-shell\s*>\s*\.enhe-chat-hero\s*\{[^}]*border:\s*0[^}]*background:\s*transparent/);
     expect(styles).toMatch(/\.enhe-chat-room-shell\s+\.enhe-chat-hero-content\s*\{[^}]*display:\s*grid/);
     expect(styles).toMatch(/grid-template-columns:\s*minmax\(0,\s*2fr\)\s+minmax\(0,\s*1fr\)/);
+  });
+
+  it("keeps the room hero out of the global light-surface background reset", () => {
+    expect(globalStyles).toMatch(/:where\(html:not\(\.dark\)\) body :is\([\s\S]*?header:not\(\.enhe-chat-hero\)[\s\S]*?background-color:\s*#ffffff !important/);
   });
 
   it("gives compact controls consistent spacing and distinguishes quiet mode", () => {

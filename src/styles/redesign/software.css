@@ -648,19 +648,23 @@
   line-height: 1.2;
 }
 
-.tool-detail-offer-creator-grid {
+.tool-detail-product-layout {
   display: grid;
   gap: 24px;
   align-items: start;
 }
 
-.tool-detail-offer-creator-grid.has-creator {
+.tool-detail-product-layout.has-creator {
   grid-template-columns: minmax(0, 1fr);
 }
 
+.tool-detail-product-main {
+  min-width: 0;
+}
+
 .tool-detail-facts-grid {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
+  display: flex;
+  flex-direction: column;
   gap: 12px;
 }
 
@@ -670,6 +674,8 @@
 
 .product-supported-agents-card {
   min-width: 0;
+  min-height: 152px;
+  box-sizing: border-box;
   padding: 16px;
   border: 1px solid var(--enhe-border);
   border-radius: 12px;
@@ -715,6 +721,8 @@
 
 .product-refund-policy-card {
   display: flex;
+  min-height: 152px;
+  box-sizing: border-box;
   align-items: flex-start;
   gap: 10px;
   margin-top: 0;
@@ -757,16 +765,25 @@
   min-width: 0;
 }
 
+.tool-detail-payment-method-grid {
+  grid-template-columns: minmax(0, 1fr);
+  align-items: start;
+}
+
 .tool-detail-payment-method-control select {
   width: 100%;
 }
 
-.tool-detail-offer-creator-main {
+.tool-detail-purchase-submit {
+  width: 100%;
   min-width: 0;
+  justify-self: stretch;
 }
 
 .product-safety-info-card {
   min-width: 0;
+  min-height: 152px;
+  box-sizing: border-box;
   padding: 16px;
   border: 1px solid color-mix(in srgb, #00a875 24%, var(--enhe-border));
   border-radius: 12px;
@@ -809,6 +826,45 @@
   font-size: 12px;
   font-weight: 700;
   letter-spacing: 0.06em;
+}
+
+.creator-profile-content {
+  display: grid;
+  gap: 24px;
+}
+
+.creator-profile-author,
+.creator-profile-work-list {
+  min-width: 0;
+}
+
+.creator-profile-work-list ul {
+  display: grid;
+  gap: 10px;
+  margin-top: 12px;
+  padding: 0;
+  list-style: none;
+}
+
+.creator-profile-work-list li {
+  overflow-wrap: anywhere;
+}
+
+.creator-profile-work-list a {
+  color: var(--enhe-action-text, #0462c2);
+  text-decoration: none;
+}
+
+.creator-profile-work-list a:hover {
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.creator-profile-no-works {
+  margin-top: 12px;
+  color: var(--enhe-text-muted);
+  font-size: 13px;
+  line-height: 1.5;
 }
 
 .creator-profile-identity {
@@ -949,31 +1005,17 @@
 }
 
 @media (min-width: 1280px) {
-  .tool-detail-offer-creator-grid.has-creator {
-    grid-template-columns: minmax(0, 1fr) minmax(280px, 1fr);
+  .tool-detail-product-layout.has-creator {
+    grid-template-columns: minmax(0, 1.2fr) minmax(360px, 0.8fr);
   }
 
-  .creator-profile-card { margin-top: 12px; }
+  .creator-profile-content {
+    grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr);
+  }
 }
 
 @media (min-width: 640px) {
-  .tool-detail-payment-method-control {
-    width: calc(50% - 6px);
-  }
-}
-
-@media (min-width: 1100px) {
-  .tool-detail-facts-grid {
-    grid-template-columns: repeat(4, minmax(0, 1fr));
-  }
-
-  .tool-detail-facts-grid.has-refund {
-    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-  }
-}
-
-@media (max-width: 600px) {
-  .tool-detail-facts-grid {
-    grid-template-columns: minmax(0, 1fr);
+  .tool-detail-payment-method-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 }

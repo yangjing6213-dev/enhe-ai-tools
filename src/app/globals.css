@@ -5822,7 +5822,7 @@ select option:disabled {
   main,
   section,
   article,
-  header,
+  header:not(.enhe-chat-hero),
   nav,
   footer,
   [class*="page"],
@@ -5943,32 +5943,44 @@ select option:disabled {
 }
 
 /* Older account/order layouts share the same public brand colors. */
-:where(html:not(.dark)) body .site-footer,
-:where(html:not(.dark)) body .site-footer :is(nav, address, .site-footer-disclosure, .site-footer-social-link) {
+:where(html:not(.dark)) body .site-footer.site-footer,
+:where(html:not(.dark)) body .site-footer.site-footer :is(nav, address, .site-footer-disclosure, .site-footer-social-link) {
   background-color: #0D3A6D !important;
   color: #fff;
 }
 
-:where(html:not(.dark)) body .site-footer :is(a, p, span, dt, dd, summary, svg) {
+:where(html:not(.dark)) body .site-footer.site-footer :is(a, p, span, dt, dd, summary, svg) {
   color: #fff !important;
 }
 
-:where(html:not(.dark)) body .site-footer :is(a:hover, summary:hover) {
+:where(html:not(.dark)) body .site-footer.site-footer :is(a:hover, summary:hover) {
   background-color: transparent !important;
 }
 
-:where(html:not(.dark)) body .site-footer .site-footer-logo {
+:where(html:not(.dark)) body .site-footer.site-footer .site-footer-logo {
   filter: brightness(0) invert(1);
 }
 
-:where(html:not(.dark)) body .site-footer :is(.site-footer-bottom, .site-footer-filings) {
+:where(html:not(.dark)) body .site-footer.site-footer :is(.site-footer-bottom, .site-footer-filings) {
   justify-content: center;
   text-align: center;
 }
 
-:where(html:not(.dark)) body .site-footer a:focus-visible,
-:where(html:not(.dark)) body .site-footer summary:focus-visible {
+:where(html:not(.dark)) body .site-footer.site-footer a:focus-visible,
+:where(html:not(.dark)) body .site-footer.site-footer summary:focus-visible {
   outline-color: #fff;
+}
+
+/* The light-mode surface reset also matches footer and navigation elements.
+   Keep the redesigned production footer on its established brand background. */
+:where(html:not(.dark)) body .enhe-redesign-production .redesign-footer,
+:where(html:not(.dark)) body .enhe-redesign-production .redesign-footer nav {
+  background-color: #0D3A6D !important;
+  color: #fff !important;
+}
+
+:where(html:not(.dark)) body .enhe-redesign-production .redesign-footer :is(h3, p, a, summary) {
+  color: #fff !important;
 }
 
 :where(html:not(.dark)) body :is(.site-user-chip, .site-login-link, .site-language-switcher),

@@ -6,14 +6,18 @@ const mocks = vi.hoisted(() => ({
   getCurrentUser: vi.fn(),
   findTool: vi.fn(),
   findPurchase: vi.fn(),
+  findTools: vi.fn(async (_query?: unknown) => [] as Array<{ id: string; slug: string; name: string; englishName: string; type: string }>),
+  countCreatorProducts: vi.fn(async () => 0),
+  aggregateCreatorRating: vi.fn(async () => ({ _avg: { rating: null as number | null }, _count: { _all: 0 } })),
   createOrder: vi.fn(),
 }));
 
 vi.mock("@/lib/auth", () => ({ getCurrentUser: mocks.getCurrentUser }));
 vi.mock("@/lib/db", () => ({
   prisma: {
-    tool: { findUnique: mocks.findTool, findMany: vi.fn(async () => []) },
+    tool: { findUnique: mocks.findTool, findMany: mocks.findTools, count: mocks.countCreatorProducts },
     toolPurchase: { findUnique: mocks.findPurchase },
+    comment: { aggregate: mocks.aggregateCreatorRating },
     aiWorkflowVersionPurchase: { findFirst: vi.fn(async () => null) },
   },
 }));
@@ -24,6 +28,7 @@ vi.mock("@/app/actions", () => ({
   createCommentAction: vi.fn(),
   deletePublicCommentAction: vi.fn(),
   createSoftwareDownloadOrderAction: mocks.createOrder,
+  sendCreatorMessageAction: vi.fn(),
 }));
 vi.mock("next/navigation", () => ({
   notFound: () => { throw new Error("NEXT_NOT_FOUND"); },
@@ -117,7 +122,7 @@ describe.each(["zh", "en"] as const)("%s product purchase login return", (locale
     const html = renderToStaticMarkup(panel);
 
     expect(html).toContain(`href="${localePrefix}/login?returnTo=${encodeURIComponent(returnTo)}"`);
-    expect(html).toContain(locale === "en" ? "Sign in to purchase" : "登录后购买");
+    expect(html).toContain(locale === "en" ? "Click to purchase" : "点击购买");
     expect(html).toContain(`id="${panelId}"`);
     expect(html).toContain("¥29.00");
     expect(html).not.toContain('data-analytics-event="begin_checkout"');
@@ -150,5 +155,76 @@ describe.each(["zh", "en"] as const)("%s product purchase login return", (locale
 
     expect(html).not.toContain("703");
     expect(html).not.toMatch(/下载次数|download count/i);
+  });
+
+  it("shows creator identity and the five latest published works beside product support cards", async () => {
+    const works = Array.from({ length: 5 }, (_, index) => ({
+      id: `work-${index + 1}`,
+      slug: `recent-work-${index + 1}`,
+      name: `最新作品 ${index + 1}`,
+      englishName: `Recent work ${index + 1}`,
+      type: "software",
+    }));
+    mocks.getCurrentUser.mockResolvedValue(null);
+    mocks.findTool.mockResolvedValue({
+      ...toolFixture("software"),
+      creator: { id: "creator-1", nickname: "作者示例", avatar: null, creatorBio: "创作者简介" },
+      securityReviewedAt: new Date("2026-11-11T00:00:00.000Z"),
+      supportedAgents: ["Codex", "Cursor"],
+    });
+    mocks.countCreatorProducts.mockResolvedValue(8);
+    mocks.aggregateCreatorRating.mockResolvedValue({ _avg: { rating: 5 }, _count: { _all: 3 } });
+    mocks.findTools.mockImplementation(async (query) =>
+      (query as { where?: { creatorId?: string } } | undefined)?.where?.creatorId ? works : [],
+    );
+
+    const page = await ToolDetailPageShell({ slug: "purchase-fixture", forceLocale: "zh", expectedType: "software" });
+    const html = renderToStaticMarkup(page);
+    const agentsIndex = html.indexOf('aria-label="适用 AI 智能体"');
+    const safetyIndex = html.indexOf("信任与安全");
+    const refundIndex = html.indexOf("退款保障");
+
+    expect(html).toContain('class="tool-detail-product-layout has-creator"');
+    expect(agentsIndex).toBeGreaterThan(-1);
+    expect(agentsIndex).toBeLessThan(safetyIndex);
+    expect(safetyIndex).toBeLessThan(refundIndex);
+    expect(html).toContain("作者示例");
+    expect(html).toContain("共 8 个已发布作品");
+    for (const work of works) expect(html).toContain(work.name);
+    expect(mocks.findTools).toHaveBeenCalledWith(expect.objectContaining({
+      where: expect.objectContaining({ creatorId: "creator-1", status: "published" }),
+      orderBy: { createdAt: "desc" },
+      take: 5,
+    }));
+  });
+
+  it("uses a consistent half-width payment selector and purchase button for paid downloads", async () => {
+    mocks.getCurrentUser.mockResolvedValue({ id: "user-1", role: "user" });
+    mocks.findTool.mockResolvedValue({ ...toolFixture("software"), creator: null });
+    const page = await ToolDetailPageShell({ slug: "purchase-fixture", forceLocale: "zh", expectedType: "software" });
+    const panel = elements(page).find((element) => element.props.id === "tool-purchase");
+    const html = renderToStaticMarkup(panel);
+
+    expect(html).toContain("点击购买");
+    expect(html).toContain("选择支付方式，支付成功后系统会自动解锁该工具的下载链接内容。");
+    expect(html).toContain("tool-detail-purchase-submit");
+  });
+
+  it("omits the refund card for free products while keeping creator layout", async () => {
+    mocks.findTool.mockResolvedValue({
+      ...toolFixture("ai_skill"),
+      isDownloadPaid: false,
+      downloadPrice: 0,
+      priceSpecs: [],
+      creator: { id: "creator-1", nickname: "作者示例", avatar: null, creatorBio: "创作者简介" },
+      supportedAgents: ["Codex"],
+    });
+
+    const page = await ToolDetailPageShell({ slug: "purchase-fixture", forceLocale: "zh", expectedType: "ai_skill" });
+    const html = renderToStaticMarkup(page);
+
+    expect(html).toContain('class="tool-detail-product-layout has-creator"');
+    expect(html).toContain("适用 AI 智能体");
+    expect(html).not.toContain("退款保障");
   });
 });

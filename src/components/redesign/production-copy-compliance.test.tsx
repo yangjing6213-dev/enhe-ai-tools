@@ -122,7 +122,7 @@ describe("ENHE Phase 2C.1.2 production copy compliance", () => {
     expect(html).not.toContain("回到顶部");
     expect(html).not.toContain("footer-back-to-top");
     expect(readSource("components/redesign/enhe-redesign-header.tsx")).toContain('id="top"');
-    expect(readSource("styles/redesign/site-refresh.css")).toMatch(/\.redesign-brand-mark\s*\{[^}]*width:\s*154px/);
+    expect(readSource("styles/redesign/site-refresh.css")).toMatch(/\.redesign-brand-mark\s*\{[^}]*width:\s*200px/);
   });
 
   it("removes the shared tagline beneath the logo", () => {

@@ -279,9 +279,15 @@ export async function ToolDetailPageShell({
   const productCreator = tool.type === "software" || tool.type === "ai_skill" ? tool.creator : null;
   const creatorProfile = productCreator
     ? await (async () => {
-        const [productCount, rating, avatarSrc] = await Promise.all([
+        const [productCount, latestProducts, rating, avatarSrc] = await Promise.all([
           prisma.tool.count({
             where: { creatorId: productCreator.id, type: { in: ["software", "ai_skill"] }, status: "published" },
+          }),
+          prisma.tool.findMany({
+            where: { creatorId: productCreator.id, type: { in: ["software", "ai_skill"] }, status: "published" },
+            orderBy: { createdAt: "desc" },
+            take: 5,
+            select: { id: true, slug: true, name: true, englishName: true, type: true },
           }),
           prisma.comment.aggregate({
             where: {
@@ -297,6 +303,7 @@ export async function ToolDetailPageShell({
         return {
           creator: productCreator,
           productCount,
+          latestProducts,
           ratingAverage: rating._avg.rating == null ? null : Number(rating._avg.rating),
           ratingCount: rating._count._all,
           avatarSrc,
@@ -620,6 +627,7 @@ export async function ToolDetailPageShell({
         : servicePrice > 0
           ? td.buyDownload.replace("{price}", Number(servicePrice).toFixed(2))
           : freeDownloadButtonLabel;
+  const checkoutButtonLabel = forceLocale === "en" ? "Click to purchase" : "点击购买";
   const workflowDetailsTitle = forceLocale === "en" ? "AI workflow details" : "AI 工作流详情";
   const introTitle = isAiWorkflow
     ? forceLocale === "en" ? "Workflow introduction" : "工作流介绍"
@@ -901,7 +909,8 @@ export async function ToolDetailPageShell({
             </div>
 
             <div className="tool-detail-main-content flex min-w-0 flex-col gap-7">
-              <div>
+              <div className={`tool-detail-product-layout${creatorProfile ? " has-creator" : ""}`}>
+                <div className="tool-detail-product-main">
                 <div className={`tool-detail-facts-grid mt-6${hasRefundPolicy ? " has-refund" : ""}`}>
                   {isAccountService ? (
                     <>
@@ -941,6 +950,9 @@ export async function ToolDetailPageShell({
                           />
                         </>
                       ) : null}
+                      {tool.supportedAgents.length ? (
+                        <SupportedAgentsCard agents={tool.supportedAgents} locale={forceLocale} />
+                      ) : null}
                       {isDownloadProduct && tool.securityReviewedAt ? (
                         <div className="product-safety-info-card">
                           <p className="text-xs text-[#8F9DB2]">{forceLocale === "en" ? "TRUST & SAFETY" : "信任与安全"}</p>
@@ -959,9 +971,6 @@ export async function ToolDetailPageShell({
                         </div>
                       ) : null}
                       {refundPolicyCard}
-                      {tool.supportedAgents.length ? (
-                        <SupportedAgentsCard agents={tool.supportedAgents} locale={forceLocale} />
-                      ) : null}
                       {visibleUsageMetric ? (
                         <Info
                           label={td.usageCount}
@@ -981,8 +990,6 @@ export async function ToolDetailPageShell({
                   </p>
                 ) : null}
 
-                <div className={`tool-detail-offer-creator-grid${creatorProfile ? " has-creator" : ""}`}>
-                <div className="tool-detail-offer-creator-main">
                 {localizedPriceSpecs.length &&
                 !shouldShowPurchaseForm &&
                 (isAccountService ||
@@ -1118,14 +1125,18 @@ export async function ToolDetailPageShell({
                             id={paymentMethodHelpId}
                             className="tool-detail-payment-help mt-2 text-xs leading-5 text-[#8F9DB2]"
                           >
-                            {forceLocale === "en"
-                              ? "Choose the method you will use on the payment page."
-                              : "请选择后续付款页面实际使用的支付方式。"}
+                            {isDownloadProduct
+                              ? forceLocale === "en"
+                                ? "Choose a payment method. After payment, this product's download link will unlock automatically."
+                                : "选择支付方式，支付成功后系统会自动解锁该工具的下载链接内容。"
+                              : forceLocale === "en"
+                                ? "Choose the method you will use on the payment page."
+                                : "请选择后续付款页面实际使用的支付方式。"}
                           </p>
                         </div>
                         {user ? (
                           <FormSubmitButton
-                            className="w-full sm:w-auto sm:justify-self-start"
+                            className="tool-detail-purchase-submit"
                             data-analytics-event="product_purchase_cta_click"
                             data-analytics-entity-type="tool"
                             data-analytics-entity-id={tool.id}
@@ -1135,17 +1146,17 @@ export async function ToolDetailPageShell({
                                 : "生成支付二维码中..."
                             }
                           >
-                            {purchaseButtonLabel}
+                            {checkoutButtonLabel}
                           </FormSubmitButton>
                         ) : (
                           <ButtonLink
                             href={purchaseLoginHref}
-                            className="w-full sm:w-auto sm:justify-self-start"
+                            className="tool-detail-purchase-submit"
                             data-analytics-event="product_purchase_cta_click"
                             data-analytics-entity-type="tool"
                             data-analytics-entity-id={tool.id}
                           >
-                            {forceLocale === "en" ? "Sign in to purchase" : "登录后购买"}
+                            {checkoutButtonLabel}
                           </ButtonLink>
                         )}
                       </div>
@@ -1195,7 +1206,7 @@ export async function ToolDetailPageShell({
                   ) : null}
                 </div>
 
-                {isDownloadProduct && tool.isDownloadPaid ? (
+                {isDownloadProduct && tool.isDownloadPaid && !shouldShowPurchaseForm ? (
                   <p className="mt-4 text-sm leading-6 text-[#FFB86B]">
                     {isAiSkill
                       ? forceLocale === "en"
@@ -1216,43 +1227,65 @@ export async function ToolDetailPageShell({
               {creatorProfile ? (
                 <aside className="creator-profile-card" aria-label={forceLocale === "en" ? "Creator information" : "创作者信息"}>
                   <p className="creator-profile-eyebrow">CREATOR</p>
-                  <div className="creator-profile-identity">
-                    <UserAvatar
-                      src={creatorProfile.avatarSrc}
-                      alt={creatorProfile.creator.nickname?.trim() || (forceLocale === "en" ? "ENHE creator" : "ENHE 创作者")}
-                      fallbackSeed={creatorProfile.creator.id}
-                      size={48}
-                      className="creator-profile-avatar"
-                    />
-                    <div className="min-w-0">
-                      <p className="creator-profile-name">{creatorProfile.creator.nickname?.trim() || (forceLocale === "en" ? "ENHE creator" : "ENHE 创作者")}</p>
-                      {creatorProfile.ratingAverage !== null && creatorProfile.ratingCount > 0 ? (
-                        <p className="creator-profile-rating" aria-label={`${creatorProfile.ratingAverage.toFixed(1)} / 5`}>
-                          <Star size={16} fill="currentColor" aria-hidden="true" />
-                          <span>{creatorProfile.ratingAverage.toFixed(1)}</span>
-                          <span className="creator-profile-rating-count">({creatorProfile.ratingCount})</span>
-                        </p>
+                  <div className="creator-profile-content">
+                    <div className="creator-profile-author">
+                      <div className="creator-profile-identity">
+                        <UserAvatar
+                          src={creatorProfile.avatarSrc}
+                          alt={creatorProfile.creator.nickname?.trim() || (forceLocale === "en" ? "ENHE creator" : "ENHE 创作者")}
+                          fallbackSeed={creatorProfile.creator.id}
+                          size={48}
+                          className="creator-profile-avatar"
+                        />
+                        <div className="min-w-0">
+                          <p className="creator-profile-name">{creatorProfile.creator.nickname?.trim() || (forceLocale === "en" ? "ENHE creator" : "ENHE 创作者")}</p>
+                          {creatorProfile.ratingAverage !== null && creatorProfile.ratingCount > 0 ? (
+                            <p className="creator-profile-rating" aria-label={`${creatorProfile.ratingAverage.toFixed(1)} / 5`}>
+                              <Star size={16} fill="currentColor" aria-hidden="true" />
+                              <span>{creatorProfile.ratingAverage.toFixed(1)}</span>
+                              <span className="creator-profile-rating-count">({creatorProfile.ratingCount})</span>
+                            </p>
+                          ) : (
+                            <p className="creator-profile-rating-empty">{forceLocale === "en" ? "No ratings yet" : "暂无评分"}</p>
+                          )}
+                        </div>
+                      </div>
+                      <p className="creator-profile-bio">
+                        {creatorProfile.creator.creatorBio?.trim() || (forceLocale === "en" ? "The creator has not added a bio yet." : "创作者暂未填写个人简介。")}
+                      </p>
+                      <CreatorContactForm
+                        creatorId={creatorProfile.creator.id}
+                        currentUserId={user?.id ?? null}
+                        toolId={tool.id}
+                        returnTo={buildCanonicalToolPath(tool, forceLocale)}
+                        locale={forceLocale}
+                      />
+                    </div>
+                    <div className="creator-profile-work-list">
+                      <p className="creator-profile-products">
+                        {forceLocale === "en"
+                          ? `${creatorProfile.productCount} published works`
+                          : `共 ${creatorProfile.productCount} 个已发布作品`}
+                      </p>
+                      {creatorProfile.latestProducts.length ? (
+                        <ul>
+                          {creatorProfile.latestProducts.map((work) => (
+                            <li key={work.id}>
+                              <Link href={buildCanonicalToolPath(work, forceLocale)}>
+                                {resolveLocalizedToolIdentity(work, forceLocale).primaryName}
+                              </Link>
+                            </li>
+                          ))}
+                        </ul>
                       ) : (
-                        <p className="creator-profile-rating-empty">{forceLocale === "en" ? "No ratings yet" : "暂无评分"}</p>
+                        <p className="creator-profile-no-works">
+                          {forceLocale === "en" ? "No published works yet." : "暂无已发布作品。"}
+                        </p>
                       )}
                     </div>
                   </div>
-                  <p className="creator-profile-bio">
-                    {creatorProfile.creator.creatorBio?.trim() || (forceLocale === "en" ? "The creator has not added a bio yet." : "创作者暂未填写个人简介。")}
-                  </p>
-                  <p className="creator-profile-products">
-                    {creatorProfile.productCount} {forceLocale === "en" ? "published products" : "个已发布产品"}
-                  </p>
-                  <CreatorContactForm
-                    creatorId={creatorProfile.creator.id}
-                    currentUserId={user?.id ?? null}
-                    toolId={tool.id}
-                    returnTo={buildCanonicalToolPath(tool, forceLocale)}
-                    locale={forceLocale}
-                  />
                 </aside>
               ) : null}
-              </div>
               </div>
 
             </div>
@@ -1738,8 +1771,8 @@ const supportedAgentFallbackIcons: Record<string, LucideIcon> = {
 
 function SupportedAgentsCard({ agents, locale }: { agents: string[]; locale: Locale }) {
   return (
-    <section className="product-supported-agents-card" aria-label={locale === "en" ? "Supported AI agents" : "适用 AI 代理"}>
-      <p className="product-supported-agents-title">{locale === "en" ? "WORKS WITH THESE AI AGENTS" : "适用 AI 代理"}</p>
+    <section className="product-supported-agents-card" aria-label={locale === "en" ? "Supported AI agents" : "适用 AI 智能体"}>
+      <p className="product-supported-agents-title">{locale === "en" ? "WORKS WITH THESE AI AGENTS" : "适用 AI 智能体"}</p>
       <div className="product-supported-agents-list">
         {agents.map((agentValue) => {
           const normalizedAgent = agentValue.trim().toLowerCase();

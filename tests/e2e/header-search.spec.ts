@@ -63,7 +63,7 @@ test("public header replaces the search link, opens recommendations, and submits
         const box = (selector: string) => el.querySelector(selector)!.getBoundingClientRect().toJSON();
         return { logo: box(".redesign-brand-mark"), search: box(".redesign-header-search"), nav: box(".redesign-desktop-nav"), scrollWidth: document.documentElement.scrollWidth };
       });
-      expect(layout.logo.width).toBe(width < 420 ? 120 : 154);
+      expect(layout.logo.width).toBe(width < 360 ? width - 200 : width < 420 ? 156 : 200);
       expect(layout.scrollWidth).toBeLessThanOrEqual(width);
       const searchRatio = await input.evaluate((element) => {
         const form = element.closest(".redesign-header-search")!;

@@ -87,7 +87,7 @@ test("homepage polish stays readable, responsive, and interactive without extern
     expect(heroColor).toBe(expectedNeutralTextColor);
     expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBeLessThanOrEqual(width);
 
-    expect((await brand.boundingBox())?.width).toBe(width < 420 ? 120 : 154);
+    expect((await brand.boundingBox())?.width).toBe(width < 360 ? width - 200 : width < 420 ? 156 : 200);
 
     if (width < 768) {
       const layout = await page.locator(".redesign-header-inner").evaluate((inner) => {

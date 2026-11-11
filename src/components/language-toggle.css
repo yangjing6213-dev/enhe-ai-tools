@@ -49,9 +49,13 @@
   .redesign-header .redesign-nav-link { padding-inline: 2px; }
   .redesign-header .redesign-login-link { padding-inline: 4px; }
 }
-@media (width < 420px) {
-  .redesign-header .redesign-header-inner { grid-template-columns: 120px minmax(0, 1fr); }
-  .redesign-header :is(.redesign-brand-region, .redesign-brand-lockup, .redesign-brand-mark) { width: 120px; }
+@media (360px <= width < 420px) {
+  .redesign-header .redesign-header-inner { grid-template-columns: 156px minmax(0, 1fr); }
+  .redesign-header :is(.redesign-brand-region, .redesign-brand-lockup, .redesign-brand-mark) { width: 156px; }
+}
+@media (width < 360px) {
+  .redesign-header .redesign-header-inner { grid-template-columns: minmax(0, calc(100vw - 200px)) minmax(0, 1fr); }
+  .redesign-header :is(.redesign-brand-region, .redesign-brand-lockup, .redesign-brand-mark) { width: min(156px, calc(100vw - 200px)); }
 }
 @media (prefers-reduced-motion: reduce) {
   .enhe-language-toggle .squish-switch__thumb { transform: translateX(var(--ss-inset)) !important; }

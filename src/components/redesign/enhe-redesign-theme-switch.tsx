@@ -34,6 +34,7 @@ export function EnheRedesignThemeSwitch({ locale }: { locale: RedesignLocale }) 
           className="redesign-theme-switch"
           aria-label="Change theme"
           title={locale === "en" ? "Change theme" : "切换主题"}
+          data-hydrated={mounted ? "true" : "false"}
         >
           <SelectedIcon size={18} aria-hidden="true" />
         </button>

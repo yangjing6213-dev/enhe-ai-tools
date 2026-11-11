@@ -168,7 +168,7 @@
 .redesign-header-inner {
   width: min(100% - 48px, 1560px);
   display: grid;
-  grid-template-columns: 154px minmax(220px, 1fr) auto;
+  grid-template-columns: 200px minmax(220px, 1fr) auto;
   gap: 16px;
   padding-block: 12px;
 }
@@ -179,7 +179,7 @@
 }
 
 .redesign-brand-lockup {
-  width: 154px;
+  width: 200px;
   min-height: 48px;
   gap: 0;
   font-size: 0;
@@ -187,14 +187,14 @@
 }
 
 .redesign-brand-mark {
-  width: 154px;
+  width: 200px;
   height: auto;
   filter: none;
   object-fit: contain;
 }
 
 .redesign-brand-region {
-  width: 154px;
+  width: 200px;
   min-width: 0;
 }
 
@@ -386,7 +386,7 @@
 
 @media (width < 1280px) {
   .redesign-header-inner {
-    grid-template-columns: 154px minmax(0, 1fr);
+    grid-template-columns: 200px minmax(0, 1fr);
     gap: 10px 16px;
   }
 

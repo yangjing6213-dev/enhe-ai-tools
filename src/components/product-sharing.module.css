@@ -1,5 +1,5 @@
 .card {
-  padding: clamp(24px, 4vw, 40px);
+  padding: 28px;
 }
 
 .card h2 {
@@ -7,7 +7,7 @@
   font-size: 1.875rem;
   font-weight: 900;
   letter-spacing: normal;
-  line-height: 1.15;
+  line-height: 1.1;
 }
 
 @media (min-width: 768px) {

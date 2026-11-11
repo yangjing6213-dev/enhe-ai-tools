@@ -27,6 +27,20 @@ describe("sitewide color mode contract", () => {
     expect(asciiText).toContain("color: #000000;");
   });
 
+  it("preserves the branded footer color through the light-mode surface reset", () => {
+    const css = read("src/app/globals.css");
+    const legacyFooterOverride = css.match(
+      /:where\(html:not\(\.dark\)\) body \.site-footer\.site-footer,[\s\S]*?\{([^}]*)\}/,
+    )?.[1] ?? "";
+    const redesignedFooterOverride = css.match(
+      /:where\(html:not\(\.dark\)\) body \.enhe-redesign-production \.redesign-footer,[\s\S]*?\{([^}]*)\}/,
+    )?.[1] ?? "";
+
+    expect(legacyFooterOverride).toContain("background-color: #0D3A6D !important;");
+    expect(redesignedFooterOverride).toContain("background-color: #0D3A6D !important;");
+    expect(redesignedFooterOverride).toContain("color: #fff !important;");
+  });
+
   it("defaults to the operating system and exposes the theme menu after language selection", () => {
     const provider = read("src/components/site-theme-provider.tsx");
     expect(provider).toContain('defaultTheme="system"');
