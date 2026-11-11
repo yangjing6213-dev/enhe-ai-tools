@@ -33,12 +33,15 @@ test("public header replaces the search link, opens recommendations, and submits
       await expect(footer.locator(".redesign-home-brand-value")).toHaveCSS("background-color", "rgba(0, 0, 0, 0)");
       await expect(footer.locator(".footer-navigation")).toHaveCSS("justify-content", width < 768 ? "center" : "flex-end");
       if (width >= 1280) {
-        const logoPositionError = await footer.evaluate((element) => {
+        const footerAlignment = await footer.evaluate((element) => {
           const logo = element.querySelector<HTMLElement>(".footer-brand-logo")!.getBoundingClientRect();
-          const grid = element.querySelector<HTMLElement>(".footer-grid")!.getBoundingClientRect();
-          return Math.abs(logo.top + logo.height / 2 - (grid.top + grid.height / 2) - logo.height * 0.1);
+          const social = element.querySelector<HTMLElement>(".footer-social-links")!.getBoundingClientRect();
+          const copyright = element.querySelector<HTMLElement>(".footer-copyright-filings")!.getBoundingClientRect();
+          const menus = element.querySelector<HTMLElement>(".footer-navigation")!.getBoundingClientRect();
+          return { logoGap: social.top - logo.bottom, rowCenterError: Math.abs(copyright.top + copyright.height / 2 - menus.top - menus.height / 2) };
         });
-        expect(logoPositionError).toBeLessThanOrEqual(1);
+        expect(footerAlignment.logoGap).toBeGreaterThanOrEqual(24);
+        expect(footerAlignment.rowCenterError).toBeLessThanOrEqual(1);
         const layout = await footer.evaluate((element) => {
           const logo = element.querySelector(".footer-brand-logo")!.getBoundingClientRect();
           const value = element.querySelector(".redesign-home-brand-value")!.getBoundingClientRect();

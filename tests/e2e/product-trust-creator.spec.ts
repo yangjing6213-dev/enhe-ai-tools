@@ -59,6 +59,7 @@ test.describe("product trust and creator contact", () => {
       if (toolId) {
         await prisma.adminAuditLog.deleteMany({ where: { targetId: toolId } });
         await prisma.comment.deleteMany({ where: { toolId } });
+        await prisma.toolPriceSpec.deleteMany({ where: { toolId } });
         await prisma.tool.deleteMany({ where: { id: toolId } });
       }
       const ids = [adminId, viewerId].filter(Boolean);
@@ -105,13 +106,43 @@ test.describe("product trust and creator contact", () => {
     }
 
     await page.setViewportSize({ width: 1440, height: 1000 });
-    const offer = await page.locator(".tool-detail-offer-creator-main").boundingBox();
+    const facts = await page.locator(".tool-detail-facts-grid").boundingBox();
     const creator = await page.locator(".creator-profile-card").boundingBox();
-    expect(creator!.x).toBeGreaterThanOrEqual(offer!.x + offer!.width);
-    await page.locator(".tool-detail-offer-creator-grid").screenshot({ path: testInfo.outputPath("creator-desktop.png") });
+    expect(creator!.x).toBeGreaterThanOrEqual(facts!.x + facts!.width);
+    expect(creator!.width).toBeGreaterThan(facts!.width);
+    expect(Math.abs(creator!.y - facts!.y)).toBeLessThanOrEqual(1);
+    expect(Math.abs(creator!.height - facts!.height)).toBeLessThanOrEqual(1);
+    const workNameFont = await page.locator(".creator-profile-work-list a").first().evaluate(element => getComputedStyle(element).fontSize);
+    const workCountFont = await page.locator(".creator-profile-products").evaluate(element => getComputedStyle(element).fontSize);
+    expect(workNameFont).toBe(workCountFont);
+    await expect(page.locator(".product-refund-policy-card")).toHaveCount(0);
+    await page.locator(".tool-detail-product-layout").screenshot({ path: testInfo.outputPath("creator-desktop.png") });
     await page.setViewportSize({ width: 390, height: 844 });
     expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
     await page.locator(".creator-profile-card").screenshot({ path: testInfo.outputPath("creator-mobile.png") });
+
+    await prisma.tool.update({ where: { id: toolId }, data: {
+      isDownloadPaid: true, downloadPrice: 5, supportedAgents: ["Codex", "Cursor"],
+    } });
+    for (const { prefix, width } of ["", "/en"].flatMap(prefix => [1440, 390].map(width => ({ prefix, width })))) {
+      await page.setViewportSize({ width, height: 1000 });
+      await page.goto(`${prefix}/software/${slug}`);
+      await expect(page.locator(".product-refund-policy-card")).toBeVisible();
+      const payment = await page.locator("#tool-purchase-payment-method").boundingBox();
+      const purchase = await page.locator(".tool-detail-purchase-submit").boundingBox();
+      expect(Math.abs(payment!.x - purchase!.x)).toBeLessThanOrEqual(1);
+      expect(Math.abs(payment!.width - purchase!.width)).toBeLessThanOrEqual(1);
+      expect(purchase!.y).toBeGreaterThan(payment!.y + payment!.height);
+      expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
+      if (width === 1440) {
+        const paidFacts = await page.locator(".tool-detail-facts-grid").boundingBox();
+        const paidCreator = await page.locator(".creator-profile-card").boundingBox();
+        expect(Math.abs(paidFacts!.y - paidCreator!.y)).toBeLessThanOrEqual(1);
+        expect(Math.abs(paidFacts!.height - paidCreator!.height)).toBeLessThanOrEqual(1);
+        await page.locator(".tool-detail-product-layout").screenshot({ path: testInfo.outputPath(`paid-creator-${prefix ? "en" : "zh"}.png`) });
+      }
+      await page.locator("#tool-purchase").screenshot({ path: testInfo.outputPath(`purchase-${prefix ? "en" : "zh"}-${width}.png`) });
+    }
 
     await context.clearCookies();
     await login(page, viewerEmail);

@@ -191,6 +191,8 @@
   height: auto;
   filter: none;
   object-fit: contain;
+  /* Align the lettering inside the transparent GIF with the search control. */
+  transform: translateY(-7.5%);
 }
 
 .redesign-brand-region {
@@ -1170,7 +1172,7 @@ body .redesign-footer nav {
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 16px;
+  gap: 24px;
   transform: translateX(-20%);
 }
 
@@ -1189,7 +1191,7 @@ body .redesign-footer nav {
 
   .redesign-footer .footer-brand-logo {
     position: absolute;
-    inset-block-start: 50%;
+    inset-block-start: 30%;
     inset-inline-start: 20%;
     transform: translateY(-40%);
   }
@@ -1252,6 +1254,18 @@ body .redesign-footer nav {
 
 .footer-navigation .footer-group-trigger {
   white-space: nowrap;
+}
+
+.footer-navigation .footer-group-trigger h3 {
+  margin: 0;
+  font-size: 13px;
+  letter-spacing: 0.04em;
+}
+
+.footer-navigation a {
+  display: flex;
+  align-items: center;
+  font-size: 14px;
 }
 
 .redesign-footer .redesign-home-brand-value {
@@ -1843,6 +1857,9 @@ body .customer-support-widget .customer-support-launcher,
 .redesign-footer .footer-bottom {
   margin-top: 0;
   padding-top: 6px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
 }
 
 @media (width >= 1280px) {
@@ -1852,7 +1869,25 @@ body .customer-support-widget .customer-support-launcher,
   }
 
   .redesign-footer .footer-grid {
-    min-height: 176px;
+    min-height: 164px;
+  }
+
+  .redesign-footer .footer-bottom {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    align-items: center;
+    column-gap: 32px;
+  }
+
+  .redesign-footer .footer-copyright-filings {
+    grid-column: 2;
+    grid-row: 1;
+  }
+
+  .redesign-footer .footer-navigation {
+    grid-column: 3;
+    grid-row: 1;
+    gap: 16px;
   }
 }
 

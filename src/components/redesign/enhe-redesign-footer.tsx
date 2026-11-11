@@ -128,6 +128,8 @@ export function EnheRedesignFooter({
             </nav>
           </div>
           <EnheRedesignBrandValue locale={locale} />
+        </div>
+        <div className="footer-bottom">
           <div className="footer-navigation">
             {copy.columns.map((column) => (
               <nav key={column.title} aria-label={column.title}>
@@ -147,8 +149,6 @@ export function EnheRedesignFooter({
               </nav>
             ))}
           </div>
-        </div>
-        <div className="footer-bottom">
           <p className="footer-copyright-filings">
             <span>{copy.copyright}</span>
             {filingEntries.map((entry, index) => (

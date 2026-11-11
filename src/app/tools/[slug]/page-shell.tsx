@@ -911,7 +911,7 @@ export async function ToolDetailPageShell({
             <div className="tool-detail-main-content flex min-w-0 flex-col gap-7">
               <div className={`tool-detail-product-layout${creatorProfile ? " has-creator" : ""}`}>
                 <div className="tool-detail-product-main">
-                <div className={`tool-detail-facts-grid mt-6${hasRefundPolicy ? " has-refund" : ""}`}>
+                <div className={`tool-detail-facts-grid${hasRefundPolicy ? " has-refund" : ""}`}>
                   {isAccountService ? (
                     <>
                       <Info
@@ -982,6 +982,71 @@ export async function ToolDetailPageShell({
                   )}
                 </div>
 
+              </div>
+              {creatorProfile ? (
+                <aside className="creator-profile-card" aria-label={forceLocale === "en" ? "Creator information" : "创作者信息"}>
+                  <p className="creator-profile-eyebrow">CREATOR</p>
+                  <div className="creator-profile-content">
+                    <div className="creator-profile-author">
+                      <div className="creator-profile-identity">
+                        <UserAvatar
+                          src={creatorProfile.avatarSrc}
+                          alt={creatorProfile.creator.nickname?.trim() || (forceLocale === "en" ? "ENHE creator" : "ENHE 创作者")}
+                          fallbackSeed={creatorProfile.creator.id}
+                          size={48}
+                          className="creator-profile-avatar"
+                        />
+                        <div className="min-w-0">
+                          <p className="creator-profile-name">{creatorProfile.creator.nickname?.trim() || (forceLocale === "en" ? "ENHE creator" : "ENHE 创作者")}</p>
+                          {creatorProfile.ratingAverage !== null && creatorProfile.ratingCount > 0 ? (
+                            <p className="creator-profile-rating" aria-label={`${creatorProfile.ratingAverage.toFixed(1)} / 5`}>
+                              <Star size={16} fill="currentColor" aria-hidden="true" />
+                              <span>{creatorProfile.ratingAverage.toFixed(1)}</span>
+                              <span className="creator-profile-rating-count">({creatorProfile.ratingCount})</span>
+                            </p>
+                          ) : (
+                            <p className="creator-profile-rating-empty">{forceLocale === "en" ? "No ratings yet" : "暂无评分"}</p>
+                          )}
+                        </div>
+                      </div>
+                      <p className="creator-profile-bio">
+                        {creatorProfile.creator.creatorBio?.trim() || (forceLocale === "en" ? "The creator has not added a bio yet." : "创作者暂未填写个人简介。")}
+                      </p>
+                      <CreatorContactForm
+                        creatorId={creatorProfile.creator.id}
+                        currentUserId={user?.id ?? null}
+                        toolId={tool.id}
+                        returnTo={buildCanonicalToolPath(tool, forceLocale)}
+                        locale={forceLocale}
+                      />
+                    </div>
+                    <div className="creator-profile-work-list">
+                      <p className="creator-profile-products">
+                        {forceLocale === "en"
+                          ? `${creatorProfile.productCount} published works`
+                          : `共 ${creatorProfile.productCount} 个已发布作品`}
+                      </p>
+                      {creatorProfile.latestProducts.length ? (
+                        <ul>
+                          {creatorProfile.latestProducts.map((work) => (
+                            <li key={work.id}>
+                              <Link href={buildCanonicalToolPath(work, forceLocale)}>
+                                {resolveLocalizedToolIdentity(work, forceLocale).primaryName}
+                              </Link>
+                            </li>
+                          ))}
+                        </ul>
+                      ) : (
+                        <p className="creator-profile-no-works">
+                          {forceLocale === "en" ? "No published works yet." : "暂无已发布作品。"}
+                        </p>
+                      )}
+                    </div>
+                  </div>
+                </aside>
+              ) : null}
+              </div>
+              <div className="tool-detail-purchase-content">
                 {isAiWorkflow && tool.aiWorkflowCandidate?.status === "published" ? (
                   <p className="mt-3 text-xs leading-5 text-[#8F9DB2]">
                     {forceLocale === "en"
@@ -1223,69 +1288,6 @@ export async function ToolDetailPageShell({
                       : "该账号服务为付费服务，支付成功后系统会自动解锁该服务的使用权限。"}
                   </p>
                 ) : null}
-              </div>
-              {creatorProfile ? (
-                <aside className="creator-profile-card" aria-label={forceLocale === "en" ? "Creator information" : "创作者信息"}>
-                  <p className="creator-profile-eyebrow">CREATOR</p>
-                  <div className="creator-profile-content">
-                    <div className="creator-profile-author">
-                      <div className="creator-profile-identity">
-                        <UserAvatar
-                          src={creatorProfile.avatarSrc}
-                          alt={creatorProfile.creator.nickname?.trim() || (forceLocale === "en" ? "ENHE creator" : "ENHE 创作者")}
-                          fallbackSeed={creatorProfile.creator.id}
-                          size={48}
-                          className="creator-profile-avatar"
-                        />
-                        <div className="min-w-0">
-                          <p className="creator-profile-name">{creatorProfile.creator.nickname?.trim() || (forceLocale === "en" ? "ENHE creator" : "ENHE 创作者")}</p>
-                          {creatorProfile.ratingAverage !== null && creatorProfile.ratingCount > 0 ? (
-                            <p className="creator-profile-rating" aria-label={`${creatorProfile.ratingAverage.toFixed(1)} / 5`}>
-                              <Star size={16} fill="currentColor" aria-hidden="true" />
-                              <span>{creatorProfile.ratingAverage.toFixed(1)}</span>
-                              <span className="creator-profile-rating-count">({creatorProfile.ratingCount})</span>
-                            </p>
-                          ) : (
-                            <p className="creator-profile-rating-empty">{forceLocale === "en" ? "No ratings yet" : "暂无评分"}</p>
-                          )}
-                        </div>
-                      </div>
-                      <p className="creator-profile-bio">
-                        {creatorProfile.creator.creatorBio?.trim() || (forceLocale === "en" ? "The creator has not added a bio yet." : "创作者暂未填写个人简介。")}
-                      </p>
-                      <CreatorContactForm
-                        creatorId={creatorProfile.creator.id}
-                        currentUserId={user?.id ?? null}
-                        toolId={tool.id}
-                        returnTo={buildCanonicalToolPath(tool, forceLocale)}
-                        locale={forceLocale}
-                      />
-                    </div>
-                    <div className="creator-profile-work-list">
-                      <p className="creator-profile-products">
-                        {forceLocale === "en"
-                          ? `${creatorProfile.productCount} published works`
-                          : `共 ${creatorProfile.productCount} 个已发布作品`}
-                      </p>
-                      {creatorProfile.latestProducts.length ? (
-                        <ul>
-                          {creatorProfile.latestProducts.map((work) => (
-                            <li key={work.id}>
-                              <Link href={buildCanonicalToolPath(work, forceLocale)}>
-                                {resolveLocalizedToolIdentity(work, forceLocale).primaryName}
-                              </Link>
-                            </li>
-                          ))}
-                        </ul>
-                      ) : (
-                        <p className="creator-profile-no-works">
-                          {forceLocale === "en" ? "No published works yet." : "暂无已发布作品。"}
-                        </p>
-                      )}
-                    </div>
-                  </div>
-                </aside>
-              ) : null}
               </div>
 
             </div>

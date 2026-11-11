@@ -71,7 +71,7 @@ describe("tool detail layout source", () => {
     expect(source).toContain("product-refund-policy-card");
     expect(styles).toContain(".product-supported-agents-card");
     expect(styles).toContain(".tool-detail-product-layout.has-creator");
-    expect(styles).toContain("grid-template-columns: minmax(0, 1.2fr) minmax(360px, 0.8fr);");
+    expect(styles).toContain("grid-template-columns: minmax(0, 0.8fr) minmax(0, 1.2fr);");
     expect(styles).toContain(".tool-detail-payment-method-control");
     expect(styles).toContain(".tool-detail-payment-method-grid");
     expect(styles).toContain(".tool-detail-purchase-submit");
@@ -84,7 +84,7 @@ describe("tool detail layout source", () => {
     const changelogEnd = source.indexOf("</section>", changelogStart);
     const faqStart = source.indexOf("{!isAiWorkflow ? faqSection : null}");
     const betweenCards = source.slice(changelogEnd, faqStart);
-    const factsGridStart = source.indexOf("tool-detail-facts-grid mt-6");
+    const factsGridStart = source.indexOf("tool-detail-facts-grid");
     const agentsCardStart = source.indexOf("<SupportedAgentsCard", factsGridStart);
     const safetyCardStart = source.indexOf("product-safety-info-card", factsGridStart);
     const refundCardStart = source.indexOf("{refundPolicyCard}", safetyCardStart);

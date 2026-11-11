@@ -241,32 +241,25 @@ test("homepage polish stays readable, responsive, and interactive without extern
       const socialLinks = element.querySelector<HTMLElement>(".footer-social-links");
       const navigation = element.querySelector<HTMLElement>(".footer-navigation");
       const firstTrigger = element.querySelector<HTMLElement>(".footer-group-trigger");
-      const footerGrid = element.querySelector<HTMLElement>(".footer-grid");
-      if (!heading || !logo || !socialLinks || !navigation || !firstTrigger || !footerGrid) {
+      const copyright = element.querySelector<HTMLElement>(".footer-copyright-filings");
+      if (!heading || !logo || !socialLinks || !navigation || !firstTrigger || !copyright) {
         throw new Error("A footer alignment element is missing.");
       }
       return {
         headingTop: heading.getBoundingClientRect().top,
         headingSize: Number.parseFloat(getComputedStyle(heading).fontSize),
-        logoPositionError: Math.abs(
-          logo.getBoundingClientRect().top + logo.getBoundingClientRect().height / 2 -
-          (footerGrid.getBoundingClientRect().top + footerGrid.getBoundingClientRect().height / 2) -
-          logo.getBoundingClientRect().height * 0.1,
-        ),
+        copyrightCenter: copyright.getBoundingClientRect().top + copyright.getBoundingClientRect().height / 2,
         socialLinksTop: socialLinks.getBoundingClientRect().top,
         logoBottom: logo.getBoundingClientRect().bottom,
         navigationTop: navigation.getBoundingClientRect().top,
         firstTriggerTop: firstTrigger.getBoundingClientRect().top,
+        navigationCenter: navigation.getBoundingClientRect().top + navigation.getBoundingClientRect().height / 2,
       };
     });
     expect(footerAlignment.headingSize).toBeGreaterThanOrEqual(36);
-    expect(footerAlignment.socialLinksTop).toBeGreaterThanOrEqual(footerAlignment.logoBottom);
+    expect(footerAlignment.socialLinksTop - footerAlignment.logoBottom).toBeGreaterThanOrEqual(24);
     if (width >= 1280) {
-      expect(footerAlignment.logoPositionError).toBeLessThanOrEqual(1);
-    }
-    if (width >= 1280) {
-      expect(Math.abs(footerAlignment.navigationTop - footerAlignment.headingTop)).toBeLessThanOrEqual(1);
-      expect(Math.abs(footerAlignment.firstTriggerTop - footerAlignment.headingTop)).toBeLessThanOrEqual(1);
+      expect(Math.abs(footerAlignment.navigationCenter - footerAlignment.copyrightCenter)).toBeLessThanOrEqual(1);
     }
     const chevronGaps = await footer.locator(".footer-group-trigger").evaluateAll((summaries) => summaries.map((summary) => {
       const title = summary.querySelector("h3")!.getBoundingClientRect();
