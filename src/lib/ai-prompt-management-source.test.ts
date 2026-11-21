@@ -155,18 +155,21 @@ describe("AI prompt management website source contract", () => {
       ["curated-编程-定制财务分析智能体", "运营", "财务分析整理助手", "Operations", "Financial Analysis Organizer"],
       ["curated-编程-教育教学设计师", "职场", "教学设计助手", "Workplace", "Instructional Design Assistant"],
       ["curated-职场-面试提问大师", "职场", "面试问题设计助手", "Workplace", "Interview Question Planner"],
-      ["curated-问答-项目起名大师", "问答", "项目命名助手", "General", "Project Naming Assistant"],
-      ["curated-职场-excel函数大神", "职场", "Excel函数助手", "Workplace", "Excel Formula Assistant"],
-      ["curated-生活-万能标题大师", "生活", "多场景标题助手", "Life", "Multi-Purpose Headline Assistant"],
+      ["curated-问答-项目起名大师", "写作", "项目命名助手", "Writing", "Project Naming Assistant"],
+      ["curated-职场-excel函数大神", "职场", "Excel 公式助手", "Workplace", "Excel Formula Assistant"],
+      ["curated-生活-万能标题大师", "写作", "多场景标题助手", "Writing", "Multi-Purpose Headline Assistant"],
       ["curated-论文-写作-审查大师", "论文", "写作与校对助手", "Academic Writing", "Writing and Review Assistant"],
       ["curated-运营-麦肯锡问题角色大师", "运营", "结构化问题分析助手", "Operations", "Structured Problem Analysis Assistant"],
       ["curated-视频-文案拆解大师", "视频", "口播文案结构分析助手", "Video", "Spoken Script Structure Analyzer"],
       ["curated-问答-人生决策大师", "问答", "决策选项梳理助手", "General", "Decision Options Organizer"],
-      ["curated-视频-书籍解构大师", "视频", "书籍内容分析助手", "Video", "Book Content Analysis Assistant"],
+      ["curated-视频-书籍解构大师", "写作", "书籍内容分析助手", "Writing", "Book Content Analysis Assistant"],
       ["curated-问答-思维模型大师", "问答", "思维模型练习助手", "General", "Thinking Model Practice Assistant"],
       ["curated-编程-工程合同审查智能体", "问答", "工程合同条款梳理助手", "General", "Engineering Contract Clause Organizer"],
       ["curated-编程-技术服务合同审查专家", "问答", "技术服务合同条款检查助手", "General", "Technology Services Contract Checklist Assistant"],
       ["curated-编程-法律合同审查智能体", "问答", "法律合同条款检查助手", "General", "Legal Contract Clause Review Assistant"],
+      ["curated-编程-网文小说构思提示词框架", "小说", "网络小说构思助手", "Fiction", "Web Fiction Story Planner"],
+      ["curated-编程-商业需求文档撰写", "职场", "商业需求文档撰写", "Workplace", "Business Requirements Writer"],
+      ["curated-编程-旅游行程制定", "生活", "旅行行程规划", "Life", "Travel Itinerary Planner"],
     ] as const;
     for (const [id, category, title, englishCategory, englishTitle] of expectedCorrections) {
       const entry = chinese.entries.find((item) => item.id === id);
@@ -185,6 +188,9 @@ describe("AI prompt management website source contract", () => {
     expect(financial?.prompt).not.toContain("采用先进的加密技术");
     expect(financial?.prompt).toContain("不声称具有注册会计师资质");
     expect(financial?.prompt).toContain("不构成投资建议");
+    const credit = chinese.entries.find((entry) => entry.id === "curated-运营-银行授信报告深度分析智能体");
+    expect(credit?.prompt).toContain("不得评估个人信用");
+    expect(english.entries.find((entry) => entry.id === credit?.id)?.prompt).toContain("Do not rate an applicant");
     const therapy = chinese.entries.find(
       (entry) => entry.id === "curated-生活-心理治疗专家",
     );
