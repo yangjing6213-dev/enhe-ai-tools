@@ -151,9 +151,13 @@
       "tags": {
         "previousSha256": "b64566e8f65a859e79b0f6629143298afe6ff9a16bfae5cce3ad25ebf01ab966",
         "value": [
-          "问答",
+          "写作",
           "项目命名助手"
         ]
+      },
+      "category": {
+        "previousSha256": "25ac8a35a75c7a86ba9ada5f86d2f235f999cfac8b36e6636de8aba5f0aa0f6c",
+        "value": "写作"
       }
     },
     "en": {
@@ -168,9 +172,13 @@
       "tags": {
         "previousSha256": "846a85e6e7f6e0a53e5a7c80c6aae7c6019008abe483d90f609df459e5c05a28",
         "value": [
-          "General",
+          "Writing",
           "Project Naming Assistant"
         ]
+      },
+      "category": {
+        "previousSha256": "468d61a94d9f9d93e56df7cf8941414523b6a129fb60aa4351b0d40c858ff44c",
+        "value": "Writing"
       }
     }
   },
@@ -259,7 +267,7 @@
     "zh": {
       "title": {
         "previousSha256": "56b9a9ec760714567ffa50563b550fa3cf5abe44eeb334aa8abdb518f261e249",
-        "value": "Excel函数助手"
+        "value": "Excel 公式助手"
       },
       "summary": {
         "previousSha256": "56b9a9ec760714567ffa50563b550fa3cf5abe44eeb334aa8abdb518f261e249",
@@ -273,7 +281,7 @@
         "previousSha256": "f27187a2e0c7a65b22d784f105e6256edc15d948e762fb468e3808779d912de0",
         "value": [
           "职场",
-          "Excel函数助手"
+          "Excel 公式助手"
         ]
       }
     },
@@ -446,9 +454,13 @@
       "tags": {
         "previousSha256": "cb103e4b658d2320c834da342cdcf17d83e112d610803a2491a69315cfeac81d",
         "value": [
-          "生活",
+          "写作",
           "多场景标题助手"
         ]
+      },
+      "category": {
+        "previousSha256": "d8b043c25235220d1d7d3f7321cbc3df21875345342f40fbf72783c174b15408",
+        "value": "写作"
       }
     },
     "en": {
@@ -459,9 +471,13 @@
       "tags": {
         "previousSha256": "0b9f05dec7b723b789a6e63274d4260c75c0d1521c3def7523ad9732f2e968de",
         "value": [
-          "Life",
+          "Writing",
           "Multi-Purpose Headline Assistant"
         ]
+      },
+      "category": {
+        "previousSha256": "f8fe9ce39c48c84a0990f475594eba79e5e920f5dce0521b1eaf53c6e53958e9",
+        "value": "Writing"
       }
     }
   },
@@ -897,13 +913,26 @@
     "zh": {
       "category": {
         "previousSha256": "593a67f0fd92b9997a4e6bbab7505247c71a6e74a2b96d14b2dd5e78c2a57717",
-        "value": "小红书"
+        "value": "视频"
       },
       "tags": {
         "previousSha256": "6da137124506dcb8dc1ed3d4bbe5e83200de93b0b7ca5789ce247c247b2f0fda",
         "value": [
-          "小红书",
+          "视频",
           "爆款短视频脚本指令："
+        ]
+      }
+    },
+    "en": {
+      "category": {
+        "previousSha256": "8ddbd3aa9538e890f9eee6152ce51190150a37375bcfe1a3eddd6a3a545e0362",
+        "value": "Video"
+      },
+      "tags": {
+        "previousSha256": "aa1711a881dab0ed54ade620490cccd0c82df141842a5175b5e71afeb3fa2300",
+        "value": [
+          "Video",
+          "Blast video script instructions:"
         ]
       }
     }
@@ -925,9 +954,13 @@
       "tags": {
         "previousSha256": "79c2877aca823179b4ef30f53b1decf9a810e4116ca982eb89eed24ef6be28f5",
         "value": [
-          "图片",
+          "问答",
           "病历信息整理助手"
         ]
+      },
+      "category": {
+        "previousSha256": "2c6d1bd358615d9b209a6720803b196aa4322033dd047bd59f895ca1c5783f48",
+        "value": "问答"
       }
     },
     "en": {
@@ -946,9 +979,13 @@
       "tags": {
         "previousSha256": "5de427fa6e7c42077963941d9b67b75db421fc58711ef75986c3dab90719ecc7",
         "value": [
-          "Images",
+          "General",
           "Medical Record Organizer"
         ]
+      },
+      "category": {
+        "previousSha256": "941b085d3176f81fff8147e5e7c3797dab41904b699111bd01d67580d4d16390",
+        "value": "General"
       }
     }
   },
@@ -971,13 +1008,26 @@
     "zh": {
       "category": {
         "previousSha256": "593a67f0fd92b9997a4e6bbab7505247c71a6e74a2b96d14b2dd5e78c2a57717",
-        "value": "小红书"
+        "value": "视频"
       },
       "tags": {
         "previousSha256": "45f9c0ebddbfb4c3554b5f30306c4c3120307a3c91dfd986181fb3e1762241e9",
         "value": [
-          "小红书",
+          "视频",
           "抖音文案润色"
+        ]
+      }
+    },
+    "en": {
+      "category": {
+        "previousSha256": "8ddbd3aa9538e890f9eee6152ce51190150a37375bcfe1a3eddd6a3a545e0362",
+        "value": "Video"
+      },
+      "tags": {
+        "previousSha256": "073cacca92a39d306828cb7f2dab80c2225822afb6e127d4dee753583c02edaf",
+        "value": [
+          "Video",
+          "♪ The twitching ♪"
         ]
       }
     }
@@ -1307,9 +1357,13 @@
       "tags": {
         "previousSha256": "5f9e63b0beee0808d55ff73c543449252f8578b27bb1faabb1538e48025c8303",
         "value": [
-          "视频",
+          "写作",
           "书籍内容分析助手"
         ]
+      },
+      "category": {
+        "previousSha256": "7879cef50267bbd6c24d0c15055e42580f83928ae4fb1bc6750cbdc9e49bb71b",
+        "value": "写作"
       }
     },
     "en": {
@@ -1320,9 +1374,13 @@
       "tags": {
         "previousSha256": "f02ae9e638ef5066102e9bc9f22b5f3876f9850a0c4817df96556bbd6b040b3d",
         "value": [
-          "Video",
+          "Writing",
           "Book Content Analysis Assistant"
         ]
+      },
+      "category": {
+        "previousSha256": "72bcb013ed85a48ff6da50bc18d37492ffea7a4436790cdefa5a006b6070814d",
+        "value": "Writing"
       }
     }
   },
@@ -1418,13 +1476,26 @@
     "zh": {
       "category": {
         "previousSha256": "593a67f0fd92b9997a4e6bbab7505247c71a6e74a2b96d14b2dd5e78c2a57717",
-        "value": "小红书"
+        "value": "写作"
       },
       "tags": {
         "previousSha256": "4de674d0dc4cd99afaffab9fd054ee32a780b12ea77579708f92674ea0b4ebf9",
         "value": [
-          "小红书",
+          "写作",
           "流行音乐歌词创作指令"
+        ]
+      }
+    },
+    "en": {
+      "category": {
+        "previousSha256": "8ddbd3aa9538e890f9eee6152ce51190150a37375bcfe1a3eddd6a3a545e0362",
+        "value": "Writing"
+      },
+      "tags": {
+        "previousSha256": "2fc96cee0071d778acffecb3f3ddec23384e351a28557319ea02425d711905de",
+        "value": [
+          "Writing",
+          "Pop Music Song Production Command"
         ]
       }
     }
@@ -1653,6 +1724,5694 @@
         "value": [
           "Workplace",
           "Project Daily Report Assistant"
+        ]
+      }
+    }
+  },
+  "curated-问答-swot助手": {
+    "zh": {
+      "category": {
+        "previousSha256": "25ac8a35a75c7a86ba9ada5f86d2f235f999cfac8b36e6636de8aba5f0aa0f6c",
+        "value": "运营"
+      },
+      "tags": {
+        "previousSha256": "3245ddbe44ebd7a16422fc811399d540ffbf385740daba840582d362c1f4a64d",
+        "value": [
+          "运营",
+          "SWOT助手"
+        ]
+      }
+    },
+    "en": {
+      "category": {
+        "previousSha256": "468d61a94d9f9d93e56df7cf8941414523b6a129fb60aa4351b0d40c858ff44c",
+        "value": "Operations"
+      },
+      "tags": {
+        "previousSha256": "6659effff57d3053e60afcd32e1d8a480dcdb434bf3255d3bf782e8a2ea7b196",
+        "value": [
+          "Operations",
+          "SWOT Assistant"
+        ]
+      }
+    }
+  },
+  "curated-视频-影评达人": {
+    "zh": {
+      "category": {
+        "previousSha256": "7879cef50267bbd6c24d0c15055e42580f83928ae4fb1bc6750cbdc9e49bb71b",
+        "value": "写作"
+      },
+      "tags": {
+        "previousSha256": "ec8b831ab61625b84cab202d2a9ffbad0acce822f76b21e852797003858370bc",
+        "value": [
+          "写作",
+          "影评达人"
+        ]
+      }
+    },
+    "en": {
+      "category": {
+        "previousSha256": "72bcb013ed85a48ff6da50bc18d37492ffea7a4436790cdefa5a006b6070814d",
+        "value": "Writing"
+      },
+      "tags": {
+        "previousSha256": "1364291e56c8c45790490cbd5a6bff4cf0da3357f35065dfaa23d924a3cd42c7",
+        "value": [
+          "Writing",
+          "The film's a success."
+        ]
+      }
+    }
+  },
+  "curated-生活-网络写手": {
+    "zh": {
+      "category": {
+        "previousSha256": "d8b043c25235220d1d7d3f7321cbc3df21875345342f40fbf72783c174b15408",
+        "value": "写作"
+      },
+      "tags": {
+        "previousSha256": "cba308bbcb5e8d1bbe1f68b86d00798206e19563d7822c60c5aa47e2c9123a16",
+        "value": [
+          "写作",
+          "网络写手"
+        ]
+      }
+    },
+    "en": {
+      "category": {
+        "previousSha256": "f8fe9ce39c48c84a0990f475594eba79e5e920f5dce0521b1eaf53c6e53958e9",
+        "value": "Writing"
+      },
+      "tags": {
+        "previousSha256": "72038a6ba61db5aa40b56512770dc07dd88c4acc14d535d2c9c0d11bbcb475c6",
+        "value": [
+          "Writing",
+          "Network writer"
+        ]
+      }
+    }
+  },
+  "curated-图片-ppt精炼": {
+    "zh": {
+      "category": {
+        "previousSha256": "2c6d1bd358615d9b209a6720803b196aa4322033dd047bd59f895ca1c5783f48",
+        "value": "职场"
+      },
+      "title": {
+        "previousSha256": "bc0f1fc7aec669e42835b5081fa7c36e5ee901cbd82fe4a6902ee5f6773266b7",
+        "value": "课程幻灯片笔记整理"
+      },
+      "tags": {
+        "previousSha256": "f26e7bcdf218e2edf74411fb2a83f5dd3537802898101bdf5942118c1e97eb6d",
+        "value": [
+          "职场",
+          "课程幻灯片笔记整理"
+        ]
+      }
+    },
+    "en": {
+      "category": {
+        "previousSha256": "941b085d3176f81fff8147e5e7c3797dab41904b699111bd01d67580d4d16390",
+        "value": "Workplace"
+      },
+      "title": {
+        "previousSha256": "90d79220c9724a39c1aa387489b36170d793f6a563752abb76aac8e3a9e7a9aa",
+        "value": "Lecture Slide Notes"
+      },
+      "tags": {
+        "previousSha256": "9894dba72bcd21e0c328f17747273da9429d00070b918cf81fcc5233eb247baf",
+        "value": [
+          "Workplace",
+          "Lecture Slide Notes"
+        ]
+      }
+    }
+  },
+  "curated-问答-美文排版": {
+    "zh": {
+      "category": {
+        "previousSha256": "25ac8a35a75c7a86ba9ada5f86d2f235f999cfac8b36e6636de8aba5f0aa0f6c",
+        "value": "写作"
+      },
+      "tags": {
+        "previousSha256": "56c7dec69440f0e246c5b93885d3e2126e682a1967b0ad1b4c3c9605467e032f",
+        "value": [
+          "写作",
+          "美文排版"
+        ]
+      }
+    },
+    "en": {
+      "category": {
+        "previousSha256": "468d61a94d9f9d93e56df7cf8941414523b6a129fb60aa4351b0d40c858ff44c",
+        "value": "Writing"
+      },
+      "tags": {
+        "previousSha256": "1c3a64a8398bed0560a17a13691d5ac94f4ccc7c8ead5b237c032d8c5676f94f",
+        "value": [
+          "Writing",
+          "American Layout"
+        ]
+      }
+    }
+  },
+  "curated-编程-角色生成助手": {
+    "zh": {
+      "category": {
+        "previousSha256": "e677ac3f8f56af98d47e3810220972caff5833c6633b024c46e9ea6b727410ad",
+        "value": "问答"
+      },
+      "tags": {
+        "previousSha256": "79823457ad36a589610e8c07f2d00a697b3eb2b5e1600168244da54e0a9b6692",
+        "value": [
+          "问答",
+          "角色生成助手"
+        ]
+      }
+    },
+    "en": {
+      "category": {
+        "previousSha256": "9aab932a7edfd6c10219348a9796dce0ff1db3dc24ff56a9d1f2e444d2e68b4a",
+        "value": "General"
+      },
+      "tags": {
+        "previousSha256": "376c632f7f76c31ea348961cf14cac7823b173a43c907657046fcce1b333339d",
+        "value": [
+          "General",
+          "Role Generation Assistant"
+        ]
+      }
+    }
+  },
+  "curated-问答-行业调研专家": {
+    "zh": {
+      "category": {
+        "previousSha256": "25ac8a35a75c7a86ba9ada5f86d2f235f999cfac8b36e6636de8aba5f0aa0f6c",
+        "value": "运营"
+      },
+      "tags": {
+        "previousSha256": "bf51a971332e055d7cfbfab527508109e5cc2fe0b922e9a6cc2de9d41c1d12b5",
+        "value": [
+          "运营",
+          "行业调研专家"
+        ]
+      }
+    },
+    "en": {
+      "category": {
+        "previousSha256": "468d61a94d9f9d93e56df7cf8941414523b6a129fb60aa4351b0d40c858ff44c",
+        "value": "Operations"
+      },
+      "tags": {
+        "previousSha256": "32f4ecb7d1f73fb8594812158b68004ce0e544d24744ff0aef880f8500aafbe1",
+        "value": [
+          "Operations",
+          "Industry research specialists"
+        ]
+      }
+    }
+  },
+  "curated-问答-3d模型专家": {
+    "zh": {
+      "category": {
+        "previousSha256": "25ac8a35a75c7a86ba9ada5f86d2f235f999cfac8b36e6636de8aba5f0aa0f6c",
+        "value": "图片"
+      },
+      "tags": {
+        "previousSha256": "913c76c174d76ecea1596d30d5703cb222f92d9fd10aae1271557f923d989efd",
+        "value": [
+          "图片",
+          "3D模型专家"
+        ]
+      }
+    },
+    "en": {
+      "category": {
+        "previousSha256": "468d61a94d9f9d93e56df7cf8941414523b6a129fb60aa4351b0d40c858ff44c",
+        "value": "Images"
+      },
+      "tags": {
+        "previousSha256": "73105a5072f7103903da969e2269ea374f456d75e2f95a7378e762527975f08e",
+        "value": [
+          "Images",
+          "3D model specialist"
+        ]
+      }
+    }
+  },
+  "curated-运营-ppt大纲生成器": {
+    "zh": {
+      "category": {
+        "previousSha256": "4542fdc93f9885bad2bcd4a5db6842078372cf371b3cd45eb6b7416dd22e2f84",
+        "value": "职场"
+      },
+      "tags": {
+        "previousSha256": "8b0ce977d1fee4567f7f66098cff413fdf0845216064a329659a10bc42ab1169",
+        "value": [
+          "职场",
+          "PPT大纲生成器"
+        ]
+      }
+    },
+    "en": {
+      "category": {
+        "previousSha256": "1653365f65b9061d88174bc9c421c6db48d40f0b280b44ca0973364458eb7557",
+        "value": "Workplace"
+      },
+      "tags": {
+        "previousSha256": "cb89d01c793de04162115e1dbf5a5efcb76f0bdf1b434ad5325fed6185af9e88",
+        "value": [
+          "Workplace",
+          "PPT Outline Generator"
+        ]
+      }
+    }
+  },
+  "curated-生活-中文润色专家": {
+    "zh": {
+      "category": {
+        "previousSha256": "d8b043c25235220d1d7d3f7321cbc3df21875345342f40fbf72783c174b15408",
+        "value": "写作"
+      },
+      "title": {
+        "previousSha256": "15566dedab3d6b816ec8be723f763d2add59c025c258ab8ba6bac946be0a7e32",
+        "value": "中文文案润色助手"
+      },
+      "tags": {
+        "previousSha256": "e249a331bce44e4330f96426bd3b6262379ed226c26389374e831b92d5c307fc",
+        "value": [
+          "写作",
+          "中文文案润色助手"
+        ]
+      }
+    },
+    "en": {
+      "category": {
+        "previousSha256": "f8fe9ce39c48c84a0990f475594eba79e5e920f5dce0521b1eaf53c6e53958e9",
+        "value": "Writing"
+      },
+      "title": {
+        "previousSha256": "b0635de80c831e523aca2720cd45c59e093dbae37149ebb6a3f37095cc4504db",
+        "value": "Chinese Copy Editor"
+      },
+      "tags": {
+        "previousSha256": "49e53e44d7bae6770d86ca99e5eb144c31f30308849c6fb02936fa60533d553d",
+        "value": [
+          "Writing",
+          "Chinese Copy Editor"
+        ]
+      }
+    }
+  },
+  "curated-论文-公司研报专家": {
+    "zh": {
+      "category": {
+        "previousSha256": "7cef1d71db62938a9e3b7dddc20161dd7e1fa66228454b28f6713039784c3003",
+        "value": "职场"
+      },
+      "title": {
+        "previousSha256": "37d3829f08f75bb4ca39d895267e188cc8cce0f892abd5a1400d2959a79c452a",
+        "value": "公司研究资料整理助手"
+      },
+      "summary": {
+        "previousSha256": "3ee9509e7a2427e2158f2e91c2ee47acbb2e1ea566df50d32392e05e271fb4d7",
+        "value": "整理用户提供的财务资料、指标和计算口径，标明来源、假设和缺失项。"
+      },
+      "prompt": {
+        "previousSha256": "bf6a5c503e10a8330e221fc90212925700015ea50f35f849cb77cf6be8cc0b40",
+        "value": "任务：公司研究资料整理助手\n整理用户提供的财务资料、指标和计算口径，标明来源、假设和缺失项。\n按表头列出资料日期、原始数字、单位、算式和结果。只解释已有数据，提出供专业人员核实的问题。不得声称持有执照或作出投资、审计、信贷结论。"
+      },
+      "tags": {
+        "previousSha256": "e767c7b2c0fe61b064a0e1dd3d5d182d9851831d728929dd0a582296b709ae74",
+        "value": [
+          "职场",
+          "公司研究资料整理助手"
+        ]
+      }
+    },
+    "en": {
+      "category": {
+        "previousSha256": "665bc989dd4909f2aa2644f529e85a74b96cb9183b0038a00be23964ef17bf17",
+        "value": "Workplace"
+      },
+      "title": {
+        "previousSha256": "390816693bb3b6252e6be20b3077f6faa018a304e1f798b8dc52bbb4006e61c6",
+        "value": "Company Research Organizer"
+      },
+      "summary": {
+        "previousSha256": "df1783e6a8654c67629c7faeaf86fdeb1adf687cb4698427ac2a0bf8dfae1511",
+        "value": "Organize supplied financial records, figures and calculation methods, with sources, assumptions and gaps."
+      },
+      "prompt": {
+        "previousSha256": "a0c216ef62f8a6011b30e19e630858f82fcdfda3b4a1b42a69e5367ce64369a9",
+        "value": "Task: Company Research Organizer\nOrganize supplied financial records, figures and calculation methods, with sources, assumptions and gaps.\nList the reporting date, original number, unit, arithmetic and result. Explain the figures and list questions for professional review. Do not claim credentials or give investment, audit or credit decisions."
+      },
+      "tags": {
+        "previousSha256": "89ea4ffcd3e835d49b51ae4880a80bb11168bcf7cf8ba3f3746b8b6e0653dcfe",
+        "value": [
+          "Workplace",
+          "Company Research Organizer"
+        ]
+      }
+    }
+  },
+  "curated-编程-电商产品描述": {
+    "zh": {
+      "category": {
+        "previousSha256": "e677ac3f8f56af98d47e3810220972caff5833c6633b024c46e9ea6b727410ad",
+        "value": "运营"
+      },
+      "title": {
+        "previousSha256": "4bb005010d4a9d2c9b3b0bda08010a5576e6696f67a20b397d9ba94c2a0600ed",
+        "value": "电商商品描述撰写助手"
+      },
+      "tags": {
+        "previousSha256": "3eefc37316710d0d4cfedcbf11333aca1564deaa440325b66b5c43dfbc76c2f0",
+        "value": [
+          "运营",
+          "电商商品描述撰写助手"
+        ]
+      }
+    },
+    "en": {
+      "category": {
+        "previousSha256": "9aab932a7edfd6c10219348a9796dce0ff1db3dc24ff56a9d1f2e444d2e68b4a",
+        "value": "Operations"
+      },
+      "title": {
+        "previousSha256": "a92ff9b19681b7bdba83bdc58e29f711b5be82f54d6965e29dafb8273fa1b176",
+        "value": "E-commerce Product Description Writer"
+      },
+      "tags": {
+        "previousSha256": "1c977329cdaae3485cc4b551af53a25a345ae8557d2d9faafd145cadb1fffddb",
+        "value": [
+          "Operations",
+          "E-commerce Product Description Writer"
+        ]
+      }
+    }
+  },
+  "curated-论文-用户痛点抓取": {
+    "zh": {
+      "category": {
+        "previousSha256": "7cef1d71db62938a9e3b7dddc20161dd7e1fa66228454b28f6713039784c3003",
+        "value": "运营"
+      },
+      "title": {
+        "previousSha256": "3c5c4431ff566bff0b9e84357a4b6048bb5f78ce4fbfcbb1c698569289145560",
+        "value": "用户需求与使用场景分析"
+      },
+      "tags": {
+        "previousSha256": "92c6c26560a0341422ecb8f166ae255d014b91a7250d44879ae513fa3daea1c2",
+        "value": [
+          "运营",
+          "用户需求与使用场景分析"
+        ]
+      }
+    },
+    "en": {
+      "category": {
+        "previousSha256": "665bc989dd4909f2aa2644f529e85a74b96cb9183b0038a00be23964ef17bf17",
+        "value": "Operations"
+      },
+      "title": {
+        "previousSha256": "32b9da9a49ebdc7c493bf89d3a17998a16777f9de6077a5d7da10de907558d31",
+        "value": "Customer Needs & Use Case Analysis"
+      },
+      "tags": {
+        "previousSha256": "2aca212c29b65a686d3e1645727c5931f413b7bb71183436491945ec0feb1343",
+        "value": [
+          "Operations",
+          "Customer Needs & Use Case Analysis"
+        ]
+      }
+    }
+  },
+  "curated-视频-拆书助理": {
+    "zh": {
+      "category": {
+        "previousSha256": "7879cef50267bbd6c24d0c15055e42580f83928ae4fb1bc6750cbdc9e49bb71b",
+        "value": "写作"
+      },
+      "tags": {
+        "previousSha256": "240f7ee94f496f1a283ddbd7156c7d5799a83b9b3e5d1a485c07bc43a4892a51",
+        "value": [
+          "写作",
+          "拆书助理"
+        ]
+      }
+    },
+    "en": {
+      "category": {
+        "previousSha256": "72bcb013ed85a48ff6da50bc18d37492ffea7a4436790cdefa5a006b6070814d",
+        "value": "Writing"
+      },
+      "tags": {
+        "previousSha256": "ae0261d09ef087e4907c8a3a1c98c59785245b3c90e995e3f8ec17a83b346136",
+        "value": [
+          "Writing",
+          "Book-opening assistant"
+        ]
+      }
+    }
+  },
+  "curated-编程-最强pmf实践者": {
+    "zh": {
+      "category": {
+        "previousSha256": "e677ac3f8f56af98d47e3810220972caff5833c6633b024c46e9ea6b727410ad",
+        "value": "运营"
+      },
+      "title": {
+        "previousSha256": "c9d9f7c28b5908d81afa4b4b56d85ef509acb56f82c685f73d3b1dceefba836c",
+        "value": "产品与市场匹配分析"
+      },
+      "tags": {
+        "previousSha256": "8ecbff301cdd04dc283ccffde91a83a0d36a981c0d5dffd2b6d37e7db495a472",
+        "value": [
+          "运营",
+          "产品与市场匹配分析"
+        ]
+      }
+    },
+    "en": {
+      "category": {
+        "previousSha256": "9aab932a7edfd6c10219348a9796dce0ff1db3dc24ff56a9d1f2e444d2e68b4a",
+        "value": "Operations"
+      },
+      "title": {
+        "previousSha256": "ed39f93effe25109a9c2846ddd062f655043c6cf006a43718a197a7dcdc79419",
+        "value": "Product–Market Fit Review"
+      },
+      "tags": {
+        "previousSha256": "6fae506379f1d971dd36cd010f48b9b7d205edbdaf3f57cf2850c11154dd0f6a",
+        "value": [
+          "Operations",
+          "Product–Market Fit Review"
+        ]
+      }
+    }
+  },
+  "curated-运营-ppt大纲生成": {
+    "zh": {
+      "category": {
+        "previousSha256": "4542fdc93f9885bad2bcd4a5db6842078372cf371b3cd45eb6b7416dd22e2f84",
+        "value": "职场"
+      },
+      "tags": {
+        "previousSha256": "1c78e38c79ad073b0cba611bbe4f844f778c3e33981e5ff58bcb79a3cd0dee02",
+        "value": [
+          "职场",
+          "PPT大纲生成"
+        ]
+      }
+    },
+    "en": {
+      "category": {
+        "previousSha256": "1653365f65b9061d88174bc9c421c6db48d40f0b280b44ca0973364458eb7557",
+        "value": "Workplace"
+      },
+      "tags": {
+        "previousSha256": "910fd5fdaf0a662390d09d62af2954a87462a92deead65fa0e347d05477f414f",
+        "value": [
+          "Workplace",
+          "PPT Outline Generation"
+        ]
+      }
+    }
+  },
+  "curated-图片-单词拆解学习": {
+    "zh": {
+      "category": {
+        "previousSha256": "2c6d1bd358615d9b209a6720803b196aa4322033dd047bd59f895ca1c5783f48",
+        "value": "问答"
+      },
+      "tags": {
+        "previousSha256": "00e03ef2713ed4221674c1e8b1228c7e7140d9996128372f3071339291fa49ae",
+        "value": [
+          "问答",
+          "单词拆解学习"
+        ]
+      }
+    },
+    "en": {
+      "category": {
+        "previousSha256": "941b085d3176f81fff8147e5e7c3797dab41904b699111bd01d67580d4d16390",
+        "value": "General"
+      },
+      "tags": {
+        "previousSha256": "4d07f45fac1004ebaaf7347e8c5c05691844b1d9da20c5b2016f102fb056d005",
+        "value": [
+          "General",
+          "Word Dismantling Learning"
+        ]
+      }
+    }
+  },
+  "curated-生活-情绪化标题师": {
+    "zh": {
+      "category": {
+        "previousSha256": "d8b043c25235220d1d7d3f7321cbc3df21875345342f40fbf72783c174b15408",
+        "value": "写作"
+      },
+      "title": {
+        "previousSha256": "2579a11a3626eef2f53f984abab2acd7678d7563952933b437439adcc4625620",
+        "value": "标题情绪表达助手"
+      },
+      "tags": {
+        "previousSha256": "76d060ec8d14d7b8b5a55cbd77e094d06310a2c76e4080d32ed71f4d1232e66c",
+        "value": [
+          "写作",
+          "标题情绪表达助手"
+        ]
+      }
+    },
+    "en": {
+      "category": {
+        "previousSha256": "f8fe9ce39c48c84a0990f475594eba79e5e920f5dce0521b1eaf53c6e53958e9",
+        "value": "Writing"
+      },
+      "title": {
+        "previousSha256": "a53a698a9aa2e61f047a7c574d0f7cfc7ee087a9306bef49822c6f7030e22ec2",
+        "value": "Headline Tone Assistant"
+      },
+      "tags": {
+        "previousSha256": "de839d6c26fa792cdc19a18642a4660fb01b0f2443c0ff7fe22e2617ae437654",
+        "value": [
+          "Writing",
+          "Headline Tone Assistant"
+        ]
+      }
+    }
+  },
+  "curated-问答-美文排版助手": {
+    "zh": {
+      "category": {
+        "previousSha256": "25ac8a35a75c7a86ba9ada5f86d2f235f999cfac8b36e6636de8aba5f0aa0f6c",
+        "value": "写作"
+      },
+      "tags": {
+        "previousSha256": "ff42a77df3ffdd0b64b1f5ab77363a3f836a49924afa1694a3a1e85982373b28",
+        "value": [
+          "写作",
+          "美文排版助手"
+        ]
+      }
+    },
+    "en": {
+      "category": {
+        "previousSha256": "468d61a94d9f9d93e56df7cf8941414523b6a129fb60aa4351b0d40c858ff44c",
+        "value": "Writing"
+      },
+      "tags": {
+        "previousSha256": "cb35f1275c58eea1f19abbf550062d68b80ed663efeb9319c21f7c1daf8041e0",
+        "value": [
+          "Writing",
+          "American Layout Assistant"
+        ]
+      }
+    }
+  },
+  "curated-问答-新闻快写": {
+    "zh": {
+      "category": {
+        "previousSha256": "25ac8a35a75c7a86ba9ada5f86d2f235f999cfac8b36e6636de8aba5f0aa0f6c",
+        "value": "写作"
+      },
+      "tags": {
+        "previousSha256": "857d71824935bb0411e215449b4d06b05d4c018655b00c379e9171280113fca9",
+        "value": [
+          "写作",
+          "新闻快写"
+        ]
+      }
+    },
+    "en": {
+      "category": {
+        "previousSha256": "468d61a94d9f9d93e56df7cf8941414523b6a129fb60aa4351b0d40c858ff44c",
+        "value": "Writing"
+      },
+      "tags": {
+        "previousSha256": "567453c300d3ee83f21d138a57b7a0d51864b8a7d798ec3cddee363726c73350",
+        "value": [
+          "Writing",
+          "News flash."
+        ]
+      }
+    }
+  },
+  "curated-论文-续写专家": {
+    "zh": {
+      "category": {
+        "previousSha256": "7cef1d71db62938a9e3b7dddc20161dd7e1fa66228454b28f6713039784c3003",
+        "value": "写作"
+      },
+      "tags": {
+        "previousSha256": "6decb99b362305e9550be124fda60aeeb79efc3be2eec431f7e9cae16994a929",
+        "value": [
+          "写作",
+          "续写专家"
+        ]
+      }
+    },
+    "en": {
+      "category": {
+        "previousSha256": "665bc989dd4909f2aa2644f529e85a74b96cb9183b0038a00be23964ef17bf17",
+        "value": "Writing"
+      },
+      "tags": {
+        "previousSha256": "d083eb052c7b867c79df9cc8aa3111720072d8d746386a9e32f98585ba8b628b",
+        "value": [
+          "Writing",
+          "Post-writing specialists"
+        ]
+      }
+    }
+  },
+  "curated-生活-李白诗句": {
+    "zh": {
+      "category": {
+        "previousSha256": "d8b043c25235220d1d7d3f7321cbc3df21875345342f40fbf72783c174b15408",
+        "value": "写作"
+      },
+      "tags": {
+        "previousSha256": "6e697a07bb34644693177078657d27626fc8e07e81f289008a673ad7eb328e57",
+        "value": [
+          "写作",
+          "李白诗句"
+        ]
+      }
+    },
+    "en": {
+      "category": {
+        "previousSha256": "f8fe9ce39c48c84a0990f475594eba79e5e920f5dce0521b1eaf53c6e53958e9",
+        "value": "Writing"
+      },
+      "tags": {
+        "previousSha256": "ed5f44ae684c5b233831e1a3b824ff19ad9eb893af371889a15e5d51e766144b",
+        "value": [
+          "Writing",
+          "Li Bai Xiao Xin"
+        ]
+      }
+    }
+  },
+  "curated-论文-高考志愿填报": {
+    "zh": {
+      "category": {
+        "previousSha256": "7cef1d71db62938a9e3b7dddc20161dd7e1fa66228454b28f6713039784c3003",
+        "value": "生活"
+      },
+      "title": {
+        "previousSha256": "c8524cb9493baefc85bb422a76ff6cf5856666652f93b2c5e5bca49fe845d47e",
+        "value": "高考志愿信息比较"
+      },
+      "summary": {
+        "previousSha256": "323d686c2ed5402ce8c6ad6987af954acbcfb8b7e91e67a7c2a1480d4db9cb95",
+        "value": "按考生和家庭给出的标准对照公开招生资料。"
+      },
+      "prompt": {
+        "previousSha256": "c38735ba7501837fdc55c776ce30561ca54f2cc69a1605a131ecd3946c537b26",
+        "value": "任务：高考志愿信息比较\n按考生和家庭给出的标准对照公开招生资料。\n整理院校、专业、年份、招生要求、来源日期和待确认信息；不预测录取结果、不代表学生作出最终选择。"
+      },
+      "tags": {
+        "previousSha256": "10f78f5551c883c311243ddbca5cb1a34646bcc1131bc00431af1306621d7e53",
+        "value": [
+          "生活",
+          "高考志愿信息比较"
+        ]
+      }
+    },
+    "en": {
+      "category": {
+        "previousSha256": "665bc989dd4909f2aa2644f529e85a74b96cb9183b0038a00be23964ef17bf17",
+        "value": "Life"
+      },
+      "title": {
+        "previousSha256": "c0eec01f77b0789c5afade66e030850b713ed9821d399819da588feecb0f8293",
+        "value": "University Application Information Comparison"
+      },
+      "summary": {
+        "previousSha256": "39fe588097abb079ba17295a2d26e987248be16db6ab5bff7ed98a80652061d5",
+        "value": "Compare official admissions information against criteria supplied by the student or family."
+      },
+      "prompt": {
+        "previousSha256": "dd590640271bf9c8aebe67e81204b8d0947c6b936bb1ed74d4f6d5b55f60e27d",
+        "value": "Task: University Application Information Comparison\nCompare official admissions information against criteria supplied by the student or family.\nList institutions, majors, years, published requirements, source dates and uncertainties. Do not predict admission or make the final choice on a student's behalf."
+      },
+      "tags": {
+        "previousSha256": "817592577843bdc6e473f5529e1b90e181e2fc29c9af4b609dfd6fd00948a836",
+        "value": [
+          "Life",
+          "University Application Information Comparison"
+        ]
+      }
+    }
+  },
+  "curated-编程-任务学习": {
+    "zh": {
+      "category": {
+        "previousSha256": "e677ac3f8f56af98d47e3810220972caff5833c6633b024c46e9ea6b727410ad",
+        "value": "问答"
+      },
+      "title": {
+        "previousSha256": "57e2dc26a42d5713b758969df51688bae54043103b79c966bd43aad76c7f4444",
+        "value": "任务式学习计划"
+      },
+      "tags": {
+        "previousSha256": "b578565f969ff5aeb5734b341b45f39f3b3ab404aaac6163d1dac6ded5315bc1",
+        "value": [
+          "问答",
+          "任务式学习计划"
+        ]
+      }
+    },
+    "en": {
+      "category": {
+        "previousSha256": "9aab932a7edfd6c10219348a9796dce0ff1db3dc24ff56a9d1f2e444d2e68b4a",
+        "value": "General"
+      },
+      "title": {
+        "previousSha256": "b237a625d4dea8331a430fa8f9aef3e7584d25bd92dfa4bd2328d0b544fa587d",
+        "value": "Task-Based Learning Plan"
+      },
+      "tags": {
+        "previousSha256": "3dbd65b46ec70c9dd19b760dd8371b2d9a63c61ac8f911a0a5507f88002d9764",
+        "value": [
+          "General",
+          "Task-Based Learning Plan"
+        ]
+      }
+    }
+  },
+  "curated-论文-替我选书": {
+    "zh": {
+      "category": {
+        "previousSha256": "7cef1d71db62938a9e3b7dddc20161dd7e1fa66228454b28f6713039784c3003",
+        "value": "生活"
+      },
+      "tags": {
+        "previousSha256": "780904b180bd0d6cf8a0018d22651e12a3bfedadd884a2455a6d135bb3faebe3",
+        "value": [
+          "生活",
+          "替我选书"
+        ]
+      }
+    },
+    "en": {
+      "category": {
+        "previousSha256": "665bc989dd4909f2aa2644f529e85a74b96cb9183b0038a00be23964ef17bf17",
+        "value": "Life"
+      },
+      "tags": {
+        "previousSha256": "bd943f2a6099bd730d980cca93d94f445c3f4207b2a43a346626d7d38b244a77",
+        "value": [
+          "Life",
+          "Pick my book."
+        ]
+      }
+    }
+  },
+  "curated-职场-excel表格助手": {
+    "zh": {
+      "title": {
+        "previousSha256": "d96838bf501a7d5182c154959af8648e9c022482b9bdb1cd8296bfb5e85adba8",
+        "value": "Excel 公式编写助手"
+      },
+      "tags": {
+        "previousSha256": "db2b7ce68a1b37c51b62bba3ff3074274031613cffe56dfaf35a3cb82699e32f",
+        "value": [
+          "职场",
+          "Excel 公式编写助手"
+        ]
+      }
+    },
+    "en": {
+      "title": {
+        "previousSha256": "b24057beac99f4355a3f6a212851a5fcc42d95b439147937ff1c6e5f5a6de115",
+        "value": "Excel Formula Writer"
+      },
+      "tags": {
+        "previousSha256": "c5a9818c586d6731ed267b3dbd1224e357742a4323ee6604e926aba6f9a62fd7",
+        "value": [
+          "Workplace",
+          "Excel Formula Writer"
+        ]
+      }
+    }
+  },
+  "curated-图片-短视频逐字稿文案撰写提示词框架-来自网友": {
+    "zh": {
+      "category": {
+        "previousSha256": "2c6d1bd358615d9b209a6720803b196aa4322033dd047bd59f895ca1c5783f48",
+        "value": "视频"
+      },
+      "title": {
+        "previousSha256": "59c1df6635d87b41e24ac66b5c885ab7fb62f1edcde32fbb57b2e871126595aa",
+        "value": "短视频逐字稿写作"
+      },
+      "tags": {
+        "previousSha256": "815574e4e9b7f8c4d048fa7f03a9b816af02a4b2bac4c77b39b84491bcb075c1",
+        "value": [
+          "视频",
+          "短视频逐字稿写作"
+        ]
+      }
+    },
+    "en": {
+      "category": {
+        "previousSha256": "941b085d3176f81fff8147e5e7c3797dab41904b699111bd01d67580d4d16390",
+        "value": "Video"
+      },
+      "title": {
+        "previousSha256": "0138dfa8e4b30342deea7a35abfb38ba67e4c3857b54e5a11d029dc47bf8f07a",
+        "value": "Short Video Transcript Writer"
+      },
+      "tags": {
+        "previousSha256": "c6e14c6b3131c0f6ec277d8060b82b8c6099b730a47d408a5da025acd82edd7d",
+        "value": [
+          "Video",
+          "Short Video Transcript Writer"
+        ]
+      }
+    }
+  },
+  "curated-图片-影视编剧助理提示词框架-来自网友": {
+    "zh": {
+      "category": {
+        "previousSha256": "2c6d1bd358615d9b209a6720803b196aa4322033dd047bd59f895ca1c5783f48",
+        "value": "视频"
+      },
+      "title": {
+        "previousSha256": "b0d7e12e1eac852181f7dac7ab0b28bd76ce43bf6e20e12ed1ddbee3e2dabb14",
+        "value": "影视剧本写作助手"
+      },
+      "tags": {
+        "previousSha256": "9d13f0ea109bd06521fa97e72479e7bcc1a4b2a9bb7726c0ed7eb24d8f20c8d8",
+        "value": [
+          "视频",
+          "影视剧本写作助手"
+        ]
+      }
+    },
+    "en": {
+      "category": {
+        "previousSha256": "941b085d3176f81fff8147e5e7c3797dab41904b699111bd01d67580d4d16390",
+        "value": "Video"
+      },
+      "title": {
+        "previousSha256": "b731ad03acbc69b606d72023710857c19f6900cfceae69c222dc035a976bac59",
+        "value": "Film & TV Script Assistant"
+      },
+      "tags": {
+        "previousSha256": "6be9ee5859f67fb3c4d66fd364a934295692c509edaa5d437e03dba17c81f457",
+        "value": [
+          "Video",
+          "Film & TV Script Assistant"
+        ]
+      }
+    }
+  },
+  "curated-图片-财务比率分析提示词框架": {
+    "zh": {
+      "category": {
+        "previousSha256": "2c6d1bd358615d9b209a6720803b196aa4322033dd047bd59f895ca1c5783f48",
+        "value": "职场"
+      },
+      "title": {
+        "previousSha256": "3116410fc670836a17936ca2df50e54604cad92a785048d9d07e1b5a21e7197d",
+        "value": "财务比率计算与说明"
+      },
+      "summary": {
+        "previousSha256": "8e4adab0f442d3f452c8729e159583c2492c80c57985c3467eb77e17ba39aed5",
+        "value": "整理用户提供的财务资料、指标和计算口径，标明来源、假设和缺失项。"
+      },
+      "prompt": {
+        "previousSha256": "79bd9084f2c4c2c268a0951f1f8a1ab5e650dd8a652920f4bd54641b580d34f3",
+        "value": "任务：财务比率计算与说明\n整理用户提供的财务资料、指标和计算口径，标明来源、假设和缺失项。\n按表头列出资料日期、原始数字、单位、算式和结果。只解释已有数据，提出供专业人员核实的问题。不得声称持有执照或作出投资、审计、信贷结论。"
+      },
+      "tags": {
+        "previousSha256": "1d9ff6eb4431c2a7dc29d6bf178b3e79715968396b0b77cd1a58aea6c993cf67",
+        "value": [
+          "职场",
+          "财务比率计算与说明"
+        ]
+      }
+    },
+    "en": {
+      "category": {
+        "previousSha256": "941b085d3176f81fff8147e5e7c3797dab41904b699111bd01d67580d4d16390",
+        "value": "Workplace"
+      },
+      "title": {
+        "previousSha256": "bf5caa2d8fdd721663650ec18d12b2ff7ed9683ba3146b7c9c9a7df2f9934e74",
+        "value": "Financial Ratio Worksheet"
+      },
+      "summary": {
+        "previousSha256": "bfbec73eab4075a121bc6369b7044b2082eae0e33b56f6334a19c51044ef93ad",
+        "value": "Organize supplied financial records, figures and calculation methods, with sources, assumptions and gaps."
+      },
+      "prompt": {
+        "previousSha256": "bfb25a33f5a094b7572a785a10f37162769a686969041ae717eec9abdfe4187e",
+        "value": "Task: Financial Ratio Worksheet\nOrganize supplied financial records, figures and calculation methods, with sources, assumptions and gaps.\nList the reporting date, original number, unit, arithmetic and result. Explain the figures and list questions for professional review. Do not claim credentials or give investment, audit or credit decisions."
+      },
+      "tags": {
+        "previousSha256": "34f3c4333251fdfbc42a4e0788c9ec890b80fcf0d7886a6b8b5d566470e912c6",
+        "value": [
+          "Workplace",
+          "Financial Ratio Worksheet"
+        ]
+      }
+    }
+  },
+  "curated-图片-账号分析提示词框架": {
+    "zh": {
+      "category": {
+        "previousSha256": "2c6d1bd358615d9b209a6720803b196aa4322033dd047bd59f895ca1c5783f48",
+        "value": "运营"
+      },
+      "title": {
+        "previousSha256": "fe0dc16feee1ca74a9f3cc26956312e5da407a6b71f697b744412deac4f3d022",
+        "value": "社交媒体账号分析"
+      },
+      "tags": {
+        "previousSha256": "24bee05abd40b31426303d6a12ad0ff375104a2d2f4e7fb8e6b467090f365790",
+        "value": [
+          "运营",
+          "社交媒体账号分析"
+        ]
+      }
+    },
+    "en": {
+      "category": {
+        "previousSha256": "941b085d3176f81fff8147e5e7c3797dab41904b699111bd01d67580d4d16390",
+        "value": "Operations"
+      },
+      "title": {
+        "previousSha256": "726ab720e59048ee0f717c6a4a989842bc852654017aedfac685bc8213b05b31",
+        "value": "Social Media Account Review"
+      },
+      "tags": {
+        "previousSha256": "3956c244145a3b498336b71b1d3cf2780140d29d7101f2929101ccc7ee0bb0b7",
+        "value": [
+          "Operations",
+          "Social Media Account Review"
+        ]
+      }
+    }
+  },
+  "curated-图片-短视频制作工作流程提示词框架": {
+    "zh": {
+      "category": {
+        "previousSha256": "2c6d1bd358615d9b209a6720803b196aa4322033dd047bd59f895ca1c5783f48",
+        "value": "视频"
+      },
+      "title": {
+        "previousSha256": "cbe1268ae81c5ba5c94fc1d9ec7a53601797508d5435841f4b5ada5ea3cc2e1b",
+        "value": "短视频制作流程规划"
+      },
+      "tags": {
+        "previousSha256": "7be24a587fd0a43b546f26790185f4ed4216072533ab769ce8f3871ac4a58e69",
+        "value": [
+          "视频",
+          "短视频制作流程规划"
+        ]
+      }
+    },
+    "en": {
+      "category": {
+        "previousSha256": "941b085d3176f81fff8147e5e7c3797dab41904b699111bd01d67580d4d16390",
+        "value": "Video"
+      },
+      "title": {
+        "previousSha256": "6eaf823a2a78542c0575091cd1feaf7e51419fa2dd4771ecb468b524ddaa50a6",
+        "value": "Short Video Production Planning"
+      },
+      "tags": {
+        "previousSha256": "758a18175976fd1a04bc1178dee91c8d4f66f52f40d0a62e764949f10c923e8e",
+        "value": [
+          "Video",
+          "Short Video Production Planning"
+        ]
+      }
+    }
+  },
+  "curated-图片-塔罗牌占卜师": {
+    "zh": {
+      "category": {
+        "previousSha256": "2c6d1bd358615d9b209a6720803b196aa4322033dd047bd59f895ca1c5783f48",
+        "value": "生活"
+      },
+      "tags": {
+        "previousSha256": "b2b6809ce8a5e2d300f48ddbe8670662d2574efe2334f63e1b1ad57a0de67d8e",
+        "value": [
+          "生活",
+          "塔罗牌占卜师"
+        ]
+      }
+    },
+    "en": {
+      "category": {
+        "previousSha256": "941b085d3176f81fff8147e5e7c3797dab41904b699111bd01d67580d4d16390",
+        "value": "Life"
+      },
+      "tags": {
+        "previousSha256": "fae62af0a447e76cf990113e94ca31a3a29fd2b82733997b93c812f564916384",
+        "value": [
+          "Life",
+          "Tarot Poker."
+        ]
+      }
+    }
+  },
+  "curated-编程-网课制作提示词框架": {
+    "zh": {
+      "category": {
+        "previousSha256": "e677ac3f8f56af98d47e3810220972caff5833c6633b024c46e9ea6b727410ad",
+        "value": "职场"
+      },
+      "title": {
+        "previousSha256": "e02a61cc165aaddcea3f413ead5b61e4518d3de77a3dfe19ee7774e9924a5ac8",
+        "value": "在线课程设计助手"
+      },
+      "tags": {
+        "previousSha256": "19f4bb83221b5c55bdab66c70e0842fc0a71ee34ca7eba3917479845362c82e1",
+        "value": [
+          "职场",
+          "在线课程设计助手"
+        ]
+      }
+    },
+    "en": {
+      "category": {
+        "previousSha256": "9aab932a7edfd6c10219348a9796dce0ff1db3dc24ff56a9d1f2e444d2e68b4a",
+        "value": "Workplace"
+      },
+      "title": {
+        "previousSha256": "77314f29752d07a5dda021331779b4b1dee38cf30679b2c4322fffa2ad2687be",
+        "value": "Online Course Design Assistant"
+      },
+      "tags": {
+        "previousSha256": "5b596c7884c9e7b24af7127df529921b23ea5cf34d0cde54c116b15330cfbf7b",
+        "value": [
+          "Workplace",
+          "Online Course Design Assistant"
+        ]
+      }
+    }
+  },
+  "curated-编程-裁员赔偿助手": {
+    "zh": {
+      "category": {
+        "previousSha256": "e677ac3f8f56af98d47e3810220972caff5833c6633b024c46e9ea6b727410ad",
+        "value": "问答"
+      },
+      "title": {
+        "previousSha256": "9c3037404b4c745bdbf25f7d4ef3b23a2caf8ae9b8bb497a41bae82f4ac5d577",
+        "value": "劳动补偿资料整理"
+      },
+      "summary": {
+        "previousSha256": "9baedcf9c692cd3176a3aa1370072cff832c190340f7923ee5bc815f35595bee",
+        "value": "整理劳动关系、通知、合同与补偿资料，供后续核对。"
+      },
+      "prompt": {
+        "previousSha256": "c15fb31b7a8bc317c56e95b0999f71a46b064fe1b130081f49ec6b28e99c730c",
+        "value": "任务：劳动补偿资料整理\n整理劳动关系、通知、合同与补偿资料，供后续核对。\n请按用户提供的时间、地区与文件整理事实时间线，把原文与待核实问题分开。涉及适用法或补偿金额的认定，列为需要执业专业人员核实的问题。"
+      },
+      "tags": {
+        "previousSha256": "e545e82a38e94aa3e4fe826d8f2894ba9746f04604f5f6f5c249d980815b5e99",
+        "value": [
+          "问答",
+          "劳动补偿资料整理"
+        ]
+      }
+    },
+    "en": {
+      "category": {
+        "previousSha256": "9aab932a7edfd6c10219348a9796dce0ff1db3dc24ff56a9d1f2e444d2e68b4a",
+        "value": "General"
+      },
+      "title": {
+        "previousSha256": "506fe9e77cfe7f7dac1ecfcd6b9bde48c92b1672fd39a740c5bb3d0fc427618a",
+        "value": "Employment Compensation Document Organizer"
+      },
+      "summary": {
+        "previousSha256": "bb7284c4ec0a00328b7372a7992e4205fc90015ac8d0dd3af6ffc45f1aff9e7a",
+        "value": "Organize employment notices, contracts and compensation records for review."
+      },
+      "prompt": {
+        "previousSha256": "ca53c2530c46ff9ae95849bdad5c05bdfcb99a40dd7b853ea10bfed853f0e3d9",
+        "value": "Task: Employment Compensation Document Organizer\nOrganize employment notices, contracts and compensation records for review.\nOrganize dates, jurisdiction and supplied documents into a timeline. Separate quoted material from open questions. Leave legal interpretation and the determination of compensation to a qualified professional."
+      },
+      "tags": {
+        "previousSha256": "ef13ff704a18a083aaf00529cbb08c9dde2ef6368e879fa92ea1bf2242199e3b",
+        "value": [
+          "General",
+          "Employment Compensation Document Organizer"
+        ]
+      }
+    }
+  },
+  "curated-编程-法律案例拆解提示词框架": {
+    "zh": {
+      "category": {
+        "previousSha256": "e677ac3f8f56af98d47e3810220972caff5833c6633b024c46e9ea6b727410ad",
+        "value": "问答"
+      },
+      "title": {
+        "previousSha256": "c02a5b21ddbe0b79452ed059d45835c94932a6a2196cc9e8a4f43f25908e7890",
+        "value": "法律案例阅读笔记"
+      },
+      "summary": {
+        "previousSha256": "8e4adab0f442d3f452c8729e159583c2492c80c57985c3467eb77e17ba39aed5",
+        "value": "整理用户提供的法律文本、引用出处和待核实的问题。"
+      },
+      "prompt": {
+        "previousSha256": "a4d671b55845661c05c299bb696f5defc3ed509bb512c5afe96a96158f1be3ed",
+        "value": "任务：法律案例阅读笔记\n整理用户提供的法律文本、引用出处和待核实的问题。\n标明相关条款、材料日期、原文依据、可能存在的歧义及缺失资料。法规的时效性、个案适用与法律结论交由具备资质的人员复核。"
+      },
+      "tags": {
+        "previousSha256": "ca791486e7b7fca60ba49244fe337effeb7b4285046aacb0426e3b67d1da5987",
+        "value": [
+          "问答",
+          "法律案例阅读笔记"
+        ]
+      }
+    },
+    "en": {
+      "category": {
+        "previousSha256": "9aab932a7edfd6c10219348a9796dce0ff1db3dc24ff56a9d1f2e444d2e68b4a",
+        "value": "General"
+      },
+      "title": {
+        "previousSha256": "3cce24cf5df69d8208210e74f29de76807e2c368fc265c307d787b36763075f3",
+        "value": "Legal Case Reading Notes"
+      },
+      "summary": {
+        "previousSha256": "bfbec73eab4075a121bc6369b7044b2082eae0e33b56f6334a19c51044ef93ad",
+        "value": "Organize supplied legal texts, citations and open questions."
+      },
+      "prompt": {
+        "previousSha256": "2d8f51d1ccf450c813284963d08dae11c2575b778c8b2c5a936f5b1894dd39f8",
+        "value": "Task: Legal Case Reading Notes\nOrganize supplied legal texts, citations and open questions.\nList relevant provisions, dates, exact sources, ambiguities and missing information. Leave current legal validity, case-specific application and conclusions to qualified reviewers."
+      },
+      "tags": {
+        "previousSha256": "c320338df598eafbbc2e1ba26ecc334e2f4fab2e78afb81a6b0893d72e6cdad6",
+        "value": [
+          "General",
+          "Legal Case Reading Notes"
+        ]
+      }
+    }
+  },
+  "curated-编程-网文小说构思提示词框架": {
+    "zh": {
+      "category": {
+        "previousSha256": "e677ac3f8f56af98d47e3810220972caff5833c6633b024c46e9ea6b727410ad",
+        "value": "小说"
+      },
+      "title": {
+        "previousSha256": "688410a29702f2348391cb98554e1c64f29d63e75db23ee9be3cfd09c02b6f2b",
+        "value": "网络小说构思助手"
+      },
+      "tags": {
+        "previousSha256": "a9b0c86571e6d7ec10172507fdc98937799d5b7c9e560ec66cd42d2dd1013d2e",
+        "value": [
+          "小说",
+          "网络小说构思助手"
+        ]
+      }
+    },
+    "en": {
+      "category": {
+        "previousSha256": "9aab932a7edfd6c10219348a9796dce0ff1db3dc24ff56a9d1f2e444d2e68b4a",
+        "value": "Fiction"
+      },
+      "title": {
+        "previousSha256": "1b855685b3f86b37f73b3934f2e66807ce6f3a350a6d8664217425754249a32c",
+        "value": "Web Fiction Story Planner"
+      },
+      "tags": {
+        "previousSha256": "8abfd7fd51f665722ae94c850f26f9516ac273f0e4928e75d41daaabe84330a8",
+        "value": [
+          "Fiction",
+          "Web Fiction Story Planner"
+        ]
+      }
+    }
+  },
+  "curated-编程-商业需求文档撰写": {
+    "zh": {
+      "category": {
+        "previousSha256": "e677ac3f8f56af98d47e3810220972caff5833c6633b024c46e9ea6b727410ad",
+        "value": "职场"
+      },
+      "tags": {
+        "previousSha256": "a3c7c9ec3c026f27aab074b15170fada221a8d54e790a466b702bdda1a71e8cb",
+        "value": [
+          "职场",
+          "商业需求文档撰写"
+        ]
+      }
+    },
+    "en": {
+      "category": {
+        "previousSha256": "9aab932a7edfd6c10219348a9796dce0ff1db3dc24ff56a9d1f2e444d2e68b4a",
+        "value": "Workplace"
+      },
+      "title": {
+        "previousSha256": "a3434d0832307d85af4a866a152054cad170cb21a83940daa21792ab519b1aa1",
+        "value": "Business Requirements Writer"
+      },
+      "tags": {
+        "previousSha256": "32f8bcab6847a06c508b81d7b4b9ec824c43797620e84e8b876ca6b74ab389f9",
+        "value": [
+          "Workplace",
+          "Business Requirements Writer"
+        ]
+      }
+    }
+  },
+  "curated-编程-产品需求文档撰写": {
+    "zh": {
+      "category": {
+        "previousSha256": "e677ac3f8f56af98d47e3810220972caff5833c6633b024c46e9ea6b727410ad",
+        "value": "职场"
+      },
+      "tags": {
+        "previousSha256": "3dd03837119887f44688692e2dbeac28e1f69f2f488a776f8daaa000374ebd5a",
+        "value": [
+          "职场",
+          "产品需求文档撰写"
+        ]
+      }
+    },
+    "en": {
+      "category": {
+        "previousSha256": "9aab932a7edfd6c10219348a9796dce0ff1db3dc24ff56a9d1f2e444d2e68b4a",
+        "value": "Workplace"
+      },
+      "title": {
+        "previousSha256": "3e3127c29a08d384f2df58f2f10c8d3a158047028e0aa07579e0798bb161e852",
+        "value": "Product Requirements Writer"
+      },
+      "tags": {
+        "previousSha256": "6ab5fed90aea31412afb2ab7f0e85ff93a0ec53f4a7944d588f217a252d1ceb9",
+        "value": [
+          "Workplace",
+          "Product Requirements Writer"
+        ]
+      }
+    }
+  },
+  "curated-问答-行业分析师": {
+    "zh": {
+      "category": {
+        "previousSha256": "25ac8a35a75c7a86ba9ada5f86d2f235f999cfac8b36e6636de8aba5f0aa0f6c",
+        "value": "运营"
+      },
+      "tags": {
+        "previousSha256": "41bc8f589e477bb5cd5c461568b9d5123cd97f167451c3283075478cf4f52e57",
+        "value": [
+          "运营",
+          "行业分析师"
+        ]
+      }
+    },
+    "en": {
+      "category": {
+        "previousSha256": "468d61a94d9f9d93e56df7cf8941414523b6a129fb60aa4351b0d40c858ff44c",
+        "value": "Operations"
+      },
+      "tags": {
+        "previousSha256": "f532a78ffe6d24faf00f321c9a1fc28c8cc2ac671e81d3dc19d08219e8282415",
+        "value": [
+          "Operations",
+          "Industry Analyst"
+        ]
+      }
+    }
+  },
+  "curated-编程-行业分析高级师": {
+    "zh": {
+      "category": {
+        "previousSha256": "e677ac3f8f56af98d47e3810220972caff5833c6633b024c46e9ea6b727410ad",
+        "value": "运营"
+      },
+      "title": {
+        "previousSha256": "96a69f2b2069c8e76073a2d9e13a69f5549c57bf9a162954a654771dbe26598a",
+        "value": "行业分析助手"
+      },
+      "tags": {
+        "previousSha256": "8716639e4056639945b74093910f3d18eb1c2aa6003e17b0843488c50acea28f",
+        "value": [
+          "运营",
+          "行业分析助手"
+        ]
+      }
+    },
+    "en": {
+      "category": {
+        "previousSha256": "9aab932a7edfd6c10219348a9796dce0ff1db3dc24ff56a9d1f2e444d2e68b4a",
+        "value": "Operations"
+      },
+      "title": {
+        "previousSha256": "60361b75cd81648b4c3fa04771479793a375d0272fb54e606b6bc8a65b3836d5",
+        "value": "Industry Analysis Assistant"
+      },
+      "tags": {
+        "previousSha256": "5a8c464378c2569b779bee4b6b2e62e8040582f596ecbf86d9e1b62cb008e3b0",
+        "value": [
+          "Operations",
+          "Industry Analysis Assistant"
+        ]
+      }
+    }
+  },
+  "curated-编程-swot模型分析": {
+    "zh": {
+      "category": {
+        "previousSha256": "e677ac3f8f56af98d47e3810220972caff5833c6633b024c46e9ea6b727410ad",
+        "value": "运营"
+      },
+      "tags": {
+        "previousSha256": "3e675582363f91a36a80dbcfeaa653fceadf2ab7d72255c60f849dcb12f4ef3f",
+        "value": [
+          "运营",
+          "SWOT模型分析"
+        ]
+      }
+    },
+    "en": {
+      "category": {
+        "previousSha256": "9aab932a7edfd6c10219348a9796dce0ff1db3dc24ff56a9d1f2e444d2e68b4a",
+        "value": "Operations"
+      },
+      "tags": {
+        "previousSha256": "765ebb361375ca1f3b5477ac16934761104ab759fd4e962d92da4d7c9a38bd0e",
+        "value": [
+          "Operations",
+          "SWOT model analysis"
+        ]
+      }
+    }
+  },
+  "curated-图片-swot模型分析顾问": {
+    "zh": {
+      "category": {
+        "previousSha256": "2c6d1bd358615d9b209a6720803b196aa4322033dd047bd59f895ca1c5783f48",
+        "value": "运营"
+      },
+      "tags": {
+        "previousSha256": "82027d4852adc1f9a1cb10bf1537b4b7714ead8e19cb4d0fdb2f60680cd6bc20",
+        "value": [
+          "运营",
+          "SWOT模型分析顾问"
+        ]
+      }
+    },
+    "en": {
+      "category": {
+        "previousSha256": "941b085d3176f81fff8147e5e7c3797dab41904b699111bd01d67580d4d16390",
+        "value": "Operations"
+      },
+      "tags": {
+        "previousSha256": "c4aef7cb4c278c80da7c16512b4f2f011a00d57965ef83dad519b10c0f31f8a4",
+        "value": [
+          "Operations",
+          "Consultant for SWOT model analysis"
+        ]
+      }
+    }
+  },
+  "curated-编程-波特五力模型分析": {
+    "zh": {
+      "category": {
+        "previousSha256": "e677ac3f8f56af98d47e3810220972caff5833c6633b024c46e9ea6b727410ad",
+        "value": "运营"
+      },
+      "title": {
+        "previousSha256": "de6ca9ad5e44cf91b000109f28c0f3098fdb5545d15caa74fafa47da22a075f2",
+        "value": "波特五力分析"
+      },
+      "tags": {
+        "previousSha256": "b50bcdd65b8bb2f96498dd4ba74b2740fd848372e9588ed0e42cad149d0f71e4",
+        "value": [
+          "运营",
+          "波特五力分析"
+        ]
+      }
+    },
+    "en": {
+      "category": {
+        "previousSha256": "9aab932a7edfd6c10219348a9796dce0ff1db3dc24ff56a9d1f2e444d2e68b4a",
+        "value": "Operations"
+      },
+      "title": {
+        "previousSha256": "40b5213df168cb7ee8cd9a8de0fbc906f6e59b15e1e9a635f4861a813c290e07",
+        "value": "Porter's Five Forces Analysis"
+      },
+      "tags": {
+        "previousSha256": "730ce7989b504859c21e1d51bb33d33fe3cf1b291b5a6358925621d32ba5e7a9",
+        "value": [
+          "Operations",
+          "Porter's Five Forces Analysis"
+        ]
+      }
+    }
+  },
+  "curated-问答-行业分析报告大纲": {
+    "zh": {
+      "category": {
+        "previousSha256": "25ac8a35a75c7a86ba9ada5f86d2f235f999cfac8b36e6636de8aba5f0aa0f6c",
+        "value": "运营"
+      },
+      "tags": {
+        "previousSha256": "bb81eee94cfcdf4afe9befc4ce9b51c05d604a39dc315c83e602787f3e94cbb6",
+        "value": [
+          "运营",
+          "行业分析报告大纲"
+        ]
+      }
+    },
+    "en": {
+      "category": {
+        "previousSha256": "468d61a94d9f9d93e56df7cf8941414523b6a129fb60aa4351b0d40c858ff44c",
+        "value": "Operations"
+      },
+      "tags": {
+        "previousSha256": "1f3bf320270a3aab1bcf2d1406b4bb080b33ed09f92d169bccf3a038f30696fa",
+        "value": [
+          "Operations",
+          "Outline of the industry analysis report"
+        ]
+      }
+    }
+  },
+  "curated-编程-pest模型分析": {
+    "zh": {
+      "category": {
+        "previousSha256": "e677ac3f8f56af98d47e3810220972caff5833c6633b024c46e9ea6b727410ad",
+        "value": "运营"
+      },
+      "tags": {
+        "previousSha256": "ab0a16d6367851f438f71ace309ecaf62bdd66079757c93c9d2e2c3cace3d18d",
+        "value": [
+          "运营",
+          "PEST模型分析"
+        ]
+      }
+    },
+    "en": {
+      "category": {
+        "previousSha256": "9aab932a7edfd6c10219348a9796dce0ff1db3dc24ff56a9d1f2e444d2e68b4a",
+        "value": "Operations"
+      },
+      "tags": {
+        "previousSha256": "2aee6c27d06f251ae54fb91c4ffd647866e4140ac0f8f42a977b39757acd4522",
+        "value": [
+          "Operations",
+          "PEST model analysis"
+        ]
+      }
+    }
+  },
+  "curated-编程-旅游行程制定": {
+    "zh": {
+      "category": {
+        "previousSha256": "e677ac3f8f56af98d47e3810220972caff5833c6633b024c46e9ea6b727410ad",
+        "value": "生活"
+      },
+      "title": {
+        "previousSha256": "776ce468a2708f893f16236355ab2750cde605c83602af719a4e650b455f0b4a",
+        "value": "旅行行程规划"
+      },
+      "tags": {
+        "previousSha256": "530ff403d8ce3110b5d6475f2658418a9d52b5294fc6714c03fafbb420929ad6",
+        "value": [
+          "生活",
+          "旅行行程规划"
+        ]
+      }
+    },
+    "en": {
+      "category": {
+        "previousSha256": "9aab932a7edfd6c10219348a9796dce0ff1db3dc24ff56a9d1f2e444d2e68b4a",
+        "value": "Life"
+      },
+      "title": {
+        "previousSha256": "d97807cd0744ac0dc2b5c3e0757f6b8d24234b4558fd9fdf82b5671a25dd31a6",
+        "value": "Travel Itinerary Planner"
+      },
+      "tags": {
+        "previousSha256": "157ce064d06af3bcd68ef2a4705b33e814939c9572eeac13b99dc982cdce7fdd",
+        "value": [
+          "Life",
+          "Travel Itinerary Planner"
+        ]
+      }
+    }
+  },
+  "curated-编程-数据分析": {
+    "zh": {
+      "category": {
+        "previousSha256": "e677ac3f8f56af98d47e3810220972caff5833c6633b024c46e9ea6b727410ad",
+        "value": "运营"
+      },
+      "title": {
+        "previousSha256": "c29b4f571c9284cef58b65d5dd05956696e6910cfff1126e4d4463ed4a9bd21a",
+        "value": "商品销售数据分析"
+      },
+      "tags": {
+        "previousSha256": "aa8cf6542b4c1b4596fbfe4a9965bd0b8b8eb5ac17bf65a063bf236318efdf44",
+        "value": [
+          "运营",
+          "商品销售数据分析"
+        ]
+      }
+    },
+    "en": {
+      "category": {
+        "previousSha256": "9aab932a7edfd6c10219348a9796dce0ff1db3dc24ff56a9d1f2e444d2e68b4a",
+        "value": "Operations"
+      },
+      "title": {
+        "previousSha256": "347a33f16fd71629ae76e5f6da9453f5e9a3c9cdc5abe3a73944df99939cc998",
+        "value": "Sales Data Analysis"
+      },
+      "tags": {
+        "previousSha256": "b1290b31d598b8aff3f4175fd92e52519969c6d722111dd0145fb0122a969e56",
+        "value": [
+          "Operations",
+          "Sales Data Analysis"
+        ]
+      }
+    }
+  },
+  "curated-生活-金句生成": {
+    "zh": {
+      "category": {
+        "previousSha256": "d8b043c25235220d1d7d3f7321cbc3df21875345342f40fbf72783c174b15408",
+        "value": "写作"
+      },
+      "tags": {
+        "previousSha256": "396893d3b2b251a2f90491e19d052ff6ce32eac6f77d26451c6f9fc25c474cf6",
+        "value": [
+          "写作",
+          "金句生成"
+        ]
+      }
+    },
+    "en": {
+      "category": {
+        "previousSha256": "f8fe9ce39c48c84a0990f475594eba79e5e920f5dce0521b1eaf53c6e53958e9",
+        "value": "Writing"
+      },
+      "tags": {
+        "previousSha256": "bd4a80bbf8cf72efca01076eb0066db0a42c36e1f91ad0b7d60362c66c89a3b2",
+        "value": [
+          "Writing",
+          "Goldline Generation"
+        ]
+      }
+    }
+  },
+  "curated-生活-仿写文案": {
+    "zh": {
+      "category": {
+        "previousSha256": "d8b043c25235220d1d7d3f7321cbc3df21875345342f40fbf72783c174b15408",
+        "value": "写作"
+      },
+      "tags": {
+        "previousSha256": "05836dfd814b248cd2c50186ffa5c86c26e911417f4da0834439384c46e92537",
+        "value": [
+          "写作",
+          "仿写文案"
+        ]
+      }
+    },
+    "en": {
+      "category": {
+        "previousSha256": "f8fe9ce39c48c84a0990f475594eba79e5e920f5dce0521b1eaf53c6e53958e9",
+        "value": "Writing"
+      },
+      "tags": {
+        "previousSha256": "cadc0384c9b5732058b377a1430c8c7e36e2289c9117c0e817b54a12a4ac3cd4",
+        "value": [
+          "Writing",
+          "Simulation of the writing"
+        ]
+      }
+    }
+  },
+  "curated-生活-文章优化": {
+    "zh": {
+      "category": {
+        "previousSha256": "d8b043c25235220d1d7d3f7321cbc3df21875345342f40fbf72783c174b15408",
+        "value": "写作"
+      },
+      "tags": {
+        "previousSha256": "f19446a23dd576e8b0b72dc32c11eda16d4454eef4d8bac54cd13cfab99af0a0",
+        "value": [
+          "写作",
+          "文章优化"
+        ]
+      }
+    },
+    "en": {
+      "category": {
+        "previousSha256": "f8fe9ce39c48c84a0990f475594eba79e5e920f5dce0521b1eaf53c6e53958e9",
+        "value": "Writing"
+      },
+      "tags": {
+        "previousSha256": "00aabc7b013b8bb3c93ce6f8bc9c53714aa3925ca407fd00d24db2bff9056e12",
+        "value": [
+          "Writing",
+          "Optimizing articles"
+        ]
+      }
+    }
+  },
+  "curated-生活-热点事件编辑文章": {
+    "zh": {
+      "category": {
+        "previousSha256": "d8b043c25235220d1d7d3f7321cbc3df21875345342f40fbf72783c174b15408",
+        "value": "写作"
+      },
+      "tags": {
+        "previousSha256": "b73370b50ce0a85fa877b656938e1ae6b710a1a51447304b8bf381d1dffcc80d",
+        "value": [
+          "写作",
+          "热点事件编辑文章"
+        ]
+      }
+    },
+    "en": {
+      "category": {
+        "previousSha256": "f8fe9ce39c48c84a0990f475594eba79e5e920f5dce0521b1eaf53c6e53958e9",
+        "value": "Writing"
+      },
+      "tags": {
+        "previousSha256": "2f402527f82fcf769c876cd0e69f8f5a57e761d2a578c7ce1e990c62e5d902c8",
+        "value": [
+          "Writing",
+          "Hotspot Event Edition"
+        ]
+      }
+    }
+  },
+  "curated-论文-高级文案编辑器": {
+    "zh": {
+      "category": {
+        "previousSha256": "7cef1d71db62938a9e3b7dddc20161dd7e1fa66228454b28f6713039784c3003",
+        "value": "写作"
+      },
+      "tags": {
+        "previousSha256": "c918c63ae5a6977b2e26f7d76f01ff62c8ea55560a753f160d7253e651b82985",
+        "value": [
+          "写作",
+          "高级文案编辑器"
+        ]
+      }
+    },
+    "en": {
+      "category": {
+        "previousSha256": "665bc989dd4909f2aa2644f529e85a74b96cb9183b0038a00be23964ef17bf17",
+        "value": "Writing"
+      },
+      "tags": {
+        "previousSha256": "e90714af21a710f9669859e849e55dd9ce52e9ef7ec8f49a912fd17bcc76b78e",
+        "value": [
+          "Writing",
+          "Advanced Script Editor"
+        ]
+      }
+    }
+  },
+  "curated-生活-文案二创": {
+    "zh": {
+      "category": {
+        "previousSha256": "d8b043c25235220d1d7d3f7321cbc3df21875345342f40fbf72783c174b15408",
+        "value": "写作"
+      },
+      "tags": {
+        "previousSha256": "bc2be50a1be44d4e68ab2837af77d84a43eef435a78e6f46ec5d5b2d99a9d6cc",
+        "value": [
+          "写作",
+          "文案二创"
+        ]
+      }
+    },
+    "en": {
+      "category": {
+        "previousSha256": "f8fe9ce39c48c84a0990f475594eba79e5e920f5dce0521b1eaf53c6e53958e9",
+        "value": "Writing"
+      },
+      "tags": {
+        "previousSha256": "481f90e0735c9d3035ab3e840dd07ad3cc39f75a237aabcea69b3bf26d4d9a4b",
+        "value": [
+          "Writing",
+          "Book 2"
+        ]
+      }
+    }
+  },
+  "curated-生活-小学数学智能助手": {
+    "zh": {
+      "category": {
+        "previousSha256": "d8b043c25235220d1d7d3f7321cbc3df21875345342f40fbf72783c174b15408",
+        "value": "问答"
+      },
+      "tags": {
+        "previousSha256": "4d001882ab0dbce3415cd908ed8553839c85173a79e95e02a5b84020bec3fa6f",
+        "value": [
+          "问答",
+          "小学数学智能助手"
+        ]
+      }
+    },
+    "en": {
+      "category": {
+        "previousSha256": "f8fe9ce39c48c84a0990f475594eba79e5e920f5dce0521b1eaf53c6e53958e9",
+        "value": "General"
+      },
+      "tags": {
+        "previousSha256": "5488b7a5c4710f71f72967ffb659a12b3931c28b3af6a4fcd146b2fc7d11809e",
+        "value": [
+          "General",
+          "Mathematical intelligence assistant at primary school"
+        ]
+      }
+    }
+  },
+  "curated-生活-训练导师": {
+    "zh": {
+      "category": {
+        "previousSha256": "d8b043c25235220d1d7d3f7321cbc3df21875345342f40fbf72783c174b15408",
+        "value": "职场"
+      },
+      "tags": {
+        "previousSha256": "02a9cc3471f45e254b34c28ae2a5c2649769571b26f95b00bd9b624eaed13d60",
+        "value": [
+          "职场",
+          "训练导师"
+        ]
+      }
+    },
+    "en": {
+      "category": {
+        "previousSha256": "f8fe9ce39c48c84a0990f475594eba79e5e920f5dce0521b1eaf53c6e53958e9",
+        "value": "Workplace"
+      },
+      "tags": {
+        "previousSha256": "9fa734986f46e7864d217638f0abd0d513816824f8a70a0994fc4bef8a0fa3e2",
+        "value": [
+          "Workplace",
+          "Training of mentors"
+        ]
+      }
+    }
+  },
+  "curated-论文-个人ip": {
+    "zh": {
+      "category": {
+        "previousSha256": "7cef1d71db62938a9e3b7dddc20161dd7e1fa66228454b28f6713039784c3003",
+        "value": "运营"
+      },
+      "title": {
+        "previousSha256": "0d7e2c2bca35312fde5eb01a872cc9d56b9d516dccd9bf2e2bef21a01b708de2",
+        "value": "个人品牌文案写作"
+      },
+      "tags": {
+        "previousSha256": "5c560b91de99d705032c62e361357b07c0873d0031bc35dedee48e9f8fe96e38",
+        "value": [
+          "运营",
+          "个人品牌文案写作"
+        ]
+      }
+    },
+    "en": {
+      "category": {
+        "previousSha256": "665bc989dd4909f2aa2644f529e85a74b96cb9183b0038a00be23964ef17bf17",
+        "value": "Operations"
+      },
+      "title": {
+        "previousSha256": "2592957e2d18edf7d70953029d7a0bc4e71bd383fae3e6fce9ebdd1aade910de",
+        "value": "Personal Brand Copywriting"
+      },
+      "tags": {
+        "previousSha256": "232bc5e1b6fb54763eaf2c7ab184d9356804f81c29041ac19589b176b99a4601",
+        "value": [
+          "Operations",
+          "Personal Brand Copywriting"
+        ]
+      }
+    }
+  },
+  "curated-视频-洗稿": {
+    "zh": {
+      "title": {
+        "previousSha256": "bfa76d3fa5615325c827537e2eac7c2d92edc39f205868c2445c7af7f764293c",
+        "value": "本地业务短视频文案"
+      },
+      "summary": {
+        "previousSha256": "54507720779f26f10a2d4ed29468b0fcd72e13321e1a0cd273fd221553d74b2a",
+        "value": "根据用户自己的素材整理原创叙事结构和语言。"
+      },
+      "prompt": {
+        "previousSha256": "9a94be48d621f1daa05c40bdce5932ecb2e0b6ace7a60d015896e851c23f75cb",
+        "value": "任务：本地业务短视频文案\n根据用户自己的素材整理原创叙事结构和语言。\n请先询问主题、受众和由用户提供或获准使用的素材。列出不同的开场、具体细节和结尾建议。使用原创表达，不冒用具体人物身份，不照搬他人文案。"
+      },
+      "tags": {
+        "previousSha256": "d4b74e38c272877d04042a98c59a4e139c00107064ae15a4c84820ef00b5c4ee",
+        "value": [
+          "视频",
+          "本地业务短视频文案"
+        ]
+      }
+    },
+    "en": {
+      "title": {
+        "previousSha256": "5eb4f3e073f257de7c2e36b520ccec3cb6227342d442fa9c916dc8326034c4bc",
+        "value": "Local Business Video Script"
+      },
+      "summary": {
+        "previousSha256": "b2c9489e5a193f2a27ddbe21baa996ac9b4748310fd34d60d5c96700f410400e",
+        "value": "Build an original narrative and phrasing from the user's own material."
+      },
+      "prompt": {
+        "previousSha256": "29876c5cea35a10161317ce043a07a9e4fd12782a72f1d00706b529f37bb1a9f",
+        "value": "Task: Local Business Video Script\nBuild an original narrative and phrasing from the user's own material.\nAsk for the topic, audience and original or licensed material. Offer distinct openings, specific details and endings, using original language. Do not impersonate a named person or reproduce another writer's copy."
+      },
+      "tags": {
+        "previousSha256": "bc287e6cb3d2654571b02378d6c63e965c67e1280aec33f630581fbd0ea114b3",
+        "value": [
+          "Video",
+          "Local Business Video Script"
+        ]
+      }
+    }
+  },
+  "curated-视频-房琪文案": {
+    "zh": {
+      "title": {
+        "previousSha256": "03a10086dbe669235ef4b6ab8ed66f937be31d0faddf18b79d64df7b57c22c37",
+        "value": "旅行短片叙事文案"
+      },
+      "summary": {
+        "previousSha256": "9cc4b5308f16e5d60a640a9da925b256bbaae29b8084c1a0463f79a14018a181",
+        "value": "根据用户自己的素材整理原创叙事结构和语言。"
+      },
+      "prompt": {
+        "previousSha256": "2d7e3011037c244fde003d120e9c3b1d10a407c7556a5a0b5bce7d26bf77db2d",
+        "value": "任务：旅行短片叙事文案\n根据用户自己的素材整理原创叙事结构和语言。\n请先询问主题、受众和由用户提供或获准使用的素材。列出不同的开场、具体细节和结尾建议。使用原创表达，不冒用具体人物身份，不照搬他人文案。"
+      },
+      "tags": {
+        "previousSha256": "308b67fce9981fc5b3921d4e6029080b937275f8efc1d6a7354141a1f75f7dfc",
+        "value": [
+          "视频",
+          "旅行短片叙事文案"
+        ]
+      }
+    },
+    "en": {
+      "title": {
+        "previousSha256": "636f54c52568e189d73e527421b65d3ee56ec7cda7d348158832c4f81f5b57d7",
+        "value": "Travel Video Storytelling"
+      },
+      "summary": {
+        "previousSha256": "139699498b3b25121cb6f854eb6e8abc4265dba46e40961b0598155cf45173a0",
+        "value": "Build an original narrative and phrasing from the user's own material."
+      },
+      "prompt": {
+        "previousSha256": "0fa7fa265269738170dd90c5aad7c11f16d278e667f06b4197bf97c98f8a200b",
+        "value": "Task: Travel Video Storytelling\nBuild an original narrative and phrasing from the user's own material.\nAsk for the topic, audience and original or licensed material. Offer distinct openings, specific details and endings, using original language. Do not impersonate a named person or reproduce another writer's copy."
+      },
+      "tags": {
+        "previousSha256": "4eee7ca3a397bed0219f3bb03f96e54145201d0aa64ac5ba8b8454cf2729c97d",
+        "value": [
+          "Video",
+          "Travel Video Storytelling"
+        ]
+      }
+    }
+  },
+  "curated-生活-董宇辉文案": {
+    "zh": {
+      "category": {
+        "previousSha256": "d8b043c25235220d1d7d3f7321cbc3df21875345342f40fbf72783c174b15408",
+        "value": "写作"
+      },
+      "title": {
+        "previousSha256": "8126faa493a738d3eb97c976d12f85905f3c45e266f6ec9a685382e766eafafe",
+        "value": "人文故事写作"
+      },
+      "summary": {
+        "previousSha256": "b998d69e893ccfa2b888d116cc3df53203400e0e307839765278e65fb93e4e5d",
+        "value": "根据用户自己的素材整理原创叙事结构和语言。"
+      },
+      "prompt": {
+        "previousSha256": "2b8ba31e238d676d59c8f537f901398fdd4e6d9a81e936bd990155ba73b0370c",
+        "value": "任务：人文故事写作\n根据用户自己的素材整理原创叙事结构和语言。\n请先询问主题、受众和由用户提供或获准使用的素材。列出不同的开场、具体细节和结尾建议。使用原创表达，不冒用具体人物身份，不照搬他人文案。"
+      },
+      "tags": {
+        "previousSha256": "3c509900574fdcfa7803af8ab629ab85239c3f78144fd0471a16c372fcb15ad5",
+        "value": [
+          "写作",
+          "人文故事写作"
+        ]
+      }
+    },
+    "en": {
+      "category": {
+        "previousSha256": "f8fe9ce39c48c84a0990f475594eba79e5e920f5dce0521b1eaf53c6e53958e9",
+        "value": "Writing"
+      },
+      "title": {
+        "previousSha256": "5bebdb286d53d9b7c0dfc0babef6a38289458e0b478eaf5503563ed979f08e8a",
+        "value": "Human-Interest Story Writing"
+      },
+      "summary": {
+        "previousSha256": "b998d69e893ccfa2b888d116cc3df53203400e0e307839765278e65fb93e4e5d",
+        "value": "Build an original narrative and phrasing from the user's own material."
+      },
+      "prompt": {
+        "previousSha256": "f178e636a22397f677eeacd85c24e72c6ac03d6530b028ffffd5c8ca8a0bd90f",
+        "value": "Task: Human-Interest Story Writing\nBuild an original narrative and phrasing from the user's own material.\nAsk for the topic, audience and original or licensed material. Offer distinct openings, specific details and endings, using original language. Do not impersonate a named person or reproduce another writer's copy."
+      },
+      "tags": {
+        "previousSha256": "094067d035ac82adabbc50f2401912b705f6437de2ac45e4323715370a7ad060",
+        "value": [
+          "Writing",
+          "Human-Interest Story Writing"
+        ]
+      }
+    }
+  },
+  "curated-编程-国际文案编著者": {
+    "zh": {
+      "category": {
+        "previousSha256": "e677ac3f8f56af98d47e3810220972caff5833c6633b024c46e9ea6b727410ad",
+        "value": "写作"
+      },
+      "title": {
+        "previousSha256": "c4d3c2b1d71d0dccc5f926d15d6e68ec732c1ebf7e02713af484cffc2c6efc0b",
+        "value": "国际贸易评论写作"
+      },
+      "tags": {
+        "previousSha256": "9c047f65c461419f6a8da5b8b4e6572a1354ecdc3f22689bb5bd6dbfc2177066",
+        "value": [
+          "写作",
+          "国际贸易评论写作"
+        ]
+      }
+    },
+    "en": {
+      "category": {
+        "previousSha256": "9aab932a7edfd6c10219348a9796dce0ff1db3dc24ff56a9d1f2e444d2e68b4a",
+        "value": "Writing"
+      },
+      "title": {
+        "previousSha256": "05d8aa34500d2e92ed3ba6746f790f89505dc6095178f29f2d411f3b81439200",
+        "value": "International Trade Commentary Writer"
+      },
+      "tags": {
+        "previousSha256": "20d5aa963919d0bcbfed1da73dc56bb1a469dd4aef93a1b9ccb0c2a67f75ae69",
+        "value": [
+          "Writing",
+          "International Trade Commentary Writer"
+        ]
+      }
+    }
+  },
+  "curated-编程-金融研报文案": {
+    "zh": {
+      "category": {
+        "previousSha256": "e677ac3f8f56af98d47e3810220972caff5833c6633b024c46e9ea6b727410ad",
+        "value": "运营"
+      },
+      "title": {
+        "previousSha256": "35a0a9356c886a52e10caa644e177eb4669e966bd9c2b6495a1afbe8f4bd163b",
+        "value": "金融研究报告整理"
+      },
+      "summary": {
+        "previousSha256": "aa0de01735c51031efd15ad3d5b7f3304ad652b72cc6aca4b3c6a36865781977",
+        "value": "整理用户提供的财务资料、指标和计算口径，标明来源、假设和缺失项。"
+      },
+      "prompt": {
+        "previousSha256": "7dab4dc4202b43574f03d095a26360e328cb5bbb9d67b8dc218eba7fe92ff36f",
+        "value": "任务：金融研究报告整理\n整理用户提供的财务资料、指标和计算口径，标明来源、假设和缺失项。\n按表头列出资料日期、原始数字、单位、算式和结果。只解释已有数据，提出供专业人员核实的问题。不得声称持有执照或作出投资、审计、信贷结论。"
+      },
+      "tags": {
+        "previousSha256": "9957baa0642d0a319d79b8f24724f24f50bf53a818af3ae176b80f317b9e0d8f",
+        "value": [
+          "运营",
+          "金融研究报告整理"
+        ]
+      }
+    },
+    "en": {
+      "category": {
+        "previousSha256": "9aab932a7edfd6c10219348a9796dce0ff1db3dc24ff56a9d1f2e444d2e68b4a",
+        "value": "Operations"
+      },
+      "title": {
+        "previousSha256": "e75ce91f2cdc57dd4b38aa01d374ea05c905c22cd4013db073d4a77067903201",
+        "value": "Financial Research Report Organizer"
+      },
+      "summary": {
+        "previousSha256": "9ee6fb45d09d1a28d7327376555a684de6a869c04e9b7ea4b91fd8890d677e5a",
+        "value": "Organize supplied financial records, figures and calculation methods, with sources, assumptions and gaps."
+      },
+      "prompt": {
+        "previousSha256": "100f521a9d865e1dfa17b4cde02b7552d7e5dd6c7d06de23cf52e32a9663385c",
+        "value": "Task: Financial Research Report Organizer\nOrganize supplied financial records, figures and calculation methods, with sources, assumptions and gaps.\nList the reporting date, original number, unit, arithmetic and result. Explain the figures and list questions for professional review. Do not claim credentials or give investment, audit or credit decisions."
+      },
+      "tags": {
+        "previousSha256": "06eba9d414d71e12ca6225fb15cf38762404e6b0d275f323e4227f5dff4ffce9",
+        "value": [
+          "Operations",
+          "Financial Research Report Organizer"
+        ]
+      }
+    }
+  },
+  "curated-编程-智能体助手提示词": {
+    "zh": {
+      "category": {
+        "previousSha256": "e677ac3f8f56af98d47e3810220972caff5833c6633b024c46e9ea6b727410ad",
+        "value": "问答"
+      },
+      "tags": {
+        "previousSha256": "7b31781acb806a86c231f4ae2c1531ffb35a9e63026f00e65944bd5aeca27211",
+        "value": [
+          "问答",
+          "智能体助手提示词"
+        ]
+      }
+    },
+    "en": {
+      "category": {
+        "previousSha256": "9aab932a7edfd6c10219348a9796dce0ff1db3dc24ff56a9d1f2e444d2e68b4a",
+        "value": "General"
+      },
+      "tags": {
+        "previousSha256": "ba7b10e5f81eae168a3230d99badad532404870cd0155aeceebc9afc3af3f524",
+        "value": [
+          "General",
+          "Smart Assistant Hint"
+        ]
+      }
+    }
+  },
+  "curated-写作-苏格拉底式导师": {
+    "zh": {
+      "category": {
+        "previousSha256": "cdba9142877361afacab344de5b98311be9b8d337d24430bca9124cbcb0f393f",
+        "value": "问答"
+      },
+      "tags": {
+        "previousSha256": "36f60977cdd0e170c7362140a3e60c591c3f3f2976d5457424240b1cdd43a4dd",
+        "value": [
+          "问答",
+          "苏格拉底式导师"
+        ]
+      }
+    },
+    "en": {
+      "category": {
+        "previousSha256": "976c534c94969d69bd71956802a592db0eac1938cd779cb60705184e06b16a1f",
+        "value": "General"
+      },
+      "tags": {
+        "previousSha256": "be9ab3588f8a3ab5288ad53022b2945927cf256d7242c46a8b1ed1323efa4e83",
+        "value": [
+          "General",
+          "Socrates-style mentor"
+        ]
+      }
+    }
+  },
+  "curated-生活-诗人": {
+    "zh": {
+      "category": {
+        "previousSha256": "d8b043c25235220d1d7d3f7321cbc3df21875345342f40fbf72783c174b15408",
+        "value": "写作"
+      },
+      "tags": {
+        "previousSha256": "57c187d102f44961e62ef8de860f5565633dc658fd134d603594152d574d6521",
+        "value": [
+          "写作",
+          "诗人"
+        ]
+      }
+    },
+    "en": {
+      "category": {
+        "previousSha256": "f8fe9ce39c48c84a0990f475594eba79e5e920f5dce0521b1eaf53c6e53958e9",
+        "value": "Writing"
+      },
+      "tags": {
+        "previousSha256": "8df6b78b44141d3eb646a3c3efddddb8ca7ed9fc16cb66ec2056c76c965a69b2",
+        "value": [
+          "Writing",
+          "Poets."
+        ]
+      }
+    }
+  },
+  "curated-运营-情感作家": {
+    "zh": {
+      "category": {
+        "previousSha256": "4542fdc93f9885bad2bcd4a5db6842078372cf371b3cd45eb6b7416dd22e2f84",
+        "value": "写作"
+      },
+      "tags": {
+        "previousSha256": "a6264b5ff202f5a33a6ba097faf33c07eb2e6b05f449892e2fa35b38d3328859",
+        "value": [
+          "写作",
+          "情感作家"
+        ]
+      }
+    },
+    "en": {
+      "category": {
+        "previousSha256": "1653365f65b9061d88174bc9c421c6db48d40f0b280b44ca0973364458eb7557",
+        "value": "Writing"
+      },
+      "tags": {
+        "previousSha256": "5e5056f11c2a578acf5a39d60738ecefd3c5061aa7b499db7418567e36c1cf5d",
+        "value": [
+          "Writing",
+          "Emotional writer."
+        ]
+      }
+    }
+  },
+  "curated-生活-文案润色专家": {
+    "zh": {
+      "category": {
+        "previousSha256": "d8b043c25235220d1d7d3f7321cbc3df21875345342f40fbf72783c174b15408",
+        "value": "写作"
+      },
+      "tags": {
+        "previousSha256": "a617c5ce61e9b80cc438176ec9bd51f36ba665294f27f5db3d58b85606512e2f",
+        "value": [
+          "写作",
+          "文案润色专家"
+        ]
+      }
+    },
+    "en": {
+      "category": {
+        "previousSha256": "f8fe9ce39c48c84a0990f475594eba79e5e920f5dce0521b1eaf53c6e53958e9",
+        "value": "Writing"
+      },
+      "tags": {
+        "previousSha256": "b381f1c58366c8030b0cd42dea36ae0d65882c40ab025f1bef4d37c35a2f68b2",
+        "value": [
+          "Writing",
+          "Documentation experts"
+        ]
+      }
+    }
+  },
+  "curated-编程-role-知识探索专家": {
+    "zh": {
+      "category": {
+        "previousSha256": "e677ac3f8f56af98d47e3810220972caff5833c6633b024c46e9ea6b727410ad",
+        "value": "问答"
+      },
+      "title": {
+        "previousSha256": "e02b3f6facb1d20c85bd35793ba1a281d7cf6d6abdaead153b1d28b893ee63f9",
+        "value": "知识探索提问"
+      },
+      "tags": {
+        "previousSha256": "9f957d7da84f1de97a3b4482f2bb1d74f8a92bbbef631c70f054537438ab1e26",
+        "value": [
+          "问答",
+          "知识探索提问"
+        ]
+      }
+    },
+    "en": {
+      "category": {
+        "previousSha256": "9aab932a7edfd6c10219348a9796dce0ff1db3dc24ff56a9d1f2e444d2e68b4a",
+        "value": "General"
+      },
+      "title": {
+        "previousSha256": "d75caaf090bc7361fa3f54b5635e4b6c333bd9182a2acd00d6c1f189ef6417d5",
+        "value": "Knowledge Exploration Questions"
+      },
+      "tags": {
+        "previousSha256": "fabea02c149a36347c823cf033b45afc3ef06fac9eedba3e246d1fe70f799b7f",
+        "value": [
+          "General",
+          "Knowledge Exploration Questions"
+        ]
+      }
+    }
+  },
+  "curated-生活-雷军演说风格": {
+    "zh": {
+      "category": {
+        "previousSha256": "d8b043c25235220d1d7d3f7321cbc3df21875345342f40fbf72783c174b15408",
+        "value": "写作"
+      },
+      "title": {
+        "previousSha256": "7c0476670c51dedd6123958b7d2f4b792751da717f0eecf2d8362dd698e01151",
+        "value": "演讲结构与表达"
+      },
+      "summary": {
+        "previousSha256": "875a15285a88b8e48ff70b8a9ba8454294976e2067fe1dad2370021199f2f822",
+        "value": "根据用户自己的素材整理原创叙事结构和语言。"
+      },
+      "prompt": {
+        "previousSha256": "5cc5305a4dfdfb4fd235d18aba9dbe373dea5e52654d92699df1b50225feaa7b",
+        "value": "任务：演讲结构与表达\n根据用户自己的素材整理原创叙事结构和语言。\n请先询问主题、受众和由用户提供或获准使用的素材。列出不同的开场、具体细节和结尾建议。使用原创表达，不冒用具体人物身份，不照搬他人文案。"
+      },
+      "tags": {
+        "previousSha256": "3ba6fef78f39373e56466ad50afbce922e2fc57e467f2717257455555eee334c",
+        "value": [
+          "写作",
+          "演讲结构与表达"
+        ]
+      }
+    },
+    "en": {
+      "category": {
+        "previousSha256": "f8fe9ce39c48c84a0990f475594eba79e5e920f5dce0521b1eaf53c6e53958e9",
+        "value": "Writing"
+      },
+      "title": {
+        "previousSha256": "3b6bcd90136fb5570890c4e515f084d3b4e8a222ec9ed088f2d6440f90082ae8",
+        "value": "Speech Structure & Delivery"
+      },
+      "summary": {
+        "previousSha256": "31fa0623928f02e630ad94cc25090ebd994dc97c9d36d3edd84e7b30fa80a1c1",
+        "value": "Build an original narrative and phrasing from the user's own material."
+      },
+      "prompt": {
+        "previousSha256": "ad721f237c8372c563f5308df1b963cb39eec3c450478c8435c2664405d58463",
+        "value": "Task: Speech Structure & Delivery\nBuild an original narrative and phrasing from the user's own material.\nAsk for the topic, audience and original or licensed material. Offer distinct openings, specific details and endings, using original language. Do not impersonate a named person or reproduce another writer's copy."
+      },
+      "tags": {
+        "previousSha256": "4269081386afccdf4b4b243933ef4444d9cb8c0fb627bf144f476ba3c48cebea",
+        "value": [
+          "Writing",
+          "Speech Structure & Delivery"
+        ]
+      }
+    }
+  },
+  "curated-问答-smart学习计划": {
+    "zh": {
+      "category": {
+        "previousSha256": "25ac8a35a75c7a86ba9ada5f86d2f235f999cfac8b36e6636de8aba5f0aa0f6c",
+        "value": "职场"
+      },
+      "tags": {
+        "previousSha256": "0b80e8183068219a60537a0653b941b40e6ff4a8572a0811415ad33da442c775",
+        "value": [
+          "职场",
+          "SMART学习计划"
+        ]
+      }
+    },
+    "en": {
+      "category": {
+        "previousSha256": "468d61a94d9f9d93e56df7cf8941414523b6a129fb60aa4351b0d40c858ff44c",
+        "value": "Workplace"
+      },
+      "tags": {
+        "previousSha256": "f2022a2449550cb35719ad1ccff39d4106129fcbb13ee15743a48d076822f57d",
+        "value": [
+          "Workplace",
+          "SMART Learning Programme"
+        ]
+      }
+    }
+  },
+  "curated-编程-逆向思维专家": {
+    "zh": {
+      "category": {
+        "previousSha256": "e677ac3f8f56af98d47e3810220972caff5833c6633b024c46e9ea6b727410ad",
+        "value": "问答"
+      },
+      "tags": {
+        "previousSha256": "6f31946743beb5b8c4ff0153b6b87c060289d95e357657b8150dea4984794400",
+        "value": [
+          "问答",
+          "逆向思维专家"
+        ]
+      }
+    },
+    "en": {
+      "category": {
+        "previousSha256": "9aab932a7edfd6c10219348a9796dce0ff1db3dc24ff56a9d1f2e444d2e68b4a",
+        "value": "General"
+      },
+      "tags": {
+        "previousSha256": "c6c0a7eb2a0746496e23048ab65a689be3c9413f27e520e1bd1a4f1ddb836048",
+        "value": [
+          "General",
+          "Reverse thinking."
+        ]
+      }
+    }
+  },
+  "curated-生活-时事热点评论家": {
+    "zh": {
+      "category": {
+        "previousSha256": "d8b043c25235220d1d7d3f7321cbc3df21875345342f40fbf72783c174b15408",
+        "value": "写作"
+      },
+      "tags": {
+        "previousSha256": "970cc8c2943a8204a671e79a07aec0a5f407058e6903fb0ffb60b2e793626c9f",
+        "value": [
+          "写作",
+          "时事热点评论家"
+        ]
+      }
+    },
+    "en": {
+      "category": {
+        "previousSha256": "f8fe9ce39c48c84a0990f475594eba79e5e920f5dce0521b1eaf53c6e53958e9",
+        "value": "Writing"
+      },
+      "tags": {
+        "previousSha256": "87fb9cdc85e1ddffe5dd00451450337c6032cd42bbeaf9b457c34b114a2ead83",
+        "value": [
+          "Writing",
+          "You know, it's a good time to be a critic."
+        ]
+      }
+    }
+  },
+  "curated-问答-个性化同理心解决方案": {
+    "zh": {
+      "category": {
+        "previousSha256": "25ac8a35a75c7a86ba9ada5f86d2f235f999cfac8b36e6636de8aba5f0aa0f6c",
+        "value": "生活"
+      },
+      "tags": {
+        "previousSha256": "8785c7652346d79ce4784b08457efc56916cac35ec17196593bfcb6554bbe82f",
+        "value": [
+          "生活",
+          "个性化同理心解决方案"
+        ]
+      }
+    },
+    "en": {
+      "category": {
+        "previousSha256": "468d61a94d9f9d93e56df7cf8941414523b6a129fb60aa4351b0d40c858ff44c",
+        "value": "Life"
+      },
+      "tags": {
+        "previousSha256": "90d03b4292c9421c4bd1b74d6955ee278ed518e9a093b00f35df12d4ddada9fd",
+        "value": [
+          "Life",
+          "Personalization and assimilated solutions"
+        ]
+      }
+    }
+  },
+  "curated-论文-地理专家": {
+    "zh": {
+      "category": {
+        "previousSha256": "7cef1d71db62938a9e3b7dddc20161dd7e1fa66228454b28f6713039784c3003",
+        "value": "问答"
+      },
+      "tags": {
+        "previousSha256": "5fd145abcb8d08730f4744de896b4c9ee2536e57c2697ce3372e873ce47bdf8a",
+        "value": [
+          "问答",
+          "地理专家"
+        ]
+      }
+    },
+    "en": {
+      "category": {
+        "previousSha256": "665bc989dd4909f2aa2644f529e85a74b96cb9183b0038a00be23964ef17bf17",
+        "value": "General"
+      },
+      "tags": {
+        "previousSha256": "681be74e07b6cb896160a1f1ce9afb47b974e5ee93004741183662c0c93acef4",
+        "value": [
+          "General",
+          "Geographical specialists"
+        ]
+      }
+    }
+  },
+  "curated-生活-祝福语": {
+    "zh": {
+      "category": {
+        "previousSha256": "d8b043c25235220d1d7d3f7321cbc3df21875345342f40fbf72783c174b15408",
+        "value": "写作"
+      },
+      "tags": {
+        "previousSha256": "e0a86246c3fbb5e897124176e7b487c0c5642dcdc2287884e501af93aef6c0b4",
+        "value": [
+          "写作",
+          "祝福语"
+        ]
+      }
+    },
+    "en": {
+      "category": {
+        "previousSha256": "f8fe9ce39c48c84a0990f475594eba79e5e920f5dce0521b1eaf53c6e53958e9",
+        "value": "Writing"
+      },
+      "tags": {
+        "previousSha256": "a5a2990bc7df89f6a977ea50f1195d502d85dc6d2ecfc3f5fd7fbfcafd6f63c2",
+        "value": [
+          "Writing",
+          "Blessings."
+        ]
+      }
+    }
+  },
+  "curated-生活-歌词创作": {
+    "zh": {
+      "category": {
+        "previousSha256": "d8b043c25235220d1d7d3f7321cbc3df21875345342f40fbf72783c174b15408",
+        "value": "写作"
+      },
+      "tags": {
+        "previousSha256": "0d370f3a55679c48b8669c8ecfc40dd0388aede91b51803d6f8e8873c33010c0",
+        "value": [
+          "写作",
+          "歌词创作"
+        ]
+      }
+    },
+    "en": {
+      "category": {
+        "previousSha256": "f8fe9ce39c48c84a0990f475594eba79e5e920f5dce0521b1eaf53c6e53958e9",
+        "value": "Writing"
+      },
+      "tags": {
+        "previousSha256": "d5e6c351aaf63f94f3e2ad10363b27a6709777911aed75f99be65b1d9dc14f71",
+        "value": [
+          "Writing",
+          "Lyric creation"
+        ]
+      }
+    }
+  },
+  "curated-生活-动画剧本创作专家": {
+    "zh": {
+      "category": {
+        "previousSha256": "d8b043c25235220d1d7d3f7321cbc3df21875345342f40fbf72783c174b15408",
+        "value": "视频"
+      },
+      "tags": {
+        "previousSha256": "39a2fd539b7ed3a4e3a2fd26539751c159a422c98c9adc77b8620228927ea152",
+        "value": [
+          "视频",
+          "动画剧本创作专家"
+        ]
+      }
+    },
+    "en": {
+      "category": {
+        "previousSha256": "f8fe9ce39c48c84a0990f475594eba79e5e920f5dce0521b1eaf53c6e53958e9",
+        "value": "Video"
+      },
+      "tags": {
+        "previousSha256": "10dcb4ee8e4293aba361ac998632df2f5100537018b8e974c43958016f463384",
+        "value": [
+          "Video",
+          "Animated script author"
+        ]
+      }
+    }
+  },
+  "curated-编程-问题拆解步骤": {
+    "zh": {
+      "category": {
+        "previousSha256": "e677ac3f8f56af98d47e3810220972caff5833c6633b024c46e9ea6b727410ad",
+        "value": "问答"
+      },
+      "tags": {
+        "previousSha256": "6aa6fb8cf790e3aefae13197bc81537d16f8d72ec350c73a65783fb9fb79b03d",
+        "value": [
+          "问答",
+          "问题拆解步骤"
+        ]
+      }
+    },
+    "en": {
+      "category": {
+        "previousSha256": "9aab932a7edfd6c10219348a9796dce0ff1db3dc24ff56a9d1f2e444d2e68b4a",
+        "value": "General"
+      },
+      "tags": {
+        "previousSha256": "cc9290d77fdb7f41457c6062172bdcac73e8cd2e8105f7e46d2cc6dfc07a832d",
+        "value": [
+          "General",
+          "Problem Dismantling Steps"
+        ]
+      }
+    }
+  },
+  "curated-问答-写书": {
+    "zh": {
+      "category": {
+        "previousSha256": "25ac8a35a75c7a86ba9ada5f86d2f235f999cfac8b36e6636de8aba5f0aa0f6c",
+        "value": "写作"
+      },
+      "tags": {
+        "previousSha256": "a3bc7f0d9e1118dd461ed1ccfecfb779da044efffbe05cd026f3246256614684",
+        "value": [
+          "写作",
+          "写书"
+        ]
+      }
+    },
+    "en": {
+      "category": {
+        "previousSha256": "468d61a94d9f9d93e56df7cf8941414523b6a129fb60aa4351b0d40c858ff44c",
+        "value": "Writing"
+      },
+      "tags": {
+        "previousSha256": "1adf867a3a8d6f95556c571169b889609eb599f54e2c16a96304abbbc03c3024",
+        "value": [
+          "Writing",
+          "Write a book."
+        ]
+      }
+    }
+  },
+  "curated-编程-董宇辉老师模仿": {
+    "zh": {
+      "category": {
+        "previousSha256": "e677ac3f8f56af98d47e3810220972caff5833c6633b024c46e9ea6b727410ad",
+        "value": "写作"
+      },
+      "title": {
+        "previousSha256": "8f2b082c6baee65ad497069f29eaee5e80b7f569d32ca8ff9fee33f51a1d654a",
+        "value": "人文直播文案练习"
+      },
+      "summary": {
+        "previousSha256": "319bd8e9133feecaf6dac354e2a9063f65a28f7325ef67cbda4b6ab05c947966",
+        "value": "根据用户自己的素材整理原创叙事结构和语言。"
+      },
+      "prompt": {
+        "previousSha256": "3319514edeb0d3c1d57414184117b1097083e2f9f4d0a96efbd06ef759cf0940",
+        "value": "任务：人文直播文案练习\n根据用户自己的素材整理原创叙事结构和语言。\n请先询问主题、受众和由用户提供或获准使用的素材。列出不同的开场、具体细节和结尾建议。使用原创表达，不冒用具体人物身份，不照搬他人文案。"
+      },
+      "tags": {
+        "previousSha256": "8ee14a51b4e1dd36dfe35de66fb3a84ad608b632d86fd75fdcc171b8e17ad1b7",
+        "value": [
+          "写作",
+          "人文直播文案练习"
+        ]
+      }
+    },
+    "en": {
+      "category": {
+        "previousSha256": "9aab932a7edfd6c10219348a9796dce0ff1db3dc24ff56a9d1f2e444d2e68b4a",
+        "value": "Writing"
+      },
+      "title": {
+        "previousSha256": "bc44658a0499fbc18a5ff8136c89eb5ac62f6989718c65682fc446089b9ce6e0",
+        "value": "Original Livestream Storytelling Practice"
+      },
+      "summary": {
+        "previousSha256": "319bd8e9133feecaf6dac354e2a9063f65a28f7325ef67cbda4b6ab05c947966",
+        "value": "Build an original narrative and phrasing from the user's own material."
+      },
+      "prompt": {
+        "previousSha256": "7d220314db3b3eb19fe1550c1d7bfef29a3cc61030bce3b493774d9204b2feb8",
+        "value": "Task: Original Livestream Storytelling Practice\nBuild an original narrative and phrasing from the user's own material.\nAsk for the topic, audience and original or licensed material. Offer distinct openings, specific details and endings, using original language. Do not impersonate a named person or reproduce another writer's copy."
+      },
+      "tags": {
+        "previousSha256": "363f8721b933251d441639f8ee1f4582a843bc6240db000473e758f08ec26ae3",
+        "value": [
+          "Writing",
+          "Original Livestream Storytelling Practice"
+        ]
+      }
+    }
+  },
+  "curated-问答-把事情拆解成sop": {
+    "zh": {
+      "category": {
+        "previousSha256": "25ac8a35a75c7a86ba9ada5f86d2f235f999cfac8b36e6636de8aba5f0aa0f6c",
+        "value": "职场"
+      },
+      "tags": {
+        "previousSha256": "b4e264a775743374386688c4d6ef660249a749f13157293c0a3a9259a6728a0b",
+        "value": [
+          "职场",
+          "把事情拆解成SOP"
+        ]
+      }
+    },
+    "en": {
+      "category": {
+        "previousSha256": "468d61a94d9f9d93e56df7cf8941414523b6a129fb60aa4351b0d40c858ff44c",
+        "value": "Workplace"
+      },
+      "tags": {
+        "previousSha256": "f1488873a88054d41fbb1537a5592777c24ea5f586b774d5111a11bc2b3819cd",
+        "value": [
+          "Workplace",
+          "Disassemble things into SOPs."
+        ]
+      }
+    }
+  },
+  "curated-图片-定制化学习导师": {
+    "zh": {
+      "category": {
+        "previousSha256": "2c6d1bd358615d9b209a6720803b196aa4322033dd047bd59f895ca1c5783f48",
+        "value": "问答"
+      },
+      "tags": {
+        "previousSha256": "369742091bf70f26ca5f608b90e338329e0f515daf6909dcf6acdd33f0205375",
+        "value": [
+          "问答",
+          "定制化学习导师"
+        ]
+      }
+    },
+    "en": {
+      "category": {
+        "previousSha256": "941b085d3176f81fff8147e5e7c3797dab41904b699111bd01d67580d4d16390",
+        "value": "General"
+      },
+      "tags": {
+        "previousSha256": "57216e606f4d19f13f861c794b1eb1a9486bd3ce8f041d734e566a7bd43bf3b5",
+        "value": [
+          "General",
+          "Customized Learning Mentor"
+        ]
+      }
+    }
+  },
+  "curated-写作-让ai更聪明": {
+    "zh": {
+      "category": {
+        "previousSha256": "cdba9142877361afacab344de5b98311be9b8d337d24430bca9124cbcb0f393f",
+        "value": "问答"
+      },
+      "tags": {
+        "previousSha256": "d953ded18884ac72642806fd1d8b18cc2bef738f97e460d4c74ae10e5f1d6dab",
+        "value": [
+          "问答",
+          "让AI更聪明"
+        ]
+      }
+    },
+    "en": {
+      "category": {
+        "previousSha256": "976c534c94969d69bd71956802a592db0eac1938cd779cb60705184e06b16a1f",
+        "value": "General"
+      },
+      "tags": {
+        "previousSha256": "7a6403c8d2c14d0a5b78e8668bf9d4f94246b99f6855e7637f6f392706b8a883",
+        "value": [
+          "General",
+          "Make AI smarter."
+        ]
+      }
+    }
+  },
+  "curated-论文-快读一本书": {
+    "zh": {
+      "category": {
+        "previousSha256": "7cef1d71db62938a9e3b7dddc20161dd7e1fa66228454b28f6713039784c3003",
+        "value": "生活"
+      },
+      "tags": {
+        "previousSha256": "7b6fb13cbe93c60a08eef0fed51616bd598d809719a2979fd73c6564b6540034",
+        "value": [
+          "生活",
+          "快读一本书"
+        ]
+      }
+    },
+    "en": {
+      "category": {
+        "previousSha256": "665bc989dd4909f2aa2644f529e85a74b96cb9183b0038a00be23964ef17bf17",
+        "value": "Life"
+      },
+      "tags": {
+        "previousSha256": "2ae49adf3d292ee9fef00354cfb0273ece73dccc0850c274e0839b842a63cf6d",
+        "value": [
+          "Life",
+          "Read a book."
+        ]
+      }
+    }
+  },
+  "curated-编程-英语专家": {
+    "zh": {
+      "category": {
+        "previousSha256": "e677ac3f8f56af98d47e3810220972caff5833c6633b024c46e9ea6b727410ad",
+        "value": "写作"
+      },
+      "title": {
+        "previousSha256": "4322134071faf02aa25800a69812dbe54cba00ebeabb435b706107efd5f41a3d",
+        "value": "英语学习问答"
+      },
+      "tags": {
+        "previousSha256": "dde454a9debd18ab7a62d5ef3bb22391c18fe215c933f5563c4607b52d38b68a",
+        "value": [
+          "写作",
+          "英语学习问答"
+        ]
+      }
+    },
+    "en": {
+      "category": {
+        "previousSha256": "9aab932a7edfd6c10219348a9796dce0ff1db3dc24ff56a9d1f2e444d2e68b4a",
+        "value": "Writing"
+      },
+      "title": {
+        "previousSha256": "a149682ed0d7d38786d51b47928a3563a5983a98ff682ac7a204e5c812809208",
+        "value": "English Learning Q&A"
+      },
+      "tags": {
+        "previousSha256": "6c6538c231fc0e21b5e75e3dd5e34277048d171fd21e1352c269a671e9701764",
+        "value": [
+          "Writing",
+          "English Learning Q&A"
+        ]
+      }
+    }
+  },
+  "curated-生活-文章读后感编辑": {
+    "zh": {
+      "category": {
+        "previousSha256": "d8b043c25235220d1d7d3f7321cbc3df21875345342f40fbf72783c174b15408",
+        "value": "写作"
+      },
+      "tags": {
+        "previousSha256": "8528bb1549506c083883b82e10f7fb7a5b644aff172b5f7732d02c6371a050a9",
+        "value": [
+          "写作",
+          "文章读后感编辑"
+        ]
+      }
+    },
+    "en": {
+      "category": {
+        "previousSha256": "f8fe9ce39c48c84a0990f475594eba79e5e920f5dce0521b1eaf53c6e53958e9",
+        "value": "Writing"
+      },
+      "tags": {
+        "previousSha256": "f14f48f305a809b68af02dca38eccb1cd898b4d2393495e8f3ff6284f9ea43d2",
+        "value": [
+          "Writing",
+          "Post-reading post-editing editor"
+        ]
+      }
+    }
+  },
+  "curated-编程-新加坡提示词冠军框架": {
+    "zh": {
+      "category": {
+        "previousSha256": "e677ac3f8f56af98d47e3810220972caff5833c6633b024c46e9ea6b727410ad",
+        "value": "问答"
+      },
+      "title": {
+        "previousSha256": "0d11565e2c0013e1cfb803694d18b971616a3fc93cc6039573d96be252405803",
+        "value": "分步提示词框架"
+      },
+      "tags": {
+        "previousSha256": "a6e3d10e1b87cb1708c2157f8e577f5d23438f8548be7ce1d54a916335a89617",
+        "value": [
+          "问答",
+          "分步提示词框架"
+        ]
+      }
+    },
+    "en": {
+      "category": {
+        "previousSha256": "9aab932a7edfd6c10219348a9796dce0ff1db3dc24ff56a9d1f2e444d2e68b4a",
+        "value": "General"
+      },
+      "title": {
+        "previousSha256": "c7d2ac7741fdc4cab0566ad90e174a1664d3c1cc7b84f8942789c689c16c3a9f",
+        "value": "Step-by-Step Prompt Framework"
+      },
+      "tags": {
+        "previousSha256": "0de5a68253414dbdfaaa28f9f7e080ac33b05dc3bfb23f74e7306906a9053270",
+        "value": [
+          "General",
+          "Step-by-Step Prompt Framework"
+        ]
+      }
+    }
+  },
+  "curated-编程-ai对话技巧分享": {
+    "zh": {
+      "category": {
+        "previousSha256": "e677ac3f8f56af98d47e3810220972caff5833c6633b024c46e9ea6b727410ad",
+        "value": "问答"
+      },
+      "tags": {
+        "previousSha256": "4a8d52cce301078d286eed2b7f532da746f36c9b0ec012d237f29339dca52e9b",
+        "value": [
+          "问答",
+          "AI对话技巧分享"
+        ]
+      }
+    },
+    "en": {
+      "category": {
+        "previousSha256": "9aab932a7edfd6c10219348a9796dce0ff1db3dc24ff56a9d1f2e444d2e68b4a",
+        "value": "General"
+      },
+      "tags": {
+        "previousSha256": "fe4cf825d210a2e0726db863067bbee5ea3f680f21d2e41dc331fde39b2af9e3",
+        "value": [
+          "General",
+          "AI Dialogue Skills Sharing"
+        ]
+      }
+    }
+  },
+  "curated-生活-育儿专家": {
+    "zh": {
+      "title": {
+        "previousSha256": "b32793bbc7e509030861ffdc83958f3c2a0052a0b4ec2d8952c6b65a926e52e9",
+        "value": "家庭沟通练习"
+      },
+      "summary": {
+        "previousSha256": "3ee9509e7a2427e2158f2e91c2ee47acbb2e1ea566df50d32392e05e271fb4d7",
+        "value": "整理父母自愿分享的日常家庭沟通场景。"
+      },
+      "prompt": {
+        "previousSha256": "a274e54824542ef192266cfe97e8bbe9350ea260fc0703a08bd947e2e1fd89aa",
+        "value": "任务：家庭沟通练习\n整理父母自愿分享的日常家庭沟通场景。\n提出开放式问题和可尝试的表达方式，避免诊断儿童或作重大教育、医疗决定。"
+      },
+      "tags": {
+        "previousSha256": "e03c561e8272c7a58a4d724d4eb8f9f80d6fc5ffb934f9859eca04f93e7d8b85",
+        "value": [
+          "生活",
+          "家庭沟通练习"
+        ]
+      }
+    },
+    "en": {
+      "title": {
+        "previousSha256": "cd65f55e10849ecefbee733d56af60601993388372987bc9611dcebefbb7e945",
+        "value": "Family Communication Practice"
+      },
+      "summary": {
+        "previousSha256": "df1783e6a8654c67629c7faeaf86fdeb1adf687cb4698427ac2a0bf8dfae1511",
+        "value": "Explore everyday family communication scenarios."
+      },
+      "prompt": {
+        "previousSha256": "b07155776446164f4744e74d72d51996386c4e69d1341420a6e081a76c047e16",
+        "value": "Task: Family Communication Practice\nExplore everyday family communication scenarios.\nSuggest open-ended questions and ways to phrase concerns. Do not diagnose a child or make consequential education or health decisions."
+      },
+      "tags": {
+        "previousSha256": "fa6274f04e1b227e1774e5cbfd461eb6bc7dfabbbd42e42d1b16d825b28134b5",
+        "value": [
+          "Life",
+          "Family Communication Practice"
+        ]
+      }
+    }
+  },
+  "curated-生活-心理学家": {
+    "zh": {
+      "title": {
+        "previousSha256": "c10912052f580312677658411aab1523eeae578fb8a5f85289d1015ba4a02375",
+        "value": "心理学概念学习助手"
+      },
+      "summary": {
+        "previousSha256": "df45a868d9a27a7fdabb73d5b5c10f14d1898d8ce6e3cf634c91ae5c16722313",
+        "value": "用通俗语言解释心理学概念，提供开放式学习问题。"
+      },
+      "prompt": {
+        "previousSha256": "be3c67f801b6af82a51eb64ad6a5c0abed169226e0f932685911bc19203920b2",
+        "value": "任务：心理学概念学习助手\n用通俗语言解释心理学概念，提供开放式学习问题。\n请用户选定一个心理学概念；说明定义、常见用途、研究限制及一个虚构示例。不要诊断个人、推断人格或提供治疗。"
+      },
+      "tags": {
+        "previousSha256": "2589ca5afb14f2a0e5c18821978919e98143b888f9759d6989c2b5decab21eb8",
+        "value": [
+          "生活",
+          "心理学概念学习助手"
+        ]
+      }
+    },
+    "en": {
+      "title": {
+        "previousSha256": "a6a20b51de427c9c2a7312b5de960f8d55dacb6279532ff5d89f65da32c46858",
+        "value": "Psychology Concepts Study Guide"
+      },
+      "summary": {
+        "previousSha256": "e025ed9f2134d3051d8d077a7a2ff5631e06c6820266b4b39e07142b29902c7f",
+        "value": "Explain psychology concepts in everyday language and suggest open-ended study questions."
+      },
+      "prompt": {
+        "previousSha256": "125379182ae82ffd62d552216d7020c4b9b2ff73ce31603cfe7220b984df8aea",
+        "value": "Task: Psychology Concepts Study Guide\nExplain psychology concepts in everyday language and suggest open-ended study questions.\nAsk for a concept. Give its definition, common uses, research limits and a fictional example. Do not diagnose a person, infer personality or provide therapy."
+      },
+      "tags": {
+        "previousSha256": "1d3546399273d82c8414798185948dc92d5fd702973d4119044dca32dc3fb1ee",
+        "value": [
+          "Life",
+          "Psychology Concepts Study Guide"
+        ]
+      }
+    }
+  },
+  "curated-论文-第一性原理": {
+    "zh": {
+      "category": {
+        "previousSha256": "7cef1d71db62938a9e3b7dddc20161dd7e1fa66228454b28f6713039784c3003",
+        "value": "问答"
+      },
+      "tags": {
+        "previousSha256": "a6a49897ea7083c2d6a9c7853e54152305c90314a2b1ae0647d9426c54348a89",
+        "value": [
+          "问答",
+          "第一性原理"
+        ]
+      }
+    },
+    "en": {
+      "category": {
+        "previousSha256": "665bc989dd4909f2aa2644f529e85a74b96cb9183b0038a00be23964ef17bf17",
+        "value": "General"
+      },
+      "tags": {
+        "previousSha256": "ffa0027cad5c0739dbe9686bb8c339d8134cf138a22a8e98c071e8b0ca8a2e3b",
+        "value": [
+          "General",
+          "First-rate principles"
+        ]
+      }
+    }
+  },
+  "curated-问答-营养配餐": {
+    "zh": {
+      "category": {
+        "previousSha256": "25ac8a35a75c7a86ba9ada5f86d2f235f999cfac8b36e6636de8aba5f0aa0f6c",
+        "value": "生活"
+      },
+      "title": {
+        "previousSha256": "c51aaf553b94e132655144f27783ee310fb798b02922382b71b3d297bd127ddb",
+        "value": "日常菜单规划"
+      },
+      "summary": {
+        "previousSha256": "32a5bbb1a59e24b800dc1afee80046a4d26b9ecfb73884ccaacd101745fe986a",
+        "value": "根据常见食材、口味与预算安排日常菜单。"
+      },
+      "prompt": {
+        "previousSha256": "8055828c9321fa3acb3a6f1232976dd3d6ed9efb468211065554c1105844e5c0",
+        "value": "任务：日常菜单规划\n根据常见食材、口味与预算安排日常菜单。\n整理每餐食材、时间和可替换选项。遇到疾病治疗或特殊营养需求，请用户将菜单交专业人员评估。"
+      },
+      "tags": {
+        "previousSha256": "a7982cfe66bc962cd2189985b938d8aadee4cafe5973b5c58d37d85a2808e847",
+        "value": [
+          "生活",
+          "日常菜单规划"
+        ]
+      }
+    },
+    "en": {
+      "category": {
+        "previousSha256": "468d61a94d9f9d93e56df7cf8941414523b6a129fb60aa4351b0d40c858ff44c",
+        "value": "Life"
+      },
+      "title": {
+        "previousSha256": "a46c872fab1776aa65545b47f213f015ac940c0da3cbde85fc6f3e2621614cc3",
+        "value": "Everyday Menu Planner"
+      },
+      "summary": {
+        "previousSha256": "b241dcefacb6b1283269079dfd9ba16bce42a0d896ec570dbd4421246f9c0dab",
+        "value": "Plan an everyday menu using ingredients, preferences and a budget."
+      },
+      "prompt": {
+        "previousSha256": "e591280384e55d802a67c979f79ab9316192e46bdb47bfc2306cf04f8d869053",
+        "value": "Task: Everyday Menu Planner\nPlan an everyday menu using ingredients, preferences and a budget.\nList ingredients, preparation time and substitutions. Have a qualified professional review menus intended for a medical condition or specialized nutrition needs."
+      },
+      "tags": {
+        "previousSha256": "b20a408d7ab2f624fd8faee6c5a6705479632d0de0776e32b9d16833ba97b246",
+        "value": [
+          "Life",
+          "Everyday Menu Planner"
+        ]
+      }
+    }
+  },
+  "curated-编程-标题创意助手": {
+    "zh": {
+      "category": {
+        "previousSha256": "e677ac3f8f56af98d47e3810220972caff5833c6633b024c46e9ea6b727410ad",
+        "value": "写作"
+      },
+      "tags": {
+        "previousSha256": "d6f33f2858d95431ae90833f5bfb176512b3125ebf6a0e55102c5200064183e4",
+        "value": [
+          "写作",
+          "标题创意助手"
+        ]
+      }
+    },
+    "en": {
+      "category": {
+        "previousSha256": "9aab932a7edfd6c10219348a9796dce0ff1db3dc24ff56a9d1f2e444d2e68b4a",
+        "value": "Writing"
+      },
+      "tags": {
+        "previousSha256": "78e86bfc605f1d80732a3f2cfdc89c8877f45a304d457f04283c77ee3d929c17",
+        "value": [
+          "Writing",
+          "Title Creative Assistant"
+        ]
+      }
+    }
+  },
+  "curated-写作-解读塔罗牌": {
+    "zh": {
+      "category": {
+        "previousSha256": "cdba9142877361afacab344de5b98311be9b8d337d24430bca9124cbcb0f393f",
+        "value": "生活"
+      },
+      "tags": {
+        "previousSha256": "4b17aa930cc1d427f830c81594af6548f193152655abee694ea93ae64e419749",
+        "value": [
+          "生活",
+          "解读塔罗牌"
+        ]
+      }
+    },
+    "en": {
+      "category": {
+        "previousSha256": "976c534c94969d69bd71956802a592db0eac1938cd779cb60705184e06b16a1f",
+        "value": "Life"
+      },
+      "tags": {
+        "previousSha256": "878e1ea4ba09b944ea7b44a7f29b478aaccdb2bcc6ebfe979ccbdf9f286e8cac",
+        "value": [
+          "Life",
+          "Read the Tarot cards."
+        ]
+      }
+    }
+  },
+  "curated-论文-万能的ai助手": {
+    "zh": {
+      "category": {
+        "previousSha256": "7cef1d71db62938a9e3b7dddc20161dd7e1fa66228454b28f6713039784c3003",
+        "value": "问答"
+      },
+      "tags": {
+        "previousSha256": "f59d341e179f75257f61b0e20acba8f26227fbcfc0bdd28064689d9595f452bd",
+        "value": [
+          "问答",
+          "万能的AI助手"
+        ]
+      }
+    },
+    "en": {
+      "category": {
+        "previousSha256": "665bc989dd4909f2aa2644f529e85a74b96cb9183b0038a00be23964ef17bf17",
+        "value": "General"
+      },
+      "tags": {
+        "previousSha256": "947e6a96b958252fcb1006a99e24f2a92ee221160a3412f0645676f156537d7a",
+        "value": [
+          "General",
+          "A.A.'s almighty."
+        ]
+      }
+    }
+  },
+  "curated-生活-爆款仿写": {
+    "zh": {
+      "category": {
+        "previousSha256": "d8b043c25235220d1d7d3f7321cbc3df21875345342f40fbf72783c174b15408",
+        "value": "写作"
+      },
+      "tags": {
+        "previousSha256": "d7a5379f2e67060bade9fff851c5e9e780289469fd9050c2f7c7beee8afe6cbc",
+        "value": [
+          "写作",
+          "爆款仿写"
+        ]
+      }
+    },
+    "en": {
+      "category": {
+        "previousSha256": "f8fe9ce39c48c84a0990f475594eba79e5e920f5dce0521b1eaf53c6e53958e9",
+        "value": "Writing"
+      },
+      "tags": {
+        "previousSha256": "90f39209ddc06189b23463613d10509a920a5f4b26d80f84df1c5aedfc6cdad9",
+        "value": [
+          "Writing",
+          "EXPLAINING"
+        ]
+      }
+    }
+  },
+  "curated-论文-麦肯锡助手": {
+    "zh": {
+      "category": {
+        "previousSha256": "7cef1d71db62938a9e3b7dddc20161dd7e1fa66228454b28f6713039784c3003",
+        "value": "运营"
+      },
+      "tags": {
+        "previousSha256": "88df9b469f1410539b076b8905920be8516414cfbd6af8d8eb499670a388ee69",
+        "value": [
+          "运营",
+          "麦肯锡助手"
+        ]
+      }
+    },
+    "en": {
+      "category": {
+        "previousSha256": "665bc989dd4909f2aa2644f529e85a74b96cb9183b0038a00be23964ef17bf17",
+        "value": "Operations"
+      },
+      "tags": {
+        "previousSha256": "600db53f218bcc2e1ab21f84d3346c218a2703c32396b5375998ac38c72e5f41",
+        "value": [
+          "Operations",
+          "McKenzie's assistant."
+        ]
+      }
+    }
+  },
+  "curated-论文-业务分析师": {
+    "zh": {
+      "category": {
+        "previousSha256": "7cef1d71db62938a9e3b7dddc20161dd7e1fa66228454b28f6713039784c3003",
+        "value": "运营"
+      },
+      "tags": {
+        "previousSha256": "a459c2930b0a255ec946367aca336671e6be27ceaacfadc625e7f595f218ee71",
+        "value": [
+          "运营",
+          "业务分析师"
+        ]
+      }
+    },
+    "en": {
+      "category": {
+        "previousSha256": "665bc989dd4909f2aa2644f529e85a74b96cb9183b0038a00be23964ef17bf17",
+        "value": "Operations"
+      },
+      "tags": {
+        "previousSha256": "bf31fc0fee92147a60d0b991a8b9ef42093dec832c0f3ba1e897543fa3ad51ea",
+        "value": [
+          "Operations",
+          "Business Analyst"
+        ]
+      }
+    }
+  },
+  "curated-编程-自动化生成提示词": {
+    "zh": {
+      "category": {
+        "previousSha256": "e677ac3f8f56af98d47e3810220972caff5833c6633b024c46e9ea6b727410ad",
+        "value": "问答"
+      },
+      "tags": {
+        "previousSha256": "4431bcd477e2e762a08d2f685bcb2b3ea6bf16f9ddb67e83bae299eddd231793",
+        "value": [
+          "问答",
+          "自动化生成提示词"
+        ]
+      }
+    },
+    "en": {
+      "category": {
+        "previousSha256": "9aab932a7edfd6c10219348a9796dce0ff1db3dc24ff56a9d1f2e444d2e68b4a",
+        "value": "General"
+      },
+      "tags": {
+        "previousSha256": "147df5e5bf50e7536c0323d2c9d3e52f08e0800ad7e5de10f5b4c9bf9e98a726",
+        "value": [
+          "General",
+          "Auto Generate Hints"
+        ]
+      }
+    }
+  },
+  "curated-编程-评论区金句引导回复指令": {
+    "zh": {
+      "category": {
+        "previousSha256": "e677ac3f8f56af98d47e3810220972caff5833c6633b024c46e9ea6b727410ad",
+        "value": "运营"
+      },
+      "tags": {
+        "previousSha256": "96fd60d29c1a0731034bf11d647c21596d6eb8e3d8c50359c3687ec79fdf9cb4",
+        "value": [
+          "运营",
+          "评论区金句引导回复指令"
+        ]
+      }
+    },
+    "en": {
+      "category": {
+        "previousSha256": "9aab932a7edfd6c10219348a9796dce0ff1db3dc24ff56a9d1f2e444d2e68b4a",
+        "value": "Operations"
+      },
+      "tags": {
+        "previousSha256": "b0247a2d6ecbeb5baf896b608025b5822aaf9d078749546d5d46aa7c1cc356a7",
+        "value": [
+          "Operations",
+          "Comment on the gold sentence guide response command"
+        ]
+      }
+    }
+  },
+  "curated-生活-教案写作指令": {
+    "zh": {
+      "category": {
+        "previousSha256": "d8b043c25235220d1d7d3f7321cbc3df21875345342f40fbf72783c174b15408",
+        "value": "职场"
+      },
+      "tags": {
+        "previousSha256": "65c66ba6a49b938c4454874cc47b101b5b630e76fa9159a7191311dda2dbffa9",
+        "value": [
+          "职场",
+          "教案写作指令"
+        ]
+      }
+    },
+    "en": {
+      "category": {
+        "previousSha256": "f8fe9ce39c48c84a0990f475594eba79e5e920f5dce0521b1eaf53c6e53958e9",
+        "value": "Workplace"
+      },
+      "tags": {
+        "previousSha256": "382aac450f43e5e70506c4fc7c66beb7c949dd69e162ee81a364f9a17c16a52c",
+        "value": [
+          "Workplace",
+          "Teaching and writing instructions"
+        ]
+      }
+    }
+  },
+  "curated-图片-单词记忆": {
+    "zh": {
+      "category": {
+        "previousSha256": "2c6d1bd358615d9b209a6720803b196aa4322033dd047bd59f895ca1c5783f48",
+        "value": "问答"
+      },
+      "tags": {
+        "previousSha256": "98f9fca83eec62af5c33e6b9fbdce507b004e9f48840b3beffce406e1551a804",
+        "value": [
+          "问答",
+          "单词记忆"
+        ]
+      }
+    },
+    "en": {
+      "category": {
+        "previousSha256": "941b085d3176f81fff8147e5e7c3797dab41904b699111bd01d67580d4d16390",
+        "value": "General"
+      },
+      "tags": {
+        "previousSha256": "4865bca32486c6f9383022e13dfc9964d03edbde4d464eda515ca0cc1d51e025",
+        "value": [
+          "General",
+          "Word Memory"
+        ]
+      }
+    }
+  },
+  "curated-生活-头条号大文章仿写指令": {
+    "zh": {
+      "category": {
+        "previousSha256": "d8b043c25235220d1d7d3f7321cbc3df21875345342f40fbf72783c174b15408",
+        "value": "写作"
+      },
+      "tags": {
+        "previousSha256": "e918e9abb0af92aad2210f3cc6b4e14efd4f398ab14095592b37985374fab11d",
+        "value": [
+          "写作",
+          "头条号大文章仿写指令"
+        ]
+      }
+    },
+    "en": {
+      "category": {
+        "previousSha256": "f8fe9ce39c48c84a0990f475594eba79e5e920f5dce0521b1eaf53c6e53958e9",
+        "value": "Writing"
+      },
+      "tags": {
+        "previousSha256": "aaf8b2b845b290a967cf7abfccc00fb6282cd3e02302827bb36615a10f0dc518",
+        "value": [
+          "Writing",
+          "The headline article mimics the instructions."
+        ]
+      }
+    }
+  },
+  "curated-图片-ppt生成指令": {
+    "zh": {
+      "category": {
+        "previousSha256": "2c6d1bd358615d9b209a6720803b196aa4322033dd047bd59f895ca1c5783f48",
+        "value": "职场"
+      },
+      "tags": {
+        "previousSha256": "d9448305e2397667c73cc020c58e94c7fb8063bf3c93d7c90c163b30010707dd",
+        "value": [
+          "职场",
+          "PPT生成指令"
+        ]
+      }
+    },
+    "en": {
+      "category": {
+        "previousSha256": "941b085d3176f81fff8147e5e7c3797dab41904b699111bd01d67580d4d16390",
+        "value": "Workplace"
+      },
+      "tags": {
+        "previousSha256": "5db2b971587143a97558f24595b1b5950b13858b858af58bd6e169cdd2e7a439",
+        "value": [
+          "Workplace",
+          "PPT Generation Command"
+        ]
+      }
+    }
+  },
+  "curated-生活-仿写名人语录指令": {
+    "zh": {
+      "category": {
+        "previousSha256": "d8b043c25235220d1d7d3f7321cbc3df21875345342f40fbf72783c174b15408",
+        "value": "写作"
+      },
+      "tags": {
+        "previousSha256": "4a29fec205aef9994da5f31a4de7372cad92a91eaf2903f9331fd56e0271d88e",
+        "value": [
+          "写作",
+          "仿写名人语录指令"
+        ]
+      }
+    },
+    "en": {
+      "category": {
+        "previousSha256": "f8fe9ce39c48c84a0990f475594eba79e5e920f5dce0521b1eaf53c6e53958e9",
+        "value": "Writing"
+      },
+      "tags": {
+        "previousSha256": "74e44c00f514f847633acb0f85acdc4f7f9dbd4b6aec2d1f5db152ee62397318",
+        "value": [
+          "Writing",
+          "Simulate the celebrity recording instructions"
+        ]
+      }
+    }
+  },
+  "curated-生活-散文写作指令": {
+    "zh": {
+      "category": {
+        "previousSha256": "d8b043c25235220d1d7d3f7321cbc3df21875345342f40fbf72783c174b15408",
+        "value": "写作"
+      },
+      "tags": {
+        "previousSha256": "f6b0e0b530efeedf36bf153bd8cff6d27c95c5281b90bd0b3f2c5e35446d8a9c",
+        "value": [
+          "写作",
+          "散文写作指令"
+        ]
+      }
+    },
+    "en": {
+      "category": {
+        "previousSha256": "f8fe9ce39c48c84a0990f475594eba79e5e920f5dce0521b1eaf53c6e53958e9",
+        "value": "Writing"
+      },
+      "tags": {
+        "previousSha256": "7085341cf6e9d63ac81f43a96dea265324e508ec045b288db3898f2ab72c4de0",
+        "value": [
+          "Writing",
+          "Script writing instructions"
+        ]
+      }
+    }
+  },
+  "curated-图片-利用记忆宫殿背诵课文": {
+    "zh": {
+      "category": {
+        "previousSha256": "2c6d1bd358615d9b209a6720803b196aa4322033dd047bd59f895ca1c5783f48",
+        "value": "问答"
+      },
+      "tags": {
+        "previousSha256": "1cb3fb3fb483c14e025161cd3bbce9d5f44bd71655d44377ffa68d9f013acbde",
+        "value": [
+          "问答",
+          "利用记忆宫殿背诵课文"
+        ]
+      }
+    },
+    "en": {
+      "category": {
+        "previousSha256": "941b085d3176f81fff8147e5e7c3797dab41904b699111bd01d67580d4d16390",
+        "value": "General"
+      },
+      "tags": {
+        "previousSha256": "46e667a822b09b84610318ed99eb4a34bc7109fe2a9039c9841846790f4931a7",
+        "value": [
+          "General",
+          "Reciting the text from the palace of memory."
+        ]
+      }
+    }
+  },
+  "curated-写作-赛道关键词组合选题指令": {
+    "zh": {
+      "category": {
+        "previousSha256": "cdba9142877361afacab344de5b98311be9b8d337d24430bca9124cbcb0f393f",
+        "value": "运营"
+      },
+      "tags": {
+        "previousSha256": "5a7f5d995ff957b71af0ec1750b8ce98ad69a472153efa9fbd4b9a9d722b82d5",
+        "value": [
+          "运营",
+          "赛道关键词组合选题指令"
+        ]
+      }
+    },
+    "en": {
+      "category": {
+        "previousSha256": "976c534c94969d69bd71956802a592db0eac1938cd779cb60705184e06b16a1f",
+        "value": "Operations"
+      },
+      "tags": {
+        "previousSha256": "cf4eb1d2c955c8c73eb004e23bee4479c88c50a6b95ff6785c2d624dcf9058e0",
+        "value": [
+          "Operations",
+          "Track Keys Selection Command"
+        ]
+      }
+    }
+  },
+  "curated-图片-写公众号推文": {
+    "zh": {
+      "category": {
+        "previousSha256": "2c6d1bd358615d9b209a6720803b196aa4322033dd047bd59f895ca1c5783f48",
+        "value": "写作"
+      },
+      "tags": {
+        "previousSha256": "826652203952211433dc3ba179c3247a973dd2873443a2ec0a8e24f219f0bf64",
+        "value": [
+          "写作",
+          "写公众号推文"
+        ]
+      }
+    },
+    "en": {
+      "category": {
+        "previousSha256": "941b085d3176f81fff8147e5e7c3797dab41904b699111bd01d67580d4d16390",
+        "value": "Writing"
+      },
+      "tags": {
+        "previousSha256": "4daa7919a3ac448575f961d3b7932e90f460e2eb997673b6f385ad86c70f47da",
+        "value": [
+          "Writing",
+          "Write a public tweet."
+        ]
+      }
+    }
+  },
+  "curated-职场-微头条-10-种框架创作指令": {
+    "zh": {
+      "category": {
+        "previousSha256": "9c6505112b9d9adb4a7e99e49462bbe0fc7ddf04e9cdb81c44ece673e796566e",
+        "value": "运营"
+      },
+      "tags": {
+        "previousSha256": "10836c7f05d116c4154dc192caf7de4f98568dfc5dc436c0334650f1b56eadd3",
+        "value": [
+          "运营",
+          "【微头条】10 种框架创作指令"
+        ]
+      }
+    },
+    "en": {
+      "category": {
+        "previousSha256": "10f6c2319deee26fb0725907432ba3e1051c97348ba4edb3c27c289eb039fc73",
+        "value": "Operations"
+      },
+      "tags": {
+        "previousSha256": "66b86a55928893eef787b15ffb3449b11142833811d2913f808842761e200f30",
+        "value": [
+          "Operations",
+          "Ten Frame Production Commands"
+        ]
+      }
+    }
+  },
+  "curated-生活-历史人物轶事解说文案": {
+    "zh": {
+      "category": {
+        "previousSha256": "d8b043c25235220d1d7d3f7321cbc3df21875345342f40fbf72783c174b15408",
+        "value": "写作"
+      },
+      "tags": {
+        "previousSha256": "730736c20a5027d7af63e929b792be27fc84823c051136418add95c9fb95c217",
+        "value": [
+          "写作",
+          "历史人物轶事解说文案"
+        ]
+      }
+    },
+    "en": {
+      "category": {
+        "previousSha256": "f8fe9ce39c48c84a0990f475594eba79e5e920f5dce0521b1eaf53c6e53958e9",
+        "value": "Writing"
+      },
+      "tags": {
+        "previousSha256": "afc9b8727c86c409fae48a600022648405e98bf9d97478f231d8ab4fdd4a4014",
+        "value": [
+          "Writing",
+          "The historical figures have anecdotal narrative."
+        ]
+      }
+    }
+  },
+  "curated-编程-知识库检索话术": {
+    "zh": {
+      "category": {
+        "previousSha256": "e677ac3f8f56af98d47e3810220972caff5833c6633b024c46e9ea6b727410ad",
+        "value": "问答"
+      },
+      "tags": {
+        "previousSha256": "7666ce95a7138db8febd6a9dfef85bbe37f0c7ebf6bb6d927aacbe9ebb399e4f",
+        "value": [
+          "问答",
+          "知识库检索话术"
+        ]
+      }
+    },
+    "en": {
+      "category": {
+        "previousSha256": "9aab932a7edfd6c10219348a9796dce0ff1db3dc24ff56a9d1f2e444d2e68b4a",
+        "value": "General"
+      },
+      "tags": {
+        "previousSha256": "0e9acb63c551904d864f05cf42b5f9fe0b08d329aace7e088abfc2f88aa09f81",
+        "value": [
+          "General",
+          "Knowledge-base search speech"
+        ]
+      }
+    }
+  },
+  "curated-论文-新闻写作": {
+    "zh": {
+      "category": {
+        "previousSha256": "7cef1d71db62938a9e3b7dddc20161dd7e1fa66228454b28f6713039784c3003",
+        "value": "写作"
+      },
+      "tags": {
+        "previousSha256": "0b6f6348662c3d8d8609c1933ac6793cbabac9ed6b2c6afdf5476b7e51e3ff6b",
+        "value": [
+          "写作",
+          "新闻写作"
+        ]
+      }
+    },
+    "en": {
+      "category": {
+        "previousSha256": "665bc989dd4909f2aa2644f529e85a74b96cb9183b0038a00be23964ef17bf17",
+        "value": "Writing"
+      },
+      "tags": {
+        "previousSha256": "7abe0fdec9b82af7d9c4c7dcbe81f4ef238e6cc86c3d67ad97e7dced9f7dc042",
+        "value": [
+          "Writing",
+          "Press writing"
+        ]
+      }
+    }
+  },
+  "curated-问答-hr助手": {
+    "zh": {
+      "category": {
+        "previousSha256": "25ac8a35a75c7a86ba9ada5f86d2f235f999cfac8b36e6636de8aba5f0aa0f6c",
+        "value": "职场"
+      },
+      "tags": {
+        "previousSha256": "dc4fdffca27f5e88e5d166b65325d60a6dcd9269a910908a8a829cbcb3045f26",
+        "value": [
+          "职场",
+          "HR助手"
+        ]
+      }
+    },
+    "en": {
+      "category": {
+        "previousSha256": "468d61a94d9f9d93e56df7cf8941414523b6a129fb60aa4351b0d40c858ff44c",
+        "value": "Workplace"
+      },
+      "tags": {
+        "previousSha256": "2f294b589141943ae35300b349059cb19d6b1d22492b62c27013ff0a53f2e0f7",
+        "value": [
+          "Workplace",
+          "HR Assistant"
+        ]
+      }
+    }
+  },
+  "curated-职场-财经助手": {
+    "zh": {
+      "title": {
+        "previousSha256": "d693ef5661cb7d0d8c71a6db03bffeb12e9cebd8cbe6b18db60aabbaed656251",
+        "value": "差旅报销问答"
+      },
+      "tags": {
+        "previousSha256": "edb0839063e629513ebb68d6f4a7e8ad90336e48d95878e24ebd4e39906c023b",
+        "value": [
+          "职场",
+          "差旅报销问答"
+        ]
+      }
+    },
+    "en": {
+      "title": {
+        "previousSha256": "41e0dc2c1875911832d5ba85772544de5c1f3b7803d2053c1e3a4c07532bd7f7",
+        "value": "Travel Expense Q&A"
+      },
+      "tags": {
+        "previousSha256": "b763c2052f498c1b12d55ef66a8477d7a549b45103b452d39284de89c5cfb3a4",
+        "value": [
+          "Workplace",
+          "Travel Expense Q&A"
+        ]
+      }
+    }
+  },
+  "curated-运营-封面提示词": {
+    "zh": {
+      "category": {
+        "previousSha256": "4542fdc93f9885bad2bcd4a5db6842078372cf371b3cd45eb6b7416dd22e2f84",
+        "value": "图片"
+      },
+      "tags": {
+        "previousSha256": "81fcc43f5950456446ed55ac9055a077e638c4c47cbb805b760261ba393a66a6",
+        "value": [
+          "图片",
+          "封面提示词"
+        ]
+      }
+    },
+    "en": {
+      "category": {
+        "previousSha256": "1653365f65b9061d88174bc9c421c6db48d40f0b280b44ca0973364458eb7557",
+        "value": "Images"
+      },
+      "tags": {
+        "previousSha256": "95006a6158bbdc09b92e03314dfda6711a5fbb6b6ae99f3cc8be0ee12ed4c4fe",
+        "value": [
+          "Images",
+          "Cover Hint"
+        ]
+      }
+    }
+  },
+  "curated-运营-商务风封面提示词": {
+    "zh": {
+      "category": {
+        "previousSha256": "4542fdc93f9885bad2bcd4a5db6842078372cf371b3cd45eb6b7416dd22e2f84",
+        "value": "图片"
+      },
+      "tags": {
+        "previousSha256": "ecd6ac1bcc050b6580100b66250ff201d9f368c69309e8ad8976affb121ade46",
+        "value": [
+          "图片",
+          "商务风封面提示词"
+        ]
+      }
+    },
+    "en": {
+      "category": {
+        "previousSha256": "1653365f65b9061d88174bc9c421c6db48d40f0b280b44ca0973364458eb7557",
+        "value": "Images"
+      },
+      "tags": {
+        "previousSha256": "83392a1dc50965fe09093d982422c8283ed0e692c4368913c98b774b82ef14c8",
+        "value": [
+          "Images",
+          "Business Wind Cover Tip"
+        ]
+      }
+    }
+  },
+  "curated-问答-科技蓝封面提示词": {
+    "zh": {
+      "category": {
+        "previousSha256": "25ac8a35a75c7a86ba9ada5f86d2f235f999cfac8b36e6636de8aba5f0aa0f6c",
+        "value": "图片"
+      },
+      "tags": {
+        "previousSha256": "cf8faa30aacb684ab6bd713b3251ce2489b6248fe4f5721edbc810bea340a06a",
+        "value": [
+          "图片",
+          "科技蓝封面提示词"
+        ]
+      }
+    },
+    "en": {
+      "category": {
+        "previousSha256": "468d61a94d9f9d93e56df7cf8941414523b6a129fb60aa4351b0d40c858ff44c",
+        "value": "Images"
+      },
+      "tags": {
+        "previousSha256": "2d6f4d997d82fc975a966826b38cc2e1e047e2bde426472a917eaab429d3c4d6",
+        "value": [
+          "Images",
+          "Technology Blue Cover Hint"
+        ]
+      }
+    }
+  },
+  "curated-问答-数字极简票券风": {
+    "zh": {
+      "category": {
+        "previousSha256": "25ac8a35a75c7a86ba9ada5f86d2f235f999cfac8b36e6636de8aba5f0aa0f6c",
+        "value": "图片"
+      },
+      "tags": {
+        "previousSha256": "06e3df1f533f04ccaa5161813d15bf3e84402866165d3a56b51ff6dff683fb5b",
+        "value": [
+          "图片",
+          "数字极简票券风"
+        ]
+      }
+    },
+    "en": {
+      "category": {
+        "previousSha256": "468d61a94d9f9d93e56df7cf8941414523b6a129fb60aa4351b0d40c858ff44c",
+        "value": "Images"
+      },
+      "tags": {
+        "previousSha256": "81cdd78b388076b53e78f7a64322811b41b93127ceaeb209c56dec134ea81ed0",
+        "value": [
+          "Images",
+          "Numbers are extremely simple."
+        ]
+      }
+    }
+  },
+  "curated-论文-新构成主义教学风": {
+    "zh": {
+      "category": {
+        "previousSha256": "7cef1d71db62938a9e3b7dddc20161dd7e1fa66228454b28f6713039784c3003",
+        "value": "图片"
+      },
+      "tags": {
+        "previousSha256": "314c7b86d77ef7c06027256db7112ba4b1a7c0e11365df6752c27750ba407bc9",
+        "value": [
+          "图片",
+          "新构成主义教学风"
+        ]
+      }
+    },
+    "en": {
+      "category": {
+        "previousSha256": "665bc989dd4909f2aa2644f529e85a74b96cb9183b0038a00be23964ef17bf17",
+        "value": "Images"
+      },
+      "tags": {
+        "previousSha256": "24832402bce68161a5cb42c52b809a508beeac92e560d302f50d9413f1083e41",
+        "value": [
+          "Images",
+          "New constitutive teaching style"
+        ]
+      }
+    }
+  },
+  "curated-运营-奢华自然意境风": {
+    "zh": {
+      "category": {
+        "previousSha256": "4542fdc93f9885bad2bcd4a5db6842078372cf371b3cd45eb6b7416dd22e2f84",
+        "value": "图片"
+      },
+      "tags": {
+        "previousSha256": "784600065b23bb4c17ecb6c62d13b3b946126112ecd286b196f486d815249d97",
+        "value": [
+          "图片",
+          "奢华自然意境风"
+        ]
+      }
+    },
+    "en": {
+      "category": {
+        "previousSha256": "1653365f65b9061d88174bc9c421c6db48d40f0b280b44ca0973364458eb7557",
+        "value": "Images"
+      },
+      "tags": {
+        "previousSha256": "d8b3243b74c7c47413cf50b3d200ff87cfbd10f86a21d085f4684567b41fc729",
+        "value": [
+          "Images",
+          "The luxury of nature."
+        ]
+      }
+    }
+  },
+  "curated-职场-新潮工业反叛风": {
+    "zh": {
+      "category": {
+        "previousSha256": "9c6505112b9d9adb4a7e99e49462bbe0fc7ddf04e9cdb81c44ece673e796566e",
+        "value": "图片"
+      },
+      "tags": {
+        "previousSha256": "3138633903f40fca8dee1468a9b727dce9c70c839555cd80ddf9bf4f0dfbf35e",
+        "value": [
+          "图片",
+          "新潮工业反叛风"
+        ]
+      }
+    },
+    "en": {
+      "category": {
+        "previousSha256": "10f6c2319deee26fb0725907432ba3e1051c97348ba4edb3c27c289eb039fc73",
+        "value": "Images"
+      },
+      "tags": {
+        "previousSha256": "990fd26145f6c93c75d800db2a6825d0c0afb72f26280cbf1e1bb9601eb8defc",
+        "value": [
+          "Images",
+          "The New Tide Industries Rebel"
+        ]
+      }
+    }
+  },
+  "curated-生活-软萌知识卡片风": {
+    "zh": {
+      "category": {
+        "previousSha256": "d8b043c25235220d1d7d3f7321cbc3df21875345342f40fbf72783c174b15408",
+        "value": "图片"
+      },
+      "tags": {
+        "previousSha256": "8a0ad9465b2b44356440e79a22eadb1fb30e2a56611da8804d82f0db583d9518",
+        "value": [
+          "图片",
+          "软萌知识卡片风"
+        ]
+      }
+    },
+    "en": {
+      "category": {
+        "previousSha256": "f8fe9ce39c48c84a0990f475594eba79e5e920f5dce0521b1eaf53c6e53958e9",
+        "value": "Images"
+      },
+      "tags": {
+        "previousSha256": "fd32562d86c16e8da3a58aef929f00038939c65bafbcfc48aadc5435726143d8",
+        "value": [
+          "Images",
+          "Soft Knowledge Card Wind"
+        ]
+      }
+    }
+  },
+  "curated-运营-商务简约信息卡片风": {
+    "zh": {
+      "category": {
+        "previousSha256": "4542fdc93f9885bad2bcd4a5db6842078372cf371b3cd45eb6b7416dd22e2f84",
+        "value": "图片"
+      },
+      "tags": {
+        "previousSha256": "bc101e5653d22df9c921b310d3b64579cbd30eb6409b0b27d67dc5dd5b077fce",
+        "value": [
+          "图片",
+          "商务简约信息卡片风"
+        ]
+      }
+    },
+    "en": {
+      "category": {
+        "previousSha256": "1653365f65b9061d88174bc9c421c6db48d40f0b280b44ca0973364458eb7557",
+        "value": "Images"
+      },
+      "tags": {
+        "previousSha256": "4ac9f6ebf2d9b3295890dc980f0d22238ac22c86548db2cec28d88df6c90f9b7",
+        "value": [
+          "Images",
+          "Business Brief Information Card"
+        ]
+      }
+    }
+  },
+  "curated-论文-幽默文案公众号提示词": {
+    "zh": {
+      "category": {
+        "previousSha256": "7cef1d71db62938a9e3b7dddc20161dd7e1fa66228454b28f6713039784c3003",
+        "value": "写作"
+      },
+      "tags": {
+        "previousSha256": "721b6ac061d05c9b947cd5032567704a3bbed823c17eefffdbacad7cff43d72c",
+        "value": [
+          "写作",
+          "幽默文案公众号提示词"
+        ]
+      }
+    },
+    "en": {
+      "category": {
+        "previousSha256": "665bc989dd4909f2aa2644f529e85a74b96cb9183b0038a00be23964ef17bf17",
+        "value": "Writing"
+      },
+      "tags": {
+        "previousSha256": "da822255395c50e49a9c8991531ace9786b08e574558977df8eaf1f75f9a367b",
+        "value": [
+          "Writing",
+          "Humorary public tip."
+        ]
+      }
+    }
+  },
+  "curated-编程-数据处理与分析智能体": {
+    "zh": {
+      "category": {
+        "previousSha256": "e677ac3f8f56af98d47e3810220972caff5833c6633b024c46e9ea6b727410ad",
+        "value": "职场"
+      },
+      "tags": {
+        "previousSha256": "18090a4199be8069ffcd3a00597bd92897f7a68bc6bb065664b1767421bd8c53",
+        "value": [
+          "职场",
+          "数据处理与分析智能体"
+        ]
+      }
+    },
+    "en": {
+      "category": {
+        "previousSha256": "9aab932a7edfd6c10219348a9796dce0ff1db3dc24ff56a9d1f2e444d2e68b4a",
+        "value": "Workplace"
+      },
+      "tags": {
+        "previousSha256": "40358e9281e25751c4914d000443dba81d015ffb746d5c0a12bd6de2a0890f0f",
+        "value": [
+          "Workplace",
+          "Data processing and analysis intelligence"
+        ]
+      }
+    }
+  },
+  "curated-图片-中小学生数学题生成智能体": {
+    "zh": {
+      "category": {
+        "previousSha256": "2c6d1bd358615d9b209a6720803b196aa4322033dd047bd59f895ca1c5783f48",
+        "value": "问答"
+      },
+      "title": {
+        "previousSha256": "43354918584440e8858d168658bf252dba592acc082b7cdc29918219488bda5e",
+        "value": "数学练习题生成"
+      },
+      "tags": {
+        "previousSha256": "2114b9066beaa252d5aec2cc15e8230aa95d0af177f258566c690a99194ad784",
+        "value": [
+          "问答",
+          "数学练习题生成"
+        ]
+      }
+    },
+    "en": {
+      "category": {
+        "previousSha256": "941b085d3176f81fff8147e5e7c3797dab41904b699111bd01d67580d4d16390",
+        "value": "General"
+      },
+      "title": {
+        "previousSha256": "8e541c82d6f3e425345c0b7c3cf078db5300c57f3096ae7b69817bf7605703f6",
+        "value": "Math Practice Question Builder"
+      },
+      "tags": {
+        "previousSha256": "b673436adf7d7b3b701dd220427d090541b960137fd1888114a9756313f05859",
+        "value": [
+          "General",
+          "Math Practice Question Builder"
+        ]
+      }
+    }
+  },
+  "curated-图片-pdf-文本分析智能体": {
+    "zh": {
+      "category": {
+        "previousSha256": "2c6d1bd358615d9b209a6720803b196aa4322033dd047bd59f895ca1c5783f48",
+        "value": "职场"
+      },
+      "title": {
+        "previousSha256": "4e4735875fd4cf7a84980923c1ba9a06b0c449bf20fd3eda668d0ce0410c3dc2",
+        "value": "PDF 文本分析"
+      },
+      "tags": {
+        "previousSha256": "9d0758feb0b76c04fe299e8e822cfd09b479ff98e89cf329b60c09c85359e95a",
+        "value": [
+          "职场",
+          "PDF 文本分析"
+        ]
+      }
+    },
+    "en": {
+      "category": {
+        "previousSha256": "941b085d3176f81fff8147e5e7c3797dab41904b699111bd01d67580d4d16390",
+        "value": "Workplace"
+      },
+      "title": {
+        "previousSha256": "2093a3d0902056ae90c26fac28a4dcf1fd486e6cf4e848210aee1c5200f6fb08",
+        "value": "PDF Text Analysis"
+      },
+      "tags": {
+        "previousSha256": "07beb7b09fa05820d533de068975a4cbc39a6c68dc0db09d30f889c8605f618e",
+        "value": [
+          "Workplace",
+          "PDF Text Analysis"
+        ]
+      }
+    }
+  },
+  "curated-视频-高级中文歌词创作助手指令": {
+    "zh": {
+      "category": {
+        "previousSha256": "7879cef50267bbd6c24d0c15055e42580f83928ae4fb1bc6750cbdc9e49bb71b",
+        "value": "写作"
+      },
+      "tags": {
+        "previousSha256": "99315b8c1fcce9e5a21f6eb51710de1c1031ce08d4575bf88e7ff30fb7fd7829",
+        "value": [
+          "写作",
+          "高级中文歌词创作助手指令"
+        ]
+      }
+    },
+    "en": {
+      "category": {
+        "previousSha256": "72bcb013ed85a48ff6da50bc18d37492ffea7a4436790cdefa5a006b6070814d",
+        "value": "Writing"
+      },
+      "tags": {
+        "previousSha256": "373bd7e63b9d9d966e5451b08f4777564a99e9b5fa93e5d355008db30655d46b",
+        "value": [
+          "Writing",
+          "Advanced Chinese Song Writer Assistant Command"
+        ]
+      }
+    }
+  },
+  "curated-图片-亚马逊-listing-生成与优化专家": {
+    "zh": {
+      "category": {
+        "previousSha256": "2c6d1bd358615d9b209a6720803b196aa4322033dd047bd59f895ca1c5783f48",
+        "value": "运营"
+      },
+      "tags": {
+        "previousSha256": "59b70eb78d36426b9890491b8b202448f1e664d0f24fb6a719ffa904e6f98d1d",
+        "value": [
+          "运营",
+          "亚马逊 Listing 生成与优化专家"
+        ]
+      }
+    },
+    "en": {
+      "category": {
+        "previousSha256": "941b085d3176f81fff8147e5e7c3797dab41904b699111bd01d67580d4d16390",
+        "value": "Operations"
+      },
+      "tags": {
+        "previousSha256": "1b74e133f5e40ba4491e56a72a04dafa2b608906f8b5d95237d64418604c4393",
+        "value": [
+          "Operations",
+          "Amazon Listing Specialist"
+        ]
+      }
+    }
+  },
+  "curated-运营-银行授信报告撰写专家": {
+    "zh": {
+      "title": {
+        "previousSha256": "4b1077099d3792bf5e3e8eb5756110ac792b5c206a48bba57bc28e59aee8ec49",
+        "value": "银行授信报告资料整理"
+      },
+      "summary": {
+        "previousSha256": "12a5b91e3e68fdae94d04fbb416e90096be822197f1622fb2378c9c2bcf6f46f",
+        "value": "整理现有贷款或授信报告的结构、材料和待补项目。"
+      },
+      "prompt": {
+        "previousSha256": "545438818e964641495c20874545d524cf0aa57fc204cda13aa215eba92017cc",
+        "value": "任务：银行授信报告资料整理\n整理现有贷款或授信报告的结构、材料和待补项目。\n只处理用户有权提供并已去除个人敏感信息的资料。按提案章节整理原始事实与资料清单，核对数字的一致性。记录缺少的支持文件。不得评估个人信用、提出额度、自动评分或决定是否批准。"
+      },
+      "tags": {
+        "previousSha256": "c6801325f462e53d6ec7e793d8b3baa9eacb3cd8a711ab7c1eec9e800a6f5cd1",
+        "value": [
+          "运营",
+          "银行授信报告资料整理"
+        ]
+      }
+    },
+    "en": {
+      "title": {
+        "previousSha256": "00963826158ced7e428a6a1450c6d56f0890ba1905eb354a8efa68bafec6dbd8",
+        "value": "Credit Report Document Organizer"
+      },
+      "summary": {
+        "previousSha256": "9d56de278a8e29ab11ac029265aa4b3d9f8e08a53c6fda769fcf2de16d148d87",
+        "value": "Organize the structure, documents and missing items in an existing credit or loan proposal."
+      },
+      "prompt": {
+        "previousSha256": "55c55fb7c1ead198eff55532d5284656bf78060bffc2259dc5388e1e8c308bbc",
+        "value": "Task: Credit Report Document Organizer\nOrganize the structure, documents and missing items in an existing credit or loan proposal.\nUse authorized records with personal identifiers removed. Organize source facts and supporting documents by proposal section, reconcile figures and flag missing evidence. Do not rate an applicant, recommend limits, score credit or approve or deny a loan."
+      },
+      "tags": {
+        "previousSha256": "beda2239ee49d7daf24937d561f7350cd0c667e7dd6b8565c067c9d7f565510f",
+        "value": [
+          "Operations",
+          "Credit Report Document Organizer"
+        ]
+      }
+    }
+  },
+  "curated-运营-旅游行程设计智能体": {
+    "zh": {
+      "category": {
+        "previousSha256": "4542fdc93f9885bad2bcd4a5db6842078372cf371b3cd45eb6b7416dd22e2f84",
+        "value": "生活"
+      },
+      "title": {
+        "previousSha256": "1643bab06a99940012e227c3fc0be9bfc559145eb3539a7c5be58e3d4537505b",
+        "value": "旅行行程设计"
+      },
+      "tags": {
+        "previousSha256": "a91602ae5e5f6337414ef12174c45bfad5c23f829db6c6c4ea4ef2fe25162d77",
+        "value": [
+          "生活",
+          "旅行行程设计"
+        ]
+      }
+    },
+    "en": {
+      "category": {
+        "previousSha256": "1653365f65b9061d88174bc9c421c6db48d40f0b280b44ca0973364458eb7557",
+        "value": "Life"
+      },
+      "title": {
+        "previousSha256": "16d000269750412e7c2b42ed262bbe05913411d74dea3a2db8752b50f5b3f52f",
+        "value": "Travel Itinerary Design"
+      },
+      "tags": {
+        "previousSha256": "b4d9ab2702126a1f658b43f8bc801211225e52b84fc08e2d9062f4ca0dfc58e7",
+        "value": [
+          "Life",
+          "Travel Itinerary Design"
+        ]
+      }
+    }
+  },
+  "curated-生活-文章去-ai-味智能体": {
+    "zh": {
+      "category": {
+        "previousSha256": "d8b043c25235220d1d7d3f7321cbc3df21875345342f40fbf72783c174b15408",
+        "value": "写作"
+      },
+      "title": {
+        "previousSha256": "62bf264938728bb6a3c8e0bbb51f30506b5cb8ed392d295025bc6a02ce2db2c4",
+        "value": "文章语言润色"
+      },
+      "tags": {
+        "previousSha256": "f8249434cf157615aea6d8552b285cbcd60a968b1e5ccc088b627756a0c5e0b2",
+        "value": [
+          "写作",
+          "文章语言润色"
+        ]
+      }
+    },
+    "en": {
+      "category": {
+        "previousSha256": "f8fe9ce39c48c84a0990f475594eba79e5e920f5dce0521b1eaf53c6e53958e9",
+        "value": "Writing"
+      },
+      "title": {
+        "previousSha256": "d38438d916b6b474cc643351573dd5ec688f18c6b8d0df243d09a9633bba9fef",
+        "value": "Article Style Editing"
+      },
+      "tags": {
+        "previousSha256": "c6276e417c9d027e2e8719f4de1d8e6b8e197a3010330f76889072a7d852991a",
+        "value": [
+          "Writing",
+          "Article Style Editing"
+        ]
+      }
+    }
+  },
+  "curated-论文-法语翻译智能体": {
+    "zh": {
+      "category": {
+        "previousSha256": "7cef1d71db62938a9e3b7dddc20161dd7e1fa66228454b28f6713039784c3003",
+        "value": "写作"
+      },
+      "tags": {
+        "previousSha256": "a7ab21a79e7c4c2cc59df6ab9bfa7338d3cb2292f4f181bd2e1e74cbdc67cda6",
+        "value": [
+          "写作",
+          "法语翻译智能体"
+        ]
+      }
+    },
+    "en": {
+      "category": {
+        "previousSha256": "665bc989dd4909f2aa2644f529e85a74b96cb9183b0038a00be23964ef17bf17",
+        "value": "Writing"
+      },
+      "tags": {
+        "previousSha256": "fdbd1450c98a5cd66a4362cbcf7fac76b3011d2b5412f16d64af4528996bf63a",
+        "value": [
+          "Writing",
+          "French translation smartware"
+        ]
+      }
+    }
+  },
+  "curated-论文-行业研究报告-2-0": {
+    "zh": {
+      "category": {
+        "previousSha256": "7cef1d71db62938a9e3b7dddc20161dd7e1fa66228454b28f6713039784c3003",
+        "value": "职场"
+      },
+      "tags": {
+        "previousSha256": "e3f2a57920681ad34d770c8caaf59be91ab0a77ade2a7cadf83c2fcd326a7846",
+        "value": [
+          "职场",
+          "行业研究报告 2.0"
+        ]
+      }
+    },
+    "en": {
+      "category": {
+        "previousSha256": "665bc989dd4909f2aa2644f529e85a74b96cb9183b0038a00be23964ef17bf17",
+        "value": "Workplace"
+      },
+      "tags": {
+        "previousSha256": "9694ce802722709f97f707bbd7662aa1cb39baaaf94123b3177d1d69c5a13fb8",
+        "value": [
+          "Workplace",
+          "Industry studies 2.0"
+        ]
+      }
+    }
+  },
+  "curated-运营-银行授信报告深度分析智能体": {
+    "zh": {
+      "title": {
+        "previousSha256": "db97a3a266f79bf8d14f28c428e16526d36871dfd65f37e54b1c0c1964b68b47",
+        "value": "授信报告资料核对"
+      },
+      "summary": {
+        "previousSha256": "c65dff8b8c9c38319a0d8952da79ef3cf4a896fd87204c91a3ac19f00599d9be",
+        "value": "整理现有贷款或授信报告的结构、材料和待补项目。"
+      },
+      "prompt": {
+        "previousSha256": "dd71b0681a3cd3b8dca888273e39680e7af2247cbd5b0b0890ea2110e820292c",
+        "value": "任务：授信报告资料核对\n整理现有贷款或授信报告的结构、材料和待补项目。\n只处理用户有权提供并已去除个人敏感信息的资料。按提案章节整理原始事实与资料清单，核对数字的一致性。记录缺少的支持文件。不得评估个人信用、提出额度、自动评分或决定是否批准。"
+      },
+      "tags": {
+        "previousSha256": "363bc9a1f38c469f60afb10f2927b6aa708b44ead95d3d9e55cb3a09096abe1d",
+        "value": [
+          "运营",
+          "授信报告资料核对"
+        ]
+      }
+    },
+    "en": {
+      "title": {
+        "previousSha256": "0574c42c6e906ecb7ca2494abd60b8c90dc4217ad6a7c0720e399406c3176adb",
+        "value": "Credit Report Evidence Checklist"
+      },
+      "summary": {
+        "previousSha256": "0c08b4856173d51118533955fd9f506a1cb1ddc258937b1d679d32e3cfc6d3ab",
+        "value": "Organize the structure, documents and missing items in an existing credit or loan proposal."
+      },
+      "prompt": {
+        "previousSha256": "a272b3705ff212da43282f7b7e9914c7b5814371e45afcb7f8e71290e7fc2ce5",
+        "value": "Task: Credit Report Evidence Checklist\nOrganize the structure, documents and missing items in an existing credit or loan proposal.\nUse authorized records with personal identifiers removed. Organize source facts and supporting documents by proposal section, reconcile figures and flag missing evidence. Do not rate an applicant, recommend limits, score credit or approve or deny a loan."
+      },
+      "tags": {
+        "previousSha256": "66f397fa83c1db1e2d80a4c6f10172b369273ae3e876c1963c24e3e3119fd7a0",
+        "value": [
+          "Operations",
+          "Credit Report Evidence Checklist"
+        ]
+      }
+    }
+  },
+  "curated-图片-11条简易指令": {
+    "zh": {
+      "category": {
+        "previousSha256": "2c6d1bd358615d9b209a6720803b196aa4322033dd047bd59f895ca1c5783f48",
+        "value": "问答"
+      },
+      "tags": {
+        "previousSha256": "72ebb38bc9d12be47a633614484db72e44e7e405e819ae72763485fa4d7a1926",
+        "value": [
+          "问答",
+          "11条简易指令"
+        ]
+      }
+    },
+    "en": {
+      "category": {
+        "previousSha256": "941b085d3176f81fff8147e5e7c3797dab41904b699111bd01d67580d4d16390",
+        "value": "General"
+      },
+      "tags": {
+        "previousSha256": "693cc6ff76367d368950effeb0226a7a978725adefdd3afef0471d54034d1c3f",
+        "value": [
+          "General",
+          "11 simple instructions"
+        ]
+      }
+    }
+  },
+  "curated-生活-回忆录写作专家": {
+    "zh": {
+      "category": {
+        "previousSha256": "d8b043c25235220d1d7d3f7321cbc3df21875345342f40fbf72783c174b15408",
+        "value": "写作"
+      },
+      "tags": {
+        "previousSha256": "111301165ff657244dec9b7b1a3db12bb385bc55769696758c748aabd5b1dd13",
+        "value": [
+          "写作",
+          "回忆录写作专家"
+        ]
+      }
+    },
+    "en": {
+      "category": {
+        "previousSha256": "f8fe9ce39c48c84a0990f475594eba79e5e920f5dce0521b1eaf53c6e53958e9",
+        "value": "Writing"
+      },
+      "tags": {
+        "previousSha256": "c727c582ca3975a057ab68c1bf1601372a0c8e6eb67d90f442308a7715d0d568",
+        "value": [
+          "Writing",
+          "Rememory writing specialist"
+        ]
+      }
+    }
+  },
+  "curated-图片-亚马逊全链路运营顾问": {
+    "zh": {
+      "category": {
+        "previousSha256": "2c6d1bd358615d9b209a6720803b196aa4322033dd047bd59f895ca1c5783f48",
+        "value": "运营"
+      },
+      "tags": {
+        "previousSha256": "44e75012f299dd2bd6764df6571097a262b3434f9d01a9329fa6e6e748e8c597",
+        "value": [
+          "运营",
+          "亚马逊全链路运营顾问"
+        ]
+      }
+    },
+    "en": {
+      "category": {
+        "previousSha256": "941b085d3176f81fff8147e5e7c3797dab41904b699111bd01d67580d4d16390",
+        "value": "Operations"
+      },
+      "tags": {
+        "previousSha256": "dde5da4526c94f9efd828e5b59c8c5ddf82e4f31c0e9304772c77737f38135b8",
+        "value": [
+          "Operations",
+          "Adviser, full-link operations, Amazon"
+        ]
+      }
+    }
+  },
+  "curated-问答-技术服务合同审查专家": {
+    "zh": {
+      "title": {
+        "previousSha256": "fc2fdb643b364afa11952ec7b5d790b9046ab73afd4400e1e5699fc90535332c",
+        "value": "技术服务合同阅读清单"
+      },
+      "summary": {
+        "previousSha256": "0f2eca272a9201fecdd5fd309fc9b036fd6a86673281cc8ff46512088077eff8",
+        "value": "整理用户提供的法律文本、引用出处和待核实的问题。"
+      },
+      "prompt": {
+        "previousSha256": "80c2460a2543d33db27ec93cde9e549c6041fd3dc4b0e35d9fb0c0fbda42fede",
+        "value": "任务：技术服务合同阅读清单\n整理用户提供的法律文本、引用出处和待核实的问题。\n标明相关条款、材料日期、原文依据、可能存在的歧义及缺失资料。法规的时效性、个案适用与法律结论交由具备资质的人员复核。"
+      },
+      "tags": {
+        "previousSha256": "fa8f830abeb136bd2101113068696bc24c218f80f2d1b82e57c4548dfe830dff",
+        "value": [
+          "问答",
+          "技术服务合同阅读清单"
+        ]
+      }
+    },
+    "en": {
+      "title": {
+        "previousSha256": "a8b4b03bbf2494b5e095f0cb8b311be00afb30404e362801636e6bb34c627a95",
+        "value": "Technical Service Contract Reading Checklist"
+      },
+      "summary": {
+        "previousSha256": "ee3cdcfb606cc0f55cd1b706e8123e71fc0aad8c311804048dcbfd7e8bb93774",
+        "value": "Organize supplied legal texts, citations and open questions."
+      },
+      "prompt": {
+        "previousSha256": "83addc5c09a67cba1172be51aa907b2f5966aaff8124f0ae5b52b559e973ab32",
+        "value": "Task: Technical Service Contract Reading Checklist\nOrganize supplied legal texts, citations and open questions.\nList relevant provisions, dates, exact sources, ambiguities and missing information. Leave current legal validity, case-specific application and conclusions to qualified reviewers."
+      },
+      "tags": {
+        "previousSha256": "6535581a4eed049f7ee0ec1e6a28bc7fa15f3810733e4b14065050fc7a24b87c",
+        "value": [
+          "General",
+          "Technical Service Contract Reading Checklist"
+        ]
+      }
+    }
+  },
+  "curated-写作-考研真题解析智能体": {
+    "zh": {
+      "category": {
+        "previousSha256": "cdba9142877361afacab344de5b98311be9b8d337d24430bca9124cbcb0f393f",
+        "value": "问答"
+      },
+      "tags": {
+        "previousSha256": "353a8f04022a9d2ba5cea6aab643926a56756fc07d81d8d73bd00da2cd5b9f66",
+        "value": [
+          "问答",
+          "考研真题解析智能体"
+        ]
+      }
+    },
+    "en": {
+      "category": {
+        "previousSha256": "976c534c94969d69bd71956802a592db0eac1938cd779cb60705184e06b16a1f",
+        "value": "General"
+      },
+      "tags": {
+        "previousSha256": "32833cf7f5c15086e4a3c258fa529542deaf4241dc49e4846dda415606ecec4a",
+        "value": [
+          "General",
+          "Study Truth to Resolve Smart"
+        ]
+      }
+    }
+  },
+  "curated-图片-智能会议纪要官": {
+    "zh": {
+      "category": {
+        "previousSha256": "2c6d1bd358615d9b209a6720803b196aa4322033dd047bd59f895ca1c5783f48",
+        "value": "职场"
+      },
+      "title": {
+        "previousSha256": "a8d1d609cd0c980b22b22806150e70f7458aa14e26b1079e38feeafffd4bc59b",
+        "value": "会议纪要整理"
+      },
+      "tags": {
+        "previousSha256": "c7ccea1b2ceb584463b9ab088b62cb2516e651316500e211b26baf7b1eb15e4d",
+        "value": [
+          "职场",
+          "会议纪要整理"
+        ]
+      }
+    },
+    "en": {
+      "category": {
+        "previousSha256": "941b085d3176f81fff8147e5e7c3797dab41904b699111bd01d67580d4d16390",
+        "value": "Workplace"
+      },
+      "title": {
+        "previousSha256": "32115689d593728f78911ec1472afc4ed1d9ab4f36bb23023c6c4123c812baa2",
+        "value": "Meeting Notes Organizer"
+      },
+      "tags": {
+        "previousSha256": "80711271675efab73d289315ae0c1e07b79bed22c507a8b9d2d6f9fbefa6240a",
+        "value": [
+          "Workplace",
+          "Meeting Notes Organizer"
+        ]
+      }
+    }
+  },
+  "curated-编程-生意分析智能体": {
+    "zh": {
+      "category": {
+        "previousSha256": "e677ac3f8f56af98d47e3810220972caff5833c6633b024c46e9ea6b727410ad",
+        "value": "运营"
+      },
+      "tags": {
+        "previousSha256": "9def96189c0957f54e07e8ededcf2b90d8c64c2dec1c9c7feba64aaa0e552c18",
+        "value": [
+          "运营",
+          "生意分析智能体"
+        ]
+      }
+    },
+    "en": {
+      "category": {
+        "previousSha256": "9aab932a7edfd6c10219348a9796dce0ff1db3dc24ff56a9d1f2e444d2e68b4a",
+        "value": "Operations"
+      },
+      "tags": {
+        "previousSha256": "a23cc985e15ba9a58554e5add2194f28e39d498a93d03d71ad7dc31480409cf7",
+        "value": [
+          "Operations",
+          "Business Analysis Smart"
+        ]
+      }
+    }
+  },
+  "curated-视频-书籍深度解析智能体": {
+    "zh": {
+      "category": {
+        "previousSha256": "7879cef50267bbd6c24d0c15055e42580f83928ae4fb1bc6750cbdc9e49bb71b",
+        "value": "写作"
+      },
+      "tags": {
+        "previousSha256": "8b1ff05d2bae38b05912f8351d708ef9a249ef074e77ce44f3eb027974761b5a",
+        "value": [
+          "写作",
+          "书籍深度解析智能体"
+        ]
+      }
+    },
+    "en": {
+      "category": {
+        "previousSha256": "72bcb013ed85a48ff6da50bc18d37492ffea7a4436790cdefa5a006b6070814d",
+        "value": "Writing"
+      },
+      "tags": {
+        "previousSha256": "2df4d3c62ab6dd8244c7d0a605aa8bd160bec2eb6536000f0b5daec8bd29d8d8",
+        "value": [
+          "Writing",
+          "Book depth resolution intelligent body"
+        ]
+      }
+    }
+  },
+  "curated-论文-内容重写专家智能体-2-0": {
+    "zh": {
+      "category": {
+        "previousSha256": "7cef1d71db62938a9e3b7dddc20161dd7e1fa66228454b28f6713039784c3003",
+        "value": "写作"
+      },
+      "title": {
+        "previousSha256": "1adfb99a22a9f4ce4670738474521012a22d27908bbce7415c12211f2c39fc12",
+        "value": "文章改写与校对"
+      },
+      "tags": {
+        "previousSha256": "691e5d9b036ac9a7cab942351766225c068e2f4d7cc08147e11981c3d13a8781",
+        "value": [
+          "写作",
+          "文章改写与校对"
+        ]
+      }
+    },
+    "en": {
+      "category": {
+        "previousSha256": "665bc989dd4909f2aa2644f529e85a74b96cb9183b0038a00be23964ef17bf17",
+        "value": "Writing"
+      },
+      "title": {
+        "previousSha256": "74573486d7afa25a4257318f4b85f7c0a7aa003a14a922ee9d251a259509d2cc",
+        "value": "Article Revision & Proofreading"
+      },
+      "tags": {
+        "previousSha256": "06187cacf2f39fff45c870b1b60ae39dcbdbfd3f17564e259e12559efbf27840",
+        "value": [
+          "Writing",
+          "Article Revision & Proofreading"
+        ]
+      }
+    }
+  },
+  "curated-运营-银行授信报告撰写": {
+    "zh": {
+      "title": {
+        "previousSha256": "9acb97db0f4af131f5c5d5736be14f2eeb5f1bc999aeb2b86583560aa22b45f7",
+        "value": "授信报告草稿整理"
+      },
+      "summary": {
+        "previousSha256": "e44870d99e3708eaa4fa0bfdb94368b35b4e9fd66cb5e48c28fb2d11383d18f5",
+        "value": "整理现有贷款或授信报告的结构、材料和待补项目。"
+      },
+      "prompt": {
+        "previousSha256": "eaad36d6c1353f5748d53b775797eb2130048b939cf13083cf87ce1e4b3c1fc8",
+        "value": "任务：授信报告草稿整理\n整理现有贷款或授信报告的结构、材料和待补项目。\n只处理用户有权提供并已去除个人敏感信息的资料。按提案章节整理原始事实与资料清单，核对数字的一致性。记录缺少的支持文件。不得评估个人信用、提出额度、自动评分或决定是否批准。"
+      },
+      "tags": {
+        "previousSha256": "f1052deb549ec7fc69e6e3cff030770d3e76765f8779c16312a6c09426858d0c",
+        "value": [
+          "运营",
+          "授信报告草稿整理"
+        ]
+      }
+    },
+    "en": {
+      "title": {
+        "previousSha256": "d7ead097bc9269de841facbd85ffd664b71d3dc31fd65d356f4eabc69ce24981",
+        "value": "Credit Report Draft Organizer"
+      },
+      "summary": {
+        "previousSha256": "38af7d54096b3f1f0daee7090b1380e4968f4da684259bc45fcd9f5f2e9e10a6",
+        "value": "Organize the structure, documents and missing items in an existing credit or loan proposal."
+      },
+      "prompt": {
+        "previousSha256": "729dfc56418d56a9d8e5bc9ab6564d05a49bf9d4d8ce695c6e7487ad3cb226ba",
+        "value": "Task: Credit Report Draft Organizer\nOrganize the structure, documents and missing items in an existing credit or loan proposal.\nUse authorized records with personal identifiers removed. Organize source facts and supporting documents by proposal section, reconcile figures and flag missing evidence. Do not rate an applicant, recommend limits, score credit or approve or deny a loan."
+      },
+      "tags": {
+        "previousSha256": "741b8e2e43693f9fe0db6b677027a3d91025c9daee16283971b3cc31b1e6a5f2",
+        "value": [
+          "Operations",
+          "Credit Report Draft Organizer"
+        ]
+      }
+    }
+  },
+  "curated-职场-贷款提案撰写与优化专家": {
+    "zh": {
+      "title": {
+        "previousSha256": "425ed1093a8bd98c8ba93339f67eb5a4b2a7b98cead7e04d5911c6cd382db29b",
+        "value": "贷款提案材料整理"
+      },
+      "summary": {
+        "previousSha256": "3ee9509e7a2427e2158f2e91c2ee47acbb2e1ea566df50d32392e05e271fb4d7",
+        "value": "整理现有贷款或授信报告的结构、材料和待补项目。"
+      },
+      "prompt": {
+        "previousSha256": "2e43b885749a304473c609c5c5607e2d71b416bb1c1ad98a1f82a2cd4192f6a4",
+        "value": "任务：贷款提案材料整理\n整理现有贷款或授信报告的结构、材料和待补项目。\n只处理用户有权提供并已去除个人敏感信息的资料。按提案章节整理原始事实与资料清单，核对数字的一致性。记录缺少的支持文件。不得评估个人信用、提出额度、自动评分或决定是否批准。"
+      },
+      "tags": {
+        "previousSha256": "84abccc8fd6fd24b6f71c46c57e64c7a1cb03d92a6a57cbc0e157190c9fe4e87",
+        "value": [
+          "职场",
+          "贷款提案材料整理"
+        ]
+      }
+    },
+    "en": {
+      "title": {
+        "previousSha256": "07ef08868f1bd51b39e0483fe37a16e1d4f411b69f993cb11f8bea6042cb6f67",
+        "value": "Loan Proposal Document Organizer"
+      },
+      "summary": {
+        "previousSha256": "df1783e6a8654c67629c7faeaf86fdeb1adf687cb4698427ac2a0bf8dfae1511",
+        "value": "Organize the structure, documents and missing items in an existing credit or loan proposal."
+      },
+      "prompt": {
+        "previousSha256": "03e81d85876ae580ce895eb152221a9fefe5a6cd32148ae6b2f6c0717d6872a2",
+        "value": "Task: Loan Proposal Document Organizer\nOrganize the structure, documents and missing items in an existing credit or loan proposal.\nUse authorized records with personal identifiers removed. Organize source facts and supporting documents by proposal section, reconcile figures and flag missing evidence. Do not rate an applicant, recommend limits, score credit or approve or deny a loan."
+      },
+      "tags": {
+        "previousSha256": "2b3e64f6ee1b12698b799ff4206761e034efd4d928784fb88d67e3356c2f44df",
+        "value": [
+          "Workplace",
+          "Loan Proposal Document Organizer"
+        ]
+      }
+    }
+  },
+  "curated-运营-事后复盘智能体": {
+    "zh": {
+      "category": {
+        "previousSha256": "4542fdc93f9885bad2bcd4a5db6842078372cf371b3cd45eb6b7416dd22e2f84",
+        "value": "职场"
+      },
+      "tags": {
+        "previousSha256": "c87888916a005248e7810acf4b387d7fa29977270ecccffee3d70083d63c5ceb",
+        "value": [
+          "职场",
+          "事后复盘智能体"
+        ]
+      }
+    },
+    "en": {
+      "category": {
+        "previousSha256": "1653365f65b9061d88174bc9c421c6db48d40f0b280b44ca0973364458eb7557",
+        "value": "Workplace"
+      },
+      "tags": {
+        "previousSha256": "f34ced9ebfe64d6c48fde82ff895e82a0249a17587b79b049275fbbc79b86375",
+        "value": [
+          "Workplace",
+          "Recuplicated Smart"
+        ]
+      }
+    }
+  },
+  "curated-生活-八字命理深度解析智能体": {
+    "zh": {
+      "title": {
+        "previousSha256": "96360b9bd7f0481ea43d423b01fe70be68ad6c28ce94edb30e06db3a85ad1747",
+        "value": "传统命理文化术语解读"
+      },
+      "summary": {
+        "previousSha256": "0f2eca272a9201fecdd5fd309fc9b036fd6a86673281cc8ff46512088077eff8",
+        "value": "解释传统命理文化中的术语与象征。"
+      },
+      "prompt": {
+        "previousSha256": "c5cfa5160d77f6ba82c233ca8c52338c88fda3158412b7c0339f6dcfb92c8456",
+        "value": "任务：传统命理文化术语解读\n解释传统命理文化中的术语与象征。\n以历史文化或娱乐为语境，标明传统说法的出处；不将其当作命运、健康或财务结果的预测。"
+      },
+      "tags": {
+        "previousSha256": "71d9218aa7587e888793a705930f76627977e7c91e9acd175bfd4943805d144b",
+        "value": [
+          "生活",
+          "传统命理文化术语解读"
+        ]
+      }
+    },
+    "en": {
+      "title": {
+        "previousSha256": "64c11bb53253f97f9ecdaf7f8e0d2d55987739ed12b53e9c4b49d53c843c68c0",
+        "value": "Traditional Fortune-Telling Terminology"
+      },
+      "summary": {
+        "previousSha256": "ee3cdcfb606cc0f55cd1b706e8123e71fc0aad8c311804048dcbfd7e8bb93774",
+        "value": "Explain terms and symbols in traditional Chinese fortune-telling."
+      },
+      "prompt": {
+        "previousSha256": "47d88eb871ec38034755d4e699d86441cc3665f7e4f202b544461586fe22dc28",
+        "value": "Task: Traditional Fortune-Telling Terminology\nExplain terms and symbols in traditional Chinese fortune-telling.\nGive cultural or historical context for traditional claims. Do not use them to predict fate, health or financial outcomes."
+      },
+      "tags": {
+        "previousSha256": "5aa612a5e7ec40669dadbfc96fec8ad62b0cfd0a992cbd116a79d694917920ad",
+        "value": [
+          "Life",
+          "Traditional Fortune-Telling Terminology"
+        ]
+      }
+    }
+  },
+  "curated-职场-决算分析报告智能体": {
+    "zh": {
+      "title": {
+        "previousSha256": "9bcacc5e7c6730d356fb437d180b58506661f5a06f79c9255de08714e02192df",
+        "value": "决算数据核对"
+      },
+      "summary": {
+        "previousSha256": "0f2eca272a9201fecdd5fd309fc9b036fd6a86673281cc8ff46512088077eff8",
+        "value": "整理用户提供的财务资料、指标和计算口径，标明来源、假设和缺失项。"
+      },
+      "prompt": {
+        "previousSha256": "f29c3ad7a0d12a0316920bbe9199838ffea0b3841404681fe7db45ef33a9c29a",
+        "value": "任务：决算数据核对\n整理用户提供的财务资料、指标和计算口径，标明来源、假设和缺失项。\n按表头列出资料日期、原始数字、单位、算式和结果。只解释已有数据，提出供专业人员核实的问题。不得声称持有执照或作出投资、审计、信贷结论。"
+      },
+      "tags": {
+        "previousSha256": "72d045c08a4940230fe97ffaec335e8fe5c4c208f9139f69a5073e4a809f1898",
+        "value": [
+          "职场",
+          "决算数据核对"
+        ]
+      }
+    },
+    "en": {
+      "title": {
+        "previousSha256": "6c189a0176cc525ea89a3f6845be539c8bb76468ec4cfae577b193b2cfccdb1b",
+        "value": "Final Accounts Data Review"
+      },
+      "summary": {
+        "previousSha256": "ee3cdcfb606cc0f55cd1b706e8123e71fc0aad8c311804048dcbfd7e8bb93774",
+        "value": "Organize supplied financial records, figures and calculation methods, with sources, assumptions and gaps."
+      },
+      "prompt": {
+        "previousSha256": "733e0964f69a23d33433adc4f7cf2bb0cc3602502862185142d6acdb9169c867",
+        "value": "Task: Final Accounts Data Review\nOrganize supplied financial records, figures and calculation methods, with sources, assumptions and gaps.\nList the reporting date, original number, unit, arithmetic and result. Explain the figures and list questions for professional review. Do not claim credentials or give investment, audit or credit decisions."
+      },
+      "tags": {
+        "previousSha256": "8c38f0737aa687923343dd3cf97ce1aec2128c93cddce4bfcc8f80563a22830c",
+        "value": [
+          "Workplace",
+          "Final Accounts Data Review"
+        ]
+      }
+    }
+  },
+  "curated-论文-公文写作智能体": {
+    "zh": {
+      "category": {
+        "previousSha256": "7cef1d71db62938a9e3b7dddc20161dd7e1fa66228454b28f6713039784c3003",
+        "value": "职场"
+      },
+      "tags": {
+        "previousSha256": "40c57ecb59e0a9ad6c258bcb001f494239ed146eb1a67a5c90af3250484fefd2",
+        "value": [
+          "职场",
+          "公文写作智能体"
+        ]
+      }
+    },
+    "en": {
+      "category": {
+        "previousSha256": "665bc989dd4909f2aa2644f529e85a74b96cb9183b0038a00be23964ef17bf17",
+        "value": "Workplace"
+      },
+      "tags": {
+        "previousSha256": "dfeea485688438a1a7b17cbd81bbb5d8d547922c0432143efcd57e8f32028e3d",
+        "value": [
+          "Workplace",
+          "A writing intelligence for a public document"
+        ]
+      }
+    }
+  },
+  "curated-论文-立法调研智能体": {
+    "zh": {
+      "title": {
+        "previousSha256": "2a8e3034b6981b84fcbd3ba36eb4868f7612cec41dc896ba91a704bf8e224fc8",
+        "value": "法规调研资料整理"
+      },
+      "summary": {
+        "previousSha256": "0f1d7d4126bf35b74a743824ca7398ff67096cb3d1a8fb0d72c0528f5fa5d738",
+        "value": "整理用户提供的法律文本、引用出处和待核实的问题。"
+      },
+      "prompt": {
+        "previousSha256": "cd21d27fdc5a0078b246bdb8ef400e479cb0123dabf8069a5bc57e77dfeb4ec5",
+        "value": "任务：法规调研资料整理\n整理用户提供的法律文本、引用出处和待核实的问题。\n标明相关条款、材料日期、原文依据、可能存在的歧义及缺失资料。法规的时效性、个案适用与法律结论交由具备资质的人员复核。"
+      },
+      "tags": {
+        "previousSha256": "35ff43cf6742f1cc7588dea57ea94d05a538dd1aad1bcc22ed41d3346a686960",
+        "value": [
+          "论文",
+          "法规调研资料整理"
+        ]
+      }
+    },
+    "en": {
+      "title": {
+        "previousSha256": "0126c6d1fe7b65c814d6dfe9ad60b6ee6bd02a71ff11019c2928d9d561f23d88",
+        "value": "Legislative Research Source Organizer"
+      },
+      "summary": {
+        "previousSha256": "a2343c43abaef835cec0ff9f9272ca4865457d47e88ffbc30b505300ebdc7449",
+        "value": "Organize supplied legal texts, citations and open questions."
+      },
+      "prompt": {
+        "previousSha256": "c7aa101eafda58defc998bc1a18787eb5bde4bb8b8aaaa5a4f38b6fccc7eeff3",
+        "value": "Task: Legislative Research Source Organizer\nOrganize supplied legal texts, citations and open questions.\nList relevant provisions, dates, exact sources, ambiguities and missing information. Leave current legal validity, case-specific application and conclusions to qualified reviewers."
+      },
+      "tags": {
+        "previousSha256": "afdb3855654d94b70f1d4bd65c6b113005c4347b71309b33c4e36fa45bac19c3",
+        "value": [
+          "Academic Writing",
+          "Legislative Research Source Organizer"
+        ]
+      }
+    }
+  },
+  "curated-论文-演讲稿撰写智能体": {
+    "zh": {
+      "category": {
+        "previousSha256": "7cef1d71db62938a9e3b7dddc20161dd7e1fa66228454b28f6713039784c3003",
+        "value": "写作"
+      },
+      "tags": {
+        "previousSha256": "a37aed3a936a6f9a16fb4fa1335a7880c89c2795ed090af5adbf4236f0ef3e7a",
+        "value": [
+          "写作",
+          "演讲稿撰写智能体"
+        ]
+      }
+    },
+    "en": {
+      "category": {
+        "previousSha256": "665bc989dd4909f2aa2644f529e85a74b96cb9183b0038a00be23964ef17bf17",
+        "value": "Writing"
+      },
+      "tags": {
+        "previousSha256": "2ff49aa9d5362bf47f9d9693cde8ad21cc86bc77265a5278fd7a30a18cf6838b",
+        "value": [
+          "Writing",
+          "Speech Writer Smart"
+        ]
+      }
+    }
+  },
+  "curated-运营-银行授信报告分析智能体": {
+    "zh": {
+      "title": {
+        "previousSha256": "c61051213b3d9336bc9d536ba7f3bf8276dbc4b13594f0a5c225c99ecedf2057",
+        "value": "授信报告信息核对"
+      },
+      "summary": {
+        "previousSha256": "f96d16baf6f62a595c4cb5fbc36c338f8404139662706d8a6a3a7e3d5ddae3fa",
+        "value": "整理现有贷款或授信报告的结构、材料和待补项目。"
+      },
+      "prompt": {
+        "previousSha256": "51968c2c8382d77a2c0a29ed77f75ae5404ac17d85e609b74df9f64d282843f1",
+        "value": "任务：授信报告信息核对\n整理现有贷款或授信报告的结构、材料和待补项目。\n只处理用户有权提供并已去除个人敏感信息的资料。按提案章节整理原始事实与资料清单，核对数字的一致性。记录缺少的支持文件。不得评估个人信用、提出额度、自动评分或决定是否批准。"
+      },
+      "tags": {
+        "previousSha256": "4f3abd98e07f095c1388060dbbfe187143a567b880c0e9cbe976456c10cdfde4",
+        "value": [
+          "运营",
+          "授信报告信息核对"
+        ]
+      }
+    },
+    "en": {
+      "title": {
+        "previousSha256": "d229241fe634c80e883f757df08422744c721321e90a1789ba85428912c880f4",
+        "value": "Credit Report Information Review"
+      },
+      "summary": {
+        "previousSha256": "99728ec1b89659dbb96d3bbdd6aa4d979c3f24b5d7c8fe4adc22a0f27f3393cb",
+        "value": "Organize the structure, documents and missing items in an existing credit or loan proposal."
+      },
+      "prompt": {
+        "previousSha256": "08e371f2cd6985c8ef0f445257a7a8deae2402f71e3719d08301285cf5b35504",
+        "value": "Task: Credit Report Information Review\nOrganize the structure, documents and missing items in an existing credit or loan proposal.\nUse authorized records with personal identifiers removed. Organize source facts and supporting documents by proposal section, reconcile figures and flag missing evidence. Do not rate an applicant, recommend limits, score credit or approve or deny a loan."
+      },
+      "tags": {
+        "previousSha256": "b4c526e66708e40769a3d8820a33e94c7bb0ae9d5602467ab28aac32f82c9a6a",
+        "value": [
+          "Operations",
+          "Credit Report Information Review"
+        ]
+      }
+    }
+  },
+  "curated-运营-可视化图表与-mermaid-支持智能体": {
+    "zh": {
+      "category": {
+        "previousSha256": "4542fdc93f9885bad2bcd4a5db6842078372cf371b3cd45eb6b7416dd22e2f84",
+        "value": "编程"
+      },
+      "tags": {
+        "previousSha256": "87cb4cd25e876e816c820692a00a6f9c89399a441aea4845c1a3716493784f57",
+        "value": [
+          "编程",
+          "可视化图表与 Mermaid 支持智能体"
+        ]
+      }
+    },
+    "en": {
+      "category": {
+        "previousSha256": "1653365f65b9061d88174bc9c421c6db48d40f0b280b44ca0973364458eb7557",
+        "value": "Programming"
+      },
+      "tags": {
+        "previousSha256": "2c77cc1d24ab44a6e8961861b1c9f6b227df21c8c80dd9c45d1ad7d2248afc4d",
+        "value": [
+          "Programming",
+          "Visualized Charts and Mermaid Support Smart"
+        ]
+      }
+    }
+  },
+  "curated-论文-英文文章润色与-ai-味去除专家": {
+    "zh": {
+      "category": {
+        "previousSha256": "7cef1d71db62938a9e3b7dddc20161dd7e1fa66228454b28f6713039784c3003",
+        "value": "写作"
+      },
+      "title": {
+        "previousSha256": "b7353538cdd3777ff2015968e7557ce8cce8bf1ac7eaa0295c975dcf8348eb3d",
+        "value": "英文文章润色"
+      },
+      "tags": {
+        "previousSha256": "7d93d36474db15e81dd9d81a3442bd7e2623555ec23f64c81584127d82335d86",
+        "value": [
+          "写作",
+          "英文文章润色"
+        ]
+      }
+    },
+    "en": {
+      "category": {
+        "previousSha256": "665bc989dd4909f2aa2644f529e85a74b96cb9183b0038a00be23964ef17bf17",
+        "value": "Writing"
+      },
+      "title": {
+        "previousSha256": "eaf37712b157494a3e1c6c8f3aecea91ed9dddf3b3c7caffdc98464098052de4",
+        "value": "English Article Editing"
+      },
+      "tags": {
+        "previousSha256": "8c2c08f6ce8658f5aaaa1f49fb7d718110f9688ddb1047dcf99d0633c1ca1731",
+        "value": [
+          "Writing",
+          "English Article Editing"
+        ]
+      }
+    }
+  },
+  "curated-运营-定制财务分析智能体": {
+    "zh": {
+      "title": {
+        "previousSha256": "668e5ee69982569e92b77ea848214ac60a83b4e0ea444a4290c2a7419193a1fd",
+        "value": "财务数据分析整理"
+      },
+      "summary": {
+        "previousSha256": "a962760fd02716d3b92f6b6b294fca491dd3a04d7e999c72e4ed53c6a3acf8f1",
+        "value": "整理用户提供的财务资料、指标和计算口径，标明来源、假设和缺失项。"
+      },
+      "prompt": {
+        "previousSha256": "2df24732b2d1f804088d67d9f0bfde1ba8cb3745ed08e64a3cf5389fdcf9fd75",
+        "value": "任务：财务数据分析整理\n整理用户提供的财务资料、指标和计算口径，标明来源、假设和缺失项。\n按表头列出资料日期、原始数字、单位、算式和结果。只解释已有数据，提出供专业人员核实的问题。不得声称持有执照或作出投资、审计、信贷结论。"
+      },
+      "tags": {
+        "previousSha256": "e8dbcb6a73d623e7170ee50f915461d976910f9788a7245cbebd37aee3fbad6f",
+        "value": [
+          "运营",
+          "财务数据分析整理"
+        ]
+      }
+    },
+    "en": {
+      "title": {
+        "previousSha256": "d9bd487ad7c221a3a23fcf82a32561c40838f96eca6784756abe138e3f985c95",
+        "value": "Financial Data Analysis Organizer"
+      },
+      "summary": {
+        "previousSha256": "21449fc4408dc0fa6cd93a48f6cdeca521d814ccdce53e0c7ed62c0fed1bdfd9",
+        "value": "Organize supplied financial records, figures and calculation methods, with sources, assumptions and gaps."
+      },
+      "prompt": {
+        "previousSha256": "10c4b2fb4848a19dd7b0ca39a25bbedf7fb832491d186f8ad04d1c8378b3700b",
+        "value": "Task: Financial Data Analysis Organizer\nOrganize supplied financial records, figures and calculation methods, with sources, assumptions and gaps.\nList the reporting date, original number, unit, arithmetic and result. Explain the figures and list questions for professional review. Do not claim credentials or give investment, audit or credit decisions."
+      },
+      "tags": {
+        "previousSha256": "9e4d70bd13d510623d5b26c2599e1e7c37b8c1c12798ee9076cdba75925f26bd",
+        "value": [
+          "Operations",
+          "Financial Data Analysis Organizer"
+        ]
+      }
+    }
+  },
+  "curated-图片-文本生成视频-1-0": {
+    "zh": {
+      "category": {
+        "previousSha256": "2c6d1bd358615d9b209a6720803b196aa4322033dd047bd59f895ca1c5783f48",
+        "value": "视频"
+      },
+      "tags": {
+        "previousSha256": "b9ee8a734da97958413f329f695c23ee6271c202ee1a6a30ce69cc3d07fcbd8b",
+        "value": [
+          "视频",
+          "文本生成视频 1.0"
+        ]
+      }
+    },
+    "en": {
+      "category": {
+        "previousSha256": "941b085d3176f81fff8147e5e7c3797dab41904b699111bd01d67580d4d16390",
+        "value": "Video"
+      },
+      "tags": {
+        "previousSha256": "d0f592f1f5a7c55ffedac06639b85d82146f2d8ab8e78de9e029de4ddd665532",
+        "value": [
+          "Video",
+          "Text generation video 1.0"
+        ]
+      }
+    }
+  },
+  "curated-职场-聊天记录心理分析专家": {
+    "zh": {
+      "category": {
+        "previousSha256": "9c6505112b9d9adb4a7e99e49462bbe0fc7ddf04e9cdb81c44ece673e796566e",
+        "value": "生活"
+      },
+      "title": {
+        "previousSha256": "b19172586db7c1eec0bff7302804a12b84bdcdf21e63f11eed706149cf22be1f",
+        "value": "对话沟通复盘"
+      },
+      "summary": {
+        "previousSha256": "0f2eca272a9201fecdd5fd309fc9b036fd6a86673281cc8ff46512088077eff8",
+        "value": "复盘经参与者同意提供的去标识对话，练习清晰表达。"
+      },
+      "prompt": {
+        "previousSha256": "198c95a146634b1963bab2521f2e8a6a23ad537870e8c101f7188312c9f9beb8",
+        "value": "任务：对话沟通复盘\n复盘经参与者同意提供的去标识对话，练习清晰表达。\n引用明确说出的观点，区分原话与问题，提出澄清问题和中性的改写。不得根据聊天记录判定人格、健康状况或真实动机。"
+      },
+      "tags": {
+        "previousSha256": "ec9b36a5a6584dad430c4c0d4b30188aa502b1d88146dce8e1618af4f44f92b3",
+        "value": [
+          "生活",
+          "对话沟通复盘"
+        ]
+      }
+    },
+    "en": {
+      "category": {
+        "previousSha256": "10f6c2319deee26fb0725907432ba3e1051c97348ba4edb3c27c289eb039fc73",
+        "value": "Life"
+      },
+      "title": {
+        "previousSha256": "fa2e4a28cf1df955c8ce897525cb1f4625d4ca9c4c74796a484412a14ebf7cdd",
+        "value": "Conversation Reflection"
+      },
+      "summary": {
+        "previousSha256": "ee3cdcfb606cc0f55cd1b706e8123e71fc0aad8c311804048dcbfd7e8bb93774",
+        "value": "Review an anonymized, consensually supplied conversation to practise clear communication."
+      },
+      "prompt": {
+        "previousSha256": "11cbf73c0049c5c360074224f4907625dcd8570cfa1a64be130af38179f921cf",
+        "value": "Task: Conversation Reflection\nReview an anonymized, consensually supplied conversation to practise clear communication.\nQuote explicit statements, separate them from questions, and propose clarifying questions and neutral alternative wording. Do not infer character, health status or hidden motives from messages."
+      },
+      "tags": {
+        "previousSha256": "d52e249c4d96537e7d4dcfde20c0fc346f315a50b245bc9043923fb350ea14f0",
+        "value": [
+          "Life",
+          "Conversation Reflection"
+        ]
+      }
+    }
+  },
+  "curated-图片-电影分镜制作": {
+    "zh": {
+      "category": {
+        "previousSha256": "2c6d1bd358615d9b209a6720803b196aa4322033dd047bd59f895ca1c5783f48",
+        "value": "视频"
+      },
+      "tags": {
+        "previousSha256": "401f8efab551b90b1be9d40eac29dab60c8d5c93079aa386e45130de4ee55259",
+        "value": [
+          "视频",
+          "电影分镜制作"
+        ]
+      }
+    },
+    "en": {
+      "category": {
+        "previousSha256": "941b085d3176f81fff8147e5e7c3797dab41904b699111bd01d67580d4d16390",
+        "value": "Video"
+      },
+      "tags": {
+        "previousSha256": "a6e55b05dedbe0bd3f117cd764b777b25d69ce93d4fc6f89188c8dfbc612cfd5",
+        "value": [
+          "Video",
+          "Film splits"
+        ]
+      }
+    }
+  },
+  "curated-编程-逻辑思维教练-表达能力顾问": {
+    "zh": {
+      "category": {
+        "previousSha256": "e677ac3f8f56af98d47e3810220972caff5833c6633b024c46e9ea6b727410ad",
+        "value": "问答"
+      },
+      "tags": {
+        "previousSha256": "d5d05b01b7f86ba9e6c510360d083a601c277771c8670abd72fb9f9c0eda76b6",
+        "value": [
+          "问答",
+          "逻辑思维教练 & 表达能力顾问"
+        ]
+      }
+    },
+    "en": {
+      "category": {
+        "previousSha256": "9aab932a7edfd6c10219348a9796dce0ff1db3dc24ff56a9d1f2e444d2e68b4a",
+        "value": "General"
+      },
+      "tags": {
+        "previousSha256": "82d8f177ac651012c4ea722fe586089f6bf0bea99adaaf012b00f3fe17864ba5",
+        "value": [
+          "General",
+          "Coaches & Expressions Advisors for Logic Thinking"
+        ]
+      }
+    }
+  },
+  "curated-职场-贷款提案撰写与优化专家-2": {
+    "zh": {
+      "title": {
+        "previousSha256": "425ed1093a8bd98c8ba93339f67eb5a4b2a7b98cead7e04d5911c6cd382db29b",
+        "value": "贷款提案结构校对"
+      },
+      "summary": {
+        "previousSha256": "3ee9509e7a2427e2158f2e91c2ee47acbb2e1ea566df50d32392e05e271fb4d7",
+        "value": "整理现有贷款或授信报告的结构、材料和待补项目。"
+      },
+      "prompt": {
+        "previousSha256": "1058a844b07be43ced25a72f3a75475e461f062ba21acd153add6d9b653d69a9",
+        "value": "任务：贷款提案结构校对\n整理现有贷款或授信报告的结构、材料和待补项目。\n只处理用户有权提供并已去除个人敏感信息的资料。按提案章节整理原始事实与资料清单，核对数字的一致性。记录缺少的支持文件。不得评估个人信用、提出额度、自动评分或决定是否批准。"
+      },
+      "tags": {
+        "previousSha256": "84abccc8fd6fd24b6f71c46c57e64c7a1cb03d92a6a57cbc0e157190c9fe4e87",
+        "value": [
+          "职场",
+          "贷款提案结构校对"
+        ]
+      }
+    },
+    "en": {
+      "title": {
+        "previousSha256": "07ef08868f1bd51b39e0483fe37a16e1d4f411b69f993cb11f8bea6042cb6f67",
+        "value": "Loan Proposal Structure Review"
+      },
+      "summary": {
+        "previousSha256": "df1783e6a8654c67629c7faeaf86fdeb1adf687cb4698427ac2a0bf8dfae1511",
+        "value": "Organize the structure, documents and missing items in an existing credit or loan proposal."
+      },
+      "prompt": {
+        "previousSha256": "0b99e7a6c61e9cc9a44d3223c60bb66ccf9d20a930a7a72deeb0a0290b31203c",
+        "value": "Task: Loan Proposal Structure Review\nOrganize the structure, documents and missing items in an existing credit or loan proposal.\nUse authorized records with personal identifiers removed. Organize source facts and supporting documents by proposal section, reconcile figures and flag missing evidence. Do not rate an applicant, recommend limits, score credit or approve or deny a loan."
+      },
+      "tags": {
+        "previousSha256": "2b3e64f6ee1b12698b799ff4206761e034efd4d928784fb88d67e3356c2f44df",
+        "value": [
+          "Workplace",
+          "Loan Proposal Structure Review"
+        ]
+      }
+    }
+  },
+  "curated-编程-lawyer": {
+    "zh": {
+      "category": {
+        "previousSha256": "e677ac3f8f56af98d47e3810220972caff5833c6633b024c46e9ea6b727410ad",
+        "value": "问答"
+      },
+      "title": {
+        "previousSha256": "9e5d19e0a8e124f6d2226d5ecb1420fa143d67f177e1e10663a4043487448d18",
+        "value": "合同条款阅读清单"
+      },
+      "summary": {
+        "previousSha256": "99d1aba7c29f24ea73edbb394fc6ad1f88fa0d41f6791ec9cac8671a0fa3129e",
+        "value": "整理用户提供的法律文本、引用出处和待核实的问题。"
+      },
+      "prompt": {
+        "previousSha256": "b6e72531aed2ed330c7d19d3d45c85a13906cfbb805677c77cbfbd0e3a784dcf",
+        "value": "任务：合同条款阅读清单\n整理用户提供的法律文本、引用出处和待核实的问题。\n标明相关条款、材料日期、原文依据、可能存在的歧义及缺失资料。法规的时效性、个案适用与法律结论交由具备资质的人员复核。"
+      },
+      "tags": {
+        "previousSha256": "3bc97dc8cb4d3ce0fec0e31810a5301cedf832738432d815b031512a2fe3a074",
+        "value": [
+          "问答",
+          "合同条款阅读清单"
+        ]
+      }
+    },
+    "en": {
+      "category": {
+        "previousSha256": "9aab932a7edfd6c10219348a9796dce0ff1db3dc24ff56a9d1f2e444d2e68b4a",
+        "value": "General"
+      },
+      "title": {
+        "previousSha256": "9e5d19e0a8e124f6d2226d5ecb1420fa143d67f177e1e10663a4043487448d18",
+        "value": "Contract Clause Reading Checklist"
+      },
+      "summary": {
+        "previousSha256": "039f0681cac6aae6bd4ca8d7ff9b93fe359ed49e38b792a930a8150b93f13b08",
+        "value": "Organize supplied legal texts, citations and open questions."
+      },
+      "prompt": {
+        "previousSha256": "f3ad7b16d7cd7fea04088a1a4b9888966e1a4f18dc02154fbcceee0bb980e88f",
+        "value": "Task: Contract Clause Reading Checklist\nOrganize supplied legal texts, citations and open questions.\nList relevant provisions, dates, exact sources, ambiguities and missing information. Leave current legal validity, case-specific application and conclusions to qualified reviewers."
+      },
+      "tags": {
+        "previousSha256": "4bc8804b5b40ee439d4846caf8c8be2088155c8456e11bc60f41054fdedd29d6",
+        "value": [
+          "General",
+          "Contract Clause Reading Checklist"
+        ]
+      }
+    }
+  },
+  "curated-论文-文章润色与-ai-味去除专家": {
+    "zh": {
+      "category": {
+        "previousSha256": "7cef1d71db62938a9e3b7dddc20161dd7e1fa66228454b28f6713039784c3003",
+        "value": "写作"
+      },
+      "title": {
+        "previousSha256": "96c57a7ccc4a85755e88560912ae18f4a84f926c1c9e365a3f1fc05ba0fa664b",
+        "value": "中文文章润色"
+      },
+      "tags": {
+        "previousSha256": "e62063e1da2f72eeb1234fce0db05bbfde06588a5167b113b78fd67098982508",
+        "value": [
+          "写作",
+          "中文文章润色"
+        ]
+      }
+    },
+    "en": {
+      "category": {
+        "previousSha256": "665bc989dd4909f2aa2644f529e85a74b96cb9183b0038a00be23964ef17bf17",
+        "value": "Writing"
+      },
+      "title": {
+        "previousSha256": "b1a85e94f3290dd616b6d4c399825d16f694c5e733de7e12eccf6a07f5f7512c",
+        "value": "Chinese Article Editing"
+      },
+      "tags": {
+        "previousSha256": "1bdcbeb49dee918d6ca43def5378207235c91d18886e031aaeae1811955efb1c",
+        "value": [
+          "Writing",
+          "Chinese Article Editing"
+        ]
+      }
+    }
+  },
+  "curated-编程-亚马逊全周期筹备顾问": {
+    "zh": {
+      "category": {
+        "previousSha256": "e677ac3f8f56af98d47e3810220972caff5833c6633b024c46e9ea6b727410ad",
+        "value": "运营"
+      },
+      "tags": {
+        "previousSha256": "6d69b950abe28701e0750cfc16b85a740b9e9c7d7057beeeae81a8d820bbb9bd",
+        "value": [
+          "运营",
+          "亚马逊全周期筹备顾问"
+        ]
+      }
+    },
+    "en": {
+      "category": {
+        "previousSha256": "9aab932a7edfd6c10219348a9796dce0ff1db3dc24ff56a9d1f2e444d2e68b4a",
+        "value": "Operations"
+      },
+      "tags": {
+        "previousSha256": "a4e779808b603ee68a213f7fc16c714e1648f6eaecfc6d30c0fc4b6ee3271a5e",
+        "value": [
+          "Operations",
+          "Consultant for preparation of the Amazon cycle"
+        ]
+      }
+    }
+  },
+  "curated-生活-文学创作转换智能体": {
+    "zh": {
+      "category": {
+        "previousSha256": "d8b043c25235220d1d7d3f7321cbc3df21875345342f40fbf72783c174b15408",
+        "value": "写作"
+      },
+      "tags": {
+        "previousSha256": "a5b67929ef378adc4709c4c764c5f53fd5e9ad1aa9e5a57016f465c135b802f6",
+        "value": [
+          "写作",
+          "文学创作转换智能体"
+        ]
+      }
+    },
+    "en": {
+      "category": {
+        "previousSha256": "f8fe9ce39c48c84a0990f475594eba79e5e920f5dce0521b1eaf53c6e53958e9",
+        "value": "Writing"
+      },
+      "tags": {
+        "previousSha256": "fa058a9e277fb4caf68a8bab374add7db82d55f4bd9b1b412f17d648e062587b",
+        "value": [
+          "Writing",
+          "Literary creativity for intelligence"
+        ]
+      }
+    }
+  },
+  "curated-运营-你是一位擅长用情绪价值做营销的高手-能深层洞察和充分调动客户的生理感受和": {
+    "zh": {
+      "title": {
+        "previousSha256": "0d3e9ed6d91f888fdef2c172dd38bd477e754f9956aafdfc69478d7c34c9a93f",
+        "value": "营销文案语气调整"
+      },
+      "tags": {
+        "previousSha256": "4ca8adf705e4cc02a806fb97ba9ddd2bddd9a21fac172d2e9bf2ebc9225fdf01",
+        "value": [
+          "运营",
+          "营销文案语气调整"
+        ]
+      }
+    },
+    "en": {
+      "title": {
+        "previousSha256": "bbc57126c262028992d7ac0a593cefb5384be9080dedb5275a8ad43653597b64",
+        "value": "Marketing Copy Tone Editor"
+      },
+      "tags": {
+        "previousSha256": "6db64de0cdd75cd1e80996294c6264b67b89c98638d0c8939a4b040cfe444c7d",
+        "value": [
+          "Operations",
+          "Marketing Copy Tone Editor"
+        ]
+      }
+    }
+  },
+  "curated-论文-麦肯锡咨询顾问智能体": {
+    "zh": {
+      "category": {
+        "previousSha256": "7cef1d71db62938a9e3b7dddc20161dd7e1fa66228454b28f6713039784c3003",
+        "value": "运营"
+      },
+      "title": {
+        "previousSha256": "24fefe54dd5eceb432c4f6fb568ec911870f442da3b29c622a2499c291d4ed86",
+        "value": "商业问题分析"
+      },
+      "tags": {
+        "previousSha256": "cffb75696714c9065bb2e8dc44da1821eabc04cc4d071a6fa9468074b4a18af3",
+        "value": [
+          "运营",
+          "商业问题分析"
+        ]
+      }
+    },
+    "en": {
+      "category": {
+        "previousSha256": "665bc989dd4909f2aa2644f529e85a74b96cb9183b0038a00be23964ef17bf17",
+        "value": "Operations"
+      },
+      "title": {
+        "previousSha256": "57bbe9b48f973d8d6a89ac9151d103c0a12c2c4f56080fc67b97345a51760330",
+        "value": "Business Problem Analysis"
+      },
+      "tags": {
+        "previousSha256": "1f2152ef98674ef63503d8d9a0784a7c45d598fbcc937b37ef14284596a200dd",
+        "value": [
+          "Operations",
+          "Business Problem Analysis"
+        ]
+      }
+    }
+  },
+  "curated-编程-个人成长型-ai-复盘教练": {
+    "zh": {
+      "category": {
+        "previousSha256": "e677ac3f8f56af98d47e3810220972caff5833c6633b024c46e9ea6b727410ad",
+        "value": "生活"
+      },
+      "title": {
+        "previousSha256": "47c368ce12b6a60fdadb366ee5ebef66aee9fd862a965523b8b96a11530b9530",
+        "value": "个人成长复盘"
+      },
+      "tags": {
+        "previousSha256": "8447fa3f1a771d4f7e09bd9db20316c0eeb0a0822d6e35a4c0bb421f76434ca3",
+        "value": [
+          "生活",
+          "个人成长复盘"
+        ]
+      }
+    },
+    "en": {
+      "category": {
+        "previousSha256": "9aab932a7edfd6c10219348a9796dce0ff1db3dc24ff56a9d1f2e444d2e68b4a",
+        "value": "Life"
+      },
+      "title": {
+        "previousSha256": "6d85fb9def0685338833483e4dcbd875cfab64ecb4b5bb1354c27cff58b9f95c",
+        "value": "Personal Progress Reflection"
+      },
+      "tags": {
+        "previousSha256": "43b6a4389a5eafc00e83c76edbf13a42f49f4e52ac7d96072528b43037ae3479",
+        "value": [
+          "Life",
+          "Personal Progress Reflection"
+        ]
+      }
+    }
+  },
+  "curated-问答-word-专家": {
+    "zh": {
+      "category": {
+        "previousSha256": "25ac8a35a75c7a86ba9ada5f86d2f235f999cfac8b36e6636de8aba5f0aa0f6c",
+        "value": "职场"
+      },
+      "title": {
+        "previousSha256": "4c392cad6194f98d22e775f6cbef7e2705defb41f1948358f673f6bfd00de8ea",
+        "value": "Word 文档排版助手"
+      },
+      "tags": {
+        "previousSha256": "580b21cf2865cd6090ec03aad499065943659ae8b95590f7c9af8484e42645d7",
+        "value": [
+          "职场",
+          "Word 文档排版助手"
+        ]
+      }
+    },
+    "en": {
+      "category": {
+        "previousSha256": "468d61a94d9f9d93e56df7cf8941414523b6a129fb60aa4351b0d40c858ff44c",
+        "value": "Workplace"
+      },
+      "title": {
+        "previousSha256": "d0bb255286241f307030454cdb1125d888ead412b78fb70ff671a245fe76c1be",
+        "value": "Word Document Formatting"
+      },
+      "tags": {
+        "previousSha256": "06b2ebadb430ec980642c62b6c3a9f5af41f9059bb83eb23d9b032846ceb817e",
+        "value": [
+          "Workplace",
+          "Word Document Formatting"
+        ]
+      }
+    }
+  },
+  "curated-职场-数据图表可视化": {
+    "zh": {
+      "category": {
+        "previousSha256": "9c6505112b9d9adb4a7e99e49462bbe0fc7ddf04e9cdb81c44ece673e796566e",
+        "value": "编程"
+      },
+      "tags": {
+        "previousSha256": "2595be620204c240166fa91a7ee637d5c388319d30ecc2fec332d1f2d2f5938f",
+        "value": [
+          "编程",
+          "数据图表可视化"
+        ]
+      }
+    },
+    "en": {
+      "category": {
+        "previousSha256": "10f6c2319deee26fb0725907432ba3e1051c97348ba4edb3c27c289eb039fc73",
+        "value": "Programming"
+      },
+      "tags": {
+        "previousSha256": "38b71eadb9f42756dae2b58b053b22adbd04014169d45f0de4282b5422707b84",
+        "value": [
+          "Programming",
+          "Visualization of Data Charts"
+        ]
+      }
+    }
+  },
+  "curated-运营-顶尖的职场-ppt-专家-擅长编写-ppt-大纲": {
+    "zh": {
+      "category": {
+        "previousSha256": "4542fdc93f9885bad2bcd4a5db6842078372cf371b3cd45eb6b7416dd22e2f84",
+        "value": "职场"
+      },
+      "title": {
+        "previousSha256": "80d6ef761333535cac22d527cfac1a7c01666d98de055469e0a3fc24b0407de9",
+        "value": "工作汇报 PPT 大纲"
+      },
+      "tags": {
+        "previousSha256": "e4ac7a41805d9084c3f8b4b853eb8c8de74f74a2bfa22404bfcf32f4fefab803",
+        "value": [
+          "职场",
+          "工作汇报 PPT 大纲"
+        ]
+      }
+    },
+    "en": {
+      "category": {
+        "previousSha256": "1653365f65b9061d88174bc9c421c6db48d40f0b280b44ca0973364458eb7557",
+        "value": "Workplace"
+      },
+      "title": {
+        "previousSha256": "912d9fce297c1ce88401902a68929dd7305351e697989eaf98821e5e6ea831a5",
+        "value": "Work Presentation Outline"
+      },
+      "tags": {
+        "previousSha256": "6754003a673bd879d81f8e13e6b2fd6e4f0536464b7c03c85a7126e966c31388",
+        "value": [
+          "Workplace",
+          "Work Presentation Outline"
+        ]
+      }
+    }
+  },
+  "curated-小说-书籍推荐专家": {
+    "zh": {
+      "category": {
+        "previousSha256": "272a1138b23154c2370864069365ca739fb732ffb2ef4591f99f312718651860",
+        "value": "生活"
+      },
+      "tags": {
+        "previousSha256": "a965f3c46194afa4510424d49b89f310c5a850c393b8bd19f436406e66d260b4",
+        "value": [
+          "生活",
+          "书籍推荐专家"
+        ]
+      }
+    },
+    "en": {
+      "category": {
+        "previousSha256": "73a05d46de472f9fc34b6377495f8c7af5a1a1c0904f260955e14d18f2465846",
+        "value": "Life"
+      },
+      "tags": {
+        "previousSha256": "b07321407f9a63a44b409da46085eb3cfc23e9e65c5b89ddd132e306b15a49e6",
+        "value": [
+          "Life",
+          "Researcher for book references"
+        ]
+      }
+    }
+  },
+  "curated-图片-整理ppt": {
+    "zh": {
+      "category": {
+        "previousSha256": "2c6d1bd358615d9b209a6720803b196aa4322033dd047bd59f895ca1c5783f48",
+        "value": "职场"
+      },
+      "title": {
+        "previousSha256": "32c4800be95c07d643b164970649964e0dfee3efaf1a76e1831726782843e6f1",
+        "value": "课程 PPT 笔记整理"
+      },
+      "tags": {
+        "previousSha256": "390f0112d810cd32dad523695bb41a73b1599ca12164e1d95dc45759c1804365",
+        "value": [
+          "职场",
+          "课程 PPT 笔记整理"
+        ]
+      }
+    },
+    "en": {
+      "category": {
+        "previousSha256": "941b085d3176f81fff8147e5e7c3797dab41904b699111bd01d67580d4d16390",
+        "value": "Workplace"
+      },
+      "title": {
+        "previousSha256": "7929d218d9bd3e64929574f2e18a962c06b63eda694b56ed5c2cd00fb49a9e28",
+        "value": "Course Slide Note Organizer"
+      },
+      "tags": {
+        "previousSha256": "ce69d695e0b49128bc91a97bdd7694c8ae5915113a7c85fe1fe07fef9fe89829",
+        "value": [
+          "Workplace",
+          "Course Slide Note Organizer"
+        ]
+      }
+    }
+  },
+  "curated-生活-书籍解说文案": {
+    "zh": {
+      "category": {
+        "previousSha256": "d8b043c25235220d1d7d3f7321cbc3df21875345342f40fbf72783c174b15408",
+        "value": "写作"
+      },
+      "tags": {
+        "previousSha256": "6de0392e28351da2eb620e9c6ba230bd6e09f6f0a726e47ac4a4c0ed6f72fd9a",
+        "value": [
+          "写作",
+          "书籍解说文案"
+        ]
+      }
+    },
+    "en": {
+      "category": {
+        "previousSha256": "f8fe9ce39c48c84a0990f475594eba79e5e920f5dce0521b1eaf53c6e53958e9",
+        "value": "Writing"
+      },
+      "tags": {
+        "previousSha256": "a0248db8c26c5dafc2aedfe48d932433cd6e31ff735c5b8c099d13bf856ef1f3",
+        "value": [
+          "Writing",
+          "Books and essays"
         ]
       }
     }
