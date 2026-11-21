@@ -827,7 +827,7 @@ async function registerRepositoryLinkOnly(input: {
     commitSha,
     licenseSpdx: license.spdx,
     licenseFilePath: license.path,
-    projectType: "workflow",
+    projectType: "source_project",
     stars: candidate.stars,
     updatedAt: candidate.updatedAt,
     language: candidate.language,
@@ -1032,7 +1032,7 @@ async function processCandidate(input: {
     licenseFilePath: license.path,
     licenseFileSha256: licenseHash,
     licenseReviewSummary: `固定提交 ${commitSha} 的 ${license.path} 文件 SHA-256 为 ${licenseHash}；GitHub 许可证识别结果为 ${license.spdx}，该许可证属于本系统允许重新分发清单。归档保留上游许可文件。`,
-    projectType: "workflow",
+    projectType: "source_project",
     stars: candidate.stars,
     verifiedEnvironments: ["docker"],
     validation: {

@@ -96,7 +96,7 @@ async function findOrCreateGoogleUser(identity: GoogleIdentity, locale: "zh" | "
         email: identity.email,
         nickname,
         googleSubject: identity.subject,
-        avatar: getDefaultAvatar(identity.subject),
+        avatar: getDefaultAvatar(randomBytes(16).toString("hex")),
         passwordHash,
       },
       select: { id: true },

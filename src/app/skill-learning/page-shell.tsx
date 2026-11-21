@@ -10,7 +10,6 @@ import {
   getPublicToolListing,
 } from "@/lib/public-content";
 import { publicPageCacheSeconds } from "@/lib/public-routes";
-import { buildThemedToolCategories } from "@/lib/tool-category-groups";
 import { resolveLocalizedToolCategoryName } from "@/lib/tool-localization";
 import {
   applyFilteredListingRobots,
@@ -27,16 +26,16 @@ export const skillLearningPageRevalidate = publicPageCacheSeconds;
 const skillLearningGeoSections = {
   zh: [
     {
-      title: "先选择未来机会方向",
+      title: "按任务选择课程",
       body: "AI教程与实战指南围绕已发布的 AI 工具教程、内容生成、智能体、自动化工作流和本地部署课程，帮助用户按真实任务选择学习路径。",
     },
     {
       title: "再确认真实价值",
-      body: "智能体、提示词、订阅和副业变现产品都应该服务于明确结果。先看它能解决什么问题、如何交付、风险边界在哪里，再决定是否深入。",
+      body: "阅读课程介绍，核对练习内容、所需工具和学习条件，再选择适合自己的课程。",
     },
     {
-      title: "沉淀为长期资产",
-      body: "真正有价值的 AI 产品应能留下可复用提示词、账号能力、智能体流程、生活工具方案或项目经验，而不是一次性的试用热闹。",
+      title: "保存练习记录",
+      body: "保存练习用的提示词、操作步骤和作品样例，方便下次做类似任务时查找。",
     },
   ],
   en: [
@@ -50,7 +49,7 @@ const skillLearningGeoSections = {
     },
     {
       title: "How to turn lessons into outcomes",
-      body: "Learn around a real task: review trends, choose related software or account support, then follow the course steps to create a document, asset, workflow, or reusable template.",
+      body: "Learn around a real task: review trends, choose the software used in the lesson, then follow the course steps to create a document, asset, workflow, or reusable template.",
     },
   ],
 } as const;
@@ -66,8 +65,8 @@ const skillLearningOutcomeSections = {
       body: "每个学习路径都应该配合真实工具练习。你可以先看 AI 资讯理解趋势，再进入 AI 工具选择产品，最后用教程步骤完成素材、方案、脚本或自动化流程。",
     },
     {
-      title: "沉淀为可复用资产",
-      body: "完成一次练习后，把提示词、操作步骤、模板、常见错误和交付样例保存下来。可复用资产越多，AI 学习越容易转化成持续效率。",
+      title: "保存常用提示词与模板",
+      body: "把用过的提示词、操作步骤、模板和常见错误记下来，下次遇到同类任务可以直接查阅。",
     },
   ],
   en: [
@@ -80,8 +79,8 @@ const skillLearningOutcomeSections = {
       body: "Each learning path should include hands-on tool practice. Read AI news for context, choose software apps for execution, then use courses to complete assets, plans, scripts, or workflows.",
     },
     {
-      title: "Turn practice into reusable assets",
-      body: "After each exercise, save prompts, steps, templates, common mistakes, and examples. The more reusable assets you build, the faster AI learning becomes real productivity.",
+      title: "Save Prompts and Templates",
+      body: "After each exercise, keep the prompts, steps, templates, and examples you want to use again.",
     },
   ],
 } as const;
@@ -89,13 +88,13 @@ const skillLearningOutcomeSections = {
 const skillLearningPathStrip = {
   zh: [
     { label: "1", title: "从真实问题开始", body: "先选一个要完成的任务。" },
-    { label: "2", title: "配合工具练习", body: "用软件或账号服务跑通流程。" },
-    { label: "3", title: "沉淀可复用资产", body: "保存提示词、步骤和模板。" },
+    { label: "2", title: "配合工具练习", body: "跟着教程完成一次练习。" },
+    { label: "3", title: "保存练习模板", body: "保存提示词、步骤和模板。" },
   ],
   en: [
     { label: "1", title: "Start from a real problem", body: "Choose one task you need to finish." },
-    { label: "2", title: "Practice with tools", body: "Run the workflow with software or access guidance." },
-    { label: "3", title: "Save reusable assets", body: "Keep prompts, steps, and templates." },
+    { label: "2", title: "Practice with tools", body: "Follow the guide and complete one exercise." },
+    { label: "3", title: "Save your templates", body: "Keep prompts, steps, and templates." },
   ],
 } as const;
 
@@ -247,7 +246,6 @@ export async function SkillLearningPageShell({
     />;
   }
 
-  const categoryOptions = buildThemedToolCategories(categories, "futureAi");
 
   return (
     <main>
@@ -261,7 +259,7 @@ export async function SkillLearningPageShell({
         <SkillLearningUserAnswerCard forceLocale={forceLocale} />
         <ListingDecisionStrip forceLocale={forceLocale} />
         <ListingTrustNote forceLocale={forceLocale} />
-        <FilterBar categories={categoryOptions} locale={forceLocale} />
+        <FilterBar categories={categories} locale={forceLocale} />
         {tools.length ? (
           <div className="listing-grid mt-8 grid gap-5 md:grid-cols-3">
             {tools.map((tool) => (
@@ -321,9 +319,9 @@ function ListingDecisionStrip({ forceLocale }: { forceLocale: Locale }) {
             body: "Look for steps, examples, and tool connections before buying.",
           },
           {
-            label: "Reusable assets",
-            title: "Save the system",
-            body: "Turn prompts, steps, and templates into assets you can reuse.",
+            label: "Practice notes",
+            title: "Save prompts and templates",
+            body: "Keep the prompts, steps, and templates you used in the exercise.",
           },
         ]
       : [
@@ -338,9 +336,9 @@ function ListingDecisionStrip({ forceLocale }: { forceLocale: Locale }) {
             body: "购买前看步骤、案例和对应工具是否足够清楚。",
           },
           {
-            label: "沉淀模板",
-            title: "形成复用资产",
-            body: "把提示词、步骤和模板保存为下一次可用的系统。",
+            label: "练习记录",
+            title: "保存常用提示词与模板",
+            body: "记下这次用到的提示词、操作步骤和模板。",
           },
         ];
 

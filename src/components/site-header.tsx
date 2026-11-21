@@ -95,8 +95,8 @@ async function SiteHeaderContent({ forceLocale }: { forceLocale?: Locale }) {
         {
           label:
             locale === "en"
-              ? "AI Prompt Management System"
-              : "AI提示词管理系统",
+              ? "Prompt Library"
+              : "提示词库",
           href: buildLocalePath(
             "/skill-learning/ai-prompt-management",
             locale,

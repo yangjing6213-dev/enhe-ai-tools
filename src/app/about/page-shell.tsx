@@ -22,7 +22,7 @@ const contactEmail = companyProfile.email.value;
 
 const aboutCopy = {
   zh: {
-    title: "恩禾ENHE AI 是什么？",
+    title: "关于恩禾",
     description:
       "从真实任务出发，帮你找到合适的 AI 工具、教程与学习路径。",
     metaDescription:
@@ -74,12 +74,12 @@ const aboutCopy = {
     ],
     topicLinksTitle: "主要栏目",
     topicLinks: [
-      { label: "AI前沿资讯", href: "/ai-news", text: "跟踪全球 AI 工具、模型、智能体和平台变化。" },
-      { label: "AI趋势分析", href: "/ai-trends", text: "把趋势拆成用户需求、产品机会和下一步行动。" },
-      { label: "AI软件应用", href: "/software", text: "按任务选择效率、创作、自动化和安全可控的工具路径。" },
+      { label: "AI资讯", href: "/ai-news", text: "跟踪全球 AI 工具、模型、智能体和平台变化。" },
+      { label: "AI应用场景", href: "/ai-trends", text: "把趋势拆成用户需求、产品机会和下一步行动。" },
+      { label: "AI工具", href: "/software", text: "按任务选择效率、创作、自动化和安全可控的工具路径。" },
       { label: "AI账号服务", href: "/account-services", text: "理解访问方式、服务范围、交付边界和平台规则。" },
-      { label: "AI技能学习", href: "/skill-learning", text: "学习提示词、自动化流程、内容创作和可复用工作方法。" },
-      { label: "使用教程", href: "/tutorials", text: "按工具查看安装、配置、使用步骤和常见问题。" }
+      { label: "AI教程与课程", href: "/skill-learning", text: "学习提示词、自动化流程、内容创作和可复用工作方法。" },
+      { label: "工具使用教程", href: "/tutorials", text: "按工具查看安装、配置、使用步骤和常见问题。" }
     ],
     faqTitle: "常见问题",
     faq: [
@@ -121,7 +121,7 @@ const aboutCopy = {
     ]
   },
   en: {
-    title: "What is ENHE AI?",
+    title: "About ENHE",
     description:
       "Find AI tools, tutorials, and learning paths that fit the work in front of you.",
     metaDescription:
@@ -174,11 +174,11 @@ const aboutCopy = {
     topicLinksTitle: "Main Sections",
     topicLinks: [
       { label: "AI News", href: "/ai-news", text: "Track global AI tools, models, agents, and platform changes." },
-      { label: "AI Trends", href: "/ai-trends", text: "Turn trend signals into user needs, opportunities, and next actions." },
-      { label: "AI Software Apps", href: "/software", text: "Choose tools by productivity, creation, automation, or safer controlled workflows." },
+      { label: "AI Use Cases", href: "/ai-trends", text: "Turn trend signals into user needs, opportunities, and next actions." },
+      { label: "AI Tools", href: "/software", text: "Choose tools by productivity, creation, automation, or safer controlled workflows." },
       { label: "AI Account Services", href: "/account-services", text: "Understand access paths, service scope, delivery boundaries, and platform rules." },
-      { label: "AI Skill Learning", href: "/skill-learning", text: "Learn prompts, automation, content creation, and reusable AI work methods." },
-      { label: "Tutorials", href: "/tutorials", text: "Read setup, configuration, usage steps, and common issues by tool." }
+      { label: "AI Tutorials & Courses", href: "/skill-learning", text: "Learn prompts, automation, content creation, and reusable AI work methods." },
+      { label: "Tool Guides", href: "/tutorials", text: "Read setup, configuration, usage steps, and common issues by tool." }
     ],
     faqTitle: "FAQ",
     faq: [
@@ -314,7 +314,7 @@ export function AboutPageShell({ forceLocale }: { forceLocale: Locale }) {
           </div>
         </section>
 
-        <details className="content-fold enhe-reference-editorial-faq mt-8">
+        <details id="faq-contact" className="content-fold enhe-reference-editorial-faq mt-8">
           <summary>
             <div className="content-fold-summary-copy">
               <h2 className="text-2xl font-black text-[var(--marketing-text)]">{copy.faqTitle}</h2>

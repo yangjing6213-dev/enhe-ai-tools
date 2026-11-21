@@ -71,6 +71,15 @@ const englishToolContentOverrides: Record<
   string,
   { summary: string; content: string }
 > = {
+  "codex-api": {
+    summary:
+      "On Windows, manage Codex sign-in mode and already configured third-party API connections. No manual configuration-file editing is required; switching changes local connection settings.",
+    content: [
+      "Codex Provider Switcher helps manage Codex sign-in mode and already configured third-party API connections on Windows.",
+      "No manual configuration-file editing is required, but switching a connection changes local Codex settings.",
+      "Back up local settings before switching. Check the connection methods supported by your current version and their conditions. This description does not extend that support scope.",
+    ].join("\n\n"),
+  },
   "local-ai-voice-generator-for-voiceover-materials": {
     summary:
       "Local AI Voice Generator is an offline Windows desktop tool for text-to-speech, authorized voice cloning, voice design, multi-speaker dialogue, and reusable audio asset management.",
@@ -101,6 +110,9 @@ const sentenceBreakPattern = /[。！？!?；;\n]+/;
 const localizedBlockPattern = /\[\[(zh|en)\]\]([\s\S]*?)\[\[\/\1\]\]/g;
 
 const userFirstToolCopyOverrides: Record<string, Partial<Record<Locale, string>>> = {
+  "codex-api": {
+    zh: "在 Windows 上管理 Codex 官方登录模式与已配置的第三方 API 连接。无需手动编辑配置文件；切换连接时，工具会修改本机连接设置。",
+  },
   "windows-ai": {
     zh: "Lumi-OS 适合想把 AI 用到真实任务里的用户：整理待办、保留长期记忆、辅助创作和推进桌面工作流，同时保留更清晰的隐私边界。",
     en: "Lumi-OS helps users apply AI to real tasks: planning work, keeping memory, supporting creation, and running more private desktop workflows.",
@@ -177,6 +189,14 @@ function getUserFirstToolCopyOverride(
   return normalizeText(userFirstToolCopyOverrides[tool.slug]?.[locale]);
 }
 
+const chineseToolContentOverrides: Record<string, string> = {
+  "codex-api": [
+    "Codex Provider Switcher 用于在 Windows 上管理 Codex 官方登录模式和已配置的第三方 API 连接。",
+    "切换连接时无需手动编辑配置文件；工具会调整本机 Codex 连接设置。",
+    "切换前请备份本机设置，并核对当前版本支持的连接方式及适用条件。本说明不扩展当前版本未列出的支持范围。",
+  ].join("\n\n"),
+};
+
 function normalizeRichText(value: string | null | undefined) {
   return value?.trim() ? value.replace(/\r\n?/g, "\n") : "";
 }
@@ -238,7 +258,7 @@ function extractImplicitLocalizedBlocks(value: string | null | undefined) {
   } satisfies Record<Locale, string>;
 }
 
-function resolveLocalizedInlineCopy(
+export function resolveLocalizedInlineCopy(
   value: string | null | undefined,
   locale: Locale,
   normalizer: (value: string | null | undefined) => string,
@@ -454,6 +474,8 @@ function buildEnglishCategoryFromChinese(name: string, type: ToolType) {
   if (name.includes("系统实用")) return "System Utilities";
   if (name.includes("数据分析")) return "Data Analysis Tools";
   if (name.includes("提升效率")) return "Productivity Tools";
+  if (name === "数字人口播") return "Talking Avatar Videos";
+  if (name === "视频生成" || name === "AI视频生成") return "Video Generation";
   if (name.includes("视频/图片处理")) return "Video/Image Processing";
   if (name.includes("图片")) return "AI Image Tool";
   if (name.includes("账号订购")) return "Account Subscription";
@@ -533,10 +555,51 @@ export function buildLocalizedToolTagItems(
     .filter((tag) => tag.name);
 }
 
+const approvedNamesBySlug: Record<string, { zh: string; en: string }> = {
+  "searchscope-seo-geo": { zh: "SearchScope｜网站问题检查与修复建议", en: "SearchScope | Website Review & Recommendations" },
+  codex: { zh: "Codex Backup｜项目与工作资料备份", en: "Codex Backup | Project & Work Context Backup" },
+  github: { zh: "GitHub Backup｜将项目备份到电脑", en: "GitHub Backup | Local Repository Backup" },
+  "ai-codex": { zh: "Product Video Studio｜产品介绍视频制作", en: "Product Video Studio | Product Videos with Codex" },
+  "product-video": { zh: "Product Video Studio｜产品介绍视频制作", en: "Product Video Studio | Product Videos with Codex" },
+  "ai-ai-zorvp8": { zh: "AgentGuardian｜AI配置风险检查", en: "AgentGuardian | AI Configuration Risk Review" },
+  "windows-ai": { zh: "Lumi-OS｜桌面AI助手", en: "Lumi-OS | Desktop AI Assistant" },
+  "ai-ai": { zh: "AI配音｜旁白与多角色对话", en: "AI Voice Generator | Narration & Dialogue" },
+  "local-ai-voice-generator-for-voiceover-materials": { zh: "AI配音｜旁白与多角色对话", en: "AI Voice Generator | Narration & Dialogue" },
+  "ai-video-studio-ai-ai-video-studio-ai": { zh: "AI视频生成｜用文字或图片制作视频", en: "AI Video Workspace | Text-to-Video & Image-to-Video" },
+  "ultimate-edition-ai-video-generation-suite": { zh: "AI视频生成｜用文字或图片制作视频", en: "AI Video Workspace | Text-to-Video & Image-to-Video" },
+  "tool-mq12l5w6": { zh: "聊天界面模拟器｜对话演示图制作", en: "Chat Interface Simulator | Chat Mockups" },
+  "no-code-chat-screenshot-maker": { zh: "聊天界面模拟器｜对话演示图制作", en: "Chat Interface Simulator | Chat Mockups" },
+  "faceswap-studio-ai": { zh: "FaceSwap Studio｜授权人像与视频合成", en: "FaceSwap Studio | Image & Video Compositing" },
+  zfb: { zh: "链接与二维码整理工具", en: "Link & QR Organizer" },
+  "zfb-transfer-link-qr-code-generator": { zh: "链接与二维码整理工具", en: "Link & QR Organizer" },
+  "codex-api": { zh: "Codex Provider Switcher｜连接配置切换", en: "Codex Provider Switcher | Switch Codex Connections" },
+  "infinitetalk-ai": { zh: "InfiniteTalk｜数字人口播视频制作", en: "InfiniteTalk | Talking Avatar Videos" },
+  "ai-prompt": { zh: "AI提示词库桌面版", en: "AI Prompt Library | Desktop Edition" },
+  "ai-prompt-management-system-418-bilingual-prompts-for-writing-seo-and-ai-creation": { zh: "AI提示词库桌面版", en: "AI Prompt Library | Desktop Edition" },
+  "ai-ai-skill": { zh: "Bilingual Prose Craft｜中英文写作润色", en: "Bilingual Prose Craft | Chinese & English Editing" },
+  "ai-skill-ai": { zh: "短剧分镜助手｜将剧本整理成镜头提示词", en: "AI Storyboarding | Shot Prompts from Scripts" },
+  skill: { zh: "AI资讯写作｜双平台图文草稿", en: "AI News Content | Drafts for Two Platforms" },
+  "ai-skill": { zh: "IntentBridge｜需求澄清与确认", en: "IntentBridge | Clarify & Confirm Requirements" },
+  intentbridge: { zh: "IntentBridge｜需求澄清与确认", en: "IntentBridge | Clarify & Confirm Requirements" },
+  "a-skill": { zh: "AShareTrace｜A股研究资料整理", en: "AShareTrace | A-Share Research Notes" },
+  "seo-geo-skill": { zh: "SEO + GEO Website Audit｜公开网页检查", en: "SEO + GEO Website Audit | Public Page Review" },
+};
+
+export function getApprovedLocalizedToolName(slug: string, locale: Locale) {
+  return approvedNamesBySlug[slug]?.[locale] ?? null;
+}
+
 export function resolveLocalizedToolIdentity(
   tool: Pick<LocalizedToolInput, "slug" | "name" | "englishName" | "type">,
   locale: Locale,
 ) {
+  const approvedNames = approvedNamesBySlug[tool.slug];
+  if (approvedNames) {
+    return locale === "zh"
+      ? { primaryName: approvedNames.zh, secondaryName: approvedNames.en }
+      : { primaryName: approvedNames.en, secondaryName: approvedNames.zh };
+  }
+
   const localizedFallbackName = getDefaultToolLabel(tool.type, locale);
   const name = normalizeText(tool.name);
   const englishName = normalizeText(tool.englishName);
@@ -705,6 +768,11 @@ export function buildLocalizedToolLongContent(
   locale: Locale,
   options: { preferAuthored?: boolean } = {},
 ) {
+  if (locale === "zh" && !options.preferAuthored) {
+    const chineseOverride = chineseToolContentOverrides[tool.slug];
+    if (chineseOverride) return chineseOverride;
+  }
+
   const englishOverride = options.preferAuthored ? undefined : englishToolContentOverrides[tool.slug];
   if (locale === "en" && englishOverride) return englishOverride.content;
 
@@ -875,6 +943,23 @@ function buildEnglishFaqFallback(
   const summary = buildEnglishToolSentence(tool);
   const typeLabel = getEnglishSentenceToolLabel(tool.type);
 
+  if (tool.type === "ai_skill") {
+    return [
+      {
+        id: "localized-faq-skill-purpose-en",
+        question: "What does this skill pack help me do?",
+        answer:
+          "Check the product overview and delivered files for the tasks this Skill supports; capabilities depend on the specific Skill and compatible AI agent.",
+      },
+      {
+        id: "localized-faq-skill-agents-en",
+        question: "Which AI assistants is it compatible with?",
+        answer:
+          "Use only the AI agents listed on this product page. Compatibility and setup steps may vary by Skill.",
+      },
+    ];
+  }
+
   return [
     {
       id: "localized-faq-overview",
@@ -885,7 +970,7 @@ function buildEnglishFaqFallback(
       id: "localized-faq-access",
       question: "How do I access it after purchase?",
       answer:
-        tool.type === "software" || tool.type === "ai_skill"
+        tool.type === "software"
           ? "Follow the payment method and access instructions on the order page. Once access is unlocked, the related download-link content is available in your account center."
           : tool.type === "skill_learning"
             ? "Follow the payment and access instructions on the order page. Once access is unlocked, the course content and practical learning materials are available in your account center."
@@ -927,6 +1012,29 @@ function buildChineseFaqFallback(
         question: "课程适合什么用户？",
         answer:
           "课程适合希望系统学习AI工具、提示词、自动化流程和实战方法的用户。建议先阅读课程介绍和目录，再决定是否购买。",
+      },
+    ];
+  }
+
+  if (tool.type === "ai_skill") {
+    return [
+      {
+        id: "localized-faq-skill-purpose",
+        question: "这个技能包能帮我做什么？",
+        answer:
+          "请阅读详情页的产品介绍、适用 AI 智能体、使用步骤和获取方式；不同 Skill 的具体用法以对应页面说明为准。",
+      },
+      {
+        id: "localized-faq-skill-access",
+        question: "适用于哪些 AI 助手？",
+        answer:
+          "请以详情页列出的适用 AI 智能体和技能包说明为准；兼容范围和设置步骤可能因技能包而异。",
+      },
+      {
+        id: "localized-faq-skill-install",
+        question: "如何安装与使用？",
+        answer:
+          "请先查看技能包详情页中的使用步骤和获取方式，再按对应 AI 助手的说明安装；如页面未提供安装步骤，请查看技能包内的说明文件。",
       },
     ];
   }
@@ -1028,6 +1136,16 @@ function buildGeneratedFaqQuestion(
       ][slot];
     }
 
+    if (tool.type === "ai_skill") {
+      return [
+        "What does this skill pack help me do?",
+        "Which AI assistants is it compatible with?",
+        "How do I install and use this skill pack?",
+        "What should I check before using it?",
+        "Where can I get help with access or use?",
+      ][slot];
+    }
+
     return [
       `What is this AI account service for?`,
       "How do I access it after purchase?",
@@ -1054,6 +1172,16 @@ function buildGeneratedFaqQuestion(
       "使用前需要确认什么？",
       `${zhName}如何融入实际工作流？`,
       "遇到下载、安装或使用问题怎么办？",
+    ][slot];
+  }
+
+  if (tool.type === "ai_skill") {
+    return [
+      `${zhName}是什么？`,
+      `如何获取和使用${zhName}？`,
+      `${zhName}适用于哪些 AI 智能体？`,
+      "使用前需要确认什么？",
+      "遇到获取或使用问题怎么办？",
     ][slot];
   }
 
@@ -1103,6 +1231,16 @@ function buildGeneratedFaqAnswer(
       ][slot];
     }
 
+    if (tool.type === "ai_skill") {
+      return [
+        summary,
+        "Use only the AI agents listed on this product page. Compatibility and setup steps may vary by Skill.",
+        "Follow the installation steps on the product page or in the delivered Skill files. If no steps are provided, check the compatible AI assistant's official instructions.",
+        "Review the product instructions, required permissions, and any prerequisites before using the Skill.",
+        "Check the delivery and support details on the product page, then contact ENHE AI support if you have an access or usage question.",
+      ][slot];
+    }
+
     return [
       summary,
       "Follow the payment and access instructions on the order page. Once access is unlocked, the service access notes, delivery scope, and compliance reminders are available in your account center.",
@@ -1129,6 +1267,16 @@ function buildGeneratedFaqAnswer(
       "请先查看系统要求、版本记录、产品介绍和使用教程，确认软件适合你的设备环境和工作流程。",
       "建议先明确要完成的任务，再按照详情页和教程进行小范围测试，确认输出质量、操作步骤和成本后再用于高频工作。",
       "可以先查看详情页、教程和版本说明；如果仍有问题，可联系 ENHE AI 客服获取下载、安装、使用或更新相关支持。",
+    ][slot];
+  }
+
+  if (tool.type === "ai_skill") {
+    return [
+      `${zhName}用于在详情页标明的 AI 智能体中辅助完成特定任务；具体能力请以产品介绍和交付内容为准。`,
+      "请以详情页列出的适用 AI 智能体和 Skill 自带的使用说明为准；不同 Skill 的兼容范围可能不同。",
+      "请按产品页或技能包内提供的安装步骤操作；如果未提供步骤，请查看对应 AI 助手的官方说明。",
+      "使用前请阅读产品说明、所需权限和前置条件，确认符合你的使用环境。",
+      "请先查看产品页中的获取和支持说明；如有权限或使用问题，可联系 ENHE AI 客服。",
     ][slot];
   }
 
@@ -1183,6 +1331,60 @@ export function buildLocalizedToolFaqItems(
     answer: resolveLocalizedInlineCopy(faq.answer, locale, normalizeRichText),
   })).filter((faq) => faq.question.trim() && faq.answer.trim());
 
+  if (tool.slug === "codex-api") {
+    return locale === "en"
+      ? [
+          {
+            id: "codex-api-local-settings-en",
+            question: "Does switching a connection change local settings?",
+            answer:
+              "Yes. No manual configuration-file editing is required, but switching changes local connection settings for Codex.",
+          },
+          {
+            id: "codex-api-backup-en",
+            question: "What should I do before switching?",
+            answer:
+              "Back up local settings first and check that the connection method is listed by your current version.",
+          },
+          {
+            id: "codex-api-support-scope-en",
+            question: "Which connection methods are supported?",
+            answer:
+              "Use the connection options shown by your current version. This page does not imply support for options that are not listed there.",
+          },
+        ]
+      : [
+          {
+            id: "codex-api-local-settings-zh",
+            question: "切换连接时会修改本机设置吗？",
+            answer: "会。无需手动编辑配置文件，但切换时会修改本机连接设置以切换 Codex 连接。",
+          },
+          {
+            id: "codex-api-backup-zh",
+            question: "切换前需要做什么？",
+            answer: "请先备份本机设置，并确认当前版本实际列出的连接方式适用。",
+          },
+          {
+            id: "codex-api-support-scope-zh",
+            question: "具体支持哪些连接方式？",
+            answer: "请以本机当前版本实际显示的连接选项为准；本页说明不扩展其支持范围。",
+          },
+        ];
+  }
+
+  const typeAppropriateFaqs = tool.type === "ai_skill"
+    ? localizedFaqs.filter((faq) => {
+        const copy = `${faq.question} ${faq.answer}`.toLowerCase();
+        return !(
+          copy.includes("ai账号服务") ||
+          copy.includes("ai工具订阅与账号使用支持") ||
+          copy.includes("购买软件后如何获取下载内容") ||
+          copy.includes("对应软件的下载链接") ||
+          copy.includes("ai account service")
+        );
+      })
+    : localizedFaqs;
+
   if (tool.type === "ai_workflow") {
     const workflowFaqs = locale === "zh" ? localizedFaqs : localizedFaqs.filter((faq) =>
       isVisibleInEnglishContent(faq.question, 2) && isVisibleInEnglishContent(faq.answer, 5),
@@ -1191,17 +1393,17 @@ export function buildLocalizedToolFaqItems(
   }
 
   if (locale === "zh") {
-    if (!localizedFaqs.length)
+    if (!typeAppropriateFaqs.length)
       return ensureMinimumLocalizedFaqItems(
         buildChineseFaqFallback(tool),
         tool,
         locale,
       );
     if (tool.type !== "online")
-      return ensureMinimumLocalizedFaqItems(localizedFaqs, tool, locale);
+      return ensureMinimumLocalizedFaqItems(typeAppropriateFaqs, tool, locale);
 
     return ensureMinimumLocalizedFaqItems(
-      localizedFaqs.map((faq) => ({
+      typeAppropriateFaqs.map((faq) => ({
         ...faq,
         answer: sanitizeAccountServiceRichCopy(faq.answer, "zh"),
       })),
@@ -1210,7 +1412,7 @@ export function buildLocalizedToolFaqItems(
     );
   }
 
-  const visibleLocalizedFaqs = localizedFaqs.filter(
+  const visibleLocalizedFaqs = typeAppropriateFaqs.filter(
     (faq) =>
       isVisibleInEnglishContent(faq.question, 2) &&
       isVisibleInEnglishContent(faq.answer, 5),

@@ -29,7 +29,7 @@ const routineE2EStorageState = {
   origins: [
     {
       origin: baseURLUrl.origin,
-      localStorage: [{ name: "enhe-entry-notice-dismissed-v1", value: "1" }],
+      localStorage: [{ name: "enhe-e2e-entry-notice-dismissed-v1", value: "1" }],
     },
   ],
 };

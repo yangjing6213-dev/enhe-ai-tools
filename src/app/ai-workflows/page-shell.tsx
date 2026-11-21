@@ -20,14 +20,14 @@ import { resolveAiWorkflowDeliveryMode } from "@/lib/ai-workflows/rules";
 
 const pageCopy = {
   zh: {
-    title: "AI 工作流",
-    intro: "按真实任务发现可复用的 AI 工作流，先看适用场景，再核对运行要求与交付内容。",
-    description: "发现按应用方向整理的热门开源工作流，查看项目用途、原仓库、开源许可证与可用的下载内容。",
+    title: "项目与资料",
+    intro: "按用途查找项目、工具和学习资料，查看运行要求以及获取方式。",
+    description: "查看项目和资料的用途、原始来源、许可说明与可用的下载内容。",
   },
   en: {
-    title: "AI Workflows",
-    intro: "Find reusable AI workflows by real tasks. Start with the use case, then review runtime requirements and deliverables.",
-    description: "Discover popular open-source workflows by application area, with project descriptions, original repositories, licenses, and available downloads.",
+    title: "Projects & Resources",
+    intro: "Browse projects, tools and learning resources by use case. Check requirements and how to access each item.",
+    description: "Explore projects and resources by use case, source, license and available downloads.",
   },
 } as const;
 
@@ -113,7 +113,7 @@ export async function AiWorkflowsPageShell({
         },
       }),
       prisma.aiWorkflowTopic.findMany({
-        where: { isEnabled: true },
+        where: { OR: [{ isEnabled: true }, { candidates: { some: { tool: { is: { type: "ai_workflow", status: "published" } } } } }] },
         select: { id: true, name: true, englishName: true },
         orderBy: [{ sortOrder: "asc" }, { name: "asc" }],
       }),

@@ -821,11 +821,11 @@ test("navigation and language links remain immediate after search moves into the
   await expect(items).toHaveText([
     "首页",
     "AI工具",
-    "共创AI",
-    "AI SkillsAI 提示词AI SkillsAI 工作流",
+    "AI社区",
+    "AI资源提示词库AI技能包项目与资料",
     "AI资讯",
-    "AI趋势",
-    "关于我们",
+    "AI应用场景",
+    "关于恩禾",
   ]);
   await expect(drawer.locator("[aria-selected]")).toHaveCount(0);
 

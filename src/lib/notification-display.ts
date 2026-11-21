@@ -28,6 +28,16 @@ export function getNotificationDisplay(notification: NotificationLike, locale: L
     };
   }
 
+  if (notification.type === "creator_message_reply") {
+    const sender = notification.content.match(/^回复者：(.+)$/m)?.[1]?.trim();
+    const product = notification.content.match(/^产品：(.+)$/m)?.[1]?.trim();
+    const message = notification.content.match(/^回复：\n([\s\S]*)$/m)?.[1]?.trim();
+    return {
+      title: "Creator message reply",
+      content: `Reply from ${sender || "a website creator"}${product ? ` about ${product}` : ""}${message ? `:\n${message}` : "."}`,
+    };
+  }
+
   if (notification.type === "payment_review") {
     if (notification.title.includes("未通过") || notification.content.includes("未通过")) {
       return {

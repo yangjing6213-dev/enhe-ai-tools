@@ -85,7 +85,8 @@
       "zod": "4.6.7"
     },
     "@prisma/config": {
-      "deepmerge-ts": "8.0.0"
+      "deepmerge-ts": "8.0.0",
+      "effect": "3.22.5"
     },
     "braces": "$braces",
     "next": {

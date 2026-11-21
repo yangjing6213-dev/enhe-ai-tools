@@ -3,8 +3,8 @@ import { getPrimaryToolPrice, type ToolPriceSpecStatus } from "@/lib/tool-price-
 import { resolveAiWorkflowDeliveryMode } from "@/lib/ai-workflows/rules";
 
 export function buildValueSentence(description: string, locale: Locale) {
-  const sentence = description.split(/[。?!；，,.!?]/).find(Boolean)?.trim() ?? description.trim();
-  const maxLength = locale === "zh" ? 44 : 86;
+  const sentence = description.split(/[。！？!?；;]/).find(Boolean)?.trim() ?? description.trim();
+  const maxLength = locale === "zh" ? 44 : 150;
   return sentence.length > maxLength ? `${sentence.slice(0, maxLength - 1)}...` : sentence;
 }
 

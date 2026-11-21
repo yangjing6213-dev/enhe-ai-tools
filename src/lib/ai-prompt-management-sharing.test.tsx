@@ -15,8 +15,8 @@ afterEach(() => { vi.unstubAllEnvs(); qrValues.length = 0; });
 
 describe("standalone prompt library sharing", () => {
   it.each([
-    ["zh", "/skill-learning/ai-prompt-management", "分享此产品", "复制产品链接"],
-    ["en", "/en/skill-learning/ai-prompt-management", "Share this product", "Copy product link"],
+    ["zh", "/skill-learning/ai-prompt-management", "分享此页面", "复制链接"],
+    ["en", "/en/skill-learning/ai-prompt-management", "Share This Page", "Copy Link"],
   ] as const)("shares the %s library after its existing content", (locale, path, label, button) => {
     vi.stubEnv("APP_URL", "https://www.enhe-tech.com.cn");
     const html = renderToStaticMarkup(<AiPromptManagementPageShell forceLocale={locale} />);

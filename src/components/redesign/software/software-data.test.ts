@@ -100,6 +100,7 @@ const EXPECTED_CATEGORIES = [
     id: "video",
     label: localized("视频生成", "Video generation"),
   },
+  { id: "presenter", label: localized("数字人口播", "Talking avatar videos") },
   {
     id: "image",
     label: localized("图片处理", "Image processing"),
@@ -208,7 +209,7 @@ const EXPECTED_PRODUCTS = [
   {
     id: "prompt-management",
     categoryId: "efficiency",
-    name: localized("AI提示词管理系统", "AI Prompt Management System"),
+    name: localized("AI提示词库桌面版", "AI Prompt Library | Desktop Edition"),
     description: localized(
       "搜索与管理可复用的中英文提示词。",
       "Search and manage reusable bilingual prompts.",
@@ -220,8 +221,8 @@ const EXPECTED_PRODUCTS = [
     ),
     media: media(
       "/redesign/software/prompt-management.png",
-      "AI提示词管理系统公开产品封面",
-      "Public cover for AI Prompt Management System",
+      "AI提示词库桌面版公开产品封面",
+      "Public cover for AI Prompt Library Desktop Edition",
     ),
   },
   {

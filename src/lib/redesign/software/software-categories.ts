@@ -3,6 +3,7 @@ import type { RedesignLocale } from "@/components/redesign/types";
 export type SoftwareCategoryId =
   | "all"
   | "skill"
+  | "presenter"
   | "video"
   | "image"
   | "audio"
@@ -38,6 +39,7 @@ export const SOFTWARE_CATEGORIES = [
       en: "Video generation",
     },
   },
+  { id: "presenter", label: { zh: "数字人口播", en: "Talking avatar videos" } },
   {
     id: "image",
     label: {

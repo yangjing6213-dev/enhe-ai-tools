@@ -61,7 +61,7 @@ export function toNewsListingCards(articles: ListingArticle[], locale: Locale): 
       englishDescription: article.englishDescription,
     }, locale) : article.summary,
     coverImage: normalizeImageSrc(article.coverImage),
-    categoryName: article.category ? resolveLocalizedNewsCategoryName(article.category.name, locale) : null,
+    categoryName: article.category ? resolveLocalizedNewsCategoryName(article.category.name, locale, article.category.id) : null,
     isPinned: article.isPinned,
     dateLabel: new Date(article.publishedAt ?? article.createdAt).toLocaleDateString(locale === "en" ? "en-US" : "zh-CN"),
     readingTime: article.readingTime,

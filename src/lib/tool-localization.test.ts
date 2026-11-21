@@ -17,6 +17,53 @@ const copyCleanerContent =
   "\u9002\u5408\u6574\u7406\u6587\u6863\u3001\u94fe\u63a5\u3001\u6807\u9898\u4e0e\u793e\u4ea4\u5a92\u4f53\u5185\u5bb9\uff0c\u8ba9\u9875\u9762\u5185\u5bb9\u66f4\u6574\u6d01\u3002";
 
 describe("tool localization helpers", () => {
+  it("uses the approved bilingual names for the 14 tools and 6 skill packs", () => {
+    const names = [
+      ["searchscope-seo-geo", "SearchScope｜网站问题检查与修复建议", "SearchScope | Website Review & Recommendations"],
+      ["ai-codex", "Product Video Studio｜产品介绍视频制作", "Product Video Studio | Product Videos with Codex"],
+      ["ai-ai", "AI配音｜旁白与多角色对话", "AI Voice Generator | Narration & Dialogue"],
+      ["ai-video-studio-ai-ai-video-studio-ai", "AI视频生成｜用文字或图片制作视频", "AI Video Workspace | Text-to-Video & Image-to-Video"],
+      ["tool-mq12l5w6", "聊天界面模拟器｜对话演示图制作", "Chat Interface Simulator | Chat Mockups"],
+      ["zfb", "链接与二维码整理工具", "Link & QR Organizer"],
+      ["ai-prompt", "AI提示词库桌面版", "AI Prompt Library | Desktop Edition"],
+      ["ai-skill", "IntentBridge｜需求澄清与确认", "IntentBridge | Clarify & Confirm Requirements"],
+      ["codex", "Codex Backup｜项目与工作资料备份", "Codex Backup | Project & Work Context Backup"],
+      ["github", "GitHub Backup｜将项目备份到电脑", "GitHub Backup | Local Repository Backup"],
+      ["product-video", "Product Video Studio｜产品介绍视频制作", "Product Video Studio | Product Videos with Codex"],
+      ["ai-ai-zorvp8", "AgentGuardian｜AI配置风险检查", "AgentGuardian | AI Configuration Risk Review"],
+      ["windows-ai", "Lumi-OS｜桌面AI助手", "Lumi-OS | Desktop AI Assistant"],
+      ["local-ai-voice-generator-for-voiceover-materials", "AI配音｜旁白与多角色对话", "AI Voice Generator | Narration & Dialogue"],
+      ["ultimate-edition-ai-video-generation-suite", "AI视频生成｜用文字或图片制作视频", "AI Video Workspace | Text-to-Video & Image-to-Video"],
+      ["no-code-chat-screenshot-maker", "聊天界面模拟器｜对话演示图制作", "Chat Interface Simulator | Chat Mockups"],
+      ["faceswap-studio-ai", "FaceSwap Studio｜授权人像与视频合成", "FaceSwap Studio | Image & Video Compositing"],
+      ["zfb-transfer-link-qr-code-generator", "链接与二维码整理工具", "Link & QR Organizer"],
+      ["codex-api", "Codex Provider Switcher｜连接配置切换", "Codex Provider Switcher | Switch Codex Connections"],
+      ["infinitetalk-ai", "InfiniteTalk｜数字人口播视频制作", "InfiniteTalk | Talking Avatar Videos"],
+      ["ai-prompt-management-system-418-bilingual-prompts-for-writing-seo-and-ai-creation", "AI提示词库桌面版", "AI Prompt Library | Desktop Edition"],
+      ["ai-ai-skill", "Bilingual Prose Craft｜中英文写作润色", "Bilingual Prose Craft | Chinese & English Editing"],
+      ["ai-skill-ai", "短剧分镜助手｜将剧本整理成镜头提示词", "AI Storyboarding | Shot Prompts from Scripts"],
+      ["skill", "AI资讯写作｜双平台图文草稿", "AI News Content | Drafts for Two Platforms"],
+      ["intentbridge", "IntentBridge｜需求澄清与确认", "IntentBridge | Clarify & Confirm Requirements"],
+      ["a-skill", "AShareTrace｜A股研究资料整理", "AShareTrace | A-Share Research Notes"],
+      ["seo-geo-skill", "SEO + GEO Website Audit｜公开网页检查", "SEO + GEO Website Audit | Public Page Review"],
+    ] as const;
+
+    for (const [slug, chineseName, englishName] of names) {
+      expect(
+        resolveLocalizedToolIdentity(
+          { slug, name: "Old source name", englishName: "Old English name", type: "software" },
+          "zh",
+        ),
+      ).toEqual({ primaryName: chineseName, secondaryName: englishName });
+      expect(
+        resolveLocalizedToolIdentity(
+          { slug, name: "Old source name", englishName: "Old English name", type: "software" },
+          "en",
+        ),
+      ).toEqual({ primaryName: englishName, secondaryName: chineseName });
+    }
+  });
+
   it("prefers english names on english pages and falls back to descriptive slugs", () => {
     expect(
       resolveLocalizedToolIdentity(
@@ -115,7 +162,7 @@ describe("tool localization helpers", () => {
     );
 
     expect(summary).toContain(
-      "AI Voice Generator - Flexible Edition is an AI software app",
+      "AI Voice Generator | Narration & Dialogue is an AI software app",
     );
   });
 
@@ -367,5 +414,114 @@ describe("tool localization helpers", () => {
     expect(courseFaqs.map((item) => item.question).join(" ")).toContain(
       "AI \u63d0\u793a\u8bcd\u5b9e\u6218\u8bfe",
     );
+  });
+
+  it("does not describe AI Skills as account services in generated Chinese or English FAQs", () => {
+    const tool = {
+      slug: "intentbridge",
+      name: "IntentBridge",
+      englishName: "IntentBridge | Clarify and Confirm Requirements with AI",
+      shortDescription: "A reusable AI Skill for clarifying requirements.",
+      content: "",
+      type: "ai_skill" as const,
+      categoryName: "AI Skills",
+    };
+
+    const chineseFaqs = buildLocalizedToolFaqItems([], tool, "zh");
+    const englishFaqs = buildLocalizedToolFaqItems([], tool, "en");
+
+    expect(chineseFaqs).toHaveLength(5);
+    expect(englishFaqs).toHaveLength(5);
+    expect(chineseFaqs.map((item) => item.question).join(" ")).not.toContain(
+      "AI\u8d26\u53f7\u670d\u52a1",
+    );
+    expect(chineseFaqs.map((item) => item.answer).join(" ")).not.toContain(
+      "AI\u5de5\u5177\u8ba2\u9605",
+    );
+    expect(englishFaqs.map((item) => item.question).join(" ")).not.toContain(
+      "AI account service",
+    );
+    expect(englishFaqs.map((item) => item.answer).join(" ")).not.toContain(
+      "AI account service",
+    );
+  });
+
+  it("replaces persisted account-service FAQs on AI Skill pages with Skill-specific guidance", () => {
+    const tool = {
+      slug: "ai-ai-skill",
+      name: "AI生成文章、报告、文案润色，去AI味Skill",
+      englishName: "Bilingual Prose Craft | Chinese & English Editing",
+      shortDescription: "A writing Skill for editing Chinese and English drafts.",
+      content: "",
+      type: "ai_skill" as const,
+      categoryName: "AI Skills",
+    };
+    const publishedFaqs = [
+      {
+        id: "published-account-faq",
+        question: "这项AI账号服务主要提供什么支持？",
+        answer:
+          "该服务主要提供AI工具订阅与账号使用支持、访问建议、交付说明和售后边界说明。",
+      },
+      {
+        id: "published-access-faq",
+        question: "购买软件后如何获取下载内容？",
+        answer: "购买后可在用户中心查看对应软件的下载链接、版本信息和使用说明。",
+      },
+    ];
+
+    const chineseFaqs = buildLocalizedToolFaqItems(publishedFaqs, tool, "zh");
+    const englishFaqs = buildLocalizedToolFaqItems(publishedFaqs, tool, "en");
+
+    expect(chineseFaqs.map((item) => item.question).join(" ")).not.toContain(
+      "AI账号服务",
+    );
+    expect(chineseFaqs.map((item) => item.answer).join(" ")).not.toContain(
+      "AI工具订阅",
+    );
+    expect(chineseFaqs.map((item) => item.question).join(" ")).toContain(
+      "如何安装与使用",
+    );
+    expect(englishFaqs.map((item) => item.question).join(" ")).not.toContain(
+      "AI account service",
+    );
+    expect(englishFaqs.map((item) => item.question).join(" ")).toContain(
+      "How do I install and use this skill pack?",
+    );
+  });
+
+  it("keeps Codex Provider Switcher copy clear that it changes local settings without manual editing", () => {
+    const tool = {
+      slug: "codex-api",
+      name: "Codex Provider Switcher",
+      englishName: "Codex Provider Switcher | Switch Codex Connections",
+      shortDescription: "无需修改任何配置文件即可切换。",
+      content: "切换连接不会修改配置文件。",
+      type: "software" as const,
+    };
+
+    const zhSummary = buildLocalizedToolSummary(tool, "zh");
+    const zhContent = buildLocalizedToolLongContent(tool, "zh");
+    const enSummary = buildLocalizedToolSummary(tool, "en");
+    const enContent = buildLocalizedToolLongContent(tool, "en");
+    const persistedFaqs = [{
+      id: "old-provider-faq",
+      question: "Does switching modify configuration files?",
+      answer: "No configuration files or local settings are changed.",
+    }];
+    const zhFaqs = buildLocalizedToolFaqItems(persistedFaqs, tool, "zh");
+    const enFaqs = buildLocalizedToolFaqItems(persistedFaqs, tool, "en");
+
+    expect(zhSummary).toContain("无需手动编辑配置文件");
+    expect(zhSummary).toContain("会修改本机连接设置");
+    expect(zhContent).toContain("切换前请备份本机设置");
+    expect(zhContent).toContain("当前版本支持的连接方式");
+    expect(enSummary).toContain("No manual configuration-file editing is required");
+    expect(enSummary).toContain("switching changes local connection settings");
+    expect(enContent).toContain("Back up local settings before switching");
+    expect(enContent).toContain("connection methods supported by your current version");
+    expect(zhFaqs.map((item) => `${item.question} ${item.answer}`).join(" ")).toContain("会修改本机连接设置");
+    expect(enFaqs.map((item) => `${item.question} ${item.answer}`).join(" ")).toContain("changes local connection settings");
+    expect(enFaqs.map((item) => item.answer).join(" ")).not.toContain("No configuration files or local settings are changed");
   });
 });

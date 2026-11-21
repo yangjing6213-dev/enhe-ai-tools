@@ -21,12 +21,12 @@ export function ProductShareActions({ locale, url }: { locale: Locale; url: stri
   return (
     <div className={styles.actions}>
       <button type="button" className={styles.copyButton} onClick={async () => setStatus(await copyProductLink(url, navigator.clipboard) ? "copied" : "manual")}>
-        {english ? "Copy product link" : "复制产品链接"}
+        {english ? "Copy Link" : "复制链接"}
       </button>
       <p className={styles.feedback} role="status" aria-live="polite">
         {status === "copied" ? (english ? "Link copied. You can paste it to share." : "链接已复制，可以粘贴分享。") : status === "manual" ? (english ? "Automatic copying is unavailable. Select and copy the link below." : "浏览器未允许自动复制，请选中下方链接手动复制。") : ""}
       </p>
-      {status === "manual" ? <input className={styles.manualLink} aria-label={english ? "Product link" : "产品链接"} value={url} readOnly onFocus={(event) => event.currentTarget.select()} /> : null}
+      {status === "manual" ? <input className={styles.manualLink} aria-label={english ? "Page link" : "页面链接"} value={url} readOnly onFocus={(event) => event.currentTarget.select()} /> : null}
     </div>
   );
 }

@@ -66,6 +66,7 @@ export function EnheRedesignHeader({
           <EnheBrandLockup
             href={homeHref}
             label={locale === "en" ? "ENHE AI home" : "ENHE AI 首页"}
+            mobileWhite={isExactCurrentPage(currentPathname, homeHref)}
           />
         </div>
         <EnheHeaderSearch locale={locale} recommendations={searchRecommendations} />

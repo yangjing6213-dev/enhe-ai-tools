@@ -2,12 +2,21 @@ import { describe, expect, it } from "vitest";
 import {
   canOpenProtectedDownloadEntry,
   canShowDownloadLinkArea,
+  getDownloadCtaLabel,
   getDownloadLinkContent,
   linkifyDownloadLinkContent,
   resolveSoftwareDownloadCtaHref
 } from "@/lib/tool-download-link";
 
 describe("tool download link visibility", () => {
+  it("labels free and paid download actions according to actual access conditions", () => {
+    expect(getDownloadCtaLabel({ locale: "zh", isPaid: false, hasPurchase: false, isLoggedIn: false, hasPublicDirectDownload: true })).toBe("免费下载");
+    expect(getDownloadCtaLabel({ locale: "en", isPaid: false, hasPurchase: false, isLoggedIn: false, hasPublicDirectDownload: false })).toBe("Sign In to Download");
+    expect(getDownloadCtaLabel({ locale: "zh", isPaid: false, hasPurchase: false, isLoggedIn: true, hasPublicDirectDownload: false })).toBe("免费下载");
+    expect(getDownloadCtaLabel({ locale: "en", isPaid: true, hasPurchase: false, isLoggedIn: true, hasPublicDirectDownload: false })).toBe("Download After Purchase");
+    expect(getDownloadCtaLabel({ locale: "zh", isPaid: true, hasPurchase: true, isLoggedIn: true, hasPublicDirectDownload: false })).toBe("下载已购内容");
+  });
+
   it("shows free software download links when a link exists", () => {
     expect(canShowDownloadLinkArea({ hasDownloadLink: true, isDownloadPaid: false, hasDownloadPurchase: false })).toBe(true);
   });

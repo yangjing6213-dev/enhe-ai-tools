@@ -14,6 +14,12 @@ describe("default avatars", () => {
       }
     }
   });
+  it("distributes different users across multiple avatars within each gender", () => {
+    for (const gender of ["male", "female"] as const) {
+      const assigned = new Set(Array.from({ length: 100 }, (_, index) => getDefaultAvatar(`distinct-${index}`, gender)));
+      expect(assigned.size).toBeGreaterThan(1);
+    }
+  });
   it("keeps the assigned avatar stable for a user", () => {
     expect(getDefaultAvatar("user-1")).toBe(getDefaultAvatar("user-1"));
   });

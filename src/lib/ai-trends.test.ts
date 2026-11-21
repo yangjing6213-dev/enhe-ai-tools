@@ -241,6 +241,7 @@ describe("AI trend briefing helpers", () => {
     expect(localized.summary).not.toMatch(/[\u3400-\u9fff]/);
     expect(localized.coreConclusion).not.toMatch(/[\u3400-\u9fff]/);
     expect(localized.publicHighlights.join(" ")).not.toMatch(/[\u3400-\u9fff]/);
+    expect(localized.englishSummaryAvailable).toBe(false);
     expect(localized.sourceSignals[0]?.observedSignal).not.toMatch(/[\u3400-\u9fff]/);
     expect(localized.fullHtml).toContain("AI Demand Briefing");
     expect(localized.fullHtml).not.toMatch(/[\u3400-\u9fff]/);
@@ -253,6 +254,7 @@ describe("AI trend briefing helpers", () => {
     expect(localized.summary).toContain("An English summary has not been provided");
     expect(localized.coreConclusion).toContain("original Chinese briefing");
     expect(localized.publicHighlights.join(" ")).not.toMatch(/clearest signal|strongest opportunity|saves time/i);
+    expect(localized.englishSummaryAvailable).toBe(false);
     expect(localized.demandBreakdowns).toEqual([]);
     expect(localized.slug).toBe(view.slug);
     expect(localized.sourceSignals).toEqual(view.sourceSignals);
@@ -279,7 +281,10 @@ describe("AI trend briefing helpers", () => {
       fullHtml: "<article><p>Actual English analysis.</p></article>"
     };
 
-    expect(localizeAiTrendBriefingView(view, "en")).toEqual(view);
+    const localized = localizeAiTrendBriefingView(view, "en");
+    expect(localized.englishSummaryAvailable).toBe(true);
+    expect(localized.summary).toBe(view.summary);
+    expect(localized.coreConclusion).toBe(view.coreConclusion);
   });
 
   it("normalizes serialized date fields before topic-page rendering", () => {

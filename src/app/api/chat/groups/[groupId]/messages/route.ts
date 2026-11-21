@@ -5,6 +5,7 @@ import { defaultChatEmojis, groupChatCopy } from "@/lib/group-chat/constants";
 import { chatError, chatJson, consumeChatRateLimit, isChatSameOriginRequest, readChatJson } from "@/lib/group-chat/http";
 import { buildChatMessageSearchWhere, chatMessagePayloadMatches, groupMessageInputSchema, isChatMemberMuted } from "@/lib/group-chat/policy";
 import { findChatMembership, nextGroupSequence, notifyChatUsers, resolvePublicReference } from "@/lib/group-chat/service";
+import { routeGroupMessageNotifications } from "@/lib/group-chat/message-notification-recipients";
 import { chatMessageInclude, serializeChatMessages } from "@/lib/group-chat/serializers";
 
 export const runtime = "nodejs";
@@ -152,16 +153,23 @@ export async function POST(request: Request, { params }: Context) {
         if (attached.count !== input.mediaIds.length) throw new Error("CHAT_MEDIA_UNAVAILABLE");
       }
       await tx.chatGroupEvent.create({ data: { groupId, sequence, kind: "message", messageId: message.id, payload: { messageId: message.id } } });
-      if (replyTarget) {
-        await notifyChatUsers(tx, [replyTarget.senderId], actor.id, { type: "chat_group_reply", title: "有人回复了你的群聊消息", content: input.text.slice(0, 160) || "有人回复了你的消息。", linkUrl: `/chat/${groupId}?message=${message.id}` });
-      }
-      if (input.mentionUserIds.length) {
-        await notifyChatUsers(tx, input.mentionUserIds.filter((userId) => userId !== replyTarget?.senderId), actor.id, { type: "chat_group_mention", title: `有人在群聊中提到了你`, content: input.text.slice(0, 160), linkUrl: `/chat/${groupId}?message=${message.id}` });
-      }
-      if (input.mentionEveryone) {
-        const recipients = await tx.chatGroupMember.findMany({ where: { groupId, status: "active", userId: { not: actor.id }, OR: [{ muted: false }, { mutedUntil: { lte: new Date() } }] }, select: { userId: true } });
-        await notifyChatUsers(tx, recipients.map(({ userId }) => userId).filter((userId) => userId !== replyTarget?.senderId), actor.id, { type: "chat_group_mention_all", title: `群聊提醒：${member.group.name}`, content: input.text.slice(0, 160), linkUrl: `/chat/${groupId}?message=${message.id}` });
-      }
+      const messageRecipients = await tx.chatGroupMember.findMany({
+        where: { groupId, status: "active", userId: { not: actor.id }, OR: [{ muted: false }, { mutedUntil: { lte: new Date() } }] },
+        select: { userId: true },
+      });
+      const notificationRecipients = routeGroupMessageNotifications({
+        activeMemberIds: messageRecipients.map(({ userId }) => userId),
+        senderId: actor.id,
+        replyToSenderId: replyTarget?.senderId,
+        mentionUserIds: input.mentionUserIds,
+        mentionEveryone: input.mentionEveryone,
+      });
+      const content = input.text.slice(0, 160) || "收到一条新群聊消息。";
+      const linkUrl = `/chat/${groupId}?message=${message.id}`;
+      if (notificationRecipients.reply.length) await notifyChatUsers(tx, notificationRecipients.reply, actor.id, { type: "chat_group_reply", title: "有人回复了你的群聊消息", content, linkUrl });
+      if (notificationRecipients.mentions.length) await notifyChatUsers(tx, notificationRecipients.mentions, actor.id, { type: "chat_group_mention", title: "有人在群聊中提到了你", content, linkUrl });
+      if (notificationRecipients.mentionAll.length) await notifyChatUsers(tx, notificationRecipients.mentionAll, actor.id, { type: "chat_group_mention_all", title: `群聊提醒：${member.group.name}`, content, linkUrl });
+      if (notificationRecipients.general.length) await notifyChatUsers(tx, notificationRecipients.general, actor.id, { type: "chat_group_message", title: `群聊新消息：${member.group.name}`, content, linkUrl });
       return { ...message, duplicate: false };
     }, { isolationLevel: "Serializable" });
     return chatJson(result, result.duplicate ? 200 : 201);

@@ -49,11 +49,11 @@ export const publicDiscoveryRoutes: readonly PublicDiscoveryRoute[] = [
   {
     path: "/ai-skills",
     lastModified: "2026-07-30T00:00:00.000Z",
-    llmsLabel: "AI Skills for agents",
+    llmsLabel: "AI Skill Packs",
   },
   { path: "/en/ai-skills", lastModified: "2026-07-30T00:00:00.000Z" },
-  { path: "/ai-workflows", lastModified: "2026-10-22T00:00:00.000Z", llmsLabel: "AI workflows" },
-  { path: "/en/ai-workflows", lastModified: "2026-10-22T00:00:00.000Z", llmsLabel: "English AI workflows" },
+  { path: "/ai-workflows", lastModified: "2026-10-22T00:00:00.000Z", llmsLabel: "Projects & Resources" },
+  { path: "/en/ai-workflows", lastModified: "2026-10-22T00:00:00.000Z", llmsLabel: "Projects & Resources (English)" },
   {
     path: "/online-tools/seo-geo-audit",
     lastModified: "2026-07-26T00:00:00.000Z",
@@ -74,7 +74,7 @@ export const publicDiscoveryRoutes: readonly PublicDiscoveryRoute[] = [
   {
     path: "/skill-learning",
     lastModified: "2026-06-17T00:00:00.000Z",
-    llmsLabel: "AI skill learning",
+    llmsLabel: "AI Tutorials & Courses",
     okfFile: "./skill-learning/index.md",
     okfLabel: "AI skill courses",
   },
@@ -82,14 +82,14 @@ export const publicDiscoveryRoutes: readonly PublicDiscoveryRoute[] = [
   {
     path: "/skill-learning/ai-prompt-management",
     lastModified: "2026-07-15T00:00:00.000Z",
-    llmsLabel: "AI Prompt Management System",
+    llmsLabel: "AI Prompt Library",
     okfFile: "./ai-prompt-management/index.md",
-    okfLabel: "AI Prompt Management System",
+    okfLabel: "AI Prompt Library",
   },
   {
     path: "/en/skill-learning/ai-prompt-management",
     lastModified: "2026-07-15T00:00:00.000Z",
-    llmsLabel: "English AI Prompt Management System",
+    llmsLabel: "English AI Prompt Library",
   },
   { path: "/product-paths/work-efficiency", lastModified: "2026-07-04T00:00:00.000Z" },
   { path: "/en/product-paths/work-efficiency", lastModified: "2026-07-04T00:00:00.000Z" },
@@ -107,7 +107,7 @@ export const publicDiscoveryRoutes: readonly PublicDiscoveryRoute[] = [
   { path: "/en/product-demos/windows-ai-lumi", lastModified: "2026-07-01T00:00:00.000Z" },
   { path: "/pricing", lastModified: "2026-06-17T00:00:00.000Z", llmsLabel: "Pricing and purchase notes" },
   { path: "/en/pricing", lastModified: "2026-06-17T00:00:00.000Z" },
-  { path: "/tutorials", lastModified: "2026-06-17T00:00:00.000Z", llmsLabel: "AI tutorials", okfLabel: "Tutorials" },
+  { path: "/tutorials", lastModified: "2026-06-17T00:00:00.000Z", llmsLabel: "Tool Guides", okfLabel: "Tutorials" },
   { path: "/en/tutorials", lastModified: "2026-06-17T00:00:00.000Z" },
   {
     path: "/ai-news",
@@ -117,7 +117,7 @@ export const publicDiscoveryRoutes: readonly PublicDiscoveryRoute[] = [
     okfLabel: "AI news and trend insights",
   },
   { path: "/en/ai-news", lastModified: "2026-06-18T00:00:00.000Z" },
-  { path: "/ai-trends", lastModified: "2026-06-19T00:00:00.000Z", llmsLabel: "AI trends", okfLabel: "AI demand trends" },
+  { path: "/ai-trends", lastModified: "2026-06-19T00:00:00.000Z", llmsLabel: "AI Use Cases", okfLabel: "AI demand trends" },
   { path: "/en/ai-trends", lastModified: "2026-06-19T00:00:00.000Z" },
   { path: "/legal/user-agreement", lastModified: "2026-10-23T00:00:00.000Z" },
   { path: "/en/legal/user-agreement", lastModified: "2026-10-23T00:00:00.000Z" },
@@ -141,7 +141,7 @@ export const machineReadableResources: readonly MachineReadableResource[] = [
   { label: "AI software concept page", path: "/okf/software/index.md" },
   { label: "AI account service knowledge bundle", path: "/okf/account-services/index.md" },
   { label: "AI skill learning knowledge bundle", path: "/okf/skill-learning/index.md" },
-  { label: "AI Prompt Management knowledge bundle", path: "/okf/ai-prompt-management/index.md" },
+  { label: "AI Prompt Library knowledge bundle", path: "/okf/ai-prompt-management/index.md" },
   { label: "Chinese AI prompt data", path: "/data/ai-prompt-management/zh.json" },
   { label: "English AI prompt data", path: "/data/ai-prompt-management/en.json" },
 ] as const;

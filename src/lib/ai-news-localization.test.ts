@@ -22,6 +22,28 @@ describe("AI news localization helpers", () => {
     expect(resolveLocalizedNewsTagName("Agent", "en")).toBe("Agent");
   });
 
+  it("uses category record identifiers to keep English news filters distinct", () => {
+    expect(
+      resolveLocalizedNewsCategoryName("AI前沿资讯", "en", "cms3x4ium0000qngnsgq1f1f3"),
+    ).toBe("AI News & Updates");
+    expect(
+      resolveLocalizedNewsCategoryName("AI工具选型指南", "en", "cmv4mthn0003kppegv992pok8"),
+    ).toBe("Model & Agent Evaluation");
+    expect(resolveLocalizedNewsCategoryName("接口安全指南", "en", "cmv7i7d30003ppi3bh90vl3ox")).toBe("API Security Guides");
+    expect(
+      resolveLocalizedNewsCategoryName("GEO内容", "en", "cmqsv2hmz001qp701tp5r8adg"),
+    ).toBe("GEO Content");
+    expect(resolveLocalizedNewsCategoryName("实战教程", "en")).toBe("Practical Guides");
+    expect(resolveLocalizedNewsCategoryName("模型动态", "en")).toBe("Model Updates");
+    expect(resolveLocalizedNewsCategoryName("AI变现", "en")).toBe("AI Business & Monetization");
+  });
+
+  it("uses a neutral English label for a category without a verified translation", () => {
+    expect(resolveLocalizedNewsCategoryName("未知栏目", "en", "unknown-category-id")).toBe(
+      "Untranslated category",
+    );
+  });
+
   it("uses English summaries and keywords when source English fields exist", () => {
     const summary = buildLocalizedNewsSummary(
       {
@@ -115,6 +137,30 @@ describe("AI news localization helpers", () => {
         "en",
       ),
     ).toBe("ChatGPT Plus");
+  });
+
+  it("selects localized tutorial preview titles and falls back when the selected translation is empty", () => {
+    const tool = {
+      slug: "chatgpt-plus",
+      name: "ChatGPT Plus 账号服务",
+      englishName: "ChatGPT Plus",
+      type: "online" as const,
+    };
+
+    expect(
+      buildLocalizedTutorialPreviewTitle(
+        "[[zh]]使用步骤[[/zh]][[en]]Setup guide[[/en]]",
+        tool,
+        "zh",
+      ),
+    ).toBe("使用步骤");
+    expect(
+      buildLocalizedTutorialPreviewTitle(
+        "[[zh]]使用步骤[[/zh]][[en]][[/en]]",
+        tool,
+        "en",
+      ),
+    ).toBe("ChatGPT Plus guide");
   });
 
   it("localizes AI news discovery labels when English source labels are present", () => {

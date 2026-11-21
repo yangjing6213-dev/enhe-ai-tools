@@ -6,12 +6,12 @@ import type { Locale } from "@/lib/dictionaries";
 import { companyProfile } from "@/lib/company-profile";
 import type { SiteEntryNoticeConfig } from "@/lib/site-entry-notice";
 import { SiteQrCode } from "@/components/site-qr-code";
+import { FavoriteSiteButton } from "@/components/favorite-site-button";
 import styles from "./site-entry-notice.module.css";
-
-const dismissedKey = "enhe-entry-notice-dismissed-v1";
 
 export function SiteEntryNotice({ locale, config }: { locale: Locale; config: SiteEntryNoticeConfig }) {
   const [visible, setVisible] = useState(false);
+  const e2eDismissed = useRef<boolean | null>(null);
   const dialogRef = useRef<HTMLDialogElement>(null);
   const titleRef = useRef<HTMLHeadingElement>(null);
   const english = locale === "en";
@@ -24,15 +24,10 @@ export function SiteEntryNotice({ locale, config }: { locale: Locale; config: Si
       setVisible(false);
       return;
     }
-    try {
-      if (window.localStorage.getItem(dismissedKey) === String(config.version)) {
-        setVisible(false);
-        return;
-      }
-    } catch {
-      // Show the notice for this page when browser storage is unavailable.
+    if (e2eDismissed.current === null) {
+      e2eDismissed.current = ["localhost", "127.0.0.1", "[::1]"].includes(window.location.hostname) && window.localStorage.getItem("enhe-e2e-entry-notice-dismissed-v1") === "1";
     }
-    setVisible(true);
+    setVisible(!e2eDismissed.current);
   }, [config.enabled, config.version]);
 
   useEffect(() => {
@@ -46,11 +41,6 @@ export function SiteEntryNotice({ locale, config }: { locale: Locale; config: Si
   }, [visible, config.enabled]);
 
   function dismiss() {
-    try {
-      window.localStorage.setItem(dismissedKey, String(config.version));
-    } catch {
-      // The notice can still be dismissed for the current page.
-    }
     setVisible(false);
   }
 
@@ -90,6 +80,9 @@ export function SiteEntryNotice({ locale, config }: { locale: Locale; config: Si
           {ending ? <p>{ending} <a href={companyProfile.email.href}>{companyProfile.email.value}</a></p> : null}
         </div>
         <SiteQrCode locale={locale} size={112} className={styles.qr} />
+        <div className={styles.favoriteWrap}>
+          <FavoriteSiteButton locale={locale} showLabel className={styles.favorite} />
+        </div>
       </div>
       <button
         type="button"

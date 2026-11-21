@@ -14,7 +14,7 @@ describe("AI trends navigation entry", () => {
     expect(header).toContain('buildLocalePath("/ai-trends", locale)');
     expect(footer).toContain("t.nav.aiTrends");
     expect(footer).toContain('buildLocalePath("/ai-trends", locale)');
-    expect(dictionaries).toContain('aiTrends: "AI趋势"');
+    expect(dictionaries).toContain('aiTrends: "AI应用场景"');
     expect(`${dictionaries}\n${topicPage}\n${archivePage}\n${detailPage}`).not.toContain("AI趋势晨报");
     expect(`${topicPage}\n${archivePage}\n${detailPage}`).not.toContain("每日晨报");
     expect(`${topicPage}\n${archivePage}\n${detailPage}`).not.toContain("晨报归档");

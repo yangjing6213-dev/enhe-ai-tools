@@ -1,3 +1,4 @@
+import { projectTypes, type SourceProjectType } from "./project-types";
 import { Prisma } from "@prisma/client";
 
 export type AiWorkflowCatalogFilters = {
@@ -5,7 +6,7 @@ export type AiWorkflowCatalogFilters = {
   topic: string;
   paid: "all" | "free" | "paid";
   environment: "all" | "windows" | "macos" | "linux";
-  type: "all" | "workflow" | "automation" | "agent" | "template" | "companion";
+  type: "all" | SourceProjectType;
   sort: "recommended" | "latest" | "downloads" | "rating" | "price";
   page: number;
   pageSize: 12;
@@ -23,7 +24,7 @@ export function normalizeAiWorkflowCatalogSearchParams(params: AiWorkflowCatalog
 
 const paidOptions = new Set(["all", "free", "paid"] as const);
 const environmentOptions = new Set(["all", "windows", "macos", "linux"] as const);
-const typeOptions = new Set(["all", "workflow", "automation", "agent", "template", "companion"] as const);
+const typeOptions = new Set(["all", ...projectTypes] as const);
 const sortOptions = new Set(["recommended", "latest", "downloads", "rating", "price"] as const);
 
 function parseOption<T extends string>(value: string | undefined, allowed: Set<T>, fallback: T): T {

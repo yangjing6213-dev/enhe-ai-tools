@@ -294,6 +294,7 @@ export async function AiNewsTopicPageShell({
                           {resolveLocalizedNewsCategoryName(
                             article.category.name,
                             forceLocale,
+                            article.category.id,
                           )}
                         </Badge>
                       ) : null}

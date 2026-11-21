@@ -26,6 +26,13 @@ describe("buildLanguageSwitcherHref", () => {
     expect(buildLanguageSwitcherHref("/en/legal/privacy-policy", "zh")).toBe("/legal/privacy-policy");
   });
 
+  it("keeps forum and AI skill routes on the same page when switching languages", () => {
+    for (const path of ["/forum", "/forum/post-123", "/ai-skills", "/ai-skills/intentbridge"]) {
+      expect(buildLanguageSwitcherHref(path, "en")).toBe(`/en${path}`);
+      expect(buildLanguageSwitcherHref(`/en${path}`, "zh")).toBe(path);
+    }
+  });
+
   it("keeps same-path locale routes in place while still triggering explicit locale switching", () => {
     expect(buildLanguageSwitcherHref("/admin", "en")).toBe("/admin?locale=en");
     expect(buildLanguageSwitcherHref("/admin/orders", "zh")).toBe(

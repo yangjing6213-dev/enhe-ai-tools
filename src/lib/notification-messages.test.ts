@@ -2,6 +2,7 @@ import { describe, expect, it } from "vitest";
 import {
   buildManualVipNotification,
   buildCreatorMessageNotification,
+  buildCreatorMessageReplyNotification,
   buildPaymentReviewNotification,
   buildRefundProcessedNotification,
   buildRefundRequestNotification
@@ -83,6 +84,21 @@ describe("notification messages", () => {
       content: "发送者：小李\n产品：ENHE Writer\n留言：\n请问支持哪些系统？",
       linkUrl: "/software/enhe-writer",
       senderId: "user-1",
+    });
+  });
+
+  it("builds a reply notification addressed to the original creator-message sender", () => {
+    expect(buildCreatorMessageReplyNotification({
+      senderId: "creator-1",
+      senderName: "作者",
+      productName: "写作工具",
+      message: "支持 Windows。",
+    })).toEqual({
+      type: "creator_message_reply",
+      title: "收到创作者留言回复",
+      content: "回复者：作者\n产品：写作工具\n回复：\n支持 Windows。",
+      linkUrl: "/user#notifications",
+      senderId: "creator-1",
     });
   });
 });

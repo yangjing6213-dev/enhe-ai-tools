@@ -45,33 +45,33 @@ describe("ENHE Phase 2C.1.2 production copy compliance", () => {
     expect(REDESIGN_ZH_NAV_ITEMS.map(({ label }) => label)).toEqual([
       "首页",
       "AI工具",
-      "共创AI",
-      "AI Skills",
+      "AI社区",
+      "AI资源",
       "AI资讯",
-      "AI趋势",
-      "关于我们",
+      "AI应用场景",
+      "关于恩禾",
     ]);
     expect(REDESIGN_EN_NAV_ITEMS.map(({ label }) => label)).toEqual([
       "Home",
       "AI Tools",
-      "Co-create AI",
-      "AI Skills",
+      "AI Community",
+      "AI Resources",
       "AI News",
-      "AI Trends",
-      "About",
+      "AI Use Cases",
+      "About ENHE",
     ]);
   });
 
-  it("uses the exact localized AI Skills dropdown labels", () => {
+  it("uses the exact localized AI Resources dropdown labels", () => {
     expect(REDESIGN_ZH_NAV_ITEMS[3].children?.map(({ label }) => label)).toEqual([
-      "AI 提示词",
-      "AI Skills",
-      "AI 工作流",
+      "提示词库",
+      "AI技能包",
+      "项目与资料",
     ]);
     expect(REDESIGN_EN_NAV_ITEMS[3].children?.map(({ label }) => label)).toEqual([
-      "AI Prompts",
-      "AI Skills",
-      "AI Workflows",
+      "Prompt Library",
+      "AI Skill Packs",
+      "Projects & Resources",
     ]);
   });
 

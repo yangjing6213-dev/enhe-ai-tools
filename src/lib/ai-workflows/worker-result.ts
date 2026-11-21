@@ -1,3 +1,4 @@
+import { projectTypes } from "./project-types";
 import { z } from "zod";
 import { isLinkableOpenSourceLicenseId, isPackageRedistributableLicenseId } from "./licenses";
 import { normalizeGitHubRepositoryUrl } from "@/lib/ai-workflows/rules";
@@ -6,7 +7,6 @@ import { aiWorkflowPresentationSchema } from "@/lib/ai-workflows/presentation";
 import { aiWorkflowSourceArchiveDeliverySchema, parseAiWorkflowSourceArchiveDelivery } from "@/lib/ai-workflows/source-archive";
 
 const environmentNames = ["windows", "wsl2", "macos", "linux", "docker"] as const;
-const projectTypes = ["workflow", "automation", "agent", "template", "companion"] as const;
 const repositoryLinkFailureReasons = [
   "LICENSE_NOT_REDISTRIBUTABLE",
   "GITHUB_ARCHIVE_UNAVAILABLE",

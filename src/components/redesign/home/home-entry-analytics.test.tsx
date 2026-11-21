@@ -33,7 +33,7 @@ describe("homepage folder entry analytics", () => {
     mocks.folders[1].onSelect?.("/en/ai-workflows", 2);
     expect(mocks.track).toHaveBeenCalledWith(expect.objectContaining({ metadata: { surface: "category_folder", target: "_ai-workflows" } }));
     expect(mocks.folders[1].items).toEqual(expect.arrayContaining([
-      expect.objectContaining({ label: "AI workflows", href: "/en/ai-workflows" }),
+      expect.objectContaining({ label: "Projects & Resources", href: "/en/ai-workflows" }),
     ]));
   });
 });

@@ -41,12 +41,12 @@ const topicPath = "/ai-trends";
 
 const content = {
   zh: {
-    title: "用 AI 解决工作与创作任务",
+    title: "AI应用场景",
     description:
-      "ENHE AI 持续整理公开趋势信号，观察用户最希望用 AI 解决的工作效率、视频生成、内容创作、编程、学习、搜索研究、营销销售和生活辅助问题，帮助判断下一步工具、技能和内容行动。",
+      "按真实工作与创作任务整理 AI 应用场景参考，帮助读者找到可进一步核对的工具、技能和教程入口。内容为编辑整理，不是实时需求调查或统计排行。",
     hero:
       "编辑建议：从高频、耗时、需要专业判断的实际任务开始，验证 AI 能否形成可复用、可检查的工作流。",
-    demandTitle: "AI 应用方向参考",
+    demandTitle: "AI应用方向参考",
     demandIntro:
       "以下方向由编辑按常见任务整理，不是实时统计排行，不代表搜索量或市场份额。请结合具体工具、官方来源和自身场景判断。",
     scenarioTitle: "工作效率场景参考",
@@ -54,23 +54,25 @@ const content = {
     scenarioPriority: "开发优先级",
     prioritiesTitle: "机会优先级建议",
     prioritiesIntro: "先从可验收、使用条件清楚的任务开始，记录人工核对、错误和总耗时，再判断是否值得做成产品。",
-    recentTitle: "近期趋势周报",
+    recentTitle: "近期 AI 趋势周报",
     recentIntro:
       "每周整理公开趋势信号与分析，审核后发布。可浏览和分享摘要，登录后阅读完整报告。",
-    dailyButton: "查看每周分析",
+    dailyButton: "查看 AI 趋势周报",
     newsButton: "查看 AI 前沿资讯",
     readSummary: "阅读摘要",
+    summaryUnavailable: "暂无英文摘要",
+    viewReportDetails: "查看报告详情",
     emptyRecent: "还没有已发布的趋势周报。发布后，这里会显示最近的公开摘要。",
     home: "首页",
-    aiTrends: "AI 趋势分析"
+    aiTrends: "AI应用场景"
   },
   en: {
-    title: "Using AI For Work And Creative Tasks",
+    title: "AI Use Cases",
     description:
-      "ENHE AI tracks public demand signals showing where people want AI help with productivity, video, content, coding, learning, research, and daily tasks.",
+      "Browse editorial references for practical AI use cases across work and creative tasks. These are not live demand measurements or statistical rankings.",
     hero:
       "Editorial suggestion: start with frequent, time-consuming tasks that need judgment, then test whether AI can turn them into repeatable, verifiable workflows.",
-    demandTitle: "AI application directions",
+    demandTitle: "AI use case references",
     demandIntro:
       "These directions are editorially organized around common tasks, not a live statistical ranking, search-volume measurement, or market-share estimate.",
     scenarioTitle: "Work productivity scenario reference",
@@ -79,15 +81,17 @@ const content = {
     prioritiesTitle: "Opportunity priorities",
     prioritiesIntro:
       "Start with a task you can verify and whose conditions are clear. Track human review, errors, and total time before deciding whether it merits a product.",
-    recentTitle: "Recent weekly briefings",
+    recentTitle: "Recent Weekly AI Briefs",
     recentIntro:
       "Public trend signals and analysis are prepared weekly and published after review. Browse and share summaries, or sign in to read the full report.",
-    dailyButton: "View weekly analysis",
+    dailyButton: "View Weekly AI Briefs",
     newsButton: "View AI news",
     readSummary: "Read summary",
+    summaryUnavailable: "English summary unavailable",
+    viewReportDetails: "View Report Details",
     emptyRecent: "No published weekly briefings yet. Recent public summaries will appear here after publication.",
     home: "Home",
-    aiTrends: "AI Trends"
+    aiTrends: "AI Use Cases"
   }
 } as const;
 
@@ -95,10 +99,10 @@ const aiTrendsGeoSections = {
   zh: [
     {
       title: "如何用趋势判断下一步行动",
-      body: "AI趋势页把公开需求信号、产品更新、创作者讨论、开发者生态和商业成熟度放在一起看。用户可以用它判断下一步应该关注哪类资讯、学习哪项技能、选择哪类软件或规划哪种服务。"
+      body: "从你正在做的任务入手，查看可以试用的工具和教程，再判断它们是否适合自己的工作。"
     },
     {
-      title: "需求热度代表什么",
+      title: "应用方向说明",
       body: "本页不提供未经核验的热度分数。方向和场景为编辑整理，用于提出可以实际测试的任务，不代表用户调查或实时需求统计。"
     },
     {
@@ -109,15 +113,15 @@ const aiTrendsGeoSections = {
   en: [
     {
       title: "How to use trends to choose the next action",
-      body: "The AI trends page combines public demand signals, product updates, creator discussion, developer momentum, and commercial maturity. Users can decide what news to watch, what skill to learn, what software to try, or what service to plan next."
+      body: "Start with a task you already do. Follow the suggested tools and guides, then test whether they fit your work."
     },
     {
-      title: "What demand heat means",
+      title: "About These Use Cases",
       body: "This page does not publish unverified heat scores. Directions and scenarios are editorial references for tasks you can test, not a user survey or live demand statistics."
     },
     {
       title: "How to connect site resources",
-      body: "After identifying a trend, read AI news for context, use AI skill courses to learn the method, then choose software apps or account service guidance to complete the workflow."
+      body: "After identifying a use case, read AI news for context, browse AI courses to learn the method, then choose software or service guidance that fits your needs."
     }
   ]
 } as const;
@@ -145,19 +149,19 @@ const aiTrendsSourceLinks = [
 const aiTrendsFaqItems = {
   zh: [
     {
-      question: "AI趋势分析中的方向和场景应该如何理解？",
+      question: "如何使用这里的场景建议？",
       answer:
         "本页方向与场景是编辑参考，不是实时统计排行。目前没有可复核的评分数据，因此不显示热度分数。报告与视频保留原始发布日期，外部链接用于进一步阅读。",
     },
     {
-      question: "AI趋势页面如何帮助我决定下一步做什么？",
+      question: "怎样选择要尝试的工具或教程？",
       answer:
         "先选一个具体任务并核对对应来源，再进入AI前沿资讯、AI软件应用、AI技能课程或账号服务咨询，把趋势转化为可执行的工具测试、教程学习和工作流搭建。",
     },
     {
-      question: "AI趋势分析是否等同于投资或商业承诺？",
+      question: "这些应用建议能保证商业收益吗？",
       answer:
-        "不是。AI趋势分析用于内容、工具和学习方向判断，不构成投资、法律或确定性商业承诺。重要决策应结合官方来源、实际测试和自身业务场景。",
+        "这里的场景建议用于选择内容、工具和学习方向，不构成投资、法律或确定性商业承诺。重要决策应结合官方来源、实际测试和自身业务场景。",
     },
   ],
   en: [
@@ -167,7 +171,7 @@ const aiTrendsFaqItems = {
         "Directions and scenarios are editorial references, not a live statistical ranking. No numeric scores are published without reproducible data. Reports and videos retain their original publication dates; external links are for further reading.",
     },
     {
-      question: "How does the AI Trends page help me choose the next action?",
+      question: "How does the AI Use Cases page help me choose the next action?",
       answer:
         "Choose a specific task and check its sources, then use AI news, software apps, skill courses, or account service guidance to turn the topic into a tool test, learning path, or workflow.",
     },
@@ -394,12 +398,12 @@ export async function AiTrendTopicPageShell({ forceLocale = "zh" }: { forceLocal
       <ContentlessState
         locale={forceLocale}
         className="ai-trends-page"
-        eyebrow={forceLocale === "en" ? "AI Trends" : "AI 趋势"}
-        title={forceLocale === "en" ? "AI Trends content has not been verified" : "AI 趋势内容尚未核验"}
+        eyebrow={forceLocale === "en" ? "AI Use Cases" : "AI应用场景"}
+        title={forceLocale === "en" ? "AI Use Case Content Has Not Been Verified" : "AI应用场景内容尚未核验"}
         intro={forceLocale === "en" ? "This local preview has no configured verified data source, so it does not show trend rankings, scores, source claims, or generated trend facts." : "本地预览未配置已核验的数据源，因此不展示趋势排行、分数、来源声明或生成的趋势事实。"}
         statusLabel="UNVERIFIED"
         stateTitle={forceLocale === "en" ? "Trend content is being prepared" : "趋势内容准备中"}
-        statusText={forceLocale === "en" ? "AI Trends remain hidden until verified source data is available." : "AI 趋势内容将在已核验数据源可用后再展示。"}
+        statusText={forceLocale === "en" ? "Editorial references remain hidden until verified source data is available." : "应用场景参考将在已核验数据源可用后再展示。"}
         primaryAction={{ href: forceLocale === "en" ? "/en" : "/", label: forceLocale === "en" ? "Return home" : "返回首页" }}
         secondaryActions={[{ href: forceLocale === "en" ? "/en/ai-news" : "/ai-news", label: forceLocale === "en" ? "Read AI News" : "阅读 AI 资讯" }]}
       />
@@ -461,7 +465,7 @@ export async function AiTrendTopicPageShell({ forceLocale = "zh" }: { forceLocal
         />
         <section className="surface-panel overflow-hidden p-7 md:p-10">
         <div className="max-w-4xl">
-          <Badge className="text-[var(--marketing-accent)]">AI Demand Trends</Badge>
+          <Badge className="text-[var(--marketing-accent)]">{forceLocale === "en" ? "AI Use Cases" : "AI应用场景"}</Badge>
           <h1 className="redesign-bold-copy mt-6 max-w-4xl text-4xl font-black leading-tight text-[var(--marketing-text)] md:text-6xl">
             {copy.title}
           </h1>
@@ -485,8 +489,8 @@ export async function AiTrendTopicPageShell({ forceLocale = "zh" }: { forceLocal
           </p>
           <h2 className="mt-4 text-2xl font-black text-[var(--marketing-text)]">
             {forceLocale === "en"
-              ? "What AI demand means now"
-              : "当前AI需求意味着什么"}
+              ? "How to Explore These Use Cases"
+              : "如何了解这些应用场景"}
           </h2>
           <p className="mt-4 max-w-4xl text-base leading-8 text-[var(--marketing-muted)]">
             {aiTrendsAnswerBlock[forceLocale]}
@@ -596,7 +600,7 @@ export async function AiTrendTopicPageShell({ forceLocale = "zh" }: { forceLocal
         <section className="mt-12 grid gap-6 lg:grid-cols-[1fr_320px]">
           <div className="glass rounded-2xl p-6">
             <h2 className="text-2xl font-black text-[var(--marketing-text)]">
-              {forceLocale === "en" ? "AI Trends FAQ" : "AI趋势常见问题"}
+              {forceLocale === "en" ? "AI Use Cases FAQ" : "AI应用场景常见问题"}
             </h2>
             <div className="mt-5 grid gap-4">
               {aiTrendsFaqItems[forceLocale].map((item) => (
@@ -648,9 +652,15 @@ export async function AiTrendTopicPageShell({ forceLocale = "zh" }: { forceLocal
                   {briefing.slug}
                 </time>
                 <h2 className="ai-trends-recent-briefing-title mt-3 text-lg font-black leading-snug text-[var(--marketing-text)]">{briefing.title}</h2>
-                <p className="ai-trends-recent-briefing-summary mt-3 line-clamp-3 text-sm leading-7 text-[var(--marketing-muted)]">{briefing.coreConclusion}</p>
+                <p className="ai-trends-recent-briefing-summary mt-3 line-clamp-3 text-sm leading-7 text-[var(--marketing-muted)]">
+                  {forceLocale === "en" && !briefing.englishSummaryAvailable
+                    ? copy.summaryUnavailable
+                    : briefing.coreConclusion}
+                </p>
                 <span className="mt-5 inline-flex items-center gap-2 text-sm font-bold text-[var(--marketing-accent)]">
-                  {copy.readSummary} <ArrowUpRight size={16} strokeWidth={1.8} aria-hidden="true" />
+                  {forceLocale === "en" && !briefing.englishSummaryAvailable
+                    ? copy.viewReportDetails
+                    : copy.readSummary} <ArrowUpRight size={16} strokeWidth={1.8} aria-hidden="true" />
                 </span>
               </Link>
             ))}
@@ -670,7 +680,7 @@ function AiTrendsGeoBlock({ forceLocale }: { forceLocale: Locale }) {
   const sections = aiTrendsGeoSections[forceLocale];
   const links = [
     { label: { zh: "阅读 AI 前沿资讯", en: "Read AI news" }, href: buildLocalePath("/ai-news", forceLocale) },
-    { label: { zh: "学习 AI 技能课程", en: "Learn AI skill courses" }, href: buildLocalePath("/skill-learning", forceLocale) },
+    { label: { zh: "浏览 AI 教程与课程", en: "Browse AI Courses" }, href: buildLocalePath("/skill-learning", forceLocale) },
     { label: { zh: "选择 AI 软件应用", en: "Choose AI software apps" }, href: buildLocalePath("/software", forceLocale) }
   ];
 

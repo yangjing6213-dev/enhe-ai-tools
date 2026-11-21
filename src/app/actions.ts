@@ -36,6 +36,7 @@ import { sendUserFlowAdminEmail } from "@/lib/user-flow-admin-email";
 import { activateVipForOrder } from "@/lib/membership";
 import {
   buildCreatorMessageNotification,
+  buildCreatorMessageReplyNotification,
   buildPaymentReviewNotification,
   buildRefundRequestNotification
 } from "@/lib/notification-messages";
@@ -91,7 +92,7 @@ export async function registerAction(formData: FormData) {
       email: input.identifier,
       passwordHash: await hashPassword(input.password),
       nickname,
-      avatar: getDefaultAvatar(input.identifier, gender)
+      avatar: getDefaultAvatar(crypto.randomUUID(), gender)
     }
   });
   try {
@@ -573,6 +574,37 @@ export async function sendCreatorMessageAction(
   );
   revalidatePath(buildLocalePath("/user", locale));
   return { status: "success", message: locale === "en" ? "Your message was sent to the creator." : "留言已发送给创作者。" };
+}
+
+export async function replyToCreatorMessageAction(
+  _previousState: { status: "idle" | "success" | "error"; message: string },
+  formData: FormData,
+): Promise<{ status: "idle" | "success" | "error"; message: string }> {
+  const locale = await getCurrentLocale();
+  const user = await requireUser(locale);
+  const notificationId = z.string().min(1).parse(formData.get("notificationId"));
+  const message = normalizeCreatorMessage(formData.get("content"));
+  if (!message) return { status: "error", message: locale === "en" ? "Enter a reply between 2 and 1,000 characters." : "请输入 2 到 1000 个字的回复。" };
+
+  const original = await prisma.notification.findFirst({
+    where: { id: notificationId, userId: user.id, type: "creator_message", senderId: { not: null } },
+    select: { id: true, senderId: true, content: true },
+  });
+  if (!original?.senderId) return { status: "error", message: locale === "en" ? "This creator message is unavailable for reply." : "这条创作者留言无法回复。" };
+
+  const repliedToday = await prisma.notification.count({
+    where: { senderId: user.id, type: "creator_message_reply", createdAt: { gte: new Date(Date.now() - 24 * 60 * 60 * 1000) } },
+  });
+  if (hasReachedCreatorMessageLimit(repliedToday)) return { status: "error", message: locale === "en" ? "You have reached the daily reply limit." : "今天发送的站内回复已达到上限。" };
+
+  const productName = original.content.match(/^产品：(.+)$/m)?.[1]?.trim() || (locale === "en" ? "a product" : "相关产品");
+  const senderName = user.nickname?.trim() || (locale === "en" ? "ENHE user" : "ENHE 用户");
+  await prisma.$transaction(async (tx) => {
+    await createUserNotification(original.senderId!, buildCreatorMessageReplyNotification({ senderId: user.id, senderName, productName, message }), tx);
+    await tx.notification.updateMany({ where: { id: original.id, userId: user.id, readAt: null }, data: { readAt: new Date() } });
+  });
+  revalidatePath(buildLocalePath("/user", locale));
+  return { status: "success", message: locale === "en" ? "Your reply was sent and the message was marked as read." : "回复已发送，原留言已标记为已读。" };
 }
 
 export async function updateUserProfileAction(formData: FormData) {

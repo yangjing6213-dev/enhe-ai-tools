@@ -295,6 +295,16 @@ describe("production software catalog adapter", () => {
     });
   });
 
+  it("respects a verified use category before matching input media in the name", () => {
+    const [sample] = buildRows(1);
+    const rows = [
+      { ...sample, id: "presenter", slug: "infinitetalk-ai", name: "图片与音频制作数字人视频", category: { name: "数字人口播" } },
+      { ...sample, id: "workspace", slug: "local-video", name: "用图片生成视频", category: { name: "视频生成" } },
+    ];
+    expect(buildSoftwareCatalogPage({ rows, locale: "zh", category: "presenter", page: 1 })?.items.map((item) => item.id)).toEqual(["presenter"]);
+    expect(buildSoftwareCatalogPage({ rows, locale: "zh", category: "video", page: 1 })?.items.map((item) => item.id)).toEqual(["workspace"]);
+  });
+
   it("maps the approved category parameter to a server-filtered result and preserves it in pagination", () => {
     const rows = [
       ...buildRows(13),

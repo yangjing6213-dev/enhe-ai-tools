@@ -39,13 +39,13 @@ describe("public navigation and search source contract", () => {
     expect(mobile).toContain("Search");
     expect(dictionaries).toContain('software: "AI工具"');
     expect(dictionaries).toContain('aiNews: "AI资讯"');
-    expect(dictionaries).toContain('aiTrends: "AI趋势"');
-    expect(dictionaries).toContain('skillLearning: "AI教程"');
-    expect(dictionaries).toContain('about: "关于我们"');
+    expect(dictionaries).toContain('aiTrends: "AI应用场景"');
+    expect(dictionaries).toContain('skillLearning: "AI教程与课程"');
+    expect(dictionaries).toContain('about: "关于恩禾"');
     expect(dictionaries).toContain('search: "搜索"');
     expect(dictionaries).toContain('software: "AI Tools"');
-    expect(dictionaries).toContain('skillLearning: "AI Tutorials"');
-    expect(dictionaries).toContain('about: "About Us"');
+    expect(dictionaries).toContain('skillLearning: "AI Tutorials & Courses"');
+    expect(dictionaries).toContain('about: "About ENHE"');
     expect(dictionaries).toContain('search: "Search"');
   });
 
@@ -115,10 +115,10 @@ describe("public navigation and search source contract", () => {
     const seo = readSource("seo.ts");
     const page = readSource("../app/skill-learning/page-shell.tsx");
 
-    expect(dictionaries).toContain('skillLearningTitle: "AI教程与实战指南"');
-    expect(dictionaries).toContain('skillLearningTitle: "Practical AI Tutorials and Guides"');
-    expect(seo).toContain('"skill-learning": "AI教程与实战指南、AI工具与本地部署教程"');
-    expect(seo).toContain('"skill-learning": "Practical AI Tutorials and Guides"');
+    expect(dictionaries).toContain('skillLearningTitle: "AI教程与课程"');
+    expect(dictionaries).toContain('skillLearningTitle: "AI Tutorials & Courses"');
+    expect(seo).toContain('"skill-learning": "AI教程与课程｜图像生成与实际操作指南"');
+    expect(seo).toContain('"skill-learning": "AI Tutorials & Courses | Image Creation and Practical Guides"');
     expect(page).toContain('path: "/skill-learning"');
     expect(page).toContain('getPublicToolCategories("skill_learning")');
   });

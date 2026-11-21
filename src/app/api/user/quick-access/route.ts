@@ -72,6 +72,7 @@ export async function GET(request: Request) {
       })),
       notifications: notifications.map((notification) => ({
         id: notification.id,
+        type: notification.type,
         ...getNotificationDisplay(notification, locale),
         linkUrl: notification.linkUrl,
         isRead: notification.readAt !== null,

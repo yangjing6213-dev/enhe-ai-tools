@@ -60,9 +60,9 @@ test("topic bar keeps action order, reply navigation and narrow-screen targets",
   await prepare(context, baseURL!, 0);
   for (const locale of ["zh", "en"]) {
     const root = locale === "en" ? "/en/forum" : "/forum";
+    await page.goto(root);
     for (const width of [320, 390, 1440]) {
       await page.setViewportSize({ width, height: 1000 });
-      await page.goto(root);
       const row = actions(page);
       await expect(row.locator("[data-forum-action]")).toHaveCount(4);
       expect(await row.locator("[data-forum-action]").evaluateAll(nodes => nodes.map(node => node.getAttribute("data-forum-action")))).toEqual(["reply", "share", "like", "bookmark"]);
@@ -132,7 +132,7 @@ test("likes persist with the new visual controls and reduced motion does not ren
   await page.reload();
   await expect(actions(page).locator("[data-forum-action=like]")).toHaveAttribute("aria-pressed", "true");
   await expect(page.locator(".forum-reply-card .forum-like-button")).toBeVisible();
-  await expect(page.getByRole("button", { name: "删除回复", exact: true })).toBeVisible();
+  await expect(page.getByRole("button", { name: "长按删除回复", exact: true })).toBeVisible();
 });
 
 test("desktop copy records a unique share and guests can copy without an account record", async ({ page, context, browser, baseURL }) => {

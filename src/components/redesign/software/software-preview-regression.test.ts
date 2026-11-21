@@ -137,7 +137,7 @@ describe("AI tools candidate bilingual preview regression", () => {
     assertLocaleSurface("en", renderCatalog("en"));
   });
 
-  it("keeps the exact 4/3/12 section contract, six filter choices, 9 initial plus 3 hidden cards, and page-two pagination", () => {
+  it("keeps the exact 4/3/12 section contract, seven filter choices, 9 initial plus 3 hidden cards, and page-two pagination", () => {
     const zhHtml = renderCatalog("zh");
     const enHtml = renderCatalog("en");
   const allProductsHtml = enHtml.slice(enHtml.indexOf('data-section="all-products"'));
@@ -150,9 +150,9 @@ describe("AI tools candidate bilingual preview regression", () => {
     expect(countMatches(allProductsHtml, /data-extra-card="true"/g)).toBe(3);
     expect(countMatches(allProductsHtml, /hidden=""/g)).toBe(3);
 
-    expect(countMatches(enHtml, /class="redesign-software-category-button"/g)).toBe(6);
-    expect(countMatches(zhHtml, /class="redesign-software-category-button"/g)).toBe(6);
-    expect(SOFTWARE_CATEGORIES).toHaveLength(7);
+    expect(countMatches(enHtml, /class="redesign-software-category-button"/g)).toBe(7);
+    expect(countMatches(zhHtml, /class="redesign-software-category-button"/g)).toBe(7);
+    expect(SOFTWARE_CATEGORIES).toHaveLength(8);
 
     expect(SOFTWARE_FILTER_CATEGORIES.map(category => category.id)).not.toContain("skill");
     for (const category of SOFTWARE_FILTER_CATEGORIES) {

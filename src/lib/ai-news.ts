@@ -1,4 +1,5 @@
 import { isWeakSeoSlug, slugify } from "@/lib/admin-form";
+import { normalizeMediaSrc } from "@/lib/media";
 import { buildLocalePath } from "@/lib/seo";
 
 export type NewsSort = "latest" | "hot" | "featured";
@@ -21,12 +22,16 @@ export type NewsTocItem = {
 
 export type NewsInlinePart =
   | { type: "text"; text: string }
-  | { type: "link"; href: string; text: string };
+  | { type: "link"; href: string; text: string }
+  | { type: "bold" | "code"; text: string }
+  | { type: "size"; size: number; text: string }
+  | { type: "background"; color: string; text: string };
 
 export type NewsContentBlock =
   | { type: "heading"; level: 2 | 3; id: string; text: string }
   | { type: "paragraph"; text?: string; parts?: NewsInlinePart[] }
   | { type: "image"; src: string; alt: string; caption?: string }
+  | { type: "video"; src: string; label: string }
   | {
       type: "list";
       ordered: boolean;
@@ -306,15 +311,19 @@ function isHttpNewsMediaUrl(value: string) {
   return /^https?:\/\//i.test(value.trim());
 }
 
-function parseMarkdownImage(line: string) {
-  const match = line.match(/^!\[([^\]]*)\]\((\S+?)(?:\s+"([^"]+)")?\)$/);
+function parseMarkdownMedia(line: string): NewsContentBlock | null {
+  const match = line.match(/^!(video)?\[([^\]]*)\]\((\S+?)(?:\s+"([^"]+)")?\)$/);
   if (!match) return null;
 
-  const src = match[2].trim();
-  if (!isHttpNewsMediaUrl(src)) return null;
+  const rawSrc = match[3].trim();
+  if (!isHttpNewsMediaUrl(rawSrc) && !/^\/(?:api\/)?uploads\/[\w%./~-]+$/u.test(rawSrc)) return null;
+  if (/[\\<>"']/u.test(rawSrc)) return null;
+  const src = normalizeMediaSrc(rawSrc);
+  if (!src) return null;
 
-  const alt = match[1].trim();
-  const caption = match[3]?.trim();
+  const alt = match[2].trim();
+  if (match[1]) return { type: "video", src, label: alt };
+  const caption = match[4]?.trim();
   return {
     type: "image" as const,
     src,
@@ -333,9 +342,17 @@ function normalizeInternalNewsHref(href: string) {
   return trimmed;
 }
 
+function normalizeNewsHref(value: string) {
+  const href = value.trim();
+  if (!href || /[\s"'<>]/u.test(href)) return null;
+  const internal = normalizeInternalNewsHref(href);
+  if (internal) return internal;
+  return /^https?:\/\//i.test(href) ? href : null;
+}
+
 function parseInlineParts(value: string): NewsInlinePart[] {
   const parts: NewsInlinePart[] = [];
-  const pattern = /\[([^\]]+)\]\(([^)\s]+)\)/g;
+  const pattern = /\*\*([^*]+?)\*\*|\[\[size=(\d{2})\]\]([\s\S]*?)\[\[\/size\]\]|\[\[bg=(#[0-9a-fA-F]{6})\]\]([\s\S]*?)\[\[\/bg\]\]|\[([^\]]+)\]\(([^)\s]+)\)|`([^`]+)`/gu;
   let cursor = 0;
   let match: RegExpExecArray | null;
 
@@ -343,13 +360,24 @@ function parseInlineParts(value: string): NewsInlinePart[] {
     const before = value.slice(cursor, match.index);
     if (before) parts.push({ type: "text", text: escapeNewsText(before) });
 
-    const href = normalizeInternalNewsHref(match[2]);
-    const text = match[1].trim();
-    if (href && text) {
-      parts.push({ type: "link", href, text: escapeNewsText(text) });
-    } else {
-      parts.push({ type: "text", text: escapeNewsText(text || match[0]) });
-    }
+    if (match[1]) parts.push({ type: "bold", text: escapeNewsText(match[1]) });
+    else if (match[2]) {
+      const size = Number(match[2]);
+      parts.push(size >= 12 && size <= 48
+        ? { type: "size", size, text: escapeNewsText(match[3]) }
+        : { type: "text", text: escapeNewsText(match[3]) });
+    } else if (match[4]) {
+      const color = match[4].toLowerCase();
+      parts.push(["#fff3cd", "#dbeafe", "#fce7f3"].includes(color)
+        ? { type: "background", color, text: escapeNewsText(match[5]) }
+        : { type: "text", text: escapeNewsText(match[5]) });
+    } else if (match[6]) {
+      const href = normalizeNewsHref(match[7]);
+      const text = match[6].trim();
+      parts.push(href && text
+        ? { type: "link", href, text: escapeNewsText(text) }
+        : { type: "text", text: escapeNewsText(text || match[0]) });
+    } else if (match[8]) parts.push({ type: "code", text: escapeNewsText(match[8]) });
     cursor = pattern.lastIndex;
   }
 
@@ -358,22 +386,22 @@ function parseInlineParts(value: string): NewsInlinePart[] {
   return parts.length ? parts : [{ type: "text", text: escapeNewsText(value) }];
 }
 
-function hasInlineLink(parts: NewsInlinePart[]) {
-  return parts.some((part) => part.type === "link");
+function hasInlineFormatting(parts: NewsInlinePart[]) {
+  return parts.some((part) => part.type !== "text");
 }
 
 function inlineTextBlock(
   value: string,
 ): Extract<NewsContentBlock, { type: "paragraph" }> {
   const parts = parseInlineParts(value);
-  return hasInlineLink(parts)
+  return hasInlineFormatting(parts)
     ? { type: "paragraph", parts }
     : { type: "paragraph", text: parts.map((part) => part.text).join("") };
 }
 
 function inlineListItem(value: string): string | { parts: NewsInlinePart[] } {
   const parts = parseInlineParts(value);
-  return hasInlineLink(parts)
+  return hasInlineFormatting(parts)
     ? { parts }
     : parts.map((part) => part.text).join("");
 }
@@ -435,11 +463,11 @@ export function renderNewsContentBlocks(content: string): NewsContentBlock[] {
       continue;
     }
 
-    const image = parseMarkdownImage(line.trim());
-    if (image) {
+    const media = parseMarkdownMedia(line.trim());
+    if (media) {
       pushParagraph(paragraphLines, blocks);
       pushList(listItems, currentListOrdered, blocks);
-      blocks.push(image);
+      blocks.push(media);
       continue;
     }
 

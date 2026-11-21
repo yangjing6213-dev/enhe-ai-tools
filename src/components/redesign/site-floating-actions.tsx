@@ -1,12 +1,13 @@
 "use client";
 
 import { Bell, Menu, MessageCircle, ShoppingCart, X } from "lucide-react";
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 
 import type { Locale } from "@/lib/dictionaries";
 import { getDictionary } from "@/lib/dictionaries";
 import { formatCurrency } from "@/lib/utils";
 import { getSupportLauncherOffset } from "@/lib/customer-support-placement";
+import { CreatorMessageReplyForm } from "@/components/creator-message-reply-form";
 
 type QuickAccessOrder = {
   id: string;
@@ -19,6 +20,7 @@ type QuickAccessOrder = {
 
 type QuickAccessNotification = {
   id: string;
+  type: string;
   title: string;
   content: string;
   linkUrl: string | null;
@@ -193,6 +195,7 @@ export function SiteFloatingActions({
     dictionary.userCenter.status[status as keyof typeof dictionary.userCenter.status] ?? status;
   const dateLabel = (value: string) =>
     new Date(value).toLocaleDateString(isEnglish ? "en-US" : "zh-CN");
+  const refreshQuickAccess = useCallback(() => setRefreshKey((value) => value + 1), []);
 
   const renderPanelContents = (panel: Exclude<OpenPanel, null>) => {
     if (!isAuthenticated) {
@@ -261,6 +264,13 @@ export function SiteFloatingActions({
                 <a href={notification.linkUrl} onClick={closePanel}>
                   {isEnglish ? "View details" : dictionary.notifications.viewDetails}
                 </a>
+              ) : null}
+              {notification.type === "creator_message" ? (
+                <CreatorMessageReplyForm
+                  notificationId={notification.id}
+                  locale={locale}
+                  onSuccess={refreshQuickAccess}
+                />
               ) : null}
             </article>
           </li>

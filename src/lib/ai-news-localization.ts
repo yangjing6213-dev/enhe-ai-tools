@@ -1,5 +1,5 @@
 import type { Locale } from "@/lib/i18n";
-import { resolveLocalizedToolIdentity } from "@/lib/tool-localization";
+import { resolveLocalizedInlineCopy, resolveLocalizedToolIdentity } from "@/lib/tool-localization";
 
 type NewsSummaryInput = {
   title: string;
@@ -31,11 +31,37 @@ const cjkPattern = /[\u3400-\u9fff]/;
 const englishWordPattern = /[A-Za-z][A-Za-z0-9'+-]*/g;
 
 const categoryMappings: Array<[RegExp, string]> = [
+  [/^ai工具选型指南$/i, "AI Tool Selection Guides"],
+  [/^工具选[型用]指南$/i, "Tool Selection Guides"],
+  [/^模型与智能体评估$/i, "Model & Agent Evaluation"],
+  [/^接口安全指南$/i, "API Security Guides"],
+  [/^ai前沿资讯$/i, "AI News & Updates"],
+  [/^geo内容$/i, "GEO Content"],
+  [/^ai快讯$/i, "AI News Briefs"],
+  [/^模型动态$/i, "Model Updates"],
+  [/^工具推荐$/i, "Recommended AI Tools"],
+  [/^实战教程$/i, "Practical Guides"],
+  [/^趋势解读$/i, "Trend Insights"],
+  [/^ai变现$/i, "AI Business & Monetization"],
   [/ai资讯|资讯|news/i, "AI News"],
   [/趋势|解读|trend|insight/i, "Trend Insights"],
-  [/工具落地|落地|workflow|实战/i, "Tool Workflows"],
-  [/教程|guide|tutorial/i, "AI Tutorials"],
+  [/工具落地|落地|workflow/i, "Tool Workflows"],
+  [/教程|guide|tutorial/i, "Practical Guides"],
 ];
+
+const categoryNamesByStableId: Record<string, string> = {
+  "cms3x4ium0000qngnsgq1f1f3": "AI News & Updates",
+  "cmv4mthn0003kppegv992pok8": "Model & Agent Evaluation",
+  "cmv7i7d30003ppi3bh90vl3ox": "API Security Guides",
+  "cmqsv2hmz001qp701tp5r8adg": "GEO Content",
+  "cmsiq1su9000tqct53bn2xvha": "Tool Selection Guides",
+  "cmqj17a970000pf3r3osnkn0t": "AI News Briefs",
+  "cmqj17aa50004pf3r3a9pybke": "Model Updates",
+  "cmqj17aa30003pf3rbgeux9f7": "Recommended AI Tools",
+  "cmqj17aa00001pf3r18g5l26c": "Practical Guides",
+  "cmqj17aai0005pf3rwsrn3ufd": "Trend Insights",
+  "cmqj17aa20002pf3ralbd914l": "AI Business & Monetization",
+};
 
 const tagMappings: Array<[RegExp, string]> = [
   [/ai资讯|news/i, "AI News"],
@@ -101,10 +127,19 @@ function splitKeywordList(value: string | null | undefined) {
     .filter(Boolean);
 }
 
-export function resolveLocalizedNewsCategoryName(name: string | null | undefined, locale: Locale) {
+export function resolveLocalizedNewsCategoryName(
+  name: string | null | undefined,
+  locale: Locale,
+  stableId?: string | null,
+) {
   const normalized = normalizeText(name);
   if (locale === "zh") return normalized;
-  return mapByRules(normalized, categoryMappings) || "AI News";
+  if (!hasCjk(normalized)) return normalized;
+  return (
+    (stableId ? categoryNamesByStableId[stableId] : undefined) ||
+    mapByRules(normalized, categoryMappings) ||
+    "Untranslated category"
+  );
 }
 
 export function resolveLocalizedNewsTagName(name: string | null | undefined, locale: Locale) {
@@ -166,12 +201,14 @@ export function buildLocalizedTutorialPreviewTitle(
   tool: RelatedToolIdentityInput,
   locale: Locale,
 ) {
-  const normalized = normalizeText(title);
-  if (locale === "zh") return normalized;
-  if (isUsableEnglish(normalized, 2)) return normalized;
+  const normalized = normalizeText(resolveLocalizedInlineCopy(title, locale, normalizeText));
+  if (locale === "zh" && hasCjk(normalized)) return normalized;
+  if (locale === "en" && isUsableEnglish(normalized, 2)) return normalized;
 
-  const localizedTool = resolveLocalizedToolIdentity(tool, "en");
-  return `${localizedTool.primaryName} guide`;
+  const localizedTool = resolveLocalizedToolIdentity(tool, locale);
+  return locale === "en"
+    ? `${localizedTool.primaryName} guide`
+    : `${localizedTool.primaryName} 使用指南`;
 }
 
 export function buildLocalizedTutorialPreviewToolName(tool: RelatedToolIdentityInput, locale: Locale) {

@@ -1,7 +1,7 @@
 import { reviewCompletionNotice } from "@/lib/review-copy";
 
 export type NotificationMessage = {
-  type: "payment_review" | "refund_request" | "refund_processed" | "vip_adjustment" | "creator_message";
+  type: "payment_review" | "refund_request" | "refund_processed" | "vip_adjustment" | "creator_message" | "creator_message_reply";
   title: string;
   content: string;
   linkUrl: string;
@@ -20,6 +20,21 @@ export function buildCreatorMessageNotification(input: {
     title: "收到新的创作者联系消息",
     content: `发送者：${input.senderName}\n产品：${input.productName}\n留言：\n${input.message}`,
     linkUrl: input.linkUrl,
+    senderId: input.senderId,
+  };
+}
+
+export function buildCreatorMessageReplyNotification(input: {
+  senderId: string;
+  senderName: string;
+  productName: string;
+  message: string;
+}): NotificationMessage {
+  return {
+    type: "creator_message_reply",
+    title: "收到创作者留言回复",
+    content: `回复者：${input.senderName}\n产品：${input.productName}\n回复：\n${input.message}`,
+    linkUrl: "/user#notifications",
     senderId: input.senderId,
   };
 }

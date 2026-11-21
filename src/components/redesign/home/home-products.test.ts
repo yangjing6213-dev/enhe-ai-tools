@@ -116,6 +116,23 @@ describe("homepage approved product showcase", () => {
     expect(fallback).not.toContain("<img");
   });
 
+  it("announces the currently displayed approved product name to assistive technology", () => {
+    const product = {
+      ...createDefaultHomeProductShowcase()[0],
+      name: { zh: "旧中文名称", en: "Old English Name" },
+      detailHref: {
+        zh: "https://www.enhe-tech.com.cn/software/ai-prompt-management-system-418-bilingual-prompts-for-writing-seo-and-ai-creation",
+        en: "https://www.enhe-tech.com.cn/en/software/ai-prompt-management-system-418-bilingual-prompts-for-writing-seo-and-ai-creation",
+      },
+    };
+    const html = renderToStaticMarkup(
+      createElement(EnheRedesignProductShowcase, { locale: "zh", products: [product] }),
+    );
+
+    expect(html).toContain("<h3>AI提示词库桌面版</h3>");
+    expect(html).toContain('aria-atomic="true">AI提示词库桌面版</span>');
+  });
+
   it("renders an uploaded video when a featured card is configured as video", () => {
     const products = createDefaultHomeProductShowcase().slice(0, 1).map((product) => ({
       ...product,

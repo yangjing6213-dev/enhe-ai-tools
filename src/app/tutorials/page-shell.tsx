@@ -7,6 +7,7 @@ import {
   buildLocalizedTutorialPreviewTitle,
   buildLocalizedTutorialPreviewToolName,
 } from "@/lib/ai-news-localization";
+import { buildLocalizedToolOptionalText } from "@/lib/tool-localization";
 import { getDictionary, type Locale } from "@/lib/dictionaries";
 import { getPublicTutorials } from "@/lib/public-content";
 import { buildCanonicalToolPath } from "@/lib/public-slugs";
@@ -208,10 +209,8 @@ export async function TutorialsPageShell({ forceLocale }: { forceLocale: Locale 
         {tutorials.map((tutorial) => {
           const title = buildLocalizedTutorialPreviewTitle(tutorial.title, tutorial.tool, forceLocale);
           const toolName = buildLocalizedTutorialPreviewToolName(tutorial.tool, forceLocale);
-          const previewText =
-            forceLocale === "en"
-              ? `Follow this guide to understand setup notes, operating steps, and common checks for ${toolName}. Open the related detail page before purchase or deployment.`
-              : tutorial.content;
+          const previewText = buildLocalizedToolOptionalText(tutorial.content, forceLocale) ||
+            (forceLocale === "en" ? "An English version of these steps is not available yet." : "这份操作说明暂无中文版。");
 
           return (
               <Link key={tutorial.id} href={buildCanonicalToolPath(tutorial.tool, forceLocale)} className="surface-panel p-6 transition-[border-color,transform] hover:-translate-y-1 hover:border-[var(--marketing-accent)]/45" data-analytics-event="content_to_product_click" data-analytics-entity-type="tool" data-analytics-entity-id={tutorial.tool.id} data-analytics-meta-source="tutorials">

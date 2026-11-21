@@ -238,6 +238,7 @@ export async function AiNewsDetailPageShell({
                 {resolveLocalizedNewsCategoryName(
                   article.category.name,
                   forceLocale,
+                  article.category.id,
                 )}
               </Badge>
             ) : null}
@@ -584,6 +585,9 @@ function NewsContent({ blocks }: { blocks: NewsContentBlock[] }) {
           );
         }
 
+        if (block.type === "video") {
+          return <video key={index} className="w-full rounded-xl" src={block.src} controls playsInline preload="metadata" aria-label={block.label || undefined} />;
+        }
         if (block.type === "image") {
           return (
             <figure
@@ -595,7 +599,7 @@ function NewsContent({ blocks }: { blocks: NewsContentBlock[] }) {
                 alt={block.alt}
                 width={1200}
                 height={675}
-                className="content-thumbnail-outline aspect-[16/9] w-full object-cover"
+                className="content-thumbnail-outline h-auto w-full object-contain"
                 unoptimized
               />
               {block.caption ? (
@@ -642,17 +646,17 @@ function InlineParts({ parts }: { parts: NewsInlinePart[] }) {
       {parts.map((part, index) => {
         if (part.type === "link") {
           const href = normalizeAiNewsInternalHref(part.href);
-
-          return (
-            <Link
-              key={`${href}-${index}`}
-              href={href}
-      className="font-semibold text-[var(--marketing-accent)] underline decoration-[var(--marketing-accent)]/35 underline-offset-4 transition-[text-decoration-color] hover:decoration-[var(--marketing-accent)]"
-            >
-              <span dangerouslySetInnerHTML={{ __html: part.text }} />
-            </Link>
-          );
+          const className = "font-semibold text-[var(--marketing-accent)] underline decoration-[var(--marketing-accent)]/35 underline-offset-4 transition-[text-decoration-color] hover:decoration-[var(--marketing-accent)]";
+          const content = <span dangerouslySetInnerHTML={{ __html: part.text }} />;
+          return href.startsWith("/")
+            ? <Link key={`${href}-${index}`} href={href} className={className}>{content}</Link>
+            : <a key={`${href}-${index}`} href={href} className={className} target="_blank" rel="noopener noreferrer">{content}</a>;
         }
+
+        if (part.type === "bold") return <strong key={`bold-${index}`} dangerouslySetInnerHTML={{ __html: part.text }} />;
+        if (part.type === "size") return <span key={`size-${index}`} style={{ fontSize: `${part.size}px` }} dangerouslySetInnerHTML={{ __html: part.text }} />;
+        if (part.type === "background") return <span key={`background-${index}`} style={{ backgroundColor: part.color, borderRadius: 3, paddingInline: 2 }} dangerouslySetInnerHTML={{ __html: part.text }} />;
+        if (part.type === "code") return <code key={`code-${index}`} dangerouslySetInnerHTML={{ __html: part.text }} />;
 
         return (
           <span

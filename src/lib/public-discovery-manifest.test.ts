@@ -84,6 +84,15 @@ describe("public discovery manifest", () => {
     expect(renderLlmsImportantPages()).toContain("https://www.enhe-tech.com.cn/en/ai-workflows");
   });
 
+  it("distinguishes the free web prompt library from the paid desktop product", () => {
+    const webLibrary = publicDiscoveryRoutes.find(
+      (route) => route.path === "/skill-learning/ai-prompt-management",
+    );
+
+    expect(webLibrary?.llmsLabel).toBe("AI Prompt Library");
+    expect(webLibrary?.okfLabel).toBe("AI Prompt Library");
+  });
+
   it("retains code-level contextual inbound links without claiming production crawl state", () => {
     const home = read("src/app/page-shell.tsx");
     const header = read("src/components/site-header.tsx");

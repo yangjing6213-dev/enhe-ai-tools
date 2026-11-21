@@ -13,6 +13,8 @@ import { ForumDeletePostButton } from "@/components/forum/forum-delete-post-butt
 import { ForumMediaEditor } from "@/components/forum/forum-media-editor";
 import { ForumMediaDisplay } from "@/components/forum/forum-media-display";
 import { EmojiText } from "@/components/emoji-text";
+import { RichTextEditor } from "@/components/rich-text-editor";
+import { RichTextContent } from "@/components/rich-text-content";
 
 type ForumPosts = Awaited<ReturnType<typeof import("@/lib/forum-data").getForumPosts>>;
 type ForumPostView = NonNullable<Awaited<ReturnType<typeof getForumPost>>>;
@@ -90,6 +92,35 @@ function JoinLink({ locale, returnTo = "/forum" }: { locale: Locale; returnTo?: 
   return <Link className="forum-login-link" href={`${pageHref(locale, "/login")}?returnTo=${encodeURIComponent(pageHref(locale, returnTo))}`}>{t.signIn}</Link>;
 }
 
+function topicArtwork(text: string, category: string) {
+  if (/本地部署|开源模型|编程|代码|开发|自动化|coding|deploy|workflow|automation/i.test(text)) return "productivity";
+  if (/绘图|图像|视频|音乐|创作|配音|image|video|music|creative/i.test(text)) return "content-creation";
+  if (/学习|教程|入门|课程|tutorial|learn|course/i.test(text)) return "ai-learning";
+  if (/资讯|发布|趋势|新闻|release|news|trend/i.test(text)) return "ai-news";
+  return category === "workflow" ? "productivity" : category === "showcase" ? "content-creation" : category === "question" ? "ai-learning" : "ai-news";
+}
+
+function TopicCover({ post, locale }: { post: ForumPosts[number]; locale: Locale }) {
+  const image = post.coverAttachmentId
+    ? post.attachments?.find((attachment) => attachment.id === post.coverAttachmentId && attachment.kind === "image")
+    : undefined;
+  const categoryLabel = getForumCategoryLabel(post.category, locale);
+  const theme = topicArtwork(`${post.title} ${post.content.slice(0, 200)}`, post.category);
+  return <Link className={`forum-topic-card__cover${image ? "" : " forum-topic-cover--generated"}`} href={pageHref(locale, `/forum/${post.id}`)} aria-label={`${locale === "en" ? "Open topic" : "查看话题"}: ${post.title}`}>
+    {image
+      ? <Image src={`/api/forum/media/${encodeURIComponent(image.id)}`} alt={post.title} width={720} height={405} unoptimized />
+      : <span className="forum-topic-cover__art" style={{ backgroundImage: `linear-gradient(0deg, rgba(7,17,42,.93), rgba(7,17,42,.15)), url("/images/home/flowing-menu/${theme}.webp")` }}>
+          <span className="forum-topic-cover__category">{categoryLabel}</span>
+          <span className="forum-topic-cover__title"><EmojiText text={post.title} /></span>
+        </span>}
+  </Link>;
+}
+
+function uninsertedAttachments(content: string, attachments: ForumPostView["attachments"]) {
+  const inserted = new Set(Array.from(content.matchAll(/\[\[media[:=]([a-zA-Z0-9_-]{1,100})\]\]/gu), (match) => match[1]));
+  return attachments.filter((attachment) => !inserted.has(attachment.id));
+}
+
 export function ForumIndexContent({ locale, posts, selectedCategory, isAuthenticated, isAdmin = false, postDeleted = false }: { locale: Locale; posts: ForumPosts; selectedCategory?: ForumCategory; isAuthenticated: boolean; isAdmin?: boolean; postDeleted?: boolean }) {
   const t = copy(locale);
   return (
@@ -114,11 +145,10 @@ export function ForumIndexContent({ locale, posts, selectedCategory, isAuthentic
       </nav>
       {postDeleted && isAuthenticated && isAdmin ? <p className="forum-success-notice" role="status">{t.postDeleted}</p> : null}
       {posts.length ? <div className="forum-post-list">{posts.map((post) => (
-        <article className="forum-post-card" key={post.id}>
-          <div className="forum-post-header"><div className="forum-author-line"><UserAvatar src={post.author.avatar} alt={post.author.displayName} size={40} className="forum-avatar" /><span><EmojiText text={post.author.displayName} /></span><time dateTime={post.createdAt.toISOString()}>{dateLabel(post.createdAt, locale)}</time></div><span className="forum-category-tag">{getForumCategoryLabel(post.category, locale)}</span></div>
+        <article className="forum-post-card forum-topic-card" key={post.id}>
+          <TopicCover post={post} locale={locale} />
           <h2><Link href={pageHref(locale, `/forum/${post.id}`)}><EmojiText text={post.title} /></Link></h2>
-          <p className="forum-post-excerpt"><EmojiText text={post.content} /></p>
-          <ForumMediaDisplay locale={locale} attachments={post.attachments ?? []} />
+          <div className="forum-post-header"><div className="forum-author-line"><UserAvatar src={post.author.avatar} alt={post.author.displayName} size={32} className="forum-avatar" /><span><EmojiText text={post.author.displayName} /></span><time dateTime={post.createdAt.toISOString()}>{dateLabel(post.createdAt, locale)}</time></div><span className="forum-category-tag">{getForumCategoryLabel(post.category, locale)}</span></div>
           <div className="forum-post-meta forum-topic-meta"><ForumPostActions locale={locale} postId={post.id} title={post.title} replyCount={post._count.replies} shareCount={post._count.shares} likeCount={post._count.likes} isLiked={post.isLiked} isBookmarked={post.isBookmarked} isAuthenticated={isAuthenticated} replyHref={`${pageHref(locale, `/forum/${post.id}`)}#replies`} />{isAuthenticated && isAdmin ? <ForumDeletePostButton locale={locale} postId={post.id} /> : null}</div>
         </article>
       ))}</div> : <p className="forum-empty-state">{t.empty}</p>}
@@ -135,7 +165,7 @@ function ReplyForm({ locale, postId, parentId, label }: { locale: Locale; postId
       <form action={createForumReplyAction}>
         <input type="hidden" name="postId" value={postId} />
         {parentId ? <input type="hidden" name="parentId" value={parentId} /> : null}
-        <textarea name="content" data-emoji-picker="on" required minLength={2} maxLength={2000} placeholder={t.replyPlaceholder} />
+        <RichTextEditor name="content" locale={locale} ariaLabel={t.replyPlaceholder} emojiPicker required minLength={2} maxLength={2000} placeholder={t.replyPlaceholder} />
         <ForumMediaEditor locale={locale} allowVideo={false} />
         <button type="submit">{t.sendReply}</button>
       </form>
@@ -148,9 +178,9 @@ function ReplyBranch({ locale, postId, replies, isAuthenticated, currentUserId, 
   return <div className="forum-reply-tree">{replies.map((reply) => (
     <article className={`forum-reply-card${reply.content.trim() ? "" : " forum-reply-deleted"}`} key={reply.id}>
       <div className="forum-author-line"><UserAvatar src={reply.author.avatar} alt={reply.author.displayName} size={34} className="forum-avatar" /><span><EmojiText text={reply.author.displayName} /></span><time dateTime={reply.createdAt.toISOString()}>{dateLabel(reply.createdAt, locale)}</time></div>
-      <p className="forum-reply-content">{reply.content.trim() ? <EmojiText text={reply.content} /> : t.replyDeleted}</p>
+      <div className="forum-reply-content">{reply.content.trim() ? <RichTextContent content={reply.content} attachments={reply.attachments ?? []} locale={locale} /> : t.replyDeleted}</div>
       {reply.content.trim() ? <>
-        <ForumMediaDisplay locale={locale} attachments={reply.attachments ?? []} />
+        <ForumMediaDisplay locale={locale} attachments={uninsertedAttachments(reply.content, reply.attachments ?? [])} />
         <div className="forum-post-meta"><ForumLikeButton locale={locale} replyId={reply.id} count={reply._count.likes} isLiked={reply.isLiked} isAuthenticated={isAuthenticated} returnTo={`/forum/${postId}`} />{isAuthenticated ? <ReplyForm locale={locale} postId={postId} parentId={reply.id} /> : null}{isAuthenticated && (isAdmin || reply.author.id === currentUserId) ? <HoldDeleteForm action={deleteForumReplyAction} locale={locale} label={t.deleteReply} data-delete-kind="forum-reply"><input type="hidden" name="replyId" value={reply.id} /></HoldDeleteForm> : null}</div>
       </> : null}
       {reply.children.length ? <ReplyBranch locale={locale} postId={postId} replies={reply.children} isAuthenticated={isAuthenticated} currentUserId={currentUserId} isAdmin={isAdmin} /> : null}
@@ -166,8 +196,8 @@ export function ForumPostContent({ locale, post, isAuthenticated, currentUserId,
       {replySubmitted ? <p className="forum-success-notice">{t.replyPublished}</p> : null}
       <article className="forum-post-card forum-post-detail">
         <div className="forum-post-header"><div className="forum-author-line"><UserAvatar src={post.author.avatar} alt={post.author.displayName} size={44} className="forum-avatar" /><span><EmojiText text={post.author.displayName} /></span><time dateTime={post.createdAt.toISOString()}>{dateLabel(post.createdAt, locale)}</time></div><span className="forum-category-tag">{getForumCategoryLabel(post.category, locale)}</span></div>
-        <h1><EmojiText text={post.title} /></h1><p className="forum-detail-content"><EmojiText text={post.content} /></p>
-        <ForumMediaDisplay locale={locale} attachments={post.attachments ?? []} />
+        <h1><EmojiText text={post.title} /></h1><RichTextContent className="forum-detail-content rich-text-content" content={post.content} attachments={post.attachments ?? []} locale={locale} />
+        <ForumMediaDisplay locale={locale} attachments={uninsertedAttachments(post.content, post.attachments ?? [])} />
         <div className="forum-post-meta forum-topic-meta"><ForumPostActions locale={locale} postId={post.id} title={post.title} replyCount={post.replyCount} shareCount={post._count.shares} likeCount={post._count.likes} isLiked={post.isLiked} isBookmarked={post.isBookmarked} isAuthenticated={isAuthenticated} replyHref="#replies" />{isAuthenticated && isAdmin ? <ForumDeletePostButton locale={locale} postId={post.id} /> : null}</div>
       </article>
       <section className="forum-replies" id="replies">
@@ -190,8 +220,9 @@ export function ForumNewPostContent({ locale, submitted, isAuthenticated }: { lo
         {isAuthenticated ? <form action={createForumPostAction}>
           <label><span>{t.categoryLabel}</span><select name="category" required defaultValue="question">{categories.map((category) => <option key={category} value={category}>{getForumCategoryLabel(category, locale)}</option>)}</select></label>
           <label><span>{t.titleLabel}</span><input name="title" required minLength={2} maxLength={120} placeholder={t.titlePlaceholder} /></label>
-          <label><span>{t.contentLabel}</span><textarea name="content" required minLength={2} maxLength={5000} placeholder={t.contentPlaceholder} /></label>
-          <ForumMediaEditor locale={locale} allowVideo />
+          <label htmlFor="forum-post-content">{t.contentLabel}</label>
+          <RichTextEditor id="forum-post-content" ariaLabel={t.contentLabel} name="content" locale={locale} required minLength={2} maxLength={5000} placeholder={t.contentPlaceholder} />
+          <ForumMediaEditor locale={locale} allowVideo allowCover />
           <button className="forum-primary-button" type="submit">{t.submit}</button>
         </form> : <JoinLink locale={locale} returnTo="/forum/new" />}
       </section>

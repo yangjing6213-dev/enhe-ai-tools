@@ -114,7 +114,7 @@ describe("AI tools candidate catalog", () => {
       "components/redesign/software/EnheRedesignSoftwareLoadMore.tsx",
     );
 
-    expect(SOFTWARE_CATEGORIES).toHaveLength(7);
+    expect(SOFTWARE_CATEGORIES).toHaveLength(8);
     expect(selector).toContain("SOFTWARE_CATEGORIES");
     expect(selector).toContain("aria-pressed");
     expect(selector).toContain("data-selected-category");

@@ -58,6 +58,14 @@
   display: block;
 }
 
+.redesign-home .redesign-home-hero-inner h1 > .redesign-home-mobile-title {
+  display: none;
+}
+
+.redesign-home .redesign-home-mobile-cards {
+  display: none;
+}
+
 .redesign-home-hero[data-locale="en"] .redesign-home-animated-line {
   font-size: clamp(20px, 6.5vw, 56px);
 }

@@ -72,8 +72,8 @@ describe("E1-NB-R23 AI Trends DB-free preview", () => {
   });
 
   it.each([
-    ["zh", "AI 趋势内容尚未核验"],
-    ["en", "AI Trends content has not been verified"],
+    ["zh", "AI应用场景内容尚未核验"],
+    ["en", "AI Use Case Content Has Not Been Verified"],
   ] as const)(
     "renders a safe DB-free %s topic page",
     async (locale, expectedText) => {

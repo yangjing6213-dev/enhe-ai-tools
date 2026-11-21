@@ -17,8 +17,8 @@ describe("product sharing", () => {
     vi.stubEnv("APP_URL", "https://www.enhe-tech.com.cn");
     const html = renderToStaticMarkup(<ProductShareCard locale="zh" title="产品示例" path={`/${type}/example`} />);
     expect(qrValues).toEqual([`https://www.enhe-tech.com.cn/${type}/example`]);
-    expect(html).toContain("分享此产品");
-    expect(html).toContain("复制产品链接");
+    expect(html).toContain("分享此页面");
+    expect(html).toContain("复制链接");
     expect(html).not.toContain("https://www.enhe-tech.com.cn");
     expect(html).not.toContain("value=\"https");
   });
@@ -26,7 +26,8 @@ describe("product sharing", () => {
     vi.stubEnv("APP_URL", "https://www.enhe-tech.com.cn");
     const html = renderToStaticMarkup(<ProductShareCard locale="en" title="Example" path="/en/ai-skills/example" />);
     expect(qrValues[0]).toBe("https://www.enhe-tech.com.cn/en/ai-skills/example");
-    expect(html).toContain("Copy product link");
+    expect(html).toContain("Share This Page");
+    expect(html).toContain("Copy Link");
   });
   it("copies the product URL and reports denied or missing clipboard access", async () => {
     const writeText = vi.fn().mockResolvedValue(undefined);

@@ -44,14 +44,27 @@ describe("public navigation current-page state", () => {
     expect(headerSource).not.toContain("查看全部");
   });
 
-  it("adds the AI Workflows destination under the plural AI Skills menu in both locales", () => {
+  it("keeps AI resource destinations under the renamed resource menu in both locales", () => {
     expect(REDESIGN_NAV_ITEMS.zh.find((item) => item.href === "/ai-skills")).toMatchObject({
-      label: "AI Skills",
+      label: "AI资源",
     });
     expect(REDESIGN_NAV_ITEMS.zh.find((item) => item.href === "/ai-skills")?.children)
-      .toContainEqual({ label: "AI 工作流", href: "/ai-workflows" });
+      .toContainEqual({ label: "项目与资料", href: "/ai-workflows" });
     expect(REDESIGN_NAV_ITEMS.en.find((item) => item.href === "/en/ai-skills")?.children)
-      .toContainEqual({ label: "AI Workflows", href: "/en/ai-workflows" });
+      .toContainEqual({ label: "Projects & Resources", href: "/en/ai-workflows" });
+  });
+
+  it("uses distinct AI Resources and AI Community labels without duplicate parent and child names", () => {
+    expect(REDESIGN_NAV_ITEMS.zh.find((item) => item.href === "/forum")?.label).toBe("AI社区");
+    expect(REDESIGN_NAV_ITEMS.en.find((item) => item.href === "/en/forum")?.label).toBe("AI Community");
+    const zhResourcesMenu = REDESIGN_NAV_ITEMS.zh.find((item) => "children" in item);
+    const enResourcesMenu = REDESIGN_NAV_ITEMS.en.find((item) => "children" in item);
+    const zhResources = zhResourcesMenu?.children ?? [];
+    const enResources = enResourcesMenu?.children ?? [];
+    expect(zhResourcesMenu?.label).toBe("AI资源");
+    expect(enResourcesMenu?.label).toBe("AI Resources");
+    expect(zhResources.map((item) => item.label)).toEqual(["提示词库", "AI技能包", "项目与资料"]);
+    expect(enResources.map((item) => item.label)).toEqual(["Prompt Library", "AI Skill Packs", "Projects & Resources"]);
   });
 
   it("allows desktop dropdown content to float without expanding the header", () => {

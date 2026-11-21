@@ -109,6 +109,7 @@ export type AiTrendBriefingView = Omit<AiTrendBriefingRecord, "sourceSignals" | 
   videoDescription: string | null;
   videoPosterUrl: string | null;
   videoDurationSeconds: number | null;
+  englishSummaryAvailable?: boolean;
   fullHtml?: string;
 };
 
@@ -543,6 +544,11 @@ export function localizeAiTrendBriefingView(view: AiTrendBriefingView, locale: "
 
   return {
     ...view,
+    englishSummaryAvailable:
+      Boolean(normalizeText(view.summary)) &&
+      !hasCjk(view.summary) &&
+      Boolean(normalizeText(view.coreConclusion)) &&
+      !hasCjk(view.coreConclusion),
     title: hasCjk(view.title) ? buildEnglishTrendFallbackTitle(view.slug) : normalizeEnglishSentence(view.title),
     summary: hasCjk(view.summary) ? buildEnglishTrendFallbackSummary(view.slug) : normalizeEnglishSentence(view.summary),
     coreConclusion: hasCjk(view.coreConclusion)

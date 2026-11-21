@@ -196,8 +196,8 @@ export const SOFTWARE_PRODUCTS = [
     id: "prompt-management",
     categoryId: "efficiency",
     name: {
-      zh: "AI提示词管理系统",
-      en: "AI Prompt Management System",
+      zh: "AI提示词库桌面版",
+      en: "AI Prompt Library | Desktop Edition",
     },
     description: {
       zh: "搜索与管理可复用的中英文提示词。",
@@ -214,8 +214,8 @@ export const SOFTWARE_PRODUCTS = [
     media: {
       src: "/redesign/software/prompt-management.png",
       alt: {
-        zh: "AI提示词管理系统公开产品封面",
-        en: "Public cover for AI Prompt Management System",
+        zh: "AI提示词库桌面版公开产品封面",
+        en: "Public cover for AI Prompt Library Desktop Edition",
       },
       ...SHARED_MEDIA_SIZE,
     },

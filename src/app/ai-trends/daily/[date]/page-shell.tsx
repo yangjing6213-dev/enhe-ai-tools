@@ -34,10 +34,11 @@ const copy = {
     developmentPriority: "开发优先级",
     openSource: "打开来源",
     noSources: "本期暂无结构化来源信号。",
-    trendOverview: "查看趋势总览"
+    trendOverview: "查看趋势总览",
+    summaryUnavailable: "该期尚未提供英文摘要，已发布的分析内容为中文。"
   },
   en: {
-    description: "Weekly AI demand analysis detail page. Public readers see the summary, and signed-in users can read the full visual HTML report.",
+    description: "Weekly AI demand analysis. English summaries are shown when available; otherwise, the page identifies the missing translation.",
     back: "Back to analysis history",
     summary: "Public summary",
     fullHtml: "Full HTML report",
@@ -54,14 +55,15 @@ const copy = {
     aiValue: "AI value",
     opportunity: "Product opportunity",
     developmentPriority: "Development priority",
-    openSource: "Open source",
+    openSource: "View Source",
     noSources: "No structured source signals are available for this issue yet.",
-    trendOverview: "View trend overview"
+    trendOverview: "View trend overview",
+    summaryUnavailable: "An English summary is not available for this issue yet. The published analysis is in Chinese."
   }
 } as const;
 
 export function generateAiTrendDailyDetailMetadata(date: string, locale: Locale = "zh"): Metadata {
-  const title = buildMetadataTitle({ pageTitle: `AI Trends Analysis ${date}`, brand: siteName });
+  const title = buildMetadataTitle({ pageTitle: `Weekly AI Brief ${date}`, brand: siteName });
   const description = buildMetaDescription(copy[locale].description);
   const path = buildLocalePath(`/ai-trends/daily/${date}`, locale);
 
@@ -80,7 +82,7 @@ export function generateAiTrendDailyDetailMetadata(date: string, locale: Locale 
       description,
       url: absoluteUrl(path),
       siteName,
-      images: [{ url: absoluteUrl(defaultOgImage), alt: `AI Trends Analysis ${date}` }],
+      images: [{ url: absoluteUrl(defaultOgImage), alt: `Weekly AI Brief ${date}` }],
       locale: locale === "en" ? "en_US" : "zh_CN",
       type: "article"
     }
@@ -103,6 +105,7 @@ export async function AiTrendDailyDetailPageShell({
   const view = localizeAiTrendBriefingView(toAiTrendBriefingView(briefing, isLoggedIn), forceLocale);
   const loginUrl = buildAiTrendLoginUrl(date, forceLocale);
   const text = copy[forceLocale];
+  const englishSummaryUnavailable = forceLocale === "en" && !view.englishSummaryAvailable;
 
   return (
     <Container className="py-14">
@@ -117,14 +120,16 @@ export async function AiTrendDailyDetailPageShell({
           <time className="mt-4 block text-sm font-bold text-[var(--marketing-accent)]" dateTime={view.slug}>
             {view.slug}
           </time>
-          <p className="mt-5 max-w-3xl text-base font-medium leading-8 text-[var(--marketing-muted)]">{view.coreConclusion}</p>
+          {!englishSummaryUnavailable ? (
+            <p className="mt-5 max-w-3xl text-base font-medium leading-8 text-[var(--marketing-muted)]">{view.coreConclusion}</p>
+          ) : null}
         </section>
 
         <div className="mt-8 grid gap-8 lg:grid-cols-[minmax(0,1fr)_320px]">
           <main className="space-y-8">
             <section className="surface-panel-soft p-6">
-              <SectionTitle title={text.summary} intro={view.summary} />
-              {view.publicHighlights.length ? (
+              <SectionTitle title={text.summary} intro={englishSummaryUnavailable ? text.summaryUnavailable : view.summary} />
+              {!englishSummaryUnavailable && view.publicHighlights.length ? (
                 <div className="grid gap-3 md:grid-cols-2">
                   {view.publicHighlights.map((highlight) => (
                     <div key={highlight} className="rounded-xl border border-white/10 bg-white/7 p-4 text-sm leading-7 text-[var(--marketing-text)]">

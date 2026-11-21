@@ -19,6 +19,7 @@ import {
   resolveHomeShowcaseMediaSrc,
   type HomeProductShowcaseItem,
 } from "@/lib/redesign/home/home-product-showcase";
+import { getApprovedLocalizedToolName } from "@/lib/tool-localization";
 
 import styles from "./EnheRedesignProductStageMotion.module.css";
 
@@ -101,6 +102,7 @@ export function EnheRedesignProductShowcase({
   const currentIndex = index < products.length ? index : 0;
   const product = products[currentIndex];
   const panelId = `redesign-home-product-panel-${locale}`;
+  const currentDisplayName = getLocalizedShowcaseProductName(product, locale);
 
   useEffect(() => {
     const mediaQuery = window.matchMedia(REDUCED_MOTION_QUERY);
@@ -177,6 +179,16 @@ export function EnheRedesignProductShowcase({
 
   const renderProduct = (product: HomeProductShowcaseItem) => {
     const mediaStatus = mediaState[product.id];
+    const pathname = new URL(
+      product.detailHref[locale],
+      "https://www.enhe-tech.com.cn",
+    ).pathname;
+    const segments = pathname.split("/").filter(Boolean);
+    const productSlug = segments[segments.length - 1];
+    const displayName = getLocalizedShowcaseProductName(product, locale);
+    const displayAlt = productSlug && getApprovedLocalizedToolName(productSlug, locale)
+      ? displayName
+      : product.alt[locale];
 
     return (
       <div
@@ -210,7 +222,7 @@ export function EnheRedesignProductShowcase({
                       className="redesign-home-product-media"
                       data-media-status={mediaStatus}
                       src={resolveHomeShowcaseMediaSrc(product.mediaSrc)}
-                      aria-label={product.alt[locale]}
+                      aria-label={displayAlt}
                       autoPlay
                       muted
                       loop
@@ -228,7 +240,7 @@ export function EnheRedesignProductShowcase({
                       className="redesign-home-product-media"
                       data-media-status={mediaStatus}
                       src={resolveHomeShowcaseMediaSrc(product.mediaSrc)}
-                      alt={product.alt[locale]}
+                      alt={displayAlt}
                       fill
                       sizes="(max-width: 767px) calc(75vw - 90px), (max-width: 1180px) calc(66vw - 36px), 930px"
                       loading="lazy"
@@ -247,7 +259,7 @@ export function EnheRedesignProductShowcase({
         </div>
 
         <div className="redesign-home-product-detail">
-          <h3>{product.name[locale]}</h3>
+          <h3>{displayName}</h3>
           <p>{product.description[locale]}</p>
           <a
             className="redesign-home-product-detail-link"
@@ -346,7 +358,7 @@ export function EnheRedesignProductShowcase({
             </nav>
           </div>
           <span className="sr-only" aria-live={isAutoRotating ? "off" : "polite"} aria-atomic="true">
-            {product.name[locale]}
+            {currentDisplayName}
           </span>
         </div>
 
@@ -364,4 +376,20 @@ export function EnheRedesignProductShowcase({
       </div>
     </section>
   );
+}
+
+function getLocalizedShowcaseProductName(
+  product: HomeProductShowcaseItem,
+  locale: RedesignLocale,
+) {
+  const pathname = new URL(
+    product.detailHref[locale],
+    "https://www.enhe-tech.com.cn",
+  ).pathname;
+  const segments = pathname.split("/").filter(Boolean);
+  const productSlug = segments[segments.length - 1];
+
+  return productSlug
+    ? getApprovedLocalizedToolName(productSlug, locale) ?? product.name[locale]
+    : product.name[locale];
 }

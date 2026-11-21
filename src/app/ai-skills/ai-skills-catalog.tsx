@@ -51,8 +51,8 @@ export function AiSkillsCatalog({
     [entries, query, locale],
   );
   const resultLabel = locale === "en"
-    ? visibleEntries.length + (visibleEntries.length === 1 ? " AI Skill found" : " AI Skills found")
-    : "找到 " + visibleEntries.length + " 个 AI Skill";
+    ? visibleEntries.length + (visibleEntries.length === 1 ? " AI Skill Pack found" : " AI Skill Packs found")
+    : "找到 " + visibleEntries.length + " 个技能包";
   const updateQuery = (nextQuery: string) => {
     setQuery(nextQuery);
     window.history.replaceState(
@@ -81,7 +81,7 @@ export function AiSkillsCatalog({
       </p>
 
       {visibleEntries.length ? (
-        <div className="redesign-software-grid redesign-software-grid-all mt-4" role="list" aria-label={locale === "en" ? "AI Skills" : "AI Skill 产品"}>
+        <div className="redesign-software-grid redesign-software-grid-all mt-4" role="list" aria-label={locale === "en" ? "AI Skill Packs" : "AI技能包"}>
           {visibleEntries.map(({ product, categoryLabel }) => (
             <EnheRedesignSoftwareCard
               key={product.id}

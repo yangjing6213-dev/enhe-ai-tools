@@ -41,9 +41,9 @@ describe("SEO and GEO follow-up source contracts", () => {
     const skillLearning = read("src/app/skill-learning/page-shell.tsx");
 
     expect(skillLearning).toContain("skillLearningGeoSections");
-    expect(skillLearning).toContain("先选择未来机会方向");
+    expect(skillLearning).toContain("按任务选择课程");
     expect(skillLearning).toContain("再确认真实价值");
-    expect(skillLearning).toContain("沉淀为长期资产");
+    expect(skillLearning).toContain("保存练习记录");
     expect(skillLearning).toContain('buildLocalePath("/ai-news", forceLocale)');
     expect(skillLearning).toContain('buildLocalePath("/software", forceLocale)');
     expect(skillLearning).toContain('buildLocalePath("/account-services", forceLocale)');

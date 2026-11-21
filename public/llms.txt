@@ -20,25 +20,25 @@ Core supporting paths:
 - AI software apps for productivity, creation, automation, and controlled workflows
 - AI account service guidance for access notes, delivery boundaries, and platform-policy reminders
 - AI skill learning for prompts, workflows, tutorials, courses, and reusable methods
-- AI Prompt Management System for searching and copying 418 bilingual prompts
+- AI Prompt Library for searching and copying Chinese and English prompts
 
 Important pages:
 <!-- PUBLIC_DISCOVERY_PAGES:START -->
 - [ENHE AI home](https://www.enhe-tech.com.cn/)
 - [About ENHE AI](https://www.enhe-tech.com.cn/about)
 - [AI software apps](https://www.enhe-tech.com.cn/software)
-- [AI Skills for agents](https://www.enhe-tech.com.cn/ai-skills)
-- [AI workflows](https://www.enhe-tech.com.cn/ai-workflows)
-- [English AI workflows](https://www.enhe-tech.com.cn/en/ai-workflows)
+- [AI Skill Packs](https://www.enhe-tech.com.cn/ai-skills)
+- [Projects & Resources](https://www.enhe-tech.com.cn/ai-workflows)
+- [Projects & Resources (English)](https://www.enhe-tech.com.cn/en/ai-workflows)
 - [Independent-site SEO/GEO Audit](https://www.enhe-tech.com.cn/online-tools/seo-geo-audit)
 - [AI account service guidance](https://www.enhe-tech.com.cn/account-services)
-- [AI skill learning](https://www.enhe-tech.com.cn/skill-learning)
-- [AI Prompt Management System](https://www.enhe-tech.com.cn/skill-learning/ai-prompt-management)
-- [English AI Prompt Management System](https://www.enhe-tech.com.cn/en/skill-learning/ai-prompt-management)
+- [AI Tutorials & Courses](https://www.enhe-tech.com.cn/skill-learning)
+- [AI Prompt Library](https://www.enhe-tech.com.cn/skill-learning/ai-prompt-management)
+- [English AI Prompt Library](https://www.enhe-tech.com.cn/en/skill-learning/ai-prompt-management)
 - [Pricing and purchase notes](https://www.enhe-tech.com.cn/pricing)
-- [AI tutorials](https://www.enhe-tech.com.cn/tutorials)
+- [Tool Guides](https://www.enhe-tech.com.cn/tutorials)
 - [AI news](https://www.enhe-tech.com.cn/ai-news)
-- [AI trends](https://www.enhe-tech.com.cn/ai-trends)
+- [AI Use Cases](https://www.enhe-tech.com.cn/ai-trends)
 <!-- PUBLIC_DISCOVERY_PAGES:END -->
 
 Contact:
@@ -54,7 +54,7 @@ Main columns:
 - AI 账号服务: 说明访问方式、订阅咨询、交付边界、合规提醒和平台规则。
 - AI 技能学习: 用提示词、工具实战、自动化流程、内容创作和项目练习，把 AI 学成可复用方法。
 - 使用教程: 围绕具体工具提供安装、配置、使用步骤和常见问题说明。
-- AI提示词管理系统: 网页版中英文提示词库免费使用；桌面版下载单独收费，当前价格与交付内容以产品详情页为准。覆盖写作、视频、图片、学习、职场、运营和编程场景。
+- AI提示词库: 网页版中英文提示词库免费使用；桌面版下载单独收费，当前价格与交付内容以产品详情页为准。覆盖写作、视频、图片、学习、职场、运营和编程场景。
 
 Agent-readable files:
 <!-- PUBLIC_DISCOVERY_RESOURCES:START -->
@@ -65,7 +65,7 @@ Agent-readable files:
 - [AI software concept page](https://www.enhe-tech.com.cn/okf/software/index.md)
 - [AI account service knowledge bundle](https://www.enhe-tech.com.cn/okf/account-services/index.md)
 - [AI skill learning knowledge bundle](https://www.enhe-tech.com.cn/okf/skill-learning/index.md)
-- [AI Prompt Management knowledge bundle](https://www.enhe-tech.com.cn/okf/ai-prompt-management/index.md)
+- [AI Prompt Library knowledge bundle](https://www.enhe-tech.com.cn/okf/ai-prompt-management/index.md)
 - [Chinese AI prompt data](https://www.enhe-tech.com.cn/data/ai-prompt-management/zh.json)
 - [English AI prompt data](https://www.enhe-tech.com.cn/data/ai-prompt-management/en.json)
 <!-- PUBLIC_DISCOVERY_RESOURCES:END -->

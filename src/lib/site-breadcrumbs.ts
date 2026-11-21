@@ -1,3 +1,5 @@
+import { getApprovedLocalizedToolName } from "@/lib/tool-localization";
+
 export type SiteBreadcrumb = {
   href: string;
   label: string;
@@ -5,16 +7,16 @@ export type SiteBreadcrumb = {
 };
 
 const sectionLabels: Record<string, { zh: string; en: string }> = {
-  about: { zh: "关于我们", en: "About" },
+  about: { zh: "关于恩禾", en: "About ENHE" },
   "account-services": { zh: "AI账号服务", en: "Account services" },
   "ai-news": { zh: "AI资讯", en: "AI News" },
-  "ai-skills": { zh: "AI Skills", en: "AI Skills" },
+  "ai-skills": { zh: "AI技能包", en: "AI Skill Packs" },
   "ai-topics": { zh: "AI话题", en: "AI Topics" },
-  "ai-trends": { zh: "AI趋势", en: "AI Trends" },
-  "ai-workflows": { zh: "AI 工作流", en: "AI Workflows" },
+  "ai-trends": { zh: "AI应用场景", en: "AI Use Cases" },
+  "ai-workflows": { zh: "项目与资料", en: "Projects & Resources" },
   admin: { zh: "后台管理", en: "Admin" },
   "build-your-own-x": { zh: "Build Your Own X", en: "Build Your Own X" },
-  forum: { zh: "共创AI论坛", en: "Co-create AI" },
+  forum: { zh: "AI社区", en: "AI Community" },
   legal: { zh: "法律信息", en: "Legal" },
   login: { zh: "登录", en: "Log in" },
   "online-tools": { zh: "AI工具", en: "AI Tools" },
@@ -25,8 +27,8 @@ const sectionLabels: Record<string, { zh: string; en: string }> = {
   register: { zh: "注册", en: "Sign up" },
   search: { zh: "搜索", en: "Search" },
   software: { zh: "AI工具", en: "AI Tools" },
-  "skill-learning": { zh: "AI学习", en: "AI Learning" },
-  tutorials: { zh: "使用教程", en: "Tutorials" },
+  "skill-learning": { zh: "AI教程与课程", en: "AI Tutorials & Courses" },
+  tutorials: { zh: "工具使用教程", en: "Tool Guides" },
   user: { zh: "用户中心", en: "My account" },
   validation: { zh: "验证", en: "Validation" },
 };
@@ -83,7 +85,8 @@ function localizedLabel(segment: string, locale: "zh" | "en", admin = false) {
   const labels = (admin ? adminLabels : sectionLabels)[segment];
   if (labels) return labels[locale];
   if (segment === "topics") return locale === "en" ? "Topics" : "话题";
-  if (segment === "daily") return locale === "en" ? "Daily" : "每日趋势";
+  if (segment === "daily") return locale === "en" ? "Weekly AI Briefs" : "AI趋势周报";
+
   if (segment === "page") return locale === "en" ? "Page" : "第";
 
   const decoded = decodeURIComponent(segment).replace(/[-_]+/g, " ").trim();
@@ -135,12 +138,15 @@ export function getPageBreadcrumbs(pathname: string, locale: "zh" | "en", pageTi
     }
 
     const hrefPath = `/${segments.slice(0, index + 1).join("/")}`;
-    let label = localizedLabel(segment, locale, isAdmin && index > 0);
+    const detailName = isLast && ["software", "ai-skills"].includes(segments[0])
+      ? getApprovedLocalizedToolName(segment, locale)
+      : null;
+    let label = detailName ?? localizedLabel(segment, locale, isAdmin && index > 0);
     if (isAdmin && index === 0) label = localizedLabel("admin", locale);
     const hasStaticLabel = Boolean(
       (isAdmin && adminLabels[segment]) ||
       (!isAdmin && sectionLabels[segment]) ||
-      ["daily", "page", "topics"].includes(segment),
+      detailName || ["daily", "page", "topics"].includes(segment),
     );
     if (isLast && !hasStaticLabel && pageTitle) label = normalizeBreadcrumbTitle(pageTitle) || label;
     breadcrumbs.push({ href: `${routePrefix}${hrefPath}`, label, current: isLast });

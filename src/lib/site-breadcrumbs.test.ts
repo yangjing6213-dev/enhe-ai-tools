@@ -45,7 +45,12 @@ describe("site breadcrumbs", () => {
     ]);
     expect(getPageBreadcrumbs("/ai-trends/daily", "zh", "AI Trends Daily Digest | ENHE AI").at(-1)).toEqual({
       href: "/ai-trends/daily",
-      label: "每日趋势",
+      label: "AI趋势周报",
+      current: true,
+    });
+    expect(getPageBreadcrumbs("/en/ai-trends/daily", "en", "AI Trends Daily Digest | ENHE AI").at(-1)).toEqual({
+      href: "/en/ai-trends/daily",
+      label: "Weekly AI Briefs",
       current: true,
     });
   });
@@ -67,6 +72,11 @@ describe("site breadcrumbs", () => {
       { href: "/en/ai-skills/marketing-seo", label: "Marketing & SEO", current: false },
       { href: "/en/ai-skills/geo-seo-suite", label: "GEO-SEO Suite — AI Search Optimization", current: true },
     ]);
+  });
+
+  it("uses readable names for known English product slugs instead of URL fragments", () => {
+    expect(getPageBreadcrumbs("/en/software/ai-ai-zorvp8", "en").at(-1)?.label).toBe("AgentGuardian | AI Configuration Risk Review");
+    expect(getPageBreadcrumbs("/en/software/codex-api", "en").at(-1)?.label).toBe("Codex Provider Switcher | Switch Codex Connections");
   });
 
   it("ignores external breadcrumb links and generic site titles", () => {

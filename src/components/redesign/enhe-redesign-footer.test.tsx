@@ -21,6 +21,31 @@ describe("footer decoration around account forms", () => {
     expect(html).toContain("enhe-dino-peek-mirrored.webp");
   });
 
+  it.each(["zh", "en"] as const)("adds a localized bookmark button to the social controls in %s", (locale) => {
+    const html = renderToStaticMarkup(<EnheRedesignFooter locale={locale} />);
+    expect(html).toContain("footer-social-bookmark");
+    expect(html).toContain(locale === "en" ? "Bookmark this site" : "收藏本站");
+  });
+
+  it.each(["zh", "en"] as const)("uses destination-accurate help, tutorial, catalog, and news labels in %s", (locale) => {
+    const html = renderToStaticMarkup(<EnheRedesignFooter locale={locale} />);
+    if (locale === "zh") {
+      expect(html).toContain("常见问题与联系");
+      expect(html).toContain("工具使用教程");
+      expect(html).toContain("AI教程与课程");
+      expect(html).toContain("浏览 AI 工具");
+      expect(html).toContain("AI资讯");
+      expect(html).toContain("/about#faq-contact");
+    } else {
+      expect(html).toContain("FAQs &amp; Contact");
+      expect(html).toContain("Tool Guides");
+      expect(html).toContain("AI Tutorials &amp; Courses");
+      expect(html).toContain("Browse AI Tools");
+      expect(html).toContain("AI News");
+      expect(html).toContain("/en/about#faq-contact");
+    }
+  });
+
   it.each(["zh", "en"] as const)("keeps the homepage QR out of the %s footer", (locale) => {
     const html = renderToStaticMarkup(<EnheRedesignFooter locale={locale} />);
     expect(html).not.toContain("role=\"img\"");

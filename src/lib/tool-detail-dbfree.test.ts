@@ -216,7 +216,7 @@ describe("public tool detail DB-free boundary", () => {
       priceSpecs: options.paid ? [{ id: "offer", name: "Product access", price: 5, status: "active", sortOrder: 0 }] : [],
       faqs: [{ id: "fixture-faq", question: "How do I get started?", answer: "Read the workflow guide.", englishQuestion: null, englishAnswer: null }],
       aiWorkflowCandidate: type === "ai_workflow" ? {
-        status: "link_only_published", repositoryUrl: "https://github.com/example/workflow", repositoryOwner: "example", repositoryName: "workflow",
+        status: "published", repositoryUrl: "https://github.com/example/workflow", repositoryOwner: "example", repositoryName: "workflow",
         projectType: "workflow", licenseSpdx: "MIT", topic: null, fileId: null, packageVersion: null, packageSize: null,
         packageSha256: null, commitSha: "1234567890123456789012345678901234567890", githubStars: 1, starsUpdatedAt: new Date("2026-10-21T00:00:00Z"),
         verifiedEnvironments: [], failureReason: "PACKAGE_LANGUAGE_UNSUPPORTED",
@@ -230,9 +230,13 @@ describe("public tool detail DB-free boundary", () => {
 
   it.each(["zh", "en"] as const)("renders simplified workflow details with FAQs last (%s)", async (locale) => {
     const html = await renderFixtureDetail("ai_workflow", locale);
-    expect(html).toContain(locale === "en" ? "Get workflow" : "获取工作流");
-    expect(html).toContain(locale === "en" ? "AI workflow details" : "AI 工作流详情");
-    expect(html).toContain(locale === "en" ? "Workflow introduction" : "工作流介绍");
+    expect(html).toContain(locale === "en" ? "View Original Project" : "查看原项目");
+    expect(html).toContain(locale === "en" ? "Download Source ZIP — Deployment Required" : "下载上游源码 ZIP（需自行部署）");
+    expect(html).toContain(locale === "en"
+      ? "No verified installer is provided. Check the upstream repository for setup and deployment requirements."
+      : "未提供已验证安装包；运行方式和部署要求请查看原仓库说明。");
+    expect(html).toContain(locale === "en" ? "Project details" : "项目详情");
+    expect(html).toContain(locale === "en" ? "Project Overview" : "项目介绍");
     expect(html).toContain(locale === "en"
       ? "This workflow comes from a GitHub repository. Review the delivery and verification status below before using it."
       : "工作流来源于 GitHub仓库；使用前请查看下方的获取方式和核验状态。");
@@ -249,7 +253,7 @@ describe("public tool detail DB-free boundary", () => {
   it("keeps the software introduction and FAQ order on ordinary product details", async () => {
     const html = await renderFixtureDetail("software", "zh");
     expect(html).toContain("产品介绍");
-    expect(html).not.toContain("工作流介绍");
+    expect(html).not.toContain("项目介绍");
     expect(html.indexOf('id="tool-faq"')).toBeGreaterThan(-1);
     expect(html.indexOf('id="tool-faq"')).toBeLessThan(html.indexOf('id="tool-related"'));
   });
@@ -260,7 +264,7 @@ describe("public tool detail DB-free boundary", () => {
       const html = await renderFixtureDetail(type, "zh", { paid: true, purchased: true });
       expect(html).toContain("data-refund-guarantee");
       expect(html).toContain("符合退款条件时可提交申请");
-      expect(html.indexOf('aria-label="分享此产品"')).toBeGreaterThan(html.indexOf('id="tool-changelog"'));
+      expect(html.indexOf('aria-label="分享此页面"')).toBeGreaterThan(html.indexOf('id="tool-changelog"'));
     },
   );
 
@@ -270,6 +274,13 @@ describe("public tool detail DB-free boundary", () => {
     expect(html).toContain("Fixture Creator");
     expect(html).toContain("Builds useful AI tools.");
     expect(html).toContain("creator-profile-card");
+    expect(html).toContain(locale === "en" ? "Review record" : "检查记录");
+    expect(html).toContain(locale === "en"
+      ? "Only the date was recorded. The reviewed version, checks performed and results were not recorded. Verify the source and requirements before installing."
+      : "这条记录仅含日期，未记录检查版本、项目或结果。安装前请核对文件来源和系统要求。");
+    expect(html).not.toContain(locale === "en" ? "Safety review passed" : "安全审核通过");
+    expect(html).not.toContain("lucide-shield-check");
+    expect(html).toContain("lucide-info");
   });
 
   it("does not invent a review, creator or refund entitlement for a free unreviewed AI Skill", async () => {

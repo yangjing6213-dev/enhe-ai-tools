@@ -1,10 +1,14 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
-const mocks = vi.hoisted(() => ({
+const mocks = vi.hoisted(() => {
+  const createNotification = vi.fn();
+  const updateNotifications = vi.fn();
+  return {
   createComment: vi.fn(),
   createUser: vi.fn(),
   countCreatorMessages: vi.fn(),
-  createNotification: vi.fn(),
+  createNotification,
+  findCreatorNotification: vi.fn(),
   findUser: vi.fn(),
   findTool: vi.fn(),
   getCurrentLocale: vi.fn(),
@@ -15,8 +19,11 @@ const mocks = vi.hoisted(() => ({
   revalidatePath: vi.fn(),
   requireUser: vi.fn(),
   saveUploadedFile: vi.fn(),
-  updateUser: vi.fn()
-}));
+  updateNotifications,
+  updateUser: vi.fn(),
+  transaction: vi.fn(async (callback: (tx: { notification: { create: typeof createNotification; updateMany: typeof updateNotifications } }) => Promise<unknown>) => callback({ notification: { create: createNotification, updateMany: updateNotifications } }))
+};
+});
 
 vi.mock("@/lib/csrf", () => ({ assertValidCsrfToken: vi.fn() }));
 vi.mock("@/lib/analytics", () => ({ trackAnalyticsEvent: vi.fn() }));
@@ -27,7 +34,8 @@ vi.mock("@/lib/db", () => ({
   prisma: {
     comment: { create: mocks.createComment },
     tool: { findUnique: mocks.findTool },
-    notification: { count: mocks.countCreatorMessages, create: mocks.createNotification },
+    notification: { count: mocks.countCreatorMessages, create: mocks.createNotification, findFirst: mocks.findCreatorNotification, updateMany: mocks.updateNotifications },
+    $transaction: mocks.transaction,
     user: { update: mocks.updateUser, create: mocks.createUser, findUnique: mocks.findUser }
   }
 }));
@@ -48,7 +56,7 @@ vi.mock("@/lib/auth", () => ({
 vi.mock("@/lib/i18n", () => ({ getCurrentLocale: mocks.getCurrentLocale }));
 vi.mock("@/lib/storage", () => ({ saveUploadedFile: mocks.saveUploadedFile }));
 
-import { registerAction, createCommentAction, sendCreatorMessageAction, updateUserAvatarAction, updateUserProfileAction } from "@/app/actions";
+import { registerAction, createCommentAction, sendCreatorMessageAction, replyToCreatorMessageAction, updateUserAvatarAction, updateUserProfileAction } from "@/app/actions";
 
 function commentForm(rating: string) {
   const formData = new FormData();
@@ -67,6 +75,8 @@ describe("comment and user profile actions", () => {
     mocks.createComment.mockResolvedValue({ id: "comment-1" });
     mocks.countCreatorMessages.mockResolvedValue(0);
     mocks.createNotification.mockResolvedValue({ id: "notification-1" });
+    mocks.findCreatorNotification.mockResolvedValue(null);
+    mocks.updateNotifications.mockResolvedValue({ count: 1 });
     mocks.updateUser.mockResolvedValue({ email: "private@example.test", nickname: "新昵称", role: "user" });
     mocks.saveUploadedFile.mockResolvedValue({ fileUrl: "/uploads/user-avatars/avatar.png" });
   });
@@ -150,6 +160,23 @@ describe("comment and user profile actions", () => {
       type: "creator_message",
       content: expect.stringContaining("请问支持哪些系统？")
     }) });
+  });
+
+  it("replies to the sender of a received creator message and marks it read", async () => {
+    mocks.findCreatorNotification.mockResolvedValue({ id: "notification-1", senderId: "creator-1", content: "发送者：访客\\n产品：示例工具\\n留言：\\n如何使用？" });
+    const form = new FormData();
+    form.set("notificationId", "notification-1");
+    form.set("content", "可以查看产品说明中的安装步骤。");
+
+    await expect(replyToCreatorMessageAction({ status: "idle", message: "" }, form)).resolves.toMatchObject({ status: "success" });
+    expect(mocks.findCreatorNotification).toHaveBeenCalledWith({ where: { id: "notification-1", userId: "user-1", type: "creator_message", senderId: { not: null } }, select: { id: true, senderId: true, content: true } });
+    expect(mocks.createNotification).toHaveBeenCalledWith({ data: expect.objectContaining({
+      userId: "creator-1",
+      senderId: "user-1",
+      type: "creator_message_reply",
+      content: expect.stringContaining("可以查看产品说明中的安装步骤。"),
+    }) });
+    expect(mocks.updateNotifications).toHaveBeenCalledWith({ where: { id: "notification-1", userId: "user-1", readAt: null }, data: { readAt: expect.any(Date) } });
   });
 
   it("blocks a user from contacting themself or exceeding the daily contact limit", async () => {

@@ -14,7 +14,7 @@ export const HOME_FEATURES: ReadonlyArray<{
     href: { zh: "/software", en: "/en/software" },
   },
   {
-    title: { zh: "AI 技能", en: "AI skills" },
+    title: { zh: "AI资源", en: "AI Resources" },
     href: { zh: "/ai-skills", en: "/en/ai-skills" },
   },
   {
@@ -22,15 +22,15 @@ export const HOME_FEATURES: ReadonlyArray<{
     href: { zh: "/ai-news", en: "/en/ai-news" },
   },
   {
-    title: { zh: "AI 趋势", en: "AI trends" },
+    title: { zh: "AI应用场景", en: "AI Use Cases" },
     href: { zh: "/ai-trends", en: "/en/ai-trends" },
   },
 ];
 
 const SKILL_ITEMS = [
-  { zh: "AI 提示词", en: "AI prompts", path: "/skill-learning/ai-prompt-management" },
-  { zh: "AI Skills", en: "AI Skills", path: "/ai-skills" },
-  { zh: "AI 工作流", en: "AI workflows", path: "/ai-workflows" },
+  { zh: "提示词库", en: "Prompt Library", path: "/skill-learning/ai-prompt-management" },
+  { zh: "AI技能包", en: "AI Skill Packs", path: "/ai-skills" },
+  { zh: "项目与资料", en: "Projects & Resources", path: "/ai-workflows" },
 ];
 const NEWS_ITEMS = [
   { zh: "AI 智能体", en: "AI agents", path: "/ai-news/topics/ai-agent" },

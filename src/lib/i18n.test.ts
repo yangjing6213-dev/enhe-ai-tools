@@ -30,7 +30,7 @@ describe("homepage and navigation copy", () => {
     expect(dictionaries.zh.home.onlineToolsTitle).toBe("精选AI账号服务");
     expect(dictionaries.zh.listing.softwareTitle).toBe("最热门AI工具");
     expect(dictionaries.zh.listing.onlineTitle).toBe("AI账号服务");
-    expect(dictionaries.zh.listing.skillLearningTitle).toBe("AI教程与实战指南");
+    expect(dictionaries.zh.listing.skillLearningTitle).toBe("AI教程与课程");
     expect(dictionaries.zh.toolDetail.software).toBe("AI软件应用");
     expect(dictionaries.zh.toolDetail.online).toBe("AI账号服务");
   });
@@ -48,6 +48,6 @@ describe("homepage and navigation copy", () => {
     expect(dictionaries.en.home.featuredSoftwareEyebrow).toBe("AI Software Apps");
     expect(dictionaries.en.home.onlineToolsEyebrow).toBe("AI Account Services");
     expect(dictionaries.en.listing.onlineTitle).toBe("AI Account Services");
-    expect(dictionaries.en.listing.skillLearningTitle).toBe("Practical AI Tutorials and Guides");
+    expect(dictionaries.en.listing.skillLearningTitle).toBe("AI Tutorials & Courses");
   });
 });

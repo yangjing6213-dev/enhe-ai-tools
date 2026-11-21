@@ -22,7 +22,6 @@ vi.mock("@/lib/ai-trends", async (importOriginal) => {
     ...actual,
     getAiTrendBriefingSummaries: vi.fn(),
     getAiTrendBriefingByDateSlug: vi.fn(),
-    localizeAiTrendBriefingView: vi.fn((view) => view),
   };
 });
 
@@ -80,5 +79,26 @@ describe("weekly briefing display without unsupported heat scores", () => {
     expect(html).not.toContain("Private full analysis");
     expect(html).toContain(locale === "zh" ? "细分场景分析" : "Scenario analysis");
     expect(generateAiTrendDailyDetailMetadata("2026-10-27", locale).robots).toEqual({ index: false, follow: true });
+  });
+
+  it("shows a clear unavailable state when the English public summary has not been written", async () => {
+    vi.mocked(getAiTrendBriefingByDateSlug).mockResolvedValue({
+      ...briefing,
+      summary: "中文摘要尚未翻译。",
+      coreConclusion: "中文结论尚未翻译。",
+      sourceSignals: {
+        ...(briefing.sourceSignals as object),
+        publicHighlights: ["中文重点尚未翻译。"],
+      } as Prisma.JsonValue,
+    });
+
+    const html = renderToStaticMarkup(
+      await AiTrendDailyDetailPageShell({ date: "2026-10-27", forceLocale: "en" }),
+    );
+
+    expect(html).toContain("An English summary is not available for this issue yet.");
+    expect(html).not.toContain("original Chinese briefing contains this issue's analysis");
+    expect(html).not.toContain("中文摘要尚未翻译");
+    expect(html).not.toContain("中文结论尚未翻译");
   });
 });

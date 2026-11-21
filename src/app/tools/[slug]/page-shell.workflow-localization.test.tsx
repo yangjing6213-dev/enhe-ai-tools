@@ -66,7 +66,7 @@ describe("workflow detail localized publication", () => {
     const page = await ToolDetailPageShell({ slug: "ai-workflow-123-design", forceLocale: locale, expectedType: "ai_workflow" });
     const all = elements(page);
     const sourceArchiveButton = all.find((element) => element.props.href === "/api/ai-workflows/ai-workflow-123-design/source-archive");
-    expect(sourceArchiveButton?.props.children).toBe(locale === "en" ? "Download GitHub source ZIP" : "下载 GitHub 源码 ZIP");
+    expect(sourceArchiveButton?.props.children).toBe(locale === "en" ? "Download Source ZIP — Deployment Required" : "下载上游源码 ZIP（需自行部署）");
     const purchase = all.find((element) => element.props.id === "tool-purchase");
     const actions = elements(purchase?.props.children as React.ReactNode);
     const repositoryAction = actions.find((element) => element.props.href === "https://github.com/example/design");

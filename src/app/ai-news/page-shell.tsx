@@ -624,7 +624,7 @@ function FilterBar({
         <option value="">{t.aiNews.allCategories}</option>
         {categories.map((category) => (
           <option key={category.id} value={category.id}>
-            {resolveLocalizedNewsCategoryName(category.name, locale)}
+            {resolveLocalizedNewsCategoryName(category.name, locale, category.id)}
           </option>
         ))}
       </select>

@@ -149,17 +149,17 @@ describe("workflow directory localized publication", () => {
   it("clears a no-match search back to the current language directory", () => {
     const zh = renderDirectory("zh", {}, [], "no-matches");
     const en = renderDirectory("en", {}, [], "no-matches");
-    expect(zh).toContain("没有匹配的工作流");
+    expect(zh).toContain("没有匹配的项目");
     expect(zh).toContain('href="/ai-workflows"');
-    expect(en).toContain("No matching workflows");
+    expect(en).toContain("No matching projects");
     expect(en).toContain('href="/en/ai-workflows"');
     expect(zh).not.toContain("采集主题尚未配置");
     expect(en).not.toContain("Collection topics are not configured");
   });
 
   it.each([
-    ["no-published", "目前还没有已发布工作流", "No workflows have been published yet"],
-    ["topics-unconfigured", "工作流主题尚未配置", "Workflow topics are not configured"],
+    ["no-published", "目前还没有已发布项目", "No projects have been published yet"],
+    ["topics-unconfigured", "项目主题尚未配置", "Project topics are not configured"],
     ["unverified", "本地预览尚未连接内容源", "Local preview is not connected to a content source"],
   ] as const)("shows the %s state without claiming a filtered result", (state, zhText, enText) => {
     expect(renderDirectory("zh", {}, [], state)).toContain(zhText);

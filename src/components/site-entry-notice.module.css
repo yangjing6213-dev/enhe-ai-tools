@@ -70,6 +70,46 @@
   margin: 14px auto 0;
 }
 
+.favoriteWrap {
+  display: grid;
+  justify-items: center;
+  gap: 8px;
+  margin-top: 16px;
+}
+
+.favorite {
+  display: inline-flex;
+  min-height: 40px;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  border: 1px solid #cbd5e1;
+  border-radius: 999px;
+  background: #fff;
+  color: #111827;
+  padding: 0 16px;
+  font: inherit;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.favorite:hover {
+  border-color: #075fc6;
+  color: #075fc6;
+}
+
+.favoriteWrap :global(.favorite-site-feedback) {
+  max-width: 100%;
+  color: #4b5563;
+  font-size: 0.8rem;
+  line-height: 1.5;
+  text-align: center;
+}
+
+.favoriteWrap :global(.favorite-site-feedback:empty) {
+  display: none;
+}
+
 .dialog .qr figcaption {
   color: #374151 !important;
   -webkit-text-fill-color: #374151 !important;

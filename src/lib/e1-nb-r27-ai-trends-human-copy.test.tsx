@@ -68,7 +68,7 @@ describe("E1-NB-R27 AI Trends human-facing answer labels", () => {
       expect(html).toContain(`>${expectedLabel}</p>`);
       expect(html).not.toContain(oldLabel);
       expect(html).not.toContain('data-content-status="UNVERIFIED"');
-      expect(html).toContain(locale === "zh" ? "查看每周分析" : "View weekly analysis");
+      expect(html).toContain(locale === "zh" ? "查看 AI 趋势周报" : "View Weekly AI Briefs");
       expect(html).not.toContain(locale === "zh" ? "查看每日分析" : "View daily analysis");
     },
   );

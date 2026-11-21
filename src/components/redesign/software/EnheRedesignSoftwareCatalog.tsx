@@ -143,7 +143,7 @@ function renderProductionCatalog({
           heading={copy.sections.featuredProducts.heading}
           description={
             locale === "en"
-              ? "Published products selected through the tracked editorial field."
+              ? "Explore selected AI tools."
               : undefined
           }
           items={listing.featuredProducts}
@@ -217,7 +217,7 @@ function renderProductionCatalog({
                   href={listing.nextHref}
                   rel="next"
                 >
-                  {copy.actions.loadMore}
+                  {locale === "en" ? "Next Page" : "下一页"}
                 </a>
               ) : null}
             </nav>

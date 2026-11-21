@@ -25,6 +25,7 @@ import { formatCurrency } from "@/lib/utils";
 import { resolveUserAvatarSrc } from "@/lib/user-avatar";
 import { UserAvatar } from "@/components/user-avatar";
 import { EmojiText } from "@/components/emoji-text";
+import { CreatorMessageReplyForm } from "@/components/creator-message-reply-form";
 
 export type UserCenterSearchParams = Promise<Record<string, string | undefined>>;
 
@@ -203,6 +204,7 @@ export async function UserCenterPageShell({
                           {t.notifications.viewDetails}
                         </Link>
                       ) : null}
+                      {notification.type === "creator_message" && notification.senderId ? <CreatorMessageReplyForm notificationId={notification.id} locale={locale} /> : null}
                     </div>
                   );
                 })}

@@ -3,13 +3,15 @@
 /* eslint-disable @next/next/no-img-element -- Uploaded previews must retain per-request authorization. */
 import { useEffect, useRef, useState } from "react";
 import HoldButton from "@/components/hold-button";
+import { insertTextAtSelection } from "@/components/rich-text-editor";
 import { forumImageMaxBytes, forumVideoMaxBytes } from "@/lib/forum-media-limits";
 
 type MediaItem = { key: string; name: string; kind: "image" | "video"; status: "uploading" | "ready" | "error" | "removing"; progress: number; id?: string; url?: string; error?: string };
 type UploadResponse = { id?: string; type?: "image" | "video"; url?: string; mimeType?: string; code?: string };
 
-export function ForumMediaEditor({ locale, allowVideo }: { locale: "zh" | "en"; allowVideo: boolean }) {
+export function ForumMediaEditor({ locale, allowVideo, allowCover = false }: { locale: "zh" | "en"; allowVideo: boolean; allowCover?: boolean }) {
   const [items, setItems] = useState<MediaItem[]>([]);
+  const [coverMediaId, setCoverMediaId] = useState("");
   const [error, setError] = useState("");
   const container = useRef<HTMLDivElement>(null);
   const imageInput = useRef<HTMLInputElement>(null);
@@ -18,11 +20,11 @@ export function ForumMediaEditor({ locale, allowVideo }: { locale: "zh" | "en"; 
   const latestItems = useRef<MediaItem[]>([]);
   const blocked = Boolean(error) || items.some((item) => item.status !== "ready");
   const text = locale === "zh" ? {
-    image: "添加图片", video: "添加视频", remove: "移除", dismiss: "清除提示", uploading: "正在上传", removing: "正在移除", uploaded: "上传完成", finish: "请等待附件上传完成，或移除失败的附件后再提交。",
+    image: "添加图片", video: "添加视频", insert: "插入正文", cover: "设为封面", coverSelected: "当前封面", remove: "移除", dismiss: "清除提示", uploading: "正在上传", removing: "正在移除", uploaded: "上传完成", finish: "请等待附件上传完成，或移除失败的附件后再提交。",
     hint: allowVideo ? "最多 6 张图片，每张 8MB；1 个 MP4/WebM 视频，最多 100MB。话题发布后，媒体会公开展示。" : "最多 4 张图片，每张 8MB。回复发布后，图片会公开展示。",
     count: allowVideo ? "最多添加 6 张图片和 1 个视频。" : "回复最多添加 4 张图片。", invalid: "请选择 JPG、PNG、WebP、GIF 图片或支持的视频。", size: "文件太大，请压缩后再上传。", login: "登录已过期，请重新登录后上传。", limit: "上传次数较多，请稍后再试。", failed: "上传失败，请移除后重试。", removeFailed: "移除失败，请稍后重试。",
   } : {
-    image: "Add images", video: "Add video", remove: "Remove", dismiss: "Dismiss", uploading: "Uploading", removing: "Removing", uploaded: "Uploaded", finish: "Wait for uploads to finish or remove failed attachments before submitting.",
+    image: "Add images", video: "Add video", insert: "Insert in text", cover: "Set as cover", coverSelected: "Current cover", remove: "Remove", dismiss: "Dismiss", uploading: "Uploading", removing: "Removing", uploaded: "Uploaded", finish: "Wait for uploads to finish or remove failed attachments before submitting.",
     hint: allowVideo ? "Up to 6 images, 8MB each, and 1 MP4/WebM video up to 100MB. Media is public with your post." : "Up to 4 images, 8MB each. Images are public with your reply.",
     count: allowVideo ? "You can add up to 6 images and 1 video." : "Replies can contain up to 4 images.", invalid: "Choose JPG, PNG, WebP, GIF images or a supported video.", size: "The file is too large. Compress it before uploading.", login: "Your session expired. Sign in again to upload.", limit: "Too many uploads. Try again later.", failed: "Upload failed. Remove the file and try again.", removeFailed: "Could not remove this file. Try again later.",
   };
@@ -101,13 +103,22 @@ export function ForumMediaEditor({ locale, allowVideo }: { locale: "zh" | "en"; 
       const response = await fetch(`/api/forum/media/${encodeURIComponent(item.id)}`, { method: "DELETE" });
       if (!response.ok) throw new Error("remove failed");
       updateItems((current) => current.filter((entry) => entry.key !== item.key));
+      if (item.id && item.id === coverMediaId) setCoverMediaId("");
     } catch (removeError) {
       updateItems((current) => current.map((entry) => entry.key === item.key ? { ...entry, status: "error", error: text.removeFailed } : entry));
       throw removeError;
     }
   }
 
+  function insertIntoText(item: MediaItem) {
+    if (!item.id) return;
+    const textarea = container.current?.closest("form")?.querySelector<HTMLTextAreaElement>('textarea[name="content"]');
+    if (!textarea) return;
+    insertTextAtSelection(textarea, `[[media:${item.id}]]\n`);
+  }
+
   return <div className="forum-media-editor" ref={container} tabIndex={-1} aria-busy={items.some((item) => item.status === "uploading" || item.status === "removing")}>
+    {allowCover ? <input type="hidden" name="coverAttachmentId" value={coverMediaId} /> : null}
     <div className="forum-media-editor__toolbar">
       <button type="button" onClick={() => imageInput.current?.click()}>{text.image}</button>
       <input className="forum-media-editor__input" ref={imageInput} type="file" accept="image/jpeg,image/png,image/webp,image/gif" multiple hidden aria-label={text.image} onChange={(event) => { addFiles(event.currentTarget.files, "image"); event.currentTarget.value = ""; }} />
@@ -120,6 +131,8 @@ export function ForumMediaEditor({ locale, allowVideo }: { locale: "zh" | "en"; 
         {item.url && (item.kind === "image" ? <img className="forum-media-editor__preview" src={item.url} alt={item.name} /> : <video className="forum-media-editor__preview" src={item.url} controls playsInline preload="metadata" aria-label={item.name} />)}
         <span title={item.name}>{item.name}</span>
         <span className="forum-media-editor__status" role="status">{item.status === "uploading" ? `${text.uploading} ${item.progress}%` : item.status === "removing" ? text.removing : item.status === "ready" ? text.uploaded : item.error}</span>
+        {item.status === "ready" && item.id ? <button type="button" className="forum-media-editor__insert" onClick={() => insertIntoText(item)}>{text.insert}</button> : null}
+        {allowCover && item.kind === "image" && item.status === "ready" && item.id ? <button type="button" className="forum-media-editor__insert" aria-pressed={coverMediaId === item.id} onClick={() => setCoverMediaId((current) => current === item.id ? "" : item.id!)}>{coverMediaId === item.id ? text.coverSelected : text.cover}</button> : null}
         <HoldButton disabled={item.status === "removing"} onHold={() => remove(item)} pendingLabel={text.removing} errorLabel={locale === "en" ? "Remove failed" : "移除失败"} doneLabel={locale === "en" ? "Removed" : "已移除"} hint={locale === "en" ? "Hold for 2 seconds" : "按住2秒"} aria-label={`${locale === "en" ? "Hold to remove" : "长按移除"} ${item.name}`}>{locale === "en" ? "Hold to remove" : "长按移除"}</HoldButton>
         {item.status === "ready" && item.id && <input type="hidden" name="attachmentIds" value={item.id} />}
       </div>)}

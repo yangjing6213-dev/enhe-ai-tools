@@ -156,7 +156,17 @@ test.describe("product trust and creator contact", () => {
     await context.clearCookies();
     await login(page, adminEmail);
     await page.goto("/user");
-    await expect(page.locator("#notifications")).toContainText(message);
+    const receivedMessage = page.locator(".user-center-notification").filter({ hasText: message }).first();
+    await expect(receivedMessage).toBeVisible();
+    await receivedMessage.getByText("回复此消息", { exact: true }).click();
+    const reply = "支持离线使用，下载后可在本地运行。";
+    await receivedMessage.locator('textarea[name="content"]').fill(reply);
+    await receivedMessage.getByRole("button", { name: "发送回复", exact: true }).click();
+    await expect(receivedMessage.getByRole("status")).toContainText("回复已发送，原留言已标记为已读。");
+    const originalMessage = await prisma.notification.findFirstOrThrow({ where: { userId: adminId, senderId: viewerId, type: "creator_message", content: { contains: message } } });
+    expect(originalMessage.readAt).not.toBeNull();
+    expect(await prisma.notification.count({ where: { userId: viewerId, senderId: adminId, type: "creator_message_reply", content: { contains: reply } } })).toBe(1);
+    await page.screenshot({ path: testInfo.outputPath("creator-inbox-reply-read.png"), fullPage: true });
 
     await page.goto(`/admin/software/${toolId}`);
     await page.locator('input[name="securityReviewed"]').uncheck();

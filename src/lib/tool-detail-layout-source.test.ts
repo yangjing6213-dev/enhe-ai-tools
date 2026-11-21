@@ -72,6 +72,8 @@ describe("tool detail layout source", () => {
     expect(styles).toContain(".product-supported-agents-card");
     expect(styles).toContain(".tool-detail-product-layout.has-creator");
     expect(styles).toContain("grid-template-columns: minmax(0, 0.8fr) minmax(0, 1.2fr);");
+    expect(source).toContain('className="product-refund-policy-slot" aria-hidden="true"');
+    expect(styles).toContain(".product-refund-policy-slot");
     expect(styles).toContain(".tool-detail-payment-method-control");
     expect(styles).toContain(".tool-detail-payment-method-grid");
     expect(styles).toContain(".tool-detail-purchase-submit");
@@ -87,7 +89,7 @@ describe("tool detail layout source", () => {
     const factsGridStart = source.indexOf("tool-detail-facts-grid");
     const agentsCardStart = source.indexOf("<SupportedAgentsCard", factsGridStart);
     const safetyCardStart = source.indexOf("product-safety-info-card", factsGridStart);
-    const refundCardStart = source.indexOf("{refundPolicyCard}", safetyCardStart);
+    const refundCardStart = source.indexOf("{refundPolicyCard ??", safetyCardStart);
 
     expect(source).toContain('forceLocale === "en" ? "Refund guarantee" : "退款保障"');
     expect(agentsCardStart).toBeGreaterThan(-1);

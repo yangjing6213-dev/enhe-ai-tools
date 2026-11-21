@@ -40,10 +40,14 @@ describe("ENHE redesign public shell candidate", () => {
     const expectedOrder = [
       "首页",
       "AI工具",
-      "AI Skill",
+      "AI社区",
+      "AI资源",
+      "提示词库",
+      "AI技能包",
+      "项目与资料",
       "AI资讯",
-      "AI趋势",
-      "关于我们",
+      "AI应用场景",
+      "关于恩禾",
     ];
     let lastIndex = -1;
     for (const label of expectedOrder) {
@@ -171,10 +175,11 @@ describe("ENHE redesign public shell candidate", () => {
 
     for (const label of [
       "帮助与服务",
-      "帮助支持",
-      "使用教程",
-      "购买与下载",
-      "产品更新",
+      "常见问题与联系",
+      "工具使用教程",
+      "AI教程与课程",
+      "浏览 AI 工具",
+      "AI资讯",
       "合规条款",
       "用户协议",
       "隐私政策",
@@ -191,10 +196,11 @@ describe("ENHE redesign public shell candidate", () => {
 
     for (const label of [
       "Help & Support",
-      "Help Center",
-      "Tutorials",
-      "Purchase & Download",
-      "Product Updates",
+      "FAQs & Contact",
+      "Tool Guides",
+      "AI Tutorials & Courses",
+      "Browse AI Tools",
+      "AI News",
       "Legal",
       "Terms of Use",
       "Privacy Policy",

@@ -191,8 +191,8 @@
   height: auto;
   filter: none;
   object-fit: contain;
-  /* Align the lettering inside the transparent GIF with the search control. */
-  transform: translateY(-7.5%);
+  /* Keep the visible mark centered against the search control. */
+  transform: translateY(0);
 }
 
 .redesign-brand-region {
@@ -1220,12 +1220,58 @@ body .redesign-footer nav {
   border: 1px solid rgb(255 255 255 / 45%);
   border-radius: 8px;
   color: #fff;
-  transition: color var(--enhe-motion-fast), background-color var(--enhe-motion-fast);
+  transition: background-color var(--enhe-motion-fast), color 0s;
 }
 
 .redesign-footer .footer-social-links a:hover {
   background: #fff;
-  color: #0d3a6d;
+  color: #000 !important;
+}
+
+.redesign-footer .footer-social-links .favorite-site-action {
+  position: relative;
+  display: inline-flex;
+}
+
+.redesign-footer .footer-social-links .footer-social-bookmark {
+  display: inline-flex;
+  width: 40px;
+  height: 40px;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid rgb(255 255 255 / 45%);
+  border-radius: 8px;
+  background: transparent;
+  color: #fff;
+  cursor: pointer;
+  transition: background-color var(--enhe-motion-fast), color 0s;
+}
+
+.redesign-footer .footer-social-links .footer-social-bookmark:hover,
+.redesign-footer .footer-social-links .footer-social-bookmark:focus-visible {
+  background: #fff;
+  color: #000 !important;
+}
+
+.redesign-footer .footer-social-links .favorite-site-feedback {
+  position: absolute;
+  z-index: 3;
+  inset-block-end: calc(100% + 10px);
+  inset-inline-start: 50%;
+  width: min(260px, 80vw);
+  transform: translateX(-50%);
+  border-radius: 8px;
+  background: #fff;
+  box-shadow: 0 8px 26px rgb(0 0 0 / 20%);
+  color: #111827;
+  padding: 10px 12px;
+  font-size: 12px;
+  line-height: 1.5;
+  text-align: center;
+}
+
+.redesign-footer .footer-social-links .favorite-site-feedback:empty {
+  display: none;
 }
 
 .redesign-footer-inner {
@@ -1325,7 +1371,12 @@ body .redesign-footer nav {
   }
 
   .redesign-footer .footer-social-links {
+    position: relative;
     margin-inline-end: 0;
+  }
+
+  .redesign-footer .footer-social-links .favorite-site-action {
+    position: static;
   }
 
   .footer-navigation {
@@ -1944,4 +1995,216 @@ body .customer-support-widget .customer-support-launcher,
 
 .enhe-redesign-production:not(.enhe-admin-shell) .enhe-search-surface::after {
   display: none;
+}
+
+.redesign-brand-mark--mobile-white { display: none; }
+
+@media (max-width: 767px) {
+  .redesign-header[data-home="true"] {
+    min-height: 68px;
+    border: 0 !important;
+    background: #081a3b !important;
+    color: #fff !important;
+  }
+
+  .redesign-header[data-home="true"] .redesign-header-inner {
+    display: flex;
+    width: calc(100% - 32px);
+    min-height: 68px;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    padding-block: 8px;
+  }
+
+  .redesign-header[data-home="true"] .redesign-brand-region {
+    width: min(152px, 42vw);
+    flex: 0 1 auto;
+    transform: none;
+  }
+
+  .redesign-header[data-home="true"] .redesign-brand-lockup {
+    width: 100%;
+    min-height: 44px;
+  }
+
+  .redesign-header[data-home="true"] .redesign-brand-mark--dark { display: none !important; }
+  .redesign-header[data-home="true"] .redesign-brand-mark--mobile-white {
+    display: block !important;
+    width: min(152px, 42vw);
+    height: auto;
+    transform: none;
+  }
+
+  .redesign-header[data-home="true"] .redesign-header-search,
+  .redesign-header[data-home="true"] .redesign-desktop-nav { display: none !important; }
+
+  .redesign-header[data-home="true"] .redesign-mobile-actions {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    margin-left: auto;
+  }
+
+  .redesign-header[data-home="true"] .redesign-mobile-actions :is(.redesign-language-switch, .redesign-theme-switch, .redesign-menu-trigger) {
+    border-color: rgb(255 255 255 / 50%) !important;
+    background: transparent !important;
+    color: #fff !important;
+    -webkit-text-fill-color: #fff !important;
+  }
+
+  .redesign-home.redesign-home-hero {
+    min-height: 0;
+    display: block;
+    overflow: hidden;
+    background: linear-gradient(148deg, #1268f5 0%, #0751d7 56%, #073799 100%);
+    color: #fff;
+  }
+
+  .enhe-redesign-production .redesign-home.redesign-home-hero {
+    background: linear-gradient(148deg, #1268f5 0%, #0751d7 56%, #073799 100%) !important;
+  }
+
+  .redesign-home .redesign-home-hero-inner {
+    position: relative;
+    box-sizing: border-box;
+    width: 100%;
+    max-width: none;
+    margin: 0;
+    padding: 36px 24px 112px;
+    text-align: left;
+  }
+
+  .redesign-home .redesign-home-mobile-label {
+    display: inline-flex;
+    margin: 0 0 22px;
+    color: rgb(255 255 255 / 82%);
+    font-size: .78rem;
+    letter-spacing: .06em;
+  }
+
+  .redesign-home .redesign-home-mobile-label::before { background: #ffd60a; }
+
+  .redesign-home .redesign-home-hero-inner h1 {
+    position: relative;
+    z-index: 1;
+    max-width: 100%;
+    margin: 0;
+    color: #fff;
+    font-size: clamp(2rem, 9.3vw, 2.6rem);
+    letter-spacing: -.045em;
+    line-height: 1.08;
+    text-align: left;
+  }
+
+  .redesign-home .redesign-home-animated-line { display: none !important; }
+
+  .redesign-home .redesign-home-hero-inner h1 > .redesign-home-mobile-title {
+    display: grid;
+    max-width: 15ch;
+    color: #fff;
+    font-size: inherit;
+    font-weight: 850;
+    letter-spacing: inherit;
+    line-height: inherit;
+    text-wrap: balance;
+  }
+
+  .redesign-home .redesign-home-subtitle {
+    position: relative;
+    z-index: 1;
+    max-width: 29rem;
+    margin: 18px 0 0;
+    color: rgb(255 255 255 / 88%);
+    font-size: 1rem;
+    line-height: 1.65;
+    text-align: left;
+  }
+
+  .redesign-home .redesign-home-cta-row {
+    position: relative;
+    z-index: 2;
+    align-items: flex-start;
+    justify-content: flex-start;
+    gap: 0;
+    margin-top: 24px;
+  }
+
+  .redesign-home .redesign-home-cta-row > .redesign-home-cta:not(:first-child) { display: none !important; }
+
+  .redesign-home .redesign-home-cta-row > .redesign-home-cta:first-child {
+    width: auto;
+    min-height: 54px;
+    border: 0 !important;
+    border-radius: 14px;
+    background: #ffd60a !important;
+    color: #082459 !important;
+    -webkit-text-fill-color: #082459 !important;
+    box-shadow: 0 8px 22px rgb(2 20 69 / 22%);
+    font-size: 1rem;
+  }
+
+  .redesign-home .redesign-home-mobile-mascot {
+    position: absolute;
+    z-index: 0;
+    right: -18px;
+    bottom: 10px;
+    display: block;
+    width: 172px;
+    height: 126px;
+    background-image: url("/images/brand/enhe-standard-white-plain-1024.gif");
+    background-repeat: no-repeat;
+    background-position: -75px center;
+    background-size: 610px auto;
+    pointer-events: none;
+    filter: drop-shadow(0 10px 18px rgb(0 20 85 / 35%));
+  }
+
+  .redesign-home .redesign-home-mobile-cards {
+    position: relative;
+    z-index: 2;
+    display: grid;
+    gap: 12px;
+    padding: 18px 20px 24px;
+    border-radius: 22px 22px 0 0;
+    background: #f7f9ff;
+  }
+
+  .redesign-home-mobile-card {
+    display: grid;
+    grid-template-columns: 58px minmax(0, 1fr) 24px;
+    min-height: 94px;
+    align-items: center;
+    gap: 14px;
+    padding: 14px 16px;
+    border: 1px solid #dce5f8;
+    border-radius: 18px;
+    background: #fff;
+    color: #0c214c;
+    box-shadow: 0 8px 18px rgb(13 43 106 / 8%);
+    text-decoration: none;
+  }
+
+  .redesign-home-mobile-card-icon {
+    display: grid;
+    width: 58px;
+    height: 58px;
+    place-items: center;
+    border-radius: 16px;
+    background: #e7f0ff;
+    color: #1268f5;
+  }
+
+  .redesign-home-mobile-card-copy { display: grid; min-width: 0; gap: 3px; }
+  .redesign-home-mobile-card-copy strong { font-size: 1.08rem; font-weight: 800; line-height: 1.25; }
+  .redesign-home-mobile-card-copy > span { color: #526383; font-size: .85rem; line-height: 1.4; }
+  .redesign-home-mobile-card-arrow { color: #0c214c; }
+  .redesign-home-features { display: none !important; }
+}
+
+@media (max-width: 380px) {
+  .redesign-header[data-home="true"] .redesign-header-inner { width: calc(100% - 24px); gap: 8px; }
+  .redesign-header[data-home="true"] .redesign-brand-region { width: min(138px, 40vw); }
+  .redesign-home-mobile-card { grid-template-columns: 50px minmax(0, 1fr) 20px; gap: 11px; padding-inline: 12px; }
+  .redesign-home-mobile-card-icon { width: 50px; height: 50px; }
 }

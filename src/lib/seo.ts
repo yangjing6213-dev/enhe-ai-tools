@@ -210,6 +210,10 @@ const localizedPublicRoutePatterns = [
   /^\/build-your-own-x$/,
   /^\/ai-topics$/,
   /^\/ai-topics\/.+$/,
+  /^\/forum$/,
+  /^\/forum\/.+$/,
+  /^\/ai-skills$/,
+  /^\/ai-skills\/.+$/,
   /^\/software$/,
   /^\/software\/.+$/,
   /^\/ai-workflows$/,
@@ -409,7 +413,7 @@ export function buildListingMetadataTitle(
   const zhTitles: Record<ListingMetadataKind, string> = {
     software: "最热门AI工具、热门AI软件与高频效率产品",
     "account-services": "AI账号服务咨询、订阅说明与合规边界",
-    "skill-learning": "AI教程与实战指南、AI工具与本地部署教程",
+    "skill-learning": "AI教程与课程｜图像生成与实际操作指南",
     "ai-news": "AI资讯、趋势解读与工具落地指南",
     pricing: "AI工具报价、购买流程与交付说明",
     tutorials: "AI工具教程、软件配置与使用指南",
@@ -417,7 +421,7 @@ export function buildListingMetadataTitle(
   const enTitles: Record<ListingMetadataKind, string> = {
     software: "Most Popular AI Tools And Productivity Software",
     "account-services": "AI Account Service Guidance and Compliance",
-    "skill-learning": "Practical AI Tutorials and Guides",
+    "skill-learning": "AI Tutorials & Courses | Image Creation and Practical Guides",
     "ai-news": "AI News, Trend Insights, and Tool Decisions",
     pricing: "AI Tool Pricing, Purchase, and Delivery Guide",
     tutorials: "AI Tool Tutorials, Setup, and Workflow Guides",
@@ -482,8 +486,8 @@ const revenuePageSeoTitles = {
     en: "InfiniteTalk AI Talking Avatar Generator",
   },
   "ai-prompt-management-system-418-bilingual-prompts-for-writing-seo-and-ai-creation": {
-    zh: "418双语提示词 AI提示词管理工具",
-    en: "418 Bilingual AI Prompt Management Tool",
+    zh: "AI提示词库桌面版",
+    en: "AI Prompt Library | Desktop Edition",
   },
   "ai-prompt-management": {
     zh: "AI提示词管理教程",
@@ -751,13 +755,13 @@ function resolveToolTypeLabel(
   if (locale === "en") {
     if (type === "online") return "AI account service";
     if (type === "skill_learning") return "AI skill course";
-    if (type === "ai_skill") return "AI Skill";
+    if (type === "ai_skill") return "AI Skill Pack";
     return "AI software app";
   }
 
   if (type === "online") return "AI账号服务";
   if (type === "skill_learning") return "AI技能课程";
-  if (type === "ai_skill") return "AI Skill";
+  if (type === "ai_skill") return "AI技能包";
   return "AI软件应用";
 }
 

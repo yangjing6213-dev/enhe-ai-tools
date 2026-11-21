@@ -16,7 +16,7 @@ ENHE AI skill learning pages help users turn AI into repeatable work outcomes. C
 
 - Chinese skill learning list: https://www.enhe-tech.com.cn/skill-learning
 - English skill learning list: https://www.enhe-tech.com.cn/en/skill-learning
-- AI Prompt Management System: https://www.enhe-tech.com.cn/skill-learning/ai-prompt-management
+- AI Prompt Library: https://www.enhe-tech.com.cn/skill-learning/ai-prompt-management
 - Tutorials: https://www.enhe-tech.com.cn/tutorials
 
 ## User Outcomes

@@ -1,8 +1,19 @@
 import { describe, expect, it } from "vitest";
 import { dictionaries } from "@/lib/i18n";
-import { buildToolCardHighlights } from "@/lib/tool-card-highlights";
+import { buildToolCardHighlights, buildValueSentence } from "@/lib/tool-card-highlights";
 
 describe("tool card highlights", () => {
+  it("keeps a complete English value sentence instead of splitting at a comma", () => {
+    expect(
+      buildValueSentence(
+        "Practice AI image, writing, video, and traffic workflows through project-based lessons that clarify the path from tool use to execution.",
+        "en",
+      ),
+    ).toBe(
+      "Practice AI image, writing, video, and traffic workflows through project-based lessons that clarify the path from tool use to execution.",
+    );
+  });
+
   it("deduplicates repeated paid-download highlights while preserving order", () => {
     const highlights = buildToolCardHighlights(
       {

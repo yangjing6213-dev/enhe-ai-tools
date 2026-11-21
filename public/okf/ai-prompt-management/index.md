@@ -1,6 +1,6 @@
 ---
 type: Dataset
-title: ENHE AI Prompt Management System
+title: ENHE AI Prompt Library
 description: Agent-readable profile for the free ENHE AI bilingual prompt library.
 resource: https://www.enhe-tech.com.cn/okf/ai-prompt-management/index.md
 canonical: https://www.enhe-tech.com.cn/skill-learning/ai-prompt-management
@@ -8,9 +8,9 @@ tags: [ai-prompts, prompt-library, prompt-engineering, productivity, writing, im
 timestamp: 2026-10-13
 ---
 
-# ENHE AI Prompt Management System
+# ENHE AI Prompt Library
 
-ENHE AI Prompt Management System is a free public prompt library with 418 Chinese and English prompt templates. It helps users search by task or scenario, filter by category, add task context, and copy a complete prompt into an AI assistant.
+ENHE AI Prompt Library is a free public web library with 418 Chinese prompts and 418 English prompts. Users can search by task or scenario, filter by category, add task context, and copy a prompt into an AI assistant.
 
 ## Public Routes
 

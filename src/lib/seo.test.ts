@@ -74,8 +74,8 @@ describe("seo helpers", () => {
     expect(buildListingMetadataTitle("software", "zh", "ENHE AI")).toContain("最热门AI工具");
     expect(buildListingMetadataTitle("account-services", "zh", "ENHE AI")).toContain("AI账号服务");
     expect(buildListingMetadataTitle("account-services", "en", "ENHE AI")).toContain("AI Account Service");
-    expect(buildListingMetadataTitle("skill-learning", "zh", "ENHE AI")).toContain("AI教程与实战指南");
-    expect(buildListingMetadataTitle("skill-learning", "en", "ENHE AI")).toContain("Practical AI Tutorials");
+    expect(buildListingMetadataTitle("skill-learning", "zh", "ENHE AI")).toContain("AI教程与课程");
+    expect(buildListingMetadataTitle("skill-learning", "en", "ENHE AI")).toContain("AI Tutorials & Courses");
     expect(buildListingMetaDescription("software", "zh")).toContain("最热门AI工具");
     expect(buildListingMetaDescription("account-services", "zh")).toContain("账号使用支持");
     expect(buildListingMetaDescription("account-services", "en")).toContain("AI account service guidance");
@@ -183,7 +183,7 @@ describe("seo helpers", () => {
         "ai-prompt-management-system-418-bilingual-prompts-for-writing-seo-and-ai-creation",
         "zh",
       ),
-    ).toBe("418双语提示词 AI提示词管理工具");
+    ).toBe("AI提示词库桌面版");
     const mappedTitle = buildToolMetadataTitle({
       name: getRevenuePageSeoTitle("infinitetalk-ai", "zh") ?? "",
       brand: "恩禾 ENHE AI",

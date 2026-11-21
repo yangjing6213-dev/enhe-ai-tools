@@ -1,6 +1,7 @@
 import type { Prisma } from "@prisma/client";
 import { archiveNewsArticleAction, upsertNewsArticleAction, upsertNewsCategoryAction } from "@/app/admin/actions";
 import { AiNewsEnglishFields } from "@/app/admin/ai-news-english-fields";
+import { RichTextEditor } from "@/components/rich-text-editor";
 import { DangerButton, Field, inputClass, selectClass, SubmitButton, textareaClass } from "@/app/admin/admin-ui";
 
 type NewsArticleWithRelations = Prisma.NewsArticleGetPayload<{
@@ -58,15 +59,19 @@ export function NewsArticleEditor({ article, categories, relatedArticles, tools,
         <Field label="一句话摘要" className="md:col-span-2">
           <textarea name="summary" required defaultValue={article?.summary ?? ""} className={textareaClass} />
         </Field>
-        <Field label="正文内容" className="md:col-span-2">
-          <textarea
+        <div className="enhe-admin-field md:col-span-2">
+          <span className="mb-2 block text-sm font-semibold">正文内容</span>
+          <RichTextEditor
             name="content"
+            locale="zh"
+            ariaLabel="正文内容"
+            newsMedia
             required
             defaultValue={article?.content ?? ""}
             className={`${textareaClass} min-h-[360px]`}
             placeholder="支持 ## H2、### H3、列表、引用和代码块。"
           />
-        </Field>
+        </div>
         <Field label="核心要点，每行一条" className="md:col-span-2">
           <textarea name="keyTakeaways" defaultValue={article?.keyTakeaways.join("\n") ?? ""} className={textareaClass} />
         </Field>

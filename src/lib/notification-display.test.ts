@@ -73,4 +73,16 @@ describe("getNotificationDisplay", () => {
     expect(display.content).toContain("From Alice about Writer");
     expect(display.content).toContain("Could you share the supported systems?");
   });
+
+  it("renders creator-message replies in English", () => {
+    const display = getNotificationDisplay({
+      type: "creator_message_reply",
+      title: "收到创作者留言回复",
+      content: "回复者：Alice\n产品：Writer\n回复：\nPlease check the installation guide.",
+    }, "en");
+
+    expect(display.title).toBe("Creator message reply");
+    expect(display.content).toContain("Reply from Alice about Writer");
+    expect(display.content).toContain("Please check the installation guide.");
+  });
 });

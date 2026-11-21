@@ -141,8 +141,8 @@ describe("production mobile navigation directional drawer", () => {
     const implementation = `${component}\n${motion}\n${drawerStyles}`;
 
     for (const orderedLabels of [
-      ["AI工具", "AI Skills", "AI资讯", "AI趋势", "关于我们"],
-      ["AI Tools", "AI Skills", "AI News", "AI Trends", "About"],
+      ["AI工具", "AI社区", "AI资源", "AI资讯", "AI应用场景", "关于恩禾"],
+      ["AI Tools", "AI Community", "AI Resources", "AI News", "AI Use Cases", "About ENHE"],
     ]) {
       let lastIndex = -1;
       for (const label of orderedLabels) {

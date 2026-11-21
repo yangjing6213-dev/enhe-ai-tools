@@ -67,6 +67,7 @@ describe("GET /api/user/quick-access", () => {
       }],
       notifications: [{
         id: "notification-1",
+        type: "general",
         title: "订单提醒",
         content: "订单正在等待付款。",
         linkUrl: null,
@@ -86,6 +87,26 @@ describe("GET /api/user/quick-access", () => {
     }));
     expect(mocks.notificationCount).toHaveBeenCalledWith({
       where: { userId: "user-1", readAt: null },
+    });
+  });
+
+  it("includes creator-message type so the inbox can show its reply action", async () => {
+    mocks.notificationFindMany.mockResolvedValueOnce([{
+      id: "creator-message-1",
+      type: "creator_message",
+      title: "收到新的创作者联系消息",
+      content: "发送者：访客\n产品：示例工具\n留言：\n如何使用？",
+      linkUrl: "/user#notifications",
+      readAt: null,
+      createdAt: new Date("2026-10-11T04:00:00.000Z"),
+    }]);
+
+    const response = await GET(request());
+    const payload = await response.json();
+
+    expect(payload.notifications[0]).toMatchObject({
+      id: "creator-message-1",
+      type: "creator_message",
     });
   });
 

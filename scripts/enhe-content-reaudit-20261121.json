@@ -1,0 +1,1919 @@
+[
+  {
+    "ref": "F20",
+    "model": "toolCategory",
+    "id": "enhe-audit-talking-avatar-videos",
+    "scope": {},
+    "before": null,
+    "after": {
+      "name": "数字人口播",
+      "type": "software",
+      "status": "active",
+      "sortOrder": 0,
+      "description": null
+    }
+  },
+  {
+    "ref": "F20",
+    "model": "aiWorkflowTopic",
+    "id": "enhe-audit-model-access-management",
+    "scope": {},
+    "before": null,
+    "after": {
+      "name": "模型接入与管理",
+      "englishName": "Model Access & Management",
+      "slug": "model-access-management",
+      "isEnabled": false,
+      "searchDirections": "",
+      "sortOrder": 0
+    }
+  },
+  {
+    "ref": "N01",
+    "model": "tool",
+    "id": "cmvdjv6qr0003mh01m97gk8d1",
+    "scope": {
+      "slug": "searchscope-seo-geo",
+      "type": "software",
+      "status": "published"
+    },
+    "before": {
+      "name": "SearchScope SEO/GEO 巡检｜公开网页证据与修复清单",
+      "englishName": "SearchScope SEO/GEO Audit | Public-Page Evidence and a Repair Checklist"
+    },
+    "after": {
+      "name": "SearchScope｜网站问题检查与修复建议",
+      "englishName": "SearchScope | Website Review & Recommendations"
+    }
+  },
+  {
+    "ref": "N02",
+    "model": "tool",
+    "id": "cmv886v540011k701j50i41u0",
+    "scope": {
+      "slug": "codex",
+      "type": "software",
+      "status": "published"
+    },
+    "before": {
+      "name": "Codex Backup｜Windows Codex 项目与工作上下文备份",
+      "englishName": "Codex Backup | Back Up Codex Projects and Local Work Context on Windows"
+    },
+    "after": {
+      "name": "Codex Backup｜项目与工作资料备份",
+      "englishName": "Codex Backup | Project & Work Context Backup"
+    }
+  },
+  {
+    "ref": "N03",
+    "model": "tool",
+    "id": "cmv868ejd0008k701zx0z5q70",
+    "scope": {
+      "slug": "github",
+      "type": "software",
+      "status": "published"
+    },
+    "before": {
+      "name": "GitHub Backup｜把有权限访问的仓库备份到本地",
+      "englishName": "GitHub Backup | Save Repositories You Can Access to a Local Copy"
+    },
+    "after": {
+      "name": "GitHub Backup｜将项目备份到电脑",
+      "englishName": "GitHub Backup | Local Repository Backup"
+    }
+  },
+  {
+    "ref": "N04",
+    "model": "tool",
+    "id": "cmv6la3fn001hs1019ggrf9ur",
+    "scope": {
+      "slug": "ai-codex",
+      "type": "software",
+      "status": "published"
+    },
+    "before": {
+      "name": "Product Video Studio｜Codex 产品介绍视频制作工作流",
+      "englishName": "Product Video Studio | A Codex-Assisted Product Video Workflow"
+    },
+    "after": {
+      "name": "Product Video Studio｜产品介绍视频制作",
+      "englishName": "Product Video Studio | Product Videos with Codex"
+    }
+  },
+  {
+    "ref": "N05",
+    "model": "tool",
+    "id": "cmv663doi0003s101uo2vodo0",
+    "scope": {
+      "slug": "ai-ai-zorvp8",
+      "type": "software",
+      "status": "published"
+    },
+    "before": {
+      "name": "AgentGuardian｜Windows AI 配置风险只读审计",
+      "englishName": "AgentGuardian | Read-Only Audit for Windows AI Configurations"
+    },
+    "after": {
+      "name": "AgentGuardian｜AI配置风险检查",
+      "englishName": "AgentGuardian | AI Configuration Risk Review"
+    }
+  },
+  {
+    "ref": "N06",
+    "model": "tool",
+    "id": "cmqrl77i7001gl901sxj7mh3y",
+    "scope": {
+      "slug": "windows-ai",
+      "type": "software",
+      "status": "published"
+    },
+    "before": {
+      "name": "Lumi-OS｜Windows 桌面 AI 工作流助手",
+      "englishName": "Lumi-OS | AI Workflow Assistant for the Windows Desktop"
+    },
+    "after": {
+      "name": "Lumi-OS｜桌面AI助手",
+      "englishName": "Lumi-OS | Desktop AI Assistant"
+    }
+  },
+  {
+    "ref": "N07",
+    "model": "tool",
+    "id": "cmqcgxxe6000jpm01z4o0t5dy",
+    "scope": {
+      "slug": "ai-ai",
+      "type": "software",
+      "status": "published"
+    },
+    "before": {
+      "name": "本地 AI 语音生成｜Windows 旁白与多角色音频工作台",
+      "englishName": "Local AI Voice Generator | Windows Workspace for Narration and Multi-Character Audio"
+    },
+    "after": {
+      "name": "AI配音｜旁白与多角色对话",
+      "englishName": "AI Voice Generator | Narration & Dialogue"
+    }
+  },
+  {
+    "ref": "N08",
+    "model": "tool",
+    "id": "cmq8as4e80008s901592x4o26",
+    "scope": {
+      "slug": "ai-video-studio-ai-ai-video-studio-ai",
+      "type": "software",
+      "status": "published"
+    },
+    "before": {
+      "name": "Windows 本地 AI 视频工作站｜文生视频与图生视频",
+      "englishName": "Windows Local AI Video Workspace | Text-to-Video and Image-to-Video",
+      "valueProposition": "一次部署，永久使用，生成无限制，随心所欲。",
+      "englishValueProposition": "Deploy once. Use forever. Generate without limits. Create your way."
+    },
+    "after": {
+      "name": "AI视频生成｜用文字或图片制作视频",
+      "englishName": "AI Video Workspace | Text-to-Video & Image-to-Video",
+      "valueProposition": "在符合要求的 Windows 电脑上，用文字或图片生成视频。可用模型、速度与画质取决于设备和设置。",
+      "englishValueProposition": "Create video from text or images on a compatible Windows PC. Model support, speed, and output quality depend on your hardware and settings."
+    }
+  },
+  {
+    "ref": "N09",
+    "model": "tool",
+    "id": "cmq12l5x70001no01ertij57f",
+    "scope": {
+      "slug": "tool-mq12l5w6",
+      "type": "software",
+      "status": "published"
+    },
+    "before": {
+      "name": "聊天界面模拟器｜制作可编辑的对话截图素材",
+      "englishName": "Chat Interface Simulator | Create Editable Conversation Screenshot Materials"
+    },
+    "after": {
+      "name": "聊天界面模拟器｜对话演示图制作",
+      "englishName": "Chat Interface Simulator | Chat Mockups"
+    }
+  },
+  {
+    "ref": "N10",
+    "model": "tool",
+    "id": "cmq1595360001pe010juszymh",
+    "scope": {
+      "slug": "faceswap-studio-ai",
+      "type": "software",
+      "status": "published"
+    },
+    "before": {
+      "name": "FaceSwap Studio｜Windows 授权人像与视频合成研究工具",
+      "englishName": "FaceSwap Studio | Windows Tool for Authorized Image and Video Compositing"
+    },
+    "after": {
+      "name": "FaceSwap Studio｜授权人像与视频合成",
+      "englishName": "FaceSwap Studio | Image & Video Compositing"
+    }
+  },
+  {
+    "ref": "N11",
+    "model": "tool",
+    "id": "cmq9qedna0001p30141wm2sc0",
+    "scope": {
+      "slug": "zfb",
+      "type": "software",
+      "status": "published"
+    },
+    "before": {
+      "name": "常用链接与二维码整理工具｜制作可核验的入口素材",
+      "englishName": "Link and QR Organizer | Create Previewable Entry Materials"
+    },
+    "after": {
+      "name": "链接与二维码整理工具",
+      "englishName": "Link & QR Organizer"
+    }
+  },
+  {
+    "ref": "N12",
+    "model": "tool",
+    "id": "cmrfae70c0029ry01kq6lqgv1",
+    "scope": {
+      "slug": "codex-api",
+      "type": "software",
+      "status": "published"
+    },
+    "before": {
+      "name": "Codex Provider Switcher｜Windows Codex 连接配置切换工具",
+      "englishName": "Codex Provider Switcher | Manage Codex Connection Profiles on Windows"
+    },
+    "after": {
+      "name": "Codex Provider Switcher｜连接配置切换",
+      "englishName": "Codex Provider Switcher | Switch Codex Connections"
+    }
+  },
+  {
+    "ref": "N13",
+    "model": "tool",
+    "id": "cmrkqr9ek0018n001szhsd14j",
+    "scope": {
+      "slug": "infinitetalk-ai",
+      "type": "software",
+      "status": "published"
+    },
+    "before": {
+      "name": "InfiniteTalk｜图片与音频驱动的数字人口播工具",
+      "englishName": "InfiniteTalk | Digital Presenter Videos from Images and Audio",
+      "categoryId": "cmpt5m9k10008n501skwvcia1"
+    },
+    "after": {
+      "name": "InfiniteTalk｜数字人口播视频制作",
+      "englishName": "InfiniteTalk | Talking Avatar Videos",
+      "categoryId": "enhe-audit-talking-avatar-videos"
+    }
+  },
+  {
+    "ref": "N14",
+    "model": "tool",
+    "id": "cmrm83d3b0010o901ddkfb3ku",
+    "scope": {
+      "slug": "ai-prompt",
+      "type": "software",
+      "status": "published"
+    },
+    "before": {
+      "name": "AI 提示词管理｜418 条中英文提示词的搜索与复用",
+      "englishName": "AI Prompt Management | Search and Reuse Chinese and English Prompts",
+      "shortDescription": "[[zh]]用搜索、分类和收藏管理 418 条中英文结构化提示词；免费网页版无需登录，桌面版为单独交付的下载产品。选中提示词后可复制到你正在使用的 AI 工具中继续修改。[[/zh]]\n\n[[en]]Search, categorize, and favorite structured prompts. The free web version requires no sign-in; the desktop edition is a separate download. Copy a prompt to your chosen AI tool and adapt it.[[/en]]"
+    },
+    "after": {
+      "name": "AI提示词库桌面版",
+      "englishName": "AI Prompt Library | Desktop Edition",
+      "shortDescription": "[[zh]]免费网页版可搜索、筛选、复制中文和英文各 418 条提示词，无需登录。桌面版单独付费下载；交付内容请查看本页购买方案。[[/zh]]\n\n[[en]]Search, filter, and copy 418 prompts in each language in the free web library without signing in. The desktop edition is a separate paid download. Check the offer on this page for delivery details.[[/en]]"
+    }
+  },
+  {
+    "ref": "N15",
+    "model": "tool",
+    "id": "cmwbntznu0023mu01u9c7s5ww",
+    "scope": {
+      "slug": "ai-ai-skill",
+      "type": "ai_skill",
+      "status": "published"
+    },
+    "before": {
+      "name": "AI生成文章、报告、文案润色，去AI味Skill",
+      "englishName": "Bilingual Prose Craft"
+    },
+    "after": {
+      "name": "Bilingual Prose Craft｜中英文写作润色",
+      "englishName": "Bilingual Prose Craft | Chinese & English Editing"
+    }
+  },
+  {
+    "ref": "N16",
+    "model": "tool",
+    "id": "cmvsq31gc001eqz01j97i8nig",
+    "scope": {
+      "slug": "ai-skill-ai",
+      "type": "ai_skill",
+      "status": "published"
+    },
+    "before": {
+      "name": "AI 短剧表演与分镜 Skill｜把剧本拆成可审核的镜头提示词",
+      "englishName": "AI Drama Performance & Storyboarding Skill | Turn a Script into Reviewable Shot Prompts"
+    },
+    "after": {
+      "name": "短剧分镜助手｜将剧本整理成镜头提示词",
+      "englishName": "AI Storyboarding | Shot Prompts from Scripts"
+    }
+  },
+  {
+    "ref": "N17",
+    "model": "tool",
+    "id": "cmvpd63lt000fpb012od6636y",
+    "scope": {
+      "slug": "skill",
+      "type": "ai_skill",
+      "status": "published"
+    },
+    "before": {
+      "name": "AI 资讯双平台图文 Skill｜一条核实资讯，整理两套发布草稿",
+      "englishName": "AI News Content Skill | One Verified Story, Two Platform Drafts"
+    },
+    "after": {
+      "name": "AI资讯写作｜双平台图文草稿",
+      "englishName": "AI News Content | Drafts for Two Platforms"
+    }
+  },
+  {
+    "ref": "N18",
+    "model": "tool",
+    "id": "cmvb3uaub000kms01t581dxn8",
+    "scope": {
+      "slug": "ai-skill",
+      "type": "ai_skill",
+      "status": "published"
+    },
+    "before": {
+      "name": "IntentBridge｜AI 需求澄清与确认 Skill",
+      "englishName": "IntentBridge | Clarify and Confirm Requirements with AI"
+    },
+    "after": {
+      "name": "IntentBridge｜需求澄清与确认",
+      "englishName": "IntentBridge | Clarify & Confirm Requirements"
+    }
+  },
+  {
+    "ref": "N19",
+    "model": "tool",
+    "id": "cmsbz874x000vlj01wnhzu0i5",
+    "scope": {
+      "slug": "a-skill",
+      "type": "ai_skill",
+      "status": "published"
+    },
+    "before": {
+      "name": "AShareTrace｜A 股研究证据整理 Skill",
+      "englishName": "AShareTrace | Evidence Notes for A-Share Research"
+    },
+    "after": {
+      "name": "AShareTrace｜A股研究资料整理",
+      "englishName": "AShareTrace | A-Share Research Notes"
+    }
+  },
+  {
+    "ref": "N20",
+    "model": "tool",
+    "id": "cms7qq4gh000flp012ccxlzyo",
+    "scope": {
+      "slug": "seo-geo-skill",
+      "type": "ai_skill",
+      "status": "published"
+    },
+    "before": {
+      "name": "SEO + GEO Website Audit Skill｜公开网页证据化巡检",
+      "englishName": "SEO + GEO Website Audit Skill | Evidence-Based Review of Public Pages"
+    },
+    "after": {
+      "name": "SEO + GEO Website Audit｜公开网页检查",
+      "englishName": "SEO + GEO Website Audit | Public Page Review"
+    }
+  },
+  {
+    "ref": "F07",
+    "model": "tool",
+    "id": "cmqjcgeac000jpb01v5fifcr3",
+    "scope": {
+      "slug": "ai-ai-ilo5a5",
+      "type": "skill_learning",
+      "status": "published"
+    },
+    "before": {
+      "valueProposition": null,
+      "englishValueProposition": null
+    },
+    "after": {
+      "valueProposition": "通过项目练习，用 AI 制作图文和视频内容。",
+      "englishValueProposition": "Learn to create written content, images, and videos through practical AI projects."
+    }
+  },
+  {
+    "ref": "F07",
+    "model": "tool",
+    "id": "cmqdyc4qx0001o801w9ida67i",
+    "scope": {
+      "slug": "ai-at8nui",
+      "type": "skill_learning",
+      "status": "published"
+    },
+    "before": {
+      "valueProposition": null,
+      "englishValueProposition": null
+    },
+    "after": {
+      "valueProposition": "把工作、学习和教学中的常见任务整理成可复用提示词。",
+      "englishValueProposition": "Build reusable prompts for work, learning, and teaching."
+    }
+  },
+  {
+    "ref": "F11",
+    "model": "aiWorkflowCandidate",
+    "id": "cmvi77k2v000cpg01f0jrck99",
+    "scope": {
+      "repositoryName": "open-design",
+      "toolId": "cmvi77k2p000apg01pbbwqw4i"
+    },
+    "before": {
+      "projectType": "workflow"
+    },
+    "after": {
+      "projectType": "software"
+    }
+  },
+  {
+    "ref": "F11",
+    "model": "aiWorkflowCandidate",
+    "id": "cmvmcyazv002snw01oju2qyr0",
+    "scope": {
+      "repositoryName": "logseq",
+      "toolId": "cmvmcyazj002qnw01l9823k3u"
+    },
+    "before": {
+      "projectType": "workflow"
+    },
+    "after": {
+      "projectType": "software"
+    }
+  },
+  {
+    "ref": "F11",
+    "model": "aiWorkflowCandidate",
+    "id": "cmvoxm0wp001imq01gjp2g2kg",
+    "scope": {
+      "repositoryName": "django-crm",
+      "toolId": "cmvoxm0wk001gmq01fvubdbdb"
+    },
+    "before": {
+      "projectType": "workflow"
+    },
+    "after": {
+      "projectType": "software"
+    }
+  },
+  {
+    "ref": "F11",
+    "model": "aiWorkflowCandidate",
+    "id": "cmvkaonw7000qqv01jju5dy0d",
+    "scope": {
+      "repositoryName": "DeepTutor",
+      "toolId": "cmvkaonvs000oqv01l8i5hdv3"
+    },
+    "before": {
+      "projectType": "workflow"
+    },
+    "after": {
+      "projectType": "software"
+    }
+  },
+  {
+    "ref": "F11",
+    "model": "aiWorkflowCandidate",
+    "id": "cmvkatelf000wqv01cyb1gcww",
+    "scope": {
+      "repositoryName": "openedx-platform",
+      "toolId": "cmvkatel7000uqv01o2j1znk6"
+    },
+    "before": {
+      "projectType": "workflow"
+    },
+    "after": {
+      "projectType": "software"
+    }
+  },
+  {
+    "ref": "F11",
+    "model": "aiWorkflowCandidate",
+    "id": "cmvrr5a4r00czpb01fle3e668",
+    "scope": {
+      "repositoryName": "DocumentServer",
+      "toolId": "cmvrr5a4l00cxpb01yi14nhab"
+    },
+    "before": {
+      "projectType": "workflow"
+    },
+    "after": {
+      "projectType": "software"
+    }
+  },
+  {
+    "ref": "F11/F20",
+    "model": "aiWorkflowCandidate",
+    "id": "cmvu9plmx004tqz01ykz3hs2j",
+    "scope": {
+      "repositoryName": "new-api",
+      "toolId": "cmvu9plms004rqz01pjhmhmk5"
+    },
+    "before": {
+      "projectType": "workflow",
+      "topicId": "aw-topic-6802f31247e42e6a468d"
+    },
+    "after": {
+      "projectType": "software",
+      "topicId": "enhe-audit-model-access-management"
+    }
+  },
+  {
+    "ref": "F11",
+    "model": "aiWorkflowCandidate",
+    "id": "cmvkaw1z5000zqv01p0fasieo",
+    "scope": {
+      "repositoryName": "engram",
+      "toolId": "cmvkaw1yy000xqv01xyqczyr0"
+    },
+    "before": {
+      "projectType": "workflow"
+    },
+    "after": {
+      "projectType": "software"
+    }
+  },
+  {
+    "ref": "F11",
+    "model": "aiWorkflowCandidate",
+    "id": "cmvxyeln6001kli01kae2sf7h",
+    "scope": {
+      "repositoryName": "lossless-cut",
+      "toolId": "cmvxyelmz001ili01vsiduh30"
+    },
+    "before": {
+      "projectType": "workflow"
+    },
+    "after": {
+      "projectType": "software"
+    }
+  },
+  {
+    "ref": "F11",
+    "model": "aiWorkflowCandidate",
+    "id": "cmvxymji3001nli0178701zg2",
+    "scope": {
+      "repositoryName": "auto-editor",
+      "toolId": "cmvxymjhy001lli01tbbbozfq"
+    },
+    "before": {
+      "projectType": "workflow"
+    },
+    "after": {
+      "projectType": "software"
+    }
+  },
+  {
+    "ref": "F11",
+    "model": "aiWorkflowCandidate",
+    "id": "cmvy4fzz50002nz017mj107u3",
+    "scope": {
+      "repositoryName": "html-video",
+      "toolId": "cmvy4fzyz0000nz01bupvjpyo"
+    },
+    "before": {
+      "projectType": "workflow"
+    },
+    "after": {
+      "projectType": "software"
+    }
+  },
+  {
+    "ref": "F11",
+    "model": "aiWorkflowCandidate",
+    "id": "cmvy4iwrh0005nz01c02h6ker",
+    "scope": {
+      "repositoryName": "Open-Generative-AI",
+      "toolId": "cmvy4iwra0003nz01bdtocc6n"
+    },
+    "before": {
+      "projectType": "workflow"
+    },
+    "after": {
+      "projectType": "software"
+    }
+  },
+  {
+    "ref": "F11",
+    "model": "aiWorkflowCandidate",
+    "id": "cmvnncpb5000hmq01ri75vsvm",
+    "scope": {
+      "repositoryName": "OpenViking",
+      "toolId": "cmvnncpb0000fmq01i9ctdvuu"
+    },
+    "before": {
+      "projectType": "workflow"
+    },
+    "after": {
+      "projectType": "framework"
+    }
+  },
+  {
+    "ref": "F11",
+    "model": "aiWorkflowCandidate",
+    "id": "cmvnyb7at0002mq0164ll5q2e",
+    "scope": {
+      "repositoryName": "txtai",
+      "toolId": "cmvnyb7an0000mq010t2hmq91"
+    },
+    "before": {
+      "projectType": "workflow"
+    },
+    "after": {
+      "projectType": "framework"
+    }
+  },
+  {
+    "ref": "F11",
+    "model": "aiWorkflowCandidate",
+    "id": "cmvxyajd9001hli01gdqn0hfv",
+    "scope": {
+      "repositoryName": "hyperframes",
+      "toolId": "cmvxyajd3001fli01f1g1mac3"
+    },
+    "before": {
+      "projectType": "workflow"
+    },
+    "after": {
+      "projectType": "framework"
+    }
+  },
+  {
+    "ref": "F11",
+    "model": "aiWorkflowCandidate",
+    "id": "cmvuappuu004xqz01ku4pks40",
+    "scope": {
+      "repositoryName": "temporal",
+      "toolId": "cmvuappuq004vqz010czzunpa"
+    },
+    "before": {
+      "projectType": "workflow"
+    },
+    "after": {
+      "projectType": "framework"
+    }
+  },
+  {
+    "ref": "F11",
+    "model": "aiWorkflowCandidate",
+    "id": "cmvy4q7le0008nz016bnnpn0k",
+    "scope": {
+      "repositoryName": "moviepy",
+      "toolId": "cmvy4q7l80006nz01uuq6r61o"
+    },
+    "before": {
+      "projectType": "workflow"
+    },
+    "after": {
+      "projectType": "framework"
+    }
+  },
+  {
+    "ref": "F11",
+    "model": "aiWorkflowCandidate",
+    "id": "cmviudh360004p701bjh8q9kd",
+    "scope": {
+      "repositoryName": "pi",
+      "toolId": "cmviudh2w0002p7010usuk22b"
+    },
+    "before": {
+      "projectType": "workflow"
+    },
+    "after": {
+      "projectType": "agent"
+    }
+  },
+  {
+    "ref": "F11",
+    "model": "aiWorkflowCandidate",
+    "id": "cmvyk8a6p001anz01om6lp5wq",
+    "scope": {
+      "repositoryName": "OpenHands",
+      "toolId": "cmvyk8a6j0018nz01s8wrdran"
+    },
+    "before": {
+      "projectType": "workflow"
+    },
+    "after": {
+      "projectType": "agent"
+    }
+  },
+  {
+    "ref": "F11",
+    "model": "aiWorkflowCandidate",
+    "id": "cmvi77oqe000ipg01s0u0pnth",
+    "scope": {
+      "repositoryName": "awesome-vue",
+      "toolId": "cmvi77oqd000gpg01808yec83"
+    },
+    "before": {
+      "projectType": "workflow"
+    },
+    "after": {
+      "projectType": "learning_material"
+    }
+  },
+  {
+    "ref": "F11",
+    "model": "aiWorkflowCandidate",
+    "id": "cmvnn2qxh000emq01ph3b4tvy",
+    "scope": {
+      "repositoryName": "the-book-of-secret-knowledge",
+      "toolId": "cmvnn2qwx000cmq01ucfjo6in"
+    },
+    "before": {
+      "projectType": "workflow"
+    },
+    "after": {
+      "projectType": "learning_material"
+    }
+  },
+  {
+    "ref": "F11",
+    "model": "aiWorkflowCandidate",
+    "id": "cmvi77mia000fpg01xseozfr3",
+    "scope": {
+      "repositoryName": "awesome-mcp-servers",
+      "toolId": "cmvi77mi9000dpg01odrcv7w6"
+    },
+    "before": {
+      "projectType": "workflow"
+    },
+    "after": {
+      "projectType": "learning_material"
+    }
+  },
+  {
+    "ref": "F11",
+    "model": "aiWorkflowCandidate",
+    "id": "cmvmjrp4k0002mr014h0ieg5p",
+    "scope": {
+      "repositoryName": "awesome-ai-tools",
+      "toolId": "cmvmjrp4a0000mr016q2fv8gg"
+    },
+    "before": {
+      "projectType": "workflow"
+    },
+    "after": {
+      "projectType": "learning_material"
+    }
+  },
+  {
+    "ref": "F11",
+    "model": "aiWorkflowCandidate",
+    "id": "cmviwchq00002mw017cr0ne7u",
+    "scope": {
+      "repositoryName": "llm-course",
+      "toolId": "cmviwchpm0000mw014wuyiv64"
+    },
+    "before": {
+      "projectType": "workflow"
+    },
+    "after": {
+      "projectType": "learning_material"
+    }
+  },
+  {
+    "ref": "F11",
+    "model": "aiWorkflowCandidate",
+    "id": "cmvrtufxb00d6pb01k33199cn",
+    "scope": {
+      "repositoryName": "awesome-ai-vtubers",
+      "toolId": "cmvrtufx600d4pb01hpxz28vz"
+    },
+    "before": {
+      "projectType": "workflow"
+    },
+    "after": {
+      "projectType": "learning_material"
+    }
+  },
+  {
+    "ref": "F11",
+    "model": "aiWorkflowCandidate",
+    "id": "cmvoxqeen001omq016lmf7be2",
+    "scope": {
+      "repositoryName": "awesome-marketing",
+      "toolId": "cmvoxqeei001mmq01sf1ky5wq"
+    },
+    "before": {
+      "projectType": "workflow"
+    },
+    "after": {
+      "projectType": "learning_material"
+    }
+  },
+  {
+    "ref": "F11",
+    "model": "aiWorkflowCandidate",
+    "id": "cmvkaruwv000tqv012dua7nec",
+    "scope": {
+      "repositoryName": "500-AI-Agents-Projects",
+      "toolId": "cmvkaruwp000rqv01wbkdr9x6"
+    },
+    "before": {
+      "projectType": "workflow"
+    },
+    "after": {
+      "projectType": "learning_material"
+    }
+  },
+  {
+    "ref": "F11",
+    "model": "aiWorkflowCandidate",
+    "id": "cmvub5ak80050qz01dzktanw5",
+    "scope": {
+      "repositoryName": "go-recipes",
+      "toolId": "cmvub5ak3004yqz01lly49v79"
+    },
+    "before": {
+      "projectType": "workflow"
+    },
+    "after": {
+      "projectType": "learning_material"
+    }
+  },
+  {
+    "ref": "F11",
+    "model": "aiWorkflowCandidate",
+    "id": "cmvymfi0q001gnz018hsm137p",
+    "scope": {
+      "repositoryName": "awesome-scalability",
+      "toolId": "cmvymfi0m001enz01v0yfpb9w"
+    },
+    "before": {
+      "projectType": "workflow"
+    },
+    "after": {
+      "projectType": "learning_material"
+    }
+  },
+  {
+    "ref": "F11",
+    "model": "aiWorkflowCandidate",
+    "id": "cmvmjxos90005mr01opvf6vlq",
+    "scope": {
+      "repositoryName": "SenseNova-Skills",
+      "toolId": "cmvmjxos30003mr01s53cuh53"
+    },
+    "before": {
+      "projectType": "workflow"
+    },
+    "after": {
+      "projectType": "skill_pack"
+    }
+  },
+  {
+    "ref": "F11",
+    "model": "aiWorkflowCandidate",
+    "id": "cmviwejm40005mw01gj66y9qs",
+    "scope": {
+      "repositoryName": "impeccable",
+      "toolId": "cmviwejlu0003mw016j9mz9nf"
+    },
+    "before": {
+      "projectType": "workflow"
+    },
+    "after": {
+      "projectType": "skill_pack"
+    }
+  },
+  {
+    "ref": "F11",
+    "model": "aiWorkflowCandidate",
+    "id": "cmvoxon5o001lmq01ecvi2rfu",
+    "scope": {
+      "repositoryName": "ai-business-skills",
+      "toolId": "cmvoxon5i001jmq014uyh6010"
+    },
+    "before": {
+      "projectType": "workflow"
+    },
+    "after": {
+      "projectType": "skill_pack"
+    }
+  },
+  {
+    "ref": "F11",
+    "model": "aiWorkflowCandidate",
+    "id": "cmvyme1o4001dnz01xfv1920s",
+    "scope": {
+      "repositoryName": "archify",
+      "toolId": "cmvyme1o0001bnz011wjp1ba7"
+    },
+    "before": {
+      "projectType": "workflow"
+    },
+    "after": {
+      "projectType": "skill_pack"
+    }
+  },
+  {
+    "ref": "F05/F26",
+    "model": "newsCategory",
+    "id": "cmsiq1su9000tqct53bn2xvha",
+    "scope": {
+      "slug": "tool-guide",
+      "status": "active"
+    },
+    "before": {
+      "name": "工具选型指南"
+    },
+    "after": {
+      "name": "工具选用指南"
+    }
+  },
+  {
+    "ref": "F05/F26",
+    "model": "newsCategory",
+    "id": "cmv7i7d30003ppi3bh90vl3ox",
+    "scope": {
+      "slug": "tutorial",
+      "status": "active"
+    },
+    "before": {
+      "name": "AI工具选型指南"
+    },
+    "after": {
+      "name": "接口安全指南"
+    }
+  },
+  {
+    "ref": "F05/F26",
+    "model": "newsCategory",
+    "id": "cmv4mthn0003kppegv992pok8",
+    "scope": {
+      "slug": "ai-tool-selection-guide",
+      "status": "active"
+    },
+    "before": {
+      "name": "AI工具选型指南"
+    },
+    "after": {
+      "name": "模型与智能体评估"
+    }
+  },
+  {
+    "ref": "F21",
+    "model": "toolFaq",
+    "id": "cmqqe83770000mk6a7sphylrq",
+    "scope": {
+      "toolId": "cmq8as4e80008s901592x4o26",
+      "status": "active"
+    },
+    "before": {
+      "question": "AI Video Studio 无所不能版本｜本地AI视频生成工作站｜文生视频 图生视频 视频增强 完整部署包主要用来做什么？",
+      "answer": "AI Video Studio 无所不能版本｜本地AI视频生成工作站｜文生视频 图生视频 视频增强 完整部署包用于辅助完成 AI 工具应用、内容生产、流程处理或效率提升类任务。使用前建议结合详情页说明确认适用场景、版本信息和交付方式。"
+    },
+    "after": {
+      "question": "AI视频生成主要用来做什么？",
+      "answer": "在符合显卡和磁盘要求的 Windows 电脑上用文字或图片生成视频。运行速度和效果取决于设备、模型和设置。"
+    }
+  },
+  {
+    "ref": "F21",
+    "model": "toolFaq",
+    "id": "cmqqe83770001mk6aykv0oewd",
+    "scope": {
+      "toolId": "cmq8as4e80008s901592x4o26",
+      "status": "active"
+    },
+    "before": {
+      "question": "购买AI Video Studio 无所不能版本｜本地AI视频生成工作站｜文生视频 图生视频 视频增强 完整部署包后如何获取下载内容？",
+      "answer": "完成购买并通过审核后，可在用户中心查看对应软件的下载链接、版本信息和使用说明。请以当前详情页和用户中心展示内容为准。"
+    },
+    "after": {
+      "question": "购买AI视频生成后如何获取下载内容？",
+      "answer": "选择方案并完成付款后，用购买时的账号打开本页或用户中心查看已解锁的下载入口。"
+    }
+  },
+  {
+    "ref": "F21",
+    "model": "toolFaq",
+    "id": "cmqqe83770002mk6amhl0c8ju",
+    "scope": {
+      "toolId": "cmq8as4e80008s901592x4o26",
+      "status": "active"
+    },
+    "before": {
+      "question": "使用AI Video Studio 无所不能版本｜本地AI视频生成工作站｜文生视频 图生视频 视频增强 完整部署包前需要确认什么？",
+      "answer": "请先查看系统要求、版本记录、工具介绍、价格说明和使用教程，确认软件适合你的设备环境、任务目标和工作流程。"
+    },
+    "after": {
+      "question": "使用AI视频生成前需要确认什么？",
+      "answer": "请先查看系统要求、版本记录、工具介绍、价格说明和使用教程，确认软件适合你的设备环境、任务目标和工作流程。"
+    }
+  },
+  {
+    "ref": "F21",
+    "model": "toolFaq",
+    "id": "cmqqe83770003mk6a002iwbhg",
+    "scope": {
+      "toolId": "cmq8as4e80008s901592x4o26",
+      "status": "active"
+    },
+    "before": {
+      "question": "AI Video Studio 无所不能版本｜本地AI视频生成工作站｜文生视频 图生视频 视频增强 完整部署包如何融入实际工作流？",
+      "answer": "建议先明确要完成的任务，再按照详情页和教程进行小范围测试，确认输出质量、操作步骤和成本后再用于高频工作。"
+    },
+    "after": {
+      "question": "AI视频生成如何融入实际工作流？",
+      "answer": "建议先明确要完成的任务，再按照详情页和教程进行小范围测试，确认输出质量、操作步骤和成本后再用于高频工作。"
+    }
+  },
+  {
+    "ref": "F21",
+    "model": "toolFaq",
+    "id": "cmqqe83770004mk6a6vbhe9gr",
+    "scope": {
+      "toolId": "cmq8as4e80008s901592x4o26",
+      "status": "active"
+    },
+    "before": {
+      "question": "遇到AI Video Studio 无所不能版本｜本地AI视频生成工作站｜文生视频 图生视频 视频增强 完整部署包下载、安装或使用问题怎么办？",
+      "answer": "可以先查看详情页、教程和版本说明；如果仍有问题，可联系 ENHE AI 客服获取下载、安装、使用或更新相关支持。"
+    },
+    "after": {
+      "question": "遇到AI视频生成下载、安装或使用问题怎么办？",
+      "answer": "可以先查看详情页、教程和版本说明；如果仍有问题，可联系 ENHE AI 客服获取下载、安装、使用或更新相关支持。"
+    }
+  },
+  {
+    "ref": "F21",
+    "model": "toolFaq",
+    "id": "cmqqe837c0005mk6a1mc9jq7b",
+    "scope": {
+      "toolId": "cmqcgxxe6000jpm01z4o0t5dy",
+      "status": "active"
+    },
+    "before": {
+      "question": "AI语音生成（随心所欲版）｜本地离线 AI 语音合成工具主要用来做什么？",
+      "answer": "AI语音生成（随心所欲版）｜本地离线 AI 语音合成工具用于辅助完成 AI 工具应用、内容生产、流程处理或效率提升类任务。使用前建议结合详情页说明确认适用场景、版本信息和交付方式。"
+    },
+    "after": {
+      "question": "AI配音主要用来做什么？",
+      "answer": "在符合要求的 Windows 电脑上生成旁白和多角色语音。请先核对系统、模型、设备以及声音素材的使用授权。"
+    }
+  },
+  {
+    "ref": "F21",
+    "model": "toolFaq",
+    "id": "cmqqe837c0006mk6a2ekrpe14",
+    "scope": {
+      "toolId": "cmqcgxxe6000jpm01z4o0t5dy",
+      "status": "active"
+    },
+    "before": {
+      "question": "购买AI语音生成（随心所欲版）｜本地离线 AI 语音合成工具后如何获取下载内容？",
+      "answer": "完成购买并通过审核后，可在用户中心查看对应软件的下载链接、版本信息和使用说明。请以当前详情页和用户中心展示内容为准。"
+    },
+    "after": {
+      "question": "购买AI配音后如何获取下载内容？",
+      "answer": "选择方案并完成付款后，用购买时的账号打开本页或用户中心查看已解锁的下载入口。"
+    }
+  },
+  {
+    "ref": "F21",
+    "model": "toolFaq",
+    "id": "cmqqe837c0007mk6a0exyokkm",
+    "scope": {
+      "toolId": "cmqcgxxe6000jpm01z4o0t5dy",
+      "status": "active"
+    },
+    "before": {
+      "question": "使用AI语音生成（随心所欲版）｜本地离线 AI 语音合成工具前需要确认什么？",
+      "answer": "请先查看系统要求、版本记录、工具介绍、价格说明和使用教程，确认软件适合你的设备环境、任务目标和工作流程。"
+    },
+    "after": {
+      "question": "使用AI配音前需要确认什么？",
+      "answer": "请先查看系统要求、版本记录、工具介绍、价格说明和使用教程，确认软件适合你的设备环境、任务目标和工作流程。"
+    }
+  },
+  {
+    "ref": "F21",
+    "model": "toolFaq",
+    "id": "cmqqe837d0008mk6a6wrzu34d",
+    "scope": {
+      "toolId": "cmqcgxxe6000jpm01z4o0t5dy",
+      "status": "active"
+    },
+    "before": {
+      "question": "AI语音生成（随心所欲版）｜本地离线 AI 语音合成工具如何融入实际工作流？",
+      "answer": "建议先明确要完成的任务，再按照详情页和教程进行小范围测试，确认输出质量、操作步骤和成本后再用于高频工作。"
+    },
+    "after": {
+      "question": "AI配音如何融入实际工作流？",
+      "answer": "建议先明确要完成的任务，再按照详情页和教程进行小范围测试，确认输出质量、操作步骤和成本后再用于高频工作。"
+    }
+  },
+  {
+    "ref": "F21",
+    "model": "toolFaq",
+    "id": "cmqqe837d0009mk6az1frpmwm",
+    "scope": {
+      "toolId": "cmqcgxxe6000jpm01z4o0t5dy",
+      "status": "active"
+    },
+    "before": {
+      "question": "遇到AI语音生成（随心所欲版）｜本地离线 AI 语音合成工具下载、安装或使用问题怎么办？",
+      "answer": "可以先查看详情页、教程和版本说明；如果仍有问题，可联系 ENHE AI 客服获取下载、安装、使用或更新相关支持。"
+    },
+    "after": {
+      "question": "遇到AI配音下载、安装或使用问题怎么办？",
+      "answer": "可以先查看详情页、教程和版本说明；如果仍有问题，可联系 ENHE AI 客服获取下载、安装、使用或更新相关支持。"
+    }
+  },
+  {
+    "ref": "F21",
+    "model": "toolFaq",
+    "id": "cmqqe837g000amk6aebeld3ls",
+    "scope": {
+      "toolId": "cmq12l5x70001no01ertij57f",
+      "status": "active"
+    },
+    "before": {
+      "question": "手机聊天截图素材制作（无需代码、操作简单、功能最强版本）主要用来做什么？",
+      "answer": "手机聊天截图素材制作（无需代码、操作简单、功能最强版本）用于辅助完成 AI 工具应用、内容生产、流程处理或效率提升类任务。使用前建议结合详情页说明确认适用场景、版本信息和交付方式。"
+    },
+    "after": {
+      "question": "聊天界面模拟器主要用来做什么？",
+      "answer": "制作可编辑的模拟对话截图，适用于演示和设计。图片用于表现虚构场景，不能作为真实聊天记录的证明。"
+    }
+  },
+  {
+    "ref": "F21",
+    "model": "toolFaq",
+    "id": "cmqqe837g000bmk6a7axo7wl2",
+    "scope": {
+      "toolId": "cmq12l5x70001no01ertij57f",
+      "status": "active"
+    },
+    "before": {
+      "question": "购买手机聊天截图素材制作（无需代码、操作简单、功能最强版本）后如何获取下载内容？",
+      "answer": "完成购买并通过审核后，可在用户中心查看对应软件的下载链接、版本信息和使用说明。请以当前详情页和用户中心展示内容为准。"
+    },
+    "after": {
+      "question": "购买聊天界面模拟器后如何获取下载内容？",
+      "answer": "选择方案并完成付款后，用购买时的账号打开本页或用户中心查看已解锁的下载入口。"
+    }
+  },
+  {
+    "ref": "F21",
+    "model": "toolFaq",
+    "id": "cmqqe837g000cmk6a8ih9ct27",
+    "scope": {
+      "toolId": "cmq12l5x70001no01ertij57f",
+      "status": "active"
+    },
+    "before": {
+      "question": "使用手机聊天截图素材制作（无需代码、操作简单、功能最强版本）前需要确认什么？",
+      "answer": "请先查看系统要求、版本记录、工具介绍、价格说明和使用教程，确认软件适合你的设备环境、任务目标和工作流程。"
+    },
+    "after": {
+      "question": "使用聊天界面模拟器前需要确认什么？",
+      "answer": "请先查看系统要求、版本记录、工具介绍、价格说明和使用教程，确认软件适合你的设备环境、任务目标和工作流程。"
+    }
+  },
+  {
+    "ref": "F21",
+    "model": "toolFaq",
+    "id": "cmqqe837g000dmk6aidnwuqqq",
+    "scope": {
+      "toolId": "cmq12l5x70001no01ertij57f",
+      "status": "active"
+    },
+    "before": {
+      "question": "手机聊天截图素材制作（无需代码、操作简单、功能最强版本）如何融入实际工作流？",
+      "answer": "建议先明确要完成的任务，再按照详情页和教程进行小范围测试，确认输出质量、操作步骤和成本后再用于高频工作。"
+    },
+    "after": {
+      "question": "聊天界面模拟器如何融入实际工作流？",
+      "answer": "建议先明确要完成的任务，再按照详情页和教程进行小范围测试，确认输出质量、操作步骤和成本后再用于高频工作。"
+    }
+  },
+  {
+    "ref": "F21",
+    "model": "toolFaq",
+    "id": "cmqqe837g000emk6aw03r8rpi",
+    "scope": {
+      "toolId": "cmq12l5x70001no01ertij57f",
+      "status": "active"
+    },
+    "before": {
+      "question": "遇到手机聊天截图素材制作（无需代码、操作简单、功能最强版本）下载、安装或使用问题怎么办？",
+      "answer": "可以先查看详情页、教程和版本说明；如果仍有问题，可联系 ENHE AI 客服获取下载、安装、使用或更新相关支持。"
+    },
+    "after": {
+      "question": "遇到聊天界面模拟器下载、安装或使用问题怎么办？",
+      "answer": "可以先查看详情页、教程和版本说明；如果仍有问题，可联系 ENHE AI 客服获取下载、安装、使用或更新相关支持。"
+    }
+  },
+  {
+    "ref": "F21",
+    "model": "toolFaq",
+    "id": "cmqqe837j000fmk6acz6k0mke",
+    "scope": {
+      "toolId": "cmq1595360001pe010juszymh",
+      "status": "active"
+    },
+    "before": {
+      "question": "FaceSwap Studio 中文整合版｜AI 人脸替换工具主要用来做什么？",
+      "answer": "FaceSwap Studio 中文整合版｜AI 人脸替换工具用于辅助完成 AI 工具应用、内容生产、流程处理或效率提升类任务。使用前建议结合详情页说明确认适用场景、版本信息和交付方式。"
+    },
+    "after": {
+      "question": "FaceSwap Studio主要用来做什么？",
+      "answer": "在 Windows 上使用已授权的图片和视频，进行人像合成的学习、测试和演示。处理前请取得素材及相关人员授权。"
+    }
+  },
+  {
+    "ref": "F21",
+    "model": "toolFaq",
+    "id": "cmqqe837j000gmk6ab4w0uoh2",
+    "scope": {
+      "toolId": "cmq1595360001pe010juszymh",
+      "status": "active"
+    },
+    "before": {
+      "question": "购买FaceSwap Studio 中文整合版｜AI 人脸替换工具后如何获取下载内容？",
+      "answer": "完成购买并通过审核后，可在用户中心查看对应软件的下载链接、版本信息和使用说明。请以当前详情页和用户中心展示内容为准。"
+    },
+    "after": {
+      "question": "购买FaceSwap Studio后如何获取下载内容？",
+      "answer": "选择方案并完成付款后，用购买时的账号打开本页或用户中心查看已解锁的下载入口。"
+    }
+  },
+  {
+    "ref": "F21",
+    "model": "toolFaq",
+    "id": "cmqqe837j000hmk6aob43j5v0",
+    "scope": {
+      "toolId": "cmq1595360001pe010juszymh",
+      "status": "active"
+    },
+    "before": {
+      "question": "使用FaceSwap Studio 中文整合版｜AI 人脸替换工具前需要确认什么？",
+      "answer": "请先查看系统要求、版本记录、工具介绍、价格说明和使用教程，确认软件适合你的设备环境、任务目标和工作流程。"
+    },
+    "after": {
+      "question": "使用FaceSwap Studio前需要确认什么？",
+      "answer": "请先查看系统要求、版本记录、工具介绍、价格说明和使用教程，确认软件适合你的设备环境、任务目标和工作流程。"
+    }
+  },
+  {
+    "ref": "F21",
+    "model": "toolFaq",
+    "id": "cmqqe837j000imk6a9cb6h8t9",
+    "scope": {
+      "toolId": "cmq1595360001pe010juszymh",
+      "status": "active"
+    },
+    "before": {
+      "question": "FaceSwap Studio 中文整合版｜AI 人脸替换工具如何融入实际工作流？",
+      "answer": "建议先明确要完成的任务，再按照详情页和教程进行小范围测试，确认输出质量、操作步骤和成本后再用于高频工作。"
+    },
+    "after": {
+      "question": "FaceSwap Studio如何融入实际工作流？",
+      "answer": "建议先明确要完成的任务，再按照详情页和教程进行小范围测试，确认输出质量、操作步骤和成本后再用于高频工作。"
+    }
+  },
+  {
+    "ref": "F21",
+    "model": "toolFaq",
+    "id": "cmqqe837j000jmk6av9li40jx",
+    "scope": {
+      "toolId": "cmq1595360001pe010juszymh",
+      "status": "active"
+    },
+    "before": {
+      "question": "遇到FaceSwap Studio 中文整合版｜AI 人脸替换工具下载、安装或使用问题怎么办？",
+      "answer": "可以先查看详情页、教程和版本说明；如果仍有问题，可联系 ENHE AI 客服获取下载、安装、使用或更新相关支持。"
+    },
+    "after": {
+      "question": "遇到FaceSwap Studio下载、安装或使用问题怎么办？",
+      "answer": "可以先查看详情页、教程和版本说明；如果仍有问题，可联系 ENHE AI 客服获取下载、安装、使用或更新相关支持。"
+    }
+  },
+  {
+    "ref": "F21",
+    "model": "toolFaq",
+    "id": "cmqqe837n000kmk6a8qeqbsc6",
+    "scope": {
+      "toolId": "cmq9qedna0001p30141wm2sc0",
+      "status": "active"
+    },
+    "before": {
+      "question": "ZFB转账链接二维码生成器主要用来做什么？",
+      "answer": "ZFB转账链接二维码生成器用于辅助完成 AI 工具应用、内容生产、流程处理或效率提升类任务。使用前建议结合详情页说明确认适用场景、版本信息和交付方式。"
+    },
+    "after": {
+      "question": "链接与二维码整理工具主要用来做什么？",
+      "answer": "整理常用网址及其二维码，预览并核对目标地址后再将入口素材分享给他人。"
+    }
+  },
+  {
+    "ref": "F21",
+    "model": "toolFaq",
+    "id": "cmqqe837n000lmk6ao7k4p57g",
+    "scope": {
+      "toolId": "cmq9qedna0001p30141wm2sc0",
+      "status": "active"
+    },
+    "before": {
+      "question": "购买ZFB转账链接二维码生成器后如何获取下载内容？",
+      "answer": "完成购买并通过审核后，可在用户中心查看对应软件的下载链接、版本信息和使用说明。请以当前详情页和用户中心展示内容为准。"
+    },
+    "after": {
+      "question": "如何获取免费的链接与二维码整理工具？",
+      "answer": "打开本页的免费下载入口，按页面提示获取文件。"
+    }
+  },
+  {
+    "ref": "F21",
+    "model": "toolFaq",
+    "id": "cmqqe837n000mmk6a1p0rr10t",
+    "scope": {
+      "toolId": "cmq9qedna0001p30141wm2sc0",
+      "status": "active"
+    },
+    "before": {
+      "question": "使用ZFB转账链接二维码生成器前需要确认什么？",
+      "answer": "请先查看系统要求、版本记录、工具介绍、价格说明和使用教程，确认软件适合你的设备环境、任务目标和工作流程。"
+    },
+    "after": {
+      "question": "使用链接与二维码整理工具前需要确认什么？",
+      "answer": "请先查看系统要求、版本记录、工具介绍、价格说明和使用教程，确认软件适合你的设备环境、任务目标和工作流程。"
+    }
+  },
+  {
+    "ref": "F21",
+    "model": "toolFaq",
+    "id": "cmqqe837n000nmk6ah2x5gtvq",
+    "scope": {
+      "toolId": "cmq9qedna0001p30141wm2sc0",
+      "status": "active"
+    },
+    "before": {
+      "question": "ZFB转账链接二维码生成器如何融入实际工作流？",
+      "answer": "建议先明确要完成的任务，再按照详情页和教程进行小范围测试，确认输出质量、操作步骤和成本后再用于高频工作。"
+    },
+    "after": {
+      "question": "链接与二维码整理工具如何融入实际工作流？",
+      "answer": "建议先明确要完成的任务，再按照详情页和教程进行小范围测试，确认输出质量、操作步骤和成本后再用于高频工作。"
+    }
+  },
+  {
+    "ref": "F21",
+    "model": "toolFaq",
+    "id": "cmqqe837n000omk6a1ks0c8jz",
+    "scope": {
+      "toolId": "cmq9qedna0001p30141wm2sc0",
+      "status": "active"
+    },
+    "before": {
+      "question": "遇到ZFB转账链接二维码生成器下载、安装或使用问题怎么办？",
+      "answer": "可以先查看详情页、教程和版本说明；如果仍有问题，可联系 ENHE AI 客服获取下载、安装、使用或更新相关支持。"
+    },
+    "after": {
+      "question": "遇到链接与二维码整理工具下载、安装或使用问题怎么办？",
+      "answer": "可以先查看详情页、教程和版本说明；如果仍有问题，可联系 ENHE AI 客服获取下载、安装、使用或更新相关支持。"
+    }
+  },
+  {
+    "ref": "F02",
+    "model": "toolFaq",
+    "id": "cmrfay83u003zry01xspx6hml",
+    "scope": {
+      "toolId": "cmrfae70c0029ry01kq6lqgv1",
+      "status": "active"
+    },
+    "before": {
+      "question": "Codex连接切换器 | 一键管理官方ChatGPT与第三方AI模型连接的作用是什么？",
+      "answer": "Codex连接切换器是一款Windows AI工具，帮助用户一键切换官方ChatGPT账号模式与第三方AI API连接，支持CCswitch、OpenRouter、SiliconFlow等AI网关，无需修改配置文件。\r\n\r\nCodex Provider Switcher is a Windows AI utility that lets you quickly switch between official ChatGPT access and third-party AI API providers like OpenRouter and SiliconFlow without editing configuration files."
+    },
+    "after": {
+      "question": "[[zh]]切换 Codex 连接时会修改本机设置吗？[[/zh]]\n\n[[en]]Does switching Codex connections change local settings?[[/en]]",
+      "answer": "[[zh]]会。工具在 Windows 上切换官方登录模式与已配置的第三方 API 连接，可能更改本地配置、认证状态或用户环境变量。操作前备份设置、退出相关程序并确认服务商支持；需要回退时使用备份恢复。[[/zh]]\n\n[[en]]Yes. Switching between official sign-in and a configured third-party API can change local configuration, authentication state, or user environment variables on Windows. Back up your settings, close related programs, and check provider support before switching. Use your backup to restore the previous configuration if needed.[[/en]]"
+    }
+  },
+  {
+    "ref": "F21",
+    "model": "toolPriceSpec",
+    "id": "cmv886v580013k7019sd2okps",
+    "scope": {
+      "toolId": "cmv886v540011k701j50i41u0",
+      "status": "active"
+    },
+    "before": {
+      "name": "Codex 本地备份工具"
+    },
+    "after": {
+      "name": "Codex Backup｜项目与工作资料备份"
+    }
+  },
+  {
+    "ref": "F21",
+    "model": "toolPriceSpec",
+    "id": "cmvdjv6rv0005mh01ti0jmpib",
+    "scope": {
+      "toolId": "cmvdjv6qr0003mh01m97gk8d1",
+      "status": "active"
+    },
+    "before": {
+      "name": "SearchScope SEO/GEO 巡检"
+    },
+    "after": {
+      "name": "SearchScope｜网站问题检查与修复建议"
+    }
+  },
+  {
+    "ref": "F21",
+    "model": "toolPriceSpec",
+    "id": "cmvsq31gw001gqz01snaeyjbl",
+    "scope": {
+      "toolId": "cmvsq31gc001eqz01j97i8nig",
+      "status": "active"
+    },
+    "before": {
+      "name": "AI短剧质变Skill"
+    },
+    "after": {
+      "name": "短剧分镜助手｜将剧本整理成镜头提示词"
+    }
+  },
+  {
+    "ref": "F21",
+    "model": "toolPriceSpec",
+    "id": "cmrm83d3h0012o901ei1haapq",
+    "scope": {
+      "toolId": "cmrm83d3b0010o901ddkfb3ku",
+      "status": "active"
+    },
+    "before": {
+      "name": "AI提示词管理系统"
+    },
+    "after": {
+      "name": "AI提示词库桌面版"
+    }
+  },
+  {
+    "ref": "F21",
+    "model": "toolPriceSpec",
+    "id": "cmsbz875r000xlj01wvc92rqr",
+    "scope": {
+      "toolId": "cmsbz874x000vlj01wnhzu0i5",
+      "status": "active"
+    },
+    "before": {
+      "name": "中国 A 股市场深度分析Skill"
+    },
+    "after": {
+      "name": "AShareTrace｜A股研究资料整理"
+    }
+  },
+  {
+    "ref": "F21",
+    "model": "toolPriceSpec",
+    "id": "cmv868ejj000ak7011buk7bsa",
+    "scope": {
+      "toolId": "cmv868ejd0008k701zx0z5q70",
+      "status": "active"
+    },
+    "before": {
+      "name": "GitHub 本地备份工具"
+    },
+    "after": {
+      "name": "GitHub Backup｜将项目备份到电脑"
+    }
+  },
+  {
+    "ref": "F21",
+    "model": "toolPriceSpec",
+    "id": "cmvpd63m0000hpb01bht4qphc",
+    "scope": {
+      "toolId": "cmvpd63lt000fpb012od6636y",
+      "status": "active"
+    },
+    "before": {
+      "name": "小红书/抖音爆款内容自动创作Skill"
+    },
+    "after": {
+      "name": "AI资讯写作｜双平台图文草稿"
+    }
+  },
+  {
+    "ref": "F21",
+    "model": "toolPriceSpec",
+    "id": "cmvb3yajz000ums01v2qknlmz",
+    "scope": {
+      "toolId": "cmvb3uaub000kms01t581dxn8",
+      "status": "active"
+    },
+    "before": {
+      "name": "AI无损沟通对话 Skill"
+    },
+    "after": {
+      "name": "IntentBridge｜需求澄清与确认"
+    }
+  },
+  {
+    "ref": "F21",
+    "model": "toolPriceSpec",
+    "id": "cmv6la3fr001js1018i0e6xf9",
+    "scope": {
+      "toolId": "cmv6la3fn001hs1019ggrf9ur",
+      "status": "active"
+    },
+    "before": {
+      "name": "Product-video"
+    },
+    "after": {
+      "name": "Product Video Studio｜产品介绍视频制作"
+    }
+  },
+  {
+    "ref": "F21",
+    "model": "toolPriceSpec",
+    "id": "cmqrl77ih001il9018r55jodh",
+    "scope": {
+      "toolId": "cmqrl77i7001gl901sxj7mh3y",
+      "status": "active"
+    },
+    "before": {
+      "name": "Windows 桌面工作流 | AI 智能体伴侣"
+    },
+    "after": {
+      "name": "Lumi-OS｜桌面AI助手"
+    }
+  },
+  {
+    "ref": "F21",
+    "model": "toolPriceSpec",
+    "id": "cmqcgxxem000lpm019v8pjnmf",
+    "scope": {
+      "toolId": "cmqcgxxe6000jpm01z4o0t5dy",
+      "status": "active"
+    },
+    "before": {
+      "name": "AI语音生成（随心所欲版）"
+    },
+    "after": {
+      "name": "AI配音｜旁白与多角色对话"
+    }
+  },
+  {
+    "ref": "F21",
+    "model": "toolPriceSpec",
+    "id": "cmrkqr9gc001an001y2anwmhy",
+    "scope": {
+      "toolId": "cmrkqr9ek0018n001szhsd14j",
+      "status": "active"
+    },
+    "before": {
+      "name": "无限制生成 AI 数字人视频"
+    },
+    "after": {
+      "name": "InfiniteTalk｜数字人口播视频制作"
+    }
+  },
+  {
+    "ref": "N01/cover",
+    "model": "tool",
+    "id": "cmvdjv6qr0003mh01m97gk8d1",
+    "scope": {
+      "slug": "searchscope-seo-geo",
+      "type": "software",
+      "status": "published"
+    },
+    "before": {
+      "coverImage": "cos://enhe-ai-tools-1303691623/tool-cover-searchscope-seo-geo/1792311290334-searchscope-enhe-cover-1672x941.png"
+    },
+    "after": {
+      "coverImage": "/images/naming-20261121/searchscope-seo-geo.webp"
+    }
+  },
+  {
+    "ref": "N02/cover",
+    "model": "tool",
+    "id": "cmv886v540011k701j50i41u0",
+    "scope": {
+      "slug": "codex",
+      "type": "software",
+      "status": "published"
+    },
+    "before": {
+      "coverImage": "cos://enhe-ai-tools-1303691623/tool-cover-codex/1791989348860-codex-backup-enhe-cover-1672x941.png"
+    },
+    "after": {
+      "coverImage": "/images/naming-20261121/codex.webp"
+    }
+  },
+  {
+    "ref": "N03/cover",
+    "model": "tool",
+    "id": "cmv868ejd0008k701zx0z5q70",
+    "scope": {
+      "slug": "github",
+      "type": "software",
+      "status": "published"
+    },
+    "before": {
+      "coverImage": "cos://enhe-ai-tools-1303691623/tool-cover-github/1791986061421-github-backup-enhe-cover-1672x941.png"
+    },
+    "after": {
+      "coverImage": "/images/naming-20261121/github.webp"
+    }
+  },
+  {
+    "ref": "N04/cover",
+    "model": "tool",
+    "id": "cmv6la3fn001hs1019ggrf9ur",
+    "scope": {
+      "slug": "ai-codex",
+      "type": "software",
+      "status": "published"
+    },
+    "before": {
+      "coverImage": "cos://enhe-ai-tools-1303691623/tool-cover-ai-codex/1791890536964-file.png"
+    },
+    "after": {
+      "coverImage": "/images/naming-20261121/ai-codex.webp"
+    }
+  },
+  {
+    "ref": "N05/cover",
+    "model": "tool",
+    "id": "cmv663doi0003s101uo2vodo0",
+    "scope": {
+      "slug": "ai-ai-zorvp8",
+      "type": "software",
+      "status": "published"
+    },
+    "before": {
+      "coverImage": "cos://enhe-ai-tools-1303691623/tool-cover-ai-ai-zorvp8/1791864966192-agentguardian-enhe-cover-1672x941.png"
+    },
+    "after": {
+      "coverImage": "/images/naming-20261121/ai-ai-zorvp8.webp"
+    }
+  },
+  {
+    "ref": "N06/cover",
+    "model": "tool",
+    "id": "cmqrl77i7001gl901sxj7mh3y",
+    "scope": {
+      "slug": "windows-ai",
+      "type": "software",
+      "status": "published"
+    },
+    "before": {
+      "coverImage": "/uploads/1783007262227-tool-cover-windows-ai-lumios-windows-ai-cover-1672x941.png"
+    },
+    "after": {
+      "coverImage": "/images/naming-20261121/windows-ai.webp"
+    }
+  },
+  {
+    "ref": "N07/cover",
+    "model": "tool",
+    "id": "cmqcgxxe6000jpm01z4o0t5dy",
+    "scope": {
+      "slug": "ai-ai",
+      "type": "software",
+      "status": "published"
+    },
+    "before": {
+      "coverImage": "/uploads/1782230665915-tool-cover-ai-ai-chatgpt-image-2026-6-23-23-50-43-4-.png"
+    },
+    "after": {
+      "coverImage": "/images/naming-20261121/ai-ai.webp"
+    }
+  },
+  {
+    "ref": "N08/cover",
+    "model": "tool",
+    "id": "cmq8as4e80008s901592x4o26",
+    "scope": {
+      "slug": "ai-video-studio-ai-ai-video-studio-ai",
+      "type": "software",
+      "status": "published"
+    },
+    "before": {
+      "coverImage": "cos://enhe-ai-tools-1303691623/tool-cover-ai-video-studio-ai-ai-video-studio-ai/1793113837348-ai.png"
+    },
+    "after": {
+      "coverImage": "/images/naming-20261121/ai-video-studio-ai-ai-video-studio-ai.webp"
+    }
+  },
+  {
+    "ref": "N09/cover",
+    "model": "tool",
+    "id": "cmq12l5x70001no01ertij57f",
+    "scope": {
+      "slug": "tool-mq12l5w6",
+      "type": "software",
+      "status": "published"
+    },
+    "before": {
+      "coverImage": "/uploads/1782230711458-tool-cover-tool-mq12l5w6-chatgpt-image-2026-6-23-23-50-42-1-.png"
+    },
+    "after": {
+      "coverImage": "/images/naming-20261121/tool-mq12l5w6.webp"
+    }
+  },
+  {
+    "ref": "N10/cover",
+    "model": "tool",
+    "id": "cmq1595360001pe010juszymh",
+    "scope": {
+      "slug": "faceswap-studio-ai",
+      "type": "software",
+      "status": "published"
+    },
+    "before": {
+      "coverImage": "cos://enhe-ai-tools-1303691623/tool-cover-faceswap-studio-ai/1793112296098-ai.png"
+    },
+    "after": {
+      "coverImage": "/images/naming-20261121/faceswap-studio-ai.webp"
+    }
+  },
+  {
+    "ref": "N11/cover",
+    "model": "tool",
+    "id": "cmq9qedna0001p30141wm2sc0",
+    "scope": {
+      "slug": "zfb",
+      "type": "software",
+      "status": "published"
+    },
+    "before": {
+      "coverImage": "/uploads/1782230761787-tool-cover-zfb-chatgpt-image-2026-6-23-23-50-42-3-.png"
+    },
+    "after": {
+      "coverImage": "/images/naming-20261121/zfb.webp"
+    }
+  },
+  {
+    "ref": "N12/cover",
+    "model": "tool",
+    "id": "cmrfae70c0029ry01kq6lqgv1",
+    "scope": {
+      "slug": "codex-api",
+      "type": "software",
+      "status": "published"
+    },
+    "before": {
+      "coverImage": "/uploads/1783709184244-tool-cover-codex-api-chatgpt-image-2026-7-11-02-42-54.png"
+    },
+    "after": {
+      "coverImage": "/images/naming-20261121/codex-api.webp"
+    }
+  },
+  {
+    "ref": "N13/cover",
+    "model": "tool",
+    "id": "cmrkqr9ek0018n001szhsd14j",
+    "scope": {
+      "slug": "infinitetalk-ai",
+      "type": "software",
+      "status": "published"
+    },
+    "before": {
+      "coverImage": "/uploads/1784038998590-tool-cover-infinitetalk-ai-chatgpt-image-2026-7-14-20-18-23.png"
+    },
+    "after": {
+      "coverImage": "/images/naming-20261121/infinitetalk-ai.webp"
+    }
+  },
+  {
+    "ref": "N14/cover",
+    "model": "tool",
+    "id": "cmrm83d3b0010o901ddkfb3ku",
+    "scope": {
+      "slug": "ai-prompt",
+      "type": "software",
+      "status": "published"
+    },
+    "before": {
+      "coverImage": "/uploads/1784128582916-tool-cover-ai-prompt-ai-prompt-management-enhe-cover-bilingual-v2.png"
+    },
+    "after": {
+      "coverImage": "/images/naming-20261121/ai-prompt.webp"
+    }
+  },
+  {
+    "ref": "N15/cover",
+    "model": "tool",
+    "id": "cmwbntznu0023mu01u9c7s5ww",
+    "scope": {
+      "slug": "ai-ai-skill",
+      "type": "ai_skill",
+      "status": "published"
+    },
+    "before": {
+      "coverImage": "cos://enhe-ai-tools-1303691623/tool-cover-ai-ai-skill/1794373803094-bilingual-prose-craft-enhe-cover-1672x941.jpg"
+    },
+    "after": {
+      "coverImage": "/images/naming-20261121/ai-ai-skill.webp"
+    }
+  },
+  {
+    "ref": "N16/cover",
+    "model": "tool",
+    "id": "cmvsq31gc001eqz01j97i8nig",
+    "scope": {
+      "slug": "ai-skill-ai",
+      "type": "ai_skill",
+      "status": "published"
+    },
+    "before": {
+      "coverImage": "cos://enhe-ai-tools-1303691623/tool-cover-ai-skill-ai/1793228726967-chatgpt-2026-10-28-23-33-44.png"
+    },
+    "after": {
+      "coverImage": "/images/naming-20261121/ai-skill-ai.webp"
+    }
+  },
+  {
+    "ref": "N17/cover",
+    "model": "tool",
+    "id": "cmvpd63lt000fpb012od6636y",
+    "scope": {
+      "slug": "skill",
+      "type": "ai_skill",
+      "status": "published"
+    },
+    "before": {
+      "coverImage": "cos://enhe-ai-tools-1303691623/tool-cover-skill/1793025636235-d4bf22202b23d919041524b0e5120e62.png"
+    },
+    "after": {
+      "coverImage": "/images/naming-20261121/skill.webp"
+    }
+  },
+  {
+    "ref": "N18/cover",
+    "model": "tool",
+    "id": "cmvb3uaub000kms01t581dxn8",
+    "scope": {
+      "slug": "ai-skill",
+      "type": "ai_skill",
+      "status": "published"
+    },
+    "before": {
+      "coverImage": "cos://enhe-ai-tools-1303691623/tool-cover-ai-skill/1792163989893-intentbridge-enhe-cover-1672x941.png"
+    },
+    "after": {
+      "coverImage": "/images/naming-20261121/ai-skill.webp"
+    }
+  },
+  {
+    "ref": "N19/cover",
+    "model": "tool",
+    "id": "cmsbz874x000vlj01wnhzu0i5",
+    "scope": {
+      "slug": "a-skill",
+      "type": "ai_skill",
+      "status": "published"
+    },
+    "before": {
+      "coverImage": "https://enhe-ai-tools-1303691623.cos.ap-shanghai.myqcloud.com/tool-cover-a-skill/1785685811689-chatgpt-image-2026-8-2-23-46-55.png"
+    },
+    "after": {
+      "coverImage": "/images/naming-20261121/a-skill.webp"
+    }
+  },
+  {
+    "ref": "N20/cover",
+    "model": "tool",
+    "id": "cms7qq4gh000flp012ccxlzyo",
+    "scope": {
+      "slug": "seo-geo-skill",
+      "type": "ai_skill",
+      "status": "published"
+    },
+    "before": {
+      "coverImage": "/uploads/1785431640174-tool-cover-seo-geo-skill-chatgpt-image-2026-7-31-01-12-05-1-.png"
+    },
+    "after": {
+      "coverImage": "/images/naming-20261121/seo-geo-skill.webp"
+    }
+  }
+]

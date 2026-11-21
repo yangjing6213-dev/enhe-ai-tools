@@ -1,8 +1,8 @@
 import { expect, test } from "@playwright/test";
 
 for (const route of [
-  { path: "/ai-workflows", locale: "zh", title: "AI 工作流", searchLabel: "搜索中文名、仓库名、用途、主题或标签" },
-  { path: "/en/ai-workflows", locale: "en", title: "AI Workflows", searchLabel: "Search Chinese name, repository, use case, topic, or tag" },
+  { path: "/ai-workflows", locale: "zh", title: "项目与资料", searchLabel: "搜索中文名、仓库名、用途、主题或标签" },
+  { path: "/en/ai-workflows", locale: "en", title: "Projects & Resources", searchLabel: "Search Chinese name, repository, use case, topic, or tag" },
 ]) {
   test(`${route.locale} AI Workflows directory shows all workflows without the direction cards`, async ({ page }) => {
     await page.setViewportSize({ width: 390, height: 844 });
@@ -15,7 +15,7 @@ for (const route of [
     const directionsLabel = route.locale === "en" ? "AI application directions" : "AI 应用方向参考";
     await expect(page.getByRole("heading", { name: directionsLabel })).toHaveCount(0);
     await expect(page.getByRole("list", { name: directionsLabel })).toHaveCount(0);
-    const heading = page.getByRole("heading", { name: route.locale === "en" ? "All workflows" : "全部工作流", exact: true });
+    const heading = page.getByRole("heading", { name: route.locale === "en" ? "All projects and resources" : "全部项目与资料", exact: true });
     await expect(heading).toBeVisible();
     await expect(heading).toHaveCSS("font-size", "18px");
     await expect(page.getByRole("heading", {
@@ -34,7 +34,7 @@ test("AI Workflows search submits the workflow filters after the direction cards
   await page.getByRole("button", { name: "应用筛选", exact: true }).click();
   await expect(page).toHaveURL(/[?&]q=SaaS(?:&|$)/);
   await expect(page.getByRole("searchbox", { name: "搜索中文名、仓库名、用途、主题或标签" })).toHaveValue("SaaS");
-  await expect(page.getByRole("heading", { name: "全部工作流", exact: true })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "全部项目与资料", exact: true })).toBeVisible();
 });
 
 for (const width of [390, 1440]) {
@@ -47,14 +47,14 @@ for (const width of [390, 1440]) {
     await expect(toggle.locator('a[lang="zh"]')).toHaveAttribute("href", "/ai-workflows");
     await toggle.getByRole("switch").click();
     await expect(page).toHaveURL((url) => url.pathname === "/ai-workflows");
-    await expect(page.getByRole("heading", { level: 1, name: "AI 工作流", exact: true })).toBeVisible();
+    await expect(page.getByRole("heading", { level: 1, name: "项目与资料", exact: true })).toBeVisible();
     expect((await context.cookies()).find((cookie) => cookie.name === "enhe_locale")?.value).toBe("zh");
 
     await expect(toggle.locator('a[lang="en"]')).toHaveAttribute("href", "/en/ai-workflows");
     await toggle.getByRole("switch").focus();
     await page.keyboard.press("Space");
     await expect(page).toHaveURL((url) => url.pathname === "/en/ai-workflows");
-    await expect(page.getByRole("heading", { level: 1, name: "AI Workflows", exact: true })).toBeVisible();
+    await expect(page.getByRole("heading", { level: 1, name: "Projects & Resources", exact: true })).toBeVisible();
     expect((await context.cookies()).find((cookie) => cookie.name === "enhe_locale")?.value).toBe("en");
   });
 }

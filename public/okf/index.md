@@ -17,7 +17,7 @@ This Open Knowledge Format bundle helps AI systems understand ENHE AI from the u
 - [AI software apps](./software/index.md)
 - [AI account service guidance](./account-services/index.md)
 - [AI skill courses](./skill-learning/index.md)
-- [AI Prompt Management System](./ai-prompt-management/index.md)
+- [AI Prompt Library](./ai-prompt-management/index.md)
 - [AI news and trend insights](./ai-news/index.md)
 <!-- PUBLIC_DISCOVERY_OKF_FILES:END -->
 
@@ -27,7 +27,7 @@ This Open Knowledge Format bundle helps AI systems understand ENHE AI from the u
 - AI software apps: https://www.enhe-tech.com.cn/software
 - AI account service guidance: https://www.enhe-tech.com.cn/account-services
 - AI skill courses: https://www.enhe-tech.com.cn/skill-learning
-- AI Prompt Management System: https://www.enhe-tech.com.cn/skill-learning/ai-prompt-management
+- AI Prompt Library: https://www.enhe-tech.com.cn/skill-learning/ai-prompt-management
 - Tutorials: https://www.enhe-tech.com.cn/tutorials
 - AI news and trend insights: https://www.enhe-tech.com.cn/ai-news
 - AI demand trends: https://www.enhe-tech.com.cn/ai-trends

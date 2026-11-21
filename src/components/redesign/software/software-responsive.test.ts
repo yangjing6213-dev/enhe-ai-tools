@@ -160,7 +160,8 @@ describe("AI tools candidate responsive browsing", () => {
     expect(css).toContain(".redesign-software-card-trust-list");
     expect(css).toContain(".redesign-software-card-trust {");
     expect(card).toContain('downloadCount={product.downloadCount}');
-    expect(card).toContain('"安全审核通过"');
+    expect(card).toContain('"本站人工检查记录"');
+    expect(card).not.toContain('"安全审核通过"');
     expect(card).toContain("data-trust-safety");
     expect(card).not.toContain("data-trust-price");
     expect(card).not.toContain("data-trust-refund");

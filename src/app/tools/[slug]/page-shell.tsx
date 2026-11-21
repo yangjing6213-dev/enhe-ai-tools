@@ -1,9 +1,10 @@
+import { projectTypeLabel } from "@/lib/ai-workflows/project-types";
 import "@/styles/redesign/software.css";
 
 import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
-import { Bot, RotateCcw, ShieldCheck, Star, Terminal, type LucideIcon } from "lucide-react";
+import { Bot, Info as InfoIcon, RotateCcw, Star, Terminal, type LucideIcon } from "lucide-react";
 import { notFound, permanentRedirect } from "next/navigation";
 import {
   createCommentAction,
@@ -67,6 +68,7 @@ import {
   shouldIndexEnglishToolPage,
 } from "@/lib/tool-localization";
 import { getPrimaryToolPrice } from "@/lib/tool-price-specs";
+import { getToolOverviewHeading, getWorkflowDeliveryCopy } from "@/lib/tool-detail-copy";
 import { normalizeToolUsageSteps, parseToolChangelogVersion } from "@/lib/tool-usage-instructions";
 import { normalizeGitHubRepositoryUrl, resolveAiWorkflowDeliveryMode } from "@/lib/ai-workflows/rules";
 import { resolveAiWorkflowTopicLabel } from "@/lib/ai-workflows/topic-label";
@@ -74,6 +76,7 @@ import {
   canOpenPublicDownloadEntry,
   canOpenProtectedDownloadEntry,
   canShowDownloadLinkArea,
+  getDownloadCtaLabel,
   getDownloadLinkContent,
   linkifyDownloadLinkContent,
   resolveSoftwareDownloadCtaHref,
@@ -120,9 +123,18 @@ export async function generateToolDetailPageMetadata(
   routeBasePath = "/software",
 ): Promise<Metadata> {
   const t = getDictionary(forceLocale);
+  const routeType = routeBasePath === "/ai-skills"
+    ? "ai_skill"
+    : routeBasePath === "/ai-workflows"
+      ? "ai_workflow"
+      : routeBasePath === "/skill-learning"
+        ? "skill_learning"
+        : routeBasePath === "/account-services"
+          ? "online"
+          : "software";
   if (!process.env.DATABASE_URL?.trim()) {
     const metadata = buildPageMetadata({
-      title: `${t.toolDetail.introTitle} - ${t.brand}`,
+      title: `${getToolOverviewHeading(routeType, forceLocale)} - ${t.brand}`,
       description:
         forceLocale === "en"
           ? "UNVERIFIED - Product detail content is not available in this local preview."
@@ -160,7 +172,7 @@ export async function generateToolDetailPageMetadata(
     : buildLocalePath(`${routeBasePath}/${canonicalSlug}`, forceLocale);
   if (!tool || tool.status !== "published") {
     return buildPageMetadata({
-      title: `${t.toolDetail.introTitle} - ${t.brand}`,
+      title: `${getToolOverviewHeading(routeType, forceLocale)} - ${t.brand}`,
       description: t.listing.emptyText,
       path: canonical,
       locale: forceLocale === "en" ? "en_US" : "zh_CN",
@@ -571,13 +583,7 @@ export async function ToolDetailPageShell({
   const workflowRepository = isAiWorkflow && tool.aiWorkflowCandidate
     ? normalizeGitHubRepositoryUrl(tool.aiWorkflowCandidate.repositoryUrl)
     : null;
-  const workflowProjectType = ({
-    workflow: forceLocale === "en" ? "Workflow" : "工作流",
-    automation: forceLocale === "en" ? "Automation tool" : "自动化工具",
-    agent: forceLocale === "en" ? "Agent project" : "智能体项目",
-    template: forceLocale === "en" ? "Template" : "模板",
-    companion: forceLocale === "en" ? "Companion tool" : "配套工具",
-  } as Record<string, string>)[tool.aiWorkflowCandidate?.projectType ?? "workflow"] || (forceLocale === "en" ? "Workflow" : "工作流");
+  const workflowProjectType = projectTypeLabel(tool.aiWorkflowCandidate?.projectType, forceLocale);
   const workflowLinkOnlyReason = workflowLinkOnly
     ? workflowPackageAwaitingReview
       ? (forceLocale === "en" ? "The package is waiting for price review before downloads can be enabled." : "软件包正在等待价格审核，审核完成后才能开放下载。")
@@ -612,12 +618,20 @@ export async function ToolDetailPageShell({
       ? "Before using this page, review the suitable scenario, delivery boundary, platform rules, and support contact. ENHE AI will continue adding common questions as the page evolves."
       : "使用前请先确认适用场景、交付边界、平台规则和支持方式；页面会随产品与课程内容持续补充常见问题。";
   const freeDownloadButtonLabel = t.toolCard.getFreeTool;
+  const downloadButtonLabel = getDownloadCtaLabel({
+    locale: forceLocale,
+    isPaid: paidDownloadProduct,
+    hasPurchase: hasDownloadPurchase,
+    isLoggedIn: Boolean(user),
+    hasPublicDirectDownload: Boolean(publicDownloadHref),
+  });
   const priceSpecHelpId = "tool-purchase-price-spec-help";
   const paymentMethodLabelId = "tool-purchase-payment-method-label";
   const paymentMethodHelpId = "tool-purchase-payment-method-help";
   const commentHelpId = "tool-comment-help";
+  const workflowDeliveryCopy = getWorkflowDeliveryCopy(forceLocale);
   const purchaseButtonLabel = workflowLinkOnly
-    ? forceLocale === "en" ? "Get workflow" : "获取工作流"
+    ? workflowDeliveryCopy.originalProject
     : isAccountService
     ? td.buyService
     : paidSkillCourse
@@ -628,10 +642,8 @@ export async function ToolDetailPageShell({
           ? td.buyDownload.replace("{price}", Number(servicePrice).toFixed(2))
           : freeDownloadButtonLabel;
   const checkoutButtonLabel = forceLocale === "en" ? "Click to purchase" : "点击购买";
-  const workflowDetailsTitle = forceLocale === "en" ? "AI workflow details" : "AI 工作流详情";
-  const introTitle = isAiWorkflow
-    ? forceLocale === "en" ? "Workflow introduction" : "工作流介绍"
-    : isAccountService ? td.serviceIntroTitle : td.introTitle;
+  const workflowDetailsTitle = forceLocale === "en" ? "Project details" : "项目详情";
+  const introTitle = getToolOverviewHeading(tool.type, forceLocale);
   const productImagesIntro = isAccountService
     ? td.serviceProductImagesIntro
     : td.productImagesIntro;
@@ -665,7 +677,7 @@ export async function ToolDetailPageShell({
           tool.type === "software"
             ? t.listing.softwareTitle
             : tool.type === "ai_workflow"
-              ? (forceLocale === "en" ? "AI Workflows" : "AI 工作流")
+              ? (forceLocale === "en" ? "Projects & Resources" : "项目与资料")
             : tool.type === "ai_skill"
               ? t.listing.aiSkillTitle
             : tool.type === "online"
@@ -860,7 +872,7 @@ export async function ToolDetailPageShell({
                     : tool.type === "skill_learning"
                       ? td.skillLearning
                       : isAiWorkflow
-                        ? forceLocale === "en" ? "AI workflow" : "AI 工作流"
+                        ? forceLocale === "en" ? "Project" : "项目"
                       : td.online}
                 </Badge>
                 <Badge
@@ -873,7 +885,7 @@ export async function ToolDetailPageShell({
                   }
                 >
                   {workflowLinkOnly
-                    ? forceLocale === "en" ? "GitHub source ZIP and repository" : "GitHub 源码 ZIP 与原仓库"
+                    ? forceLocale === "en" ? "Source project · deployment required" : "源码项目 · 需自行部署"
                     : paidSkillCourse
                     ? forceLocale === "en" ? "Paid course" : "付费课程"
                     : tool.type === "software" && tool.isDownloadPaid
@@ -942,7 +954,7 @@ export async function ToolDetailPageShell({
                         <>
                           <Info
                             label={forceLocale === "en" ? "Delivery" : "获取方式"}
-                            value={forceLocale === "en" ? "GitHub source ZIP and repository link" : "GitHub 源码 ZIP 与原仓库链接"}
+                            value={workflowDeliveryCopy.delivery}
                           />
                           <Info
                             label={forceLocale === "en" ? "Project language" : "项目语言"}
@@ -957,20 +969,24 @@ export async function ToolDetailPageShell({
                         <div className="product-safety-info-card">
                           <p className="text-xs text-[#8F9DB2]">{forceLocale === "en" ? "TRUST & SAFETY" : "信任与安全"}</p>
                           <div className="product-safety-info-heading">
-                            <ShieldCheck size={20} aria-hidden="true" />
-                            <strong>{forceLocale === "en" ? "Manual safety review passed" : "安全审核通过"}</strong>
+                            <InfoIcon size={20} aria-hidden="true" />
+                            <strong>{forceLocale === "en" ? "Review record" : "检查记录"}</strong>
                           </div>
                           <p className="product-safety-info-date">
-                            {forceLocale === "en" ? "Confirmed by an ENHE AI admin on " : "由 ENHE AI 管理员于"}
+                            {forceLocale === "en" ? "Date recorded by an ENHE AI admin: " : "ENHE AI 管理员记录日期："}
                             {tool.securityReviewedAt.toLocaleDateString(forceLocale === "en" ? "en-US" : "zh-CN", { year: "numeric", month: "2-digit", day: "2-digit", timeZone: "Asia/Shanghai" })}
-                            {forceLocale === "en" ? "." : "确认。"}
+                            {forceLocale === "en" ? "." : "。"}
                           </p>
                           <p className="product-safety-info-note">
-                            {forceLocale === "en" ? "Please verify the source and system requirements before installing." : "安装前请核对来源和系统要求。"}
+                            {forceLocale === "en"
+                              ? "Only the date was recorded. The reviewed version, checks performed and results were not recorded. Verify the source and requirements before installing."
+                              : "这条记录仅含日期，未记录检查版本、项目或结果。安装前请核对文件来源和系统要求。"}
                           </p>
                         </div>
                       ) : null}
-                      {refundPolicyCard}
+                      {refundPolicyCard ?? (creatorProfile ? (
+                        <div className="product-refund-policy-slot" aria-hidden="true" />
+                      ) : null)}
                       {visibleUsageMetric ? (
                         <Info
                           label={td.usageCount}
@@ -985,7 +1001,7 @@ export async function ToolDetailPageShell({
               </div>
               {creatorProfile ? (
                 <aside className="creator-profile-card" aria-label={forceLocale === "en" ? "Creator information" : "创作者信息"}>
-                  <p className="creator-profile-eyebrow">CREATOR</p>
+                  <p className="creator-profile-eyebrow">{forceLocale === "en" ? "Creator" : "创作者"}</p>
                   <div className="creator-profile-content">
                     <div className="creator-profile-author">
                       <div className="creator-profile-identity">
@@ -1240,7 +1256,7 @@ export async function ToolDetailPageShell({
                           : paidDownloadProduct && !hasDownloadPurchase ? "前往购买" : "查看如何使用"
                         : paidDownloadProduct && hasDownloadPurchase
                           ? isAiSkill ? td.downloadSkill : td.downloadSoftware
-                          : freeDownloadButtonLabel}
+                          : downloadButtonLabel}
                     </ButtonLink>
                   ) : (
                     <ButtonLink
@@ -1266,10 +1282,16 @@ export async function ToolDetailPageShell({
                       data-analytics-entity-type="tool"
                       data-analytics-entity-id={tool.id}
                     >
-                      {forceLocale === "en" ? "Download GitHub source ZIP" : "下载 GitHub 源码 ZIP"}
+                      {workflowDeliveryCopy.sourceArchive}
                     </ButtonLink>
                   ) : null}
                 </div>
+
+                {workflowLinkOnly ? (
+                  <p className="mt-3 text-sm leading-6 text-[#8F9DB2]">
+                    {workflowDeliveryCopy.noVerifiedInstaller}
+                  </p>
+                ) : null}
 
                 {isDownloadProduct && tool.isDownloadPaid && !shouldShowPurchaseForm ? (
                   <p className="mt-4 text-sm leading-6 text-[#FFB86B]">
@@ -1316,7 +1338,7 @@ export async function ToolDetailPageShell({
                   <Info label={forceLocale === "en" ? "Application area" : "应用方向"} value={tool.aiWorkflowCandidate.topic ? resolveAiWorkflowTopicLabel(tool.aiWorkflowCandidate.topic, forceLocale) || "-" : "-"} />
                   <Info label={forceLocale === "en" ? "Project type" : "项目类型"} value={workflowProjectType} />
                   <Info label={forceLocale === "en" ? "License" : "开源许可证"} value={tool.aiWorkflowCandidate.licenseSpdx || (forceLocale === "en" ? "Not provided" : "未提供")} />
-                  <Info label={workflowLinkOnly ? (forceLocale === "en" ? "Delivery" : "获取方式") : (forceLocale === "en" ? "Package version" : "交付版本")} value={workflowLinkOnly ? (forceLocale === "en" ? "GitHub source ZIP and repository link" : "GitHub 源码 ZIP 与原仓库链接") : tool.aiWorkflowCandidate.packageVersion || tool.version || "-"} />
+                  <Info label={workflowLinkOnly ? (forceLocale === "en" ? "Delivery" : "获取方式") : (forceLocale === "en" ? "Package version" : "交付版本")} value={workflowLinkOnly ? workflowDeliveryCopy.delivery : tool.aiWorkflowCandidate.packageVersion || tool.version || "-"} />
                   <Info label={workflowLinkOnly ? (forceLocale === "en" ? "GitHub stars" : "GitHub 星标") : (forceLocale === "en" ? "Package size" : "压缩包大小")} value={workflowLinkOnly ? `${(tool.aiWorkflowCandidate.githubStars ?? 0).toLocaleString()} · ${tool.aiWorkflowCandidate.starsUpdatedAt?.toLocaleDateString(forceLocale === "en" ? "en-US" : "zh-CN") ?? "-"}` : tool.aiWorkflowCandidate.packageSize ? `${(Number(tool.aiWorkflowCandidate.packageSize) / 1024 / 1024).toFixed(1)} MB` : "-"} />
                   <Info label={workflowLinkOnly ? (forceLocale === "en" ? "Package verification" : "打包核验") : (forceLocale === "en" ? "Verified environments" : "实际验证环境")} value={workflowLinkOnly ? workflowPackageAwaitingReview ? (forceLocale === "en" ? "Awaiting price review" : "等待价格审核") : tool.aiWorkflowCandidate.failureReason === "CANDIDATE_TEST_FAILED" ? (forceLocale === "en" ? "Automated test did not pass" : "自动测试未通过") : (forceLocale === "en" ? "No ENHE package available" : "本站暂无可下载包") : tool.aiWorkflowCandidate.verifiedEnvironments.length ? tool.aiWorkflowCandidate.verifiedEnvironments.join(" · ") : localizedSystemRequirement || (forceLocale === "en" ? "Not recorded" : "暂无记录")} />
                 </div>

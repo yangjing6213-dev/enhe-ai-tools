@@ -142,6 +142,25 @@ describe("forum member actions", () => {
     expect(mocks.postCreate).toHaveBeenCalledWith({ data: expect.objectContaining({ status: "approved" }) });
   });
 
+  it("stores an uploaded image as the topic cover", async () => {
+    const data = form({ category: "showcase", title: "我的作品", content: "作品说明", coverAttachmentId: "cover-1" });
+    data.append("attachmentIds", "cover-1");
+    mocks.attachmentFindMany.mockResolvedValue([{ id: "cover-1", authorId: "user-1", kind: "image", fileSize: 1024, postId: null, replyId: null, discardedAt: null, createdAt: new Date() }]);
+
+    await createForumPostAction(data);
+
+    expect(mocks.postCreate).toHaveBeenCalledWith({ data: expect.objectContaining({ coverAttachmentId: "cover-1" }) });
+  });
+
+  it("rejects a cover that is not one of the uploaded topic images", async () => {
+    const data = form({ category: "showcase", title: "我的作品", content: "作品说明", coverAttachmentId: "other-file" });
+    data.append("attachmentIds", "cover-1");
+    mocks.attachmentFindMany.mockResolvedValue([{ id: "cover-1", authorId: "user-1", kind: "image", fileSize: 1024, postId: null, replyId: null, discardedAt: null, createdAt: new Date() }]);
+
+    await expect(createForumPostAction(data)).rejects.toThrow("FORUM_INVALID_COVER_ATTACHMENT");
+    expect(mocks.postCreate).not.toHaveBeenCalled();
+  });
+
   it("rejects video uploads and more than four images on a reply", async () => {
     const video = form({ postId: "post-1", content: "看这个作品" });
     video.append("attachmentIds", "video-1");

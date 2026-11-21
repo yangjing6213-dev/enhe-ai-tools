@@ -71,6 +71,7 @@ test("homepage polish stays readable, responsive, and interactive without extern
     const brand = page.locator(".redesign-brand-lockup");
     const brandLabel = page.locator(".redesign-header[data-home='true'] .redesign-brand-label");
     const hero = page.locator(".redesign-home-hero");
+    const mobileCards = hero.locator(".redesign-home-mobile-cards");
     await expect(brand).toBeVisible();
     await expect(brandLabel).toHaveCount(0);
     await expect(hero.locator("h1")).toHaveAttribute("aria-label", "AI一站式平台 创造未来 改变生活");
@@ -80,14 +81,33 @@ test("homepage polish stays readable, responsive, and interactive without extern
     await expect(heroTitleLines.nth(1).locator(".masked-heading__measure")).toHaveText("创造未来改变生活");
     await expect(heroTitleLines.locator(".masked-heading__source")).toHaveCount(2);
     await expect(page.locator(".redesign-footer .redesign-home-brand-value-cta")).toHaveCount(0);
-    await expect(hero.locator(".redesign-home-hero-inner")).toHaveCSS("text-align", "center");
-    await expect(hero).toHaveCSS("background-image", "none");
+    await expect(hero.locator(".redesign-home-hero-inner")).toHaveCSS(
+      "text-align",
+      width < 768 ? "left" : "center",
+    );
+    if (width < 768) {
+      await expect(hero).not.toHaveCSS("background-image", "none");
+      await expect(hero.locator(".redesign-home-mobile-title")).toBeVisible();
+      await expect(hero.locator(".redesign-home-animated-line").first()).toBeHidden();
+      await expect(mobileCards).toBeVisible();
+    } else {
+      await expect(hero).toHaveCSS("background-image", "none");
+      await expect(hero.locator(".redesign-home-mobile-title")).toHaveCSS("display", "none");
+      await expect(mobileCards).toHaveCSS("display", "none");
+    }
     const heroColor = await hero.evaluate((element) => getComputedStyle(element).color);
+    const expectedHeroTextColor = width < 768 ? "rgb(255, 255, 255)" : "rgb(0, 0, 0)";
+    expect(heroColor).toBe(expectedHeroTextColor);
     const expectedNeutralTextColor = "rgb(0, 0, 0)";
-    expect(heroColor).toBe(expectedNeutralTextColor);
     expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBeLessThanOrEqual(width);
 
-    expect((await brand.boundingBox())?.width).toBe(width < 360 ? width - 200 : width < 420 ? 156 : 200);
+    const brandWidth = (await brand.boundingBox())?.width ?? 0;
+    if (width < 360) {
+      expect(brandWidth).toBeGreaterThan(width * 0.35);
+      expect(brandWidth).toBeLessThanOrEqual(width * 0.4);
+    } else {
+      expect(brandWidth).toBe(width < 420 ? 152 : 200);
+    }
 
     if (width < 768) {
       const layout = await page.locator(".redesign-header-inner").evaluate((inner) => {
@@ -137,6 +157,12 @@ test("homepage polish stays readable, responsive, and interactive without extern
 
     const productHeading = page.locator(".redesign-home-products-heading h2");
     await expect(productHeading).toHaveCSS("text-align", "center");
+    if (width === 1440) {
+      const logo = (await page.locator(".redesign-brand-mark--dark").boundingBox())!;
+      const search = (await page.locator(".redesign-header-search input").boundingBox())!;
+      const centerDelta = (logo.y + logo.height / 2) - (search.y + search.height / 2);
+      expect(Math.abs(centerDelta), `Logo minus search centerline: ${centerDelta}px`).toBeLessThanOrEqual(2);
+    }
     const matchedHomeFontSizes = await page.evaluate(() => {
       const fontSize = (selector: string) => {
         const element = document.querySelector<HTMLElement>(selector);
@@ -206,6 +232,8 @@ test("homepage polish stays readable, responsive, and interactive without extern
     await expect(reviews.getByRole("button", { name: "下一条评价" })).toHaveCount(0);
     if (width <= 480) {
       await expect(reviews.locator('.redesign-home-review-card:not([data-position="0"])').first()).toHaveCSS("visibility", "hidden");
+      const activeReviewCard = reviews.locator('.redesign-home-review-card[data-position="0"]');
+      await expect.poll(() => activeReviewCard.evaluate((card) => card.getBoundingClientRect().right)).toBeLessThanOrEqual(width);
       const activeReviewBounds = await reviews.locator('.redesign-home-review-card[data-position="0"]').evaluate((card) => {
         const { left, right, width: cardWidth } = card.getBoundingClientRect();
         return { left, right, width: cardWidth };
@@ -233,7 +261,8 @@ test("homepage polish stays readable, responsive, and interactive without extern
 
     const footer = page.locator(".redesign-footer");
     await expect(footer).toHaveCSS("background-color", "rgb(13, 58, 109)");
-    await expect(page.locator(".redesign-brand-mark")).toHaveAttribute("src", /enhe-standard-black-preview\.gif/);
+    await expect(page.locator(".redesign-brand-mark--dark")).toHaveAttribute("src", /enhe-standard-black-preview\.gif/);
+    await expect(page.locator(".redesign-brand-mark--mobile-white")).toHaveAttribute("src", /enhe-standard-white-plain-1024\.gif/);
     await expect(footer.locator(".footer-brand-logo")).toHaveAttribute("src", /enhe-white-en-preview\.gif/);
     const footerAlignment = await footer.evaluate((element) => {
       const heading = element.querySelector<HTMLElement>(".redesign-home-brand-value-inner h2");
@@ -267,6 +296,28 @@ test("homepage polish stays readable, responsive, and interactive without extern
       return icon.left - title.right;
     }));
     expect(chevronGaps.every((gap) => gap >= 6 && gap <= 10)).toBe(true);
+    if (width === 1440) {
+      const socialControls = footer.locator(".footer-social-links").locator("a, button.footer-social-bookmark");
+      await expect(socialControls).toHaveCount(4);
+      for (const control of await socialControls.all()) {
+        await control.hover();
+        const foreground = await control.evaluate((element) => getComputedStyle(element).color);
+        expect(foreground).toBe("rgb(0, 0, 0)");
+        await expect.poll(() => control.evaluate((element) => getComputedStyle(element).backgroundColor))
+          .toBe("rgb(255, 255, 255)");
+        await expect.poll(() => control.evaluate((element) => getComputedStyle(element).backgroundColor))
+          .toBe("rgb(255, 255, 255)");
+      }
+      await footer.locator(".footer-social-bookmark").click();
+      await expect(footer.locator(".favorite-site-feedback")).toContainText("浏览器不允许网页自动添加书签");
+    }
+    if (width < 768) {
+      await footer.locator(".footer-social-bookmark").click();
+      const hint = await footer.locator(".favorite-site-feedback").boundingBox();
+      expect(hint).toBeTruthy();
+      expect(hint!.x).toBeGreaterThanOrEqual(0);
+      expect(hint!.x + hint!.width).toBeLessThanOrEqual(width);
+    }
     const footerGroup = footer.locator("details.footer-group").first();
     await expect(footerGroup).not.toHaveAttribute("open", "");
     await footerGroup.locator("summary").click();
@@ -338,7 +389,7 @@ test("homepage polish stays readable, responsive, and interactive without extern
     }
 
     if (process.env.ENHE_CAPTURE_HOME_UI === "1") {
-      await page.screenshot({ path: `test-results/homepage-ui-polish-${width}.png`, fullPage: true });
+      await page.screenshot({ path: test.info().outputPath(`homepage-ui-polish-${width}.png`), fullPage: true });
     }
   }
 
@@ -362,7 +413,7 @@ test("homepage polish stays readable, responsive, and interactive without extern
     await page.locator(".redesign-home-products").scrollIntoViewIfNeeded();
     await expect(page.locator('.redesign-home-product-media[data-media-status="ready"]').first()).toBeVisible();
     await page.evaluate(() => window.scrollTo(0, 0));
-    await page.screenshot({ path: "test-results/homepage-ui-polish-dark-1440.png", fullPage: true });
+    await page.screenshot({ path: test.info().outputPath("homepage-ui-polish-dark-1440.png"), fullPage: true });
   }
   await page.setViewportSize({ width: 1440, height: 900 });
   const englishResponse = await page.goto("/en", { waitUntil: "load" });
@@ -443,9 +494,10 @@ test("floating cart and inbox match the white circular support icon and open per
         }],
         notifications: [{
           id: "notification-1",
-          title: "订单支付提醒",
-          content: "你的订单正在等待付款。",
-          linkUrl: null,
+          type: "creator_message",
+          title: "收到新的创作者联系消息",
+          content: "发送者：访客\n产品：示例工具\n留言：\n如何使用？",
+          linkUrl: "/user#notifications",
           isRead: false,
           createdAt: "2026-10-11T04:00:00.000Z",
         }],
@@ -500,8 +552,13 @@ test("floating cart and inbox match the white circular support icon and open per
 
   await inbox.click();
   const inboxPanel = page.getByRole("dialog", { name: "站内消息" });
-  await expect(inboxPanel).toContainText("订单支付提醒");
-  await expect(inboxPanel).toContainText("你的订单正在等待付款。");
+  await expect(inboxPanel).toContainText("收到新的创作者联系消息");
+  await expect(inboxPanel).toContainText("如何使用？");
+  await inboxPanel.getByText("回复此消息").click();
+  const replyInput = inboxPanel.getByPlaceholder("输入回复内容");
+  await expect(replyInput).toBeVisible();
+  await expect(replyInput).toHaveCSS("color", "rgb(0, 0, 0)");
+  await expect(replyInput).toHaveCSS("background-color", "rgb(255, 255, 255)");
   await page.keyboard.press("Escape");
   await expect(inboxPanel).toHaveCount(0);
 });

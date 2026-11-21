@@ -47,6 +47,8 @@ export async function createForumPostAction(formData: FormData) {
   });
   if (!parsed.success) throw new Error("FORUM_INVALID_POST");
   const attachmentIds = readForumAttachmentIds(formData, "post");
+  const coverAttachmentId = readText(formData, "coverAttachmentId").trim() || null;
+  if (coverAttachmentId && (!/^[a-zA-Z0-9_-]{1,100}$/.test(coverAttachmentId) || !attachmentIds.includes(coverAttachmentId))) throw new Error("FORUM_INVALID_COVER_ATTACHMENT");
 
   const since = new Date(Date.now() - forumSubmissionWindowMs);
   const [posts, replies] = await Promise.all([
@@ -55,12 +57,13 @@ export async function createForumPostAction(formData: FormData) {
   ]);
   if (!canCreateForumContent(posts + replies)) throw new Error("FORUM_SUBMISSION_LIMIT");
 
-  const data = { ...parsed.data, authorId: user.id, status: "approved" as const };
+  const data = { ...parsed.data, authorId: user.id, coverAttachmentId, status: "approved" as const };
   if (attachmentIds.length) {
     await prisma.$transaction(async (tx) => {
       const where = { id: { in: attachmentIds }, authorId: user.id, postId: null, replyId: null, discardedAt: null, createdAt: { gte: new Date(Date.now() - forumAttachmentLifetimeMs) } };
       const attachments = await tx.forumAttachment.findMany({ where });
       assertForumAttachmentSelection(attachmentIds, attachments, user.id, "post");
+      if (coverAttachmentId && attachments.find((attachment) => attachment.id === coverAttachmentId)?.kind !== "image") throw new Error("FORUM_INVALID_COVER_ATTACHMENT");
       const post = await tx.forumPost.create({ data });
       const claimed = await tx.forumAttachment.updateMany({ where, data: { postId: post.id } });
       if (claimed.count !== attachmentIds.length) throw new Error("FORUM_INVALID_ATTACHMENTS");

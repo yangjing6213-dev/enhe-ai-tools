@@ -107,6 +107,19 @@ describe("software page schema boundary", () => {
     expect(actionStart).toBeGreaterThan(statusEnd);
   });
 
+  it.each([["zh", "下一页", "/software"], ["en", "Next Page", "/en/software"]] as const)(
+    "labels the %s page-replacement action and retains its filters",
+    async (locale, label, path) => {
+      const nextHref = `${path}?category=video&page=3&q=studio`;
+      const html = renderToStaticMarkup(await SoftwarePageShell({
+        searchParams: Promise.resolve({ category: "video", page: "2", q: "studio" }),
+        forceLocale: locale,
+        preloadedListing: { ...emptyListing(), page: 2, nextHref, previousHref: `${path}?category=video&q=studio`, totalPages: 3 },
+      }));
+      expect(html).toContain(`href="${path}?category=video&amp;page=3&amp;q=studio" rel="next">${label}</a>`);
+    },
+  );
+
   it("keeps the collection schema for a non-empty configured catalog", async () => {
     const tree = await SoftwarePageShell({
       searchParams: Promise.resolve({}),

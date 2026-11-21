@@ -4,7 +4,7 @@ for (const prefix of ['', '/en']) {
     const groups = [
       {
         paths: ['/skill-learning/ai-prompt-management', '/ai-skills', '/ai-workflows'],
-        labels: prefix ? ['AI prompts', 'AI Skills', 'AI workflows'] : ['AI 提示词', 'AI Skills', 'AI 工作流'],
+        labels: prefix ? ['Prompt Library', 'AI Skill Packs', 'Projects & Resources'] : ['提示词库', 'AI技能包', '项目与资料'],
       },
       {
         paths: ['/ai-news/topics/ai-agent', '/ai-news/topics/local-ai', '/ai-news/topics/open-source-models', '/ai-news/topics/ai-tutorials', '/ai-news/topics/ai-regulation'],

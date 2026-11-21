@@ -2,10 +2,11 @@
 
 import { useCallback, useEffect, useState } from "react";
 import Link from "next/link";
+import { mergeChatGroups } from "@/lib/group-chat/merge-groups";
 
 type Group = {
-  id: string; name: string; description: string; rules?: string; avatarMediaId?: string | null;
-  activeMemberCount?: number; maxMembers?: number; pauseJoins?: boolean; readOnly?: boolean;
+  id: string; ownerId?: string; name: string; description: string; rules?: string; avatarMediaId?: string | null;
+  activeMemberCount: number; maxMembers: number; pauseJoins?: boolean; readOnly?: boolean;
   unreadCount?: number; role?: string; muted?: boolean; status?: string; membershipStatus?: string | null; applicationPending?: boolean;
   lastMessage?: { text: string; sender: string; createdAt: string } | null;
 };
@@ -37,7 +38,7 @@ export function ChatHub({ isSiteAdmin = false, initialTab = "mine" }: { isSiteAd
         fetch("/api/chat/groups?mode=discover", { cache: "no-store" }).then(jsonResponse),
         fetch("/api/chat/groups?mode=applications", { cache: "no-store" }).then(jsonResponse),
       ]);
-      setGroups([...mine.groups, ...discover.groups.map((group: Group) => ({ ...group, _discover: true }))]);
+      setGroups(mergeChatGroups(mine.groups as Group[], discover.groups as Group[]));
       setApplications(applied.applications);
     } catch (caught) {
       setError(caught instanceof Error ? caught.message : "群聊信息暂时无法加载。");
@@ -106,14 +107,14 @@ export function ChatHub({ isSiteAdmin = false, initialTab = "mine" }: { isSiteAd
           {visibleGroups.map((group) => <article className="enhe-chat-card" key={`${tab}-${group.id}`}>
             <div className="enhe-chat-row">
               <span className="enhe-chat-avatar" aria-hidden="true">{group.name.slice(0, 1)}</span>
-              <div><h2>{group.name}</h2><span className="enhe-chat-muted">{group.activeMemberCount ?? 0} / {group.maxMembers ?? 0} 位成员</span></div>
+              <div><h2>{group.name}</h2><span className="enhe-chat-muted">{group.activeMemberCount} / {group.maxMembers} 位成员</span></div>
               {Boolean(group.unreadCount) && <strong aria-label={`${group.unreadCount} 条未读`}>{group.unreadCount}</strong>}
             </div>
             <p>{group.description}</p>
             {group.lastMessage && tab === "mine" && <p className="enhe-chat-muted">{group.lastMessage.sender}：{group.lastMessage.text}</p>}
             {tab === "mine" ? <div className="enhe-chat-actions">
               <Link className="enhe-chat-button enhe-chat-button-primary" href={`/chat/${group.id}`}>{group.readOnly ? "查看群聊" : "进入群聊"}</Link>
-              {(group.role === "owner" || group.role === "admin") && <Link className="enhe-chat-button" href={`/chat/${group.id}/manage`}>管理</Link>}
+              {(group.role === "owner" || group.role === "admin" || isSiteAdmin) && <Link className="enhe-chat-button" href={isSiteAdmin && group.role === "member" ? `/admin/chat-groups/${group.id}` : `/chat/${group.id}/manage`}>管理</Link>}
             </div> : <>
               <p className="enhe-chat-muted">群规：{group.rules}</p>
               {group.applicationPending ? <span className="enhe-chat-muted">申请审核中</span> : group.pauseJoins ? <span className="enhe-chat-muted">暂不接收新成员</span> : <button className="enhe-chat-button enhe-chat-button-primary" disabled={busyId === group.id} onClick={() => void apply(group)}>{busyId === group.id ? "提交中…" : "申请加入"}</button>}

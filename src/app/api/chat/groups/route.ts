@@ -19,7 +19,7 @@ export async function GET(request: Request) {
     const rows = await prisma.chatGroup.findMany({
       where: { status: "active", visibility: "listed" },
       select: {
-        id: true, name: true, description: true, rules: true, avatarMediaId: true,
+        id: true, ownerId: true, name: true, description: true, rules: true, avatarMediaId: true,
         activeMemberCount: true, maxMembers: true, pauseJoins: true, readOnly: true, status: true,
         members: { where: { userId: actor.id }, select: { status: true }, take: 1 },
         applications: { where: { userId: actor.id, status: "pending" }, select: { id: true }, take: 1 },
@@ -56,8 +56,8 @@ export async function GET(request: Request) {
       role: true, muted: true, mutedUntil: true, lastReadSequence: true,
       group: {
         select: {
-          id: true, name: true, description: true, avatarMediaId: true,
-          activeMemberCount: true, lastSequence: true, readOnly: true, status: true,
+          id: true, ownerId: true, name: true, description: true, avatarMediaId: true,
+          activeMemberCount: true, maxMembers: true, lastSequence: true, readOnly: true, status: true,
           messages: { where: { status: "active" }, orderBy: { sequence: "desc" }, take: 1, select: { text: true, sender: { select: { nickname: true } }, createdAt: true } },
         },
       },

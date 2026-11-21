@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { AiNewsTranslationPanel } from "@/app/admin/ai-news-translation-panel";
+import { RichTextEditor } from "@/components/rich-text-editor";
 import { Field, inputClass, textareaClass } from "@/app/admin/admin-ui";
 
 type AiNewsEnglishFieldsProps = {
@@ -65,14 +66,18 @@ export function AiNewsEnglishFields({ article }: AiNewsEnglishFieldsProps) {
       <Field label="English summary" className="md:col-span-2">
         <textarea name="englishSummary" value={englishSummary} onChange={(event) => setEnglishSummary(event.target.value)} className={textareaClass} />
       </Field>
-      <Field label="English content" className="md:col-span-2">
-        <textarea
+      <div className="enhe-admin-field md:col-span-2">
+        <span className="mb-2 block text-sm font-semibold">English content</span>
+        <RichTextEditor
           name="englishContent"
+          locale="en"
+          ariaLabel="English content"
+          newsMedia
           value={englishContent}
-          onChange={(event) => setEnglishContent(event.target.value)}
+          onChange={setEnglishContent}
           className={`${textareaClass} min-h-[260px]`}
         />
-      </Field>
+      </div>
       <Field label="English takeaways" className="md:col-span-2">
         <textarea
           name="englishKeyTakeaways"

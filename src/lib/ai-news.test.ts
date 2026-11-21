@@ -210,6 +210,16 @@ describe("AI news helpers", () => {
     ]);
   });
 
+  it("keeps embedded uploads at their original position between paragraphs", () => {
+    expect(renderNewsContentBlocks("Start\n\n![Photo](/uploads/photo.png)\n\nMiddle\n\n!video[Clip](/uploads/clip.mp4)\n\nEnd")).toEqual([
+      { type: "paragraph", text: "Start" },
+      { type: "image", src: "/api/uploads/photo.png", alt: "Photo" },
+      { type: "paragraph", text: "Middle" },
+      { type: "video", src: "/api/uploads/clip.mp4", label: "Clip" },
+      { type: "paragraph", text: "End" },
+    ]);
+  });
+
   it("renders safe internal markdown links in paragraph and list blocks", () => {
     const blocks = renderNewsContentBlocks(
       "正文可查看 [AI软件应用](/software) 和 [AI账号服务](https://www.enhe-tech.com.cn/account-services)。\n- 学习 [AI技能教程](/skill-learning)\n- 忽略 [外部链接](https://example.com/bad)",
@@ -236,10 +246,33 @@ describe("AI news helpers", () => {
               { type: "link", href: "/skill-learning", text: "AI技能教程" },
             ],
           },
-          "忽略 外部链接",
+        {
+          parts: [
+            { type: "text", text: "忽略 " },
+            { type: "link", href: "https://example.com/bad", text: "外部链接" },
+          ],
+        },
         ],
       },
     ]);
+  });
+
+  it("renders the rich text formatting used by the admin editor and allows safe external links", () => {
+    const [block] = renderNewsContentBlocks("**重要内容** [[size=24]]大标题[[/size]] [[bg=#dbeafe]]重点[[/bg]] `npm run build` [官方文档](https://example.com/docs)");
+    expect(block).toEqual({
+      type: "paragraph",
+      parts: [
+        { type: "bold", text: "重要内容" },
+        { type: "text", text: " " },
+        { type: "size", size: 24, text: "大标题" },
+        { type: "text", text: " " },
+        { type: "background", color: "#dbeafe", text: "重点" },
+        { type: "text", text: " " },
+        { type: "code", text: "npm run build" },
+        { type: "text", text: " " },
+        { type: "link", href: "https://example.com/docs", text: "官方文档" },
+      ],
+    });
   });
 
   it("builds deduped related keywords without generic automation tags", () => {

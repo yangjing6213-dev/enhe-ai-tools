@@ -10,6 +10,7 @@ const author = { id: "author", displayName: "用户 :enhe_01:", nickname: "用�
 const reply = { id: "reply-1", postId: "post-1", parentId: null, authorId: "author", status: "approved", author, createdAt: new Date("2026-10-14T00:00:00Z"), updatedAt: new Date("2026-10-14T00:00:00Z"), content: "回复正文", attachments: [], isLiked: false, _count: { likes: 0 }, children: [] };
 const post = {
   id: "post-1", author, createdAt: new Date("2026-10-14T00:00:00Z"), category: "workflow", title: "测试话题", content: "话题正文 :enhe_01:",
+  coverAttachmentId: "image-1",
   attachments: [{ id: "image-1", kind: "image", mimeType: "image/webp", originalName: "image.webp" }], isLiked: true, isBookmarked: true,
   _count: { likes: 1, replies: 2, shares: 3, bookmarks: 1 }, replyCount: 2, replies: [{ ...reply, children: [{ ...reply, id: "reply-2", children: [] }] }],
 } as unknown as Parameters<typeof ForumPostContent>[0]["post"];
@@ -48,14 +49,33 @@ describe("forum public surfaces", () => {
     expect(english).toContain("Topic deleted. The topic and its replies are no longer public.");
   });
 
-  it("keeps the cover filling its stable frame and separates the topic tag from the author", () => {
+  it("shows the chosen topic cover without rendering post media in the list", () => {
     const html = renderToStaticMarkup(<ForumIndexContent locale="zh" posts={[post] as unknown as Parameters<typeof ForumIndexContent>[0]["posts"]} isAuthenticated />);
     expect(html).toContain("forum-cover-logo4.png");
     expect(html).toContain('data-nimg="fill"');
+    expect(html).toContain('class="forum-topic-card__cover"');
+    expect(html).toContain('/api/forum/media/image-1');
+    expect(html).not.toContain('class="forum-media-display"');
     expect(html).toContain('class="forum-post-header"');
     expect(html).toContain('class="forum-category-tag"');
     expect(html).not.toContain("举报");
     expect(html).toContain('class="enhe-inline-emoji"');
+  });
+
+  it("uses a generated topic cover instead of leaking body images into the list", () => {
+    const bodyImageOnlyPost = { ...post, coverAttachmentId: null } as typeof post;
+    const html = renderToStaticMarkup(<ForumIndexContent locale="zh" posts={[bodyImageOnlyPost] as unknown as Parameters<typeof ForumIndexContent>[0]["posts"]} isAuthenticated />);
+
+    expect(html).toContain("forum-topic-cover--generated");
+    expect(html).toContain("/images/home/flowing-menu/productivity.webp");
+    expect(html).toContain("测试话题");
+    expect(html).not.toContain("/api/forum/media/image-1");
+    expect(html).not.toContain("class=\"forum-media-display");
+  });
+
+  it("selects generated artwork from the topic body even within the same category", () => {
+    const posts = [{ ...post, title: "My experiment", content: "A short video generated from still images.", coverAttachmentId: null }] as unknown as Parameters<typeof ForumIndexContent>[0]["posts"];
+    expect(renderToStaticMarkup(<ForumIndexContent locale="en" posts={posts} isAuthenticated />)).toContain("/images/home/flowing-menu/content-creation.webp");
   });
 
   it("orders icon actions consistently and keeps topic deletion after them", () => {
@@ -124,5 +144,14 @@ describe("forum public surfaces", () => {
     const guest = renderToStaticMarkup(<ForumNewPostContent locale="en" submitted={false} isAuthenticated={false} />);
     expect(guest).toContain("Sign in to join the discussion");
     expect(guest).not.toContain('type="file"');
+  });
+
+  it("uses rich text tools and supports a generated cover when no image is selected", () => {
+    const html = renderToStaticMarkup(<ForumNewPostContent locale="zh" submitted={false} isAuthenticated />);
+    expect(html).toContain('role="toolbar"');
+    expect(html).toContain("加粗");
+    expect(html).toContain("字号");
+    expect(html).toContain("背景色");
+    expect(html).toContain('name="coverAttachmentId"');
   });
 });

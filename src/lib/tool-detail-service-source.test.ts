@@ -8,7 +8,8 @@ describe("tool detail service purchase source", () => {
 
     expect(source).toContain("isPurchasableAccountService");
     expect(source).toContain("shouldShowPurchaseForm");
-    expect(source).toContain("td.serviceIntroTitle");
+    expect(source).toContain("getToolOverviewHeading(tool.type, forceLocale)");
+    expect(source).toContain("const introTitle = getToolOverviewHeading(tool.type, forceLocale)");
     expect(source).toContain("td.serviceProductImagesIntro");
     expect(source).toContain("td.buyService");
     expect(source).toContain('name="priceSpecId"');

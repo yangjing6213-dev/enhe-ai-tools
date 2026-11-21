@@ -1252,14 +1252,15 @@ model Comment {
 }
 
 model ForumPost {
-  id        String             @id @default(cuid())
-  authorId  String             @map("author_id")
-  category  ForumCategory
-  title     String
-  content   String
-  status    ForumContentStatus @default(pending)
-  createdAt DateTime           @default(now()) @map("created_at")
-  updatedAt DateTime           @updatedAt @map("updated_at")
+  id                String             @id @default(cuid())
+  authorId          String             @map("author_id")
+  category          ForumCategory
+  title             String
+  content           String
+  coverAttachmentId String?            @map("cover_attachment_id")
+  status            ForumContentStatus @default(pending)
+  createdAt         DateTime           @default(now()) @map("created_at")
+  updatedAt         DateTime           @updatedAt @map("updated_at")
   author    User               @relation("ForumPostAuthor", fields: [authorId], references: [id])
   replies   ForumReply[]
   likes     ForumLike[]

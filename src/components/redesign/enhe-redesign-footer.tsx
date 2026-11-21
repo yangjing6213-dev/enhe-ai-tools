@@ -2,6 +2,7 @@ import { Fragment } from "react";
 import Image from "next/image";
 import { ChevronDown, Github } from "lucide-react";
 import { companyProfile } from "@/lib/company-profile";
+import { FavoriteSiteButton } from "@/components/favorite-site-button";
 import { EnheRedesignBrandValue } from "./home/EnheRedesignBrandValue";
 import type { ProductionFiling } from "@/lib/production-filing";
 import type { RedesignFooterCopy, RedesignLocale } from "./types";
@@ -13,10 +14,11 @@ const FOOTER_COPY: Record<RedesignLocale, RedesignFooterCopy> = {
       {
         title: "帮助与服务",
         links: [
-          { label: "帮助支持", href: "/about" },
-          { label: "使用教程", href: "/skill-learning" },
-          { label: "购买与下载", href: "/software" },
-          { label: "产品更新", href: "/ai-news" },
+          { label: "常见问题与联系", href: "/about#faq-contact" },
+          { label: "工具使用教程", href: "/tutorials" },
+          { label: "AI教程与课程", href: "/skill-learning" },
+          { label: "浏览 AI 工具", href: "/software" },
+          { label: "AI资讯", href: "/ai-news" },
         ],
       },
       {
@@ -45,10 +47,11 @@ const FOOTER_COPY: Record<RedesignLocale, RedesignFooterCopy> = {
       {
         title: "Help & Support",
         links: [
-          { label: "Help Center", href: "/en/about" },
-          { label: "Tutorials", href: "/en/skill-learning" },
-          { label: "Purchase & Download", href: "/en/software" },
-          { label: "Product Updates", href: "/en/ai-news" },
+          { label: "FAQs & Contact", href: "/en/about#faq-contact" },
+          { label: "Tool Guides", href: "/en/tutorials" },
+          { label: "AI Tutorials & Courses", href: "/en/skill-learning" },
+          { label: "Browse AI Tools", href: "/en/software" },
+          { label: "AI News", href: "/en/ai-news" },
         ],
       },
       {
@@ -125,6 +128,7 @@ export function EnheRedesignFooter({
                   <text x="20" y="21" fill="currentColor" textAnchor="middle" fontSize="10" fontWeight="700" fontFamily="sans-serif">小红书</text>
                 </svg>
               </a>
+              <FavoriteSiteButton locale={locale} className="footer-social-bookmark" />
             </nav>
           </div>
           <EnheRedesignBrandValue locale={locale} />

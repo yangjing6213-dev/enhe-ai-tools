@@ -3,6 +3,27 @@ export function canShowDownloadLinkArea(input: { hasDownloadLink: boolean; isDow
   return !input.isDownloadPaid || input.hasDownloadPurchase;
 }
 
+export function getDownloadCtaLabel(input: {
+  locale: "zh" | "en";
+  isPaid: boolean;
+  hasPurchase: boolean;
+  isLoggedIn: boolean;
+  hasPublicDirectDownload: boolean;
+}) {
+  const { locale, isPaid, hasPurchase, isLoggedIn, hasPublicDirectDownload } = input;
+  if (isPaid) {
+    if (hasPurchase) return locale === "zh" ? "下载已购内容" : "Download Purchased Content";
+    if (isLoggedIn) return locale === "zh" ? "购买后下载" : "Download After Purchase";
+    return locale === "zh" ? "登录后购买" : "Sign In to Purchase";
+  }
+
+  if (!isLoggedIn && !hasPublicDirectDownload) {
+    return locale === "zh" ? "登录后下载" : "Sign In to Download";
+  }
+
+  return locale === "zh" ? "免费下载" : "Download Free";
+}
+
 export function getDownloadLinkContent(file?: { filePath?: string | null; fileUrl?: string | null } | null) {
   const content = file?.fileUrl ?? file?.filePath ?? "";
   return content.trim() ? content.replace(/\r\n?/g, "\n") : "";

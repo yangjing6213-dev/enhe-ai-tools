@@ -18,28 +18,31 @@ import {
   buildLocalePath,
   buildPageMetadata,
 } from "@/lib/seo";
-import { resolveLocalizedToolCategoryName } from "@/lib/tool-localization";
+import {
+  resolveLocalizedToolCategoryName,
+  resolveLocalizedToolIdentity,
+} from "@/lib/tool-localization";
 
 export const aiSkillsPageRevalidate = publicPageCacheSeconds;
 
 const pageCopy = {
   zh: {
-    title: "AI Skill",
-    intro: "查找可安装到 Codex、OpenClaw、Claude Code、Cursor 等智能体中的专业 Skill，购买后获取 ZIP 包和使用说明。",
-    answerTitle: "按智能体和任务选择 AI Skill",
-    answerBody: "先确认准备在哪个智能体中使用，再查看适用任务、版本、价格和交付说明。每个商品详情页都会明确列出已支持的智能体。",
-    search: "搜索 Skill 名称或用途",
-    emptyTitle: "暂无 AI Skill",
-    emptyText: "试试其他关键词，或等待新的 AI Skill 发布。",
+    title: "AI技能包",
+    intro: "按任务查找可安装到 AI 智能体的技能包。打开详情可查看支持的智能体、安装方法和获取条件。",
+    answerTitle: "按智能体和任务选择技能包",
+    answerBody: "先确认准备在哪个智能体中使用，再查看适用任务、版本、价格和交付说明。每个技能包详情页都会明确列出已支持的智能体。",
+    search: "搜索技能包名称或用途",
+    emptyTitle: "暂无技能包",
+    emptyText: "试试其他关键词，或等待新的技能包发布。",
   },
   en: {
-    title: "AI Skills",
-    intro: "Browse professional Skills for Codex, OpenClaw, Claude Code, Cursor, and other AI agents. Purchase a Skill to access its ZIP package and setup notes.",
-    answerTitle: "Choose an AI Skill by agent and task",
-    answerBody: "Start with the agent you use, then review the task fit, version, price, and delivery notes. Each product page lists the agents that are currently supported.",
-    search: "Search Skill name or use case",
-    emptyTitle: "No AI Skills yet",
-    emptyText: "Try a different search or check again when new AI Skills are published.",
+    title: "AI Skill Packs",
+    intro: "Find skill packs for your AI agent. Each listing explains compatibility, installation and access.",
+    answerTitle: "Choose a skill pack by agent and task",
+    answerBody: "Start with the agent you use, then review the task fit, version, price, and delivery notes. Each skill pack lists the agents that are currently supported.",
+    search: "Search skill packs by name or use case",
+    emptyTitle: "No skill packs found",
+    emptyText: "Try a different search or check again when new skill packs are published.",
   },
 } as const;
 
@@ -72,7 +75,7 @@ export async function AiSkillsPageShell({
       <ContentlessState
         locale={forceLocale}
         className="ai-skills-page"
-        eyebrow={forceLocale === "en" ? "AI Skills" : "AI Skill"}
+        eyebrow={forceLocale === "en" ? "AI Skill Packs" : "AI技能包"}
         title={copy.title}
         intro={copy.intro}
         statusLabel="UNVERIFIED"
@@ -120,7 +123,7 @@ export async function AiSkillsPageShell({
       itemListElement: tools.map((tool, index) => ({
         "@type": "ListItem",
         position: index + 1,
-        name: tool.englishName || tool.name,
+        name: resolveLocalizedToolIdentity(tool, forceLocale).primaryName,
         url: absoluteUrl(buildCanonicalToolPath(tool, forceLocale)),
       })),
     },

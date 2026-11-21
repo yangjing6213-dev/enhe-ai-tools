@@ -17,11 +17,11 @@ import {
 
 const pageCopy = {
   zh: {
-    title: "AI提示词管理系统",
+    title: "提示词库",
     description:
-      "免费 AI 提示词管理系统，收录写作、短视频、图像生成、学习、职场、运营和编程等场景的中英文提示词，支持搜索、分类、补充任务背景并一键复制。",
+      "免费公开的 AI 提示词库，按写作、图像、学习、职场和编程等场景查找中英文提示词，支持搜索、分类、补充任务背景并复制。",
     eyebrow: "免费 AI 技能工具",
-    heading: "AI提示词管理系统",
+    heading: "提示词库",
     intro:
       "不再翻聊天记录找提示词。先选场景，再补充自己的任务背景，把收藏的提示词变成随手可用的工作指令。",
     guideTitle: "怎样用得更稳",
@@ -30,12 +30,12 @@ const pageCopy = {
     related: "继续学习",
     relatedLinks: [
       { label: "Build Your Own X 项目导航器", href: "/build-your-own-x" },
-      { label: "AI技能学习", href: "/skill-learning" },
+      { label: "AI教程与课程", href: "/skill-learning" },
       { label: "AI前沿资讯", href: "/ai-news" },
     ],
     faq: [
       {
-        question: "AI提示词管理系统适合谁？",
+        question: "提示词库适合谁？",
         answer:
           "适合普通 AI 用户、内容创作者、电商运营、产品经理、学生、职场用户和需要企业内部提示词库的团队。",
       },
@@ -51,11 +51,11 @@ const pageCopy = {
     ],
   },
   en: {
-    title: "AI Prompt Management System",
+    title: "Prompt Library",
     description:
       "Search 418 Chinese prompts and 418 English prompts across 11 categories in a free library. Filter by category, add task context, and copy prompts into your AI assistant.",
     eyebrow: "Free AI skill tool",
-    heading: "AI Prompt Management System",
+    heading: "Prompt Library",
     intro:
       "Browse 418 Chinese prompts and 418 English prompts across 11 categories in the free public web library. Search by task, filter by category, add your own context, and copy a prompt into the AI assistant you use. No sign-in is required. The desktop download is a separate paid product; check the current offer for its price, included files, and delivery details.",
     guideTitle: "How to use the prompt library",
@@ -64,7 +64,7 @@ const pageCopy = {
     related: "Keep learning",
     relatedLinks: [
       { label: "Build Your Own X Navigator", href: "/build-your-own-x" },
-      { label: "AI Skill Learning", href: "/skill-learning" },
+      { label: "AI Tutorials & Courses", href: "/skill-learning" },
       { label: "AI News", href: "/ai-news" },
     ],
     faq: [
@@ -142,7 +142,7 @@ export function AiPromptManagementPageShell({
           path: buildLocalePath("/", forceLocale),
         },
         {
-          name: forceLocale === "en" ? "AI Skill Learning" : "AI技能学习",
+          name: forceLocale === "en" ? "AI Tutorials & Courses" : "AI教程与课程",
           path: buildLocalePath("/skill-learning", forceLocale),
         },
         { name: copy.title, path },

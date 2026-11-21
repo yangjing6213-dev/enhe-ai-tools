@@ -13,14 +13,16 @@ const archivePath = "/ai-trends/daily";
 
 const copy = {
   zh: {
-    title: "AI 需求趋势每周分析",
-    description: "AI 需求趋势周报历史。公开用户可阅读摘要，登录用户可阅读完整 HTML 报告。",
-    intro: "每周结合公开资料分析可实际验证的 AI 应用场景，审核后发布。可浏览摘要，登录后可阅读完整报告。",
+    title: "AI趋势周报",
+    description: "AI 趋势周报历史。公开用户可阅读已发布摘要，登录用户可阅读完整 HTML 报告。",
+    intro: "每周结合公开资料整理可实际验证的 AI 应用场景，审核后发布。可浏览已发布摘要，登录后可阅读完整报告。",
     back: "返回趋势总览",
     login: "登录查看完整报告",
     archiveTitle: "分析历史",
     readFull: "阅读全文",
     readSummary: "阅读摘要",
+    summaryUnavailable: "暂无英文摘要",
+    viewReportDetails: "查看报告详情",
     emptyTitle: "暂无分析",
     emptyText: "第一份 AI 趋势周报发布后，这里会显示公开摘要。",
     sources: "个来源信号",
@@ -29,15 +31,17 @@ const copy = {
     loginHint: "登录后看全文"
   },
   en: {
-    title: "Weekly AI Demand Analysis",
-    description: "Weekly AI demand analysis history. Public readers can view summaries, and signed-in users can read full HTML reports.",
+    title: "Weekly AI Brief",
+    description: "Archive of weekly AI briefs. Public readers can view published summaries, and signed-in users can read full HTML reports.",
     intro:
-      "Weekly reviews use public sources to identify AI tasks you can test, then publish after review. Browse the summary or sign in to read the full report.",
+      "Weekly briefs use public sources to identify AI tasks you can test, then publish after review. Browse available summaries or sign in to read the full report.",
     back: "Back to trend overview",
     login: "Log in to read the full report",
     archiveTitle: "Analysis history",
     readFull: "Read full report",
     readSummary: "Read summary",
+    summaryUnavailable: "English summary unavailable",
+    viewReportDetails: "View Report Details",
     emptyTitle: "No analysis yet",
     emptyText: "Public summaries will appear here after the first AI trend briefing is published.",
     sources: "source signals",
@@ -150,8 +154,12 @@ export async function AiTrendDailyArchivePageShell({ forceLocale = "zh" }: { for
                       ) : null}
                     </div>
                     <h2 className="mt-3 text-2xl font-black leading-snug text-[var(--marketing-text)]">{briefing.title}</h2>
-                    <p className="mt-3 text-base leading-8 text-[var(--marketing-muted)]">{briefing.coreConclusion}</p>
-                    {briefing.publicHighlights.length ? (
+                    {forceLocale === "en" && !briefing.englishSummaryAvailable ? (
+                      <p className="mt-3 text-base leading-8 text-[var(--marketing-muted)]">{text.summaryUnavailable}</p>
+                    ) : (
+                      <p className="mt-3 text-base leading-8 text-[var(--marketing-muted)]">{briefing.coreConclusion}</p>
+                    )}
+                    {(forceLocale !== "en" || briefing.englishSummaryAvailable) && briefing.publicHighlights.length ? (
                       <div className="mt-4 flex flex-wrap gap-2">
                         {briefing.publicHighlights.slice(0, 5).map((highlight) => (
                           <Badge key={highlight}>{highlight}</Badge>
@@ -179,7 +187,9 @@ export async function AiTrendDailyArchivePageShell({ forceLocale = "zh" }: { for
                     href={buildLocalePath(`/ai-trends/daily/${briefing.slug}`, forceLocale)}
             className="inline-flex shrink-0 items-center justify-center gap-2 rounded-full border border-[var(--marketing-accent)]/40 px-5 py-3 text-sm font-bold text-[var(--marketing-accent)] transition-colors hover:border-[var(--marketing-accent)]"
                   >
-                    {isLoggedIn ? text.readFull : text.readSummary}
+                    {forceLocale === "en" && !briefing.englishSummaryAvailable
+                      ? text.viewReportDetails
+                      : isLoggedIn ? text.readFull : text.readSummary}
                     <ArrowUpRight size={16} strokeWidth={1.8} aria-hidden="true" />
                   </Link>
                 </div>

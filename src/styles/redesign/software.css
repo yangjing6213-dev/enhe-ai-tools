@@ -676,6 +676,13 @@
   min-width: 0;
 }
 
+.product-refund-policy-slot {
+  flex: 1;
+  min-width: 0;
+  visibility: hidden;
+  pointer-events: none;
+}
+
 .tool-detail-purchase-content {
   min-width: 0;
 }
@@ -802,9 +809,9 @@
   min-height: 152px;
   box-sizing: border-box;
   padding: 16px;
-  border: 1px solid color-mix(in srgb, #00a875 24%, var(--enhe-border));
+  border: 1px solid var(--enhe-border);
   border-radius: 12px;
-  background: color-mix(in srgb, #00a875 5%, var(--enhe-page-bg));
+  background: var(--enhe-surface);
 }
 
 .product-safety-info-heading {
@@ -812,13 +819,13 @@
   align-items: center;
   gap: 8px;
   margin-top: 9px;
-  color: #008d65;
+  color: var(--enhe-text);
   font-size: 14px;
 }
 
 .product-safety-info-heading svg {
   flex: 0 0 auto;
-  color: #00a875;
+  color: var(--enhe-text-muted);
 }
 
 .product-safety-info-date,

@@ -296,6 +296,9 @@ function resolveSoftwareCatalogCategory(
     `${row.name} ${row.englishName ?? ""} ${row.slug}`,
   );
   const category = normalizeCategoryText(row.category?.name ?? "");
+  if (category === "数字人口播") return "presenter";
+  if (category === "视频生成" || category === "ai视频生成") return "video";
+  if (category === "语音生成" || category === "ai语音生成") return "audio";
   const combined = `${identity} ${category}`;
 
   if (matchesCategory(combined, ["语音", "音频", "voice", "audio"])) {
