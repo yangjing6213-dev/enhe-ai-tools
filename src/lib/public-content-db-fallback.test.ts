@@ -87,6 +87,18 @@ describe("public content data access fallback", () => {
     expect(db.toolCategoryFindMany).toHaveBeenCalledOnce();
   });
 
+  it("exposes the course format without returning lesson bodies or media links", async () => {
+    vi.stubEnv("DATABASE_URL", "postgresql://localhost/enhe-test");
+    db.toolFindMany.mockResolvedValue([{ id: "course", tutorials: [{ content: "A paid lesson", imageUrl: null, videoUrl: null }] }]);
+    const { getPublicToolListing } = await import("@/lib/public-content");
+    await expect(getPublicToolListing("skill_learning")).resolves.toEqual([{ id: "course", courseFormat: "written" }]);
+    expect(db.toolFindMany).toHaveBeenCalledWith(expect.objectContaining({
+      include: expect.objectContaining({ tutorials: {
+        where: { status: "active" }, select: { content: true, imageUrl: true, videoUrl: true },
+      } }),
+    }));
+  });
+
   it("rethrows unexpected configured database failures", async () => {
     vi.stubEnv("DATABASE_URL", "postgresql://localhost/enhe-test");
     db.toolFindMany.mockRejectedValue(new Error("unexpected tool failure"));

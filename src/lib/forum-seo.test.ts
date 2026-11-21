@@ -17,8 +17,8 @@ describe("forum route metadata", () => {
   afterEach(() => vi.unstubAllEnvs());
 
   it.each([
-    { path: "@/app/(zh-public)/forum/page", locale: "zh", canonical: "/forum", title: "共创AI论坛" },
-    { path: "@/app/en/forum/page", locale: "en", canonical: "/en/forum", title: "AI Community Forum" },
+    { path: "@/app/(zh-public)/forum/page", locale: "zh", canonical: "/forum", title: "AI社区" },
+    { path: "@/app/en/forum/page", locale: "en", canonical: "/en/forum", title: "AI Community" },
   ])("gives the $locale forum its own metadata and canonical without category parameters", async ({ path, canonical, title }) => {
     const route = await import(path);
     const metadata: Metadata = await route.generateMetadata({ searchParams: Promise.resolve({ category: "workflow" }) });

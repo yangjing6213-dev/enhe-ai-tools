@@ -8,7 +8,24 @@ export function buildValueSentence(description: string, locale: Locale) {
   return sentence.length > maxLength ? `${sentence.slice(0, maxLength - 1)}...` : sentence;
 }
 
+const courseFormatLabels = {
+  written: { zh: "文字教程", en: "Written Guide" },
+  illustrated: { zh: "图文教程", en: "Illustrated Guide" },
+  video: { zh: "视频课程", en: "Video Course" },
+  unknown: { zh: "课程形式待确认", en: "Course format unconfirmed" },
+} as const;
+
+export type CourseFormat = keyof typeof courseFormatLabels;
+
+export function classifyCourseFormat(lessons: { content: string; imageUrl: string | null; videoUrl: string | null }[]): CourseFormat {
+  if (lessons.some((lesson) => lesson.videoUrl?.trim())) return "video";
+  if (lessons.some((lesson) => lesson.imageUrl?.trim())) return "illustrated";
+  if (lessons.some((lesson) => lesson.content.replace(/\[\[\/?(?:zh|en)\]\]/gi, "").trim())) return "written";
+  return "unknown";
+}
+
 type ToolHighlightInput = {
+  courseFormat?: CourseFormat;
   type: "software" | "online" | "skill_learning" | "ai_skill" | "ai_workflow";
   isDownloadPaid?: boolean;
   downloadPrice?: unknown;
@@ -46,20 +63,19 @@ export function buildToolCardHighlights(tool: ToolHighlightInput, locale: Locale
   const isPaid =
     (isDownloadProduct && tool.isDownloadPaid) ||
     ((tool.type === "online" || tool.type === "skill_learning") && Number.isFinite(servicePrice) && servicePrice > 0);
+  if (tool.type === "skill_learning") {
+    return [courseFormatLabels[tool.courseFormat ?? "unknown"][locale], isPaid ? t.toolCard.capabilityPaidCourse : t.toolCard.free];
+  }
   const paidCapability =
     tool.type === "online"
       ? t.toolCard.capabilityPaidService
-      : tool.type === "skill_learning"
-        ? t.toolCard.capabilityPaidCourse
-        : t.toolCard.capabilityPaidDownload;
+      : t.toolCard.capabilityPaidDownload;
   const access = isPaid ? paidCapability : t.toolCard.capabilityFree;
   const runtime = tool.type === "software"
     ? t.toolCard.capabilitySoftware
     : tool.type === "ai_skill"
       ? t.toolCard.capabilitySkill
-      : tool.type === "skill_learning"
-        ? t.toolCard.capabilityCourse
-        : t.toolCard.capabilityOnline;
+      : t.toolCard.capabilityOnline;
   const commerce = isPaid ? paidCapability : t.toolCard.capabilityAccess;
 
   return Array.from(new Set([runtime, access, commerce]));

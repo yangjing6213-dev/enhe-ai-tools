@@ -6,7 +6,7 @@ import { Card } from "@/components/ui/card";
 import { getDictionary, type Locale } from "@/lib/i18n";
 import { resolveToolImageSrc } from "@/lib/tool-image";
 import { buildCanonicalToolPath } from "@/lib/public-slugs";
-import { buildToolCardHighlights, buildValueSentence } from "@/lib/tool-card-highlights";
+import { buildToolCardHighlights, buildValueSentence, type CourseFormat } from "@/lib/tool-card-highlights";
 import {
   buildLocalizedToolPreviewText,
   resolveLocalizedToolCategoryName,
@@ -34,6 +34,7 @@ type ToolCardProps = {
     downloadPrice?: unknown;
     priceSpecs?: { price: unknown; status: ToolPriceSpecStatus }[];
     supportedAgents?: string[];
+    courseFormat?: CourseFormat;
     downloadFileId?: string | null;
     aiWorkflowCandidate?: { status: string; fileId: string | null } | null;
     category?: { name: string } | null;
@@ -109,7 +110,7 @@ export function ToolCard({
         ? t.toolCard.deliverySkill
       : tool.type === "online"
         ? t.toolCard.deliveryService
-        : t.toolCard.deliveryCourse;
+        : highlights[0];
   const primaryActionLabel = workflowAccessUnconfirmed ? t.toolCard.viewDetails : showPrice ? t.toolCard.compareBeforeBuy : t.toolCard.getFreeTool;
   const visibleMetrics = getVisibleToolMetrics({
     downloadCount: tool.downloadCount,
@@ -169,7 +170,7 @@ export function ToolCard({
         {showMarketingMeta ? (
           <>
             <div className={`grid gap-2${isCompact ? " tool-product-card-highlights mt-2" : " mt-5"}`}>
-              {highlights.slice(0, isCompact ? 2 : highlights.length).map((item) => (
+              {highlights.slice(tool.type === "skill_learning" && !isCompact ? 1 : 0, isCompact ? 2 : highlights.length).map((item) => (
                 <span key={item} className="inline-flex items-center gap-2 text-sm text-[var(--marketing-muted)]">
                   <Check size={14} className="shrink-0 text-[var(--marketing-accent)]" />
                   {item}

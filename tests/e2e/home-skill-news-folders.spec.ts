@@ -37,15 +37,28 @@ for (const prefix of ['', '/en']) {
     await page.keyboard.press('Enter');
     await page.waitForURL(new RegExp(`${prefix}/ai-workflows$`), { waitUntil: 'commit' });
   });
-  test(`news options fit phones and blue language switch ${prefix || 'zh'}`, async ({ page }) => {
-    await page.setViewportSize({ width: 320, height: 1000 }); await page.goto(prefix || '/');
-    const trigger = page.locator('.redesign-home-features .folder-float').nth(2).locator('.folder-float__trigger');
-    await trigger.scrollIntoViewIfNeeded(); await trigger.focus(); await page.keyboard.press('Enter'); await expect(page.locator('.redesign-home-features .folder-float').nth(2)).toHaveAttribute('open',''); await page.waitForTimeout(1000);
-    for (const option of await page.locator('.redesign-home-features .folder-float').nth(2).locator('.folder-float__item').all()) {
-      const bounds = (await option.boundingBox())!; expect(bounds.x).toBeGreaterThanOrEqual(0); expect(bounds.x + bounds.width).toBeLessThanOrEqual(320);
+  test(`mobile routes fit the viewport and news opens with the keyboard ${prefix || 'zh'}`, async ({ page }) => {
+    await page.setViewportSize({ width: 320, height: 1000 });
+    await page.goto(prefix || '/');
+    await expect(page.locator('.redesign-home-features')).toBeHidden();
+    const cards = page.locator('.redesign-home-mobile-cards a');
+    await expect(cards).toHaveCount(3);
+    for (const [index, path] of ['/software', '/forum', '/ai-news'].entries()) {
+      const card = cards.nth(index);
+      await expect(card).toBeVisible();
+      await expect(card).toHaveAttribute('href', `${prefix}${path}`);
+      const bounds = (await card.boundingBox())!;
+      expect(bounds.x).toBeGreaterThanOrEqual(0);
+      expect(bounds.x + bounds.width).toBeLessThanOrEqual(320);
     }
     expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBeLessThanOrEqual(320);
     await expect(page.locator('.enhe-language-toggle .squish-switch__track').first()).toHaveCSS('background-color', 'rgb(4, 98, 194)');
+    const news = cards.getByText(prefix ? 'Stay informed' : '跟进资讯', { exact: true });
+    await expect(news).toBeVisible();
+    await cards.nth(2).focus();
+    await expect(cards.nth(2)).toBeFocused();
+    await page.keyboard.press('Enter');
+    await page.waitForURL(new RegExp(`${prefix}/ai-news$`), { waitUntil: 'domcontentloaded' });
   });
   test(`workflow links work without JavaScript ${prefix || 'zh'}`, async ({ browser }) => {
     const context = await browser.newContext({ javaScriptEnabled: false });

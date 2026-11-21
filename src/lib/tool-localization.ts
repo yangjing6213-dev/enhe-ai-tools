@@ -1066,8 +1066,8 @@ function buildWorkflowFaqFallback(tool: LocalizedToolInput, locale: Locale): Loc
       : "请在本页获取区查看原项目链接或交付包的下载说明。";
   } else if (tool.workflowDeliveryMode === "repository_link") {
     accessAnswer = isEnglish
-      ? "Choose View Original Project for the upstream repository. Follow its setup instructions to deploy the source."
-      : "点击“查看原项目”前往上游仓库，按项目说明部署源码。";
+      ? "Choose View Original Project to open the upstream GitHub repository. Follow its setup instructions to deploy the source."
+      : "点击“查看原项目”前往上游 GitHub 仓库，按项目说明部署源码。";
   } else if (tool.isDownloadPaid === true && Number.isFinite(tool.workflowPackagePrice) && Number(tool.workflowPackagePrice) > 0) {
     accessAnswer = isEnglish
       ? "Review the price and package version before purchase. Successful payment unlocks the protected download entry for the purchased version."

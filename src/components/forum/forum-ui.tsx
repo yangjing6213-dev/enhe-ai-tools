@@ -23,7 +23,7 @@ const categories: ForumCategory[] = ["question", "experience", "workflow", "show
 
 function copy(locale: Locale) {
   return locale === "en" ? {
-    title: "AI Community Forum",
+    title: "AI Community",
     coverAlt: "ENHE AI website shown on a laptop and phone",
     intro: "Ask questions, share useful workflows, and learn from the ENHE AI community.",
     newPost: "Start a discussion",
@@ -50,7 +50,7 @@ function copy(locale: Locale) {
     deleteReply: "Delete reply",
     comment: "Comment",
   } : {
-    title: "共创AI论坛",
+    title: "AI社区",
     coverAlt: "笔记本电脑和手机上的 ENHE 官网画面",
     intro: "在这里提问、分享实用工作流，与 ENHE AI 用户一起交流。",
     newPost: "发布新话题",

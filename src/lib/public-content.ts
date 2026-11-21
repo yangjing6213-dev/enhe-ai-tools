@@ -15,6 +15,7 @@ import {
   getCanonicalAiNewsSlug,
   getCanonicalToolSlug,
 } from "@/lib/public-slugs";
+import { classifyCourseFormat } from "@/lib/tool-card-highlights";
 import { parseVirtualToolCategoryId } from "@/lib/tool-category-groups";
 
 const publicContentRevalidate = 300;
@@ -152,7 +153,7 @@ const getCachedPublicToolListing = unstable_cache(
     }
 
     try {
-      return await prisma.tool.findMany({
+      const tools = await prisma.tool.findMany({
         where: {
           type,
           status: "published",
@@ -181,6 +182,10 @@ const getCachedPublicToolListing = unstable_cache(
             : {}),
         },
         include: {
+          tutorials: type === "skill_learning" ? {
+            where: { status: "active" },
+            select: { content: true, imageUrl: true, videoUrl: true },
+          } : false,
           category: true,
           priceSpecs: {
             where: { status: "active" },
@@ -196,6 +201,9 @@ const getCachedPublicToolListing = unstable_cache(
               ? { usageCount: "desc" }
               : { createdAt: "desc" },
       });
+      return tools.map(({ tutorials, ...tool }) => tutorials
+        ? { ...tool, courseFormat: classifyCourseFormat(tutorials) }
+        : tool);
     } catch (error) {
       if (isRecoverablePublicReadError(error)) {
         return [];

@@ -23,7 +23,7 @@ test("homepage exposes the community forum in Chinese and English navigation and
   expect(forumStyle).toEqual(toolsStyle);
 
   await page.goto("/forum", { waitUntil: "domcontentloaded" });
-  await expect(page.getByRole("heading", { level: 1, name: "共创AI论坛" })).toBeVisible();
+  await expect(page.getByRole("heading", { level: 1, name: "AI社区", exact: true })).toBeVisible();
   await expect(page.getByRole("img", { name: "笔记本电脑和手机上的 ENHE 官网画面" })).toBeVisible();
 
   await page.goto("/en", { waitUntil: "domcontentloaded" });
@@ -31,7 +31,7 @@ test("homepage exposes the community forum in Chinese and English navigation and
   await expect(page.getByRole("link", { name: "Explore AI tools" })).toHaveAttribute("href", "/en/software");
   await expect(page.getByRole("link", { name: "Explore the AI Community" })).toHaveAttribute("href", "/en/forum");
   await page.goto("/en/forum", { waitUntil: "domcontentloaded" });
-  await expect(page.getByRole("heading", { level: 1, name: "AI Community Forum" })).toBeVisible();
+  await expect(page.getByRole("heading", { level: 1, name: "AI Community", exact: true })).toBeVisible();
 });
 
 test("mobile homepage shows stacked route cards without horizontal overflow", async ({ page }) => {

@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { dictionaries } from "@/lib/i18n";
-import { buildToolCardHighlights, buildValueSentence } from "@/lib/tool-card-highlights";
+import { buildToolCardHighlights, buildValueSentence, classifyCourseFormat } from "@/lib/tool-card-highlights";
 
 describe("tool card highlights", () => {
   it("keeps a complete English value sentence instead of splitting at a comma", () => {
@@ -46,6 +46,17 @@ describe("tool card highlights", () => {
     ]);
   });
 
+  it("describes only the media present in active course lessons", () => {
+    const lesson = { content: "Follow the instructions.", imageUrl: null, videoUrl: null };
+    expect(classifyCourseFormat([])).toBe("unknown");
+    expect(classifyCourseFormat([{ ...lesson, content: "  " }])).toBe("unknown");
+    expect(classifyCourseFormat([lesson])).toBe("written");
+    expect(classifyCourseFormat([{ ...lesson, imageUrl: "/example.webp" }])).toBe("illustrated");
+    expect(classifyCourseFormat([lesson, { ...lesson, videoUrl: "/lesson.mp4" }])).toBe("video");
+    expect(buildToolCardHighlights({ type: "skill_learning", courseFormat: "written" }, "zh")[0]).toBe("文字教程");
+    expect(buildToolCardHighlights({ type: "skill_learning", courseFormat: "video" }, "en")[0]).toBe("Video Course");
+  });
+
   it("marks skill courses as paid only when an active positive price exists", () => {
     expect(
       buildToolCardHighlights(
@@ -57,9 +68,8 @@ describe("tool card highlights", () => {
         "zh"
       )
     ).toEqual([
-      dictionaries.zh.toolCard.capabilityCourse,
-      dictionaries.zh.toolCard.capabilityFree,
-      dictionaries.zh.toolCard.capabilityAccess
+      "课程形式待确认",
+      dictionaries.zh.toolCard.free
     ]);
 
     expect(
@@ -71,6 +81,6 @@ describe("tool card highlights", () => {
         },
         "zh"
       )
-    ).toEqual([dictionaries.zh.toolCard.capabilityCourse, dictionaries.zh.toolCard.capabilityPaidCourse]);
+    ).toEqual(["课程形式待确认", dictionaries.zh.toolCard.capabilityPaidCourse]);
   });
 });
