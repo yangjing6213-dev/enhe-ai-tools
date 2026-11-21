@@ -469,7 +469,7 @@ function humanizeSlug(slug: string) {
 
 function buildEnglishCategoryFromChinese(name: string, type: ToolType) {
   if (!name) return getDefaultToolLabel(type, "en");
-  if (name.includes("办公效率")) return "Office Productivity Tools";
+  if (name.includes("办公效率") || name.includes("办公与效率")) return "Office Productivity Tools";
   if (name.includes("文件处理")) return "File Processing Tools";
   if (name.includes("系统实用")) return "System Utilities";
   if (name.includes("数据分析")) return "Data Analysis Tools";

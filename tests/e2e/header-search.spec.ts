@@ -8,7 +8,7 @@ test("public header replaces the search link, opens recommendations, and submits
       await page.setViewportSize({ width, height: 900 });
       await page.goto(english ? "/en" : "/");
       const header = page.locator(".redesign-header");
-      const input = header.getByRole("combobox");
+      const input = header.getByRole("combobox", { name: english ? "Search tools and resources" : "搜索工具与资源" });
       await expect(input).toBeVisible();
       await expect(header.locator(".redesign-brand-label")).toHaveCount(0);
       await expect(header.locator('.redesign-nav-link[href$="/search"]')).toHaveCount(0);
@@ -82,7 +82,7 @@ test("public header replaces the search link, opens recommendations, and submits
         expect(layout.search.top).toBeGreaterThanOrEqual(layout.logo.bottom);
       }
       await input.click();
-      const panel = page.getByRole("dialog", { name: english ? "Most downloaded" : "下载最多的产品" });
+      const panel = page.getByRole("dialog", { name: english ? "Most downloaded" : "下载最多" });
       await expect(panel).toBeVisible();
       await expect(input).toBeFocused();
       await expect(panel).toContainText(english ? "not available yet" : "暂无下载推荐");

@@ -121,13 +121,35 @@ test.describe("product trust and creator contact", () => {
     expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
     await page.locator(".creator-profile-card").screenshot({ path: testInfo.outputPath("creator-mobile.png") });
 
-    await prisma.tool.update({ where: { id: toolId }, data: {
-      isDownloadPaid: true, downloadPrice: 5, supportedAgents: ["Codex", "Cursor"],
-    } });
-    for (const { prefix, width } of ["", "/en"].flatMap(prefix => [1440, 390].map(width => ({ prefix, width })))) {
+    const layouts = ["", "/en"].flatMap(prefix => [1440, 390].map(width => ({ prefix, width })));
+    const stableCards = page.locator(".product-supported-agents-card, .product-safety-info-card");
+    const cardSizes = () => stableCards.evaluateAll(cards => cards.map(card => {
+      const { width, height } = card.getBoundingClientRect();
+      return { width, height };
+    }));
+    const freeSizes = new Map<string, Awaited<ReturnType<typeof cardSizes>>>();
+    await prisma.tool.update({ where: { id: toolId }, data: { supportedAgents: ["Codex", "Cursor"] } });
+    for (const { prefix, width } of layouts) {
+      await page.setViewportSize({ width, height: 1000 });
+      await page.goto(`${prefix}/software/${slug}`);
+      await expect(stableCards).toHaveCount(2);
+      await expect(page.locator(".product-refund-policy-card")).toHaveCount(0);
+      if (width === 390) await expect(page.locator(".product-refund-policy-slot")).toHaveCSS("display", "none");
+      await page.evaluate(() => document.fonts.ready);
+      freeSizes.set(`${prefix}:${width}`, await cardSizes());
+    }
+
+    await prisma.tool.update({ where: { id: toolId }, data: { isDownloadPaid: true, downloadPrice: 5 } });
+    for (const { prefix, width } of layouts) {
       await page.setViewportSize({ width, height: 1000 });
       await page.goto(`${prefix}/software/${slug}`);
       await expect(page.locator(".product-refund-policy-card")).toBeVisible();
+      await page.evaluate(() => document.fonts.ready);
+      expect(await cardSizes()).toEqual(freeSizes.get(`${prefix}:${width}`));
+      const factCards = page.locator(".tool-detail-facts-grid > *");
+      expect(await factCards.evaluateAll(cards => cards.every(card => (
+        card.scrollWidth <= card.clientWidth + 1 && card.scrollHeight <= card.clientHeight + 1
+      )))).toBe(true);
       const payment = await page.locator("#tool-purchase-payment-method").boundingBox();
       const purchase = await page.locator(".tool-detail-purchase-submit").boundingBox();
       expect(Math.abs(payment!.x - purchase!.x)).toBeLessThanOrEqual(1);

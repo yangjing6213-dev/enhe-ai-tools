@@ -22,8 +22,8 @@ export function EnheHeaderSearch({ locale, recommendations = [] }: {
   const id = useId();
   const isEnglish = locale === "en";
   const searchPath = isEnglish ? "/en/search" : "/search";
-  const title = isEnglish ? "Most downloaded" : "下载最多的产品";
-  const searchLabel = isEnglish ? "Search products" : "搜索产品";
+  const title = isEnglish ? "Most downloaded" : "下载最多";
+  const searchLabel = isEnglish ? "Search tools and resources" : "搜索工具与资源";
 
   return (
     <Popover open={open} onOpenChange={setOpen}>
@@ -54,7 +54,7 @@ export function EnheHeaderSearch({ locale, recommendations = [] }: {
             aria-expanded={open}
             aria-controls={open ? id : undefined}
             aria-haspopup="dialog"
-            placeholder={isEnglish ? "Search AI tools…" : "搜索你需要的 AI 工具…"}
+            placeholder={`${searchLabel}…`}
             onFocus={() => setOpen(true)}
             onClick={() => setOpen(true)}
             onKeyDown={(event) => {
@@ -97,7 +97,7 @@ export function EnheHeaderSearch({ locale, recommendations = [] }: {
               </li>
             ))}
           </ul>
-        ) : <p>{isEnglish ? "Recommendations are not available yet. Search for a product above." : "暂无下载推荐，可以输入关键词搜索产品。"}</p>}
+        ) : <p>{isEnglish ? "Recommendations are not available yet. Enter a keyword to search tools and resources." : "暂无下载推荐，可输入关键词搜索工具与资源。"}</p>}
       </PopoverContent>
     </Popover>
   );

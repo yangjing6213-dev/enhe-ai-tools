@@ -4,7 +4,7 @@ test("routine browser checks start with the entry notice already dismissed", asy
   await page.goto("/", { waitUntil: "load" });
   await expect(page.getByRole("dialog", { name: "本站最新公告通知" })).toHaveCount(0);
   expect(await page.evaluate(() => localStorage.getItem("enhe-e2e-entry-notice-dismissed-v1"))).toBe("1");
-  const search = page.getByRole("combobox", { name: "搜索产品" });
+  const search = page.getByRole("combobox", { name: "搜索工具与资源" });
   await search.fill("ENHE");
   await expect(search).toHaveValue("ENHE");
   await expect(page.getByRole("dialog", { name: "本站最新公告通知" })).toHaveCount(0);

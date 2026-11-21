@@ -676,11 +676,14 @@
   min-width: 0;
 }
 
+.tool-detail-product-layout.has-creator .tool-detail-facts-grid {
+  display: grid;
+  grid-auto-rows: 1fr;
+}
+
 .product-refund-policy-slot {
-  flex: 1;
-  min-width: 0;
+  display: none;
   visibility: hidden;
-  pointer-events: none;
 }
 
 .tool-detail-purchase-content {
@@ -1031,6 +1034,10 @@
 }
 
 @media (min-width: 1280px) {
+  .product-refund-policy-slot {
+    display: block;
+  }
+
   .tool-detail-product-layout.has-creator {
     grid-template-columns: minmax(0, 0.8fr) minmax(0, 1.2fr);
   }

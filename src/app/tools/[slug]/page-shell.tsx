@@ -339,6 +339,14 @@ export async function ToolDetailPageShell({
     tool.type,
     forceLocale,
   );
+  const typeLabel = {
+    software: td.software,
+    ai_skill: td.aiSkill,
+    skill_learning: td.skillLearning,
+    ai_workflow: forceLocale === "en" ? "Project" : "项目",
+    online: td.online,
+  }[tool.type];
+  const categoryAndType = new Set([localizedCategoryName ?? td.uncategorized, typeLabel]);
   const shouldShowSecondaryName =
     forceLocale === "zh" && Boolean(localizedTool.secondaryName);
   const toolLocalizationInput = {
@@ -865,18 +873,7 @@ export async function ToolDetailPageShell({
 
             <div className="tool-detail-summary">
               <div className="flex flex-wrap gap-2">
-                <Badge>{localizedCategoryName ?? td.uncategorized}</Badge>
-                <Badge>
-                  {tool.type === "software"
-                    ? td.software
-                    : tool.type === "ai_skill"
-                      ? td.aiSkill
-                    : tool.type === "skill_learning"
-                      ? td.skillLearning
-                      : isAiWorkflow
-                        ? forceLocale === "en" ? "Project" : "项目"
-                      : td.online}
-                </Badge>
+                {Array.from(categoryAndType, (label) => <Badge key={label}>{label}</Badge>)}
                 <Badge
                   className={
                     paidSkillCourse ||
