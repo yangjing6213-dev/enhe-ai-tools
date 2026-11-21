@@ -14,7 +14,7 @@ describe("editable homepage product showcase", () => {
     expect(products[0]).toMatchObject({
       id: "ultimate-edition",
       mediaType: "image",
-      mediaSrc: "/redesign/home/ultimate-edition.png",
+      mediaSrc: "/images/naming-20261121/ai-video-studio-ai-ai-video-studio-ai.webp",
       detailHref: { zh: "https://www.enhe-tech.com.cn/software/ultimate-edition-ai-video-generation-suite" },
     });
   });

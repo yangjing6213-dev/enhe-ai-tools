@@ -4,19 +4,19 @@ const viewports = [1440, 1024, 768, 480, 390, 320] as const;
 const locales = [
   {
     route: "/",
-    previous: "上一款产品",
-    next: "下一款产品",
-    firstName: "无所不能版｜AI生成视频应用",
-    secondName: "InfiniteTalk",
-    thirdName: "AI语音生成",
+    previous: "上一个推荐",
+    next: "下一个推荐",
+    firstName: "AI视频生成｜用文字或图片制作视频",
+    secondName: "InfiniteTalk｜数字人口播视频制作",
+    thirdName: "AI配音｜旁白与多角色对话",
   },
   {
     route: "/en",
-    previous: "Previous product",
-    next: "Next product",
-    firstName: "Ultimate Edition | AI Video Generation Suite",
-    secondName: "InfiniteTalk",
-    thirdName: "Local AI Voice Generator",
+    previous: "Previous Recommendation",
+    next: "Next Recommendation",
+    firstName: "AI Video Workspace | Text-to-Video & Image-to-Video",
+    secondName: "InfiniteTalk | Talking Avatar Videos",
+    thirdName: "AI Voice Generator | Narration & Dialogue",
   },
 ] as const;
 
@@ -121,7 +121,7 @@ for (const width of viewports) {
         "data-product-id",
         "infinitetalk",
       );
-      await stage.getByRole("button", { name: locale.route === "/" ? "显示第 3 款产品" : "Show product 3" }).click();
+      await stage.getByRole("button", { name: locale.route === "/" ? "显示第 3 个推荐" : "Show recommendation 3" }).click();
       await expect(currentProduct(stage)).toHaveAttribute(
         "data-product-id",
         "ai-voice",
@@ -177,7 +177,7 @@ test("reduced motion keeps manual switching while pausing automatic switching", 
     "data-auto-rotating",
     "false",
   );
-  await page.getByRole("button", { name: "下一款产品" }).click();
+  await page.getByRole("button", { name: "下一个推荐" }).click();
   await expect(currentProduct(stage)).toHaveAttribute(
     "data-product-id",
     "infinitetalk",

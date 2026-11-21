@@ -21,19 +21,10 @@ export type RedesignProduct = {
 export const HOME_PRODUCTS = [
   {
     id: "ultimate-edition",
-    name: {
-      zh: "无所不能版｜AI生成视频应用",
-      en: "Ultimate Edition | AI Video Generation Suite",
-    },
-    description: {
-      zh: "本地完成文生视频、图生视频与视频增强，不受在线平台限制，打造更自由、更接近“无所不能”的视频创作体验。",
-      en: "Complete text-to-video, image-to-video, and video enhancement locally, without online-platform limits, for a freer creative process.",
-    },
-    alt: {
-      zh: "无所不能版｜AI生成视频应用公开产品封面",
-      en: "Public cover for Ultimate Edition | AI Video Generation Suite",
-    },
-    mediaSrc: "/redesign/home/ultimate-edition.png",
+    name: { zh: "AI视频生成｜用文字或图片制作视频", en: "AI Video Workspace | Text-to-Video & Image-to-Video" },
+    description: { zh: "在符合显卡和磁盘要求的 Windows 电脑上用文字或图片生成视频。效果取决于设备、模型和设置。", en: "Create video from text or images on a compatible Windows PC. Results depend on the hardware, model, and settings." },
+    alt: { zh: "AI视频生成｜用文字或图片制作视频", en: "AI Video Workspace | Text-to-Video & Image-to-Video" },
+    mediaSrc: "/images/naming-20261121/ai-video-studio-ai-ai-video-studio-ai.webp",
     width: 1672,
     height: 941,
     detailHref: {
@@ -43,13 +34,10 @@ export const HOME_PRODUCTS = [
   },
   {
     id: "infinitetalk",
-    name: { zh: "InfiniteTalk", en: "InfiniteTalk" },
-    description: {
-      zh: "使用人物图片与音频，生成自然流畅的数字人口播视频。",
-      en: "Use a person image and audio to create a natural, fluent digital-presenter video.",
-    },
-    alt: { zh: "InfiniteTalk 公开产品封面", en: "Public cover for InfiniteTalk" },
-    mediaSrc: "/redesign/home/infinitetalk.png",
+    name: { zh: "InfiniteTalk｜数字人口播视频制作", en: "InfiniteTalk | Talking Avatar Videos" },
+    description: { zh: "使用已授权的图片与音频制作数字人口播视频。", en: "Create talking avatar videos from images and audio you have permission to use." },
+    alt: { zh: "InfiniteTalk｜数字人口播视频制作", en: "InfiniteTalk | Talking Avatar Videos" },
+    mediaSrc: "/images/naming-20261121/infinitetalk-ai.webp",
     width: 1672,
     height: 941,
     detailHref: {
@@ -59,13 +47,10 @@ export const HOME_PRODUCTS = [
   },
   {
     id: "ai-voice",
-    name: { zh: "AI语音生成", en: "Local AI Voice Generator" },
-    description: {
-      zh: "本地生成旁白、配音和多角色对话，不受在线次数与平台流程限制，打造更自由、更接近“无所不能”的声音创作体验。",
-      en: "Generate narration, voiceover, and multi-character dialogue locally without online quota or platform-process limits.",
-    },
-    alt: { zh: "AI语音生成公开产品封面", en: "Public cover for Local AI Voice Generator" },
-    mediaSrc: "/redesign/home/ai-voice.png",
+    name: { zh: "AI配音｜旁白与多角色对话", en: "AI Voice Generator | Narration & Dialogue" },
+    description: { zh: "在 Windows 电脑上生成旁白、配音和多角色对话。", en: "Create narration, voiceovers, and multi-character dialogue on a Windows PC." },
+    alt: { zh: "AI配音｜旁白与多角色对话", en: "AI Voice Generator | Narration & Dialogue" },
+    mediaSrc: "/images/naming-20261121/ai-ai.webp",
     width: 1672,
     height: 941,
     detailHref: {
@@ -75,13 +60,10 @@ export const HOME_PRODUCTS = [
   },
   {
     id: "lumi-os",
-    name: { zh: "Lumi-OS", en: "LumiOS Personal AI Operating Companion" },
-    description: {
-      zh: "AI智能体不仅能够作为你的情感陪伴，还能协助整理任务、记忆信息和完成日常工作。",
-      en: "An AI agent for companionship that can also organize tasks, remember information, and help with everyday work.",
-    },
-    alt: { zh: "Lumi-OS 公开产品封面", en: "Public cover for LumiOS Personal AI Operating Companion" },
-    mediaSrc: "/redesign/home/lumi-os.png",
+    name: { zh: "Lumi-OS｜桌面AI助手", en: "Lumi-OS | Desktop AI Assistant" },
+    description: { zh: "在 Windows 桌面上整理任务、记录信息，并跟进日常工作。", en: "Organize tasks, keep notes, and follow up on everyday work from your Windows desktop." },
+    alt: { zh: "Lumi-OS｜桌面AI助手", en: "Lumi-OS | Desktop AI Assistant" },
+    mediaSrc: "/images/naming-20261121/windows-ai.webp",
     width: 1672,
     height: 941,
     detailHref: {
@@ -91,13 +73,10 @@ export const HOME_PRODUCTS = [
   },
   {
     id: "faceswap-studio",
-    name: { zh: "FaceSwap Studio", en: "FaceSwap Studio Local Portrait Synthesis Lab" },
-    description: {
-      zh: "本地完成人物素材合成、效果预览与创作处理，不受在线平台限制，打造更自由、更接近“无所不能”的人像创作体验。",
-      en: "Process portrait material, preview results, and shape creative drafts locally without online-platform limits.",
-    },
-    alt: { zh: "FaceSwap Studio 公开产品封面", en: "Public cover for FaceSwap Studio" },
-    mediaSrc: "/redesign/home/faceswap-studio.png",
+    name: { zh: "FaceSwap Studio｜授权人像与视频合成", en: "FaceSwap Studio | Image & Video Compositing" },
+    description: { zh: "在 Windows 上使用已授权的人像素材，测试图片与视频合成效果。", en: "Test image and video compositing on Windows using portrait material you have permission to use." },
+    alt: { zh: "FaceSwap Studio｜授权人像与视频合成", en: "FaceSwap Studio | Image & Video Compositing" },
+    mediaSrc: "/images/naming-20261121/faceswap-studio-ai.webp",
     width: 1672,
     height: 941,
     detailHref: {

@@ -1062,12 +1062,12 @@ function buildWorkflowFaqFallback(tool: LocalizedToolInput, locale: Locale): Loc
   let accessAnswer: string;
   if (!tool.workflowDeliveryMode) {
     accessAnswer = isEnglish
-      ? "Review the delivery method shown on this page before using Get workflow. Follow the linked source or the package access instructions provided there."
-      : "请先确认本页标注的获取方式，再使用“获取工作流”入口；按对应来源链接或交付包的访问说明操作。";
+      ? "Check the delivery section for the original project link or package download instructions."
+      : "请在本页获取区查看原项目链接或交付包的下载说明。";
   } else if (tool.workflowDeliveryMode === "repository_link") {
     accessAnswer = isEnglish
-      ? "Use Get workflow to open the GitHub repository. ENHE does not provide a download package for this entry; follow the upstream instructions."
-      : "点击“获取工作流”前往 GitHub 原仓库。本站未为该条目提供下载包，请按原仓库说明获取和使用。";
+      ? "Choose View Original Project for the upstream repository. Follow its setup instructions to deploy the source."
+      : "点击“查看原项目”前往上游仓库，按项目说明部署源码。";
   } else if (tool.isDownloadPaid === true && Number.isFinite(tool.workflowPackagePrice) && Number(tool.workflowPackagePrice) > 0) {
     accessAnswer = isEnglish
       ? "Review the price and package version before purchase. Successful payment unlocks the protected download entry for the purchased version."
@@ -1085,7 +1085,7 @@ function buildWorkflowFaqFallback(tool: LocalizedToolInput, locale: Locale): Loc
   return [
     {
       id: "localized-faq-workflow-access",
-      question: isEnglish ? "How do I get this workflow?" : "如何获取该工作流？",
+      question: isEnglish ? "How can I access this project?" : "如何获取这个项目？",
       answer: accessAnswer,
     },
     {

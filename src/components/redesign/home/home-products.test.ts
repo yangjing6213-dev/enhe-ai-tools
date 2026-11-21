@@ -21,9 +21,9 @@ const showcaseSource = readFileSync(
   "utf8",
 );
 const homeStyles = readFileSync(join(process.cwd(), "src/styles/redesign/home.css"), "utf8");
-const phaseOneMediaManifest = JSON.parse(
+const homeCoverManifest = JSON.parse(
   readFileSync(
-    join(process.cwd(), "docs/enhe-redesign/phase-1a/prototype/assets/product-media-manifest.json"),
+    join(process.cwd(), "docs/audits/enhe-naming-20261111/evidence/2026-11-21/home-cover-digests.json"),
     "utf8",
   ),
 ) as Array<{ localPath: string; sha256: string }>;
@@ -68,12 +68,12 @@ describe("homepage approved product showcase", () => {
 
   it("keeps bilingual content, public links, and fixed media dimensions", () => {
     expect(HOME_PRODUCTS[0]).toMatchObject({
-      mediaSrc: "/redesign/home/ultimate-edition.png",
+      mediaSrc: "/images/naming-20261121/ai-video-studio-ai-ai-video-studio-ai.webp",
       width: 1672,
       height: 941,
       name: {
-        zh: "无所不能版｜AI生成视频应用",
-        en: "Ultimate Edition | AI Video Generation Suite",
+        zh: "AI视频生成｜用文字或图片制作视频",
+        en: "AI Video Workspace | Text-to-Video & Image-to-Video",
       },
       detailHref: {
         zh: "https://www.enhe-tech.com.cn/software/ultimate-edition-ai-video-generation-suite",
@@ -81,11 +81,11 @@ describe("homepage approved product showcase", () => {
       },
     });
     expect(HOME_PRODUCTS[2]).toMatchObject({
-      mediaSrc: "/redesign/home/ai-voice.png",
-      name: { zh: "AI语音生成", en: "Local AI Voice Generator" },
-      alt: { zh: "AI语音生成公开产品封面", en: "Public cover for Local AI Voice Generator" },
+      mediaSrc: "/images/naming-20261121/ai-ai.webp",
+      name: { zh: "AI配音｜旁白与多角色对话", en: "AI Voice Generator | Narration & Dialogue" },
+      alt: { zh: "AI配音｜旁白与多角色对话", en: "AI Voice Generator | Narration & Dialogue" },
     });
-    expect(HOME_PRODUCTS.every((product) => product.mediaSrc.startsWith("/redesign/home/"))).toBe(true);
+    expect(HOME_PRODUCTS.every((product) => product.mediaSrc.startsWith("/images/naming-20261121/"))).toBe(true);
     expect(HOME_PRODUCTS.every((product) => product.width === 1672 && product.height === 941)).toBe(true);
     expect(HOME_PRODUCTS.every((product) => product.description.zh && product.description.en)).toBe(true);
   });
@@ -106,7 +106,7 @@ describe("homepage approved product showcase", () => {
 
     for (const product of HOME_PRODUCTS) {
       expect(fallback).toContain(`data-product-id="${product.id}"`);
-      expect(fallback).toContain(`<h3>${product.name[locale]}</h3>`);
+      expect(fallback).toContain(`<h3>${product.name[locale].replaceAll("&", "&amp;")}</h3>`);
       expect(fallback).toContain(`<p>${product.description[locale]}</p>`);
       expect(fallback).toContain(`href="${product.detailHref[locale]}"`);
       expect(fallback).toContain(`>${cta}</a>`);
@@ -221,8 +221,8 @@ describe("homepage approved product showcase", () => {
 
   it("renders one accessible indicator for each featured product", () => {
     const html = renderToStaticMarkup(createElement(EnheRedesignProductShowcase, { locale: "zh" }));
-    expect(html).toContain('aria-label="选择推荐产品"');
-    expect(html.match(/aria-label="显示第 \d 款产品"/g) ?? []).toHaveLength(HOME_PRODUCT_COUNT);
+    expect(html).toContain('aria-label="选择推荐内容"');
+    expect(html.match(/aria-label="显示第 \d 个推荐"/g) ?? []).toHaveLength(HOME_PRODUCT_COUNT);
     expect(html).toContain('aria-current="true"');
   });
 
@@ -238,18 +238,18 @@ describe("homepage approved product showcase", () => {
     expect(mobileStyles).toMatch(/\.redesign-home-product-control\s*\{[^}]*width:\s*32px/);
   });
 
-  it("keeps all five public media files present and matching the Phase 1A manifest", () => {
+  it("keeps all five public media files present and matching the current naming audit manifest", () => {
     expect(HOME_PRODUCTS).toHaveLength(5);
 
     for (const product of HOME_PRODUCTS) {
       const filename = basename(product.mediaSrc);
-      const manifestEntry = phaseOneMediaManifest.find((entry) => basename(entry.localPath) === filename);
+      const manifestEntry = homeCoverManifest.find((entry) => basename(entry.localPath) === filename);
       const assetPath = join(process.cwd(), "public", product.mediaSrc.replace(/^\/+/, ""));
 
       expect(manifestEntry).toBeDefined();
       expect(existsSync(assetPath)).toBe(true);
       if (!manifestEntry) {
-        throw new Error(`Missing Phase 1A manifest entry for ${filename}`);
+        throw new Error(`Missing current naming audit manifest entry for ${filename}`);
       }
       expect(createHash("sha256").update(readFileSync(assetPath)).digest("hex").toUpperCase()).toBe(
         manifestEntry.sha256,

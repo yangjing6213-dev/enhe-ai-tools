@@ -63,6 +63,7 @@ import {
   buildLocalizedToolSummary,
   buildLocalizedToolTagItems,
   buildLocalizedToolTutorialItems,
+  getApprovedLocalizedToolName,
   resolveLocalizedToolCategoryName,
   resolveLocalizedToolIdentity,
   shouldIndexEnglishToolPage,
@@ -180,12 +181,13 @@ export async function generateToolDetailPageMetadata(
     });
   }
 
+  const approvedName = getApprovedLocalizedToolName(tool.slug, forceLocale);
   const revenuePageSeoTitle = getRevenuePageSeoTitle(
     canonicalSlug,
     forceLocale,
   );
   const metadata = buildPageMetadata({
-    title: buildToolMetadataTitle({
+    title: approvedName ? `${approvedName} | ${t.brand}` : buildToolMetadataTitle({
       name:
         revenuePageSeoTitle ?? buildLocalizedToolMetaHeading(tool, forceLocale),
       englishName:

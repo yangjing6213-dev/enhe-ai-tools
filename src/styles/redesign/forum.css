@@ -143,6 +143,8 @@
 .forum-topic-card .forum-author-line { gap: 7px; font-size: .82rem; }
 .forum-topic-card .forum-author-line time { font-size: .78rem; }
 .forum-topic-card .forum-category-tag { margin-left: auto; }
+.forum-original-language { display: block; color: var(--marketing-muted); font-size: .75rem; }
+.forum-topic-card > .forum-original-language { margin: .75rem 18px 0; }
 .forum-topic-card .forum-post-meta { margin: auto 18px 12px; padding-top: 8px; }
 .forum-topic-card .forum-post-actions { gap: 8px; }
 
@@ -377,6 +379,7 @@
   .forum-topic-card { padding: 0; }
   .forum-post-card.forum-topic-card h2 { margin: 14px 16px 6px; }
   .forum-topic-card .forum-post-header { margin-inline: 16px; }
+  .forum-topic-card > .forum-original-language,
   .forum-topic-card .forum-post-meta { margin-inline: 16px; }
   .forum-post-card .forum-author-line { gap: 7px; }
   .forum-post-actions { gap: 8px; }

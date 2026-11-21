@@ -48,8 +48,8 @@ const routes: FormalRoute[] = [
     menu: "菜单",
     closeMenu: "收起菜单",
     support: "客服",
-    previous: "上一款产品",
-    next: "下一款产品",
+    previous: "上一个推荐",
+    next: "下一个推荐",
   },
   {
     path: "/en",
@@ -58,8 +58,8 @@ const routes: FormalRoute[] = [
     menu: "Menu",
     closeMenu: "Close menu",
     support: "Chat",
-    previous: "Previous product",
-    next: "Next product",
+    previous: "Previous Recommendation",
+    next: "Next Recommendation",
   },
   {
     path: "/software",
@@ -95,14 +95,14 @@ const homeSsrRoutes = [
     locale: "zh",
     h1: routes[0].h1,
     cta: "查看产品",
-    next: "下一款产品",
+    next: "下一个推荐",
   },
   {
     path: "/en",
     locale: "en",
     h1: routes[1].h1,
     cta: "View product",
-    next: "Next product",
+    next: "Next Recommendation",
   },
 ] as const;
 
@@ -1142,8 +1142,8 @@ test("home product stage and mobile navigation preserve latest state across navi
   await page.setViewportSize({ width: 390, height: 844 });
   await openFormalRoute(page, "/");
   const stage = page.locator(".redesign-home-product-stage");
-  const next = page.getByRole("button", { name: "下一款产品" });
-  const previous = page.getByRole("button", { name: "上一款产品" });
+  const next = page.getByRole("button", { name: "下一个推荐" });
+  const previous = page.getByRole("button", { name: "上一个推荐" });
   await stage.scrollIntoViewIfNeeded();
 
   await next.click();
@@ -1307,8 +1307,8 @@ test("product stage survives 30 rapid latest-intent rounds", async ({ page }) =>
   await page.setViewportSize({ width: 390, height: 844 });
   await openFormalRoute(page, "/");
   const stage = page.locator(".redesign-home-product-stage");
-  const next = page.getByRole("button", { name: "下一款产品" });
-  const previous = page.getByRole("button", { name: "上一款产品" });
+  const next = page.getByRole("button", { name: "下一个推荐" });
+  const previous = page.getByRole("button", { name: "上一个推荐" });
   await stage.scrollIntoViewIfNeeded();
 
   for (let run = 0; run < 30; run += 1) {
@@ -1441,7 +1441,7 @@ test("cross-module flow survives 20 rapid product and drawer rounds", async ({ p
   await page.setViewportSize({ width: 390, height: 844 });
   await openFormalRoute(page, "/");
   const stage = page.locator(".redesign-home-product-stage");
-  const next = page.getByRole("button", { name: "下一款产品" });
+  const next = page.getByRole("button", { name: "下一个推荐" });
   const trigger = page.getByRole("button", { name: "菜单", exact: true });
   const drawer = page.locator(".redesign-mobile-drawer");
   await stage.scrollIntoViewIfNeeded();

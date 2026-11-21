@@ -10,6 +10,7 @@ const sectionLabels: Record<string, { zh: string; en: string }> = {
   about: { zh: "关于恩禾", en: "About ENHE" },
   "account-services": { zh: "AI账号服务", en: "Account services" },
   "ai-news": { zh: "AI资讯", en: "AI News" },
+  "ai-prompt-management": { zh: "提示词库", en: "Prompt Library" },
   "ai-skills": { zh: "AI技能包", en: "AI Skill Packs" },
   "ai-topics": { zh: "AI话题", en: "AI Topics" },
   "ai-trends": { zh: "AI应用场景", en: "AI Use Cases" },

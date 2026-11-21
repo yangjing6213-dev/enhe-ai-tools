@@ -1,3 +1,5 @@
+import { createHash } from "node:crypto";
+import editorialOverrides from "./lib/ai-prompt-editorial-overrides.json";
 import { mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { dirname, join, resolve } from "node:path";
 
@@ -32,6 +34,7 @@ type SourceDataset = {
 const englishCategoryByChinese: Record<string, string> = {
   编程: "Programming",
   红书: "Xiaohongshu",
+  小红书: "Xiaohongshu",
   角色: "Roles",
   论文: "Academic Writing",
   生活: "Life",
@@ -97,18 +100,36 @@ for (const entry of source.entries) {
   }
 }
 
-const zhEntries = source.entries.map((entry) => ({
+// Preserve reviewed website edits when reimporting the same older desktop data.
+type ReviewedField = { previousSha256: string; value: string | string[] };
+type ReviewedFields = Partial<Record<keyof Translation, ReviewedField>>;
+const reviewed: Record<string, { zh?: ReviewedFields; en?: ReviewedFields }> = editorialOverrides;
+function applyReviewedFields(entry: Translation & { id: string }, locale: "zh" | "en") {
+  const overrides = reviewed[entry.id]?.[locale];
+  if (!overrides) return entry;
+  const result = { ...entry };
+  for (const [field, correction] of Object.entries(overrides)) {
+    const key = field as keyof Translation;
+    const digest = createHash("sha256").update(JSON.stringify(entry[key])).digest("hex");
+    if (digest !== correction.previousSha256) continue;
+    if (key === "tags" && Array.isArray(correction.value)) result.tags = correction.value;
+    else if (key !== "tags" && typeof correction.value === "string") result[key] = correction.value;
+  }
+  return result;
+}
+
+const zhEntries = source.entries.map((entry) => applyReviewedFields({
   id: entry.id,
   category: entry.category,
   title: entry.title,
   summary: entry.summary,
   prompt: entry.prompt,
   tags: entry.tags,
-}));
+}, "zh"));
 const enEntries = source.entries.map((entry) => {
   const english = entry.translations!.en!;
   const category = englishCategoryByChinese[entry.category] ?? english.category;
-  return {
+  return applyReviewedFields({
     id: entry.id,
     category,
     title: english.title,
@@ -117,7 +138,7 @@ const enEntries = source.entries.map((entry) => {
     tags: Array.from(
       new Set([category, ...english.tags.filter((tag) => tag !== english.category)]),
     ),
-  };
+  }, "en");
 });
 const datasets = {
   zh: {

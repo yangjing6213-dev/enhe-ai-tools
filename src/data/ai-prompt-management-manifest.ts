@@ -4,12 +4,12 @@ export const aiPromptManagementManifest = {
   "categories": {
     "zh": [
       "编程",
-      "红书",
       "论文",
       "生活",
       "视频",
       "图片",
       "问答",
+      "小红书",
       "小说",
       "写作",
       "运营",

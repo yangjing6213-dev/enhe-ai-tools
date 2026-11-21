@@ -83,6 +83,13 @@ function pageHref(locale: Locale, path: string) {
   return buildLocalePath(path, locale);
 }
 
+function OriginalPostNote({ locale, post }: { locale: Locale; post: { title: string; content: string } }) {
+  if (locale !== "en") return null;
+  const sample = post.title + " " + post.content.slice(0, 400);
+  const chinese = /[这们为对与还从说请个吗您]/u.test(sample) && !/[\u3040-\u30ff\uac00-\ud7a3]/u.test(sample);
+  return <small className="forum-original-language">{chinese ? "Original post in Chinese" : "Original post"}</small>;
+}
+
 function dateLabel(date: Date, locale: Locale) {
   return date.toLocaleDateString(locale === "en" ? "en-US" : "zh-CN", { year: "numeric", month: "short", day: "numeric" });
 }
@@ -147,6 +154,7 @@ export function ForumIndexContent({ locale, posts, selectedCategory, isAuthentic
       {posts.length ? <div className="forum-post-list">{posts.map((post) => (
         <article className="forum-post-card forum-topic-card" key={post.id}>
           <TopicCover post={post} locale={locale} />
+          <OriginalPostNote locale={locale} post={post} />
           <h2><Link href={pageHref(locale, `/forum/${post.id}`)}><EmojiText text={post.title} /></Link></h2>
           <div className="forum-post-header"><div className="forum-author-line"><UserAvatar src={post.author.avatar} alt={post.author.displayName} size={32} className="forum-avatar" /><span><EmojiText text={post.author.displayName} /></span><time dateTime={post.createdAt.toISOString()}>{dateLabel(post.createdAt, locale)}</time></div><span className="forum-category-tag">{getForumCategoryLabel(post.category, locale)}</span></div>
           <div className="forum-post-meta forum-topic-meta"><ForumPostActions locale={locale} postId={post.id} title={post.title} replyCount={post._count.replies} shareCount={post._count.shares} likeCount={post._count.likes} isLiked={post.isLiked} isBookmarked={post.isBookmarked} isAuthenticated={isAuthenticated} replyHref={`${pageHref(locale, `/forum/${post.id}`)}#replies`} />{isAuthenticated && isAdmin ? <ForumDeletePostButton locale={locale} postId={post.id} /> : null}</div>
@@ -196,6 +204,7 @@ export function ForumPostContent({ locale, post, isAuthenticated, currentUserId,
       {replySubmitted ? <p className="forum-success-notice">{t.replyPublished}</p> : null}
       <article className="forum-post-card forum-post-detail">
         <div className="forum-post-header"><div className="forum-author-line"><UserAvatar src={post.author.avatar} alt={post.author.displayName} size={44} className="forum-avatar" /><span><EmojiText text={post.author.displayName} /></span><time dateTime={post.createdAt.toISOString()}>{dateLabel(post.createdAt, locale)}</time></div><span className="forum-category-tag">{getForumCategoryLabel(post.category, locale)}</span></div>
+        <OriginalPostNote locale={locale} post={post} />
         <h1><EmojiText text={post.title} /></h1><RichTextContent className="forum-detail-content rich-text-content" content={post.content} attachments={post.attachments ?? []} locale={locale} />
         <ForumMediaDisplay locale={locale} attachments={uninsertedAttachments(post.content, post.attachments ?? [])} />
         <div className="forum-post-meta forum-topic-meta"><ForumPostActions locale={locale} postId={post.id} title={post.title} replyCount={post.replyCount} shareCount={post._count.shares} likeCount={post._count.likes} isLiked={post.isLiked} isBookmarked={post.isBookmarked} isAuthenticated={isAuthenticated} replyHref="#replies" />{isAuthenticated && isAdmin ? <ForumDeletePostButton locale={locale} postId={post.id} /> : null}</div>

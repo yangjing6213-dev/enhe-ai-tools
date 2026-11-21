@@ -34,11 +34,11 @@ describe("homepage experience review candidate", () => {
       { zh: "Ethan Brooks", en: "Ethan Brooks" },
     ]);
     expect(HOME_REVIEWS.map((review) => review.productLabel)).toEqual([
-      { zh: "无所不能版｜AI生成视频应用", en: "Ultimate Edition | AI Video Generation Suite" },
-      { zh: "InfiniteTalk", en: "InfiniteTalk" },
-      { zh: "AI语音生成", en: "AI Voice Generator" },
-      { zh: "Lumi-OS", en: "LumiOS" },
-      { zh: "FaceSwap Studio", en: "FaceSwap Studio" },
+      { zh: "AI视频生成｜用文字或图片制作视频", en: "AI Video Workspace | Text-to-Video & Image-to-Video" },
+      { zh: "InfiniteTalk｜数字人口播视频制作", en: "InfiniteTalk | Talking Avatar Videos" },
+      { zh: "AI配音｜旁白与多角色对话", en: "AI Voice Generator | Narration & Dialogue" },
+      { zh: "Lumi-OS｜桌面AI助手", en: "Lumi-OS | Desktop AI Assistant" },
+      { zh: "FaceSwap Studio｜授权人像与视频合成", en: "FaceSwap Studio | Image & Video Compositing" },
     ]);
     expect(HOME_REVIEWS.map((review) => review.avatarAlt)).toEqual([
       { zh: "AI 生成的虚构人物林小满头像", en: "AI-generated fictional portrait of Lin Xiaoman" },
@@ -79,8 +79,8 @@ describe("homepage experience review candidate", () => {
     expect(HOME_REVIEWS[0]).toMatchObject({
       displayName: { zh: "林小满", en: "Lin Xiaoman" },
       productLabel: {
-        zh: "无所不能版｜AI生成视频应用",
-        en: "Ultimate Edition | AI Video Generation Suite",
+        zh: "AI视频生成｜用文字或图片制作视频",
+        en: "AI Video Workspace | Text-to-Video & Image-to-Video",
       },
       avatarSrc: "/redesign/home/avatar-1.webp",
       avatarAlt: { zh: "AI 生成的虚构人物林小满头像", en: "AI-generated fictional portrait of Lin Xiaoman" },
