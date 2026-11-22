@@ -178,9 +178,8 @@
   transform: translateX(clamp(0px, calc(50vw - 640px), 164px));
 }
 
-.redesign-header[data-locale="en"] .redesign-brand-region,
-.redesign-header[data-locale="en"] .redesign-header-search {
-  transform: none;
+.redesign-header .redesign-header-search {
+  margin-right: clamp(0px, calc(50vw - 640px), 164px);
 }
 
 .redesign-brand-lockup {
@@ -213,6 +212,17 @@
   .redesign-header[data-locale="en"] .redesign-desktop-nav {
     font-size: 11px;
     letter-spacing: 0;
+  }
+}
+
+@media (width >= 1280px) {
+  .redesign-header[data-locale="en"] .redesign-desktop-nav {
+    font-size: 13px;
+    letter-spacing: 0;
+  }
+
+  .redesign-header[data-locale="en"] .redesign-desktop-nav-list {
+    gap: 7px;
   }
 }
 
