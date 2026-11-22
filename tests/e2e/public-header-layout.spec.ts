@@ -1,7 +1,7 @@
 import { expect, test } from "@playwright/test";
 
 test.describe("English public header layout", () => {
-  for (const width of [900, 1024, 1100, 1280, 1366, 1440, 1600, 1920]) {
+  for (const width of [900, 1024, 1100, 1280, 1366, 1440, 1600, 1920, 2087]) {
     test(`keeps search separate from the first navigation link at ${width}px`, async ({ page }) => {
       await page.setViewportSize({ width, height: 900 });
       await page.goto("/en", { waitUntil: "load" });
@@ -13,12 +13,15 @@ test.describe("English public header layout", () => {
       const [searchBounds, linkBounds] = await Promise.all([search.boundingBox(), firstNavLink.boundingBox()]);
       expect(searchBounds).not.toBeNull();
       expect(linkBounds).not.toBeNull();
-      expect(searchBounds!.width).toBeGreaterThanOrEqual(180);
+      expect(searchBounds!.width).toBeGreaterThanOrEqual(220);
       const overlaps = searchBounds!.x < linkBounds!.x + linkBounds!.width
         && searchBounds!.x + searchBounds!.width > linkBounds!.x
         && searchBounds!.y < linkBounds!.y + linkBounds!.height
         && searchBounds!.y + searchBounds!.height > linkBounds!.y;
       expect(overlaps).toBe(false);
+      if (Math.abs(searchBounds!.y - linkBounds!.y) < 4) {
+        expect(searchBounds!.x + searchBounds!.width + 16).toBeLessThanOrEqual(linkBounds!.x);
+      }
     });
   }
 });
