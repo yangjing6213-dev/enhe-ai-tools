@@ -178,6 +178,11 @@
   transform: translateX(clamp(0px, calc(50vw - 640px), 164px));
 }
 
+.redesign-header[data-locale="en"] .redesign-brand-region,
+.redesign-header[data-locale="en"] .redesign-header-search {
+  transform: none;
+}
+
 .redesign-brand-lockup {
   width: 200px;
   min-height: 48px;
@@ -1112,13 +1117,6 @@
     transition-property: background-color, border-color, box-shadow, color, opacity !important;
     transition-duration: var(--enhe-motion-fast) !important;
     transition-timing-function: var(--enhe-ease-ui-feedback) !important;
-  }
-}
-
-/* Color 70 accents and Color 100 footer, preserving the white page canvas. */
-@media (width >= 768px) {
-  .redesign-header-search {
-    width: 50%;
   }
 }
 

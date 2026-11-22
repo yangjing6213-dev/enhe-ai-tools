@@ -4,7 +4,7 @@
 import { useEffect, useRef, useState } from "react";
 import HoldButton from "@/components/hold-button";
 import { insertTextAtSelection } from "@/components/rich-text-editor";
-import { forumImageMaxBytes, forumVideoMaxBytes } from "@/lib/forum-media-limits";
+import { getForumImageMaxBytes, forumVideoMaxBytes } from "@/lib/forum-media-limits";
 
 type MediaItem = { key: string; name: string; kind: "image" | "video"; status: "uploading" | "ready" | "error" | "removing"; progress: number; id?: string; url?: string; error?: string };
 type UploadResponse = { id?: string; type?: "image" | "video"; url?: string; mimeType?: string; code?: string };
@@ -21,12 +21,12 @@ export function ForumMediaEditor({ locale, allowVideo, allowCover = false }: { l
   const blocked = Boolean(error) || items.some((item) => item.status !== "ready");
   const text = locale === "zh" ? {
     image: "添加图片", video: "添加视频", insert: "插入正文", cover: "设为封面", coverSelected: "当前封面", remove: "移除", dismiss: "清除提示", uploading: "正在上传", removing: "正在移除", uploaded: "上传完成", finish: "请等待附件上传完成，或移除失败的附件后再提交。",
-    hint: allowVideo ? "最多 6 张图片，每张 8MB；1 个 MP4/WebM 视频，最多 100MB。话题发布后，媒体会公开展示。" : "最多 4 张图片，每张 8MB。回复发布后，图片会公开展示。",
-    count: allowVideo ? "最多添加 6 张图片和 1 个视频。" : "回复最多添加 4 张图片。", invalid: "请选择 JPG、PNG、WebP、GIF 图片或支持的视频。", size: "文件太大，请压缩后再上传。", login: "登录已过期，请重新登录后上传。", limit: "上传次数较多，请稍后再试。", failed: "上传失败，请移除后重试。", removeFailed: "移除失败，请稍后重试。",
+    hint: allowVideo ? "最多 10 张图片，每张 10MB；1 个 MP4/WebM 视频，最多 100MB。话题发布后，媒体会公开展示。" : "最多 4 张图片，每张 8MB。回复发布后，图片会公开展示。",
+    count: allowVideo ? "最多添加 10 张图片和 1 个视频。" : "回复最多添加 4 张图片。", invalid: "请选择 JPG、PNG、WebP、GIF 图片或支持的视频。", size: "文件太大，请压缩后再上传。", login: "登录已过期，请重新登录后上传。", limit: "上传次数较多，请稍后再试。", failed: "上传失败，请移除后重试。", removeFailed: "移除失败，请稍后重试。",
   } : {
     image: "Add images", video: "Add video", insert: "Insert in text", cover: "Set as cover", coverSelected: "Current cover", remove: "Remove", dismiss: "Dismiss", uploading: "Uploading", removing: "Removing", uploaded: "Uploaded", finish: "Wait for uploads to finish or remove failed attachments before submitting.",
-    hint: allowVideo ? "Up to 6 images, 8MB each, and 1 MP4/WebM video up to 100MB. Media is public with your post." : "Up to 4 images, 8MB each. Images are public with your reply.",
-    count: allowVideo ? "You can add up to 6 images and 1 video." : "Replies can contain up to 4 images.", invalid: "Choose JPG, PNG, WebP, GIF images or a supported video.", size: "The file is too large. Compress it before uploading.", login: "Your session expired. Sign in again to upload.", limit: "Too many uploads. Try again later.", failed: "Upload failed. Remove the file and try again.", removeFailed: "Could not remove this file. Try again later.",
+    hint: allowVideo ? "Up to 10 images, 10MB each, and 1 MP4/WebM video up to 100MB. Media is public with your post." : "Up to 4 images, 8MB each. Images are public with your reply.",
+    count: allowVideo ? "You can add up to 10 images and 1 video." : "Replies can contain up to 4 images.", invalid: "Choose JPG, PNG, WebP, GIF images or a supported video.", size: "The file is too large. Compress it before uploading.", login: "Your session expired. Sign in again to upload.", limit: "Too many uploads. Try again later.", failed: "Upload failed. Remove the file and try again.", removeFailed: "Could not remove this file. Try again later.",
   };
 
   function updateItems(update: (current: MediaItem[]) => MediaItem[]) {
@@ -87,8 +87,8 @@ export function ForumMediaEditor({ locale, allowVideo, allowCover = false }: { l
     setError("");
     const chosen = Array.from(files);
     const sameKind = latestItems.current.filter((item) => item.kind === kind).length;
-    if (sameKind + chosen.length > (kind === "image" ? allowVideo ? 6 : 4 : allowVideo ? 1 : 0)) { setError(text.count); return; }
-    if (chosen.some((file) => file.size <= 0 || file.size > (kind === "image" ? forumImageMaxBytes : forumVideoMaxBytes))) { setError(text.size); return; }
+    if (sameKind + chosen.length > (kind === "image" ? allowVideo ? 10 : 4 : allowVideo ? 1 : 0)) { setError(text.count); return; }
+    if (chosen.some((file) => file.size <= 0 || file.size > (kind === "image" ? getForumImageMaxBytes(allowVideo ? "post" : "reply") : forumVideoMaxBytes))) { setError(text.size); return; }
     if (chosen.some((file) => !(kind === "image" ? ["image/jpeg", "image/png", "image/webp", "image/gif"].includes(file.type) : ["video/mp4", "video/webm"].includes(file.type)))) { setError(text.invalid); return; }
     const additions = chosen.map((file): MediaItem => ({ key: crypto.randomUUID(), name: file.name, kind, status: "uploading", progress: 0 }));
     updateItems((current) => [...current, ...additions]);

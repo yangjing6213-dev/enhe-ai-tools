@@ -357,6 +357,26 @@
 .forum-form-card form { display: grid; gap: 18px; margin-top: 22px; }
 .forum-form-card label { display: grid; gap: 8px; font-weight: 700; }
 .forum-form-card .forum-primary-button { justify-self: start; }
+.forum-page .rich-text-editor__action {
+  border-color: var(--enhe-action, #0462c2);
+  background-color: var(--enhe-action, #0462c2);
+  color: #fff;
+}
+.forum-page .rich-text-editor__action:hover { background-color: var(--enhe-action-hover, #0059b3); color: #fff; }
+.forum-form-select-control { position: relative; display: block; width: 100%; }
+.forum-form-card .forum-form-select-control > select { display: block; appearance: none; padding-right: 48px; }
+.forum-form-card .forum-form-select-control::after {
+  position: absolute;
+  top: 50%;
+  right: 18px;
+  width: 8px;
+  height: 8px;
+  transform: translateY(-65%) rotate(45deg);
+  border-right: 2px solid currentColor;
+  border-bottom: 2px solid currentColor;
+  content: "";
+  pointer-events: none;
+}
 
 .forum-admin-list { display: grid; gap: 18px; }
 .forum-admin-card h2 { margin: 10px 0; font-size: 1.25rem; overflow-wrap: anywhere; }

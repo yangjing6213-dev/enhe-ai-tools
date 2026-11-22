@@ -2,8 +2,8 @@ import { randomUUID } from "node:crypto";
 import { extname } from "node:path";
 import sharp from "sharp";
 
-import { forumAttachmentLifetimeMs, forumImageMaxBytes, forumVideoMaxBytes, type ForumMediaSurface } from "@/lib/forum-media-limits";
-export { forumAttachmentLifetimeMs, forumImageMaxBytes, forumVideoMaxBytes, forumMediaUploadWindowMs, forumMediaUploadMax, forumMediaPendingMax, type ForumMediaSurface } from "@/lib/forum-media-limits";
+import { forumAttachmentLifetimeMs, getForumImageMaxBytes, forumVideoMaxBytes, type ForumMediaSurface } from "@/lib/forum-media-limits";
+export { forumAttachmentLifetimeMs, forumImageMaxBytes, forumPostImageMaxBytes, forumVideoMaxBytes, getForumImageMaxBytes, forumMediaUploadWindowMs, forumMediaUploadMax, forumMediaPendingMax, type ForumMediaSurface } from "@/lib/forum-media-limits";
 
 type AttachmentSelection = { id: string; authorId: string; kind: string; fileSize: number; postId: string | null; replyId: string | null; discardedAt: Date | null; createdAt: Date };
 type AttachmentAccess = { authorId: string; post: { status: string } | null; reply: { status: string; post: { status: string } } | null };
@@ -31,7 +31,7 @@ export function isForumMediaSameOriginRequest(request: Request) {
 
 export function readForumAttachmentIds(formData: FormData, surface: ForumMediaSurface) {
   const entries = formData.getAll("attachmentIds");
-  if (entries.length > (surface === "post" ? 7 : 4) || entries.some((id) => typeof id !== "string" || !/^[a-zA-Z0-9_-]{1,100}$/.test(id))) throw new Error("FORUM_INVALID_ATTACHMENTS");
+  if (entries.length > (surface === "post" ? 11 : 4) || entries.some((id) => typeof id !== "string" || !/^[a-zA-Z0-9_-]{1,100}$/.test(id))) throw new Error("FORUM_INVALID_ATTACHMENTS");
   const ids = entries as string[];
   if (new Set(ids).size !== ids.length) throw new Error("FORUM_INVALID_ATTACHMENTS");
   return ids;
@@ -45,11 +45,11 @@ export function assertForumAttachmentSelection(ids: string[], attachments: Attac
   for (const item of attachments) {
     if (!ids.includes(item.id) || item.authorId !== authorId || item.postId || item.replyId || item.discardedAt !== null || item.createdAt.getTime() < now - forumAttachmentLifetimeMs) invalid();
     if (!Number.isInteger(item.fileSize) || item.fileSize <= 0) invalid();
-    if (item.kind === "image" && item.fileSize <= forumImageMaxBytes) images += 1;
+    if (item.kind === "image" && item.fileSize <= getForumImageMaxBytes(surface)) images += 1;
     else if (item.kind === "video" && item.fileSize <= forumVideoMaxBytes) videos += 1;
     else invalid();
   }
-  if (images > (surface === "post" ? 6 : 4) || videos > (surface === "post" ? 1 : 0)) invalid();
+  if (images > (surface === "post" ? 10 : 4) || videos > (surface === "post" ? 1 : 0)) invalid();
 }
 
 export function isForumAttachmentPublic(item: AttachmentAccess) {
@@ -77,7 +77,7 @@ export async function prepareForumMediaUpload(input: File, surface: ForumMediaSu
   const image = imageFormats[extension];
   const video = surface === "post" && ((extension === ".mp4" && input.type === "video/mp4") || (extension === ".webm" && input.type === "video/webm"));
   if ((!image || input.type !== image.mime) && !video) throw new Error("FORUM_MEDIA_TYPE");
-  const maxBytes = image ? forumImageMaxBytes : forumVideoMaxBytes;
+  const maxBytes = image ? getForumImageMaxBytes(surface) : forumVideoMaxBytes;
   if (input.size <= 0 || input.size > maxBytes) throw new Error("FORUM_MEDIA_SIZE");
   const buffer = Buffer.from(await input.arrayBuffer());
   const originalName = input.name.split(/[\\/]/).pop()?.replace(/[\x00-\x1f\x7f]/g, "").slice(0, 160) || "media";
@@ -87,7 +87,7 @@ export async function prepareForumMediaUpload(input: File, surface: ForumMediaSu
       const metadata = await decoder.metadata();
       if (metadata.format !== image.format || !metadata.width || !metadata.height || (metadata.pages ?? 1) > 100 || metadata.width * metadata.height > 24_000_000) throw new Error("FORUM_MEDIA_TYPE");
       const normalized = await decoder.rotate().webp({ quality: 85 }).toBuffer();
-      if (normalized.length > forumImageMaxBytes) throw new Error("FORUM_MEDIA_SIZE");
+      if (normalized.length > getForumImageMaxBytes(surface)) throw new Error("FORUM_MEDIA_SIZE");
       return { kind: "image" as const, originalName, file: new File([new Uint8Array(normalized)], `${randomUUID()}.webp`, { type: "image/webp" }) };
     } catch (error) {
       if (error instanceof Error && error.message === "FORUM_MEDIA_SIZE") throw error;

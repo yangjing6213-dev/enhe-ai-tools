@@ -227,7 +227,7 @@ export function ForumNewPostContent({ locale, submitted, isAuthenticated }: { lo
         <p>{t.submitHint}</p>
         {submitted ? <p className="forum-success-notice">{t.published}</p> : null}
         {isAuthenticated ? <form action={createForumPostAction}>
-          <label><span>{t.categoryLabel}</span><select name="category" required defaultValue="question">{categories.map((category) => <option key={category} value={category}>{getForumCategoryLabel(category, locale)}</option>)}</select></label>
+          <label><span>{t.categoryLabel}</span><span className="forum-form-select-control"><select name="category" required defaultValue="question">{categories.map((category) => <option key={category} value={category}>{getForumCategoryLabel(category, locale)}</option>)}</select></span></label>
           <label><span>{t.titleLabel}</span><input name="title" required minLength={2} maxLength={120} placeholder={t.titlePlaceholder} /></label>
           <label htmlFor="forum-post-content">{t.contentLabel}</label>
           <RichTextEditor id="forum-post-content" ariaLabel={t.contentLabel} name="content" locale={locale} required minLength={2} maxLength={5000} placeholder={t.contentPlaceholder} />

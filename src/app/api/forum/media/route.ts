@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { getCurrentUser } from "@/lib/auth";
 import { prisma } from "@/lib/db";
-import { forumAttachmentLifetimeMs, forumImageMaxBytes, forumMediaPendingMax, forumMediaUploadMax, forumMediaUploadWindowMs, forumVideoMaxBytes, getForumMediaUrl, isForumMediaSameOriginRequest, prepareForumMediaUpload } from "@/lib/forum-media";
+import { forumAttachmentLifetimeMs, forumMediaPendingMax, forumMediaUploadMax, forumMediaUploadWindowMs, forumVideoMaxBytes, getForumImageMaxBytes, getForumMediaUrl, isForumMediaSameOriginRequest, prepareForumMediaUpload } from "@/lib/forum-media";
 import { deleteForumMediaStoredFile } from "@/lib/forum-media-storage";
 import { saveUploadedFile } from "@/lib/storage";
 
@@ -57,7 +57,7 @@ export async function POST(request: Request) {
     const surface = formData.get("surface");
     if (!(input instanceof File) || (surface !== "post" && surface !== "reply")) return jsonError("FORUM_MEDIA_INVALID", 400);
     const media = await prepareForumMediaUpload(input, surface);
-    const stored = await saveUploadedFile(media.file, { folder: "forum-media", access: "private", maxBytes: media.kind === "image" ? forumImageMaxBytes : forumVideoMaxBytes });
+    const stored = await saveUploadedFile(media.file, { folder: "forum-media", access: "private", maxBytes: media.kind === "image" ? getForumImageMaxBytes(surface) : forumVideoMaxBytes });
     storedPath = stored.filePath;
     const record = await prisma.forumAttachment.create({ data: { authorId: user.id, kind: media.kind, filePath: stored.filePath, mimeType: stored.mimeType, fileSize: stored.fileSize, originalName: media.originalName } });
     return NextResponse.json({ id: record.id, type: media.kind, url: getForumMediaUrl(record.id), mimeType: stored.mimeType }, { status: 201, headers: noStore });

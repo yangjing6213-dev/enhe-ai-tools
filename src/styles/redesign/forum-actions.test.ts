@@ -34,3 +34,15 @@ describe("forum topic action icon colors", () => {
     expect(active?.has("background")).toBe(false);
   });
 });
+
+describe("forum post editor controls", () => {
+  it("uses the site blue for formatting actions and keeps the select arrow inset", () => {
+    const rules = new Map<string, Map<string, string>>();
+    stylesheet.walkRules((rule) => {
+      rules.set(rule.selector, new Map(rule.nodes.flatMap((node) => node.type === "decl" ? [[node.prop, node.value] as [string, string]] : [])));
+    });
+    expect(rules.get(".forum-page .rich-text-editor__action")?.get("background-color")).toMatch(/var\(--enhe-action,\s*#0462c2\)/);
+    expect(rules.get(".forum-page .rich-text-editor__action")?.get("color")).toBe("#fff");
+    expect(rules.get(".forum-form-card .forum-form-select-control::after")?.get("right")).toBe("18px");
+  });
+});

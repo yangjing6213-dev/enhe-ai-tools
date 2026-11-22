@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
-import { assertForumAttachmentSelection, canReadForumAttachment, parseForumMediaRange, prepareForumMediaUpload } from "@/lib/forum-media";
+import { assertForumAttachmentSelection, canReadForumAttachment, parseForumMediaRange, prepareForumMediaUpload, readForumAttachmentIds } from "@/lib/forum-media";
+import { forumPostImageMaxBytes } from "@/lib/forum-media-limits";
 
 const png = Buffer.from("iVBORw0KGgoAAAANSUhEUgAAAAIAAAACCAIAAAD91JpzAAAACXBIWXMAAAPoAAAD6AG1e1JrAAAAE0lEQVQImWP4z8DwnwGM/zMwAAAf7gP9qS/A4gAAAABJRU5ErkJggg==", "base64");
 const attachment = { id: "a-1", authorId: "u-1", kind: "image", fileSize: 1024, postId: null, replyId: null, discardedAt: null, createdAt: new Date() };
@@ -24,6 +25,15 @@ describe("forum media boundaries", () => {
     await expect(prepareForumMediaUpload(large, "reply")).rejects.toThrow("FORUM_MEDIA_SIZE");
   });
 
+  it("allows topic images up to 10 MB while keeping reply images at 8 MB", async () => {
+    const topicImage = new File([png], "topic.png", { type: "image/png" });
+    Object.defineProperty(topicImage, "size", { value: forumPostImageMaxBytes });
+    expect((await prepareForumMediaUpload(topicImage, "post")).kind).toBe("image");
+    const oversizedTopicImage = new File([png], "topic-too-large.png", { type: "image/png" });
+    Object.defineProperty(oversizedTopicImage, "size", { value: forumPostImageMaxBytes + 1 });
+    await expect(prepareForumMediaUpload(oversizedTopicImage, "post")).rejects.toThrow("FORUM_MEDIA_SIZE");
+  });
+
   it("accepts MP4 signatures for posts and rejects videos in replies", async () => {
     const mp4 = Buffer.from("000000186674797069736f6d0000000069736f6d6d703432000000086d646174", "hex");
     const file = new File([mp4], "demo.mp4", { type: "video/mp4" });
@@ -34,13 +44,31 @@ describe("forum media boundaries", () => {
 
   it("checks ownership, freshness, previous assignment, duplicates and per-surface limits", () => {
     expect(() => assertForumAttachmentSelection(["a-1"], [attachment], "u-1", "post")).not.toThrow();
-    for (const invalid of [{ ...attachment, authorId: "u-2" }, { ...attachment, postId: "post-1" }, { ...attachment, discardedAt: new Date() }, { ...attachment, createdAt: new Date(0) }, { ...attachment, fileSize: 9 * 1024 * 1024 }]) {
+    for (const invalid of [{ ...attachment, authorId: "u-2" }, { ...attachment, postId: "post-1" }, { ...attachment, discardedAt: new Date() }, { ...attachment, createdAt: new Date(0) }, { ...attachment, fileSize: 11 * 1024 * 1024 }]) {
       expect(() => assertForumAttachmentSelection(["a-1"], [invalid], "u-1", "post")).toThrow("FORUM_INVALID_ATTACHMENTS");
     }
     expect(() => assertForumAttachmentSelection(["a-1", "a-1"], [attachment], "u-1", "post")).toThrow();
     expect(() => assertForumAttachmentSelection(["a-1"], [{ ...attachment, kind: "video" }], "u-1", "reply")).toThrow();
-    const images = Array.from({ length: 7 }, (_, index) => ({ ...attachment, id: `a-${index}` }));
-    expect(() => assertForumAttachmentSelection(images.map((item) => item.id), images, "u-1", "post")).toThrow();
+    const topicImages = Array.from({ length: 10 }, (_, index) => ({ ...attachment, id: `a-${index}`, fileSize: forumPostImageMaxBytes }));
+    expect(() => assertForumAttachmentSelection(topicImages.map((item) => item.id), topicImages, "u-1", "post")).not.toThrow();
+    expect(() => assertForumAttachmentSelection(topicImages.map((item) => item.id), topicImages, "u-1", "reply")).toThrow("FORUM_INVALID_ATTACHMENTS");
+    expect(() => assertForumAttachmentSelection([...topicImages.map((item) => item.id), "a-10"], [...topicImages, { ...attachment, id: "a-10" }], "u-1", "post")).toThrow("FORUM_INVALID_ATTACHMENTS");
+  });
+
+  it("accepts up to ten attachment IDs for topics and four for replies", () => {
+    const topicForm = new FormData();
+    for (let index = 0; index < 10; index += 1) topicForm.append("attachmentIds", `image-${index}`);
+    expect(readForumAttachmentIds(topicForm, "post")).toHaveLength(10);
+    topicForm.append("attachmentIds", "video-1");
+    expect(readForumAttachmentIds(topicForm, "post")).toHaveLength(11);
+    topicForm.append("attachmentIds", "image-10");
+    expect(() => readForumAttachmentIds(topicForm, "post")).toThrow("FORUM_INVALID_ATTACHMENTS");
+
+    const replyForm = new FormData();
+    for (let index = 0; index < 4; index += 1) replyForm.append("attachmentIds", `reply-${index}`);
+    expect(readForumAttachmentIds(replyForm, "reply")).toHaveLength(4);
+    replyForm.append("attachmentIds", "reply-4");
+    expect(() => readForumAttachmentIds(replyForm, "reply")).toThrow("FORUM_INVALID_ATTACHMENTS");
   });
 
   it("makes media public only while its own parent and the reply post are approved", () => {

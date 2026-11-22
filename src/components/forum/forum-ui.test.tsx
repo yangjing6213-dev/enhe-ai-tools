@@ -140,6 +140,7 @@ describe("forum public surfaces", () => {
     expect(html).toContain('accept="video/mp4,video/webm"');
     expect(html).toContain('accept="image/jpeg,image/png,image/webp,image/gif"');
     expect(html).toContain("Posts appear publicly right after publishing.");
+    expect(html).toContain("Up to 10 images, 10MB each");
     expect(html).toContain("Publish topic");
     const guest = renderToStaticMarkup(<ForumNewPostContent locale="en" submitted={false} isAuthenticated={false} />);
     expect(guest).toContain("Sign in to join the discussion");
@@ -153,5 +154,7 @@ describe("forum public surfaces", () => {
     expect(html).toContain("字号");
     expect(html).toContain("背景色");
     expect(html).toContain('name="coverAttachmentId"');
+    expect(html).toContain('class="forum-form-select-control"');
+    expect(html).toContain("最多 10 张图片，每张 10MB");
   });
 });
