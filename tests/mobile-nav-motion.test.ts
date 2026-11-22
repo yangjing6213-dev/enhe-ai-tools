@@ -10,6 +10,7 @@ const componentPath =
   "src/components/redesign/enhe-redesign-mobile-menu.tsx";
 const motionPath = "src/lib/motion/mobile-nav-motion.ts";
 const stylesPath = "src/styles/redesign/shell.css";
+const headerStylesPath = "src/styles/redesign/site-refresh.css";
 const navigationPath = "src/components/redesign/navigation.ts";
 
 function readProjectFile(relativePath: string) {
@@ -104,14 +105,17 @@ describe("production mobile navigation directional drawer", () => {
     expect(component).not.toMatch(/await\s+.*(?:close|animation).*href|setTimeout\s*\(/);
   });
 
-  it("cleans the drawer when resizing across the fixed 768px breakpoint", () => {
+  it("cleans the drawer when resizing across the fixed 900px breakpoint", () => {
     const component = readProjectFile(componentPath);
     const styles = readProjectFile(stylesPath);
+    const headerStyles = readProjectFile(headerStylesPath);
 
-    expect(component).toContain('const MOBILE_NAV_QUERY = "(width < 768px)"');
+    expect(component).toContain('const MOBILE_NAV_QUERY = "(width < 900px)"');
     expect(component).toContain("window.matchMedia(MOBILE_NAV_QUERY)");
     expect(component).toContain('mediaQuery.addEventListener("change"');
     expect(component).toContain("desktopFocusTargetRef");
+    expect(headerStyles).toMatch(/@media \(768px <= width < 900px\)\s*\{[\s\S]*?\.redesign-desktop-nav\s*\{\s*display:\s*none;\s*\}[\s\S]*?\.redesign-mobile-actions\s*\{\s*display:\s*flex;/);
+    expect(headerStyles).not.toContain("@media (768px <= width < 901px)");
     expect(styles).toContain("@media (width < 768px)");
     expect(styles).not.toContain("@media (width < 769px)");
   });
