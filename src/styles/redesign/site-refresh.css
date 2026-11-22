@@ -1638,6 +1638,16 @@ body .customer-support-widget .customer-support-launcher,
   display: none;
 }
 
+.enhe-redesign-production:has(.redesign-mobile-drawer:not([aria-hidden="true"]))
+  .customer-support-widget {
+  z-index: calc(var(--enhe-z-layer) - 2) !important;
+}
+
+.enhe-redesign-production:has(.redesign-mobile-drawer:not([aria-hidden="true"]))
+  .redesign-header {
+  z-index: calc(var(--enhe-z-layer) + 1) !important;
+}
+
 @media (width < 768px) {
   .enhe-redesign-production .site-floating-actions {
     right: calc(16px + var(--support-safe-area-inline-end, env(safe-area-inset-right, 0px)));

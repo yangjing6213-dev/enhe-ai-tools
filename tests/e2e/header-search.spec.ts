@@ -4,7 +4,7 @@ test("public header replaces the search link, opens recommendations, and submits
   test.setTimeout(120_000);
   for (const locale of ["zh", "en"] as const) {
     const english = locale === "en";
-    for (const width of [1920, 1440, 1280, 1024, 768, 390, 320]) {
+    for (const width of [1920, 1440, 1280, 1024, 900, 899, 768, 390, 320]) {
       await page.setViewportSize({ width, height: 900 });
       await page.goto(english ? "/en" : "/");
       const header = page.locator(".redesign-header");
@@ -13,7 +13,7 @@ test("public header replaces the search link, opens recommendations, and submits
       await expect(header.locator('.redesign-nav-link[href$="/search"]')).toHaveCount(0);
       await expect(page.locator(".redesign-home-cta").first()).toHaveCSS("border-radius", "12px");
       await expect(header.locator(".redesign-language-switch:visible")).toHaveCSS("border-width", "0px");
-      if (width >= 768) await expect(header.locator(".redesign-login-link:visible")).toHaveCSS("border-width", "0px");
+      if (width >= 900) await expect(header.locator(".redesign-login-link:visible")).toHaveCSS("border-width", "0px");
       await expect(header.locator(".redesign-language-switch:visible")).toHaveCSS("background-color", "rgba(0, 0, 0, 0)");
       await expect(header.locator('.squish-switch:visible')).toHaveAttribute("aria-checked", english ? "true" : "false");
       const footer = page.locator(".redesign-footer");
@@ -80,21 +80,38 @@ test("public header replaces the search link, opens recommendations, and submits
       } else {
         expect(layout.logo.width).toBe(200);
       }
+      const menuTrigger = header.getByRole("button", { name: english ? "Menu" : "菜单" });
+      if (width < 900) {
+        await expect(menuTrigger).toBeVisible();
+        await expect(header.locator(".redesign-desktop-nav")).toBeHidden();
+      } else {
+        await expect(menuTrigger).toBeHidden();
+        await expect(header.locator(".redesign-desktop-nav")).toBeVisible();
+      }
       expect(layout.scrollWidth).toBeLessThanOrEqual(width);
       if (width >= 768) {
         await expect(input).toBeVisible();
-        const searchRatio = await input.evaluate((element) => {
-          const form = element.closest(".redesign-header-search")!;
-          const inner = form.parentElement!;
-          const columns = getComputedStyle(inner).gridTemplateColumns.split(" ").map(parseFloat);
-          return form.getBoundingClientRect().width / (columns.length === 3 ? columns[1] : inner.clientWidth);
-        });
-        expect(searchRatio).toBeCloseTo(0.5, 1);
-        if (width >= 1280) {
-          expect(layout.search.x).toBeGreaterThanOrEqual(layout.logo.right);
-          expect(layout.search.right).toBeLessThanOrEqual(layout.nav.x + 1);
+        if (width < 900) {
+          const headerBox = await header.boundingBox();
+          expect(headerBox).not.toBeNull();
+          expect(layout.search.width).toBeGreaterThan(0);
+          expect(layout.search.width).toBeLessThanOrEqual(460);
+          expect(layout.search.x).toBeGreaterThanOrEqual(headerBox!.x);
+          expect(layout.search.right).toBeLessThanOrEqual(headerBox!.x + headerBox!.width);
         } else {
-          expect(layout.search.top).toBeGreaterThanOrEqual(layout.logo.bottom);
+          const searchRatio = await input.evaluate((element) => {
+            const form = element.closest(".redesign-header-search")!;
+            const inner = form.parentElement!;
+            const columns = getComputedStyle(inner).gridTemplateColumns.split(" ").map(parseFloat);
+            return form.getBoundingClientRect().width / (columns.length === 3 ? columns[1] : inner.clientWidth);
+          });
+          expect(searchRatio).toBeCloseTo(0.5, 1);
+          if (width >= 1280) {
+            expect(layout.search.x).toBeGreaterThanOrEqual(layout.logo.right);
+            expect(layout.search.right).toBeLessThanOrEqual(layout.nav.x + 1);
+          } else {
+            expect(layout.search.top).toBeGreaterThanOrEqual(layout.logo.bottom);
+          }
         }
         await input.click();
         const panel = page.getByRole("dialog", { name: english ? "Most downloaded" : "下载最多" });

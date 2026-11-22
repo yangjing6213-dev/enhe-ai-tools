@@ -1,7 +1,7 @@
 import { expect, test, type Page } from "@playwright/test";
 
-const mobileWidths = [320, 390, 480, 483, 484, 767] as const;
-const desktopWidths = [768, 769, 1024, 1440] as const;
+const mobileWidths = [320, 390, 480, 483, 484, 767, 768, 769, 899] as const;
+const desktopWidths = [900, 1024, 1440] as const;
 const routes = [
   {
     path: "/",
@@ -784,7 +784,7 @@ test("mixed keyboard and pointer interruptions preserve the rendered drawer posi
   await expect(drawer).toBeHidden();
 });
 
-test("desktop resize closes the mobile drawer and releases modal state", async ({ page }) => {
+test("the mobile drawer stays open through tablet widths and closes at the desktop breakpoint", async ({ page }) => {
   const errors = monitorErrors(page);
   await page.setViewportSize({ width: 767, height: 900 });
   await openFormalRoute(page, "/software");
@@ -792,6 +792,16 @@ test("desktop resize closes the mobile drawer and releases modal state", async (
   const hiddenTrigger = page.locator(".redesign-menu-trigger");
 
   await page.setViewportSize({ width: 768, height: 900 });
+  await expect(hiddenTrigger).toBeVisible();
+  await expect(hiddenTrigger).toHaveAttribute("aria-expanded", "true");
+  await expect(drawer).toBeVisible();
+
+  await page.setViewportSize({ width: 899, height: 900 });
+  await expect(hiddenTrigger).toBeVisible();
+  await expect(hiddenTrigger).toHaveAttribute("aria-expanded", "true");
+  await expect(drawer).toBeVisible();
+
+  await page.setViewportSize({ width: 900, height: 900 });
   await expect(hiddenTrigger).toBeHidden();
   await expect(hiddenTrigger).toHaveAttribute("aria-expanded", "false");
   await expect(drawer).toBeHidden();
@@ -800,7 +810,7 @@ test("desktop resize closes the mobile drawer and releases modal state", async (
   await expect(page.locator(".redesign-desktop-nav a[href]").first()).toBeFocused();
   await expect(page.locator(".redesign-mobile-drawer")).toHaveCount(0);
 
-  await page.setViewportSize({ width: 769, height: 900 });
+  await page.setViewportSize({ width: 901, height: 900 });
   await expect(page.locator(".redesign-desktop-nav")).toBeVisible();
   await expect(page.getByRole("button", { name: "客服", exact: true })).toBeVisible();
   expect(await rootOverflow(page)).toBe(0);

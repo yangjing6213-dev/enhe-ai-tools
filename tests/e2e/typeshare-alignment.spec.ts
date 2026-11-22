@@ -41,7 +41,7 @@ for (const route of routes) {
     const primaryNewsLinkHref = route.startsWith("/en/") ? "/en/ai-news" : "/ai-news";
     const response = await page.goto(route, { waitUntil: "load" });
     expect(response?.status(), `${route} response status`).toBe(200);
-    for (const width of [320, 390, 480, 768, 900, 1024, 1100, 1280, 1440]) {
+    for (const width of [320, 390, 480, 768, 899, 900, 1024, 1100, 1280, 1440]) {
       await page.setViewportSize({ width, height: 900 });
       await expect(page.locator("main").first()).toBeVisible();
       if (route === "/ai-news" || route === "/en/ai-news") {
@@ -120,7 +120,7 @@ for (const route of routes) {
         (switches) => switches.filter((control) => (control as HTMLElement).getClientRects().length > 0).length,
       );
       expect(visibleLanguageSwitchCount, `${route} has one visible language switch at ${width}px`).toBe(1);
-      if (width < 768) {
+      if (width < 900) {
         const menuTrigger = masthead.locator(".redesign-menu-trigger");
         await expect(menuTrigger, `${route} has a mobile menu trigger at ${width}px`).toBeVisible();
         await expect(menuTrigger).toHaveAttribute("aria-expanded", "false");

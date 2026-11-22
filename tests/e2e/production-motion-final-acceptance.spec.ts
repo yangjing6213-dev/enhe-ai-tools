@@ -34,6 +34,8 @@ const viewports = [
   { width: 767, height: 900 },
   { width: 768, height: 900 },
   { width: 769, height: 900 },
+  { width: 899, height: 900 },
+  { width: 900, height: 900 },
   { width: 1024, height: 900 },
   { width: 1440, height: 900 },
 ] as const;
@@ -603,7 +605,7 @@ for (const route of routes) {
           }
         }
 
-        if (viewport.width < 768) {
+        if (viewport.width < 900) {
           const menuTrigger = page.locator(".redesign-menu-trigger");
           await menuTrigger.scrollIntoViewIfNeeded();
           await expect(menuTrigger).toBeVisible();
@@ -624,12 +626,35 @@ for (const route of routes) {
             "display",
             "none",
           );
-          await expect(support).toBeHidden();
+          if (viewport.width < 768) {
+            await expect(support).toBeHidden();
+          } else {
+            await expect(support).toBeVisible();
+            const supportLayer = await page.evaluate(() => {
+              const widget = document.querySelector<HTMLElement>(".customer-support-widget");
+              const overlay = document.querySelector<HTMLElement>(".redesign-menu-overlay");
+              if (!widget || !overlay) throw new Error("The support widget and mobile menu overlay must both be present.");
+              const widgetBox = widget.getBoundingClientRect();
+              const target = document.elementFromPoint(
+                widgetBox.left + widgetBox.width / 2,
+                widgetBox.top + widgetBox.height / 2,
+              );
+              return {
+                widgetZIndex: Number.parseInt(getComputedStyle(widget).zIndex, 10),
+                overlayZIndex: Number.parseInt(getComputedStyle(overlay).zIndex, 10),
+                supportReceivesPointer: Boolean(target?.closest(".customer-support-widget")),
+              };
+            });
+            expect(supportLayer.widgetZIndex).toBeLessThan(supportLayer.overlayZIndex);
+            expect(supportLayer.supportReceivesPointer).toBe(false);
+          }
           await closeMobileMenu(page, drawer, trigger);
-          await expect(page.locator(".site-floating-actions")).toHaveCSS(
-            "display",
-            "flex",
-          );
+          if (viewport.width < 768) {
+            await expect(page.locator(".site-floating-actions")).toHaveCSS(
+              "display",
+              "flex",
+            );
+          }
           await expect(support).toBeVisible();
         } else {
           await expect(page.locator(".redesign-menu-trigger")).toBeHidden();
@@ -1340,7 +1365,7 @@ test("mobile navigation closes for a delayed desktop breakpoint event", async ({
     const originalMatchMedia = window.matchMedia.bind(window);
     window.matchMedia = (query: string) => {
       const mediaQuery = originalMatchMedia(query);
-      if (query !== "(width < 768px)") return mediaQuery;
+      if (query !== "(width < 900px)") return mediaQuery;
 
       return new Proxy(mediaQuery, {
         get(target, property) {
@@ -1413,7 +1438,11 @@ test("mobile navigation survives 30 rapid close and resize rounds", async ({ pag
         detail: 1,
       });
     } else {
-      await page.setViewportSize({ width: 768, height: 900 });
+      await page.setViewportSize({ width: 899, height: 900 });
+      await expect(drawer).toBeVisible();
+      await expect(trigger).toHaveAttribute("aria-expanded", "true");
+
+      await page.setViewportSize({ width: 900, height: 900 });
       await expect(drawer).toBeHidden();
       await expect(trigger, `round ${run} at desktop`).toHaveAttribute(
         "aria-expanded",
