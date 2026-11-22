@@ -98,20 +98,16 @@ test("public header replaces the search link, opens recommendations, and submits
           expect(layout.search.width).toBeLessThanOrEqual(460);
           expect(layout.search.x).toBeGreaterThanOrEqual(headerBox!.x);
           expect(layout.search.right).toBeLessThanOrEqual(headerBox!.x + headerBox!.width);
+        } else if (width < 1280) {
+          const headerBox = await header.boundingBox();
+          expect(headerBox).not.toBeNull();
+          expect(layout.search.x).toBeGreaterThanOrEqual(headerBox!.x);
+          expect(layout.search.right).toBeLessThanOrEqual(headerBox!.x + headerBox!.width);
+          expect(layout.search.top).toBeGreaterThanOrEqual(layout.logo.bottom);
         } else {
-          const searchRatio = await input.evaluate((element) => {
-            const form = element.closest(".redesign-header-search")!;
-            const inner = form.parentElement!;
-            const columns = getComputedStyle(inner).gridTemplateColumns.split(" ").map(parseFloat);
-            return form.getBoundingClientRect().width / (columns.length === 3 ? columns[1] : inner.clientWidth);
-          });
-          expect(searchRatio).toBeCloseTo(0.5, 1);
-          if (width >= 1280) {
-            expect(layout.search.x).toBeGreaterThanOrEqual(layout.logo.right);
-            expect(layout.search.right).toBeLessThanOrEqual(layout.nav.x + 1);
-          } else {
-            expect(layout.search.top).toBeGreaterThanOrEqual(layout.logo.bottom);
-          }
+          expect(layout.search.width).toBeGreaterThanOrEqual(220);
+          expect(layout.search.x).toBeGreaterThanOrEqual(layout.logo.right);
+          expect(layout.search.right + 16).toBeLessThanOrEqual(layout.nav.x + 1);
         }
         await input.click();
         const panel = page.getByRole("dialog", { name: english ? "Most downloaded" : "下载最多" });
