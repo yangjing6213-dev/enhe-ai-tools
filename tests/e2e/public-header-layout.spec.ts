@@ -36,7 +36,7 @@ test("forum editor actions use white text on site blue with an inset category ar
     action: getComputedStyle(document.querySelector(".rich-text-editor__action")!).backgroundColor,
     primary: getComputedStyle(document.querySelector(".forum-primary-button")!).backgroundColor,
     text: getComputedStyle(document.querySelector(".rich-text-editor__action")!).color,
-    arrowRight: getComputedStyle(document.querySelector(".forum-form-select-control"), "::after").right,
+    arrowRight: getComputedStyle(document.querySelector(".forum-form-select-control")!, "::after").right,
   }));
   expect(colors.action).toBe(colors.primary);
   expect(colors.text).toBe("rgb(255, 255, 255)");
