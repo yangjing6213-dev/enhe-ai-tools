@@ -2208,3 +2208,45 @@ body .customer-support-widget .customer-support-launcher,
   .redesign-home-mobile-card { grid-template-columns: 50px minmax(0, 1fr) 20px; gap: 11px; padding-inline: 12px; }
   .redesign-home-mobile-card-icon { width: 50px; height: 50px; }
 }
+
+@media (768px <= width < 900px) {
+  .redesign-header .redesign-header-inner {
+    grid-template-columns: minmax(0, 1fr) auto;
+    grid-template-rows: auto auto;
+    gap: 8px 16px;
+  }
+
+  .redesign-header .redesign-brand-region {
+    grid-column: 1;
+    grid-row: 1;
+    width: min(200px, 100%);
+    transform: none;
+  }
+
+  .redesign-header .redesign-desktop-nav {
+    display: none;
+  }
+
+  .redesign-header .redesign-mobile-actions {
+    display: flex;
+    grid-column: 2;
+    grid-row: 1;
+  }
+
+  .redesign-header .redesign-header-search {
+    grid-column: 1 / -1;
+    grid-row: 2;
+    width: min(460px, 100%);
+    transform: none;
+  }
+}
+
+@media (1024px <= width < 1440px) {
+  .redesign-header .redesign-desktop-nav-list {
+    gap: clamp(6px, 0.65vw, 9px);
+  }
+
+  .redesign-header .redesign-nav-link {
+    padding-inline: 4px;
+  }
+}

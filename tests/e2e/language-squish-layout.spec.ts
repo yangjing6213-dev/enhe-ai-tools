@@ -11,6 +11,15 @@ for (const width of [320, 768, 1366, 1920]) {
       await expect(page.locator(".site-back-nav")).toHaveCount(0);
       const toggle = page.locator('.redesign-header .enhe-language-toggle:visible');
       await expect(toggle.getByRole("switch")).toHaveAttribute("aria-checked", path === "/en" ? "true" : "false");
+      if (width >= 768 && width < 900) {
+        await expect(page.locator('.redesign-header .redesign-desktop-nav')).toBeHidden();
+        const menu = page.locator('.redesign-header .redesign-menu-trigger:visible');
+        await expect(menu).toBeVisible();
+        await menu.click();
+        await expect(page.locator('.redesign-mobile-drawer')).toBeVisible();
+        await page.keyboard.press("Escape");
+        await expect(page.locator('.redesign-mobile-drawer')).toBeHidden();
+      }
       const rect = (await toggle.boundingBox())!;
       expect(rect.x).toBeGreaterThanOrEqual(0);
       expect(rect.x + rect.width).toBeLessThanOrEqual(width);

@@ -19,7 +19,7 @@ import {
 import { isExactCurrentPage } from "./navigation";
 import type { RedesignAccount, RedesignLocale, RedesignNavItem } from "./types";
 
-const MOBILE_NAV_QUERY = "(width < 768px)";
+const MOBILE_NAV_QUERY = "(width < 900px)";
 const REDUCED_MOTION_QUERY = "(prefers-reduced-motion: reduce)";
 const FOCUSABLE_MENU_CONTROLS =
   "a[href], button:not([disabled]), summary, [tabindex]:not([tabindex='-1'])";

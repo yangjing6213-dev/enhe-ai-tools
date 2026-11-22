@@ -202,9 +202,9 @@ test("homepage polish stays readable, responsive, and interactive without extern
     expect(productArrowAlignment, `product arrows sit outside and center on the cover at ${width}px`).toBe(true);
     const currentProductTitle = page.locator('[data-product-current="true"] .redesign-home-product-detail h3');
     const initialProductTitle = await currentProductTitle.textContent();
-    await page.getByRole("button", { name: "下一款产品" }).click();
+    await page.locator(".redesign-home-product-control").nth(1).click();
     await expect.poll(() => currentProductTitle.textContent()).not.toBe(initialProductTitle);
-    await page.getByRole("button", { name: "上一款产品" }).click();
+    await page.locator(".redesign-home-product-control").nth(0).click();
     await expect.poll(() => currentProductTitle.textContent()).toBe(initialProductTitle);
 
     const reviews = page.locator(".redesign-home-reviews");

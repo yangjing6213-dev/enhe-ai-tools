@@ -90,6 +90,6 @@ test("reduced motion disables automatic rotation but keeps manual product select
   await expect(section.locator(".redesign-home-product-autoplay")).toHaveCount(0);
   await page.clock.runFor(12000);
   await expect(current).toHaveAttribute("data-product-id", "ultimate-edition");
-  await section.getByRole("button", { name: "Next product" }).click();
+  await section.locator(".redesign-home-product-control").nth(1).click();
   await expect(current).toHaveAttribute("data-product-id", "infinitetalk");
 });

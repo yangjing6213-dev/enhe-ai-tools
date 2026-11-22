@@ -275,7 +275,7 @@ test("product stage has no relevant layout shift or animation residue", async ({
   await stage.scrollIntoViewIfNeeded();
   await prepareInteractionBaseline(page);
   const before = await layoutShift(page);
-  await page.getByRole("button", { name: "下一款产品" }).click();
+  await page.locator(".redesign-home-product-control").nth(1).click();
   await expect(page.locator('[data-product-current="true"]')).toHaveAttribute(
     "data-product-id",
     "infinitetalk",
