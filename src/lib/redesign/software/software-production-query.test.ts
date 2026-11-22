@@ -108,6 +108,7 @@ describe("production software public query", () => {
     ]);
 
     vi.unstubAllEnvs();
+    vi.stubEnv("DATABASE_URL", undefined);
 
     await expect(getPublicSoftwareCatalogRows()).resolves.toEqual([]);
     expect(db.toolFindMany).toHaveBeenCalledOnce();
