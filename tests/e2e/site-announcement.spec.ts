@@ -54,7 +54,7 @@ test.describe("bilingual navigation announcement", () => {
     await page.getByRole("button", { name: "登录", exact: true }).click();
     await expect(page).toHaveURL(/\/admin$/, { timeout: 30_000 });
     await page.goto("/admin/settings");
-    const form = page.locator(".enhe-admin-announcement-form");
+    const form = page.locator('section[aria-labelledby="announcement-settings-title"] .enhe-admin-announcement-form');
     await form.locator('[name="enabled"]').check();
     await form.locator('[name="zhText"]').fill("新工具已上架，查看工具 →");
     await form.locator('[name="enText"]').fill("New tools are available. Explore tools →");
@@ -108,9 +108,9 @@ test.describe("bilingual navigation announcement", () => {
       await visitor.goto(`${origin}/`);
       await expect(visitor.locator(".site-announcement")).toBeVisible();
       await page.goto("/admin/settings");
-      await page.locator('.enhe-admin-announcement-form [name="enabled"]').uncheck();
-      await page.getByRole("button", { name: "保存通知横幅" }).click();
-      await expect(page.locator('.enhe-admin-announcement-form [role="status"]')).toContainText("当前已关闭");
+      await form.locator('[name="enabled"]').uncheck();
+      await form.getByRole("button", { name: "保存通知横幅" }).click();
+      await expect(form.getByRole("status")).toContainText("当前已关闭");
       await visitor.reload();
       await expect(visitor.locator(".site-announcement")).toHaveCount(0);
     } finally { await fresh.close(); }
