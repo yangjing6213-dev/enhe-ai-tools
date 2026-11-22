@@ -1,0 +1,248 @@
+{
+  "forumTop": {
+    "title": "AI社区 | ENHE AI",
+    "cover": [
+      {
+        "alt": "笔记本电脑和手机上的 ENHE 官网画面",
+        "w": 1118,
+        "h": 478
+      },
+      {
+        "alt": "ENHE_HU",
+        "w": 40,
+        "h": 40
+      },
+      {
+        "alt": "ENHE_HU",
+        "w": 40,
+        "h": 40
+      },
+      {
+        "alt": "ENHE_HU",
+        "w": 40,
+        "h": 40
+      },
+      {
+        "alt": "ENHE_HU",
+        "w": 40,
+        "h": 40
+      }
+    ],
+    "pager": [
+      {
+        "text": "2",
+        "href": "/login?returnTo=%2Fforum%2Fcmvrx03xy00drpb01ibevq4sr"
+      },
+      {
+        "text": "0",
+        "href": "/forum/cmvrivabn00crpb01rn1xe1fj#replies"
+      },
+      {
+        "text": "0",
+        "href": null
+      },
+      {
+        "text": "2",
+        "href": "/login?returnTo=%2Fforum%2Fcmvrivabn00crpb01rn1xe1fj"
+      },
+      {
+        "text": "0",
+        "href": "/forum/cmvqequ1p0082pb01suwu711k#replies"
+      },
+      {
+        "text": "0",
+        "href": null
+      },
+      {
+        "text": "2",
+        "href": "/login?returnTo=%2Fforum%2Fcmvqequ1p0082pb01suwu711k"
+      },
+      {
+        "text": "0",
+        "href": "/forum/cmvp6gydz000bpb0178whc1nv#replies"
+      },
+      {
+        "text": "0",
+        "href": null
+      },
+      {
+        "text": "1",
+        "href": "/login?returnTo=%2Fforum%2Fcmvp6gydz000bpb0178whc1nv"
+      }
+    ],
+    "articleCards": [
+      {
+        "text": "工作流交流\nChatGPT新增Accounting插件：月末对账先保留来源、差异与审批三张表\nChatGPT新增Accounting插件：月末对账先保留来源、差异与审批三张表\nENHE_HU\n2026年11月22日\n工作流交流\n0\n0\n0",
+        "images": 1,
+        "videos": 0
+      },
+      {
+        "text": "工作流交流\nGitHub Copilot新增8个连接器：先核对预览开关、白名单与服务权限\nGitHub Copilot新增8个连接器：先核对预览开关、白名单与服务权限\nENHE_HU\n2026年11月21日\n工作流交流\n0\n0\n0",
+        "images": 1,
+        "videos": 0
+      },
+      {
+        "text": "工作流交流\nGranite 4.1 LLMON预览发布：用合成注入样例验收指令与数据分离\nGranite 4.1 LLMON预览发布：用合成注入样例验收指令与数据分离\nENHE_HU\n2026年11月20日\n工作流交流\n0\n0\n0",
+        "images": 1,
+        "videos": 0
+      },
+      {
+        "text": "工作流交流\nMiniMax H3 Image进入ComfyUI：用固定六步先验收生成与多参考编辑\nMiniMax H3 Image进入ComfyUI：用固定六步先验收生成与多参考编辑\nENHE_HU\n2026年11月19日\n工作流交流\n0\n0\n0",
+        "images": 1,
+        "videos": 0
+      },
+      {
+        "text": "工作流交流\nAI试点怎样变成可验收工作流？先写基线、责任人与回退\nAI试点怎样变成可验收工作流？先写基线、责任人与回退\nENHE_HU\n2026年11月18日\n工作流交流\n0\n0\n0",
+        "images": 1,
+        "videos": 0
+      },
+      {
+        "text": "工作流交流\nZONOS3‑Mini开放权重：本地配音先核对设备、许可与声音授权\nZONOS3‑Mini开放权重：本地配音先核对设备、许可与声音授权\nENHE_HU\n2026年11月17日\n工作流交流\n0\n0\n0",
+        "images": 1,
+        "videos": 0
+      },
+      {
+        "text": "工作流交流\nChatGPT Wallet上线：批准前先核对订单、总价与订阅条件\nChatGPT Wallet上线：批准前先核对订单、总价与订阅条件\nENHE_HU\n2026年11月16日\n工作流交流\n0\n0\n0",
+        "images": 1,
+        "videos": 0
+      },
+      {
+        "text": "经验分享\nLocModel 本地模型部署神器！开源越狱、图片、AI 视频生成一键搞定！老司机必备\nLocModel 本地模型部署神器！开源越狱、图片、AI 视频生成一键搞定！老司机必备\nENHE_HU\n2026年11月15日\n经验分享\n0\n0\n0",
+        "images": 1,
+        "videos": 0
+      }
+    ]
+  },
+  "locModelHref": "/forum/cmwhvzlw40076pj011uzztgnf",
+  "forumCategory": {
+    "url": "https://www.enhe-tech.com.cn/forum",
+    "firstCard": "工作流交流\nChatGPT新增Accounting插件：月末对账先保留来源、差异与审批三张表\nChatGPT新增Accounting插件：月末对账先保留来源、差异与审批三张表\nENHE_HU\n2026年11月22日\n工作流交流\n0\n0\n0"
+  },
+  "localeStart": "https://www.enhe-tech.com.cn/forum",
+  "localeEnglish": "https://www.enhe-tech.com.cn/en/forum",
+  "localeBack": "https://www.enhe-tech.com.cn/forum",
+  "newsBefore": {
+    "url": "https://www.enhe-tech.com.cn/ai-news",
+    "categories": [
+      {
+        "text": "全部分类",
+        "value": ""
+      },
+      {
+        "text": "AI前沿资讯",
+        "value": "cms3x4ium0000qngnsgq1f1f3"
+      },
+      {
+        "text": "GEO内容",
+        "value": "cmqsv2hmz001qp701tp5r8adg"
+      },
+      {
+        "text": "工具选用指南",
+        "value": "cmsiq1su9000tqct53bn2xvha"
+      },
+      {
+        "text": "接口安全指南",
+        "value": "cmv7i7d30003ppi3bh90vl3ox"
+      },
+      {
+        "text": "模型与智能体评估",
+        "value": "cmv4mthn0003kppegv992pok8"
+      },
+      {
+        "text": "AI快讯",
+        "value": "cmqj17a970000pf3r3osnkn0t"
+      },
+      {
+        "text": "模型动态",
+        "value": "cmqj17aa50004pf3r3a9pybke"
+      },
+      {
+        "text": "工具推荐",
+        "value": "cmqj17aa30003pf3rbgeux9f7"
+      },
+      {
+        "text": "实战教程",
+        "value": "cmqj17aa00001pf3r18g5l26c"
+      },
+      {
+        "text": "趋势解读",
+        "value": "cmqj17aai0005pf3rwsrn3ufd"
+      },
+      {
+        "text": "AI变现",
+        "value": "cmqj17aa20002pf3ralbd914l"
+      }
+    ],
+    "pager": []
+  },
+  "newsCategory": {
+    "selected": {
+      "text": "GEO内容",
+      "value": "cmqsv2hmz001qp701tp5r8adg"
+    },
+    "url": "https://www.enhe-tech.com.cn/ai-news",
+    "firstArticle": "AI前沿资讯\nChatGPT Live Dictation上线：长提示词先做转写、结构与隐私检查\n\nOpenAI于11月18日推出ChatGPT Live Dictation，语音会在说话时同步变成文字，并取消单次录音十分钟上限，面向各计划和主要平台逐步开放。本文给出一套长提示词检查法：先口述目标、背景、限制和输出格式四个标签，边说边纠正专名与数字，发送前再核对缺失、误听和敏感信息，并按语音数据设置决定是否保留或分享录音。这样能利用长口"
+  },
+  "paidDetail": {
+    "url": "https://www.enhe-tech.com.cn/software/product-video",
+    "title": "Product Video Studio｜产品介绍视频制作 | 恩禾 ENHE AI",
+    "heading": "Product Video Studio｜产品介绍视频制作",
+    "body": "duct Video Studio｜产品介绍视频制作\n\nProduct Video Studio | Product Videos with Codex\n\n把产品资料推进到经你确认的文案、分镜和视频成片。Codex 协助整理与制作；你负责确认资料、文案、素材、声音和画面，成片需人工检查，工具不会自动发布视频。\n\n适用 AI 智能体\n\nCodex\nOpenClaw\nClaude Code\n\n信任与安全\n\n检查记录\n\nENHE AI 管理员记录日期：2026/10/27。\n\n这条记录仅含日期，未记录检查版本、项目或结果。安装前请核对文件来源和系统要求。\n\n退款保障\n\n符合退款条件时可提交申请；已开通、下载或使用的数字服务通常不支持无理由退款。\n\n查看完整退款规则\n\n创作者\n\nENHE_HU\n\n5.0\n(3)\n\n产品设计师 - 一人公司实践者 - AI Builder\n用AI打造一个人公司。\n- GitHub: yangjing6213-dev\n- X/Twitter: Amenenhe_ai\n- 网站：www.enhe-tech.com.cn\n- 微信：ENHE-AI\n- 邮箱：amen.enhe@gmail.com\n\n联系创作者\n\n共 20 个已发布作品\n\n最专业的AI短剧导演工作流 Skill/轻松搭建短剧生成智能体\n老司机真正必备的本地 AI 部署神器\nBilingual Prose Craft｜中英文写作润色\n短剧分镜助手｜将剧本整理成镜头提示词\nAI资讯写作｜双平台图文草稿\n选择购买方案\n\n生成支付二维码前请选择一个方案，订单金额以所选方案为准。\n\nProduct Video Studio｜产品介绍视频制作\n¥5.00\n支付方式\n支付宝\n微信\n\n选择支付方式，支付成功后系统会自动解锁该工具的下载链接内容。\n\n点击购买\n工具介绍\n\n展示核心功能、适用场景和交付信息。\n\n播放产品视频\nProduct-video 中文介绍\n解决什么问题\n有产品却难以用短视频讲清“给谁用、解决什么问题、怎么开始”，而剪辑、配音和字幕又需要多轮整理。Product Video Studio 将资料整理、文案、镜头、配音、字幕、渲染和质量检查放进一套可继续的本地工作流程。\n\n适合谁用、适用场景\n适合独立开发者、产品设计师和小团队制作产品介绍、功能演示或教程短片。尤其适合愿意先审核文案和分镜，再进入动画制作的用户；不适合期待输入一句话后自动出片并直接发布的人。\n\n如何使用\n提供产品名称、网址/截图、目标用户、痛点、希望展示的功能、品牌素材使用权、画幅和时长；先审阅完整文案和分镜，再确认声音与关键画面；选择默认 HyperFrames + GSAP 或本地可选的 Codex + Remotion 模式；运行渲染和 QA 命令，查看视频、字幕、素材与检查报告后再决定是否使用。\n\n使用边界\n不是“无需确认自动生成并发布”的服务，不保证推广效果。产品资料和素材应真实且有权使用；仓库不附带完整私有品牌素材、参考录音或本机模型。可生成的文件、依赖、运行时间和声音能力以当前仓库及交付版本为准。\n\n文案由 AI 辅助整理，已由发布者复核。\n更新日志\n0 条记录\n\n当版本、交付说明或使用建议发生变化时，ENHE AI 会在这里同步重要更新。使用或购买前，请以当前页面说明为准。\n\n分享此页面\n\n扫码查看此页面，或复制链接分享给朋友。\n\n复制链接\n\n常见问题\n购买软件后如何获取下载内容？\n使用前需要确认什么？\nProduct Video Studio｜产品介绍视频制作主要用来做什么？\nProduct Video Studio｜产品介绍视频制作如何融入实际工作流？\n用户评论\n\n登录后可以评论。\n\nENHE_HU\n\n非常感谢！工作流非常适合自己的工作，帮助自己提升很多的效率。可以提前下班了。",
+    "selects": [
+      {
+        "aria": null,
+        "options": [
+          "支付宝",
+          "微信"
+        ]
+      }
+    ],
+    "buttons": [
+      "播放产品视频",
+      "复制链接"
+    ]
+  },
+  "forumDetail": {
+    "url": "https://www.enhe-tech.com.cn/forum/cmwhvzlw40076pj011uzztgnf",
+    "title": "LocModel 本地模型部署神器！开源越狱、图片、AI 视频生成一键搞定！老司机必备 | ENHE AI",
+    "videos": 1,
+    "images": [
+      {
+        "alt": "ENHE_HU",
+        "w": 40,
+        "natural": 1254
+      },
+      {
+        "alt": "帖子图片 1",
+        "w": 748,
+        "natural": 748
+      },
+      {
+        "alt": "帖子图片 2",
+        "w": 748,
+        "natural": 748
+      },
+      {
+        "alt": "帖子图片 3",
+        "w": 748,
+        "natural": 748
+      },
+      {
+        "alt": "帖子图片 4",
+        "w": 748,
+        "natural": 748
+      },
+      {
+        "alt": "帖子图片 5",
+        "w": 748,
+        "natural": 748
+      },
+      {
+        "alt": "帖子图片 6",
+        "w": 748,
+        "natural": 748
+      }
+    ],
+    "text": "◀\n返回话题列表\nENHE_HU\n2026年11月15日\n经验分享\nLocModel 本地模型部署神器！开源越狱、图片、AI 视频生成一键搞定！老司机必备\n\n如果你想在自己的电脑上部署和运行各种开源 AI 模型，那么今天介绍的这款工具绝对值得体验！它不仅可以根据电脑的硬件配置，自动检测并推荐最适合你的 AI 模型，还集成了图片生成、视频生成、大语言模型以及 AI 智能体等多种功能。\n\n无论是生成图片、图片编辑，还是通过开源视频模型制作视频，都可以直接在软件中完成，无需在多个工具之间来回切换。\n\n更重要的是，它还支持运行各种开源、无审查的越狱模型，让你摆脱在线 AI 服务的诸多内容限制。同时，软件提供在线模型下载和手动导入两种方式，并针对不同硬件进行了优化，支持显存、内存和硬盘加载，即使显存容量不足，也能通过其他资源辅助运行。\n\n此外，它还兼容 NVIDIA、AMD、Intel 显卡，甚至可以调用 CPU 运行模型，让不同配置的电脑都能找到适合自己的本地 AI 部署方案。\n\n本地部署\n一、下载 LocModel 本地部署神器\nLocModel 是一款免费的开源模型本地部署工具，主打一键识别电脑硬件、自动适配并推荐开源模型、自动安装推理引擎以及支持在线下载或导入 GGUF 格式模型。\n下载地址：https://enhe-downloads-1303691623.cos.ap-shang"
+  }
+}

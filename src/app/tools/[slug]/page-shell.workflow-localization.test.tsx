@@ -63,19 +63,34 @@ describe("workflow detail localized publication", () => {
   afterEach(() => { vi.unstubAllGlobals(); vi.unstubAllEnvs(); });
 
   it.each([
-    [null, ["AI Software App"]],
-    ["AI办公与效率", ["Office Productivity Tools", "AI Software App"]],
-  ] as const)("shows distinct use and type badges for category %s", async (category, expected) => {
+    [null, null, ["AI Software App"]],
+    ["AI办公与效率", null, ["Office Productivity Tools", "AI Software App"]],
+    ["AI办公与效率", "Windows 10/11", ["Office Productivity Tools", "Windows Desktop Tool"]],
+  ] as const)("shows distinct use and type badges for category %s and requirement %s", async (category, requirement, expected) => {
     const tool = fixture("software");
-    mocks.findTool.mockResolvedValue({ ...tool, category: category ? { name: category } : null });
+    mocks.findTool.mockResolvedValue({ ...tool, systemRequirement: requirement ?? tool.systemRequirement, category: category ? { name: category } : null });
     const page = await ToolDetailPageShell({ slug: tool.slug, forceLocale: "en", expectedType: "software" });
     const summary = elements(page).find((element) => element.props.className === "tool-detail-summary");
     const badgeRow = elements(summary?.props.children as React.ReactNode)
       .find((element) => element.props.className === "flex flex-wrap gap-2");
     const labels = elements(badgeRow?.props.children as React.ReactNode)
       .map((element) => element.props.children)
-      .filter((label) => label === "AI Software App" || label === "Office Productivity Tools");
+      .filter((label) => label === "AI Software App" || label === "Office Productivity Tools" || label === "Windows Desktop Tool");
     expect(labels).toEqual(expected);
+  });
+
+  it("uses the Windows desktop tool type label in Chinese when the system requirement says Windows", async () => {
+    const tool = fixture("software");
+    mocks.findTool.mockResolvedValue({ ...tool, systemRequirement: "Windows 10/11", category: { name: "AI办公与效率" } });
+    const page = await ToolDetailPageShell({ slug: tool.slug, forceLocale: "zh", expectedType: "software" });
+    const summary = elements(page).find((element) => element.props.className === "tool-detail-summary");
+    const badgeRow = elements(summary?.props.children as React.ReactNode)
+      .find((element) => element.props.className === "flex flex-wrap gap-2");
+    const labels = elements(badgeRow?.props.children as React.ReactNode)
+      .map((element) => element.props.children);
+
+    expect(labels).toContain("Windows 桌面工具");
+    expect(labels).not.toContain("AI软件应用");
   });
 
   it.each(["zh", "en"] as const)("keeps the exact %s text in the hero, body, requirements and metadata", async (locale) => {

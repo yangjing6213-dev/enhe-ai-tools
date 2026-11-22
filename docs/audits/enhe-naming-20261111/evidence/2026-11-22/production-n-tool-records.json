@@ -1,0 +1,302 @@
+[
+  {
+    "id": "cmsbz874x000vlj01wnhzu0i5",
+    "name": "AShareTrace｜A股研究资料整理",
+    "englishName": "AShareTrace | A-Share Research Notes",
+    "slug": "a-skill",
+    "type": "ai_skill",
+    "isDownloadPaid": true,
+    "isVipRequired": false,
+    "systemRequirement": "Windows 10/11",
+    "category": {
+      "name": "AI Skill",
+      "type": "ai_skill",
+      "status": "active"
+    }
+  },
+  {
+    "id": "cmqcgxxe6000jpm01z4o0t5dy",
+    "name": "AI配音｜旁白与多角色对话",
+    "englishName": "AI Voice Generator | Narration & Dialogue",
+    "slug": "ai-ai",
+    "type": "software",
+    "isDownloadPaid": true,
+    "isVipRequired": false,
+    "systemRequirement": "Windows 10/11",
+    "category": {
+      "name": "AI语音生成",
+      "type": "software",
+      "status": "active"
+    }
+  },
+  {
+    "id": "cmwbntznu0023mu01u9c7s5ww",
+    "name": "Bilingual Prose Craft｜中英文写作润色",
+    "englishName": "Bilingual Prose Craft | Chinese & English Editing",
+    "slug": "ai-ai-skill",
+    "type": "ai_skill",
+    "isDownloadPaid": false,
+    "isVipRequired": false,
+    "systemRequirement": "Windows/Mac",
+    "category": {
+      "name": "AI Skill",
+      "type": "ai_skill",
+      "status": "active"
+    }
+  },
+  {
+    "id": "cmv663doi0003s101uo2vodo0",
+    "name": "AgentGuardian｜AI配置风险检查",
+    "englishName": "AgentGuardian | AI Configuration Risk Review",
+    "slug": "ai-ai-zorvp8",
+    "type": "software",
+    "isDownloadPaid": false,
+    "isVipRequired": false,
+    "systemRequirement": "Windows 10/11",
+    "category": {
+      "name": "AI办公与效率",
+      "type": "software",
+      "status": "active"
+    }
+  },
+  {
+    "id": "cmv6la3fn001hs1019ggrf9ur",
+    "name": "Product Video Studio｜产品介绍视频制作",
+    "englishName": "Product Video Studio | Product Videos with Codex",
+    "slug": "ai-codex",
+    "type": "software",
+    "isDownloadPaid": true,
+    "isVipRequired": false,
+    "systemRequirement": "Windows 10/11",
+    "category": {
+      "name": "AI视频生成",
+      "type": "software",
+      "status": "active"
+    }
+  },
+  {
+    "id": "cmrm83d3b0010o901ddkfb3ku",
+    "name": "AI提示词库桌面版",
+    "englishName": "AI Prompt Library | Desktop Edition",
+    "slug": "ai-prompt",
+    "type": "software",
+    "isDownloadPaid": true,
+    "isVipRequired": false,
+    "systemRequirement": "Windows 10/11",
+    "category": {
+      "name": "AI办公与效率",
+      "type": "software",
+      "status": "active"
+    }
+  },
+  {
+    "id": "cmvb3uaub000kms01t581dxn8",
+    "name": "IntentBridge｜需求澄清与确认",
+    "englishName": "IntentBridge | Clarify & Confirm Requirements",
+    "slug": "ai-skill",
+    "type": "ai_skill",
+    "isDownloadPaid": true,
+    "isVipRequired": false,
+    "systemRequirement": "Windows 10/11",
+    "category": {
+      "name": "AI Skill",
+      "type": "ai_skill",
+      "status": "active"
+    }
+  },
+  {
+    "id": "cmvsq31gc001eqz01j97i8nig",
+    "name": "短剧分镜助手｜将剧本整理成镜头提示词",
+    "englishName": "AI Storyboarding | Shot Prompts from Scripts",
+    "slug": "ai-skill-ai",
+    "type": "ai_skill",
+    "isDownloadPaid": true,
+    "isVipRequired": false,
+    "systemRequirement": "Windows/Mac",
+    "category": {
+      "name": "AI Skill",
+      "type": "ai_skill",
+      "status": "active"
+    }
+  },
+  {
+    "id": "cmq8as4e80008s901592x4o26",
+    "name": "AI视频生成｜用文字或图片制作视频",
+    "englishName": "AI Video Workspace | Text-to-Video & Image-to-Video",
+    "slug": "ai-video-studio-ai-ai-video-studio-ai",
+    "type": "software",
+    "isDownloadPaid": true,
+    "isVipRequired": false,
+    "systemRequirement": "Windows 10/11",
+    "category": {
+      "name": "AI视频生成",
+      "type": "software",
+      "status": "active"
+    }
+  },
+  {
+    "id": "cmv886v540011k701j50i41u0",
+    "name": "Codex Backup｜项目与工作资料备份",
+    "englishName": "Codex Backup | Project & Work Context Backup",
+    "slug": "codex",
+    "type": "software",
+    "isDownloadPaid": true,
+    "isVipRequired": false,
+    "systemRequirement": "Windows 10/11",
+    "category": {
+      "name": "AI办公与效率",
+      "type": "software",
+      "status": "active"
+    }
+  },
+  {
+    "id": "cmrfae70c0029ry01kq6lqgv1",
+    "name": "Codex Provider Switcher｜连接配置切换",
+    "englishName": "Codex Provider Switcher | Switch Codex Connections",
+    "slug": "codex-api",
+    "type": "software",
+    "isDownloadPaid": false,
+    "isVipRequired": false,
+    "systemRequirement": "Windows 10/11",
+    "category": {
+      "name": "AI办公与效率",
+      "type": "software",
+      "status": "active"
+    }
+  },
+  {
+    "id": "cmq1595360001pe010juszymh",
+    "name": "FaceSwap Studio｜授权人像与视频合成",
+    "englishName": "FaceSwap Studio | Image & Video Compositing",
+    "slug": "faceswap-studio-ai",
+    "type": "software",
+    "isDownloadPaid": true,
+    "isVipRequired": false,
+    "systemRequirement": "Windows 10/11",
+    "category": {
+      "name": "视频处理",
+      "type": "software",
+      "status": "active"
+    }
+  },
+  {
+    "id": "cmv868ejd0008k701zx0z5q70",
+    "name": "GitHub Backup｜将项目备份到电脑",
+    "englishName": "GitHub Backup | Local Repository Backup",
+    "slug": "github",
+    "type": "software",
+    "isDownloadPaid": true,
+    "isVipRequired": false,
+    "systemRequirement": "Windows 10/11",
+    "category": {
+      "name": "AI办公与效率",
+      "type": "software",
+      "status": "active"
+    }
+  },
+  {
+    "id": "cmrkqr9ek0018n001szhsd14j",
+    "name": "InfiniteTalk｜数字人口播视频制作",
+    "englishName": "InfiniteTalk | Talking Avatar Videos",
+    "slug": "infinitetalk-ai",
+    "type": "software",
+    "isDownloadPaid": true,
+    "isVipRequired": false,
+    "systemRequirement": "Windows 10/11",
+    "category": {
+      "name": "数字人口播",
+      "type": "software",
+      "status": "active"
+    }
+  },
+  {
+    "id": "cmvdjv6qr0003mh01m97gk8d1",
+    "name": "SearchScope｜网站问题检查与修复建议",
+    "englishName": "SearchScope | Website Review & Recommendations",
+    "slug": "searchscope-seo-geo",
+    "type": "software",
+    "isDownloadPaid": true,
+    "isVipRequired": false,
+    "systemRequirement": "Windows 10/11",
+    "category": {
+      "name": "AI办公与效率",
+      "type": "software",
+      "status": "active"
+    }
+  },
+  {
+    "id": "cms7qq4gh000flp012ccxlzyo",
+    "name": "SEO + GEO Website Audit｜公开网页检查",
+    "englishName": "SEO + GEO Website Audit | Public Page Review",
+    "slug": "seo-geo-skill",
+    "type": "ai_skill",
+    "isDownloadPaid": false,
+    "isVipRequired": false,
+    "systemRequirement": "Windows 10/11",
+    "category": {
+      "name": "AI Skill",
+      "type": "ai_skill",
+      "status": "active"
+    }
+  },
+  {
+    "id": "cmvpd63lt000fpb012od6636y",
+    "name": "AI资讯写作｜双平台图文草稿",
+    "englishName": "AI News Content | Drafts for Two Platforms",
+    "slug": "skill",
+    "type": "ai_skill",
+    "isDownloadPaid": true,
+    "isVipRequired": false,
+    "systemRequirement": "Windows/Mac",
+    "category": {
+      "name": "AI Skill",
+      "type": "ai_skill",
+      "status": "active"
+    }
+  },
+  {
+    "id": "cmq12l5x70001no01ertij57f",
+    "name": "聊天界面模拟器｜对话演示图制作",
+    "englishName": "Chat Interface Simulator | Chat Mockups",
+    "slug": "tool-mq12l5w6",
+    "type": "software",
+    "isDownloadPaid": true,
+    "isVipRequired": false,
+    "systemRequirement": "Windows 10/11",
+    "category": {
+      "name": "AI办公与效率",
+      "type": "software",
+      "status": "active"
+    }
+  },
+  {
+    "id": "cmqrl77i7001gl901sxj7mh3y",
+    "name": "Lumi-OS｜桌面AI助手",
+    "englishName": "Lumi-OS | Desktop AI Assistant",
+    "slug": "windows-ai",
+    "type": "software",
+    "isDownloadPaid": true,
+    "isVipRequired": false,
+    "systemRequirement": "Windows 10/11",
+    "category": {
+      "name": "AI 智能体",
+      "type": "software",
+      "status": "active"
+    }
+  },
+  {
+    "id": "cmq9qedna0001p30141wm2sc0",
+    "name": "链接与二维码整理工具",
+    "englishName": "Link & QR Organizer",
+    "slug": "zfb",
+    "type": "software",
+    "isDownloadPaid": false,
+    "isVipRequired": false,
+    "systemRequirement": "Windows 10/11",
+    "category": {
+      "name": "AI办公与效率",
+      "type": "software",
+      "status": "active"
+    }
+  }
+]

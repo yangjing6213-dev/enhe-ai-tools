@@ -1,0 +1,75 @@
+{
+  "capturedAt": "2026-11-22T12:23:26.646Z",
+  "checks": {
+    "englishNewsTwoCategories": {
+      "optionCount": 12,
+      "results": [
+        {
+          "selected": "Tool Selection Guides",
+          "url": "https://www.enhe-tech.com.cn/en/ai-news?q=&category=cmsiq1su9000tqct53bn2xvha&tag=&sort=latest",
+          "title": "AI News, Trend Insights, and Tool Decisions | ENHE AI",
+          "h1": "AI News And Trend Insights",
+          "cards": [
+            "Tool Selection Guides\nHow to Choose an AI Home Gateway: Eight Checks Beyond Local Processing\n\nAn AI home gateway can see connected devices, access records, and network controls, so a dedicated NPU or a 'local processing' label is not enough. NIST guidance for consumer routers and trusted IoT onboarding emphasizes asset identification, minimized interfaces, reliable updates, explicit authorization, secure credential delivery, and lifecycle management. This durable guide turns those principles into eight purchase checks for AI routers, smart-home hubs, and provider-supplied gateways. Before buying or enabling one, identify every product component, map local and cloud data flows, separate admin",
+            "Tool Selection Guides\nHow to Build an AI Agent Evaluation Baseline: From Offline Tests to Production Review\n\nHow to Build an AI Agent Evaluation Baseline: From Offline Tests to Production Review. The official source dated August 2026 describes a concrete product, research, or governance change rather than a universal guarantee. This article separates what is available now from preview or planned access, then translates the change into one ordinary-user task: establishing a repeatable baseline for AI-agent quality, risk, cost, and human review. Before using it, readers should verify account eligibility, workspace permissions, data boundaries, model or service cost, human review, audit logs, a",
+            "Tool Selection Guides\nHow to Adopt AI Agents in Slack and Teams with an Approval Checklist\n\nReview the official scope, availability, ordinary-user task, permissions, cost, review, and rollback checks for How to Adopt AI Agents in Slack and Teams with an Approval Checklist.\n\n8/22/2026\n10 views\nSources available on the article page\nAI Agents\nAI News\n权限治理\n0\nLike, 0"
+          ],
+          "mainExcerpt": "ENHE AI INSIGHTS\n\nAI News And Trend Insights\n\nTrack AI tools, model updates, industry trends, and practical tutorials so you can turn new technology into real productivity.\n\nFilter news\nSearch title, summary, keywords, or tags\nAll categories\nAll categories\nAI News & Updates\nGEO Content\nTool Selection Guides\nAPI Security Guides\nModel & Agent Evaluation\nAI News Briefs\nModel Updates\nRecommended AI Tools\nPractical Guides\nTrend Insights\nAI Business & Monetization\nAll tags\nAll tags\n/tasks\n3.6 Flash\n3D CT\n5K display\n@GitHub Canvas\nADP 4.0\nAEO\nAI Control Plane\nAI Control Roadmap\nAI Controls\nAI Credit\nAI Foundations\nAI Gateway\nAI Mode\nAI Overviews\nAI RMF\nAI ROI\nAI Scan\nAI Security Mesh\nAI Studio\nAI Task Scheduling\nAI adoption\nAI agent governance\nAI agents\nAI biology\nAI coding\nAI coding agents\nAI cost\nAI credits\nAI data\nAI economy\nAI education\nAI governance\nAI measurement\nAI observability\nAI safety\nAI secret detection\nAI stack\nAI strategy\nAI transformation\nAI validation\nAI workflow\nAIDBS\nAIOps\nAI Tools\nAI Tutorials\nAI Trends\nAI News\nLatest\nLatest\nPopular\nFeatured\n\nKEY TAKEAWAY\n\nWhat ENHE AI news is for\n\nENHE AI news is not a raw headline feed. It turns changes in AI agents, MCP-style tool ecosystems, local AI, open models, platform policy, and practical AI tools into clear next steps: watch the trend, choose software, learn a skill, or check account-service boundaries.\n\nLatest Insights\nTool Selection Guides\nHow to Choose an AI Home Gateway: Eight Checks Beyond Local Processing\n\nAn AI home gateway can see connected devices, access records, and network controls, so a dedicated NPU or a 'local processing' label is not enough. NIST guidance for consumer routers and trusted IoT onboarding emphasizes asset identification, minimized interfaces, reliable updates, explicit authorization, "
+        },
+        {
+          "selected": "API Security Guides",
+          "url": "https://www.enhe-tech.com.cn/en/ai-news?q=&category=cmv7i7d30003ppi3bh90vl3ox&tag=&sort=latest",
+          "title": "AI News, Trend Insights, and Tool Decisions | ENHE AI",
+          "h1": "AI News And Trend Insights",
+          "cards": [
+            "API Security Guides\nWhat to Do After a Claude API Key Leak: A Seven-Step Response Checklist\n\nGitHub added detection for anthropic_service_api_key and anthropic_user_api_key on October 13, 2026 and included both patterns in push protection by default for repositories with secret scanning enabled, including free public repositories. Prevention does not replace incident response. Anthropic recommends immediately revoking a suspected compromised key in Claude Console, using environment variables or encrypted secret storage, separating keys by environment and purpose, rotating keys, and scanning repositories. This durable seven-step checklist covers the full response: stop the affected workload, ",
+            "What AI news does for users\n\nAI news should help users decide whether a model, tool, policy, or platform change affects their creative work, operations, learning, or workflows. Useful news explains what happened, why it matters, and what to do next.",
+            "How to turn news into action\n\nAfter reading an article, convert the signal into one of three actions: watch the trend, test a software app, or learn a related skill. This turns news into practical decisions."
+          ],
+          "mainExcerpt": "ENHE AI INSIGHTS\n\nAI News And Trend Insights\n\nTrack AI tools, model updates, industry trends, and practical tutorials so you can turn new technology into real productivity.\n\nFilter news\nSearch title, summary, keywords, or tags\nAll categories\nAll categories\nAI News & Updates\nGEO Content\nTool Selection Guides\nAPI Security Guides\nModel & Agent Evaluation\nAI News Briefs\nModel Updates\nRecommended AI Tools\nPractical Guides\nTrend Insights\nAI Business & Monetization\nAll tags\nAll tags\n/tasks\n3.6 Flash\n3D CT\n5K display\n@GitHub Canvas\nADP 4.0\nAEO\nAI Control Plane\nAI Control Roadmap\nAI Controls\nAI Credit\nAI Foundations\nAI Gateway\nAI Mode\nAI Overviews\nAI RMF\nAI ROI\nAI Scan\nAI Security Mesh\nAI Studio\nAI Task Scheduling\nAI adoption\nAI agent governance\nAI agents\nAI biology\nAI coding\nAI coding agents\nAI cost\nAI credits\nAI data\nAI economy\nAI education\nAI governance\nAI measurement\nAI observability\nAI safety\nAI secret detection\nAI stack\nAI strategy\nAI transformation\nAI validation\nAI workflow\nAIDBS\nAIOps\nAI Tools\nAI Tutorials\nAI Trends\nAI News\nLatest\nLatest\nPopular\nFeatured\n\nKEY TAKEAWAY\n\nWhat ENHE AI news is for\n\nENHE AI news is not a raw headline feed. It turns changes in AI agents, MCP-style tool ecosystems, local AI, open models, platform policy, and practical AI tools into clear next steps: watch the trend, choose software, learn a skill, or check account-service boundaries.\n\nLatest Insights\nAPI Security Guides\nWhat to Do After a Claude API Key Leak: A Seven-Step Response Checklist\n\nGitHub added detection for anthropic_service_api_key and anthropic_user_api_key on October 13, 2026 and included both patterns in push protection by default for repositories with secret scanning enabled, including free public repositories. Prevention does not replace incident response. Anthropic recommends "
+        }
+      ],
+      "distinctFirstCard": true
+    },
+    "newsPagination": {
+      "pageOne": "https://www.enhe-tech.com.cn/ai-news",
+      "nextLinkCount": 1,
+      "pageTwo": {
+        "url": "https://www.enhe-tech.com.cn/ai-news/page/2",
+        "title": "AI资讯、趋势解读与工具落地指南 | 恩禾 ENHE AI",
+        "h1": "AI前沿资讯与趋势洞察",
+        "cards": [
+          "AI前沿资讯\nCopilot代码审查新增Adaptive：用两类PR验收深度、密钥与上下文\n\nGitHub于11月17日为Copilot代码审查推出Adaptive投入档位，并公开预览跨仓库公开上下文和密钥检测。Balanced仍是默认，管理员可限制最高投入。本文给出两类PR验收：用小型修复检查速度、误报与遗漏，用跨仓库变更检查上下文引用、密钥提示和建议可执行性；同时保留分支保护、必需审查和专门的密钥扫描。只有AI评论能被代码与测试复核，且没有拖慢关键流程，才逐步扩大自动审查。\n\n2026/11/20\n3 views\n来源见详情\nGitHub Copilot\nAdaptive effort\n跨仓库上下文\n0\n喜欢, 0",
+          "AI前沿资讯\nGitHub Copilot新增8个连接器：先核对预览开关、白名单与服务权限\n\nGitHub于11月18日把Box、Buildkite、Calendly、ClickUp、Mixpanel、Supabase、Webflow和Wix八个已验证连接器加入公开预览。不同计划和组织策略可能影响可见性，企业还可能需要更新MCP白名单并在外部服务侧批准权限。本文给出四道门检查：确认预览策略，核对实际server URL，只授权最小范围账号，先执行只读任务并保存来源与撤销入口。连接成功不代表已经允许写入，更不应默认扩大生产权限。\n\n2026/11/20\n3 views\n来源见详情\nGitHub Copilot\nSupabase\nBox\n0\n喜欢, 0",
+          "实战教程\n怎样把结果而不是步骤交给AI代理？一份Autopilot委派验收契约\n\n微软在Autopilot预览中把AI代理描述为拥有身份、记忆、工作区和远程电脑的个人队友，可在云端继续执行工作，并强调交付结果而不是逐步脚本。本文把这一概念整理为委派契约：先写清目标和排除项，限定数据、账号、费用与外部沟通权限，定义每个里程碑的证据和人工批准，设置异常升级、预算与停止条件，最后用可复查产物而非代理自述验收。它适用于任何长任务代理，不等于已启用微软预览。\n\n2026/11/20\n4 views\n来源见详情\nAI资讯\nAutopilot\n结果委派\n0\n喜欢, 0"
+        ],
+        "mainExcerpt": "ENHE AI INSIGHTS\n\nAI前沿资讯与趋势洞察\n\n关注 AI 工具、模型更新、行业趋势与实用教程，帮助你更快理解变化，把新技术变成真实生产力。\n\n筛选资讯\n搜索标题、摘要、关键词或标签\n全部分类\n全部分类\nAI前沿资讯\nGEO内容\n工具选用指南\n接口安全指南\n模型与智能体评估\nAI快讯\n模型动态\n工具推荐\n实战教程\n趋势解读\nAI变现\n全部标签\n全部标签\n/tasks\n15秒AI视频\n1M上下文开源模型\n2026年10月19日\n28天参与度\n3.6 Flash\n3D CT\n5K display\n64GB统一内存\n@GitHub Canvas\nA2A协议\nA2A和MCP怎么选\nADP 4.0\nAEO\nAI Control Plane\nAI Control Roadmap\nAI Controls\nAI Credit\nAI Foundations\nAI Gateway\nAI Mode\nAI Overviews\nAI RMF\nAI ROI\nAI Scan\nAI Security Mesh\nAI Studio\nAI Task Scheduling\nAI adoption\nAI agent governance\nAI agents\nAI biology\nAI coding\nAI coding agents\nAI cost\nAI credits\nAI data\nAI economy\nAI education\nAI governance\nAI measurement\nAI observability\nAI safety\nAI secret detection\nAI stack\nAI strategy\nAI transformation\nAI validation\n最新\n最新\n热门\n推荐\n最新资讯\n2026/11/21\nChatGPT Live Dictation上线：长提示词先做转写、结构与隐私检查\n深度阅读 →\n\n核心结论\n\nENHE AI 资讯真正解决什么\n\nENHE AI 的 AI前沿资讯重点不是追热点，而是把 AI智能体、MCP 工具生态、本地 AI、开源模型、平台政策和实用工具变化解释成可执行的下一步：关注趋势、选择软件、学习技能或确认账号服务边界。\n\n最新资讯\nAI前沿资讯\nCopilot代码审查新增Adaptive：用两类PR验收深度、密钥与上下文\n\nGitHub于11月17日为Copilot代码审查推出Adaptive投入档位，并公开预览跨仓库公开上下文和密钥检测。Balanced仍是默认，管理员可限制最高投入。本文给出两类PR验收：用小型修复检查速度、误报与遗漏，用跨仓库变更检查上下文引用、密钥提示和建议可执行性；同时保留分支保护、必需审查和专门的密钥扫描。只有AI评论能被代码与测试复核，且没有拖慢关键流程，才逐步扩大自动审查。\n\n2026/11/20\n3 views\n来源见详情\nGitHub Copilot\nAdaptive effort\n跨仓库上下文\n0\n喜欢, 0\nAI前沿资讯\nGitHub Copilot新增8个连接器：先核对预览开关、白名单与服务权限\n\nGitHub于11月18日把Box、Buildkite、Calendly、ClickUp、Mixpanel、Supabase、Webflow和Wix八个已验证连接器加入公开预览。不同计划和组织策略可能影响可见性，企业还可能需要更新MCP白名单并在外部服务侧批准权限。本文给出四道门检查：确认预览策略，核对实际server URL，只授权最小范围账号，先执行只读任务并保存来源与撤销入口。连接成功不代表已经允许写入，更不应默认扩大生产权限。\n\n2026/11/20\n3 views\n来源见详情\nGitHub Copilot\nSupabase\nBox\n0\n喜欢, 0\n实战教程\n怎样把结果而不是步骤交给AI代理？一份Autopilot委派验收契约\n\n微软在Autopilot预览中把AI代理描述为拥有身份、记忆、工作区和远程电脑的个人队友，可在云端继续执行工作，并强调交付结果而不是逐步脚本。本文把这一概念整理为委派契约：先写清目标和排除项，限定数据、账号、费用与外部沟通权限，定义每个里程碑的证据和人工批准，设置异常升级、预算与停止条件，最后用可复查产物而非代理自述验收。它适用"
+      }
+    },
+    "forumLanguageSwitch": {
+      "startUrl": "https://www.enhe-tech.com.cn/forum",
+      "clickedUrl": "https://www.enhe-tech.com.cn/en/forum",
+      "expectedTarget": "https://www.enhe-tech.com.cn/en/forum",
+      "backUrl": "/forum",
+      "startRouteBack": true,
+      "passes": true
+    },
+    "codexDetailLanguageSwitch": {
+      "startUrl": "https://www.enhe-tech.com.cn/software/codex-api",
+      "clickedUrl": "https://www.enhe-tech.com.cn/en/software/codex-api",
+      "expectedTarget": "https://www.enhe-tech.com.cn/en/software/codex-api",
+      "backUrl": "/software/codex-api",
+      "startRouteBack": true,
+      "passes": true
+    },
+    "weeklyReportLanguageSwitch": {
+      "startUrl": "https://www.enhe-tech.com.cn/en/ai-trends/daily",
+      "clickedUrl": "https://www.enhe-tech.com.cn/ai-trends/daily",
+      "expectedTarget": "https://www.enhe-tech.com.cn/ai-trends/daily",
+      "backUrl": "/en/ai-trends/daily",
+      "startRouteBack": true,
+      "passes": true
+    }
+  },
+  "pageErrors": []
+}

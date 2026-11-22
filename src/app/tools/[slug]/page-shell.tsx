@@ -339,8 +339,11 @@ export async function ToolDetailPageShell({
     tool.type,
     forceLocale,
   );
+  const softwareTypeLabel = /\bwindows\b/i.test(tool.systemRequirement ?? "")
+    ? forceLocale === "en" ? "Windows Desktop Tool" : "Windows 桌面工具"
+    : td.software;
   const typeLabel = {
-    software: td.software,
+    software: softwareTypeLabel,
     ai_skill: td.aiSkill,
     skill_learning: td.skillLearning,
     ai_workflow: forceLocale === "en" ? "Project" : "项目",

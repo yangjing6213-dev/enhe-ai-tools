@@ -1,0 +1,20 @@
+[
+  {
+    "id": "cmqdyc4qx0001o801w9ida67i",
+    "name": "高频AI提示词｜日常工作学习教学",
+    "englishName": "High-Frequency AI Prompts for Work, Learning, and Teaching",
+    "slug": "ai-at8nui",
+    "shortDescription": "[[zh]]把写作、学习、教学和办公任务整理成可复用提示词[[/zh]][[en]]Turn common writing, learning, teaching, and office tasks into reusable prompt patterns for beginners who want less trial and error.[[/en]]",
+    "valueProposition": "把工作、学习和教学中的常见任务整理成可复用提示词。",
+    "englishValueProposition": "Build reusable prompts for work, learning, and teaching."
+  },
+  {
+    "id": "cmqjcgeac000jpb01v5fifcr3",
+    "name": "AI副业实操课｜从工具到项目",
+    "englishName": "Practical AI Side Project Course",
+    "slug": "ai-ai-ilo5a5",
+    "shortDescription": "[[zh]]通过项目练习建立从工具使用到实际执行的路径[[/zh]][[en]]Practice AI image, writing, video, and traffic workflows through project-based lessons that clarify the path from tool use to execution.[[/en]]",
+    "valueProposition": "通过项目练习，用 AI 制作图文和视频内容。",
+    "englishValueProposition": "Learn to create written content, images, and videos through practical AI projects."
+  }
+]

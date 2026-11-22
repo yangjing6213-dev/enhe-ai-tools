@@ -26,6 +26,8 @@ type ToolCardProps = {
     slug: string;
     type: "software" | "online" | "skill_learning" | "ai_skill" | "ai_workflow";
     shortDescription: string;
+    valueProposition?: string | null;
+    englishValueProposition?: string | null;
     coverImage?: string | null;
     isVipRequired: boolean;
     downloadCount: number;
@@ -55,18 +57,24 @@ export function ToolCard({
   const isCompact = variant === "compact";
   const showMarketingMeta = variant !== "homeFeatured";
   const shouldShowSecondaryName = locale === "zh" && Boolean(localizedTool.secondaryName);
+  const fallbackSummary = buildLocalizedToolPreviewText(
+    {
+      slug: tool.slug,
+      name: tool.name,
+      englishName: tool.englishName,
+      shortDescription: tool.shortDescription,
+      type: tool.type,
+      categoryName: tool.category?.name
+    },
+    locale
+  );
+  const courseValueProposition = locale === "en"
+    ? tool.englishValueProposition?.trim()
+    : tool.valueProposition?.trim();
   const summary = buildValueSentence(
-    buildLocalizedToolPreviewText(
-      {
-        slug: tool.slug,
-        name: tool.name,
-        englishName: tool.englishName,
-        shortDescription: tool.shortDescription,
-        type: tool.type,
-        categoryName: tool.category?.name
-      },
-      locale
-    ),
+    tool.type === "skill_learning" && courseValueProposition
+      ? courseValueProposition
+      : fallbackSummary,
     locale
   );
   const highlights = showMarketingMeta ? buildCardHighlights(tool, locale) : [];
