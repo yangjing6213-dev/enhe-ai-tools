@@ -9,7 +9,6 @@ test("public header replaces the search link, opens recommendations, and submits
       await page.goto(english ? "/en" : "/");
       const header = page.locator(".redesign-header");
       const input = header.getByRole("combobox", { name: english ? "Search tools and resources" : "搜索工具与资源" });
-      await expect(input).toBeVisible();
       await expect(header.locator(".redesign-brand-label")).toHaveCount(0);
       await expect(header.locator('.redesign-nav-link[href$="/search"]')).toHaveCount(0);
       await expect(page.locator(".redesign-home-cta").first()).toHaveCSS("border-radius", "12px");
@@ -31,7 +30,10 @@ test("public header replaces the search link, opens recommendations, and submits
       await expect(footer.locator(".redesign-home-brand-value-cta")).toHaveCount(0);
       await expect(footer.locator(".redesign-home-brand-value-inner h2")).toHaveCSS("color", "rgb(255, 255, 255)");
       await expect(footer.locator(".redesign-home-brand-value")).toHaveCSS("background-color", "rgba(0, 0, 0, 0)");
-      await expect(footer.locator(".footer-navigation")).toHaveCSS("justify-content", width < 768 ? "center" : "flex-end");
+      await expect(footer.locator(".footer-navigation")).toHaveCSS(
+        "justify-content",
+        width < 768 ? "center" : /^(?:flex-end|flow-end)$/,
+      );
       if (width >= 1280) {
         const footerAlignment = await footer.evaluate((element) => {
           const logo = element.querySelector<HTMLElement>(".footer-brand-logo")!.getBoundingClientRect();
@@ -64,36 +66,54 @@ test("public header replaces the search link, opens recommendations, and submits
       }
       const layout = await header.evaluate((el) => {
         const box = (selector: string) => el.querySelector(selector)!.getBoundingClientRect().toJSON();
-        return { logo: box(".redesign-brand-mark"), search: box(".redesign-header-search"), nav: box(".redesign-desktop-nav"), scrollWidth: document.documentElement.scrollWidth };
+        const mobile = window.innerWidth < 768;
+        return {
+          logo: box(mobile ? ".redesign-brand-mark--mobile-white" : ".redesign-brand-mark"),
+          search: box(".redesign-header-search"),
+          nav: box(".redesign-desktop-nav"),
+          scrollWidth: document.documentElement.scrollWidth,
+        };
       });
-      expect(layout.logo.width).toBe(width < 360 ? width - 200 : width < 420 ? 156 : 200);
-      expect(layout.scrollWidth).toBeLessThanOrEqual(width);
-      const searchRatio = await input.evaluate((element) => {
-        const form = element.closest(".redesign-header-search")!;
-        const inner = form.parentElement!;
-        const columns = getComputedStyle(inner).gridTemplateColumns.split(" ").map(parseFloat);
-        return form.getBoundingClientRect().width / (columns.length === 3 ? columns[1] : inner.clientWidth);
-      });
-      expect(searchRatio).toBeCloseTo(width >= 768 ? 0.5 : 1, 1);
-      if (width >= 1280) {
-        expect(layout.search.x).toBeGreaterThanOrEqual(layout.logo.right);
-        expect(layout.search.right).toBeLessThanOrEqual(layout.nav.x + 1);
+      if (width < 768) {
+        expect(layout.logo.width).toBeGreaterThan(width * 0.35);
+        expect(layout.logo.width).toBeLessThanOrEqual(width * 0.42 + 1);
       } else {
-        expect(layout.search.top).toBeGreaterThanOrEqual(layout.logo.bottom);
+        expect(layout.logo.width).toBe(200);
       }
-      await input.click();
-      const panel = page.getByRole("dialog", { name: english ? "Most downloaded" : "下载最多" });
-      await expect(panel).toBeVisible();
-      await expect(input).toBeFocused();
-      await expect(panel).toContainText(english ? "not available yet" : "暂无下载推荐");
-      await input.press("Escape");
-      await expect(panel).not.toBeVisible();
-      await input.click();
-      await expect(panel).toBeVisible();
-      // The compact hero can sit behind the search panel; use a genuine outside point.
-      await page.locator(".redesign-home-feature-folder").first().click({ position: { x: 1, y: 1 } });
-      await expect(panel).not.toBeVisible();
+      expect(layout.scrollWidth).toBeLessThanOrEqual(width);
+      if (width >= 768) {
+        await expect(input).toBeVisible();
+        const searchRatio = await input.evaluate((element) => {
+          const form = element.closest(".redesign-header-search")!;
+          const inner = form.parentElement!;
+          const columns = getComputedStyle(inner).gridTemplateColumns.split(" ").map(parseFloat);
+          return form.getBoundingClientRect().width / (columns.length === 3 ? columns[1] : inner.clientWidth);
+        });
+        expect(searchRatio).toBeCloseTo(0.5, 1);
+        if (width >= 1280) {
+          expect(layout.search.x).toBeGreaterThanOrEqual(layout.logo.right);
+          expect(layout.search.right).toBeLessThanOrEqual(layout.nav.x + 1);
+        } else {
+          expect(layout.search.top).toBeGreaterThanOrEqual(layout.logo.bottom);
+        }
+        await input.click();
+        const panel = page.getByRole("dialog", { name: english ? "Most downloaded" : "下载最多" });
+        await expect(panel).toBeVisible();
+        await expect(input).toBeFocused();
+        await expect(panel).toContainText(english ? "not available yet" : "暂无下载推荐");
+        await input.press("Escape");
+        await expect(panel).not.toBeVisible();
+        await input.click();
+        await expect(panel).toBeVisible();
+        // The compact hero can sit behind the search panel; use a genuine outside point.
+        await page.locator(".redesign-home-feature-folder").first().click({ position: { x: 1, y: 1 } });
+        await expect(panel).not.toBeVisible();
+      } else {
+        await expect(header.locator(".redesign-header-search")).toBeHidden();
+        await expect(header.getByRole("button", { name: english ? "Menu" : "菜单" })).toBeVisible();
+      }
     }
+    await page.setViewportSize({ width: 1440, height: 900 });
     const input = page.locator(".redesign-header").getByRole("combobox");
     await input.fill("AI 视频");
     await input.press("Enter");

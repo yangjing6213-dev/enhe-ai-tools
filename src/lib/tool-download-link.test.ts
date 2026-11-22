@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
 import {
+  getPublicDownloadLinks,
   canOpenProtectedDownloadEntry,
   canShowDownloadLinkArea,
   getDownloadCtaLabel,
@@ -62,6 +63,24 @@ describe("tool download link visibility", () => {
     expect(canOpenProtectedDownloadEntry("/uploads/app.zip")).toBe(true);
     expect(canOpenProtectedDownloadEntry("https://example.com/app.zip")).toBe(true);
     expect(canOpenProtectedDownloadEntry("cos://bucket/app.zip")).toBe(true);
+    expect(canOpenProtectedDownloadEntry("https://example.com/a\nhttps://example.com/b")).toBe(false);
+  });
+
+  it("only offers explicitly authored public HTTPS entries to guests", () => {
+    const publicUrl = "https://example.com/app.zip";
+    const backup = "https://example.com/backup.zip";
+    const links = (content: string, filePath = content, paid = false) => getPublicDownloadLinks({ filePath, fileUrl: content }, paid);
+
+    expect(links(publicUrl)).toEqual([publicUrl]);
+    expect(links(`${publicUrl}\n${backup}`)).toEqual([publicUrl, backup]);
+    expect(links(`${publicUrl}\n备用：${backup}`)).toEqual([]);
+    expect(links(publicUrl, "cos://bucket/private/object")).toEqual([]);
+    expect(links(publicUrl, publicUrl, true)).toEqual([]);
+    expect(links("http://example.com/app.zip")).toEqual([]);
+    expect(links("https://user:secret@example.com/file")).toEqual([]);
+    expect(links(`${publicUrl}?q-signature=fixture`)).toEqual([]);
+    expect(links(`${publicUrl}?token=fixture`)).toEqual([]);
+    expect(links(`${publicUrl}?X-Amz-Credential=fixture`)).toEqual([]);
   });
 
   it("routes purchased users to the download-link section and unpaid paid users to the purchase prompt", () => {

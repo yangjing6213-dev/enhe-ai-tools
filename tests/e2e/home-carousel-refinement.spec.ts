@@ -5,6 +5,18 @@ for (const route of ["/", "/en"]) {
     for (const viewport of [{ width: 1366, height: 768 }, { width: 390, height: 844 }]) {
       await page.setViewportSize(viewport);
       await page.goto(route);
+      if (viewport.width < 768) {
+        await expect(page.locator(".redesign-home-features")).toBeHidden();
+        const mobileCards = page.locator(".redesign-home-mobile-cards a");
+        await expect(mobileCards).toHaveCount(3);
+        for (const [index, path] of ["/software", "/forum", "/ai-news"].entries()) {
+          await expect(mobileCards.nth(index)).toBeVisible();
+          await expect(mobileCards.nth(index)).toHaveAttribute("href", `${route === "/en" ? route : ""}${path}`);
+        }
+        expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBeLessThanOrEqual(viewport.width);
+        await page.screenshot({ path: test.info().outputPath(`mobile-explore-${viewport.width}.png`) });
+        continue;
+      }
       const folders = page.locator(".redesign-home-features .folder-float");
       await expect(folders).toHaveCount(4);
 
@@ -124,7 +136,7 @@ for (const route of ["/", "/en"]) {
 
 for (const route of ["/", "/en"]) {
   for (const width of [320, 768, 1440]) {
-    test(`product layout stays fixed and folders work on ${route} at ${width}px`, async ({ page }) => {
+    test(`product layout stays fixed and navigation works on ${route} at ${width}px`, async ({ page }) => {
       await page.setViewportSize({ width, height: 1000 });
       await page.goto(route);
       await page.addStyleTag({ content: "html { scroll-behavior: auto !important }" });
@@ -142,6 +154,15 @@ for (const route of ["/", "/en"]) {
         await page.keyboard.press("ArrowRight");
         expect(await geometry()).toEqual(before);
         await expect(stage.locator('[data-product-current="true"] img')).toHaveCSS("object-fit", "contain");
+      }
+      if (width < 768) {
+        await expect(page.locator(".redesign-home-features")).toBeHidden();
+        const cards = page.locator(".redesign-home-mobile-cards a");
+        await expect(cards).toHaveCount(3);
+        await expect(cards.first()).toHaveAttribute("href", route === "/en" ? "/en/software" : "/software");
+        await cards.first().click();
+        await expect(page).toHaveURL(route === "/en" ? /\/en\/software$/ : /\/software$/);
+        return;
       }
       const folders = page.locator(".redesign-home-features .folder-float");
       await expect(folders).toHaveCount(4);
@@ -182,18 +203,16 @@ test("product indicators select the matching borderless product without mobile o
   expect(await page.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth)).toBe(0);
 });
 
-test("folders remain usable on a touch screen with reduced motion", async ({ browser, baseURL }) => {
+test("mobile exploration cards remain usable on a touch screen with reduced motion", async ({ browser, baseURL }) => {
   const context = await browser.newContext({ viewport: { width: 390, height: 900 }, hasTouch: true, reducedMotion: "reduce" });
   try {
     const page = await context.newPage();
     await page.goto(`${baseURL}/en`);
-    const folder = page.locator(".redesign-home-features .folder-float").first();
-    const trigger = folder.locator(".folder-float__trigger");
-    await trigger.tap();
-    await expect(folder).toHaveAttribute("open", "");
-    await page.waitForTimeout(1000);
-    await expect(folder).not.toHaveAttribute("data-live");
-    await folder.locator(".folder-float__item").first().tap();
-    await expect(page).toHaveURL(/\/en\/software\?category=video$/);
+    await expect(page.locator(".redesign-home-features")).toBeHidden();
+    const cards = page.locator(".redesign-home-mobile-cards a");
+    await expect(cards).toHaveCount(3);
+    await expect(cards.nth(0)).toHaveAttribute("href", "/en/software");
+    await cards.nth(0).tap();
+    await expect(page).toHaveURL(/\/en\/software$/);
   } finally { await context.close(); }
 });

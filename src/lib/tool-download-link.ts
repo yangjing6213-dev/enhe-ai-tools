@@ -66,16 +66,30 @@ export function linkifyDownloadLinkContent(content: string): DownloadLinkContent
 }
 
 export function canOpenProtectedDownloadEntry(content: string) {
-  return content.startsWith("/") || content.startsWith("cos://") || /^https?:\/\//i.test(content);
+  if (/^https?:\/\//i.test(content)) {
+    const segments = linkifyDownloadLinkContent(content);
+    return segments.length === 1 && segments[0].type === "link" && segments[0].href === content;
+  }
+  return !/[\r\n]/.test(content) && (content.startsWith("/") || content.startsWith("cos://"));
 }
 
-export function canOpenPublicDownloadEntry(input: {
-  content: string;
-  isDownloadPaid: boolean;
-  hasDownloadPurchase: boolean;
-}) {
-  if (input.isDownloadPaid) return false;
-  return /^https?:\/\//i.test(input.content);
+export function getPublicDownloadLinks(file: { filePath: string; fileUrl?: string | null } | null | undefined, isPaid: boolean) {
+  const content = getDownloadLinkContent(file);
+  if (isPaid || !file || content !== file.filePath.replace(/\r\n?/g, "\n")) return [];
+
+  const segments = linkifyDownloadLinkContent(content);
+  if (segments.some(segment => segment.type === "text" && segment.text.trim() !== "")) return [];
+  const links = segments.flatMap(segment => segment.type === "link" ? [segment.href] : []);
+  const allPublic = links.every(href => {
+    try {
+      const url = new URL(href);
+      if (url.protocol !== "https:" || url.username || url.password) return false;
+      return !Array.from(url.searchParams.keys()).some(key => /^(?:q-(?:ak|key-time|sign-algorithm|sign-time|signature|header-list|url-param-list)|x-amz-(?:credential|date|expires|security-token|signature)|x-goog-(?:credential|date|expires|signature)|signature|sig|token|access[_-]?token|access[_-]?key|auth[_-]?key|expires|policy|key-pair-id)$/i.test(key));
+    } catch {
+      return false;
+    }
+  });
+  return allPublic ? links : [];
 }
 
 export function resolveSoftwareDownloadCtaHref(input: {

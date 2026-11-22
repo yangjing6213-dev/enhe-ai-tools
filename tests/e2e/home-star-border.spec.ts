@@ -14,13 +14,15 @@ for (const [path, locale, width, destination] of [
     await expect(canvas).toHaveAttribute("aria-hidden", "true");
     await expect(canvas).toHaveCSS("pointer-events", "none");
     await expect(link).toHaveCSS("border-radius", "12px");
-    await expect(link).toHaveCSS("background-color", "rgb(12, 12, 15)");
-    await expect(link).toHaveCSS("color", "rgb(255, 255, 255)");
+    const background = width < 768 ? "rgb(255, 214, 10)" : "rgb(12, 12, 15)";
+    const textColor = width < 768 ? "rgb(8, 36, 89)" : "rgb(255, 255, 255)";
+    await expect(link).toHaveCSS("background-color", background);
+    await expect(link).toHaveCSS("color", textColor);
     await expect.poll(() => canvas.evaluate((node: HTMLCanvasElement) => node.width)).toBeGreaterThan(96);
     const first = await canvas.evaluate((node: HTMLCanvasElement) => node.toDataURL());
     await expect.poll(() => canvas.evaluate((node: HTMLCanvasElement) => node.toDataURL())).not.toBe(first);
     await link.hover();
-    await expect(link).toHaveCSS("background-color", "rgb(12, 12, 15)");
+    await expect(link).toHaveCSS("background-color", background);
     expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBeLessThanOrEqual(width);
     if (locale === "zh") {
       await link.focus();

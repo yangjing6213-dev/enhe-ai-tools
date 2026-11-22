@@ -74,7 +74,7 @@ import { normalizeToolUsageSteps, parseToolChangelogVersion } from "@/lib/tool-u
 import { normalizeGitHubRepositoryUrl, resolveAiWorkflowDeliveryMode } from "@/lib/ai-workflows/rules";
 import { resolveAiWorkflowTopicLabel } from "@/lib/ai-workflows/topic-label";
 import {
-  canOpenPublicDownloadEntry,
+  getPublicDownloadLinks,
   canOpenProtectedDownloadEntry,
   canShowDownloadLinkArea,
   getDownloadCtaLabel,
@@ -529,6 +529,14 @@ export async function ToolDetailPageShell({
   );
   const purchaseLoginHref = `${buildLocalePath("/login", forceLocale)}?returnTo=${encodeURIComponent(purchaseReturnPath)}`;
   const downloadLinkContent = isAiWorkflow ? "" : getDownloadLinkContent(effectiveDownloadFile);
+  const hasDownloadLink = Boolean(effectiveDownloadFile?.id);
+  const publicLinks = getPublicDownloadLinks(effectiveDownloadFile, paidDownloadProduct);
+  const publicDownloadHref = publicLinks.length === 1 && downloadLinkContent.trim() === publicLinks[0] ? publicLinks[0] : null;
+  const guestCanDownload = isAiWorkflow || publicLinks.length > 0;
+  const managedDownload = Boolean(effectiveDownloadFile && effectiveDownloadFile.filePath !== downloadLinkContent);
+  const canOpenDownloadEntry = isAiSkill || isAiWorkflow
+    ? hasDownloadLink
+    : managedDownload || canOpenProtectedDownloadEntry(downloadLinkContent);
   const visibleDownloadLinkContent =
     isAiWorkflow
       ? forceLocale === "en"
@@ -538,30 +546,19 @@ export async function ToolDetailPageShell({
       ? forceLocale === "en"
         ? "Use the protected download button below to get the current Skill package."
         : "请使用下方受保护的下载按钮获取当前 Skill 压缩包。"
-      : buildLocalizedToolOptionalText(downloadLinkContent, forceLocale, { allowUntranslated: true });
+      : managedDownload || (paidDownloadProduct && canOpenDownloadEntry)
+        ? forceLocale === "en" ? "Use the download button below to get the file." : "请使用下方下载按钮获取文件。"
+        : buildLocalizedToolOptionalText(downloadLinkContent, forceLocale, { allowUntranslated: true });
   const visibleDownloadFileName =
     buildLocalizedToolOptionalText(
       effectiveDownloadFile?.fileName,
       forceLocale,
     ) || td.noDownloadFileName;
-  const hasDownloadLink = isAiWorkflow
-    ? Boolean(effectiveDownloadFile?.id)
-    : Boolean(tool.downloadFileId && effectiveDownloadFile && downloadLinkContent);
   const showDownloadLinkArea = canShowDownloadLinkArea({
     hasDownloadLink: hasDownloadLink && !hasHowToDelivery,
     isDownloadPaid: paidDownloadProduct,
     hasDownloadPurchase,
-  });
-  const canOpenDownloadEntry = isAiSkill || isAiWorkflow
-    ? hasDownloadLink
-    : canOpenProtectedDownloadEntry(downloadLinkContent);
-  const publicDownloadHref = canOpenPublicDownloadEntry({
-    content: downloadLinkContent,
-    isDownloadPaid: paidDownloadProduct,
-    hasDownloadPurchase,
-  })
-    ? downloadLinkContent
-    : null;
+  }) && (Boolean(user) || guestCanDownload);
   const protectedDownloadHref = `/api/tools/${tool.id}/download`;
   const softwareDownloadCtaHref = resolveSoftwareDownloadCtaHref({
     hasDownloadLink,
@@ -633,7 +630,7 @@ export async function ToolDetailPageShell({
     isPaid: paidDownloadProduct,
     hasPurchase: hasDownloadPurchase,
     isLoggedIn: Boolean(user),
-    hasPublicDirectDownload: Boolean(publicDownloadHref),
+    hasPublicDirectDownload: guestCanDownload,
   });
   const priceSpecHelpId = "tool-purchase-price-spec-help";
   const paymentMethodLabelId = "tool-purchase-payment-method-label";
@@ -1718,7 +1715,7 @@ export async function ToolDetailPageShell({
                 {canOpenDownloadEntry ? (
                   <div>
                     <ButtonLink
-                      href={protectedDownloadHref}
+                      href={publicDownloadHref ?? protectedDownloadHref}
                       className="tool-download-button" data-no-card-glow
                       data-analytics-event="product_download_click"
                       data-analytics-entity-type="tool"
