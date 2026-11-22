@@ -107,6 +107,8 @@ try {
     "-d",
     "--rm",
     "--pull=never",
+    "--tmpfs",
+    "/var/lib/postgresql/data:rw,noexec,nosuid,size=512m",
     "--name",
     containerName,
     "-e",
