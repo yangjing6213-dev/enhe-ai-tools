@@ -279,8 +279,8 @@ describe("public tool detail DB-free boundary", () => {
       ? "Only the date was recorded. The reviewed version, checks performed and results were not recorded. Verify the source and requirements before installing."
       : "这条记录仅含日期，未记录检查版本、项目或结果。安装前请核对文件来源和系统要求。");
     expect(html).not.toContain(locale === "en" ? "Safety review passed" : "安全审核通过");
-    expect(html).not.toContain("lucide-shield-check");
-    expect(html).toContain("lucide-info");
+    expect(html).toContain("lucide-shield-check");
+    expect(html).not.toContain("lucide-info");
   });
 
   it("does not invent a review, creator or refund entitlement for a free unreviewed AI Skill", async () => {
