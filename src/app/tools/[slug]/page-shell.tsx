@@ -4,7 +4,7 @@ import "@/styles/redesign/software.css";
 import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
-import { Bot, Info as InfoIcon, RotateCcw, Star, Terminal, type LucideIcon } from "lucide-react";
+import { Bot, RotateCcw, ShieldCheck, Star, Terminal, type LucideIcon } from "lucide-react";
 import { notFound, permanentRedirect } from "next/navigation";
 import {
   createCommentAction,
@@ -968,7 +968,7 @@ export async function ToolDetailPageShell({
                         <div className="product-safety-info-card">
                           <p className="text-xs text-[#8F9DB2]">{forceLocale === "en" ? "TRUST & SAFETY" : "信任与安全"}</p>
                           <div className="product-safety-info-heading">
-                            <InfoIcon size={20} aria-hidden="true" />
+                            <ShieldCheck size={20} aria-hidden="true" className="product-safety-info-icon" />
                             <strong>{forceLocale === "en" ? "Review record" : "检查记录"}</strong>
                           </div>
                           <p className="product-safety-info-date">

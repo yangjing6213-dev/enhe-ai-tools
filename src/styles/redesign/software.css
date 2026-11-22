@@ -831,6 +831,10 @@
   color: var(--enhe-text-muted);
 }
 
+.product-safety-info-heading .product-safety-info-icon {
+  color: var(--enhe-success-text, #166534);
+}
+
 .product-safety-info-date,
 .product-safety-info-note {
   margin-top: 7px;

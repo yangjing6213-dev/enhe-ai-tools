@@ -134,6 +134,9 @@
   font: inherit;
   font-weight: 700;
   cursor: pointer;
+  transition: none !important;
+  animation: none !important;
+  transform: translateX(-50%) !important;
 }
 
 .close:focus-visible {

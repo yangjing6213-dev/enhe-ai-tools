@@ -1,6 +1,11 @@
 import { z } from "zod";
 
 export const SITE_ENTRY_NOTICE_KEY = "site_entry_notice";
+export const SITE_ENTRY_NOTICE_SESSION_KEY = "enhe-entry-notice-dismissed-v1";
+
+export function isSiteEntryNoticeHomePath(pathname: string) {
+  return pathname === "/" || pathname === "/en";
+}
 
 export const DEFAULT_SITE_ENTRY_NOTICE = {
   enabled: true,

@@ -17,10 +17,14 @@ test.describe("new visitors", () => {
     { route: "/", title: "本站最新公告通知", close: "关闭公告", qr: "扫码收藏网站", favorite: "收藏本站", favoriteFeedback: "浏览器不允许网页自动添加书签" },
     { route: "/en", title: "Latest Site Announcement", close: "Close announcement", qr: "Scan to bookmark this site", favorite: "Bookmark this site", favoriteFeedback: "Your browser blocks automatic bookmarks" },
   ]) {
-    test(`shows and dismisses the ${locale.route === "/" ? "Chinese" : "English"} site entry notice`, async ({ page }) => {
+    test(`shows the ${locale.route === "/" ? "Chinese" : "English"} notice only on the first homepage visit of a tab session`, async ({ page, browser }) => {
+      const aboutRoute = locale.route === "/" ? "/about" : "/en/about";
+      const dialog = page.getByRole("dialog", { name: locale.title });
+
+      await page.goto(aboutRoute, { waitUntil: "load" });
+      await expect(dialog).toHaveCount(0);
       await page.goto(locale.route, { waitUntil: "load" });
 
-      const dialog = page.getByRole("dialog", { name: locale.title });
       await expect(dialog).toBeVisible();
       await expect(dialog.getByRole("img", { name: locale.qr })).toBeVisible();
 
@@ -45,13 +49,36 @@ test.describe("new visitors", () => {
       await dialog.getByRole("button", { name: locale.favorite }).click();
       await expect(dialog.getByRole("status")).toContainText(locale.favoriteFeedback);
 
-      await page.getByRole("button", { name: locale.close }).click();
+      const closeButton = page.getByRole("button", { name: locale.close });
+      await closeButton.hover();
+      await expect.poll(async () => closeButton.evaluate((element) => {
+        const style = getComputedStyle(element);
+        return `${style.transitionDuration}|${style.animationName}`;
+      })).toBe("0s|none");
+      await closeButton.click();
       await expect(dialog).toBeHidden();
 
       await page.reload({ waitUntil: "load" });
-      await expect(dialog).toBeVisible();
-      await page.getByRole("button", { name: locale.close }).click();
-      await expect(dialog).toBeHidden();
+      await expect(dialog).toHaveCount(0);
+      await page.goto(aboutRoute, { waitUntil: "load" });
+      await expect(dialog).toHaveCount(0);
+      await page.goto(locale.route, { waitUntil: "load" });
+      await expect(dialog).toHaveCount(0);
+
+      const nextVisit = await browser.newPage();
+      await nextVisit.goto(aboutRoute, { waitUntil: "load" });
+      await expect(nextVisit.getByRole("dialog", { name: locale.title })).toHaveCount(0);
+      await nextVisit.goto(locale.route, { waitUntil: "load" });
+      await expect(nextVisit.getByRole("dialog", { name: locale.title })).toBeVisible();
+      await nextVisit.close();
     });
   }
+});
+
+test("the about page hero does not repeat the website URL", async ({ page }) => {
+  await page.goto("/about", { waitUntil: "load" });
+
+  const hero = page.locator("main .enhe-reference-editorial-hero");
+  await expect(hero.getByText("https://www.enhe-tech.com.cn/", { exact: true })).toHaveCount(0);
+  await expect(hero.locator('a[href="https://www.enhe-tech.com.cn/"]')).toHaveCount(0);
 });

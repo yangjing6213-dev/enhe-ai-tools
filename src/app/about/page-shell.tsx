@@ -29,7 +29,6 @@ const aboutCopy = {
       "了解 ENHE AI 如何帮助普通 AI 用户完成工作、创作内容、整理资料、学习技能和选择工具，并在敏感素材、隐私边界和长期流程中兼顾安全、稳定与少走弯路。",
     intro:
       "工具、资讯与教程按实际用途整理，帮助你更快判断从哪里开始。",
-    officialSite: "https://www.enhe-tech.com.cn/",
     sections: [
       {
         title: "平台定位",
@@ -128,7 +127,6 @@ const aboutCopy = {
       "Learn how ENHE AI helps everyday users work faster, create content, learn skills, choose tools, and keep sensitive AI workflows safer.",
     intro:
       "Tools, news, and tutorials are organized by use so you can decide where to begin.",
-    officialSite: "https://www.enhe-tech.com.cn/",
     sections: [
       {
         title: "Platform Positioning",
@@ -275,12 +273,6 @@ export function AboutPageShell({ forceLocale }: { forceLocale: Locale }) {
             <p className="mt-5 max-w-3xl text-sm leading-7 text-[var(--marketing-muted)]">
               {copy.intro}
             </p>
-            <a
-              href={copy.officialSite}
-              className="mt-6 inline-flex break-all rounded-full border border-white/14 bg-white/8 px-4 py-2 text-sm font-bold text-[var(--marketing-text)] transition-[border-color,color] hover:border-[var(--marketing-accent)] hover:text-[var(--marketing-accent)]"
-            >
-              {copy.officialSite}
-            </a>
           </div>
         </section>
 

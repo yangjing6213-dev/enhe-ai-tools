@@ -5,7 +5,7 @@ import { describe, expect, it } from "vitest";
 const root = resolve(__dirname, "../..");
 
 describe("site entry notice", () => {
-  it("shows the notice on each fresh entry without persisting dismissal and offers bookmarking", () => {
+  it("shows the notice only on a fresh homepage visit in the current tab session and offers bookmarking", () => {
     const component = readFileSync(resolve(root, "src/components/site-entry-notice.tsx"), "utf8");
     const favoriteButton = readFileSync(resolve(root, "src/components/favorite-site-button.tsx"), "utf8");
     const styles = readFileSync(resolve(root, "src/components/site-entry-notice.module.css"), "utf8");
@@ -14,8 +14,11 @@ describe("site entry notice", () => {
     const config = readFileSync(resolve(root, "src/lib/site-entry-notice.ts"), "utf8");
 
     expect(chrome).toContain("<SiteEntryNotice locale={forceLocale} config={entryNoticeConfig} />");
+    expect(component).toContain("usePathname");
+    expect(component).toContain("isSiteEntryNoticeHomePath");
+    expect(component).toContain("sessionStorage.getItem(SITE_ENTRY_NOTICE_SESSION_KEY)");
+    expect(component).toContain("sessionStorage.setItem(SITE_ENTRY_NOTICE_SESSION_KEY, \"1\")");
     expect(component).toContain('localStorage.getItem("enhe-e2e-entry-notice-dismissed-v1")');
-    expect(component).not.toContain('localStorage.setItem("enhe-entry-notice-dismissed-v1"');
     expect(component).toContain("FavoriteSiteButton");
     expect(component).toContain('aria-modal="true"');
     expect(component).toContain('titleRef.current?.focus({ preventScroll: true })');

@@ -190,6 +190,8 @@ describe.each(["zh", "en"] as const)("%s product purchase login return", (locale
     expect(safetyIndex).toBeLessThan(refundIndex);
     expect(html).toContain("作者示例");
     expect(html).toContain("共 8 个已发布作品");
+    expect(html).toContain("lucide-shield-check");
+    expect(html).toContain("product-safety-info-icon");
     const supportLayout = elements(page).find((element) => element.props.className === "tool-detail-product-layout has-creator");
     expect(elements(supportLayout).some((element) => element.props.id === "tool-purchase")).toBe(false);
     expect(html.indexOf('class="creator-profile-card"')).toBeLessThan(html.indexOf('id="tool-purchase"'));

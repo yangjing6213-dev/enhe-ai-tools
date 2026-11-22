@@ -1,7 +1,14 @@
 import { describe, expect, it } from "vitest";
-import { parseSiteEntryNotice, siteEntryNoticeSchema } from "./site-entry-notice";
+import { isSiteEntryNoticeHomePath, parseSiteEntryNotice, siteEntryNoticeSchema } from "./site-entry-notice";
 
 describe("site entry notice settings", () => {
+  it.each([["/", true], ["/en", true], ["/about", false], ["/en/about", false], ["/forum", false]] as const)(
+    "limits notice display to the localized homepage: %s",
+    (pathname, expected) => {
+      expect(isSiteEntryNoticeHomePath(pathname)).toBe(expected);
+    },
+  );
+
   it("keeps the existing bilingual announcement enabled when no saved setting exists", () => {
     const config = parseSiteEntryNotice(undefined);
 

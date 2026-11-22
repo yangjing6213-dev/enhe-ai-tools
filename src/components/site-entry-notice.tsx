@@ -2,9 +2,10 @@
 
 import { Bell, X } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
+import { usePathname } from "next/navigation";
 import type { Locale } from "@/lib/dictionaries";
 import { companyProfile } from "@/lib/company-profile";
-import type { SiteEntryNoticeConfig } from "@/lib/site-entry-notice";
+import { isSiteEntryNoticeHomePath, SITE_ENTRY_NOTICE_SESSION_KEY, type SiteEntryNoticeConfig } from "@/lib/site-entry-notice";
 import { SiteQrCode } from "@/components/site-qr-code";
 import { FavoriteSiteButton } from "@/components/favorite-site-button";
 import styles from "./site-entry-notice.module.css";
@@ -14,21 +15,29 @@ export function SiteEntryNotice({ locale, config }: { locale: Locale; config: Si
   const e2eDismissed = useRef<boolean | null>(null);
   const dialogRef = useRef<HTMLDialogElement>(null);
   const titleRef = useRef<HTMLHeadingElement>(null);
+  const pathname = usePathname();
+  const isHomePath = isSiteEntryNoticeHomePath(pathname ?? "");
   const english = locale === "en";
   const title = english ? config.enTitle : config.zhTitle;
   const paragraphs = (english ? config.enBody : config.zhBody).split(/\n\s*\n/u).filter(Boolean);
   const ending = english ? config.enEnding : config.zhEnding;
 
   useEffect(() => {
-    if (!config.enabled) {
+    if (!config.enabled || !isHomePath) {
       setVisible(false);
       return;
     }
     if (e2eDismissed.current === null) {
       e2eDismissed.current = ["localhost", "127.0.0.1", "[::1]"].includes(window.location.hostname) && window.localStorage.getItem("enhe-e2e-entry-notice-dismissed-v1") === "1";
     }
-    setVisible(!e2eDismissed.current);
-  }, [config.enabled, config.version]);
+    let dismissedInThisSession = false;
+    try {
+      dismissedInThisSession = window.sessionStorage.getItem(SITE_ENTRY_NOTICE_SESSION_KEY) === "1";
+    } catch {
+      // Treat blocked storage as a fresh visit instead of preventing the page from rendering.
+    }
+    setVisible(!e2eDismissed.current && !dismissedInThisSession);
+  }, [config.enabled, config.version, isHomePath]);
 
   useEffect(() => {
     const dialog = dialogRef.current;
@@ -41,6 +50,11 @@ export function SiteEntryNotice({ locale, config }: { locale: Locale; config: Si
   }, [visible, config.enabled]);
 
   function dismiss() {
+    try {
+      window.sessionStorage.setItem(SITE_ENTRY_NOTICE_SESSION_KEY, "1");
+    } catch {
+      // The notice can still close when session storage is unavailable.
+    }
     setVisible(false);
   }
 
