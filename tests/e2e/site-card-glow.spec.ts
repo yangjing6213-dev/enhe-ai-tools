@@ -67,7 +67,7 @@ test("top-level cards stay static while nested cards retain glow without affecti
 });
 
 test("news takeaway wrapper stays static inside an article while its inner cards retain glow", async ({ page }) => {
-  await page.goto("/about", { waitUntil: "networkidle" });
+  await page.goto("/about", { waitUntil: "load" });
   await page.emulateMedia({ reducedMotion: "no-preference" });
   await page.evaluate(() => {
     const article = document.createElement("article");
