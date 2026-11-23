@@ -179,6 +179,12 @@
 .enhe-chat-hero-description h2 { margin: 0 0 8px; font-size: 1.05rem; }
 .enhe-chat-hero-description p { max-width: none; margin: 0; color: #f4f7ff; line-height: 1.65; overflow-wrap: anywhere; }
 
+.enhe-chat-room-shell > .enhe-chat-hero .enhe-chat-hero-summary,
+.enhe-chat-room-shell > .enhe-chat-hero .enhe-chat-hero-description {
+  background-color: transparent !important;
+  background-image: none !important;
+}
+
 .enhe-chat-room-shell .enhe-chat-room-title-row {
   display: flex;
   align-items: center;

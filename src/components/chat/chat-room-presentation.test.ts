@@ -53,6 +53,11 @@ describe("chat room presentation", () => {
     expect(styles).toMatch(/grid-template-columns:\s*minmax\(0,\s*2fr\)\s+minmax\(0,\s*1fr\)/);
   });
 
+  it("keeps the hero summary and description transparent over the global light-surface reset", () => {
+    expect(styles).toMatch(/\.enhe-chat-room-shell\s*>\s*\.enhe-chat-hero\s+\.enhe-chat-hero-summary\s*,\s*\.enhe-chat-room-shell\s*>\s*\.enhe-chat-hero\s+\.enhe-chat-hero-description\s*\{[^}]*background-color:\s*transparent\s*!important/);
+    expect(globalStyles).toMatch(/body\s*:is\([\s\S]*?section[\s\S]*?background-color:\s*#ffffff\s*!important/);
+  });
+
   it("keeps the room hero out of the global light-surface background reset", () => {
     expect(globalStyles).toMatch(/:where\(html:not\(\.dark\)\) body :is\([\s\S]*?header:not\(\.enhe-chat-hero\)[\s\S]*?background-color:\s*#ffffff !important/);
   });
