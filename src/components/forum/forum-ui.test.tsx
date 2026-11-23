@@ -97,6 +97,11 @@ describe("forum public surfaces", () => {
       expect(html).toContain('class="forum-topic-delete"');
       expect(html).toContain('hold-button--md forum-delete-post');
     }
+    const deleteIndex = list.indexOf('data-delete-kind="forum-post"');
+    const editIndex = list.indexOf('href="/admin/forum/post-1/edit"');
+    expect(editIndex).toBeGreaterThan(deleteIndex);
+    expect(list).toContain('class="forum-primary-button forum-topic-edit"');
+    expect(list).toContain('--hb-bg:#0462c2');
     expect(list).toContain('href="/forum/post-1#replies"');
     expect(detail).toContain('href="#replies"');
   });

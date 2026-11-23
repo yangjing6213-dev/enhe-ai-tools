@@ -45,6 +45,10 @@ it("preloads a topic into the administrator editor and shows its existing media"
   expect(html).toContain("可编辑话题");
   expect(html).toContain('name="id" value="post-1"');
   expect(html).toContain('name="title"');
-  expect(html).toContain("现有附件（保存时保留）");
+  expect(html).toContain("话题图片和附件");
   expect(html).toContain("/api/forum/media/attachment-1");
+  expect(html).toContain('name="attachmentIds" value="attachment-1"');
+  expect(html).toContain("插入正文");
+  expect(html).toContain("长按移除");
+  expect(html).toContain("添加图片");
 });

@@ -10,6 +10,11 @@ const mocks = vi.hoisted(() => ({
   replyUpdate: vi.fn(),
   replyFindUnique: vi.fn(),
   reportUpdate: vi.fn(),
+  attachmentFindMany: vi.fn(),
+  attachmentUpdateMany: vi.fn(),
+  attachmentDeleteMany: vi.fn(),
+  deleteMediaFile: vi.fn(),
+  transaction: vi.fn(),
 }));
 
 vi.mock("next/cache", () => ({ revalidatePath: mocks.revalidatePath }));
@@ -21,8 +26,11 @@ vi.mock("@/lib/db", () => ({
     forumPost: { update: mocks.postUpdate, findUnique: mocks.postFindUnique },
     forumReply: { update: mocks.replyUpdate, findUnique: mocks.replyFindUnique },
     forumReport: { update: mocks.reportUpdate },
+    forumAttachment: { findMany: mocks.attachmentFindMany, updateMany: mocks.attachmentUpdateMany, deleteMany: mocks.attachmentDeleteMany },
+    $transaction: mocks.transaction,
   },
 }));
+vi.mock("@/lib/forum-media-storage", () => ({ deleteForumMediaStoredFile: mocks.deleteMediaFile }));
 
 import { moderateForumContentAction, resolveForumReportAction } from "@/app/admin/forum/actions";
 import * as forumActions from "@/app/admin/forum/actions";
@@ -43,6 +51,14 @@ describe("forum moderation actions", () => {
     mocks.postUpdate.mockResolvedValue({ id: "post-1" });
     mocks.replyUpdate.mockResolvedValue({ id: "reply-1" });
     mocks.reportUpdate.mockResolvedValue({ id: "report-1" });
+    mocks.attachmentFindMany.mockResolvedValue([]);
+    mocks.attachmentUpdateMany.mockResolvedValue({ count: 1 });
+    mocks.attachmentDeleteMany.mockResolvedValue({ count: 1 });
+    mocks.deleteMediaFile.mockResolvedValue(true);
+    mocks.transaction.mockImplementation((callback: (tx: unknown) => Promise<unknown>) => callback({
+      forumPost: { update: mocks.postUpdate },
+      forumAttachment: { updateMany: mocks.attachmentUpdateMany, deleteMany: mocks.attachmentDeleteMany },
+    }));
   });
 
   it("requires an administrator and records moderation in the audit log", async () => {
@@ -96,5 +112,48 @@ describe("forum moderation actions", () => {
     await expect(updateTopic(form({ id: "post-1", category: "other", title: "x", content: "正文" }))).rejects.toThrow("FORUM_INVALID_POST");
     expect(mocks.postFindUnique).not.toHaveBeenCalled();
     expect(mocks.postUpdate).not.toHaveBeenCalled();
+  });
+
+  it("removes deselected images from an edited topic and retires their stored files", async () => {
+    const updateTopic = (forumActions as Record<string, unknown>).updateForumPostAction as ((data: FormData) => Promise<void>) | undefined;
+    expect(updateTopic).toBeTypeOf("function");
+    if (!updateTopic) return;
+
+    mocks.postFindUnique.mockResolvedValueOnce({
+      id: "post-1", category: "workflow", title: "旧标题", content: "旧正文",
+      attachments: [{ id: "image-1", kind: "image", fileSize: 2048, filePath: "forum-media/image-1.webp", authorId: "author-1", postId: "post-1", replyId: null, discardedAt: null, createdAt: new Date() }],
+    });
+    const data = form({ id: "post-1", category: "workflow", title: "新标题", content: "新正文", manageAttachments: "true" });
+
+    await updateTopic(data);
+
+    expect(mocks.attachmentUpdateMany).toHaveBeenCalledWith(expect.objectContaining({
+      where: expect.objectContaining({ id: { in: ["image-1"] }, postId: "post-1" }),
+      data: expect.objectContaining({ postId: null, discardedAt: expect.any(Date) }),
+    }));
+    expect(mocks.deleteMediaFile).toHaveBeenCalledWith("forum-media/image-1.webp");
+    expect(mocks.attachmentDeleteMany).toHaveBeenCalledWith(expect.objectContaining({ where: expect.objectContaining({ id: "image-1", postId: null }) }));
+  });
+
+  it("attaches newly uploaded images to the edited topic after verifying the admin owns them", async () => {
+    const updateTopic = (forumActions as Record<string, unknown>).updateForumPostAction as ((data: FormData) => Promise<void>) | undefined;
+    expect(updateTopic).toBeTypeOf("function");
+    if (!updateTopic) return;
+
+    mocks.postFindUnique.mockResolvedValueOnce({ id: "post-1", category: "workflow", title: "旧标题", content: "旧正文", attachments: [] });
+    mocks.attachmentFindMany.mockResolvedValueOnce([{
+      id: "new-image", authorId: "admin-1", kind: "image", fileSize: 2048,
+      postId: null, replyId: null, discardedAt: null, createdAt: new Date(),
+    }]);
+    const data = form({ id: "post-1", category: "workflow", title: "新标题", content: "[[media:new-image]]", manageAttachments: "true" });
+    data.append("attachmentIds", "new-image");
+
+    await updateTopic(data);
+
+    expect(mocks.attachmentFindMany).toHaveBeenCalledWith(expect.objectContaining({ where: expect.objectContaining({ id: { in: ["new-image"] } }) }));
+    expect(mocks.attachmentUpdateMany).toHaveBeenCalledWith(expect.objectContaining({
+      where: expect.objectContaining({ id: { in: ["new-image"] }, authorId: "admin-1", postId: null }),
+      data: { postId: "post-1" },
+    }));
   });
 });

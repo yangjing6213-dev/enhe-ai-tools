@@ -6,27 +6,42 @@ import HoldButton from "@/components/hold-button";
 import { insertTextAtSelection } from "@/components/rich-text-editor";
 import { getForumImageMaxBytes, forumVideoMaxBytes } from "@/lib/forum-media-limits";
 
-type MediaItem = { key: string; name: string; kind: "image" | "video"; status: "uploading" | "ready" | "error" | "removing"; progress: number; id?: string; url?: string; error?: string };
+type MediaItem = { key: string; name: string; kind: "image" | "video"; status: "uploading" | "ready" | "error" | "removing"; progress: number; id?: string; url?: string; error?: string; existing?: boolean };
 type UploadResponse = { id?: string; type?: "image" | "video"; url?: string; mimeType?: string; code?: string };
+type InitialForumAttachment = { id: string; kind: string; mimeType: string; originalName: string };
 
-export function ForumMediaEditor({ locale, allowVideo, allowCover = false }: { locale: "zh" | "en"; allowVideo: boolean; allowCover?: boolean }) {
-  const [items, setItems] = useState<MediaItem[]>([]);
+export function removeForumMediaMarkers(content: string, attachmentId: string) {
+  return content.split("[[media:" + attachmentId + "]]").join("").split("[[media=" + attachmentId + "]]").join("");
+}
+
+export function ForumMediaEditor({ locale, allowVideo, allowCover = false, surface = allowVideo ? "post" : "reply", initialAttachments = [], editableExisting = false }: {
+  locale: "zh" | "en";
+  allowVideo: boolean;
+  allowCover?: boolean;
+  surface?: "post" | "reply";
+  initialAttachments?: InitialForumAttachment[];
+  editableExisting?: boolean;
+}) {
+  const [items, setItems] = useState<MediaItem[]>(() => initialAttachments.flatMap((attachment) => {
+    if (attachment.kind !== "image" && attachment.kind !== "video") return [];
+    return [{ key: attachment.id, id: attachment.id, name: attachment.originalName, kind: attachment.kind, status: "ready", progress: 100, url: "/api/forum/media/" + encodeURIComponent(attachment.id), existing: true }];
+  }));
   const [coverMediaId, setCoverMediaId] = useState("");
   const [error, setError] = useState("");
   const container = useRef<HTMLDivElement>(null);
   const imageInput = useRef<HTMLInputElement>(null);
   const videoInput = useRef<HTMLInputElement>(null);
   const requests = useRef(new Map<string, XMLHttpRequest>());
-  const latestItems = useRef<MediaItem[]>([]);
+  const latestItems = useRef<MediaItem[]>(items);
   const blocked = Boolean(error) || items.some((item) => item.status !== "ready");
   const text = locale === "zh" ? {
     image: "添加图片", video: "添加视频", insert: "插入正文", cover: "设为封面", coverSelected: "当前封面", remove: "移除", dismiss: "清除提示", uploading: "正在上传", removing: "正在移除", uploaded: "上传完成", finish: "请等待附件上传完成，或移除失败的附件后再提交。",
-    hint: allowVideo ? "最多 10 张图片，每张 10MB；1 个 MP4/WebM 视频，最多 100MB。话题发布后，媒体会公开展示。" : "最多 4 张图片，每张 8MB。回复发布后，图片会公开展示。",
-    count: allowVideo ? "最多添加 10 张图片和 1 个视频。" : "回复最多添加 4 张图片。", invalid: "请选择 JPG、PNG、WebP、GIF 图片或支持的视频。", size: "文件太大，请压缩后再上传。", login: "登录已过期，请重新登录后上传。", limit: "上传次数较多，请稍后再试。", failed: "上传失败，请移除后重试。", removeFailed: "移除失败，请稍后重试。",
+    hint: surface === "post" ? allowVideo ? "最多 10 张图片，每张 10MB；1 个 MP4/WebM 视频，最多 100MB。话题发布后，媒体会公开展示。" : "最多添加 10 张图片，每张 10MB；已有视频可保留或移除。" : "最多 4 张图片，每张 8MB。回复发布后，图片会公开展示。",
+    count: surface === "post" ? allowVideo ? "最多添加 10 张图片和 1 个视频。" : "话题最多保留 10 张图片。" : "回复最多添加 4 张图片。", invalid: "请选择 JPG、PNG、WebP、GIF 图片或支持的视频。", size: "文件太大，请压缩后再上传。", login: "登录已过期，请重新登录后上传。", limit: "上传次数较多，请稍后再试。", failed: "上传失败，请移除后重试。", removeFailed: "移除失败，请稍后重试。",
   } : {
     image: "Add images", video: "Add video", insert: "Insert in text", cover: "Set as cover", coverSelected: "Current cover", remove: "Remove", dismiss: "Dismiss", uploading: "Uploading", removing: "Removing", uploaded: "Uploaded", finish: "Wait for uploads to finish or remove failed attachments before submitting.",
-    hint: allowVideo ? "Up to 10 images, 10MB each, and 1 MP4/WebM video up to 100MB. Media is public with your post." : "Up to 4 images, 8MB each. Images are public with your reply.",
-    count: allowVideo ? "You can add up to 10 images and 1 video." : "Replies can contain up to 4 images.", invalid: "Choose JPG, PNG, WebP, GIF images or a supported video.", size: "The file is too large. Compress it before uploading.", login: "Your session expired. Sign in again to upload.", limit: "Too many uploads. Try again later.", failed: "Upload failed. Remove the file and try again.", removeFailed: "Could not remove this file. Try again later.",
+    hint: surface === "post" ? allowVideo ? "Up to 10 images, 10MB each, and 1 MP4/WebM video up to 100MB. Media is public with your post." : "Up to 10 images, 10MB each. Existing videos can be kept or removed." : "Up to 4 images, 8MB each. Images are public with your reply.",
+    count: surface === "post" ? allowVideo ? "You can add up to 10 images and 1 video." : "A topic can keep up to 10 images." : "Replies can contain up to 4 images.", invalid: "Choose JPG, PNG, WebP, GIF images or a supported video.", size: "The file is too large. Compress it before uploading.", login: "Your session expired. Sign in again to upload.", limit: "Too many uploads. Try again later.", failed: "Upload failed. Remove the file and try again.", removeFailed: "Could not remove this file. Try again later.",
   };
 
   function updateItems(update: (current: MediaItem[]) => MediaItem[]) {
@@ -78,7 +93,7 @@ export function ForumMediaEditor({ locale, allowVideo, allowCover = false }: { l
       requests.current.delete(item.key);
       updateItems((current) => current.map((entry) => entry.key === item.key ? { ...entry, status: "ready", progress: 100, id: response.id, url: response.url } : entry));
     };
-    const body = new FormData(); body.set("file", file); body.set("surface", allowVideo ? "post" : "reply");
+    const body = new FormData(); body.set("file", file); body.set("surface", surface);
     xhr.send(body);
   }
 
@@ -87,8 +102,9 @@ export function ForumMediaEditor({ locale, allowVideo, allowCover = false }: { l
     setError("");
     const chosen = Array.from(files);
     const sameKind = latestItems.current.filter((item) => item.kind === kind).length;
-    if (sameKind + chosen.length > (kind === "image" ? allowVideo ? 10 : 4 : allowVideo ? 1 : 0)) { setError(text.count); return; }
-    if (chosen.some((file) => file.size <= 0 || file.size > (kind === "image" ? getForumImageMaxBytes(allowVideo ? "post" : "reply") : forumVideoMaxBytes))) { setError(text.size); return; }
+    const maximum = kind === "image" ? surface === "post" ? 10 : 4 : allowVideo && surface === "post" ? 1 : 0;
+    if (sameKind + chosen.length > maximum) { setError(text.count); return; }
+    if (chosen.some((file) => file.size <= 0 || file.size > (kind === "image" ? getForumImageMaxBytes(surface) : forumVideoMaxBytes))) { setError(text.size); return; }
     if (chosen.some((file) => !(kind === "image" ? ["image/jpeg", "image/png", "image/webp", "image/gif"].includes(file.type) : ["video/mp4", "video/webm"].includes(file.type)))) { setError(text.invalid); return; }
     const additions = chosen.map((file): MediaItem => ({ key: crypto.randomUUID(), name: file.name, kind, status: "uploading", progress: 0 }));
     updateItems((current) => [...current, ...additions]);
@@ -98,10 +114,30 @@ export function ForumMediaEditor({ locale, allowVideo, allowCover = false }: { l
   async function remove(item: MediaItem) {
     requests.current.get(item.key)?.abort();
     if (!item.id) { updateItems((current) => current.filter((entry) => entry.key !== item.key)); return; }
+    if (item.existing && editableExisting) {
+      const textarea = container.current?.closest("form")?.querySelector<HTMLTextAreaElement>('textarea[name="content"]');
+      if (textarea) {
+        const content = removeForumMediaMarkers(textarea.value, item.id);
+        if (content !== textarea.value) {
+          textarea.value = content;
+          textarea.dispatchEvent(new Event("input", { bubbles: true }));
+        }
+      }
+      updateItems((current) => current.filter((entry) => entry.key !== item.key));
+      return;
+    }
     updateItems((current) => current.map((entry) => entry.key === item.key ? { ...entry, status: "removing" } : entry));
     try {
       const response = await fetch(`/api/forum/media/${encodeURIComponent(item.id)}`, { method: "DELETE" });
       if (!response.ok) throw new Error("remove failed");
+      const textarea = container.current?.closest("form")?.querySelector<HTMLTextAreaElement>('textarea[name="content"]');
+      if (textarea) {
+        const content = removeForumMediaMarkers(textarea.value, item.id);
+        if (content !== textarea.value) {
+          textarea.value = content;
+          textarea.dispatchEvent(new Event("input", { bubbles: true }));
+        }
+      }
       updateItems((current) => current.filter((entry) => entry.key !== item.key));
       if (item.id && item.id === coverMediaId) setCoverMediaId("");
     } catch (removeError) {
