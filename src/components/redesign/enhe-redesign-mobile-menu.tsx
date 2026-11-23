@@ -16,7 +16,7 @@ import {
   type MobileNavMotionPhase,
   type MobileNavMotionProfile,
 } from "@/lib/motion/mobile-nav-motion";
-import { isExactCurrentPage } from "./navigation";
+import { isCurrentNavigationItem } from "./navigation";
 import type { RedesignAccount, RedesignLocale, RedesignNavItem } from "./types";
 
 const MOBILE_NAV_QUERY = "(width < 900px)";
@@ -65,10 +65,6 @@ export function EnheRedesignMobileMenu({
     : inputModality;
   const motionPhase: MobileNavMotionPhase = open ? "open" : "close";
   const motionContract = resolveMobileNavMotion(motionProfile, motionPhase);
-  const isCurrentPath = (href: string) => {
-    return isExactCurrentPage(pathname, href);
-  };
-
   const stopActiveAnimations = useCallback(() => {
     for (const control of activeAnimationsRef.current) {
       control.cancel();
@@ -466,7 +462,7 @@ export function EnheRedesignMobileMenu({
                         <a
                           key={child.href}
                           href={child.href}
-                          aria-current={isCurrentPath(child.href) ? "page" : undefined}
+                          aria-current={isCurrentNavigationItem(pathname, child) ? "page" : undefined}
                           onClick={(event) => close(getClickModality(event))}
                         >
                           {child.label}
@@ -478,7 +474,7 @@ export function EnheRedesignMobileMenu({
                   <a
                     key={item.href}
                     href={item.href}
-                    aria-current={isCurrentPath(item.href) ? "page" : undefined}
+                    aria-current={isCurrentNavigationItem(pathname, item) ? "page" : undefined}
                     onClick={(event) => close(getClickModality(event))}
                   >
                     <span>{item.label}</span>

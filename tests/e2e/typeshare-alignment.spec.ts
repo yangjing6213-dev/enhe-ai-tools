@@ -39,6 +39,7 @@ for (const route of routes) {
     });
 
     const primaryNewsLinkHref = route.startsWith("/en/") ? "/en/ai-news" : "/ai-news";
+    const isPrimaryNewsRoute = route === primaryNewsLinkHref || route.startsWith(`${primaryNewsLinkHref}/`);
     const response = await page.goto(route, { waitUntil: "load" });
     expect(response?.status(), `${route} response status`).toBe(200);
     for (const width of [320, 390, 480, 768, 899, 900, 1024, 1100, 1280, 1440]) {
@@ -131,7 +132,7 @@ for (const route of routes) {
         await expect(mobileDrawer.locator(".redesign-mobile-account a"), `${route} exposes one account link in the mobile drawer`).toHaveCount(1);
         await expect(mobileDrawer.locator(".redesign-language-switch"), `${route} keeps the language switch outside the mobile drawer`).toHaveCount(0);
         const mobilePrimaryNewsLink = mobileDrawer.locator(`a[href="${primaryNewsLinkHref}"]`);
-        if (route.endsWith("/ai-news")) {
+        if (isPrimaryNewsRoute) {
           await expect(mobilePrimaryNewsLink).toHaveAttribute("aria-current", "page");
         } else {
           await expect(mobilePrimaryNewsLink).not.toHaveAttribute("aria-current");
@@ -146,7 +147,7 @@ for (const route of routes) {
         expect(visibleDesktopAccountEntryCount, `${route} has one visible desktop account entry at ${width}px`).toBe(1);
         await expect(masthead.locator(".redesign-menu-trigger")).toBeHidden();
         const desktopPrimaryNewsLink = masthead.locator(`.redesign-desktop-nav a.redesign-nav-link[href="${primaryNewsLinkHref}"]`);
-        if (route.endsWith("/ai-news")) {
+        if (isPrimaryNewsRoute) {
           await expect(desktopPrimaryNewsLink).toHaveAttribute("aria-current", "page");
         } else {
           await expect(desktopPrimaryNewsLink).not.toHaveAttribute("aria-current");
@@ -186,7 +187,7 @@ for (const route of routes) {
       await expect(page.locator("main.enhe-contentless-page .enhe-contentless-hero h1")).toHaveCount(1);
       await expect(page.locator(".ai-news-workspace-container")).toHaveCount(1);
       const primaryNewsLink = page.locator(`header.redesign-header .redesign-desktop-nav a.redesign-nav-link[href="${primaryNewsLinkHref}"]`);
-      if (route.endsWith("/ai-news")) {
+      if (isPrimaryNewsRoute) {
         await expect(primaryNewsLink).toHaveAttribute("aria-current", "page");
       } else {
         await expect(primaryNewsLink).not.toHaveAttribute("aria-current");
