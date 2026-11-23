@@ -126,7 +126,7 @@ describe("ENHE redesign public shell candidate", () => {
 
     expect(adapter).toContain("currentPathname={pathname}");
     expect(header).toContain("currentPathname");
-    expect(header).toContain('aria-current={isCurrentPath(item.href) ? "page" : undefined}');
+    expect(header).toContain('aria-current={isCurrentNavigationItem(currentPathname, item) ? "page" : undefined}');
     expect(menu).toContain("pathname");
     expect(menu).toContain('aria-current={isCurrentPath(item.href) ? "page" : undefined}');
     expect(menu).toMatch(/<div[\s\S]*?className="redesign-menu-overlay"/);
