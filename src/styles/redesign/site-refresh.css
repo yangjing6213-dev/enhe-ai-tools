@@ -1885,8 +1885,7 @@ body .customer-support-widget .customer-support-launcher,
 
 @media (max-width: 767px) {
   .redesign-footer-mascot {
-    --footer-mascot-size: min(147px, calc(50vw - 48px));
-    left: 22px;
+    display: none;
   }
 }
 

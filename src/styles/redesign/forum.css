@@ -385,6 +385,16 @@
 .forum-admin-card button[data-status="rejected"] { border-color: #b42318; background: #b42318; }
 .forum-admin-card button[data-status="rejected"]:hover { background: #912018; }
 .forum-admin-empty { padding: 20px; border: 1px solid var(--enhe-border, #d8d8d8); border-radius: 14px; }
+.forum-admin-topic-management { display: grid; gap: 14px; margin-bottom: 32px; }
+.forum-admin-topic-management > h2 { margin: 0; font-size: 1.35rem; }
+.forum-admin-topic-row { display: flex; align-items: center; justify-content: space-between; gap: 18px; }
+.forum-admin-topic-row h3 { margin: 8px 0 4px; font-size: 1.05rem; overflow-wrap: anywhere; }
+.forum-admin-topic-row small { color: var(--enhe-text-muted, #5f665f); }
+.forum-admin-edit-form { display: grid; gap: 18px; max-width: 960px; margin: 0 auto; }
+.forum-admin-edit-form label { display: grid; gap: 8px; font-weight: 700; }
+.forum-admin-edit-form .rich-text-editor { font-weight: 400; }
+.forum-admin-edit-actions { display: flex; flex-wrap: wrap; align-items: center; gap: 14px; }
+.forum-admin-edit-actions .forum-primary-button { justify-self: start; }
 
 @media (max-width: 700px) {
   .forum-cover {
@@ -396,6 +406,7 @@
   .forum-heading { align-items: flex-start; flex-direction: column; gap: 18px; }
   .forum-heading .forum-primary-button { width: 100%; }
   .forum-post-card, .forum-form-card, .forum-admin-card { padding: 18px; border-radius: 14px; }
+  .forum-admin-topic-row { align-items: flex-start; flex-direction: column; }
   .forum-topic-card { padding: 0; }
   .forum-post-card.forum-topic-card h2 { margin: 14px 16px 6px; }
   .forum-topic-card .forum-post-header { margin-inline: 16px; }

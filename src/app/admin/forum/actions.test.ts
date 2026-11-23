@@ -25,6 +25,7 @@ vi.mock("@/lib/db", () => ({
 }));
 
 import { moderateForumContentAction, resolveForumReportAction } from "@/app/admin/forum/actions";
+import * as forumActions from "@/app/admin/forum/actions";
 
 function form(entries: Record<string, string>) {
   const data = new FormData();
@@ -37,7 +38,7 @@ describe("forum moderation actions", () => {
     vi.clearAllMocks();
     mocks.requireAdmin.mockResolvedValue({ id: "admin-1", role: "admin" });
     mocks.currentLocale.mockResolvedValue("zh");
-    mocks.postFindUnique.mockResolvedValue({ id: "post-1", status: "pending" });
+    mocks.postFindUnique.mockResolvedValue({ id: "post-1", status: "pending", category: "question", title: "旧标题", content: "旧正文" });
     mocks.replyFindUnique.mockResolvedValue({ id: "reply-1", status: "pending", postId: "post-1" });
     mocks.postUpdate.mockResolvedValue({ id: "post-1" });
     mocks.replyUpdate.mockResolvedValue({ id: "reply-1" });
@@ -62,5 +63,38 @@ describe("forum moderation actions", () => {
     await resolveForumReportAction(form({ id: "report-1" }));
     expect(mocks.reportUpdate).toHaveBeenCalledWith({ where: { id: "report-1" }, data: { status: "resolved", resolvedAt: expect.any(Date) } });
     expect(mocks.audit).toHaveBeenCalledWith(expect.objectContaining({ action: "forum.report.resolved", targetId: "report-1" }));
+  });
+
+  it("allows administrators to edit a topic while preserving its attachment relations", async () => {
+    const updateTopic = (forumActions as Record<string, unknown>).updateForumPostAction as ((data: FormData) => Promise<void>) | undefined;
+    expect(updateTopic).toBeTypeOf("function");
+    if (!updateTopic) return;
+
+    mocks.requireAdmin.mockRejectedValueOnce(new Error("UNAUTHORIZED"));
+    const data = form({ id: "post-1", category: "experience", title: "更新标题", content: "更新正文" });
+    await expect(updateTopic(data)).rejects.toThrow("UNAUTHORIZED");
+    expect(mocks.postUpdate).not.toHaveBeenCalled();
+
+    await updateTopic(data);
+    expect(mocks.postUpdate).toHaveBeenCalledWith({
+      where: { id: "post-1" },
+      data: { category: "experience", title: "更新标题", content: "更新正文" },
+    });
+    expect(mocks.audit).toHaveBeenCalledWith(expect.objectContaining({
+      adminId: "admin-1", action: "forum.post.edited", targetId: "post-1",
+      metadata: { category: "experience", titleChanged: true, contentChanged: true },
+    }));
+    expect(mocks.revalidatePath).toHaveBeenCalledWith("/forum/post-1");
+    expect(mocks.revalidatePath).toHaveBeenCalledWith("/en/forum/post-1");
+  });
+
+  it("rejects invalid topic edits before writing", async () => {
+    const updateTopic = (forumActions as Record<string, unknown>).updateForumPostAction as ((data: FormData) => Promise<void>) | undefined;
+    expect(updateTopic).toBeTypeOf("function");
+    if (!updateTopic) return;
+
+    await expect(updateTopic(form({ id: "post-1", category: "other", title: "x", content: "正文" }))).rejects.toThrow("FORUM_INVALID_POST");
+    expect(mocks.postFindUnique).not.toHaveBeenCalled();
+    expect(mocks.postUpdate).not.toHaveBeenCalled();
   });
 });

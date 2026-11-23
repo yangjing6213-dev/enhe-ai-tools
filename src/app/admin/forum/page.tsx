@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { AdminContentShell, AdminSection } from "@/app/admin/admin-ui";
 import { moderateForumContentAction, resolveForumReportAction } from "@/app/admin/forum/actions";
 import { prisma } from "@/lib/db";
@@ -11,18 +12,36 @@ const mediaSelect = { id: true, kind: true, mimeType: true, originalName: true }
 export default async function AdminForumPage() {
   const locale = await getCurrentLocale();
   const en = locale === "en";
-  const [posts, replies, reports] = await Promise.all([
+  const [posts, replies, reports, topics] = await Promise.all([
     prisma.forumPost.findMany({ where: { status: "pending" }, include: { author: { select: { nickname: true } }, attachments: { select: mediaSelect, orderBy: { createdAt: "asc" } } }, orderBy: { createdAt: "asc" }, take: 50 }),
     prisma.forumReply.findMany({ where: { status: "pending" }, include: { author: { select: { nickname: true } }, post: { select: { id: true, title: true } }, attachments: { select: mediaSelect, orderBy: { createdAt: "asc" } } }, orderBy: { createdAt: "asc" }, take: 50 }),
     prisma.forumReport.findMany({ where: { status: "pending" }, include: { reporter: { select: { nickname: true } }, post: { select: { id: true, title: true } }, reply: { select: { id: true, content: true, postId: true } } }, orderBy: { createdAt: "asc" }, take: 50 }),
+    prisma.forumPost.findMany({ select: { id: true, title: true, category: true, status: true, createdAt: true, author: { select: { nickname: true } } }, orderBy: { createdAt: "desc" }, take: 100 }),
   ]);
   const title = en ? "Community forum review" : "共创AI论坛审核";
   const approve = en ? "Approve" : "通过";
   const reject = en ? "Reject" : "驳回";
   const empty = en ? "No items are waiting for review." : "目前没有待审核内容。";
+  const statusLabel = (status: string) => en
+    ? ({ approved: "Published", pending: "Pending review", rejected: "Rejected" }[status] ?? status)
+    : ({ approved: "已发布", pending: "待审核", rejected: "已驳回" }[status] ?? status);
 
   return <AdminSection title={title} intro={en ? "Review discussions, replies, images and videos before they become public." : "审核帖子、回复及附加的图片和视频，通过后才会公开。"}>
     <AdminContentShell className="enhe-admin-content-management">
+      <section className="forum-admin-topic-management" aria-label={en ? "Topic management" : "话题管理"}>
+        <h2>{en ? "Topic management" : "话题管理"}</h2>
+        <div className="forum-admin-list">
+          {topics.map((topic) => <article className="forum-admin-card forum-admin-topic-row" key={topic.id}>
+            <div>
+              <span className="forum-category-tag">{getForumCategoryLabel(topic.category, locale)}</span>
+              <h3><EmojiText text={topic.title} /></h3>
+              <small>{statusLabel(topic.status)} · {topic.author.nickname || (en ? "Member" : "用户")} · {new Intl.DateTimeFormat(en ? "en" : "zh-CN", { dateStyle: "medium" }).format(topic.createdAt)}</small>
+            </div>
+            <Link className="forum-back-link" href={`/admin/forum/${encodeURIComponent(topic.id)}/edit`}>{en ? "Edit topic" : "编辑话题"}</Link>
+          </article>)}
+          {!topics.length ? <p className="forum-admin-empty">{en ? "No topics are available." : "暂无话题。"}</p> : null}
+        </div>
+      </section>
       <div className="forum-admin-list">
         {[...posts.map((post) => ({ type: "post" as const, id: post.id, author: post.author.nickname || (en ? "Member" : "用户"), title: post.title, body: post.content, attachments: post.attachments, category: getForumCategoryLabel(post.category, locale) })), ...replies.map((reply) => ({ type: "reply" as const, id: reply.id, author: reply.author.nickname || (en ? "Member" : "用户"), title: reply.post.title, body: reply.content, attachments: reply.attachments, category: en ? "Reply" : "回复" }))].map((item) => (
           <article className="forum-admin-card" key={`${item.type}-${item.id}`}>

@@ -5,6 +5,7 @@ import { prisma } from "@/lib/db";
 import { requireAdmin } from "@/lib/auth";
 import { writeAdminAuditLog } from "@/lib/admin-audit";
 import { buildLocalePath } from "@/lib/seo";
+import { forumPostInputSchema } from "@/lib/forum-rules";
 
 function text(formData: FormData, key: string) {
   const value = formData.get(key);
@@ -64,4 +65,39 @@ export async function resolveForumReportAction(formData: FormData) {
     summary: "Resolved a forum report.",
   });
   await refreshForum();
+}
+
+export async function updateForumPostAction(formData: FormData) {
+  const admin = await requireAdmin();
+  const id = text(formData, "id");
+  if (!id) throw new Error("FORUM_INVALID_POST");
+
+  const parsed = forumPostInputSchema.safeParse({
+    category: text(formData, "category"),
+    title: text(formData, "title"),
+    content: text(formData, "content"),
+  });
+  if (!parsed.success) throw new Error("FORUM_INVALID_POST");
+
+  const existing = await prisma.forumPost.findUnique({
+    where: { id },
+    select: { id: true, category: true, title: true, content: true },
+  });
+  if (!existing) throw new Error("FORUM_POST_NOT_FOUND");
+
+  await prisma.forumPost.update({ where: { id }, data: parsed.data });
+  await writeAdminAuditLog({
+    adminId: admin.id,
+    action: "forum.post.edited",
+    targetType: "forum_post",
+    targetId: id,
+    summary: "Edited a forum post.",
+    metadata: {
+      category: parsed.data.category,
+      titleChanged: existing.title !== parsed.data.title,
+      contentChanged: existing.content !== parsed.data.content,
+    },
+  });
+  await refreshForum(id);
+  revalidatePath(`/admin/forum/${encodeURIComponent(id)}/edit`);
 }
