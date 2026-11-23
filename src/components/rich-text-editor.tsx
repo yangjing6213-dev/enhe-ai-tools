@@ -94,11 +94,13 @@ export function RichTextEditor({ name, locale, id, ariaLabel, defaultValue, valu
     onChange?.(textarea.value);
   }
 
-  const buttonClass = "rounded-lg border border-[var(--enhe-border,#d8d8d8)] bg-white px-2.5 py-1.5 text-sm text-[var(--enhe-text,#080808)] hover:bg-slate-50 focus-visible:outline focus-visible:outline-2 focus-visible:outline-blue-600";
+  const buttonBaseClass = "rounded-lg border border-[var(--enhe-border,#d8d8d8)] px-2.5 py-1.5 text-sm focus-visible:outline focus-visible:outline-2 focus-visible:outline-blue-600";
+  const buttonClass = `${buttonBaseClass} bg-white text-[var(--enhe-text,#080808)] hover:bg-slate-50`;
+  const actionButtonClass = `${buttonBaseClass} bg-white text-[var(--enhe-text,#080808)] rich-text-editor__action`;
   return (
     <div className="rich-text-editor grid min-w-0 gap-2">
       <div className="rich-text-editor__toolbar flex flex-wrap items-center gap-2" role="toolbar" aria-label={english ? "Text formatting" : "文字格式工具"}>
-        <button type="button" className={`${buttonClass} rich-text-editor__action`} onClick={() => wrapSelection("**", "**")}>{english ? "Bold" : "加粗"}</button>
+        <button type="button" className={actionButtonClass} onClick={() => wrapSelection("**", "**")}>{english ? "Bold" : "加粗"}</button>
         <label className="flex items-center gap-1 text-sm text-[var(--enhe-text,#080808)]">
           <span className="sr-only">{english ? "Font size" : "字体大小"}</span>
           <select className={buttonClass} defaultValue="" onChange={(event) => { if (event.target.value) wrapSelection(`[[size=${event.target.value}]]`, "[[/size]]"); event.currentTarget.value = ""; }}>
@@ -106,7 +108,7 @@ export function RichTextEditor({ name, locale, id, ariaLabel, defaultValue, valu
             {[14, 16, 18, 24, 32].map((size) => <option key={size} value={size}>{size}px</option>)}
           </select>
         </label>
-        <button type="button" className={`${buttonClass} rich-text-editor__action`} onClick={addLink}>{english ? "Link" : "超链接"}</button>
+        <button type="button" className={actionButtonClass} onClick={addLink}>{english ? "Link" : "超链接"}</button>
         <label className="flex items-center gap-1 text-sm text-[var(--enhe-text,#080808)]">
           <span className="sr-only">{english ? "Text background" : "文字背景"}</span>
           <select className={buttonClass} defaultValue="" onChange={(event) => { if (event.target.value) wrapSelection(`[[bg=${event.target.value}]]`, "[[/bg]]"); event.currentTarget.value = ""; }}>
@@ -116,8 +118,8 @@ export function RichTextEditor({ name, locale, id, ariaLabel, defaultValue, valu
             <option value="#fce7f3">{english ? "Pink" : "粉色"}</option>
           </select>
         </label>
-        <button type="button" className={`${buttonClass} rich-text-editor__action`} onClick={() => wrapSelection("`", "`")}>{english ? "Inline code" : "行内代码"}</button>
-        <button type="button" className={`${buttonClass} rich-text-editor__action`} onClick={() => wrapSelection("```\n", "\n```")}>{english ? "Code block" : "代码块"}</button>
+        <button type="button" className={actionButtonClass} onClick={() => wrapSelection("`", "`")}>{english ? "Inline code" : "行内代码"}</button>
+        <button type="button" className={actionButtonClass} onClick={() => wrapSelection("```\n", "\n```")}>{english ? "Code block" : "代码块"}</button>
         {newsMedia && <label className={`${buttonClass} cursor-pointer focus-within:outline`}>
           {uploading ? (english ? "Uploading…" : "上传中…") : (english ? "Insert image or video" : "插入图片或视频")}
           <input type="file" className="sr-only" accept="image/jpeg,image/png,image/webp,image/gif,video/mp4,video/webm,video/quicktime" disabled={uploading}
