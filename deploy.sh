@@ -296,4 +296,8 @@ printf 'APP_IMAGE_TAG=%s\nRELEASE_REF=%s\nROLLBACK_TOPOLOGY=full\nRELEASE_IDENTI
   "$RELEASE_REF" "$RELEASE_REF" > "$active_state_tmp"
 mv "$active_state_tmp" "$RUNTIME_DIR/active-release.env"
 DEPLOYMENT_COMPLETE=1
+if ! sh "$APP_DIR/deploy/enhe-ai-tools/scripts/enhe-install-cron.sh"; then
+  echo "Application release $RELEASE_REF is healthy, but installing the root maintenance schedule failed." >&2
+  exit 1
+fi
 echo "Deployment completed for release $RELEASE_REF."

@@ -165,6 +165,7 @@ chmod +x /opt/enhe-ai-tools/deploy/enhe-ai-tools/scripts/*.sh
 - 恢复操作前的独立副本写入 `/opt/enhe-ai-tools/backups/pre-restore`，现有恢复脚本显式使用 `RETENTION_DAYS=90`。运行备份脚本会按生效天数清理对应目录中过期的 `.dump` 及校验文件；缩短保留周期或清理历史副本前，须先确认具体范围。本次文档同步不改变任务、保留参数或已有文件。
 - 每 5 分钟检查 `http://127.0.0.1:3001/api/health`，异常时通过 SMTP 发邮件。
 - 健康告警 30 分钟内只发送一次，恢复后自动清除告警状态。
+- 每天 03:45 按账号角色清理站内消息：普通成员保留 3 个月，管理员保留 1 年。成功部署时会由 root 自动安装该任务；通知的 `createdAt` 作为保留期限依据。
 
 也可以手动执行：
 

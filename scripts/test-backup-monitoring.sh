@@ -69,7 +69,9 @@ chmod +x "$TMP/bin/id" "$TMP/bin/crontab"
 sh "$ROOT/deploy/enhe-ai-tools/scripts/enhe-install-cron.sh" >/dev/null
 grep -q unrelated-root "$CRON_FIXTURE/root" || fail 'root unrelated job lost'
 grep -q unrelated-user "$CRON_FIXTURE/ubuntu" || fail 'user unrelated job lost'
-[ "$(grep -c 'enhe-ai-tools launch operations' "$CRON_FIXTURE/root")" -eq 3 ] || fail 'expected three root jobs'
+[ "$(grep -c 'enhe-ai-tools launch operations' "$CRON_FIXTURE/root")" -eq 4 ] || fail 'expected four root jobs'
+grep -q 'notification-retention' "$CRON_FIXTURE/root" || fail 'notification retention schedule missing'
 if grep -q 'enhe-ai-tools launch operations' "$CRON_FIXTURE/ubuntu"; then fail 'old user jobs retained'; fi
 [ "$(head -1 "$CRON_FIXTURE/writes")" = root ] || fail 'old schedule removed before replacement installed'
-echo '[backup-monitor-test] freshness, corruption, alert retry/recovery, and cron identity tests passed'
+grep -q 'sh "$APP_DIR/deploy/enhe-ai-tools/scripts/enhe-install-cron.sh"' "$ROOT/deploy.sh" || fail 'deployment does not install the root maintenance schedule'
+echo '[backup-monitor-test] freshness, corruption, alert retry/recovery, cron identity, and notification retention tests passed'

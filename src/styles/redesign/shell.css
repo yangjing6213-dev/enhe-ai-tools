@@ -486,6 +486,29 @@
   color: var(--enhe-text);
 }
 
+.redesign-nav-label {
+  position: relative;
+  display: inline-block;
+}
+
+.redesign-nav-label::after {
+  position: absolute;
+  inset-inline: 0;
+  inset-block-end: -5px;
+  width: 100%;
+  height: 2px;
+  border-radius: 999px;
+  background: var(--enhe-action);
+  content: "";
+  transform: scaleX(0);
+  transform-origin: left center;
+  transition: transform 160ms ease;
+}
+
+.redesign-nav-link[aria-current="page"] .redesign-nav-label::after {
+  transform: scaleX(1);
+}
+
 .redesign-language-switch {
   display: inline-flex;
   align-items: center;

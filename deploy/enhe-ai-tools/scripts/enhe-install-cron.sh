@@ -11,6 +11,7 @@ CRON_MARKER="enhe-ai-tools launch operations"
 BACKUP_LOG="$APP_DIR/backups/backup.log"
 HEALTH_LOG="$APP_DIR/backups/health-watch.log"
 ORDER_EXPIRY_LOG="$APP_DIR/backups/order-expiry.log"
+NOTIFICATION_RETENTION_LOG="$APP_DIR/backups/notification-retention.log"
 
 mkdir -p "$APP_DIR/backups"
 
@@ -23,6 +24,7 @@ crontab -l 2>/dev/null | grep -v "$CRON_MARKER" > "$tmp_file" || true
   echo "15 3 * * * cd $APP_DIR && /bin/sh $APP_DIR/deploy/enhe-ai-tools/scripts/enhe-backup-db.sh >> $BACKUP_LOG 2>&1 # $CRON_MARKER backup"
   echo "*/5 * * * * cd $APP_DIR && /bin/sh $APP_DIR/deploy/enhe-ai-tools/scripts/enhe-health-watch.sh >> $HEALTH_LOG 2>&1 # $CRON_MARKER health"
   echo "* * * * * /usr/bin/flock -n $APP_DIR/backups/order-expiry.lock /usr/bin/docker exec -w /app enhe-ai-tools-app node --import tsx scripts/expire-unpaid-orders.ts >> $ORDER_EXPIRY_LOG 2>&1 # $CRON_MARKER order-expiry"
+  echo "45 3 * * * /usr/bin/flock -n $APP_DIR/backups/notification-retention.lock /usr/bin/docker exec -w /app enhe-ai-tools-app node --import tsx scripts/expire-notifications.ts >> $NOTIFICATION_RETENTION_LOG 2>&1 # $CRON_MARKER notification-retention"
 } | crontab -
 
 # Install the replacement first, then remove only this application's old jobs.
@@ -32,4 +34,4 @@ if id ubuntu >/dev/null 2>&1; then
   crontab -u ubuntu "$tmp_file"
 fi
 
-echo "[enhe-install-cron] root jobs installed: daily backup, 5-minute site/backup health watch and 1-minute unpaid-order expiry"
+echo "[enhe-install-cron] root jobs installed: daily backup, 5-minute site/backup health watch, 1-minute unpaid-order expiry and daily notification retention"

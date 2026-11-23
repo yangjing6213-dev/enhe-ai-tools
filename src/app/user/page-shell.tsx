@@ -26,6 +26,7 @@ import { resolveUserAvatarSrc } from "@/lib/user-avatar";
 import { UserAvatar } from "@/components/user-avatar";
 import { EmojiText } from "@/components/emoji-text";
 import { CreatorMessageReplyForm } from "@/components/creator-message-reply-form";
+import { SiteBackgroundMusicCard } from "@/components/site-background-music";
 
 export type UserCenterSearchParams = Promise<Record<string, string | undefined>>;
 
@@ -55,7 +56,11 @@ export async function UserCenterPageShell({
     prisma.notification.findMany({
       where: { userId: user.id },
       orderBy: { createdAt: "desc" },
-      take: 8
+      take: 3
+    }),
+    prisma.notification.findMany({
+      where: { userId: user.id, readAt: null },
+      orderBy: { createdAt: "desc" }
     }),
     prisma.order.findMany({
       where: { userId: user.id },
@@ -98,7 +103,9 @@ export async function UserCenterPageShell({
     prisma.notification.count({ where: { userId: user.id, readAt: null } })
     ])
   ]);
-  const [notifications, orders, downloads, usages, comments, purchases, publishedTools, recovery, unreadNotificationCount] = userData;
+  const [latestNotifications, unreadNotifications, orders, downloads, usages, comments, purchases, publishedTools, recovery, unreadNotificationCount] = userData;
+  const notificationsById = new Map([...latestNotifications, ...unreadNotifications].map((notification) => [notification.id, notification]));
+  const notifications = Array.from(notificationsById.values()).sort((left, right) => right.createdAt.getTime() - left.createdAt.getTime());
 
   const entitlementSummary = buildUserToolEntitlements({
     purchasedToolIds: purchases.map((purchase) => purchase.toolId),
@@ -155,7 +162,7 @@ export async function UserCenterPageShell({
           </Panel>
 
           <Panel id="notifications" title={t.notifications.title.replace("{count}", String(unreadNotificationCount))}>
-            <p className="mb-3 text-xs text-[var(--marketing-muted)]">{locale === "en" ? "Showing your 8 most recent notifications." : "展示最近 8 条通知。"}</p>
+            <p className="mb-3 text-xs text-[var(--marketing-muted)]">{locale === "en" ? "Showing the 3 newest messages and all unread messages." : "显示最新 3 条消息和全部未读消息。"}</p>
             {notifications.length ? (
               <div className="space-y-3">
                 <form action={markAllNotificationsReadAction}>
@@ -212,6 +219,9 @@ export async function UserCenterPageShell({
             ) : (
               <EmptyText>{t.notifications.empty}</EmptyText>
             )}
+            <Link href={buildLocalePath("/user/messages", locale)} className="user-center-action user-center-action--primary user-center-action--compact mt-4">
+              {locale === "en" ? "Message history" : "历史消息"}
+            </Link>
           </Panel>
 
           <Panel title={locale === "en" ? "Email notification settings" : "邮件通知设置"}>
@@ -304,19 +314,23 @@ export async function UserCenterPageShell({
             <div className="space-y-3">
               {orders.length ? (
                 orders.map((order) => (
-                  <div key={order.id} className="user-center-record rounded-xl border p-4">
-                    <div className="flex flex-wrap justify-between gap-3">
-                      <span className="break-all">{order.orderNo}</span>
-                      <span className="font-semibold text-[var(--enhe-action)]">{formatCurrency(order.amount.toString())}</span>
-                    </div>
-                    <p className="mt-2 text-sm text-[var(--marketing-muted)]">
-                      {order.plan ? formatLegacyPlanName(locale) : order.tool?.name ?? t.userCenter.orderItem}
-                    </p>
-                    <div className="mt-2 flex flex-wrap items-center gap-2 text-sm">
-                      <span className="user-center-badge rounded-full border px-2 py-1">{formatStatus(order.orderStatus, locale)}</span>
-                      {order.paymentProof ? <span className="text-[var(--marketing-muted)]">{t.userCenter.proof} {formatStatus(order.paymentProof.reviewStatus, locale)}</span> : null}
-                      <time dateTime={order.createdAt.toISOString()} className="text-xs text-[var(--marketing-muted)]">{formatDateTime(order.createdAt, locale)}</time>
-                    </div>
+                  <details key={order.id} className="user-center-record user-center-order rounded-xl border p-4">
+                    <summary className="user-center-order-summary cursor-pointer list-none">
+                      <div className="flex flex-wrap justify-between gap-3">
+                        <span className="break-all">{order.orderNo}</span>
+                        <span className="font-semibold text-[var(--enhe-action)]">{formatCurrency(order.amount.toString())}</span>
+                      </div>
+                      <p className="mt-2 text-sm text-[var(--marketing-muted)]">
+                        {order.plan ? formatLegacyPlanName(locale) : order.tool?.name ?? t.userCenter.orderItem}
+                      </p>
+                      <div className="mt-2 flex flex-wrap items-center gap-2 text-sm">
+                        <span className="user-center-badge rounded-full border px-2 py-1">{formatStatus(order.orderStatus, locale)}</span>
+                        <time dateTime={order.createdAt.toISOString()} className="text-xs text-[var(--marketing-muted)]">{formatDateTime(order.createdAt, locale)}</time>
+                        <span className="ml-auto text-xs font-semibold text-[var(--marketing-accent)]">{locale === "en" ? "View order" : "展开订单"}</span>
+                      </div>
+                    </summary>
+                    <div className="user-center-order-details">
+                    {order.paymentProof ? <p className="mt-2 text-sm text-[var(--marketing-muted)]">{t.userCenter.proof} {formatStatus(order.paymentProof.reviewStatus, locale)}</p> : null}
                     {order.orderStatus === "pending_review" || order.paymentProof?.reviewStatus === "pending" ? (
                       <p className="mt-2 text-xs leading-5 text-[var(--marketing-muted)]">{getReviewNotice(locale)}</p>
                     ) : null}
@@ -342,12 +356,17 @@ export async function UserCenterPageShell({
                         </form>
                       ) : null}
                     </div>
-                  </div>
+                    </div>
+                  </details>
                 ))
               ) : (
                 <><EmptyText>{t.userCenter.noOrders}</EmptyText><BrowseProducts locale={locale} /></>
               )}
             </div>
+          </Panel>
+
+          <Panel title={locale === "en" ? "Background music" : "背景音乐"}>
+            <SiteBackgroundMusicCard locale={locale} />
           </Panel>
 
           <section id="purchased-products" className="user-center-purchases space-y-6" aria-label={locale === "en" ? "Purchased products" : "已购产品"}>

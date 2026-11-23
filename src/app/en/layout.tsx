@@ -7,6 +7,7 @@ import "@/styles/redesign/site-refresh.css";
 import "@/styles/redesign/forum.css";
 import { headers } from "next/headers";
 import { RootDocument, sharedRootMetadata } from "@/app/root-layout-shared";
+import { SiteBackgroundMusicProvider } from "@/components/site-background-music";
 
 export const metadata = sharedRootMetadata;
 
@@ -25,7 +26,7 @@ export default async function EnglishLayout({ children }: { children: React.Reac
 
   return (
     <RootDocument lang="en-US" disableLegacyVisualEffects={isEnglishPublicPath(pathname)}>
-      {children}
+      <SiteBackgroundMusicProvider>{children}</SiteBackgroundMusicProvider>
     </RootDocument>
   );
 }

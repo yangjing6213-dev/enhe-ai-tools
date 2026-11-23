@@ -1219,10 +1219,14 @@ body .redesign-footer nav {
   gap: 10px;
 }
 
-.redesign-footer .footer-social-links a {
+.redesign-footer .footer-social-links :is(a, .footer-social-bookmark) {
   display: inline-flex;
+  flex: 0 0 40px;
   width: 40px;
   height: 40px;
+  min-width: 40px;
+  aspect-ratio: 1;
+  box-sizing: border-box;
   align-items: center;
   justify-content: center;
   border: 1px solid rgb(255 255 255 / 45%);
@@ -1231,7 +1235,8 @@ body .redesign-footer nav {
   transition: background-color var(--enhe-motion-fast), color 0s;
 }
 
-.redesign-footer .footer-social-links a:hover {
+.redesign-footer .footer-social-links :is(a, .footer-social-bookmark):hover,
+.redesign-footer .footer-social-links .footer-social-bookmark:focus-visible {
   background: #fff;
   color: #000 !important;
 }
@@ -1242,23 +1247,8 @@ body .redesign-footer nav {
 }
 
 .redesign-footer .footer-social-links .footer-social-bookmark {
-  display: inline-flex;
-  width: 40px;
-  height: 40px;
-  align-items: center;
-  justify-content: center;
-  border: 1px solid rgb(255 255 255 / 45%);
-  border-radius: 8px;
   background: transparent;
-  color: #fff;
   cursor: pointer;
-  transition: background-color var(--enhe-motion-fast), color 0s;
-}
-
-.redesign-footer .footer-social-links .footer-social-bookmark:hover,
-.redesign-footer .footer-social-links .footer-social-bookmark:focus-visible {
-  background: #fff;
-  color: #000 !important;
 }
 
 .redesign-footer .footer-social-links .favorite-site-feedback {

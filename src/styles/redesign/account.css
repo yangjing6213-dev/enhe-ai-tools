@@ -113,6 +113,37 @@
   padding: 0.35rem 0.75rem;
 }
 
+.site-background-music-card {
+  display: grid;
+  gap: 16px;
+}
+
+.site-background-music-track {
+  display: grid;
+  max-width: 32rem;
+  gap: 8px;
+  color: var(--marketing-text);
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.site-background-music-track select {
+  min-height: 44px;
+  width: 100%;
+  border: 1px solid var(--marketing-border);
+  border-radius: 12px;
+  background: var(--marketing-card);
+  padding: 0 14px;
+  color: var(--marketing-text);
+}
+
+.site-background-music-playback {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px;
+}
+
 .enhe-redesign-production .user-center-page button:not(:disabled) {
   border-color: var(--enhe-action);
   background-color: var(--enhe-action);

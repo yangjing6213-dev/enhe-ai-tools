@@ -17,7 +17,7 @@ import {
   NavigationMenuList,
   NavigationMenuTrigger,
 } from "@/components/ui/navigation-menu";
-import { isExactCurrentPage } from "./navigation";
+import { isCurrentNavigationItem, isExactCurrentPage } from "./navigation";
 import type { RedesignAccount, RedesignLanguageHrefs, RedesignLocale, RedesignNavItem } from "./types";
 
 export function EnheRedesignHeader({
@@ -49,10 +49,6 @@ export function EnheRedesignHeader({
   menuTriggerLabel: string;
   menuCloseLabel: string;
 }) {
-  const isCurrentPath = (href: string) => {
-    return isExactCurrentPage(currentPathname, href);
-  };
-
   return (
     <header
       className="redesign-header"
@@ -81,14 +77,14 @@ export function EnheRedesignHeader({
                 <NavigationMenuItem key={item.href}>
                   <NavigationMenuTrigger
                     className="redesign-nav-link"
-                    aria-current={isCurrentPath(item.href) ? "page" : undefined}
+                    aria-current={isCurrentNavigationItem(currentPathname, item) ? "page" : undefined}
                   >
-                    {item.label}
+                    <span className="redesign-nav-label">{item.label}</span>
                   </NavigationMenuTrigger>
                   <NavigationMenuContent className="redesign-nav-menu-content">
                     {item.children.map((child) => (
                       <NavigationMenuLink key={child.href} asChild>
-                        <PrefetchLink className="redesign-nav-dropdown-item" href={child.href} prefetch={false} aria-current={isCurrentPath(child.href) ? "page" : undefined}>
+                        <PrefetchLink className="redesign-nav-dropdown-item" href={child.href} prefetch={false} aria-current={isCurrentNavigationItem(currentPathname, child) ? "page" : undefined}>
                           {child.label}
                         </PrefetchLink>
                       </NavigationMenuLink>
@@ -109,9 +105,9 @@ export function EnheRedesignHeader({
                       className="redesign-nav-link"
                       href={item.href}
                       prefetch={false}
-                      aria-current={isCurrentPath(item.href) ? "page" : undefined}
+                      aria-current={isCurrentNavigationItem(currentPathname, item) ? "page" : undefined}
                     >
-                      <span>{item.label}</span>
+                      <span className="redesign-nav-label">{item.label}</span>
                     </PrefetchLink>
                   </NavigationMenuLink>
                   {item.href === (locale === "en" ? "/en/ai-trends" : "/ai-trends") ? (

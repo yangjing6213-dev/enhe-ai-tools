@@ -4,6 +4,14 @@ export function isExactCurrentPage(pathname: string | undefined, href: string) {
   return pathname === href;
 }
 
+export function isCurrentNavigationItem(pathname: string | undefined, item: RedesignNavItem) {
+  if (!pathname) return false;
+  const matchesPath = (href: string) =>
+    pathname === href || (href !== "/" && href !== "/en" && pathname.startsWith(`${href}/`));
+
+  return matchesPath(item.href) || Boolean(item.children?.some((child) => matchesPath(child.href)));
+}
+
 export const REDESIGN_NAV_ITEMS = {
   zh: [
     { label: "首页", href: "/" },

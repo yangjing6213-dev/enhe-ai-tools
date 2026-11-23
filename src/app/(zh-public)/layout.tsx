@@ -7,13 +7,14 @@ import "@/styles/redesign/site-refresh.css";
 import "@/styles/redesign/forum.css";
 import "@/styles/redesign/chat.css";
 import { RootDocument, sharedRootMetadata } from "@/app/root-layout-shared";
+import { SiteBackgroundMusicProvider } from "@/components/site-background-music";
 
 export const metadata = sharedRootMetadata;
 
 export default function ZhPublicRootLayout({ children }: { children: React.ReactNode }) {
   return (
     <RootDocument lang="zh-CN" disableLegacyVisualEffects>
-      {children}
+      <SiteBackgroundMusicProvider>{children}</SiteBackgroundMusicProvider>
     </RootDocument>
   );
 }

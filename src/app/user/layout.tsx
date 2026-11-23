@@ -7,6 +7,7 @@ import type { Metadata } from "next";
 import { RootDocument, sharedRootMetadata } from "@/app/root-layout-shared";
 import { PublicSiteChrome } from "@/components/public-site-chrome";
 import { getCurrentLocale } from "@/lib/i18n";
+import { SiteBackgroundMusicProvider } from "@/components/site-background-music";
 
 export const metadata: Metadata = {
   ...sharedRootMetadata,
@@ -22,7 +23,9 @@ export default async function UserLayout({ children }: { children: React.ReactNo
 
   return (
     <RootDocument lang={locale === "en" ? "en-US" : "zh-CN"} disableLegacyVisualEffects>
-      <PublicSiteChrome forceLocale={locale} showFooterMascot={false}>{children}</PublicSiteChrome>
+      <SiteBackgroundMusicProvider>
+        <PublicSiteChrome forceLocale={locale} showFooterMascot={false}>{children}</PublicSiteChrome>
+      </SiteBackgroundMusicProvider>
     </RootDocument>
   );
 }

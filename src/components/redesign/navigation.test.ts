@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { REDESIGN_NAV_ITEMS, isExactCurrentPage } from "./navigation";
+import { REDESIGN_NAV_ITEMS, isCurrentNavigationItem, isExactCurrentPage } from "./navigation";
 import { readFileSync } from "node:fs";
 import { join } from "node:path";
 
@@ -13,6 +13,7 @@ const mobileMenuSource = readFileSync(
 );
 const globalStyles = readFileSync(join(process.cwd(), "src/app/globals.css"), "utf8");
 const navigationMenuSource = readFileSync(join(process.cwd(), "src/components/ui/navigation-menu.tsx"), "utf8");
+const shellStyles = readFileSync(join(process.cwd(), "src/styles/redesign/shell.css"), "utf8");
 
 describe("public navigation current-page state", () => {
   it("marks only the exact destination as the current page", () => {
@@ -20,6 +21,21 @@ describe("public navigation current-page state", () => {
     expect(isExactCurrentPage("/ai-news/topics", "/ai-news")).toBe(false);
     expect(isExactCurrentPage("/ai-news/topics/ai-agent", "/ai-news")).toBe(false);
     expect(isExactCurrentPage("/en/ai-news/topics", "/en/ai-news")).toBe(false);
+  });
+
+  it("keeps a top-level navigation item active on its nested pages", () => {
+    const forum = REDESIGN_NAV_ITEMS.zh.find((item) => item.href === "/forum");
+    const resources = REDESIGN_NAV_ITEMS.zh.find((item) => item.href === "/ai-skills");
+    expect(isCurrentNavigationItem("/forum/topic/example", forum!)).toBe(true);
+    expect(isCurrentNavigationItem("/ai-workflows/example", resources!)).toBe(true);
+    expect(isCurrentNavigationItem("/about/team", REDESIGN_NAV_ITEMS.zh.at(-1)!)).toBe(true);
+    expect(isCurrentNavigationItem("/software", forum!)).toBe(false);
+  });
+
+  it("draws an active blue underline only as wide as the navigation label", () => {
+    expect(headerSource).toContain('className="redesign-nav-label"');
+    expect(shellStyles).toMatch(/\.redesign-nav-label::after\s*\{[\s\S]*?width:\s*100%/);
+    expect(shellStyles).toMatch(/\.redesign-nav-link\[aria-current="page"\]\s+\.redesign-nav-label::after/);
   });
 
   it("puts Home first and removes the old Search link in both locale menus", () => {

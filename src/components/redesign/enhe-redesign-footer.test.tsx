@@ -1,9 +1,13 @@
 import React from "react";
 import { renderToStaticMarkup } from "react-dom/server";
+import { readFileSync } from "node:fs";
+import { join } from "node:path";
 import { describe, expect, it } from "vitest";
 import { EnheRedesignFooter } from "./enhe-redesign-footer";
 
 Object.assign(globalThis, { React });
+
+const footerStyles = readFileSync(join(process.cwd(), "src/styles/redesign/site-refresh.css"), "utf8");
 
 describe("footer decoration around account forms", () => {
   it.each(["zh", "en"] as const)("omits only the mascot when %s forms need clear controls", (locale) => {
@@ -25,6 +29,14 @@ describe("footer decoration around account forms", () => {
     const html = renderToStaticMarkup(<EnheRedesignFooter locale={locale} />);
     expect(html).toContain("footer-social-bookmark");
     expect(html).toContain(locale === "en" ? "Bookmark this site" : "收藏本站");
+  });
+
+  it("gives the bookmark button the same square rounded shape and size as the three social icons", () => {
+    const sharedControlRule = footerStyles.match(/\.redesign-footer \.footer-social-links :is\(a, \.footer-social-bookmark\)\s*\{([^}]+)\}/)?.[1] ?? "";
+    expect(sharedControlRule).toMatch(/width:\s*40px/);
+    expect(sharedControlRule).toMatch(/height:\s*40px/);
+    expect(sharedControlRule).toMatch(/border-radius:\s*8px/);
+    expect(sharedControlRule).toMatch(/aspect-ratio:\s*1/);
   });
 
   it.each(["zh", "en"] as const)("uses destination-accurate help, tutorial, catalog, and news labels in %s", (locale) => {

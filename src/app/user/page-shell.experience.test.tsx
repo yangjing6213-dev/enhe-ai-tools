@@ -4,7 +4,7 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 import { UserCenterPageShell } from "./page-shell";
 
 const mocks = vi.hoisted(() => ({
-  orders: vi.fn(), tools: vi.fn(), recovery: vi.fn(), unread: vi.fn()
+  orders: vi.fn(), tools: vi.fn(), recovery: vi.fn(), unread: vi.fn(), notifications: vi.fn()
 }));
 vi.mock("@/app/actions", () => ({
   cancelOrderAction: vi.fn(), changePasswordAction: vi.fn(), logoutAction: vi.fn(),
@@ -16,7 +16,7 @@ vi.mock("@/lib/auth", () => ({ requireUser: async () => ({
   phone: null, acceptEmailUpdates: false, googleSubject: null
 }) }));
 vi.mock("@/lib/db", () => ({ prisma: {
-  notification: { findMany: async () => [], count: mocks.unread },
+  notification: { findMany: mocks.notifications, count: mocks.unread },
   order: { findMany: mocks.orders }, downloadLog: { findMany: async () => [] },
   toolUsageLog: { findMany: async () => [] }, comment: { findMany: async () => [] },
   toolPurchase: { findMany: async () => [{ toolId: "skill-1" }] }, tool: { findMany: mocks.tools },
@@ -24,6 +24,7 @@ vi.mock("@/lib/db", () => ({ prisma: {
 } }));
 vi.mock("@/lib/user-avatar", () => ({ resolveUserAvatarSrc: async () => null }));
 vi.mock("@/components/user-avatar", () => ({ UserAvatar: () => <span>Avatar</span> }));
+vi.mock("@/components/site-background-music", () => ({ SiteBackgroundMusicCard: () => <div>Background music control</div> }));
 vi.mock("@/components/emoji-text", () => ({ EmojiText: ({ text }: { text: string }) => <>{text}</> }));
 vi.mock("@/components/form-submit-button", () => ({
   FormSubmitButton: ({ children, className, disabled }: React.PropsWithChildren<{ className?: string; disabled?: boolean }>) =>
@@ -36,6 +37,7 @@ const skill = { id: "skill-1", name: "Owned AI Skill", slug: "owned-skill", type
 beforeEach(() => {
   vi.clearAllMocks();
   mocks.orders.mockResolvedValue([]);
+  mocks.notifications.mockResolvedValue([]);
   mocks.tools.mockImplementation(async ({ where }) => where.OR.some((entry: { type: string }) => entry.type === "ai_skill") ? [skill] : []);
   mocks.recovery.mockResolvedValue({ recoveryEmail: "recovery@example.test", recoveryVerifiedAt: new Date("2026-10-01") });
   mocks.unread.mockResolvedValue(12);
@@ -72,6 +74,39 @@ describe("account center product access and navigation", () => {
     expect(html).toContain("凭证");
     expect(html).toContain("审核");
     expect(html).not.toContain('href="/orders/manual-1/pay"');
+  });
+
+  it("collapses each order and keeps its action links inside the expanded details", async () => {
+    mocks.orders.mockResolvedValue([{ id: "paid-1", orderNo: "PAID-1", amount: 5, orderStatus: "activated", plan: null, tool: skill, paymentProof: null, createdAt: new Date("2026-10-01") }]);
+    const html = await render("zh");
+    const orderCard = html.slice(html.indexOf("<details"), html.indexOf("</details>") + "</details>".length);
+    expect(orderCard).toContain("PAID-1");
+    expect(orderCard).toContain("<summary");
+    expect(orderCard).toContain('href="/orders/paid-1"');
+    expect(orderCard).not.toMatch(/<details[^>]*open/);
+  });
+
+  it("shows the newest three notifications and any older unread notifications", async () => {
+    const latest = [1, 2, 3].map((index) => ({
+      id: `latest-${index}`, userId: "user-1", senderId: null, type: "general",
+      title: `latest-read-${index}`, content: "read", linkUrl: null,
+      readAt: new Date("2026-11-20"), createdAt: new Date(`2026-11-${20 - index}`)
+    }));
+    const olderUnread = {
+      id: "unread-old", userId: "user-1", senderId: null, type: "general",
+      title: "older-unread-message", content: "unread", linkUrl: null,
+      readAt: null, createdAt: new Date("2026-10-01")
+    };
+    mocks.notifications.mockImplementation(async ({ where, take }: { where: { readAt?: Date | null }; take?: number }) =>
+      where.readAt === null ? [olderUnread] : latest.slice(0, take ?? latest.length)
+    );
+    const html = await render("zh");
+    expect(html).toContain("latest-read-1");
+    expect(html).toContain("latest-read-2");
+    expect(html).toContain("latest-read-3");
+    expect(html).toContain("older-unread-message");
+    expect(html).not.toContain("older-read-hidden");
+    expect(html).toContain("历史消息");
   });
 
   it("shows the verified recovery state without exposing the recovery address", async () => {
