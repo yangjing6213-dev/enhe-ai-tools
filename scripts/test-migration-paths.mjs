@@ -67,6 +67,24 @@ function sleep(milliseconds) {
   Atomics.wait(new Int32Array(new SharedArrayBuffer(4)), 0, 0, milliseconds);
 }
 
+function createDatabaseWhenReady(container, database) {
+  for (let attempt = 0; attempt < 45; attempt += 1) {
+    const result = spawnSync("docker", ["exec", container, "createdb", "-U", "codex", database], {
+      encoding: "utf8",
+    });
+    if (result.error) throw result.error;
+    if (result.status === 0) return;
+
+    const detail = (result.stderr || result.stdout || "").trim();
+    if (!/No such file or directory|Connection refused|database system is starting up/i.test(detail)) {
+      throw new Error(`Could not create migration drill database ${database}: ${detail}`);
+    }
+    sleep(1000);
+  }
+
+  throw new Error(`Migration drill PostgreSQL container stayed unavailable while creating ${database}.`);
+}
+
 function databaseUrl(port, database) {
   return `postgresql://codex:${postgresPassword}@127.0.0.1:${port}/${database}?schema=public`;
 }
@@ -148,7 +166,7 @@ try {
   const port = portMatch[1];
 
   for (const database of ["migration_fresh", "migration_upgrade"]) {
-    run("docker", ["exec", containerName, "createdb", "-U", "codex", database]);
+    createDatabaseWhenReady(containerName, database);
   }
 
   const currentSchema = join(repoRoot, "prisma", "schema.prisma");
