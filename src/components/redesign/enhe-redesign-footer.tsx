@@ -1,6 +1,6 @@
 import { Fragment } from "react";
 import Image from "next/image";
-import { ChevronDown, Github } from "lucide-react";
+import { Github } from "lucide-react";
 import { companyProfile } from "@/lib/company-profile";
 import { FavoriteSiteButton } from "@/components/favorite-site-button";
 import { EnheRedesignBrandValue } from "./home/EnheRedesignBrandValue";
@@ -140,7 +140,6 @@ export function EnheRedesignFooter({
                 <details className="footer-group">
                   <summary className="footer-group-trigger">
                     <h3>{column.title}</h3>
-                    <ChevronDown aria-hidden="true" size={18} />
                   </summary>
                   <div className="footer-group-links">
                     {column.links.map((link) => (

@@ -1,6 +1,6 @@
 import React from "react";
 import { renderToStaticMarkup } from "react-dom/server";
-import { existsSync, statSync } from "node:fs";
+import { existsSync, readFileSync, statSync } from "node:fs";
 import { join } from "node:path";
 import { describe, expect, it } from "vitest";
 import { SiteBackgroundMusicCard, SiteBackgroundMusicProvider } from "./site-background-music";
@@ -18,9 +18,26 @@ describe("site background music controls", () => {
     expect(html).toContain("/audio/background-music/uplifting-acoustic.mp3");
     expect(html).toContain('aria-pressed="false"');
     expect(html).not.toMatch(/<audio[^>]*autoplay/);
-    expect(html).toContain('aria-valuenow="5"');
+    expect(html).toContain('value="5"');
     expect(html).toContain('aria-label="音量"');
     expect(html).toContain("播放音乐");
+  });
+
+  it("keeps the playback action centered without a visible track caption or slider motion", () => {
+    const html = renderToStaticMarkup(
+      <SiteBackgroundMusicProvider>
+        <SiteBackgroundMusicCard locale="zh" />
+      </SiteBackgroundMusicProvider>
+    );
+    const playback = html.match(/class="site-background-music-playback"[^>]*>([\s\S]*?)<\/div>/)?.[1] ?? "";
+    const accountCss = readFileSync(new URL("../styles/redesign/account.css", import.meta.url), "utf8");
+
+    expect(html).not.toContain(">曲目</span>");
+    expect(playback).not.toContain("轻快原声 · Wavecont");
+    expect(html).not.toContain("elastic-slider");
+    expect(html).toContain('type="range"');
+    expect(accountCss).toMatch(/\.site-background-music-playback\s*\{[^}]*justify-content:\s*center/);
+    expect(accountCss).toMatch(/\.site-background-music-card[\s\S]*?animation:\s*none/);
   });
 
   it("ships all ten approved background tracks as compact public MP3 files", () => {

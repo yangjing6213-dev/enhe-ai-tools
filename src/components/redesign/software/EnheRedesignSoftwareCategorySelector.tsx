@@ -409,7 +409,6 @@ export function EnheRedesignSoftwareCategorySelector({
         }}
       >
         <span>{triggerLabel}</span>
-        <span aria-hidden="true">▾</span>
       </button>
       <motion.div
         className="redesign-software-category-overlay"

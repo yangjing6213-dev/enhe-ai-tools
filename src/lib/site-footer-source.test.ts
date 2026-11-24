@@ -33,12 +33,26 @@ describe("site footer source", () => {
     const css = readFileSync(new URL("../app/globals.css", import.meta.url), "utf8").replace(/\r\n/g, "\n");
 
     expect(footer.match(/<details className="site-footer-disclosure">/g)).toHaveLength(2);
-    expect(footer).toContain("ChevronDown");
+    expect(footer).not.toContain("ChevronDown");
     expect(footer).not.toContain("site-footer-group-title-desktop");
     expect(css).toContain(
       ".site-footer-disclosure > summary {\n  display: flex;\n  min-height: 52px;",
     );
     expect(css).not.toContain(".site-footer-disclosure {\n    display: contents;");
+  });
+
+  it("removes decorative arrows from site dropdown controls without removing their behavior", () => {
+    const css = readFileSync(new URL("../app/globals.css", import.meta.url), "utf8");
+    const forumCss = readFileSync(new URL("../styles/redesign/forum.css", import.meta.url), "utf8");
+    const navMenu = readFileSync(new URL("../components/ui/navigation-menu.tsx", import.meta.url), "utf8");
+    const publicNavDropdown = readFileSync(new URL("../components/public-nav-dropdown.tsx", import.meta.url), "utf8");
+    const redesignFooter = readFileSync(new URL("../components/redesign/enhe-redesign-footer.tsx", import.meta.url), "utf8");
+
+    expect(css).toMatch(/select:not\(\[multiple\]\)\s*\{[^}]*appearance:\s*none/);
+    expect(forumCss).not.toContain(".forum-form-select-control::after");
+    expect(navMenu).not.toContain("ChevronDownIcon");
+    expect(publicNavDropdown).not.toContain("ChevronDown");
+    expect(redesignFooter).not.toContain("ChevronDown");
   });
 
   it("keeps the footer brand area concise", () => {

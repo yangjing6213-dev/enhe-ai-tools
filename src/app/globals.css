@@ -387,6 +387,12 @@ select {
   color: var(--foreground);
 }
 
+select:not([multiple]) {
+  -webkit-appearance: none;
+  appearance: none;
+  background-image: none !important;
+}
+
 select option,
 select optgroup {
   background-color: var(--marketing-bg);
@@ -1330,21 +1336,10 @@ select option:disabled {
   cursor: pointer;
 }
 
-.site-nav-dropdown-trigger svg {
-  opacity: 0.68;
-  transition: transform 180ms ease, opacity 180ms ease;
-}
-
 .site-nav-dropdown:hover .site-nav-dropdown-trigger,
 .site-nav-dropdown:focus-within .site-nav-dropdown-trigger {
   background: transparent;
   color: var(--marketing-accent);
-}
-
-.site-nav-dropdown:hover .site-nav-dropdown-trigger svg,
-.site-nav-dropdown:focus-within .site-nav-dropdown-trigger svg {
-  opacity: 1;
-  transform: rotate(180deg);
 }
 
 .site-nav-dropdown-panel {
@@ -1372,11 +1367,6 @@ select option:disabled {
   opacity: 1;
   pointer-events: auto;
   transform: translateX(-50%) translateY(0);
-}
-
-.site-nav-dropdown.is-dismissed .site-nav-dropdown-trigger svg {
-  opacity: 0.68;
-  transform: rotate(0);
 }
 
 .site-nav-dropdown.is-dismissed .site-nav-dropdown-panel {
@@ -3920,16 +3910,6 @@ select option:disabled {
 
 .site-footer-disclosure > summary:hover {
   background-color: #ffffff;
-}
-
-.site-footer-disclosure > summary svg {
-  flex: 0 0 auto;
-  color: var(--marketing-accent);
-  transition: transform 180ms ease;
-}
-
-.site-footer-disclosure[open] > summary svg {
-  transform: rotate(180deg);
 }
 
 .site-footer-link-list {

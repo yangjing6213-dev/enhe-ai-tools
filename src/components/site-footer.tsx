@@ -1,5 +1,5 @@
 import Image from "next/image";
-import { ChevronDown, Mail, Music2, NotebookText, Youtube, type LucideIcon } from "lucide-react";
+import { Mail, Music2, NotebookText, Youtube, type LucideIcon } from "lucide-react";
 import { PrefetchLink } from "@/components/prefetch-link";
 import { Container } from "@/components/ui";
 import { companyProfile } from "@/lib/company-profile";
@@ -103,7 +103,6 @@ export async function SiteFooter({ forceLocale }: { forceLocale?: Locale }) {
               <details className="site-footer-disclosure">
                 <summary className="site-footer-group-title">
                   <span>{group.title}</span>
-                  <ChevronDown size={18} strokeWidth={1.8} aria-hidden="true" />
                 </summary>
                 <ul className="site-footer-link-list">
                   {group.links.map((link) => (
@@ -122,7 +121,6 @@ export async function SiteFooter({ forceLocale }: { forceLocale?: Locale }) {
             <details className="site-footer-disclosure">
               <summary className="site-footer-group-title">
                 <span>{locale === "en" ? "Company" : "公司信息"}</span>
-                <ChevronDown size={18} strokeWidth={1.8} aria-hidden="true" />
               </summary>
               <dl className="site-footer-company-list">
                 <div className="site-footer-company-row">

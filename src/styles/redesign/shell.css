@@ -805,15 +805,6 @@
   margin: 0;
 }
 
-.footer-group > summary svg {
-  flex: 0 0 auto;
-  transition: transform var(--enhe-motion-fast) var(--enhe-ease-ui-move);
-}
-
-.footer-group[open] > summary svg {
-  transform: rotate(180deg);
-}
-
 .footer-group-links {
   display: grid;
   align-content: start;

@@ -26,7 +26,7 @@ test.describe("English public header layout", () => {
   }
 });
 
-test("forum editor actions use site blue while the category arrow stays inset", async ({ page }) => {
+test("forum editor actions use site blue and category dropdown has no arrow", async ({ page }) => {
   await page.goto("/en", { waitUntil: "load" });
   await page.evaluate(() => {
     const fixture = document.createElement("main");
@@ -42,7 +42,8 @@ test("forum editor actions use site blue while the category arrow stays inset", 
       background: getComputedStyle(button).backgroundColor,
       text: getComputedStyle(button).color,
     })),
-    arrowRight: getComputedStyle(document.querySelector(".forum-form-select-control")!, "::after").right,
+    arrowContent: getComputedStyle(document.querySelector(".forum-form-select-control")!, "::after").content,
+    selectAppearance: getComputedStyle(document.querySelector(".forum-form-select-control select")!).appearance,
   }));
   expect(colors.actions).toHaveLength(4);
   for (const action of colors.actions) {
@@ -50,5 +51,6 @@ test("forum editor actions use site blue while the category arrow stays inset", 
     expect(action.text).toBe("rgb(255, 255, 255)");
   }
   expect(colors.primary).toBe("rgb(4, 98, 194)");
-  expect(colors.arrowRight).toBe("18px");
+  expect(colors.arrowContent).toBe("none");
+  expect(colors.selectAppearance).toBe("none");
 });

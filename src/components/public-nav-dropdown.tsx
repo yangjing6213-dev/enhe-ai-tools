@@ -1,6 +1,5 @@
 "use client";
 
-import { ChevronDown } from "lucide-react";
 import { useState, type MouseEvent, type ReactNode } from "react";
 import { PublicNavLink } from "@/components/public-nav-link";
 import { cn } from "@/lib/utils";
@@ -38,7 +37,6 @@ export function PublicNavDropdown({
         onFocus={() => setDismissed(false)}
       >
         <span>{label}</span>
-        <ChevronDown size={14} strokeWidth={1.8} aria-hidden="true" />
       </PublicNavLink>
       <div
         className="site-nav-dropdown-panel"

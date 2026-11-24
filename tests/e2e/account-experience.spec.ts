@@ -40,6 +40,20 @@ test("account shortcuts and recovery actions remain usable in both languages", a
       await page.setViewportSize({ width, height: 900 });
       const response = await page.goto(`${prefix}/user`, { waitUntil: "load" });
       expect(response?.status()).toBe(200);
+      const musicCard = page.locator(".site-background-music-card");
+      const musicButton = musicCard.locator(".site-background-music-playback button");
+      await expect(musicCard.locator(".site-background-music-track > span")).toHaveCount(0);
+      await expect(musicCard.locator(".site-background-music-playback span")).toHaveCount(0);
+      await expect(musicCard.locator(".site-background-music-playback")).toHaveCSS("justify-content", "center");
+      await expect(musicCard.locator(".site-background-music-volume input[type='range']")).toHaveValue("5");
+      await expect(musicCard.locator("select")).toHaveCSS("appearance", "none");
+      await expect(musicCard.locator(".elastic-slider")).toHaveCount(0);
+      await expect(musicButton).toHaveCSS("transition-duration", "0s");
+      await musicButton.hover();
+      await expect(musicButton).toHaveCSS("transform", "none");
+      await expect(page.locator(".site-primary-nav [data-slot='navigation-menu-trigger'] svg")).toHaveCount(0);
+      await expect(page.locator(".site-nav-dropdown-trigger svg")).toHaveCount(0);
+      await expect(page.locator(".site-footer-disclosure > summary svg, .redesign-footer .footer-group > summary svg")).toHaveCount(0);
       await expect(page.locator("#orders .user-center-order")).toHaveCount(1);
       await expect(page.locator("#orders .user-center-order")).toContainText("LOCAL-VISUAL-ORDER");
       const sidebarPanels = await page.evaluate((isEnglish) => {

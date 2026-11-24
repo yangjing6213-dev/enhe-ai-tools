@@ -75,6 +75,13 @@ describe("AI tools candidate responsive browsing", () => {
     );
   });
 
+  it("keeps category dropdown behavior without a decorative arrow glyph", () => {
+    const selector = readCandidate("components/redesign/software/EnheRedesignSoftwareCategorySelector.tsx");
+
+    expect(selector).toContain("aria-expanded={open}");
+    expect(selector).not.toContain("▾");
+  });
+
   it("uses the shared 48px button token for the primary card action", () => {
     const css = readCandidate("styles/redesign/software.css");
 

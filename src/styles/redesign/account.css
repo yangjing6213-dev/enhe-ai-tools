@@ -118,6 +118,14 @@
   gap: 16px;
 }
 
+.site-background-music-card,
+.site-background-music-card *,
+.site-background-music-card *::before,
+.site-background-music-card *::after {
+  animation: none !important;
+  transition: none !important;
+}
+
 .site-background-music-track {
   display: grid;
   max-width: 32rem;
@@ -141,7 +149,82 @@
   display: flex;
   flex-wrap: wrap;
   align-items: center;
+  justify-content: center;
   gap: 12px;
+}
+
+.site-background-music-volume {
+  display: grid;
+  width: min(100%, 18rem);
+  gap: 8px;
+  margin-inline: auto;
+}
+
+.site-background-music-volume > output {
+  color: var(--marketing-muted);
+  font-size: 12px;
+  line-height: 1;
+  text-align: center;
+}
+
+.site-background-music-volume-controls {
+  display: flex;
+  min-height: 34px;
+  align-items: center;
+  gap: 12px;
+  color: var(--marketing-muted);
+}
+
+.site-background-music-volume-controls input[type="range"] {
+  flex: 1;
+  min-width: 0;
+  height: 34px;
+  margin: 0;
+  appearance: none;
+  -webkit-appearance: none;
+  border: 0;
+  border-radius: 999px;
+  background: transparent;
+  cursor: pointer;
+}
+
+.site-background-music-volume-controls input[type="range"]::-webkit-slider-runnable-track {
+  height: 6px;
+  border-radius: 999px;
+  background: linear-gradient(90deg, var(--enhe-action) 0%, var(--enhe-action) var(--music-volume), var(--enhe-border) var(--music-volume), var(--enhe-border) 100%);
+}
+
+.site-background-music-volume-controls input[type="range"]::-moz-range-track {
+  height: 6px;
+  border-radius: 999px;
+  background: linear-gradient(90deg, var(--enhe-action) 0%, var(--enhe-action) var(--music-volume), var(--enhe-border) var(--music-volume), var(--enhe-border) 100%);
+}
+
+.site-background-music-volume-controls input[type="range"]::-webkit-slider-thumb {
+  width: 16px;
+  height: 16px;
+  margin-top: -5px;
+  appearance: none;
+  -webkit-appearance: none;
+  border: 2px solid var(--enhe-action);
+  border-radius: 50%;
+  background: var(--enhe-surface);
+}
+
+.site-background-music-volume-controls input[type="range"]::-moz-range-thumb {
+  width: 12px;
+  height: 12px;
+  border: 2px solid var(--enhe-action);
+  border-radius: 50%;
+  background: var(--enhe-surface);
+}
+
+.enhe-redesign-production .user-center-page .site-background-music-card .user-center-action:hover {
+  border-color: var(--enhe-action);
+  background-color: var(--enhe-action);
+  box-shadow: none;
+  color: #fff;
+  transform: none;
 }
 
 .enhe-redesign-production .user-center-page button:not(:disabled) {

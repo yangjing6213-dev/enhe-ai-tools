@@ -290,12 +290,7 @@ test("homepage polish stays readable, responsive, and interactive without extern
     if (width >= 1280) {
       expect(Math.abs(footerAlignment.navigationCenter - footerAlignment.copyrightCenter)).toBeLessThanOrEqual(1);
     }
-    const chevronGaps = await footer.locator(".footer-group-trigger").evaluateAll((summaries) => summaries.map((summary) => {
-      const title = summary.querySelector("h3")!.getBoundingClientRect();
-      const icon = summary.querySelector("svg")!.getBoundingClientRect();
-      return icon.left - title.right;
-    }));
-    expect(chevronGaps.every((gap) => gap >= 6 && gap <= 10)).toBe(true);
+    await expect(footer.locator(".footer-group-trigger svg")).toHaveCount(0);
     if (width === 1440) {
       const socialControls = footer.locator(".footer-social-links").locator("a, button.footer-social-bookmark");
       await expect(socialControls).toHaveCount(4);
