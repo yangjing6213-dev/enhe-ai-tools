@@ -44,6 +44,11 @@ describe("footer decoration around account forms", () => {
     expect(bookmarkWrapperRule).toMatch(/height:\s*40px/);
     expect(bookmarkButtonRule).toMatch(/min-height:\s*40px/);
     expect(bookmarkButtonRule).toMatch(/padding:\s*0/);
+    expect(bookmarkButtonRule).toMatch(/appearance:\s*none/);
+    expect(bookmarkButtonRule).toMatch(/border:\s*1px solid rgb\(255 255 255 \/ 45%\)/);
+    expect(bookmarkButtonRule).toMatch(/border-radius:\s*8px/);
+    expect(bookmarkButtonRule).toMatch(/box-shadow:\s*none/);
+    expect(footerStyles).toMatch(/\.redesign-footer \.footer-social-links \.footer-social-bookmark:hover[\s\S]*?transform:\s*none/);
   });
 
   it.each(["zh", "en"] as const)("uses destination-accurate help, tutorial, catalog, and news labels in %s", (locale) => {

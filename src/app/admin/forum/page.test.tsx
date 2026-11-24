@@ -40,7 +40,7 @@ it("lets administrators open an editor for published topics", async () => {
 });
 
 it("preloads a topic into the administrator editor and shows its existing media", async () => {
-  const html = renderToStaticMarkup(await AdminForumTopicEditPage({ params: Promise.resolve({ id: "post-1" }) }));
+  const html = renderToStaticMarkup(await AdminForumTopicEditPage({ params: Promise.resolve({ id: "post-1" }), searchParams: Promise.resolve({}) }));
 
   expect(html).toContain("可编辑话题");
   expect(html).toContain('name="id" value="post-1"');
@@ -54,4 +54,14 @@ it("preloads a topic into the administrator editor and shows its existing media"
   expect(html).toContain("插入正文");
   expect(html).toContain("长按移除");
   expect(html).toContain("添加图片");
+});
+
+it("shows a clear success status after the administrator saves a topic edit", async () => {
+  const html = renderToStaticMarkup(await AdminForumTopicEditPage({
+    params: Promise.resolve({ id: "post-1" }),
+    searchParams: Promise.resolve({ saved: "1" }),
+  }));
+
+  expect(html).toContain('role="status"');
+  expect(html).toContain("话题修改已保存。");
 });

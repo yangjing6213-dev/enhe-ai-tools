@@ -3,6 +3,7 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 const mocks = vi.hoisted(() => ({
   requireAdmin: vi.fn(),
   currentLocale: vi.fn(),
+  redirect: vi.fn(),
   revalidatePath: vi.fn(),
   audit: vi.fn(),
   postUpdate: vi.fn(),
@@ -18,6 +19,7 @@ const mocks = vi.hoisted(() => ({
 }));
 
 vi.mock("next/cache", () => ({ revalidatePath: mocks.revalidatePath }));
+vi.mock("next/navigation", () => ({ redirect: mocks.redirect }));
 vi.mock("@/lib/auth", () => ({ requireAdmin: mocks.requireAdmin }));
 vi.mock("@/lib/i18n", () => ({ getCurrentLocale: mocks.currentLocale }));
 vi.mock("@/lib/admin-audit", () => ({ writeAdminAuditLog: mocks.audit }));
@@ -102,6 +104,7 @@ describe("forum moderation actions", () => {
     }));
     expect(mocks.revalidatePath).toHaveBeenCalledWith("/forum/post-1");
     expect(mocks.revalidatePath).toHaveBeenCalledWith("/en/forum/post-1");
+    expect(mocks.redirect).toHaveBeenCalledWith("/admin/forum/post-1/edit?saved=1");
   });
 
   it("rejects invalid topic edits before writing", async () => {

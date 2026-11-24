@@ -2,9 +2,10 @@ import React from "react";
 import { renderToStaticMarkup } from "react-dom/server";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { UserCenterPageShell } from "./page-shell";
+import { UserOrderHistoryPageShell } from "@/app/user/orders/history-page-shell";
 
 const mocks = vi.hoisted(() => ({
-  orders: vi.fn(), tools: vi.fn(), recovery: vi.fn(), unread: vi.fn(), notifications: vi.fn()
+  orders: vi.fn(), orderCount: vi.fn(), tools: vi.fn(), recovery: vi.fn(), unread: vi.fn(), notifications: vi.fn()
 }));
 vi.mock("@/app/actions", () => ({
   cancelOrderAction: vi.fn(), changePasswordAction: vi.fn(), logoutAction: vi.fn(),
@@ -17,7 +18,7 @@ vi.mock("@/lib/auth", () => ({ requireUser: async () => ({
 }) }));
 vi.mock("@/lib/db", () => ({ prisma: {
   notification: { findMany: mocks.notifications, count: mocks.unread },
-  order: { findMany: mocks.orders }, downloadLog: { findMany: async () => [] },
+  order: { findMany: mocks.orders, count: mocks.orderCount }, downloadLog: { findMany: async () => [] },
   toolUsageLog: { findMany: async () => [] }, comment: { findMany: async () => [] },
   toolPurchase: { findMany: async () => [{ toolId: "skill-1" }] }, tool: { findMany: mocks.tools },
   user: { findUnique: mocks.recovery }
@@ -37,6 +38,7 @@ const skill = { id: "skill-1", name: "Owned AI Skill", slug: "owned-skill", type
 beforeEach(() => {
   vi.clearAllMocks();
   mocks.orders.mockResolvedValue([]);
+  mocks.orderCount.mockResolvedValue(0);
   mocks.notifications.mockResolvedValue([]);
   mocks.tools.mockImplementation(async ({ where }) => where.OR.some((entry: { type: string }) => entry.type === "ai_skill") ? [skill] : []);
   mocks.recovery.mockResolvedValue({ recoveryEmail: "recovery@example.test", recoveryVerifiedAt: new Date("2026-10-01") });
@@ -76,36 +78,54 @@ describe("account center product access and navigation", () => {
     expect(html).not.toContain('href="/orders/manual-1/pay"');
   });
 
-  it("hides every order detail until its card is expanded", async () => {
-    mocks.orders.mockResolvedValue([
-      { id: "paid-1", orderNo: "PAID-1", amount: 5, orderStatus: "activated", plan: null, tool: skill, paymentProof: null, createdAt: new Date("2026-10-01") },
-      { id: "pending-2", orderNo: "PENDING-2", amount: 9.9, orderStatus: "pending_payment", plan: null, tool: skill, paymentProof: null, createdAt: new Date("2026-10-02") },
-    ]);
+  it("shows the newest five orders as full cards and links the remaining orders to history", async () => {
+    mocks.orders.mockResolvedValue(Array.from({ length: 5 }, (_, index) => ({
+      id: `order-${index + 1}`, orderNo: `ORDER-${index + 1}`, amount: 5 + index, orderStatus: "activated", plan: null,
+      tool: skill, paymentProof: null, createdAt: new Date(`2026-11-${20 - index}T00:00:00Z`),
+    })));
+    mocks.orderCount.mockResolvedValue(8);
     const html = await render("zh");
-    const orderCards = [...html.matchAll(/<details[^>]*user-center-order[^>]*>[\s\S]*?<\/details>/g)].map(([card]) => card);
-    expect(orderCards).toHaveLength(2);
-
-    for (const [index, orderCard] of orderCards.entries()) {
-      const summary = orderCard.match(/<summary[^>]*>[\s\S]*?<\/summary>/)?.[0] ?? "";
-      expect(summary).toContain(`订单 ${index + 1}`);
-      expect(summary).toContain("展开订单");
-      expect(summary).not.toMatch(/PAID-1|PENDING-2|Owned AI Skill|¥|激活|待付款|2026/);
-      expect(orderCard).not.toMatch(/<details[^>]*open/);
-    }
-
-    expect(orderCards[0]).toContain("PAID-1");
+    const orderCards = [...html.matchAll(/<article[^>]*user-center-record user-center-order[^>]*>[\s\S]*?<\/article>/g)].map(([card]) => card);
+    expect(orderCards).toHaveLength(5);
+    expect(html).not.toContain("<details class=\"user-center-record user-center-order");
+    expect(orderCards[0]).toContain("ORDER-1");
     expect(orderCards[0]).toContain("Owned AI Skill");
     expect(orderCards[0]).toContain("¥5.00");
-    expect(orderCards[0]).toContain('href="/orders/paid-1"');
-    expect(orderCards[1]).toContain("PENDING-2");
-    expect(orderCards[1]).toContain("待支付");
-    expect(orderCards[1]).toContain('href="/orders/pending-2/pay"');
+    expect(orderCards[0]).toContain('href="/orders/order-1"');
+    expect(orderCards[4]).toContain("ORDER-5");
+    expect(html).not.toContain("ORDER-6");
+    expect(html).toContain('href="/user/orders"');
+    expect(html).toContain("历史订单");
+    expect(mocks.orderCount).toHaveBeenCalledWith({ where: { userId: "user-1" } });
+    expect(mocks.orders).toHaveBeenCalledWith(expect.objectContaining({ where: { userId: "user-1" }, take: 5 }));
   });
 
-  it("places background music below account settings in the right column", async () => {
+  it("places account settings and background music in the left column above email settings", async () => {
     const html = await render("zh");
-    expect(html.indexOf('id="orders"')).toBeLessThan(html.indexOf('id="account-security"'));
-    expect(html.indexOf('id="account-security"')).toBeLessThan(html.indexOf("Background music control"));
+    const sidebar = html.match(/<aside[^>]*>[\s\S]*?<\/aside>/)?.[0] ?? "";
+    expect(sidebar.indexOf('id="account-security"')).toBeGreaterThanOrEqual(0);
+    expect(sidebar.indexOf("Background music control")).toBeGreaterThan(sidebar.indexOf('id="account-security"'));
+    expect(sidebar.indexOf("邮件通知设置")).toBeGreaterThan(sidebar.indexOf("Background music control"));
+  });
+
+  it("lists only orders after the five newest in paginated order history", async () => {
+    mocks.orderCount.mockResolvedValue(6);
+    mocks.orders.mockResolvedValue([{
+      id: "order-6", orderNo: "OLDER-ORDER-6", amount: 5, orderStatus: "activated", plan: null,
+      tool: skill, paymentProof: null, createdAt: new Date("2026-11-01T00:00:00Z"),
+    }]);
+    const html = renderToStaticMarkup(await UserOrderHistoryPageShell({
+      searchParams: Promise.resolve({}),
+      forceLocale: "zh",
+    }));
+
+    expect(html).toContain("OLDER-ORDER-6");
+    expect(html).toContain("历史订单");
+    expect(mocks.orders).toHaveBeenCalledWith(expect.objectContaining({
+      where: { userId: "user-1" },
+      skip: 5,
+      take: 20,
+    }));
   });
 
   it("shows the newest three notifications and any older unread notifications", async () => {

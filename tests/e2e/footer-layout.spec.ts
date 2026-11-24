@@ -1,5 +1,34 @@
 import { expect, test } from "@playwright/test";
 
+test("bookmark control keeps the same square frame as the social icons on hover", async ({ page }) => {
+  await page.setViewportSize({ width: 1280, height: 900 });
+  await page.goto("/");
+  const footer = page.locator(".redesign-footer");
+  await footer.scrollIntoViewIfNeeded();
+  await page.mouse.move(0, 0);
+
+  const controls = footer.locator(".footer-social-links > a, .footer-social-links > .favorite-site-action > button");
+  await expect(controls).toHaveCount(4);
+  const initialFrames = await controls.evaluateAll((elements) => elements.map((element) => {
+    const style = getComputedStyle(element);
+    const bounds = element.getBoundingClientRect();
+    return { width: bounds.width, height: bounds.height, radius: style.borderRadius, borderWidth: style.borderTopWidth, borderStyle: style.borderTopStyle };
+  }));
+  expect(initialFrames).toEqual(Array.from({ length: 4 }, () => ({ width: 40, height: 40, radius: "8px", borderWidth: "1px", borderStyle: "solid" })));
+
+  const bookmark = footer.locator(".footer-social-bookmark");
+  await bookmark.hover();
+  await expect(bookmark).toHaveCSS("background-color", "rgb(255, 255, 255)");
+  await expect(bookmark).toHaveCSS("color", "rgb(0, 0, 0)");
+  await expect(bookmark).toHaveCSS("transform", "none");
+  const hoveredFrame = await bookmark.evaluate((element) => {
+    const style = getComputedStyle(element);
+    const bounds = element.getBoundingClientRect();
+    return { width: bounds.width, height: bounds.height, radius: style.borderRadius, borderWidth: style.borderTopWidth, borderStyle: style.borderTopStyle };
+  });
+  expect(hoveredFrame).toEqual(initialFrames[0]);
+});
+
 test.describe("footer menu layout", () => {
   for (const { locale, width } of [
     { locale: "zh", width: 1920 },

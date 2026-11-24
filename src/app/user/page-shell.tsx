@@ -1,6 +1,5 @@
 import Link from "next/link";
 import {
-  cancelOrderAction,
   changePasswordAction,
   logoutAction,
   markAllNotificationsReadAction,
@@ -16,17 +15,18 @@ import { requireUser } from "@/lib/auth";
 import { prisma } from "@/lib/db";
 import { getCurrentLocale, getDictionary, type Locale } from "@/lib/i18n";
 import { getNotificationDisplay } from "@/lib/notification-display";
-import { canUserCancelOrder } from "@/lib/order-rules";
 import { buildCanonicalToolPath } from "@/lib/public-slugs";
 import { buildLocalePath } from "@/lib/seo";
 import { reviewCompletionNotice, reviewCompletionNoticeEn } from "@/lib/review-copy";
 import { buildUserToolEntitlements, type UserEntitlementTool } from "@/lib/user-entitlements";
-import { formatCurrency } from "@/lib/utils";
 import { resolveUserAvatarSrc } from "@/lib/user-avatar";
 import { UserAvatar } from "@/components/user-avatar";
 import { EmojiText } from "@/components/emoji-text";
 import { CreatorMessageReplyForm } from "@/components/creator-message-reply-form";
 import { SiteBackgroundMusicCard } from "@/components/site-background-music";
+import { UserOrderCard } from "@/components/user-order-card";
+
+const RECENT_ORDER_COUNT = 5;
 
 export type UserCenterSearchParams = Promise<Record<string, string | undefined>>;
 
@@ -65,8 +65,10 @@ export async function UserCenterPageShell({
     prisma.order.findMany({
       where: { userId: user.id },
       include: { plan: true, tool: true, paymentProof: true },
-      orderBy: { createdAt: "desc" }
+      orderBy: [{ createdAt: "desc" }, { id: "desc" }],
+      take: RECENT_ORDER_COUNT
     }),
+    prisma.order.count({ where: { userId: user.id } }),
     prisma.downloadLog.findMany({
       where: { userId: user.id },
       include: { tool: true },
@@ -103,7 +105,7 @@ export async function UserCenterPageShell({
     prisma.notification.count({ where: { userId: user.id, readAt: null } })
     ])
   ]);
-  const [latestNotifications, unreadNotifications, orders, downloads, usages, comments, purchases, publishedTools, recovery, unreadNotificationCount] = userData;
+  const [latestNotifications, unreadNotifications, orders, orderCount, downloads, usages, comments, purchases, publishedTools, recovery, unreadNotificationCount] = userData;
   const notificationsById = new Map([...latestNotifications, ...unreadNotifications].map((notification) => [notification.id, notification]));
   const notifications = Array.from(notificationsById.values()).sort((left, right) => right.createdAt.getTime() - left.createdAt.getTime());
 
@@ -128,7 +130,7 @@ export async function UserCenterPageShell({
         </form>
       </div>
       <nav className="user-center-shortcuts mb-6 grid grid-cols-2 gap-3 lg:grid-cols-4" aria-label={locale === "en" ? "Account shortcuts" : "用户中心快捷入口"}>
-        <Link href="#orders" className="user-center-action">{t.userCenter.orders}<span className="user-center-badge rounded-full border px-2 py-0.5 text-xs">{orders.length}</span></Link>
+        <Link href="#orders" className="user-center-action">{t.userCenter.orders}<span className="user-center-badge rounded-full border px-2 py-0.5 text-xs">{orderCount}</span></Link>
         <Link href="#purchased-products" className="user-center-action">{locale === "en" ? "Purchased products" : "已购产品"}<span className="user-center-badge rounded-full border px-2 py-0.5 text-xs">{purchasedProductCount}</span></Link>
         <Link href="#notifications" className="user-center-action">{locale === "en" ? "Unread notifications" : "未读通知"}<span className="user-center-badge rounded-full border px-2 py-0.5 text-xs">{unreadNotificationCount}</span></Link>
         <Link href="#account-security" className="user-center-action">{locale === "en" ? "Account security" : "账户安全"}</Link>
@@ -224,86 +226,6 @@ export async function UserCenterPageShell({
             </Link>
           </Panel>
 
-          <Panel title={locale === "en" ? "Email notification settings" : "邮件通知设置"}>
-            <form action={updateNewsletterSettingsAction} className="grid gap-4">
-              <label className="user-center-setting-option flex items-center gap-3 rounded-xl border px-4 py-3 text-sm text-[var(--marketing-text)]">
-                <input type="hidden" name="acceptEmailUpdates" value="false" />
-                <input
-                  name="acceptEmailUpdates"
-                  type="checkbox"
-                  defaultChecked={user?.acceptEmailUpdates ?? true}
-                  value="true"
-                  className="h-4 w-4 accent-[var(--marketing-accent)]"
-                />
-                {locale === "en" ? "I want to receive ENHE AI monthly product digest" : "我愿意接收 ENHE AI 月度产品简报和更新资讯"}
-              </label>
-              <FormSubmitButton className="text-base" pendingLabel={locale === "en" ? "Saving..." : "保存中..."}>
-                {locale === "en" ? "Save settings" : "保存设置"}
-              </FormSubmitButton>
-            </form>
-          </Panel>
-
-        </aside>
-
-        <div className="order-1 min-w-0 space-y-6 lg:order-2">
-          <Panel id="orders" title={t.userCenter.orders}>
-            <div className="space-y-3">
-              {orders.length ? (
-                orders.map((order, index) => (
-                  <details key={order.id} className="user-center-record user-center-order rounded-xl border p-4">
-                    <summary className="user-center-order-summary cursor-pointer list-none">
-                      <div className="flex flex-wrap items-center justify-between gap-3">
-                        <span className="font-semibold">{locale === "en" ? `Order ${index + 1}` : `订单 ${index + 1}`}</span>
-                        <span className="ml-auto text-xs font-semibold text-[var(--marketing-accent)]">{locale === "en" ? "View order" : "展开订单"}</span>
-                      </div>
-                    </summary>
-                    <div className="user-center-order-details">
-                    <div className="mt-3 flex flex-wrap justify-between gap-3">
-                      <span className="break-all">{order.orderNo}</span>
-                      <span className="font-semibold text-[var(--enhe-action)]">{formatCurrency(order.amount.toString())}</span>
-                    </div>
-                    <p className="mt-2 text-sm text-[var(--marketing-muted)]">
-                      {order.plan ? formatLegacyPlanName(locale) : order.tool?.name ?? t.userCenter.orderItem}
-                    </p>
-                    <div className="mt-2 flex flex-wrap items-center gap-2 text-sm">
-                      <span className="user-center-badge rounded-full border px-2 py-1">{formatStatus(order.orderStatus, locale)}</span>
-                      <time dateTime={order.createdAt.toISOString()} className="text-xs text-[var(--marketing-muted)]">{formatDateTime(order.createdAt, locale)}</time>
-                    </div>
-                    {order.paymentProof ? <p className="mt-2 text-sm text-[var(--marketing-muted)]">{t.userCenter.proof} {formatStatus(order.paymentProof.reviewStatus, locale)}</p> : null}
-                    {order.orderStatus === "pending_review" || order.paymentProof?.reviewStatus === "pending" ? (
-                      <p className="mt-2 text-xs leading-5 text-[var(--marketing-muted)]">{getReviewNotice(locale)}</p>
-                    ) : null}
-                    <div className="mt-3 flex flex-wrap gap-2">
-                      <Link href={`/orders/${order.id}`} className="user-center-action user-center-action--compact px-3 py-1 text-xs">
-                        {t.userCenter.details}
-                      </Link>
-                      {["pending_payment", "rejected"].includes(order.orderStatus) ? (
-                        <Link href={`/orders/${order.id}/pay`} className="user-center-action user-center-action--primary user-center-action--compact px-3 py-1 text-xs font-semibold">
-                          {t.userCenter.payNow}
-                        </Link>
-                      ) : null}
-                      {canUserCancelOrder(order.orderStatus) ? (
-                        <form action={cancelOrderAction}>
-                          <input type="hidden" name="orderId" value={order.id} />
-                          <FormSubmitButton
-                            variant="secondary"
-                            pendingLabel={locale === "en" ? "Cancelling..." : "取消中..."}
-                            className="px-3 py-1 text-xs"
-                          >
-                            {t.userCenter.cancelOrder}
-                          </FormSubmitButton>
-                        </form>
-                      ) : null}
-                    </div>
-                    </div>
-                  </details>
-                ))
-              ) : (
-                <><EmptyText>{t.userCenter.noOrders}</EmptyText><BrowseProducts locale={locale} /></>
-              )}
-            </div>
-          </Panel>
-
           <Panel id="account-security" title={t.userCenter.accountSettings}>
             <p className="break-all text-[var(--marketing-text)]">{user.email ?? user.phone}</p>
             <p className="mt-2 text-sm text-[var(--marketing-muted)]">
@@ -371,6 +293,43 @@ export async function UserCenterPageShell({
 
           <Panel title={locale === "en" ? "Background music" : "背景音乐"}>
             <SiteBackgroundMusicCard locale={locale} />
+          </Panel>
+
+          <Panel title={locale === "en" ? "Email notification settings" : "邮件通知设置"}>
+            <form action={updateNewsletterSettingsAction} className="grid gap-4">
+              <label className="user-center-setting-option flex items-center gap-3 rounded-xl border px-4 py-3 text-sm text-[var(--marketing-text)]">
+                <input type="hidden" name="acceptEmailUpdates" value="false" />
+                <input
+                  name="acceptEmailUpdates"
+                  type="checkbox"
+                  defaultChecked={user?.acceptEmailUpdates ?? true}
+                  value="true"
+                  className="h-4 w-4 accent-[var(--marketing-accent)]"
+                />
+                {locale === "en" ? "I want to receive ENHE AI monthly product digest" : "我愿意接收 ENHE AI 月度产品简报和更新资讯"}
+              </label>
+              <FormSubmitButton className="text-base" pendingLabel={locale === "en" ? "Saving..." : "保存中..."}>
+                {locale === "en" ? "Save settings" : "保存设置"}
+              </FormSubmitButton>
+            </form>
+          </Panel>
+
+        </aside>
+
+        <div className="order-1 min-w-0 space-y-6 lg:order-2">
+          <Panel id="orders" title={t.userCenter.orders}>
+            <div className="space-y-3">
+              {orders.length ? (
+                orders.map((order) => <UserOrderCard key={order.id} order={order} locale={locale} />)
+              ) : (
+                <><EmptyText>{t.userCenter.noOrders}</EmptyText><BrowseProducts locale={locale} /></>
+              )}
+            </div>
+            {orderCount > RECENT_ORDER_COUNT ? (
+              <Link href={buildLocalePath("/user/orders", locale)} className="user-center-action user-center-action--primary user-center-action--compact mt-4">
+                {locale === "en" ? "Order history" : "历史订单"}
+              </Link>
+            ) : null}
           </Panel>
 
           <section id="purchased-products" className="user-center-purchases space-y-6" aria-label={locale === "en" ? "Purchased products" : "已购产品"}>
@@ -524,10 +483,6 @@ function formatStatus(status: string | null | undefined, locale: Locale) {
 
 function formatDateTime(value: Date, locale: Locale) {
   return value.toLocaleString(locale === "en" ? "en-US" : "zh-CN");
-}
-
-function formatLegacyPlanName(locale: Locale) {
-  return locale === "en" ? "Legacy membership order" : "历史会员订单";
 }
 
 function getReviewNotice(locale: Locale) {

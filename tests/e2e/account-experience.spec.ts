@@ -40,10 +40,30 @@ test("account shortcuts and recovery actions remain usable in both languages", a
       await page.setViewportSize({ width, height: 900 });
       const response = await page.goto(`${prefix}/user`, { waitUntil: "load" });
       expect(response?.status()).toBe(200);
+      await expect(page.locator("#orders .user-center-order")).toHaveCount(1);
+      await expect(page.locator("#orders .user-center-order")).toContainText("LOCAL-VISUAL-ORDER");
+      const sidebarPanels = await page.evaluate((isEnglish) => {
+        const sidebar = document.querySelector(".user-center-page aside")!;
+        const account = document.querySelector("#account-security")!.getBoundingClientRect();
+        const panels = Array.from(sidebar.querySelectorAll<HTMLElement>(".user-center-panel"));
+        const music = panels.find((panel) => panel.textContent?.includes(isEnglish ? "Background music" : "背景音乐"))!.getBoundingClientRect();
+        const email = panels.find((panel) => panel.textContent?.includes(isEnglish ? "Email notification settings" : "邮件通知设置"))!.getBoundingClientRect();
+        return {
+          accountTop: account.top, accountX: account.x, accountWidth: account.width,
+          musicTop: music.top, musicX: music.x, musicWidth: music.width,
+          emailTop: email.top, emailX: email.x, emailWidth: email.width,
+        };
+      }, locale === "en");
+      expect(sidebarPanels.accountTop).toBeLessThan(sidebarPanels.musicTop);
+      expect(sidebarPanels.musicTop).toBeLessThan(sidebarPanels.emailTop);
+      expect(sidebarPanels.accountX).toBeCloseTo(sidebarPanels.emailX, 0);
+      expect(sidebarPanels.musicX).toBeCloseTo(sidebarPanels.emailX, 0);
+      expect(sidebarPanels.accountWidth).toBe(sidebarPanels.emailWidth);
+      expect(sidebarPanels.musicWidth).toBe(sidebarPanels.emailWidth);
       const logout = page.locator(".user-center-logout");
       await expect(logout).toHaveCSS("color", "rgb(255, 255, 255)");
       await expect(logout).toHaveCSS("-webkit-text-fill-color", "rgb(255, 255, 255)");
-      await expect(logout).toHaveCSS("background-color", "rgb(161, 106, 0)");
+      await expect(logout).toHaveCSS("background-color", "rgb(4, 98, 194)");
       await logout.focus();
       await expect(logout).toBeFocused();
       for (const target of ["orders", "purchased-products", "notifications", "account-security"]) {

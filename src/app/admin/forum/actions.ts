@@ -1,6 +1,7 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
+import { redirect } from "next/navigation";
 import { prisma } from "@/lib/db";
 import { requireAdmin } from "@/lib/auth";
 import { writeAdminAuditLog } from "@/lib/admin-audit";
@@ -170,4 +171,5 @@ export async function updateForumPostAction(formData: FormData) {
   });
   await refreshForum(id);
   revalidatePath(`/admin/forum/${encodeURIComponent(id)}/edit`);
+  redirect(`/admin/forum/${encodeURIComponent(id)}/edit?saved=1`);
 }

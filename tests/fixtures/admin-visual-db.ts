@@ -437,6 +437,14 @@ export const prisma = new Proxy(
               return async (args?: { where?: { id?: string } }) =>
                 args?.where?.id === localVisualOrder.id ? localVisualOrder : null;
             }
+            if (modelName === "order" && operation === "findMany") {
+              return async (args?: { where?: { userId?: string } }) =>
+                args?.where?.userId === localVisualUser.id ? [localVisualOrder] : [];
+            }
+            if (modelName === "order" && operation === "count") {
+              return async (args?: { where?: { userId?: string } }) =>
+                args?.where?.userId === localVisualUser.id ? 1 : 0;
+            }
             if (modelName === "paymentProof" && operation === "findUnique") {
               return async (args?: { where?: { id?: string } }) =>
                 args?.where?.id === localVisualPaymentProof.id ? localVisualPaymentProof : null;

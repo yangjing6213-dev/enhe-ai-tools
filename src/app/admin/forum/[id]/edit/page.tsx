@@ -10,8 +10,18 @@ import { getCurrentLocale } from "@/lib/i18n";
 
 const mediaSelect = { id: true, kind: true, mimeType: true, originalName: true } as const;
 
-export default async function AdminForumTopicEditPage({ params }: { params: Promise<{ id: string }> }) {
-  const [{ id }, locale] = await Promise.all([params, getCurrentLocale()]);
+export default async function AdminForumTopicEditPage({
+  params,
+  searchParams,
+}: {
+  params: Promise<{ id: string }>;
+  searchParams?: Promise<Record<string, string | undefined>>;
+}) {
+  const [{ id }, locale, query] = await Promise.all([
+    params,
+    getCurrentLocale(),
+    searchParams ?? Promise.resolve({} as Record<string, string | undefined>),
+  ]);
   const post = await prisma.forumPost.findUnique({
     where: { id },
     select: {
@@ -31,6 +41,11 @@ export default async function AdminForumTopicEditPage({ params }: { params: Prom
 
   return <AdminSection title={title} intro={en ? "Update the topic text, category and attached media." : "修改话题文字、分类及图片附件；你可以添加、移除图片，也可以把图片插入正文。"}>
     <AdminContentShell className="enhe-admin-content-management">
+      {query.saved === "1" ? (
+        <p role="status" aria-live="polite" className="status-success mb-4">
+          {en ? "Topic changes saved." : "话题修改已保存。"}
+        </p>
+      ) : null}
       <form className="forum-form-card forum-admin-edit-form" action={updateForumPostAction}>
         <input type="hidden" name="id" value={post.id} />
         <input type="hidden" name="manageAttachments" value="true" />

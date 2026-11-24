@@ -1251,11 +1251,35 @@ body .redesign-footer nav {
 }
 
 .redesign-footer .footer-social-links .footer-social-bookmark {
+  display: inline-flex;
+  flex: 0 0 40px;
+  width: 40px;
+  height: 40px;
+  min-width: 40px;
+  aspect-ratio: 1;
+  box-sizing: border-box;
+  align-items: center;
+  justify-content: center;
+  -webkit-appearance: none;
+  appearance: none;
+  border: 1px solid rgb(255 255 255 / 45%);
+  border-radius: 8px;
   background: transparent;
+  color: #fff;
+  box-shadow: none;
+  margin: 0;
   cursor: pointer;
   min-height: 40px;
   padding: 0;
+  font: inherit;
   line-height: 1;
+  transform: none;
+}
+
+.redesign-footer .footer-social-links .footer-social-bookmark:hover,
+.redesign-footer .footer-social-links .footer-social-bookmark:focus-visible,
+.redesign-footer .footer-social-links .footer-social-bookmark:active {
+  transform: none;
 }
 
 .redesign-footer .footer-social-links .favorite-site-feedback {
@@ -1277,6 +1301,19 @@ body .redesign-footer nav {
 
 .redesign-footer .footer-social-links .favorite-site-feedback:empty {
   display: none;
+}
+
+.enhe-redesign-production .redesign-footer .footer-social-links > a,
+.enhe-redesign-production .redesign-footer .footer-social-links > .favorite-site-action > .footer-social-bookmark {
+  width: 40px !important;
+  min-width: 40px !important;
+  height: 40px !important;
+  min-height: 40px !important;
+  border-radius: 8px !important;
+}
+
+.enhe-redesign-production .redesign-footer .footer-social-links > .favorite-site-action > .footer-social-bookmark:is(:hover, :focus-visible, :active) {
+  transform: none !important;
 }
 
 .redesign-footer-inner {
