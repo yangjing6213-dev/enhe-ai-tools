@@ -156,4 +156,48 @@ describe("forum moderation actions", () => {
       data: { postId: "post-1" },
     }));
   });
+
+  it("updates the selected topic cover from the retained image attachments", async () => {
+    const updateTopic = (forumActions as Record<string, unknown>).updateForumPostAction as ((data: FormData) => Promise<void>) | undefined;
+    expect(updateTopic).toBeTypeOf("function");
+    if (!updateTopic) return;
+
+    const createdAt = new Date();
+    mocks.postFindUnique.mockResolvedValueOnce({
+      id: "post-1", category: "workflow", title: "旧标题", content: "旧正文", coverAttachmentId: "image-1",
+      attachments: [
+        { id: "image-1", kind: "image", fileSize: 2048, filePath: "forum-media/image-1.webp", authorId: "admin-1", postId: "post-1", replyId: null, discardedAt: null, createdAt },
+        { id: "image-2", kind: "image", fileSize: 2048, filePath: "forum-media/image-2.webp", authorId: "admin-1", postId: "post-1", replyId: null, discardedAt: null, createdAt },
+      ],
+    });
+    const data = form({ id: "post-1", category: "workflow", title: "新标题", content: "新正文", manageAttachments: "true", coverAttachmentId: "image-2" });
+    data.append("attachmentIds", "image-1");
+    data.append("attachmentIds", "image-2");
+
+    await updateTopic(data);
+
+    expect(mocks.postUpdate).toHaveBeenCalledWith({
+      where: { id: "post-1" },
+      data: { category: "workflow", title: "新标题", content: "新正文", coverAttachmentId: "image-2" },
+    });
+    expect(mocks.audit).toHaveBeenCalledWith(expect.objectContaining({
+      metadata: expect.objectContaining({ coverChanged: true }),
+    }));
+  });
+
+  it("rejects a video as the topic cover before writing", async () => {
+    const updateTopic = (forumActions as Record<string, unknown>).updateForumPostAction as ((data: FormData) => Promise<void>) | undefined;
+    expect(updateTopic).toBeTypeOf("function");
+    if (!updateTopic) return;
+
+    mocks.postFindUnique.mockResolvedValueOnce({
+      id: "post-1", category: "workflow", title: "旧标题", content: "旧正文", coverAttachmentId: null,
+      attachments: [{ id: "video-1", kind: "video", fileSize: 2048, filePath: "forum-media/video-1.mp4", authorId: "admin-1", postId: "post-1", replyId: null, discardedAt: null, createdAt: new Date() }],
+    });
+    const data = form({ id: "post-1", category: "workflow", title: "新标题", content: "新正文", manageAttachments: "true", coverAttachmentId: "video-1" });
+    data.append("attachmentIds", "video-1");
+
+    await expect(updateTopic(data)).rejects.toThrow("FORUM_INVALID_COVER_ATTACHMENT");
+    expect(mocks.postUpdate).not.toHaveBeenCalled();
+  });
 });

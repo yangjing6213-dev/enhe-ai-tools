@@ -175,6 +175,18 @@ const localVisualToolsById = [
   },
 ];
 const localVisualContentDate = new Date("2026-09-30T00:00:00.000Z");
+const localVisualForumAttachments = [
+  { id: "local-visual-forum-image-1", kind: "image", mimeType: "image/webp", originalName: "local-cover-one.webp" },
+  { id: "local-visual-forum-image-2", kind: "image", mimeType: "image/webp", originalName: "local-cover-two.webp" }
+];
+const localVisualForumPost = {
+  id: "local-visual-forum-post",
+  category: "experience",
+  title: "Local visual fixture forum topic",
+  content: "Local forum editor formatting probe.",
+  coverAttachmentId: localVisualForumAttachments[0].id,
+  attachments: localVisualForumAttachments
+};
 const localVisualArticle = {
   id: "local-visual-article",
   title: "Local visual fixture AI news article",
@@ -329,6 +341,7 @@ const localVisualTutorial = {
   tool: localVisualTool
 };
 const localVisualContentRecords: Record<string, { id: string }> = {
+  forumPost: localVisualForumPost,
   newsArticle: localVisualArticle,
   newsTopic: localVisualTopic,
   productDemo: localVisualProductDemo,

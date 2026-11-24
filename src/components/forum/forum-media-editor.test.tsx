@@ -10,7 +10,9 @@ describe("forum media editor", () => {
     const html = renderToStaticMarkup(<ForumMediaEditor
       locale="zh"
       allowVideo={false}
+      allowCover
       surface="post"
+      initialCoverMediaId="image-1"
       initialAttachments={[{ id: "image-1", kind: "image", mimeType: "image/webp", originalName: "封面.webp" }]}
       editableExisting
     />);
@@ -18,6 +20,9 @@ describe("forum media editor", () => {
     expect(html).toContain("封面.webp");
     expect(html).toContain('src="/api/forum/media/image-1"');
     expect(html).toContain('name="attachmentIds" value="image-1"');
+    expect(html).toContain('name="coverAttachmentId" value="image-1"');
+    expect(html).toContain('aria-pressed="true"');
+    expect(html).toContain("当前封面");
     expect(html).toContain("插入正文");
     expect(html).toContain("长按移除");
     expect(html).toContain("添加图片");

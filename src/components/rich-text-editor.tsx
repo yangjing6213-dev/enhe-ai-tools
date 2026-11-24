@@ -28,6 +28,17 @@ export function insertTextAtSelection(textarea: HTMLTextAreaElement, inserted: s
   textarea.dispatchEvent(new Event("input", { bubbles: true }));
 }
 
+export function wrapTextSelection(value: string, start: number, end: number, prefix: string, suffix: string, fallback: string) {
+  const selected = value.slice(start, end) || fallback;
+  const replacement = `${prefix}${selected}${suffix}`;
+  return {
+    value: `${value.slice(0, start)}${replacement}${value.slice(end)}`,
+    replacement,
+    selectionStart: start + prefix.length,
+    selectionEnd: start + prefix.length + selected.length,
+  };
+}
+
 export function RichTextEditor({ name, locale, id, ariaLabel, defaultValue, value, onChange, required, minLength, maxLength, rows = 10, placeholder, className, emojiPicker = false, newsMedia = false }: RichTextEditorProps) {
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const [uploading, setUploading] = useState(false);
@@ -69,10 +80,9 @@ export function RichTextEditor({ name, locale, id, ariaLabel, defaultValue, valu
     if (!textarea) return;
     const start = textarea.selectionStart;
     const end = textarea.selectionEnd;
-    const selected = textarea.value.slice(start, end) || (english ? "text" : "文字");
-    textarea.setRangeText(`${prefix}${selected}${suffix}`, start, end, "select");
-    const innerStart = start + prefix.length;
-    textarea.setSelectionRange(innerStart, innerStart + selected.length);
+    const formatted = wrapTextSelection(textarea.value, start, end, prefix, suffix, english ? "text" : "文字");
+    textarea.setRangeText(formatted.replacement, start, end, "select");
+    textarea.setSelectionRange(formatted.selectionStart, formatted.selectionEnd);
     textarea.focus();
     textarea.dispatchEvent(new Event("input", { bubbles: true }));
     onChange?.(textarea.value);

@@ -19,6 +19,7 @@ export default async function AdminForumTopicEditPage({ params }: { params: Prom
       category: true,
       title: true,
       content: true,
+      coverAttachmentId: true,
       attachments: { select: mediaSelect, orderBy: { createdAt: "asc" } },
     },
   });
@@ -49,7 +50,7 @@ export default async function AdminForumTopicEditPage({ params }: { params: Prom
         <RichTextEditor id="forum-admin-post-content" ariaLabel={en ? "Content" : "内容"} name="content" locale={locale} defaultValue={post.content} required minLength={2} maxLength={5000} />
         <section className="forum-admin-edit-media" aria-label={en ? "Topic images and attachments" : "话题图片和附件"}>
           <h2>{en ? "Topic images and attachments" : "话题图片和附件"}</h2>
-          <ForumMediaEditor locale={locale} allowVideo={false} surface="post" initialAttachments={post.attachments} editableExisting />
+          <ForumMediaEditor locale={locale} allowVideo={false} allowCover initialCoverMediaId={post.coverAttachmentId ?? ""} surface="post" initialAttachments={post.attachments} editableExisting />
         </section>
         <div className="forum-admin-edit-actions">
           <button className="forum-primary-button" type="submit">{en ? "Save changes" : "保存修改"}</button>

@@ -43,6 +43,13 @@ const missingAdminDetailRoutes = [
 
 const populatedAdminDetailRoutes = [
   {
+    path: "/admin/forum/local-visual-forum-post/edit",
+    heading: "编辑论坛话题",
+    surface: ".forum-admin-edit-form",
+    valueSelector: 'input[name="title"]',
+    value: "Local visual fixture forum topic"
+  },
+  {
     path: "/admin/ai-news/local-visual-article",
     heading: "编辑 AI 资讯",
     surface: ".enhe-admin-content-form > div > form",
@@ -367,6 +374,41 @@ test("Populated admin content detail editors render across all design widths", a
       });
     }
   }
+});
+
+test("Forum topic editor can change its cover and apply text formatting", async ({ page }) => {
+  await page.route("**/api/forum/media/**", async (route) => {
+    if (route.request().method() !== "GET") return route.fallback();
+    await route.fulfill({
+      status: 200,
+      contentType: "image/svg+xml",
+      body: '<svg xmlns="http://www.w3.org/2000/svg" width="32" height="20"><rect width="32" height="20" fill="#dbeafe"/></svg>'
+    });
+  });
+  await page.goto("/admin/forum/local-visual-forum-post/edit", { waitUntil: "networkidle" });
+  await expect(page.locator(".forum-admin-edit-form")).toBeVisible();
+
+  const coverField = page.locator('input[name="coverAttachmentId"]');
+  await expect(coverField).toHaveValue("local-visual-forum-image-1");
+  const secondAttachment = page.locator(".forum-media-editor__item").nth(1);
+  await secondAttachment.getByRole("button", { name: "设为封面" }).click();
+  await expect(coverField).toHaveValue("local-visual-forum-image-2");
+
+  const content = page.locator('textarea[name="content"]');
+  await content.fill("AI社区加粗");
+  await content.selectText();
+  await page.getByRole("button", { name: "加粗", exact: true }).click();
+  await expect(content).toHaveValue("**AI社区加粗**");
+
+  await content.fill("AI社区字号");
+  await content.selectText();
+  await page.getByRole("combobox", { name: "字体大小", exact: true }).selectOption("24");
+  await expect(content).toHaveValue("[[size=24]]AI社区字号[[/size]]");
+
+  await content.fill("AI社区背景");
+  await content.selectText();
+  await page.getByRole("combobox", { name: "文字背景", exact: true }).selectOption("#dbeafe");
+  await expect(content).toHaveValue("[[bg=#dbeafe]]AI社区背景[[/bg]]");
 });
 
 test("Admin AI News desktop pages keep the shared shell", async ({ page }) => {

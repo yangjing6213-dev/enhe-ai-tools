@@ -85,13 +85,14 @@ export async function updateForumPostAction(formData: FormData) {
   const existing = await prisma.forumPost.findUnique({
     where: { id },
     select: {
-      id: true, category: true, title: true, content: true,
+      id: true, category: true, title: true, content: true, coverAttachmentId: true,
       ...(manageAttachments ? { attachments: { where: { discardedAt: null }, select: { id: true, kind: true, fileSize: true, filePath: true, authorId: true, postId: true, replyId: true, discardedAt: true, createdAt: true }, orderBy: { createdAt: "asc" as const } } } : {}),
     },
   });
   if (!existing) throw new Error("FORUM_POST_NOT_FOUND");
 
   const attachmentIds = manageAttachments ? readForumAttachmentIds(formData, "post") : [];
+  const coverAttachmentId = manageAttachments ? text(formData, "coverAttachmentId") || null : null;
   const existingAttachments = manageAttachments ? existing.attachments : [];
   const existingById = new Map(existingAttachments.map((attachment) => [attachment.id, attachment]));
   const newAttachmentIds = attachmentIds.filter((attachmentId) => !existingById.has(attachmentId));
@@ -108,6 +109,9 @@ export async function updateForumPostAction(formData: FormData) {
   if (manageAttachments && (imageCount > 10 || videoCount > 1 || selectedAttachments.some((attachment) => attachment?.kind !== "image" && attachment?.kind !== "video"))) {
     throw new Error("FORUM_INVALID_ATTACHMENTS");
   }
+  if (manageAttachments && coverAttachmentId && selectedAttachments.find((attachment) => attachment?.id === coverAttachmentId)?.kind !== "image") {
+    throw new Error("FORUM_INVALID_COVER_ATTACHMENT");
+  }
   if (manageAttachments) {
     const selectedIds = new Set(attachmentIds);
     const referencedIds = Array.from(parsed.data.content.matchAll(/\[\[media[:=]([a-zA-Z0-9_-]{1,100})\]\]/gu), (match) => match[1]);
@@ -118,7 +122,7 @@ export async function updateForumPostAction(formData: FormData) {
 
   if (manageAttachments) {
     await prisma.$transaction(async (tx) => {
-      await tx.forumPost.update({ where: { id }, data: parsed.data });
+      await tx.forumPost.update({ where: { id }, data: { ...parsed.data, coverAttachmentId } });
       if (newAttachmentIds.length) {
         const claimed = await tx.forumAttachment.updateMany({
           where: { id: { in: newAttachmentIds }, authorId: admin.id, postId: null, replyId: null, discardedAt: null, createdAt: { gte: new Date(Date.now() - forumAttachmentLifetimeMs) } },
@@ -157,7 +161,11 @@ export async function updateForumPostAction(formData: FormData) {
       category: parsed.data.category,
       titleChanged: existing.title !== parsed.data.title,
       contentChanged: existing.content !== parsed.data.content,
-      ...(manageAttachments ? { addedAttachmentCount: newAttachmentIds.length, removedAttachmentCount: removedAttachments.length } : {}),
+      ...(manageAttachments ? {
+        addedAttachmentCount: newAttachmentIds.length,
+        removedAttachmentCount: removedAttachments.length,
+        coverChanged: existing.coverAttachmentId !== coverAttachmentId,
+      } : {}),
     },
   });
   await refreshForum(id);

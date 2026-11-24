@@ -34,7 +34,8 @@ export function SiteBackgroundMusicProvider({
   tracks = SITE_BACKGROUND_MUSIC_TRACKS,
 }: React.PropsWithChildren<{ tracks?: readonly BackgroundMusicTrack[] }>) {
   const audioRef = useRef<HTMLAudioElement>(null);
-  const [selectedTrackId, setSelectedTrackId] = useState(tracks[0]?.id ?? "");
+  const defaultTrack = tracks.find((track) => track.id === "uplifting-acoustic") ?? tracks[0];
+  const [selectedTrackId, setSelectedTrackId] = useState(defaultTrack?.id ?? "");
   const [volume, setVolume] = useState(5);
   const [isPlaying, setIsPlaying] = useState(false);
   const [autoplayBlocked, setAutoplayBlocked] = useState(false);
@@ -67,33 +68,6 @@ export function SiteBackgroundMusicProvider({
   useEffect(() => {
     if (audioRef.current) audioRef.current.volume = volume / 100;
   }, [volume]);
-
-  useEffect(() => {
-    const audio = audioRef.current;
-    if (!audio) return;
-    const onPermissionGesture = () => attemptPlayback();
-    const removePermissionListeners = () => {
-      document.removeEventListener("pointerdown", onPermissionGesture);
-      document.removeEventListener("keydown", onPermissionGesture);
-    };
-    const attemptPlayback = () => {
-      const request = audio.play();
-      if (!request) return;
-      void request.then(() => {
-        setIsPlaying(true);
-        setAutoplayBlocked(false);
-        removePermissionListeners();
-      }).catch(() => {
-        setIsPlaying(false);
-        setAutoplayBlocked(true);
-      });
-    };
-    audio.load();
-    document.addEventListener("pointerdown", onPermissionGesture);
-    document.addEventListener("keydown", onPermissionGesture);
-    attemptPlayback();
-    return removePermissionListeners;
-  }, [selectedTrack?.src]);
 
   const togglePlayback = useCallback(async () => {
     const audio = audioRef.current;

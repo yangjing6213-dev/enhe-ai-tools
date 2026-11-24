@@ -14,19 +14,20 @@ export function removeForumMediaMarkers(content: string, attachmentId: string) {
   return content.split("[[media:" + attachmentId + "]]").join("").split("[[media=" + attachmentId + "]]").join("");
 }
 
-export function ForumMediaEditor({ locale, allowVideo, allowCover = false, surface = allowVideo ? "post" : "reply", initialAttachments = [], editableExisting = false }: {
+export function ForumMediaEditor({ locale, allowVideo, allowCover = false, surface = allowVideo ? "post" : "reply", initialAttachments = [], initialCoverMediaId = "", editableExisting = false }: {
   locale: "zh" | "en";
   allowVideo: boolean;
   allowCover?: boolean;
   surface?: "post" | "reply";
   initialAttachments?: InitialForumAttachment[];
+  initialCoverMediaId?: string;
   editableExisting?: boolean;
 }) {
   const [items, setItems] = useState<MediaItem[]>(() => initialAttachments.flatMap((attachment) => {
     if (attachment.kind !== "image" && attachment.kind !== "video") return [];
     return [{ key: attachment.id, id: attachment.id, name: attachment.originalName, kind: attachment.kind, status: "ready", progress: 100, url: "/api/forum/media/" + encodeURIComponent(attachment.id), existing: true }];
   }));
-  const [coverMediaId, setCoverMediaId] = useState("");
+  const [coverMediaId, setCoverMediaId] = useState(() => allowCover && initialAttachments.some((attachment) => attachment.id === initialCoverMediaId && attachment.kind === "image") ? initialCoverMediaId : "");
   const [error, setError] = useState("");
   const container = useRef<HTMLDivElement>(null);
   const imageInput = useRef<HTMLInputElement>(null);
@@ -123,6 +124,7 @@ export function ForumMediaEditor({ locale, allowVideo, allowCover = false, surfa
           textarea.dispatchEvent(new Event("input", { bubbles: true }));
         }
       }
+      if (item.id === coverMediaId) setCoverMediaId("");
       updateItems((current) => current.filter((entry) => entry.key !== item.key));
       return;
     }

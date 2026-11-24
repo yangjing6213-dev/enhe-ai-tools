@@ -16,7 +16,7 @@ vi.mock("@/lib/db", () => ({ prisma: {
     findMany: async (args: { where?: { status?: string } }) => args.where?.status === "pending"
       ? [{ id: "pending-post", author: { nickname: "用户" }, title: "等待审核", content: "正文", category: "workflow", attachments: [] }]
       : [{ id: "approved-post", author: { nickname: "用户" }, title: "已发布话题", content: "已发布正文", category: "experience", status: "approved", createdAt: new Date("2026-11-20T00:00:00Z") }],
-    findUnique: async () => ({ id: "post-1", category: "workflow", title: "可编辑话题", content: "现有正文", status: "approved", attachments: [{ id: "attachment-1", kind: "image", mimeType: "image/png", originalName: "cover.png" }] }),
+    findUnique: async () => ({ id: "post-1", category: "workflow", title: "可编辑话题", content: "现有正文", status: "approved", coverAttachmentId: "attachment-1", attachments: [{ id: "attachment-1", kind: "image", mimeType: "image/png", originalName: "cover.png" }] }),
   },
   forumReply: { findMany: async () => [] }, forumReport: { findMany: async () => [] },
 } }));
@@ -48,6 +48,9 @@ it("preloads a topic into the administrator editor and shows its existing media"
   expect(html).toContain("话题图片和附件");
   expect(html).toContain("/api/forum/media/attachment-1");
   expect(html).toContain('name="attachmentIds" value="attachment-1"');
+  expect(html).toContain('name="coverAttachmentId" value="attachment-1"');
+  expect(html).toContain('aria-pressed="true"');
+  expect(html).toContain("当前封面");
   expect(html).toContain("插入正文");
   expect(html).toContain("长按移除");
   expect(html).toContain("添加图片");

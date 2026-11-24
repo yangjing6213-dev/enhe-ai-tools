@@ -33,10 +33,17 @@ describe("footer decoration around account forms", () => {
 
   it("gives the bookmark button the same square rounded shape and size as the three social icons", () => {
     const sharedControlRule = footerStyles.match(/\.redesign-footer \.footer-social-links :is\(a, \.footer-social-bookmark\)\s*\{([^}]+)\}/)?.[1] ?? "";
+    const bookmarkWrapperRule = footerStyles.match(/\.redesign-footer \.footer-social-links \.favorite-site-action\s*\{([^}]+)\}/)?.[1] ?? "";
+    const bookmarkButtonRule = footerStyles.match(/\.redesign-footer \.footer-social-links \.footer-social-bookmark\s*\{([^}]+)\}/)?.[1] ?? "";
     expect(sharedControlRule).toMatch(/width:\s*40px/);
     expect(sharedControlRule).toMatch(/height:\s*40px/);
     expect(sharedControlRule).toMatch(/border-radius:\s*8px/);
     expect(sharedControlRule).toMatch(/aspect-ratio:\s*1/);
+    expect(bookmarkWrapperRule).toMatch(/flex:\s*0 0 40px/);
+    expect(bookmarkWrapperRule).toMatch(/width:\s*40px/);
+    expect(bookmarkWrapperRule).toMatch(/height:\s*40px/);
+    expect(bookmarkButtonRule).toMatch(/min-height:\s*40px/);
+    expect(bookmarkButtonRule).toMatch(/padding:\s*0/);
   });
 
   it.each(["zh", "en"] as const)("uses destination-accurate help, tutorial, catalog, and news labels in %s", (locale) => {

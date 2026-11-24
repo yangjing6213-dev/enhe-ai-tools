@@ -1244,11 +1244,18 @@ body .redesign-footer nav {
 .redesign-footer .footer-social-links .favorite-site-action {
   position: relative;
   display: inline-flex;
+  flex: 0 0 40px;
+  width: 40px;
+  height: 40px;
+  box-sizing: border-box;
 }
 
 .redesign-footer .footer-social-links .footer-social-bookmark {
   background: transparent;
   cursor: pointer;
+  min-height: 40px;
+  padding: 0;
+  line-height: 1;
 }
 
 .redesign-footer .footer-social-links .favorite-site-feedback {

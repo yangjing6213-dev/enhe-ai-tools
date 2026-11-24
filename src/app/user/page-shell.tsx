@@ -243,93 +243,32 @@ export async function UserCenterPageShell({
             </form>
           </Panel>
 
-          <Panel id="account-security" title={t.userCenter.accountSettings}>
-            <p className="break-all text-[var(--marketing-text)]">{user.email ?? user.phone}</p>
-            <p className="mt-2 text-sm text-[var(--marketing-muted)]">
-              {t.userCenter.role.replace("{role}", user.role === "admin" ? t.userCenter.admin : t.userCenter.user)}
-            </p>
-            {!user.googleSubject ? <p className="mt-3 text-sm text-[var(--marketing-muted)]">
-              {recovery?.recoveryVerifiedAt
-                ? locale === "en" ? "Recovery email verified" : "找回邮箱已验证"
-                : locale === "en" ? "No verified recovery email yet" : "尚未验证找回邮箱"}
-            </p> : null}
-            {!user.googleSubject ? <Link
-              href={buildLocalePath("/user/recovery-email", locale)}
-              className="mt-3 inline-flex text-sm font-semibold text-[var(--marketing-accent)]"
-            >
-              {recovery?.recoveryVerifiedAt
-                ? locale === "en" ? "Manage recovery email" : "管理找回邮箱"
-                : locale === "en" ? "Set up a verified recovery email" : "设置并验证找回邮箱"}
-            </Link> : null}
-            {passwordMessage ? (
-              <p className={`mt-4 ${passwordMessage.type === "success" ? "status-success" : "status-danger"}`}>{passwordMessage.text}</p>
-            ) : null}
-            {user.googleSubject ? (
-              <p className="mt-5 text-sm text-[var(--marketing-muted)]">
-                {locale === "en" ? "This account uses Google sign-in. Manage your password in your Google account." : "此账号通过 Google 登录，密码请在 Google 账号中管理。"}
-              </p>
-            ) : <form action={changePasswordAction} className="mt-5 grid gap-3">
-            <PasswordInput
-              wrapperClassName="user-center-password-input"
-              name="currentPassword"
-                aria-label={t.userCenter.currentPassword}
-                required
-                autoComplete="current-password"
-                placeholder={t.userCenter.currentPassword}
-                showLabel={t.auth.showPassword}
-                hideLabel={t.auth.hidePassword}
-                className="form-control-dark text-sm"
-              />
-            <PasswordInput
-              wrapperClassName="user-center-password-input"
-              name="newPassword"
-                aria-label={t.userCenter.newPassword}
-                minLength={8}
-                required
-                autoComplete="new-password"
-                placeholder={t.userCenter.newPassword}
-                showLabel={t.auth.showPassword}
-                hideLabel={t.auth.hidePassword}
-                className="form-control-dark text-sm"
-              />
-            <PasswordInput
-              wrapperClassName="user-center-password-input"
-              name="confirmPassword"
-                aria-label={t.userCenter.confirmPassword}
-                minLength={8}
-                required
-                autoComplete="new-password"
-                placeholder={t.userCenter.confirmPassword}
-                showLabel={t.auth.showPassword}
-                hideLabel={t.auth.hidePassword}
-                className="form-control-dark text-sm"
-              />
-              <FormSubmitButton pendingLabel={locale === "en" ? "Saving..." : "保存中..."}>{t.userCenter.changePassword}</FormSubmitButton>
-            </form>}
-          </Panel>
         </aside>
 
         <div className="order-1 min-w-0 space-y-6 lg:order-2">
           <Panel id="orders" title={t.userCenter.orders}>
             <div className="space-y-3">
               {orders.length ? (
-                orders.map((order) => (
+                orders.map((order, index) => (
                   <details key={order.id} className="user-center-record user-center-order rounded-xl border p-4">
                     <summary className="user-center-order-summary cursor-pointer list-none">
-                      <div className="flex flex-wrap justify-between gap-3">
-                        <span className="break-all">{order.orderNo}</span>
-                        <span className="font-semibold text-[var(--enhe-action)]">{formatCurrency(order.amount.toString())}</span>
-                      </div>
-                      <p className="mt-2 text-sm text-[var(--marketing-muted)]">
-                        {order.plan ? formatLegacyPlanName(locale) : order.tool?.name ?? t.userCenter.orderItem}
-                      </p>
-                      <div className="mt-2 flex flex-wrap items-center gap-2 text-sm">
-                        <span className="user-center-badge rounded-full border px-2 py-1">{formatStatus(order.orderStatus, locale)}</span>
-                        <time dateTime={order.createdAt.toISOString()} className="text-xs text-[var(--marketing-muted)]">{formatDateTime(order.createdAt, locale)}</time>
+                      <div className="flex flex-wrap items-center justify-between gap-3">
+                        <span className="font-semibold">{locale === "en" ? `Order ${index + 1}` : `订单 ${index + 1}`}</span>
                         <span className="ml-auto text-xs font-semibold text-[var(--marketing-accent)]">{locale === "en" ? "View order" : "展开订单"}</span>
                       </div>
                     </summary>
                     <div className="user-center-order-details">
+                    <div className="mt-3 flex flex-wrap justify-between gap-3">
+                      <span className="break-all">{order.orderNo}</span>
+                      <span className="font-semibold text-[var(--enhe-action)]">{formatCurrency(order.amount.toString())}</span>
+                    </div>
+                    <p className="mt-2 text-sm text-[var(--marketing-muted)]">
+                      {order.plan ? formatLegacyPlanName(locale) : order.tool?.name ?? t.userCenter.orderItem}
+                    </p>
+                    <div className="mt-2 flex flex-wrap items-center gap-2 text-sm">
+                      <span className="user-center-badge rounded-full border px-2 py-1">{formatStatus(order.orderStatus, locale)}</span>
+                      <time dateTime={order.createdAt.toISOString()} className="text-xs text-[var(--marketing-muted)]">{formatDateTime(order.createdAt, locale)}</time>
+                    </div>
                     {order.paymentProof ? <p className="mt-2 text-sm text-[var(--marketing-muted)]">{t.userCenter.proof} {formatStatus(order.paymentProof.reviewStatus, locale)}</p> : null}
                     {order.orderStatus === "pending_review" || order.paymentProof?.reviewStatus === "pending" ? (
                       <p className="mt-2 text-xs leading-5 text-[var(--marketing-muted)]">{getReviewNotice(locale)}</p>
@@ -363,6 +302,71 @@ export async function UserCenterPageShell({
                 <><EmptyText>{t.userCenter.noOrders}</EmptyText><BrowseProducts locale={locale} /></>
               )}
             </div>
+          </Panel>
+
+          <Panel id="account-security" title={t.userCenter.accountSettings}>
+            <p className="break-all text-[var(--marketing-text)]">{user.email ?? user.phone}</p>
+            <p className="mt-2 text-sm text-[var(--marketing-muted)]">
+              {t.userCenter.role.replace("{role}", user.role === "admin" ? t.userCenter.admin : t.userCenter.user)}
+            </p>
+            {!user.googleSubject ? <p className="mt-3 text-sm text-[var(--marketing-muted)]">
+              {recovery?.recoveryVerifiedAt
+                ? locale === "en" ? "Recovery email verified" : "找回邮箱已验证"
+                : locale === "en" ? "No verified recovery email yet" : "尚未验证找回邮箱"}
+            </p> : null}
+            {!user.googleSubject ? <Link
+              href={buildLocalePath("/user/recovery-email", locale)}
+              className="mt-3 inline-flex text-sm font-semibold text-[var(--marketing-accent)]"
+            >
+              {recovery?.recoveryVerifiedAt
+                ? locale === "en" ? "Manage recovery email" : "管理找回邮箱"
+                : locale === "en" ? "Set up a verified recovery email" : "设置并验证找回邮箱"}
+            </Link> : null}
+            {passwordMessage ? (
+              <p className={`mt-4 ${passwordMessage.type === "success" ? "status-success" : "status-danger"}`}>{passwordMessage.text}</p>
+            ) : null}
+            {user.googleSubject ? (
+              <p className="mt-5 text-sm text-[var(--marketing-muted)]">
+                {locale === "en" ? "This account uses Google sign-in. Manage your password in your Google account." : "此账号通过 Google 登录，密码请在 Google 账号中管理。"}
+              </p>
+            ) : <form action={changePasswordAction} className="mt-5 grid gap-3">
+              <PasswordInput
+                wrapperClassName="user-center-password-input"
+                name="currentPassword"
+                aria-label={t.userCenter.currentPassword}
+                required
+                autoComplete="current-password"
+                placeholder={t.userCenter.currentPassword}
+                showLabel={t.auth.showPassword}
+                hideLabel={t.auth.hidePassword}
+                className="form-control-dark text-sm"
+              />
+              <PasswordInput
+                wrapperClassName="user-center-password-input"
+                name="newPassword"
+                aria-label={t.userCenter.newPassword}
+                minLength={8}
+                required
+                autoComplete="new-password"
+                placeholder={t.userCenter.newPassword}
+                showLabel={t.auth.showPassword}
+                hideLabel={t.auth.hidePassword}
+                className="form-control-dark text-sm"
+              />
+              <PasswordInput
+                wrapperClassName="user-center-password-input"
+                name="confirmPassword"
+                aria-label={t.userCenter.confirmPassword}
+                minLength={8}
+                required
+                autoComplete="new-password"
+                placeholder={t.userCenter.confirmPassword}
+                showLabel={t.auth.showPassword}
+                hideLabel={t.auth.hidePassword}
+                className="form-control-dark text-sm"
+              />
+              <FormSubmitButton pendingLabel={locale === "en" ? "Saving..." : "保存中..."}>{t.userCenter.changePassword}</FormSubmitButton>
+            </form>}
           </Panel>
 
           <Panel title={locale === "en" ? "Background music" : "背景音乐"}>

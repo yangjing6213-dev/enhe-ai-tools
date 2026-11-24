@@ -76,14 +76,36 @@ describe("account center product access and navigation", () => {
     expect(html).not.toContain('href="/orders/manual-1/pay"');
   });
 
-  it("collapses each order and keeps its action links inside the expanded details", async () => {
-    mocks.orders.mockResolvedValue([{ id: "paid-1", orderNo: "PAID-1", amount: 5, orderStatus: "activated", plan: null, tool: skill, paymentProof: null, createdAt: new Date("2026-10-01") }]);
+  it("hides every order detail until its card is expanded", async () => {
+    mocks.orders.mockResolvedValue([
+      { id: "paid-1", orderNo: "PAID-1", amount: 5, orderStatus: "activated", plan: null, tool: skill, paymentProof: null, createdAt: new Date("2026-10-01") },
+      { id: "pending-2", orderNo: "PENDING-2", amount: 9.9, orderStatus: "pending_payment", plan: null, tool: skill, paymentProof: null, createdAt: new Date("2026-10-02") },
+    ]);
     const html = await render("zh");
-    const orderCard = html.slice(html.indexOf("<details"), html.indexOf("</details>") + "</details>".length);
-    expect(orderCard).toContain("PAID-1");
-    expect(orderCard).toContain("<summary");
-    expect(orderCard).toContain('href="/orders/paid-1"');
-    expect(orderCard).not.toMatch(/<details[^>]*open/);
+    const orderCards = [...html.matchAll(/<details[^>]*user-center-order[^>]*>[\s\S]*?<\/details>/g)].map(([card]) => card);
+    expect(orderCards).toHaveLength(2);
+
+    for (const [index, orderCard] of orderCards.entries()) {
+      const summary = orderCard.match(/<summary[^>]*>[\s\S]*?<\/summary>/)?.[0] ?? "";
+      expect(summary).toContain(`订单 ${index + 1}`);
+      expect(summary).toContain("展开订单");
+      expect(summary).not.toMatch(/PAID-1|PENDING-2|Owned AI Skill|¥|激活|待付款|2026/);
+      expect(orderCard).not.toMatch(/<details[^>]*open/);
+    }
+
+    expect(orderCards[0]).toContain("PAID-1");
+    expect(orderCards[0]).toContain("Owned AI Skill");
+    expect(orderCards[0]).toContain("¥5.00");
+    expect(orderCards[0]).toContain('href="/orders/paid-1"');
+    expect(orderCards[1]).toContain("PENDING-2");
+    expect(orderCards[1]).toContain("待支付");
+    expect(orderCards[1]).toContain('href="/orders/pending-2/pay"');
+  });
+
+  it("places background music below account settings in the right column", async () => {
+    const html = await render("zh");
+    expect(html.indexOf('id="orders"')).toBeLessThan(html.indexOf('id="account-security"'));
+    expect(html.indexOf('id="account-security"')).toBeLessThan(html.indexOf("Background music control"));
   });
 
   it("shows the newest three notifications and any older unread notifications", async () => {

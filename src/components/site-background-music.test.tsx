@@ -6,22 +6,18 @@ import { describe, expect, it } from "vitest";
 import { SiteBackgroundMusicCard, SiteBackgroundMusicProvider } from "./site-background-music";
 import { SITE_BACKGROUND_MUSIC_TRACKS } from "@/lib/site-background-music";
 
-const tracks = [
-  { id: "theme-one", label: "Corporate Motivation", src: "/music/theme-one.mp3" },
-  { id: "theme-two", label: "Summer Night", src: "/music/theme-two.mp3" }
-];
-
 describe("site background music controls", () => {
-  it("renders the selected track, playback controls, and a five-percent volume default", () => {
+  it("defaults to Uplifting Acoustic while keeping the five-percent volume default", () => {
     const html = renderToStaticMarkup(
-      <SiteBackgroundMusicProvider tracks={tracks}>
+      <SiteBackgroundMusicProvider>
         <SiteBackgroundMusicCard locale="zh" />
       </SiteBackgroundMusicProvider>
     );
 
-    expect(html).toContain("Corporate Motivation");
-    expect(html).toContain("Summer Night");
-    expect(html).toContain("/music/theme-one.mp3");
+    expect(html).toContain("轻快原声 · Wavecont");
+    expect(html).toContain("/audio/background-music/uplifting-acoustic.mp3");
+    expect(html).toContain('aria-pressed="false"');
+    expect(html).not.toMatch(/<audio[^>]*autoplay/);
     expect(html).toContain('aria-valuenow="5"');
     expect(html).toContain('aria-label="音量"');
     expect(html).toContain("播放音乐");
