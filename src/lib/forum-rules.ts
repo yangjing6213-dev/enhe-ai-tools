@@ -6,7 +6,7 @@ export type ForumCategory = z.infer<typeof forumCategorySchema>;
 export const forumPostInputSchema = z.object({
   category: forumCategorySchema,
   title: z.string().trim().min(2).max(120),
-  content: z.string().trim().min(2).max(5000),
+  content: z.string().trim().min(2),
 });
 
 export const forumReplyInputSchema = z.object({

@@ -333,6 +333,10 @@
 .rich-text-content h2 { font-size: 1.35em; }
 .rich-text-content h3 { font-size: 1.15em; }
 .rich-text-content p, .rich-text-content blockquote, .rich-text-content pre { margin: 0; white-space: pre-wrap; }
+.rich-text-table-wrapper { max-width: 100%; overflow-x: auto; }
+.rich-text-table { width: 100%; border-collapse: collapse; }
+.rich-text-table th, .rich-text-table td { min-width: 7rem; border: 1px solid var(--enhe-border, #d8d8d8); padding: 8px 10px; text-align: left; vertical-align: top; }
+.rich-text-table th { background: rgba(4, 98, 194, .08); font-weight: 600; }
 .rich-text-content blockquote { border-left: 3px solid var(--blue-11, #0462c2); padding: 4px 0 4px 14px; color: var(--enhe-text-muted, #5f665f); }
 .rich-text-content pre { overflow-x: auto; border-radius: 10px; padding: 14px; background: #07112d; color: #e8eefb; }
 .rich-text-content code { border-radius: 4px; padding: .12em .32em; background: rgba(100, 116, 139, .14); font-family: ui-monospace, SFMono-Regular, Consolas, monospace; }

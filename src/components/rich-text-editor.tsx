@@ -28,6 +28,18 @@ export function insertTextAtSelection(textarea: HTMLTextAreaElement, inserted: s
   textarea.dispatchEvent(new Event("input", { bubbles: true }));
 }
 
+export function insertMarkdownTableAtSelection(textarea: HTMLTextAreaElement | null, locale: "zh" | "en") {
+  if (!textarea) return;
+  const before = textarea.value.slice(0, textarea.selectionStart);
+  const after = textarea.value.slice(textarea.selectionEnd);
+  const prefix = before ? (before.endsWith("\n\n") ? "" : before.endsWith("\n") ? "\n" : "\n\n") : "";
+  const suffix = after ? (after.startsWith("\n\n") ? "" : after.startsWith("\n") ? "\n" : "\n\n") : "";
+  const table = locale === "en"
+    ? "| Column 1 | Column 2 |\n| --- | --- |\n| Content | Content |"
+    : "| 列 1 | 列 2 |\n| --- | --- |\n| 内容 | 内容 |";
+  insertTextAtSelection(textarea, `${prefix}${table}${suffix}`);
+}
+
 export function wrapTextSelection(value: string, start: number, end: number, prefix: string, suffix: string, fallback: string) {
   const selected = value.slice(start, end) || fallback;
   const replacement = `${prefix}${selected}${suffix}`;
@@ -130,6 +142,11 @@ export function RichTextEditor({ name, locale, id, ariaLabel, defaultValue, valu
         </label>
         <button type="button" className={actionButtonClass} onClick={() => wrapSelection("`", "`")}>{english ? "Inline code" : "行内代码"}</button>
         <button type="button" className={actionButtonClass} onClick={() => wrapSelection("```\n", "\n```")}>{english ? "Code block" : "代码块"}</button>
+        <button type="button" className={actionButtonClass} onClick={() => {
+          const editor = textareaRef.current;
+          insertMarkdownTableAtSelection(editor, locale);
+          if (editor) onChange?.(editor.value);
+        }}>{english ? "Insert table" : "插入表格"}</button>
         {newsMedia && <label className={`${buttonClass} cursor-pointer focus-within:outline`}>
           {uploading ? (english ? "Uploading…" : "上传中…") : (english ? "Insert image or video" : "插入图片或视频")}
           <input type="file" className="sr-only" accept="image/jpeg,image/png,image/webp,image/gif,video/mp4,video/webm,video/quicktime" disabled={uploading}

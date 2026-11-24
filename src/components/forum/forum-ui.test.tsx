@@ -158,8 +158,11 @@ describe("forum public surfaces", () => {
     expect(html).toContain("加粗");
     expect(html).toContain("字号");
     expect(html).toContain("背景色");
+    expect(html).toContain("插入表格");
     expect(html).toContain('name="coverAttachmentId"');
     expect(html).toContain('class="forum-form-select-control"');
     expect(html).toContain("最多 10 张图片，每张 10MB");
+    const contentField = html.match(/<textarea[^>]*id="forum-post-content"[^>]*>/)?.[0] ?? "";
+    expect(contentField).not.toMatch(/maxlength/i);
   });
 });

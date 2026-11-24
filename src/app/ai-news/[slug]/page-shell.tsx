@@ -585,6 +585,21 @@ function NewsContent({ blocks }: { blocks: NewsContentBlock[] }) {
           );
         }
 
+        if (block.type === "table") {
+          return (
+            <div key={index} className="max-w-full overflow-x-auto rounded-xl border border-[var(--marketing-border)]">
+              <table className="w-full border-collapse text-left text-sm">
+                <thead className="bg-[var(--marketing-accent)]/8 text-[var(--marketing-text)]">
+                  <tr>{block.headers.map((cell, column) => <th key={column} scope="col" className="border-b border-[var(--marketing-border)] px-3 py-2 font-semibold"><NewsTableCellContent cell={cell} /></th>)}</tr>
+                </thead>
+                <tbody className="text-[var(--marketing-muted)]">
+                  {block.rows.map((row, rowIndex) => <tr key={rowIndex}>{block.headers.map((_, column) => <td key={column} className="border-b border-[var(--marketing-border)] px-3 py-2 align-top"><NewsTableCellContent cell={row[column] ?? ""} /></td>)}</tr>)}
+                </tbody>
+              </table>
+            </div>
+          );
+        }
+
         if (block.type === "video") {
           return <video key={index} className="w-full rounded-xl" src={block.src} controls playsInline preload="metadata" aria-label={block.label || undefined} />;
         }
@@ -667,6 +682,12 @@ function InlineParts({ parts }: { parts: NewsInlinePart[] }) {
       })}
     </>
   );
+}
+
+function NewsTableCellContent({ cell }: { cell: string | { parts: NewsInlinePart[] } }) {
+  return typeof cell === "string"
+    ? <span dangerouslySetInnerHTML={{ __html: cell }} />
+    : <InlineParts parts={cell.parts} />;
 }
 
 function normalizeAiNewsInternalHref(href: string) {

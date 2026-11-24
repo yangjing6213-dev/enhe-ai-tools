@@ -9,11 +9,11 @@ import {
 } from "@/lib/forum-rules";
 
 describe("forum rules", () => {
-  it("accepts the four fixed categories and enforces post text limits", () => {
+  it("accepts long topic content without a fixed character cap", () => {
     expect(forumPostInputSchema.safeParse({ category: "question", title: "请教", content: "求建议" }).success).toBe(true);
     expect(forumPostInputSchema.safeParse({ category: "other", title: "请教", content: "求建议" }).success).toBe(false);
     expect(forumPostInputSchema.safeParse({ category: "question", title: "x".repeat(121), content: "求建议" }).success).toBe(false);
-    expect(forumPostInputSchema.safeParse({ category: "question", title: "有效标题", content: "x".repeat(5001) }).success).toBe(false);
+    expect(forumPostInputSchema.safeParse({ category: "question", title: "有效标题", content: "x".repeat(10000) }).success).toBe(true);
   });
 
   it("enforces reply text limits and stops reply trees at depth five", () => {

@@ -27,6 +27,8 @@ export type NewsInlinePart =
   | { type: "size"; size: number; text: string }
   | { type: "background"; color: string; text: string };
 
+type NewsTableCell = string | { parts: NewsInlinePart[] };
+
 export type NewsContentBlock =
   | { type: "heading"; level: 2 | 3; id: string; text: string }
   | { type: "paragraph"; text?: string; parts?: NewsInlinePart[] }
@@ -38,6 +40,7 @@ export type NewsContentBlock =
       items: Array<string | { parts: NewsInlinePart[] }>;
     }
   | { type: "quote"; text: string }
+  | { type: "table"; headers: NewsTableCell[]; rows: NewsTableCell[][] }
   | { type: "code"; language?: string; code: string };
 
 export const newsPageSize = 9;
@@ -406,6 +409,12 @@ function inlineListItem(value: string): string | { parts: NewsInlinePart[] } {
     : parts.map((part) => part.text).join("");
 }
 
+function parseNewsTableRow(value: string) {
+  const trimmed = value.trim();
+  if (!trimmed.includes("|")) return null;
+  return trimmed.replace(/^\|/u, "").replace(/\|$/u, "").split("|").map((cell) => cell.trim());
+}
+
 export function renderNewsContentBlocks(content: string): NewsContentBlock[] {
   const blocks: NewsContentBlock[] = [];
   const paragraphLines: string[] = [];
@@ -416,7 +425,9 @@ export function renderNewsContentBlocks(content: string): NewsContentBlock[] {
   let codeLanguage = "";
   const codeLines: string[] = [];
 
-  for (const rawLine of content.split(/\r?\n/)) {
+  const lines = content.split(/\r?\n/);
+  for (let index = 0; index < lines.length; index += 1) {
+    const rawLine = lines[index];
     const line = rawLine.trimEnd();
     const codeFence = line.match(/^```(.*)$/);
     if (codeFence) {
@@ -440,6 +451,25 @@ export function renderNewsContentBlocks(content: string): NewsContentBlock[] {
 
     if (inCode) {
       codeLines.push(rawLine);
+      continue;
+    }
+
+    const headers = parseNewsTableRow(line);
+    const divider = parseNewsTableRow(lines[index + 1] ?? "");
+    if (headers?.length && divider?.length === headers.length && divider.every((cell) => /^:?-{3,}:?$/u.test(cell))) {
+      pushParagraph(paragraphLines, blocks);
+      pushList(listItems, currentListOrdered, blocks);
+      const rows: NewsTableCell[][] = [];
+      let rowIndex = index + 2;
+      while (rowIndex < lines.length && lines[rowIndex].trim()) {
+        const cells = parseNewsTableRow(lines[rowIndex]);
+        if (!cells) break;
+        const normalized = [...cells.slice(0, headers.length), ...Array(Math.max(0, headers.length - cells.length)).fill("")];
+        rows.push(normalized.map(inlineListItem));
+        rowIndex += 1;
+      }
+      blocks.push({ type: "table", headers: headers.map(inlineListItem), rows });
+      index = rowIndex - 1;
       continue;
     }
 

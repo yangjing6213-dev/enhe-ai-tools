@@ -275,6 +275,16 @@ describe("AI news helpers", () => {
     });
   });
 
+  it("renders inserted markdown tables while preserving safe inline formatting", () => {
+    expect(renderNewsContentBlocks("| 名称 | 用途 |\n| --- | --- |\n| **重点** | AI 工具 |" )).toEqual([
+      {
+        type: "table",
+        headers: ["名称", "用途"],
+        rows: [[{ parts: [{ type: "bold", text: "重点" }] }, "AI 工具"]],
+      },
+    ]);
+  });
+
   it("builds deduped related keywords without generic automation tags", () => {
     expect(
       buildAiNewsRelatedKeywords({

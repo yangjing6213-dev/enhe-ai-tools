@@ -62,7 +62,7 @@ export default async function AdminForumTopicEditPage({
           <input name="title" required minLength={2} maxLength={120} defaultValue={post.title} />
         </label>
         <label htmlFor="forum-admin-post-content">{en ? "Content" : "内容"}</label>
-        <RichTextEditor id="forum-admin-post-content" ariaLabel={en ? "Content" : "内容"} name="content" locale={locale} defaultValue={post.content} required minLength={2} maxLength={5000} />
+        <RichTextEditor id="forum-admin-post-content" ariaLabel={en ? "Content" : "内容"} name="content" locale={locale} defaultValue={post.content} required minLength={2} />
         <section className="forum-admin-edit-media" aria-label={en ? "Topic images and attachments" : "话题图片和附件"}>
           <h2>{en ? "Topic images and attachments" : "话题图片和附件"}</h2>
           <ForumMediaEditor locale={locale} allowVideo={false} allowCover initialCoverMediaId={post.coverAttachmentId ?? ""} surface="post" initialAttachments={post.attachments} editableExisting />

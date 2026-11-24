@@ -7,7 +7,14 @@ type ContentBlock =
   | { type: "heading"; level: 2 | 3; text: string }
   | { type: "quote"; text: string }
   | { type: "code"; text: string }
+  | { type: "table"; rows: string[][] }
   | { type: "media"; id: string };
+
+function parseTableRow(line: string) {
+  const trimmed = line.trim();
+  if (!trimmed.includes("|")) return null;
+  return trimmed.replace(/^\|/u, "").replace(/\|$/u, "").split("|").map((cell) => cell.trim());
+}
 
 function parseBlocks(content: string): ContentBlock[] {
   const blocks: ContentBlock[] = [];
@@ -20,7 +27,9 @@ function parseBlocks(content: string): ContentBlock[] {
     paragraph.length = 0;
   };
 
-  for (const line of content.split(/\r?\n/u)) {
+  const lines = content.split(/\r?\n/u);
+  for (let index = 0; index < lines.length; index += 1) {
+    const line = lines[index];
     if (/^```/.test(line.trim())) {
       if (inCode) {
         blocks.push({ type: "code", text: code.join("\n") });
@@ -33,6 +42,22 @@ function parseBlocks(content: string): ContentBlock[] {
       continue;
     }
     if (inCode) { code.push(line); continue; }
+    const headers = parseTableRow(line);
+    const divider = parseTableRow(lines[index + 1] ?? "");
+    if (headers?.length && divider?.length === headers.length && divider.every((cell) => /^:?-{3,}:?$/u.test(cell))) {
+      flushParagraph();
+      const rows = [headers];
+      let rowIndex = index + 2;
+      while (rowIndex < lines.length && lines[rowIndex].trim()) {
+        const cells = parseTableRow(lines[rowIndex]);
+        if (!cells) break;
+        rows.push([...cells.slice(0, headers.length), ...Array(Math.max(0, headers.length - cells.length)).fill("")]);
+        rowIndex += 1;
+      }
+      blocks.push({ type: "table", rows });
+      index = rowIndex - 1;
+      continue;
+    }
     if (!line.trim()) { flushParagraph(); continue; }
     const media = line.trim().match(/^\[\[media[:=]([a-zA-Z0-9_-]{1,100})\]\]$/u);
     const heading = line.match(/^(#{1,2})\s+(.+)$/u);
@@ -101,6 +126,7 @@ export function RichTextContent({ content, attachments = [], locale = "zh", clas
       if (block.type === "heading") return block.level === 2 ? <h2 key={index}><InlineText text={block.text} mediaById={mediaById} locale={locale} /></h2> : <h3 key={index}><InlineText text={block.text} mediaById={mediaById} locale={locale} /></h3>;
       if (block.type === "quote") return <blockquote key={index}><InlineText text={block.text} mediaById={mediaById} locale={locale} /></blockquote>;
       if (block.type === "code") return <pre key={index}><code>{block.text}</code></pre>;
+      if (block.type === "table") return <div className="rich-text-table-wrapper" key={index}><table className="rich-text-table"><thead><tr>{block.rows[0].map((cell, column) => <th key={column} scope="col"><InlineText text={cell} mediaById={mediaById} locale={locale} /></th>)}</tr></thead><tbody>{block.rows.slice(1).map((row, rowIndex) => <tr key={rowIndex}>{block.rows[0].map((_, column) => <td key={column}><InlineText text={row[column] ?? ""} mediaById={mediaById} locale={locale} /></td>)}</tr>)}</tbody></table></div>;
       if (block.type === "media") return <div className="rich-text-media-block" key={index}><InlineMedia id={block.id} mediaById={mediaById} locale={locale} /></div>;
       return <p key={index}><InlineText text={block.text} mediaById={mediaById} locale={locale} /></p>;
     })}
