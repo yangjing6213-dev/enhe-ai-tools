@@ -149,7 +149,7 @@ for (const locale of ["zh", "en"] as const) {
     const builderBody = pageSource.match(/export function buildAiTrendReportSrcDoc\(fullHtml: string, locale: Locale = "zh"\) \{([\s\S]*)\}\s*$/)?.[1];
     expect(builderBody).toBeTruthy();
     const buildSrcDoc = new Function("fullHtml", "locale", builderBody!) as (html: string, locale: string) => string;
-    const srcdoc = buildSrcDoc(`<style>body { font-family: system-ui,"Microsoft YaHei",sans-serif; }</style><p id="report-font-probe">${locale === "en" ? "AI trends report" : "中文人工智能趋势报告"}</p>`, locale);
+    const srcdoc = buildSrcDoc(`<style>body { font-family: system-ui,"Microsoft YaHei",sans-serif; } .rank { font: 700 12px Consolas,monospace; }</style><p id="report-font-probe">${locale === "en" ? "AI trends report" : "中文人工智能趋势报告"}</p><span id="report-rank-probe" class="rank">1</span>`, locale);
     const fontResponses: Array<{ origin: string | undefined; mode: string | undefined; allowOrigin: string | undefined }> = [];
     page.on("response", async (response) => {
       const fontPath = new URL(response.url()).pathname;
@@ -184,6 +184,10 @@ for (const locale of ["zh", "en"] as const) {
     expect(firstFamily(reportFont.family)).toBe(family);
     expect(reportFont.loaded.length).toBeGreaterThan(0);
     expect(reportFont.loaded.every((status) => status === "loaded")).toBe(true);
+    const rank = frame.locator("#report-rank-probe");
+    expect(firstFamily(await rank.evaluate((element) => getComputedStyle(element).fontFamily))).toBe(family);
+    await expect(rank).toHaveCSS("font-size", "12px");
+    await expect(rank).toHaveCSS("font-weight", "700");
     await expect.poll(() => fontResponses.some((response) => response.allowOrigin === "*" && (
       browserName === "webkit"
         ? response.origin === undefined && response.mode === "no-cors"
