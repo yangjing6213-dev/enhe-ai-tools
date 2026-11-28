@@ -1,0 +1,29 @@
+{
+  "family": "MiSans Latin",
+  "cssFamily": "MiSans",
+  "modified": false,
+  "source": "https://hyperos.mi.com/font-download/MiSans_Latin.zip",
+  "sourceSha256": "d24091ccd409a4152ffcc12cd659c16df9cdcdb4c702d8ae355b321e711f0004",
+  "license": "LICENSE.pdf",
+  "licenseSource": "https://hyperos.mi.com/font-download/MiSans%E5%AD%97%E4%BD%93%E7%9F%A5%E8%AF%86%E4%BA%A7%E6%9D%83%E8%AE%B8%E5%8F%AF%E5%8D%8F%E8%AE%AE.pdf",
+  "assets": [
+    {
+      "file": "MiSansLatin-Regular-fc17182f3f2b.woff2",
+      "weight": 330,
+      "bytes": 61144,
+      "sha256": "fc17182f3f2b941cef6ca1317cb50d556532fdff46d8c540234543947b9fa0e5"
+    },
+    {
+      "file": "MiSansLatin-Semibold-8d81deaf1c0f.woff2",
+      "weight": 520,
+      "bytes": 69284,
+      "sha256": "8d81deaf1c0fae067649d572171f63c08c2bb434c3a3263aa6f1c831282a2c46"
+    },
+    {
+      "file": "MiSansLatin-Bold-9dfe63a0d0b3.woff2",
+      "weight": 630,
+      "bytes": 69772,
+      "sha256": "9dfe63a0d0b3347f4c466f9ae58264a4a8df63c47660cab2a0c4b8c58c06461b"
+    }
+  ]
+}

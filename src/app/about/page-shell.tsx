@@ -273,6 +273,11 @@ export function AboutPageShell({ forceLocale }: { forceLocale: Locale }) {
             <p className="mt-5 max-w-3xl text-sm leading-7 text-[var(--marketing-muted)]">
               {copy.intro}
             </p>
+            <p id="font-license" className="mt-5 text-sm leading-7">
+              {forceLocale === "en" ? "This site uses OPPO Sans and MiSans fonts. " : "本站使用 OPPO Sans 与 MiSans 字体。"}
+              <a href="/fonts/oppo-sans-4/LICENSE.txt" className="underline">{forceLocale === "en" ? "OPPO Sans license" : "OPPO Sans 字体许可"}</a>{" · "}
+              <a href="/fonts/misans-latin/LICENSE.pdf" className="underline">{forceLocale === "en" ? "MiSans license" : "MiSans 字体许可"}</a>
+            </p>
           </div>
         </section>
 

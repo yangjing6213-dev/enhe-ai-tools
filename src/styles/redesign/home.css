@@ -45,6 +45,8 @@
 }
 
 .redesign-home .redesign-home-hero-inner h1 {
+  /* Preserve the approved headline, including its mobile rendering. */
+  font-family: "ENHE Rounded", "Microsoft YaHei", Arial, sans-serif;
   max-width: 860px;
   margin: 0 auto;
   color: var(--enhe-text, #080808);

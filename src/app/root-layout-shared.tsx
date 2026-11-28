@@ -49,6 +49,7 @@ export async function RootDocument({
   return (
     <html lang={lang} suppressHydrationWarning>
       <head>
+        {lang === "zh-CN" ? <link rel="preload" href="/fonts/oppo-sans-4/oppo-sans-4.0-4f58dbaeaea7.ttf" as="font" type="font/ttf" crossOrigin="anonymous" /> : null}
         <link
           rel="alternate"
           type="text/plain"

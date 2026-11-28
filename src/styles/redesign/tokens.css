@@ -41,11 +41,11 @@
   --enhe-z-header: 20;
   --enhe-z-layer: 40;
   --enhe-z-focus: 60;
-  --enhe-font-zh: "ENHE Rounded", "Microsoft YaHei", Arial, sans-serif;
-  --enhe-font-en: "ENHE Rounded", "Microsoft YaHei", Arial, sans-serif;
-  --enhe-font-display: "ENHE Rounded", "Microsoft YaHei", Arial, sans-serif;
-  --enhe-font-utility: "ENHE Rounded", "Microsoft YaHei", Arial, sans-serif;
-  --enhe-font-brand-label: "LXGW WenKai Lite", var(--enhe-font-zh);
+  --enhe-font-zh: "OPPO Sans 4.0", "Microsoft YaHei", Arial, sans-serif;
+  --enhe-font-en: "MiSans", "OPPO Sans 4.0", Arial, sans-serif;
+  --enhe-font-display: var(--font-sans);
+  --enhe-font-utility: var(--font-sans);
+  --enhe-font-brand-label: var(--font-sans);
 
   /* Typeshare comparison tokens: layout rhythm only, never reference-brand assets. */
   --enhe-reference-brand: var(--enhe-action);

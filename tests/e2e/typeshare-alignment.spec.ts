@@ -111,9 +111,9 @@ for (const route of routes) {
         titleColor: "rgb(0, 0, 0)",
         titleTrackingRatio: -0.025,
       });
-      const expectedLocaleFont = "ENHE Rounded";
-      expect(designTokens.bodyFont).toContain(expectedLocaleFont);
-      expect(designTokens.titleFont).toContain(expectedLocaleFont);
+      const expectedLocaleFont = route.startsWith("/en/") ? "MiSans" : "OPPO Sans 4.0";
+      expect(designTokens.bodyFont.split(",")[0].replace(/["']/g, "").trim()).toBe(expectedLocaleFont);
+      expect(designTokens.titleFont.split(",")[0].replace(/["']/g, "").trim()).toBe(expectedLocaleFont);
       expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBeLessThanOrEqual(width);
       const masthead = page.locator("header.redesign-header");
       await expect(masthead).toHaveCount(1);

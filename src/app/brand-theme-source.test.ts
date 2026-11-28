@@ -26,7 +26,7 @@ describe("ENHE shared design tokens", () => {
     const css = readFileSync(resolve(root, "src/app/globals.css"), "utf8");
 
     expect(css).toContain("font-family: 'ENHE Rounded'");
-    expect(css).toContain("--font-sans: 'ENHE Rounded'");
+    expect(css).toContain("--font-sans: 'OPPO Sans 4.0'");
   });
 
   it("uses white text when legacy accent backgrounds are remapped to blue", () => {

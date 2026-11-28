@@ -9,6 +9,30 @@ const rootLayoutPath = join(projectRoot, "src", "app", "root-layout-shared.tsx")
 const publicFontsPath = join(projectRoot, "public", "fonts");
 
 describe("ENHE typography source contract", () => {
+  it("serves the unmodified official MiSans Latin faces and full license", () => {
+    const fontDir = join(publicFontsPath, "misans-latin");
+    const manifest = JSON.parse(readFileSync(join(fontDir, "manifest.json"), "utf8"));
+    expect(manifest.modified).toBe(false);
+    expect(manifest.assets.map((asset: { weight: number }) => asset.weight)).toEqual([330, 520, 630]);
+    for (const asset of manifest.assets) {
+      const bytes = readFileSync(join(fontDir, asset.file));
+      expect(bytes.length).toBe(asset.bytes);
+      expect(createHash("sha256").update(bytes).digest("hex")).toBe(asset.sha256);
+    }
+    const license = readFileSync(join(fontDir, "LICENSE.pdf"));
+    expect(createHash("sha256").update(license).digest("hex")).toBe("4a93a27cd2bd81b3b5ecfd0a853144a876fa26938a93a68443c67d74172fcb86");
+  });
+  it("embeds the unchanged official OPPO variable font with its bundled license", () => {
+    const fontDir = join(publicFontsPath, "oppo-sans-4");
+    const manifest = JSON.parse(readFileSync(join(fontDir, "manifest.json"), "utf8"));
+    const bytes = readFileSync(join(fontDir, manifest.file));
+    expect(createHash("sha256").update(bytes).digest("hex")).toBe("4f58dbaeaea78ebe9dafaadd2bec60f50983ef15de31605beff55aac94420dd2");
+    expect(bytes.length).toBe(22775460);
+    expect(manifest.modified).toBe(false);
+    expect(readFileSync(join(fontDir, "LICENSE.txt"), "utf8")).toContain("embed, bundle, redistribute");
+    expect(readFileSync(cssPath, "utf8")).toContain("font-weight: 100 700;");
+    expect(readFileSync(join(projectRoot, "src/app/about/page-shell.tsx"), "utf8")).toContain("This site uses OPPO Sans and MiSans fonts.");
+  });
   it("ships the complete approved OFL face with a verified immutable asset and preserved glyph evidence", () => {
     const fontDir = join(publicFontsPath, "enhe-rounded");
     const manifest = JSON.parse(readFileSync(join(fontDir, "manifest.json"), "utf8"));
@@ -33,7 +57,7 @@ describe("ENHE typography source contract", () => {
     expect(existsSync(join(publicFontsPath, "misans", "MiSans-Bold.min.css"))).toBe(true);
   });
 
-  it("sets the approved rounded font as the shared Chinese and English UI family", () => {
+  it("sets the approved OPPO Chinese and MiSans English UI families", () => {
     const css = readFileSync(cssPath, "utf8");
 
     expect(css).toContain("@font-face");
@@ -47,20 +71,20 @@ describe("ENHE typography source contract", () => {
     expect(css).not.toContain('@import "../../public/fonts/misans/MiSans-Bold.min.css"');
     expect(css).not.toContain("@import url('/fonts/misans/MiSans-Regular.min.css')");
     expect(css).not.toContain("@import url('/fonts/misans/MiSans-Bold.min.css')");
-    expect(css).toContain("--font-sans: 'ENHE Rounded', 'Microsoft YaHei', Arial, sans-serif");
-    expect(css).toContain("--font-heading-zh: 'ENHE Rounded', 'Microsoft YaHei', Arial, sans-serif");
+    expect(css).toContain("--font-sans: 'OPPO Sans 4.0', 'Microsoft YaHei', Arial, sans-serif");
+    expect(css).toContain("--font-heading-zh: 'OPPO Sans 4.0', 'Microsoft YaHei', Arial, sans-serif");
     expect(css).toContain("font-family: var(--font-sans)");
     expect(css).not.toContain("fonts.googleapis.com");
   });
 
-  it("keeps Chinese and English headings aligned to the same approved rounded family", () => {
+  it("uses the language-specific family for ordinary headings", () => {
     const css = readFileSync(cssPath, "utf8");
 
     expect(css).toContain("html[lang='zh-CN'] :is(h1, h2, h3, .home-hero-title)");
     expect(css).toContain("font-family: var(--font-heading-zh)");
     expect(css).toContain("html[lang='en-US'] :is(h1, h2, h3, .home-hero-title)");
     expect(css).toContain("font-family: var(--font-heading-en)");
-    expect(css).toContain("--font-heading-en: 'ENHE Rounded'");
+    expect(css).toContain("--font-heading-en: 'MiSans'");
   });
 
   it("does not preload unused Montserrat 800 and 900 font files in the shared document head", () => {

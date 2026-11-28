@@ -347,7 +347,7 @@
   padding: 16px;
   background: var(--enhe-page-bg);
   color: var(--enhe-text);
-  font-family: var(--enhe-font-zh);
+  font-family: var(--font-sans);
 }
 
 .redesign-header-search-panel h2,

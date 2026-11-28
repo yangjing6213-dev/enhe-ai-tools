@@ -22,9 +22,41 @@
   font-weight: 500;
 }
 
+@font-face {
+  font-family: 'OPPO Sans 4.0';
+  src: url('/fonts/oppo-sans-4/oppo-sans-4.0-4f58dbaeaea7.ttf') format('truetype');
+  font-display: swap;
+  font-style: normal;
+  font-weight: 100 700;
+}
+
+@font-face {
+  font-family: 'MiSans';
+  src: url('/fonts/misans-latin/MiSansLatin-Regular-fc17182f3f2b.woff2') format('woff2');
+  font-display: swap;
+  font-style: normal;
+  font-weight: 330;
+}
+
+@font-face {
+  font-family: 'MiSans';
+  src: url('/fonts/misans-latin/MiSansLatin-Semibold-8d81deaf1c0f.woff2') format('woff2');
+  font-display: swap;
+  font-style: normal;
+  font-weight: 520;
+}
+
+@font-face {
+  font-family: 'MiSans';
+  src: url('/fonts/misans-latin/MiSansLatin-Bold-9dfe63a0d0b3.woff2') format('woff2');
+  font-display: swap;
+  font-style: normal;
+  font-weight: 630;
+}
+
 @theme {
-  --font-sans: 'ENHE Rounded', 'Microsoft YaHei', Arial, sans-serif;
-  --font-heading: 'ENHE Rounded', 'Microsoft YaHei', Arial, sans-serif;
+  --font-sans: 'OPPO Sans 4.0', 'Microsoft YaHei', Arial, sans-serif;
+  --font-heading: var(--font-sans);
 }
 
 :root {
@@ -42,9 +74,9 @@
   --blue-11: var(--brand-blue);
   --blue-12: var(--brand-blue);
   color-scheme: light;
-  --font-sans: 'ENHE Rounded', 'Microsoft YaHei', Arial, sans-serif;
-  --font-heading-en: 'ENHE Rounded', var(--font-sans);
-  --font-heading-zh: 'ENHE Rounded', 'Microsoft YaHei', Arial, sans-serif;
+  --font-sans: 'OPPO Sans 4.0', 'Microsoft YaHei', Arial, sans-serif;
+  --font-heading-en: 'MiSans', 'OPPO Sans 4.0', Arial, sans-serif;
+  --font-heading-zh: 'OPPO Sans 4.0', 'Microsoft YaHei', Arial, sans-serif;
   --mouse-x: 72vw;
   --mouse-y: 18vh;
   --marketing-bg: #ffffff;
@@ -5701,8 +5733,8 @@ select option:disabled {
 }
 
 @theme inline {
-  --font-heading: 'ENHE Rounded', 'Microsoft YaHei', Arial, sans-serif;
-  --font-sans: 'ENHE Rounded', 'Microsoft YaHei', Arial, sans-serif;
+  --font-heading: var(--font-sans);
+  --font-sans: 'OPPO Sans 4.0', 'Microsoft YaHei', Arial, sans-serif;
   --color-sidebar-ring: var(--sidebar-ring);
   --color-sidebar-border: var(--sidebar-border);
   --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
@@ -5985,3 +6017,6 @@ select option:disabled {
   font-family: var(--font-sans), "Apple Color Emoji", "Segoe UI Emoji", "Noto Color Emoji";
   overflow-wrap: anywhere;
 }
+
+/* Page language controls body text, headings and native form controls. */
+html:lang(en) { --font-sans: var(--font-heading-en); }

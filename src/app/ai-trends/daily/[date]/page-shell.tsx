@@ -214,7 +214,7 @@ export async function AiTrendDailyDetailPageShell({
                 </div>
                 <iframe
                   title={`${view.title} ${text.fullHtml}`}
-                  srcDoc={buildAiTrendReportSrcDoc(view.fullHtml)}
+                  srcDoc={buildAiTrendReportSrcDoc(view.fullHtml, forceLocale)}
                   sandbox="allow-popups allow-popups-to-escape-sandbox"
                   referrerPolicy="no-referrer"
                   className="h-[78vh] min-h-[620px] w-full rounded-2xl border border-white/10 bg-white"
@@ -272,6 +272,14 @@ export async function AiTrendDailyDetailPageShell({
   );
 }
 
-export function buildAiTrendReportSrcDoc(fullHtml: string) {
-  return `<!doctype html><html lang="zh-CN"><head><meta charset="utf-8"><base target="_blank"><meta name="viewport" content="width=device-width,initial-scale=1"><style>html,body{margin:0;background:#fff;color:#111;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Microsoft YaHei",Arial,sans-serif;}a{color:#c44725}</style></head><body>${fullHtml}</body></html>`;
+export function buildAiTrendReportSrcDoc(fullHtml: string, locale: Locale = "zh") {
+  const language = locale === "en" ? "en-US" : "zh-CN";
+  const family = locale === "en" ? '"MiSans","OPPO Sans 4.0"' : '"OPPO Sans 4.0"';
+  const misans = locale === "en" ? [
+    ["MiSansLatin-Regular-fc17182f3f2b.woff2", 330],
+    ["MiSansLatin-Semibold-8d81deaf1c0f.woff2", 520],
+    ["MiSansLatin-Bold-9dfe63a0d0b3.woff2", 630]
+  ].map(([file, weight]) => `@font-face{font-family:"MiSans";src:url("/fonts/misans-latin/${file}") format("woff2");font-style:normal;font-weight:${weight};font-display:swap;}`).join("") : "";
+  // Published reports can include their own body font; keep the selected site family authoritative.
+  return `<!doctype html><html lang="${language}"><head><meta charset="utf-8"><base target="_blank"><meta name="viewport" content="width=device-width,initial-scale=1"><style>@font-face{font-family:"OPPO Sans 4.0";src:url("/fonts/oppo-sans-4/oppo-sans-4.0-4f58dbaeaea7.ttf") format("truetype");font-style:normal;font-weight:100 700;font-display:swap;}${misans}html,body{margin:0;background:#fff;color:#111;font-family:${family},-apple-system,BlinkMacSystemFont,"Segoe UI","Microsoft YaHei",Arial,sans-serif!important;}a{color:#c44725}</style></head><body>${fullHtml}</body></html>`;
 }
