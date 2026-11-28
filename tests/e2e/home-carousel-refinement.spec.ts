@@ -1,5 +1,30 @@
 import { expect, test } from "@playwright/test";
 
+test("folder closes when Escape immediately follows native summary activation", async ({ page }) => {
+  await page.setViewportSize({ width: 1440, height: 1000 });
+  await page.goto("/");
+  const folder = page.locator(".redesign-home-features .folder-float").first();
+  // Confirm hydration and begin with React state and the native details element both closed.
+  await folder.hover();
+  await expect(folder).toHaveAttribute("data-open", "");
+  await folder.locator(".folder-float__trigger").focus();
+  await page.keyboard.press("Escape");
+  await page.mouse.move(0, 0);
+  await expect(folder).not.toHaveAttribute("data-open");
+  await expect(folder).not.toHaveAttribute("open");
+
+  const state = await folder.evaluate((node: HTMLDetailsElement) => {
+    const summary = node.querySelector<HTMLElement>("summary")!;
+    // A native toggle changes .open before its queued toggle event updates React state.
+    summary.click();
+    const opened = node.open;
+    summary.dispatchEvent(new KeyboardEvent("keydown", { key: "Escape", bubbles: true }));
+    return { opened, closed: !node.open };
+  });
+  expect(state).toEqual({ opened: true, closed: true });
+  await expect(folder).not.toHaveAttribute("open");
+});
+
 for (const route of ["/", "/en"]) {
   test(`homepage folder text is centered inside each floating label on ${route}`, async ({ page }) => {
     for (const viewport of [{ width: 1366, height: 768 }, { width: 390, height: 844 }]) {

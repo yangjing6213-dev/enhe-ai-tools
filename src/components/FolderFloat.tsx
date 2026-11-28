@@ -423,7 +423,7 @@ const FolderFloat: React.FC<FolderFloatProps> = ({
           : undefined
       }
       onKeyDown={(e: React.KeyboardEvent<HTMLDetailsElement>) => {
-        if (e.key === 'Escape' && open) {
+        if (e.key === 'Escape' && e.currentTarget.open) {
           e.stopPropagation();
           set(false);
         }
