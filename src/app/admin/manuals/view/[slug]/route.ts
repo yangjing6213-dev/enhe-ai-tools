@@ -2,6 +2,7 @@ import { readFile } from "node:fs/promises";
 import { NextResponse } from "next/server";
 import { getCurrentUser } from "@/lib/auth";
 import { getOperationManualBySlug, getOperationManualFilePath } from "@/lib/operation-manuals";
+import { injectStandalonePageTypography } from "@/lib/standalone-page-typography";
 
 export async function GET(_: Request, { params }: { params: Promise<{ slug: string }> }) {
   const user = await getCurrentUser();
@@ -16,7 +17,9 @@ export async function GET(_: Request, { params }: { params: Promise<{ slug: stri
   }
 
   try {
-    const html = await readFile(getOperationManualFilePath(manual), "utf8");
+    const source = await readFile(getOperationManualFilePath(manual), "utf8");
+    const htmlLanguage = source.match(/<html\b[^>]*\blang=["']([^"']+)["']/i)?.[1]?.toLowerCase();
+    const html = injectStandalonePageTypography(source, htmlLanguage?.startsWith("en") ? "en" : "zh");
     return new Response(html, {
       headers: {
         "Cache-Control": "private, no-store",

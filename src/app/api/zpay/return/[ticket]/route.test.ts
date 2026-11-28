@@ -68,7 +68,11 @@ describe("ZPAY payment return handoff", () => {
     const response = await GET(new Request(`https://www.enhe-tech.com.cn/api/zpay/return/${ticket}?trade_status=TRADE_SUCCESS`), params);
 
     expect(response.status).toBe(202);
-    expect(await response.text()).toMatch(/正在确认付款|payment confirmation/i);
+    const html = await response.text();
+    expect(html).toMatch(/正在确认付款|payment confirmation/i);
+    expect(html).toContain('href="/fonts/oppo-sans-4/oppo-sans-4.0-4f58dbaeaea7.ttf" as="font"');
+    expect(html).toContain('font-family:"OPPO Sans 4.0"');
+    expect(html).toContain('src:url("/fonts/oppo-sans-4/oppo-sans-4.0-4f58dbaeaea7.ttf")');
     expect(mocks.consumeTicket).not.toHaveBeenCalled();
     expect(mocks.createSession).not.toHaveBeenCalled();
   });
@@ -79,6 +83,9 @@ describe("ZPAY payment return handoff", () => {
     const response = await GET(new Request(`https://www.enhe-tech.com.cn/api/zpay/return/${ticket}`), params);
 
     expect(response.status).toBe(410);
+    const html = await response.text();
+    expect(html).toContain('href="/fonts/oppo-sans-4/oppo-sans-4.0-4f58dbaeaea7.ttf" as="font"');
+    expect(html).toContain('font-family:"OPPO Sans 4.0"');
     expect(response.headers.get("set-cookie")).toBeNull();
     expect(mocks.createSession).not.toHaveBeenCalled();
   });
@@ -97,5 +104,22 @@ describe("ZPAY payment return handoff", () => {
     expect(response.status).toBe(410);
     expect(mocks.consumeTicket).not.toHaveBeenCalled();
     expect(mocks.createSession).not.toHaveBeenCalled();
+  });
+
+  it("uses the site font on the payment confirmation error page", async () => {
+    mocks.transaction.mockRejectedValue(new Error("database unavailable"));
+    const consoleError = vi.spyOn(console, "error").mockImplementation(() => undefined);
+
+    try {
+      const response = await GET(new Request(`https://www.enhe-tech.com.cn/api/zpay/return/${ticket}`), params);
+      const html = await response.text();
+
+      expect(response.status).toBe(503);
+      expect(response.headers.get("content-type")).toContain("text/html");
+      expect(html).toContain('href="/fonts/oppo-sans-4/oppo-sans-4.0-4f58dbaeaea7.ttf" as="font"');
+      expect(html).toContain('font-family:"OPPO Sans 4.0"');
+    } finally {
+      consoleError.mockRestore();
+    }
   });
 });

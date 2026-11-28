@@ -137,6 +137,36 @@ for (const locale of ["zh", "en"] as const) {
 }
 
 for (const locale of ["zh", "en"] as const) {
+  for (const width of [390, 1440]) {
+    test(`${locale} standalone error pages load the site font at ${width}px`, async ({ page }) => {
+      test.setTimeout(90_000);
+      const family = locale === "zh" ? "OPPO Sans 4.0" : "MiSans";
+      const fontPath = locale === "zh" ? oppoFontPath : `/fonts/misans-latin/${misansAssets[0].file}`;
+      const fontResponses: string[] = [];
+      page.on("response", (response) => {
+        if (response.ok() && new URL(response.url()).pathname === fontPath) fontResponses.push(response.url());
+      });
+      await page.setViewportSize({ width, height: 900 });
+
+      const missingPageResponse = await page.goto(locale === "zh" ? "/__font-audit-missing-page__" : "/en/__font-audit-missing-page__");
+      expect(missingPageResponse?.status()).toBe(404);
+      expect(await page.locator("html").getAttribute("lang")).toBe(locale === "zh" ? "zh-CN" : "en-US");
+      expect(firstFamily(await page.locator("body").evaluate((element) => getComputedStyle(element).fontFamily))).toBe(family);
+      expect((await loadedFont(page, family, locale === "zh" ? "页面未找到返回首页" : "Page not found Return home"))
+        .every((face) => face.status === "loaded" && face.family === family)).toBe(true);
+      expect(fontResponses.length).toBeGreaterThan(0);
+      expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBeLessThanOrEqual(width);
+
+      const paymentReturnResponse = await page.goto("/api/zpay/return/font-audit-invalid-ticket");
+      expect(paymentReturnResponse?.status()).toBe(410);
+      expect(await page.locator("html").getAttribute("lang")).toBe("zh-CN");
+      expect(firstFamily(await page.locator("body").evaluate((element) => getComputedStyle(element).fontFamily))).toBe("OPPO Sans 4.0");
+      expect((await loadedFont(page, "OPPO Sans 4.0", "支付返回链接已失效请登录"))
+        .every((face) => face.status === "loaded" && face.family === "OPPO Sans 4.0")).toBe(true);
+      expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBeLessThanOrEqual(width);
+    });
+  }
+
   test(`${locale} real AI trend report srcdoc loads its font inside the restricted sandbox`, async ({ page, browserName }) => {
     test.setTimeout(90_000);
     if (browserName === "chromium") {

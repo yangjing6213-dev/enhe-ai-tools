@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { getAuthSecret, hashSessionToken, signHeaderUserCookieValue, signSessionCookieValue, createSessionToken } from "@/lib/auth-security";
 import { headerUserCookieName } from "@/lib/header-user-cookie";
 import { prisma } from "@/lib/db";
+import { standalonePageTypographyMarkup } from "@/lib/standalone-page-typography";
 import {
   getZpayPaymentReturnOrderId,
   isZpayPaymentReturnToken,
@@ -26,14 +27,14 @@ function noStoreHeaders() {
 
 function invalidTicketResponse() {
   return new NextResponse(
-    '<!doctype html><html lang="zh-CN"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>支付返回链接已失效</title><body><main><h1>支付返回链接已失效</h1><p>请登录后在用户中心查看订单状态。</p><a href="/login">返回登录</a></main></body></html>',
+    `<!doctype html><html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">${standalonePageTypographyMarkup("zh")}<title>支付返回链接已失效</title></head><body><main><h1>支付返回链接已失效</h1><p>请登录后在用户中心查看订单状态。</p><a href="/login">返回登录</a></main></body></html>`,
     { status: 410, headers: { ...noStoreHeaders(), "Content-Type": "text/html; charset=utf-8" } },
   );
 }
 
 function paymentPendingResponse() {
   return new NextResponse(
-    '<!doctype html><html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta http-equiv="refresh" content="3"><title>正在确认付款</title></head><body><main><h1>正在确认付款</h1><p>支付结果确认后，将自动进入用户中心。</p><p>页面会自动重试，请勿重复付款。</p></main></body></html>',
+    `<!doctype html><html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta http-equiv="refresh" content="3">${standalonePageTypographyMarkup("zh")}<title>正在确认付款</title></head><body><main><h1>正在确认付款</h1><p>支付结果确认后，将自动进入用户中心。</p><p>页面会自动重试，请勿重复付款。</p></main></body></html>`,
     { status: 202, headers: { ...noStoreHeaders(), "Content-Type": "text/html; charset=utf-8" } },
   );
 }
@@ -127,6 +128,9 @@ export async function GET(request: Request, { params }: PaymentReturnPageProps) 
     return response;
   } catch (error) {
     console.error("[zpay] payment return handler failed", error);
-    return new NextResponse("暂时无法确认付款，请稍后重试。", { status: 503, headers: noStoreHeaders() });
+    return new NextResponse(
+      `<!doctype html><html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">${standalonePageTypographyMarkup("zh")}<title>付款确认暂不可用</title></head><body><main><h1>付款确认暂不可用</h1><p>暂时无法确认付款，请稍后重试。</p></main></body></html>`,
+      { status: 503, headers: { ...noStoreHeaders(), "Content-Type": "text/html; charset=utf-8", "Content-Language": "zh-CN" } },
+    );
   }
 }
